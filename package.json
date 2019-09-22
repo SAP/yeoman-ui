@@ -1,0 +1,25 @@
+{
+  "name": "yowiz",
+  "version": "0.0.1",
+  "main": "index.js",
+  "description": "yowiz",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "launch": "node out/index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://i034929@github.wdf.sap.corp/i034929/yowiz.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/yeoman-environment": "^2.3.2",
+    "yeoman-environment": "^2.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^12.7.5",
+    "typescript": "^3.6.3"
+  }
+}
