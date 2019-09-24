@@ -1,25 +1,51 @@
 {
-  "name": "yowiz",
-  "version": "0.0.1",
-  "main": "index.js",
-  "description": "yowiz",
-  "scripts": {
-    "build": "tsc",
-    "watch": "tsc -w",
-    "launch": "node out/index"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://i034929@github.wdf.sap.corp/i034929/yowiz.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@types/yeoman-environment": "^2.3.2",
-    "yeoman-environment": "^2.4.0"
-  },
-  "devDependencies": {
-    "@types/node": "^12.7.5",
-    "typescript": "^3.6.3"
-  }
+	"name": "yowiz",
+	"displayName": "yowiz",
+	"publisher": "sap",
+	"description": "",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.38.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"*",
+		"onCommand:sap.loadYowiz"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "sap.loadYowiz",
+				"title": "Load yowiz",
+				"category": "Yowiz"
+			},
+			{
+				"command": "sap.runYowiz",
+				"title": "Run yowiz",
+				"category": "Yowiz"
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./ && cp -r ./src/media/ ./out/",
+		"watch": "tsc -watch -p ./",
+		"postinstall": "node ./node_modules/vscode/bin/install",
+		"test": "npm run compile && node ./node_modules/vscode/bin/test"
+	},
+	"dependencies": {
+		"yeoman-environment": "^2.4.0"
+	},
+	"devDependencies": {
+		"@types/inquirer": "^6.5.0",
+		"@types/mocha": "^2.2.42",
+		"@types/node": "^10.12.21",
+		"@types/yeoman-environment": "^2.3.2",
+		"tslint": "^5.12.1",
+		"typescript": "^3.3.1",
+		"vscode": "^1.1.28"
+	}
 }
