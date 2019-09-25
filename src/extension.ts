@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { Yowiz } from "./yowiz";
+import inquirer = require('inquirer');
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
@@ -12,8 +13,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand('sap.runYowiz', async () => {
 			if (YowizPanel.currentPanel) {
-				const generatorsList: string[] = await YowizPanel.yowiz.getGenerators();
-				const selectedItem = await vscode.window.showQuickPick(generatorsList);
+				const selectedItem = await vscode.window.showQuickPick(YowizPanel.yowiz.getGenerators(), {placeHolder: "Choose a generator..."});
 				if (selectedItem) {
 					YowizPanel.yowiz.run(selectedItem);
 				}
@@ -124,8 +124,8 @@ export class YowizPanel {
 		this._panel.webview.postMessage({ command: 'refactor' });
 	}
 
-	public sendQuestions(q: string) {
-		this._panel.webview.postMessage({ command: 'questions', data: q });
+	public sendQuestions(questions: inquirer.QuestionCollection<any>) {
+		this._panel.webview.postMessage({ command: 'questions', data: questions });
 	}
 
 	public dispose() {

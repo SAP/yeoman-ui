@@ -13,11 +13,14 @@ export class Yowiz {
     this._env = Environment.createEnv(undefined, undefined, wizAdapter);
   }
 
-  public async getGenerators(): Promise<string[]> {
-    const promise: Promise<string[]> = new Promise((resolve, reject) => {
-      this._env.lookup(() => {
-        resolve(this._env.getGeneratorNames());
-      });
+  public getGenerators(): Promise<string[]> {
+    const promise: Promise<string[]> = new Promise((resolve) => {
+      // setTimeout() is a hack to overcome the fact that yeoman-environment lookup() is synchronous
+      setTimeout(() => {
+        this._env.lookup(() => {
+          resolve(this._env.getGeneratorNames());
+        });
+      }, 100);
     });
     return promise;
   }
