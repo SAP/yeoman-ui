@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <!--
+                Use a content security policy to only allow loading images from https or from our extension directory,
+                and only allow scripts that have a specific nonce.
+                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} http:; script-src 'nonce-${nonce}' http: ${webview.cspSource};">
+                -->
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yowiz</title>
+</head>
+
+<body>
+    <h1 id="generatorName">No Generator</h1>
+    <div id="questions">no questions</div>
+
+    <script src=/main.js nonce="${nonce}"></script>
+</body>
+
+</html>
