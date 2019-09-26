@@ -30,6 +30,8 @@
 		]
 	},
 	"scripts": {
+		"vue:prep": "cd ../vue && npm i",
+		"vue:cp": "cd ../vue && npm run build && cd ../ext && rm -rf out/media && cp -r  ../vue/dist/ out/media",
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./ && cp -r ./src/media/ ./out/",
 		"watch": "tsc -watch -p ./",
@@ -44,6 +46,7 @@
 		"@types/mocha": "^2.2.42",
 		"@types/node": "^10.12.21",
 		"@types/yeoman-environment": "^2.3.2",
+		"cpx": "^1.5.0",
 		"tslint": "^5.12.1",
 		"typescript": "^3.6.1",
 		"vscode": "^1.1.28"
