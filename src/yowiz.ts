@@ -14,6 +14,12 @@ export class Yowiz {
   }
 
   public getGenerators(): Promise<string[]> {
+    // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
+    // on the other hand, we never look for newly installed generators...
+    if (this._env.getGeneratorNames().length > 0) {
+      return Promise.resolve(this._env.getGeneratorNames());
+    }
+
     const promise: Promise<string[]> = new Promise((resolve) => {
       // setTimeout() is a hack to overcome the fact that yeoman-environment lookup() is synchronous
       setTimeout(() => {
@@ -26,17 +32,11 @@ export class Yowiz {
   }
 
   public run(generatorName: string) {
-    // The #lookup() method will search the user computer for installed generators.
-    // The search if done from the current working directory.
-    const genNames = this._env.getGeneratorNames();
-    console.log(genNames);
-    this._env.lookup(() => {
-      this._env.run(generatorName, {'skip-install': true}, err => {
-        if (err) {
-          console.error(err);
-        }
-        console.log('done running yowiz');
-      });
+    this._env.run(generatorName, {'skip-install': true}, err => {
+      if (err) {
+        console.error(err);
+      }
+      console.log('done running yowiz');
     });
   }
 }

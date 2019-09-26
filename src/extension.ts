@@ -15,6 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
 			if (YowizPanel.currentPanel) {
 				const selectedItem = await vscode.window.showQuickPick(YowizPanel.yowiz.getGenerators(), {placeHolder: "Choose a generator..."});
 				if (selectedItem) {
+					YowizPanel.currentPanel.initWizard(selectedItem);
 					YowizPanel.yowiz.run(selectedItem);
 				}
 			}
@@ -47,6 +48,8 @@ export class YowizPanel {
 	private readonly _panel: vscode.WebviewPanel;
 	private readonly _extensionPath: string;
 	private _disposables: vscode.Disposable[] = [];
+	private _questionsResolutions: Map<number, any>;
+	private _taskId: number;
 
 	public static createOrShow(extensionPath: string) {
 		const column = vscode.window.activeTextEditor
@@ -83,6 +86,8 @@ export class YowizPanel {
 	}
 
 	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
+		this._questionsResolutions = new Map();
+		this._taskId = 0;
 		this._panel = panel;
 		this._extensionPath = extensionPath;
 
@@ -111,21 +116,28 @@ export class YowizPanel {
 					case 'alert':
 						vscode.window.showErrorMessage(message.text);
 						return;
-				}
+					case 'answers':
+						const resolve = this._questionsResolutions.get(message.taskId);
+						resolve(message.data);
+						return;
+					}
 			},
 			null,
 			this._disposables
 		);
 	}
 
-	public doRefactor() {
-		// Send a message to the webview webview.
-		// You can send any JSON serializable data.
-		this._panel.webview.postMessage({ command: 'refactor' });
+	public initWizard(generatorName: string) {
+		this._panel.webview.postMessage({ command: 'initWizard', generatorName: generatorName });
 	}
 
-	public sendQuestions(questions: inquirer.QuestionCollection<any>) {
-		this._panel.webview.postMessage({ command: 'questions', data: questions });
+	public askQuestions(questions: inquirer.QuestionCollection<any>): Promise<inquirer.Answers> {
+		const taskId = this._taskId++;
+		const promise: Promise<inquirer.Answers> = new Promise((resolve, reject) => {
+			this._panel.webview.postMessage({ command: 'questions', taskId: taskId, data: questions });
+			this._questionsResolutions.set(taskId, resolve);
+		});
+		return promise;
 	}
 
 	public dispose() {
@@ -194,8 +206,7 @@ export class YowizPanel {
                 <title>Yowiz</title>
             </head>
             <body>
-                <h1>${name}</h1>
-                <h1 id="lines-of-code-counter">0</h1>
+                <h1 id="generatorName">${name}</h1>
                 <div id="questions">no questions</div>
 
                 <script nonce="${nonce}" src="${scriptUri}"></script>

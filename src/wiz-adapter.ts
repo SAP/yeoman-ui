@@ -56,7 +56,6 @@ export class WizAdapter implements Adapter {
     questions: Adapter.Questions<T1>,
     cb?: (res: T1) => T2
   ): Promise<T2> {
-    let answers: inquirer.Answers | undefined = undefined;
     if (this._messaging && questions) {
       return (<Promise<T2>>this._messaging.askQuestions(questions));
     } else {

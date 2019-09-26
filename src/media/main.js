@@ -5,47 +5,38 @@
 
     const oldState = vscode.getState();
 
-    const counter = document.getElementById('lines-of-code-counter');
+    const generatorNameElement = document.getElementById('generatorName');
     const questionsElement = document.getElementById('questions');
+
     console.log(oldState);
-    let currentCount = (oldState && oldState.count) || 0;
-    counter.textContent = currentCount;
-
-    // setInterval(() => {
-    //     counter.textContent = currentCount++;
-
-    //     // Update state
-    //     vscode.setState({ count: currentCount });
-
-    //     // Alert the extension when the cat introduces a bug
-    //     if (Math.random() < Math.min(0.001 * currentCount, 0.05)) {
-    //         // Send a message back to the extension
-    //         vscode.postMessage({
-    //             command: 'alert',
-    //             text: '🐛  on line ' + currentCount
-    //         });
-    //     }
-    // }, 100);
 
     // Handle messages sent from the extension to the webview
     window.addEventListener('message', event => {
-        const message = event.data; // The json data that the extension sent
+        const message = event.data;
 
         switch (message.command) {
-            case 'refactor':
-                currentCount = Math.ceil(currentCount * 0.5);
-                counter.textContent = currentCount;
+            case 'initWizard':
+                generatorNameElement.textContent = message.generatorName;
+                questionsElement.textContent = "";
                 break;
             case 'questions':
-                debugger;
                 let questions = message.data;
+                const answers = {};
                 if (questions.length) {
                     for (let i in questions) {
                         const question = questions[i];
                         const p = document.createElement("p");
-                        p.textContent = question.message;
+                        p.textContent = `[${question.type}]: ${question.message}`;
                         questionsElement.appendChild(p);
+
+                        answers[question.name] = `The answer to ${question.message}`;
                     }
+                    
+                    vscode.postMessage({
+                        command: "answers",
+                        taskId: message.taskId,
+                        data: answers
+                    });
                 }
                 break;
             }
