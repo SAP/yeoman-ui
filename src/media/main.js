@@ -13,7 +13,6 @@
     // Handle messages sent from the extension to the webview
     window.addEventListener('message', event => {
         const message = event.data;
-
         switch (message.command) {
             case 'initWizard':
                 generatorNameElement.textContent = message.generatorName;
