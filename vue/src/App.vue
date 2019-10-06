@@ -8,22 +8,41 @@
       :stepName="steps[stepIndex].name"
     />
 
-    <Step v-if="steps.length" :currentStep="steps[stepIndex]" :next="next" />
-    <div class="navigation">
-      <b-button @click="next" variant="success" :disabled="stepIndex===steps.length-1">Next</b-button>
-      <b-button variant="primary" :disabled="stepIndex<steps.length-1">Finish</b-button>
-    </div>
+    <b-container class="bv-example-row">
+      <b-row>
+        <b-col sm="auto">
+          <b-container>
+            <Navigation
+              v-if="steps.length"
+              :currentStep="stepIndex"
+              :steps="steps"
+            />
+          </b-container>
+        </b-col>
+        <b-col>
+          <b-container>
+            <Step v-if="steps.length" :currentStep="steps[stepIndex]" :next="next" />
+            <div class="navigation">
+              <b-button @click="next" variant="success" :disabled="stepIndex===steps.length-1">Next</b-button>
+              <b-button variant="primary" :disabled="stepIndex<steps.length-1">Finish</b-button>
+            </div>
+          </b-container>
+        </b-col>
+      </b-row>
+    </b-container>
   </div>
 </template>
 
 <script>
 import Header from "./components/Header.vue";
+import Navigation from "./components/Navigation.vue";
 import Step from "./components/Step.vue";
 
 export default {
   name: "app",
   components: {
     Header,
+    Navigation,
     Step
   },
   data() {
@@ -44,7 +63,7 @@ export default {
   },
   mounted() {
     //todo: add validate support
-    document.body.className = "vscode-dark"
+    document.body.className = "vscode-dark";
     this.yeomanName = "yeoman generator";
     let checkboxQ = {
       type: "checkbox",
@@ -100,5 +119,4 @@ export default {
   font-weight: var(--vscode-editor-font-weight);
   font-size: var(--vscode-editor-font-size);
 }
-
 </style>
