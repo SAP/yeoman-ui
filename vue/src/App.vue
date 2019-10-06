@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <Header
+      v-if="steps.length"
       :currentStep="stepIndex+1"
       :numOfSteps="steps.length"
       :yeomanName="yeomanName"
@@ -43,7 +44,7 @@ export default {
   },
   mounted() {
     //todo: add validate support
-
+    document.body.className = "vscode-dark"
     this.yeomanName = "yeoman generator";
     let checkboxQ = {
       type: "checkbox",
@@ -92,18 +93,12 @@ export default {
   /* -webkit-font-smoothing: antialiased; */
   /* -moz-osx-font-smoothing: grayscale; */
   /* text-align: center; */
-  color: #2c3e50;
+  /* color: #2c3e50; */
   margin-top: 60px;
-}
-body.vscode-light {
-  color: black;
-}
-
-body.vscode-dark {
-  color: white;
+  background-color: var(--vscode-editor-foreground);
+  font-family: var(--vscode-editor-font-family);
+  font-weight: var(--vscode-editor-font-weight);
+  font-size: var(--vscode-editor-font-size);
 }
 
-body.vscode-high-contrast {
-  color: red;
-}
 </style>
