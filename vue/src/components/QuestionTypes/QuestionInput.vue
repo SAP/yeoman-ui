@@ -1,6 +1,5 @@
 <template>
   <div class="question-input-container">
-    <hr class="my-input-question" />
 
     <b-form-input v-model="text" v-bind:placeholder="currentQuestion.default_answer"></b-form-input>
 
@@ -19,8 +18,8 @@ export default {
       }
   },
   watch: {
-      text: (te)=>{
-          console.log(te);
+      text: ()=>{
+          // console.log(te);
       }
   }
 };

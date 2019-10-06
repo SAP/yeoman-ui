@@ -7,20 +7,11 @@
       :stepName="steps[stepIndex].name"
     />
 
-    <b-container class="bv-example-row">
-      <b-row>
-        <b-col>
-          <Step v-if="steps.length" :currentStep="steps[stepIndex]" :next="next" />
-        </b-col>
-      </b-row>
-
-      <b-row>
-        <b-col>
-          <b-button @click="next" variant="success" :disabled="stepIndex===steps.length-1">Next</b-button>
-          <b-button variant="primary" :disabled="stepIndex<steps.length-1">Finish</b-button>
-        </b-col>
-      </b-row>
-    </b-container>
+    <Step v-if="steps.length" :currentStep="steps[stepIndex]" :next="next" />
+    <div class="navigation">
+      <b-button @click="next" variant="success" :disabled="stepIndex===steps.length-1">Next</b-button>
+      <b-button variant="primary" :disabled="stepIndex<steps.length-1">Finish</b-button>
+    </div>
   </div>
 </template>
 
@@ -97,11 +88,22 @@ export default {
 
 <style>
 #app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
+  /* font-family: "Avenir", Helvetica, Arial, sans-serif; */
+  /* -webkit-font-smoothing: antialiased; */
+  /* -moz-osx-font-smoothing: grayscale; */
+  /* text-align: center; */
   color: #2c3e50;
   margin-top: 60px;
+}
+body.vscode-light {
+  color: black;
+}
+
+body.vscode-dark {
+  color: white;
+}
+
+body.vscode-high-contrast {
+  color: red;
 }
 </style>

@@ -1,6 +1,5 @@
 <template>
   <div class="question-confirm-container">
-    <hr class="my-confirm-question" />
 
     <b-list-group>
       <b-list-group-item @click="selected = 'yes'" :class="{selected:selected == 'yes'}">Yes</b-list-group-item>

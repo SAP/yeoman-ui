@@ -1,8 +1,6 @@
 <template>
   <div class="question-checkbox-container">
-    <hr class="my-checkbox-question" />
 
-    <b-form-group label="Individual stacked checkboxes (default)">
       <b-form-checkbox
         v-for="answer in currentQuestion.answers"
         :key="answer"
@@ -10,7 +8,7 @@
         :options="answer"
         name="flavour-3a"
       >{{ answer }}</b-form-checkbox>
-    </b-form-group>
+
   </div>
 </template>
 <script>

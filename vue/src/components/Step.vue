@@ -1,11 +1,17 @@
 <template>
   <div>
-    <QuestionTypeSelector v-for="(item, index) in currentStep.questions" :key="index" :currentQuestion="item" :next="next" />
+    <b-form>
+      <QuestionTypeSelector
+        v-for="(item, index) in currentStep.questions"
+        :key="index"
+        :currentQuestion="item"
+        :next="next"
+      />
+    </b-form>
   </div>
 </template>
 
 <script>
-
 import QuestionTypeSelector from "./QuestionTypeSelector.vue";
 
 export default {
@@ -14,8 +20,8 @@ export default {
     QuestionTypeSelector
   },
   props: {
-      currentStep: Object,
-      currentQuestion: Object,
+    currentStep: Object,
+    currentQuestion: Object,
     next: Function
   },
   data() {

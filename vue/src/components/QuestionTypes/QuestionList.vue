@@ -1,6 +1,5 @@
 <template>
   <div class="question-list-container">
-    <hr class="my-list-question" />
 
     <b-list-group>
       <b-list-group-item

@@ -1,8 +1,6 @@
 <template>
   <div>
-    <b-jumbotron>
-      <template v-slot:lead>{{ currentQuestion.question }}</template>
-
+    <b-form-group :label="currentQuestion.question">
       <QuestionInput v-if="currentQuestion.type==='input'" :currentQuestion="currentQuestion" />
 
       <QuestionList v-if="currentQuestion.type==='list'" :currentQuestion="currentQuestion" />
@@ -10,9 +8,7 @@
       <QuestionConfirm v-if="currentQuestion.type==='confirm'" :currentQuestion="currentQuestion" />
 
       <QuestionCheckbox v-if="currentQuestion.type==='checkbox'" :currentQuestion="currentQuestion" />
-
-
-    </b-jumbotron>
+    </b-form-group>
   </div>
 </template>
 
