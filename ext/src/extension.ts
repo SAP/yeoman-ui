@@ -142,16 +142,14 @@ export class YowizPanel {
 	}
 
 	public initWizard(generatorName: string) {
-		this._panel.webview.postMessage({ command: 'initWizard', generatorName: generatorName });
+		this._rpc.invoke("setGeneratorName", [generatorName]);
 	}
 
 	public askQuestions(questions: inquirer.QuestionCollection<any>): Promise<inquirer.Answers> {
-		const taskId = this._taskId++;
-		const promise: Promise<inquirer.Answers> = new Promise((resolve, reject) => {
-			this._panel.webview.postMessage({ command: 'questions', taskId: taskId, data: questions });
-			this._questionsResolutions.set(taskId, resolve);
-		});
-		return promise;
+		return this._rpc.invoke("receivePrompts", [questions]).then((response => {
+			vscode.window.showInformationMessage(response);
+			return Promise.resolve([]);
+		}));
 	}
 
 	public dispose() {
@@ -203,7 +201,8 @@ export class YowizPanel {
 		);
 		const scriptUri = webview.asWebviewUri(scriptPathOnDisk);
 
-		// very fragile: assuming double quotes and src is first attribute
+		// TODO: very fragile: assuming double quotes and src is first attribute
+		// specifically, doesn't work when building vue for development (vue-cli-service build --mode development)
 		indexHtml = indexHtml.replace(/<link href=/g, `<link href=${scriptUri.toString()}`);
 		indexHtml = indexHtml.replace(/<script src=/g, `<script src=${scriptUri.toString()}`);
 		return indexHtml;

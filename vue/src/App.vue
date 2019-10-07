@@ -12,11 +12,7 @@
       <b-row>
         <b-col sm="auto">
           <b-container>
-            <Navigation
-              v-if="steps.length"
-              :currentStep="stepIndex"
-              :steps="steps"
-            />
+            <Navigation v-if="steps.length" :currentStep="stepIndex" :steps="steps" />
           </b-container>
         </b-col>
         <b-col>
@@ -60,14 +56,40 @@ export default {
   methods: {
     next() {
       this.stepIndex++;
+    },
+    setGeneratorName(name) {
+      this.yeomanName = name;
+    },
+    receivePrompts(questions) {
+      // eslint-disable-line no-unused-vars
+      // eslint-disable-next-line
+      console.dir(questions);
+      // eslint-disable-next-line
+      console.log("received questions");
+      const prompt = { questions: questions, name: Math.random() };
+      this.prompts.push(prompt);
+      return "received questions";
+    },
+    initRpc() {
+      if (acquireVsCodeApi && typeof acquireVsCodeApi === "function") {
+        const vscode = acquireVsCodeApi();
+        const rpc = new RpcBrowser(window, vscode);
+        rpc.registerMethod({
+          func: this.receivePrompts,
+          thisArg: this,
+          name: "receivePrompts"
+        });
+        rpc.registerMethod({
+          func: this.setGeneratorName,
+          thisArg: this,
+          name: "setGeneratorName"
+        });
+        rpc.invoke("showMessage", ["message from yowiz webview"]);
+      }
     }
   },
   mounted() {
-    if (acquireVsCodeApi && typeof acquireVsCodeApi === 'function') {
-      const vscode = acquireVsCodeApi();
-      const rpc = new RpcBrowser(window, vscode);
-      rpc.invoke("showMessage", ["message from yowiz webview"]);
-    }
+    this.initRpc();
 
     //todo: add validate support
     document.body.className = "vscode-dark";
