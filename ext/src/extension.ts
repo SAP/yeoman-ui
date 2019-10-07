@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { Yowiz } from "./yowiz";
 import inquirer = require('inquirer');
+import { RpcExtenstion } from './rpc/rpc-extension';
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
@@ -14,7 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand('sap.runYowiz', async () => {
 			if (YowizPanel.currentPanel) {
-				const selectedItem = await vscode.window.showQuickPick(YowizPanel.yowiz.getGenerators(), {placeHolder: "Choose a generator..."});
+				const selectedItem = await vscode.window.showQuickPick(YowizPanel.yowiz.getGenerators(), { placeHolder: "Choose a generator..." });
 				if (selectedItem) {
 					YowizPanel.currentPanel.initWizard(selectedItem);
 					YowizPanel.yowiz.run(selectedItem);
@@ -42,6 +43,7 @@ export class YowizPanel {
 	 * Track the currently panel. Only allow a single panel to exist at a time.
 	 */
 	public static currentPanel: YowizPanel | undefined;
+	private _rpc: RpcExtenstion;
 
 	public static readonly viewType = 'yowiz';
 
@@ -86,11 +88,22 @@ export class YowizPanel {
 		this.yowiz = new Yowiz(YowizPanel.currentPanel);
 	}
 
+	showMessage(message: string) {
+		let _vscode = vscode;
+		return new Promise((resolve, reject) => {
+			_vscode.window.showInformationMessage(message, "yes", "no").then((res) => {
+				resolve(res);
+			});
+		});
+	}
+
 	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
 		this._questionsResolutions = new Map();
 		this._taskId = 0;
 		this._panel = panel;
 		this._extensionPath = extensionPath;
+		this._rpc = new RpcExtenstion(this._panel.webview);
+		this._rpc.registerMethod({ func: this.showMessage, thisArg: this });
 
 		// Set the webview's initial html content
 		this._update();
@@ -121,7 +134,7 @@ export class YowizPanel {
 						const resolve = this._questionsResolutions.get(message.taskId);
 						resolve(message.data);
 						return;
-					}
+				}
 			},
 			null,
 			this._disposables
