@@ -17,7 +17,8 @@
         </b-col>
         <b-col>
           <b-container>
-            <Step v-if="steps.length" :currentStep="steps[stepIndex]" :next="next" />
+            <GeneratorSelection v-if="selectedGenerator" :generators="generators" />
+            <Step v-if="!selectedGenerator && steps.length" :currentStep="steps[stepIndex]" :next="next" />
             <div class="navigation">
               <b-button @click="next" variant="success" :disabled="stepIndex===steps.length-1">Next</b-button>
               <b-button variant="primary" :disabled="stepIndex<steps.length-1">Finish</b-button>
@@ -31,6 +32,7 @@
 
 <script>
 import Header from "./components/Header.vue";
+import GeneratorSelection from "./components/GeneratorSelection.vue";
 import Navigation from "./components/Navigation.vue";
 import Step from "./components/Step.vue";
 import { RpcBrowser } from "./rpc/rpc-browser.js";
@@ -39,6 +41,7 @@ export default {
   name: "app",
   components: {
     Header,
+    GeneratorSelection,
     Navigation,
     Step
   },
@@ -51,7 +54,9 @@ export default {
       stepIndex: 0,
       index: 0,
       numTotal: 0,
-      rpc: Object
+      rpc: Object,
+      selectedGenerator: true,
+      generators: []
     };
   },
   methods: {
@@ -83,8 +88,8 @@ export default {
       this.rpc.invoke("runGenerator", [generatorName]);
     },
     initRpc() {
-      if (acquireVsCodeApi && typeof acquireVsCodeApi === "function") {
-        const vscode = acquireVsCodeApi();
+      if (window.acquireVsCodeApi && typeof window.acquireVsCodeApi === "function") {
+        const vscode = window.acquireVsCodeApi();
         const rpc = new RpcBrowser(window, vscode);
         this.rpc = rpc;
         rpc.registerMethod({
@@ -108,6 +113,26 @@ export default {
   },
   mounted() {
     this.initRpc();
+
+    let generator1 = {
+      name: "generator 1",
+      description: "Some quick example text of the generator description. This is a long text so that the example will look good.",
+      imageUrl : "https://picsum.photos/600/300/?image=11"
+    }
+
+    let generator2 = {
+      name: "generator 2",
+      description: "Some quick example text of the generator description. This is a long text so that the example will look good.",
+      imageUrl : "https://picsum.photos/600/300/?image=22"
+    }
+
+    let generator3 = {
+      name: "generator 3",
+      description: "Some quick example text of the generator description. This is a long text so that the example will look good.",
+      imageUrl : "https://picsum.photos/600/300/?image=33"
+    }
+
+    this.generators = [generator1, generator2, generator3];
 
     //todo: add validate support
     this.yeomanName = "yeoman generator";
