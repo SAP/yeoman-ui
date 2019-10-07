@@ -71,12 +71,12 @@ export default {
   margin-bottom: 15px;
 }
 .list-group-item:hover {
-  background: #eee;
+  background: var(--list-hoverBackground);
   cursor: pointer;
 }
 
 .selected {
-  background-color: lightblue;
+  background-color: var(--list-activeSelectionBackground);
 }
 
 .correct {

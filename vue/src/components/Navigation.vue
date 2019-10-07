@@ -26,6 +26,13 @@ export default {
 </script>
 <style scoped>
 .selected {
-  background-color: lightblue;
+  background-color: var(--list-activeSelectionBackground);
+}
+.list-group {
+  margin-bottom: 15px;
+}
+.list-group-item:hover {
+  background: var(--list-hoverBackground);
+  cursor: pointer;
 }
 </style>

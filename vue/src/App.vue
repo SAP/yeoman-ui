@@ -63,7 +63,6 @@ export default {
   },
   mounted() {
     //todo: add validate support
-    document.body.className = "vscode-dark";
     this.yeomanName = "yeoman generator";
     let checkboxQ = {
       type: "checkbox",
@@ -112,9 +111,9 @@ export default {
   /* -webkit-font-smoothing: antialiased; */
   /* -moz-osx-font-smoothing: grayscale; */
   /* text-align: center; */
-  /* color: #2c3e50; */
-  margin-top: 60px;
-  background-color: var(--vscode-editor-foreground);
+  /* margin-top: 60px; */
+  color: white;
+  background-color: var(--vscode-editor-background);
   font-family: var(--vscode-editor-font-family);
   font-weight: var(--vscode-editor-font-weight);
   font-size: var(--vscode-editor-font-size);
