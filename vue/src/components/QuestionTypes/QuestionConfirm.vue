@@ -23,9 +23,9 @@ export default {
   watch: {
   },
   mounted() {
-      if (this.currentQuestion.defaultAnswer === "yes") {
+      if (this.currentQuestion.default === "yes") {
         this.selected = "yes";
-      } else if (this.currentQuestion.defaultAnswer === "no") {
+      } else if (this.currentQuestion.default === "no") {
         this.selected = "no";
       } else {
         this.selected = undefined;

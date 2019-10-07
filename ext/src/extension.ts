@@ -194,17 +194,18 @@ export class YowizPanel {
 	private _getHtmlForWebview(webview: vscode.Webview, name: string) {
 		// TODO: don't use sync
 		let indexHtml: string = fs.readFileSync(path.join(__dirname, "media", "index.html"), "utf8");
+		if (indexHtml) {
+			// Local path to main script run in the webview
+			const scriptPathOnDisk = vscode.Uri.file(
+				path.join(this._extensionPath, 'out/media')
+			);
+			const scriptUri = webview.asWebviewUri(scriptPathOnDisk);
 
-		// Local path to main script run in the webview
-		const scriptPathOnDisk = vscode.Uri.file(
-			path.join(this._extensionPath, 'out/media')
-		);
-		const scriptUri = webview.asWebviewUri(scriptPathOnDisk);
-
-		// TODO: very fragile: assuming double quotes and src is first attribute
-		// specifically, doesn't work when building vue for development (vue-cli-service build --mode development)
-		indexHtml = indexHtml.replace(/<link href=/g, `<link href=${scriptUri.toString()}`);
-		indexHtml = indexHtml.replace(/<script src=/g, `<script src=${scriptUri.toString()}`);
+			// TODO: very fragile: assuming double quotes and src is first attribute
+			// specifically, doesn't work when building vue for development (vue-cli-service build --mode development)
+			indexHtml = indexHtml.replace(/<link href=/g, `<link href=${scriptUri.toString()}`);
+			indexHtml = indexHtml.replace(/<script src=/g, `<script src=${scriptUri.toString()}`);
+		}
 		return indexHtml;
 	}
 }

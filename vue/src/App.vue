@@ -95,24 +95,24 @@ export default {
     this.yeomanName = "yeoman generator";
     let checkboxQ = {
       type: "checkbox",
-      question: "checkbox: what is checkbox?",
-      answers: ["a", "b", "c", "d"]
+      message: "checkbox: what is checkbox?",
+      choices: ["a", "b", "c", "d"]
     };
     let inputQ = {
       type: "input",
       default_answer: "input: default answer",
-      question: "input: what is input?"
+      message: "input: what is input?"
     };
     let listQ = {
       type: "list",
-      defaultAnswer: 1,
-      question: "list: what is list?",
-      answers: ["a", "b", "c", "d"]
+      default: 1,
+      message: "list: what is list?",
+      choices: ["a", "b", "c", "d"]
     };
     let confirmQ = {
       type: "confirm",
-      defaultAnswer: "yes",
-      question: "confirm: what is list?"
+      default: "yes",
+      message: "confirm: what is list?"
     };
 
     let prompt1 = {
@@ -141,10 +141,24 @@ export default {
   /* -moz-osx-font-smoothing: grayscale; */
   /* text-align: center; */
   /* margin-top: 60px; */
-  color: white;
-  background-color: var(--vscode-editor-background);
-  font-family: var(--vscode-editor-font-family);
-  font-weight: var(--vscode-editor-font-weight);
-  font-size: var(--vscode-editor-font-size);
+  color: var(--vscode-foreground);
+  background-color: var(--vscode-panel-background);
+  font-family: var(--vscode-font-family);
+  font-weight: var(--vscode-font-weight);
+  font-size: var(--vscode-font-size);
 }
+
+html, body {
+  background-color: var(--vscode-panel-background);
+}
+
+.list-group-item.selected {
+  background-color: var(--vscode-list-active-selection-background);
+}
+
+.form-control {
+  color: var(--vscode-input-foreground);
+  background-color: var(--vscode-input-background);
+}
+
 </style>

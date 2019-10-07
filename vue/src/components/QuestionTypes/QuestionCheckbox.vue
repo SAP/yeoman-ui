@@ -2,12 +2,12 @@
   <div class="question-checkbox-container">
 
       <b-form-checkbox
-        v-for="answer in currentQuestion.answers"
-        :key="answer"
-        :value="answer"
-        :options="answer"
+        v-for="choice in currentQuestion.choices"
+        :key="choice"
+        :value="choice"
+        :options="choice"
         name="flavour-3a"
-      >{{ answer }}</b-form-checkbox>
+      >{{ choice }}</b-form-checkbox>
 
   </div>
 </template>
@@ -58,8 +58,8 @@ export default {
     }
   },
   mounted() {
-    if (this.currentQuestion.defaultAnswer) {
-      this.selectedIndex = this.currentQuestion.defaultAnswer;
+    if (this.currentQuestion.default) {
+      this.selectedIndex = this.currentQuestion.default;
     }
   }
 };

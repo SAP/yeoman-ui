@@ -1,6 +1,8 @@
 <template>
   <div>
-    <b-form-group :label="currentQuestion.question">
+    <b-form-group :label="currentQuestion.message">
+      <!-- TODO: support expand -->
+
       <QuestionInput v-if="currentQuestion.type==='input'" :currentQuestion="currentQuestion" />
 
       <QuestionList v-if="currentQuestion.type==='list'" :currentQuestion="currentQuestion" />

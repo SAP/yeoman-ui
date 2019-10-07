@@ -3,11 +3,11 @@
 
     <b-list-group>
       <b-list-group-item
-        v-for="(answer, index) in currentQuestion.answers"
+        v-for="(choice, index) in currentQuestion.choices"
         :key="index"
         @click.prevent="selectAnswer(index)"
         :class="answerClass(index)"
-      >{{ answer }}</b-list-group-item>
+      >{{ choice }}</b-list-group-item>
     </b-list-group>
 
   </div>
@@ -59,8 +59,8 @@ export default {
     }
   },
   mounted() {
-      if (this.currentQuestion.defaultAnswer) {
-        this.selectedIndex = this.currentQuestion.defaultAnswer;
+      if (this.currentQuestion.default) {
+        this.selectedIndex = this.currentQuestion.default;
       }
   }
 };
@@ -71,12 +71,12 @@ export default {
   margin-bottom: 15px;
 }
 .list-group-item:hover {
-  background: var(--list-hoverBackground);
+  background: var(--vscode-list-hover-background);
   cursor: pointer;
 }
 
 .selected {
-  background-color: var(--list-activeSelectionBackground);
+  background-color: var(--vscode-list-active-selection-background);
 }
 
 .correct {
