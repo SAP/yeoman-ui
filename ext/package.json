@@ -33,7 +33,7 @@
 		"vue:prep": "cd ../vue && npm i",
 		"vue:cp": "cd ../vue && npm run build && cd ../ext && rm -rf out/media && cp -r  ../vue/dist/ out/media",
 		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./ && cp -r ./src/media/ ./out/",
+		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"postinstall": "node ./node_modules/vscode/bin/install",
 		"test": "npm run compile && node ./node_modules/vscode/bin/test"

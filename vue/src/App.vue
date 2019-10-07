@@ -37,6 +37,7 @@
 import Header from "./components/Header.vue";
 import Navigation from "./components/Navigation.vue";
 import Step from "./components/Step.vue";
+import { RpcBrowser } from "./rpc/rpc-browser.js";
 
 export default {
   name: "app",
@@ -62,6 +63,12 @@ export default {
     }
   },
   mounted() {
+    if (acquireVsCodeApi && typeof acquireVsCodeApi === 'function') {
+      const vscode = acquireVsCodeApi();
+      const rpc = new RpcBrowser(window, vscode);
+      rpc.invoke("showMessage", ["message from yowiz webview"]);
+    }
+
     //todo: add validate support
     this.yeomanName = "yeoman generator";
     let checkboxQ = {
