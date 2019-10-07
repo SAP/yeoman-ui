@@ -17,7 +17,7 @@ export class Messaging {
 
   public async askQuestions(questions: Adapter.Questions<any>): Promise<inquirer.Answers> {
     if (this._yowizPanel) {
-      const answers = await this._yowizPanel.askQuestions(questions);
+      const answers = await this._yowizPanel.sendQuestions(questions);
       return answers;
     }
     return Promise.resolve({});

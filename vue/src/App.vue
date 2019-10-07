@@ -50,17 +50,25 @@ export default {
       questions: [],
       stepIndex: 0,
       index: 0,
-      numTotal: 0
+      numTotal: 0,
+      rpc: Object
     };
   },
   methods: {
     next() {
       this.stepIndex++;
     },
-    setGeneratorName(name) {
+
+    receiveGeneratorName(name) {
       this.yeomanName = name;
     },
-    receivePrompts(questions) {
+    receiveGenerators(generators) {
+      // TODO: render generator tiles
+      // eslint-disable-next-line
+      console.dir(generators);
+      return "received generators";
+    },
+    receiveQuestions(questions) {
       // eslint-disable-line no-unused-vars
       // eslint-disable-next-line
       console.dir(questions);
@@ -70,21 +78,31 @@ export default {
       this.prompts.push(prompt);
       return "received questions";
     },
+    runGenerator(generatorName) {
+      // TODO: call this method after user chose which generator to run
+      this.rpc.invoke("runGenerator", [generatorName]);
+    },
     initRpc() {
       if (acquireVsCodeApi && typeof acquireVsCodeApi === "function") {
         const vscode = acquireVsCodeApi();
         const rpc = new RpcBrowser(window, vscode);
+        this.rpc = rpc;
         rpc.registerMethod({
-          func: this.receivePrompts,
+          func: this.receiveGenerators,
           thisArg: this,
-          name: "receivePrompts"
+          name: "receiveGenerators"
         });
         rpc.registerMethod({
-          func: this.setGeneratorName,
+          func: this.receiveQuestions,
           thisArg: this,
-          name: "setGeneratorName"
+          name: "receiveQuestions"
         });
-        rpc.invoke("showMessage", ["message from yowiz webview"]);
+        rpc.registerMethod({
+          func: this.receiveGeneratorName,
+          thisArg: this,
+          name: "receiveGeneratorName"
+        });
+        rpc.invoke("receiveIsWebviewReady", []);
       }
     }
   },

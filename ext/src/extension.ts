@@ -17,7 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
 			if (YowizPanel.currentPanel) {
 				const selectedItem = await vscode.window.showQuickPick(YowizPanel.yowiz.getGenerators(), { placeHolder: "Choose a generator..." });
 				if (selectedItem) {
-					YowizPanel.currentPanel.initWizard(selectedItem);
+					YowizPanel.currentPanel.sendGeneratorName(selectedItem);
 					YowizPanel.yowiz.run(selectedItem);
 				}
 			}
@@ -103,7 +103,9 @@ export class YowizPanel {
 		this._panel = panel;
 		this._extensionPath = extensionPath;
 		this._rpc = new RpcExtenstion(this._panel.webview);
+		this._rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
 		this._rpc.registerMethod({ func: this.showMessage, thisArg: this });
+		this._rpc.registerMethod({ func: this.runGenerator, thisArg: this });
 
 		// Set the webview's initial html content
 		this._update();
@@ -141,12 +143,23 @@ export class YowizPanel {
 		);
 	}
 
-	public initWizard(generatorName: string) {
-		this._rpc.invoke("setGeneratorName", [generatorName]);
+	public sendGeneratorName(generatorName: string) {
+		this._rpc.invoke("receieveGeneratorName", [generatorName]);
 	}
 
-	public askQuestions(questions: inquirer.QuestionCollection<any>): Promise<inquirer.Answers> {
-		return this._rpc.invoke("receivePrompts", [questions]).then((response => {
+	public async receiveIsWebviewReady() {
+		// TODO: loading generators takes a long time; consider prefetching list of generators
+		const generators: string[] = await YowizPanel.yowiz.getGenerators();
+		const response: string = await this._rpc.invoke("receiveGenerators", [generators]);
+		console.log(response);
+	}
+
+	public runGenerator(generatorName: string): void {
+		YowizPanel.yowiz.run(generatorName);
+	}
+
+	public sendQuestions(questions: inquirer.QuestionCollection<any>): Promise<inquirer.Answers> {
+		return this._rpc.invoke("receiveQuestions", [questions]).then((response => {
 			vscode.window.showInformationMessage(response);
 			return Promise.resolve([]);
 		}));
