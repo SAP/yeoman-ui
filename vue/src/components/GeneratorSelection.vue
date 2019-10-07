@@ -14,7 +14,6 @@
       >
         <b-card-text>{{generator.description}}</b-card-text>
 
-        <b-button href="#" variant="primary">Go somewhere</b-button>
       </b-card>
       
     </b-card-group>

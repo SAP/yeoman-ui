@@ -71,6 +71,13 @@ export default {
       // TODO: render generator tiles
       // eslint-disable-next-line
       console.dir(generators);
+      generators.forEach(element => {
+        this.generators.push({
+          name : element,
+          description: "Some quick example text of the generator description. This is a long text so that the example will look good.",
+          imageUrl : "https://picsum.photos/600/300/?image=22"
+        })
+      });
       return "received generators";
     },
     receiveQuestions(questions) {
@@ -88,8 +95,8 @@ export default {
       this.rpc.invoke("runGenerator", [generatorName]);
     },
     initRpc() {
-      if (window.acquireVsCodeApi && typeof window.acquireVsCodeApi === "function") {
-        const vscode = window.acquireVsCodeApi();
+      if (acquireVsCodeApi && typeof acquireVsCodeApi === "function") {
+        const vscode = acquireVsCodeApi();
         const rpc = new RpcBrowser(window, vscode);
         this.rpc = rpc;
         rpc.registerMethod({
@@ -132,7 +139,7 @@ export default {
       imageUrl : "https://picsum.photos/600/300/?image=33"
     }
 
-    this.generators = [generator1, generator2, generator3];
+    this.generators = [];//[generator1, generator2, generator3];
 
     //todo: add validate support
     this.yeomanName = "yeoman generator";
