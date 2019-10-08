@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { Yowiz } from "./yowiz";
+import { Yowiz, IGeneratorChoice, IGeneratorQuestion, IPrompt } from "./yowiz";
 import inquirer = require('inquirer');
 import { RpcExtenstion } from './rpc/rpc-extension';
 
@@ -14,13 +14,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('sap.runYowiz', async () => {
-			if (YowizPanel.currentPanel) {
-				const selectedItem = await vscode.window.showQuickPick(YowizPanel.yowiz.getGenerators(), { placeHolder: "Choose a generator..." });
-				if (selectedItem) {
-					YowizPanel.currentPanel.sendGeneratorName(selectedItem);
-					YowizPanel.yowiz.run(selectedItem);
-				}
-			}
+			// if (YowizPanel.currentPanel) {
+			// 	const selectedItem = await vscode.window.showQuickPick(YowizPanel.yowiz.getGenerators(), { placeHolder: "Choose a generator..." });
+			// 	if (selectedItem) {
+			// 		YowizPanel.currentPanel.sendGeneratorName(selectedItem);
+			// 		YowizPanel.yowiz.run(selectedItem);
+			// 	}
+			// }
 		})
 	);
 
@@ -149,8 +149,12 @@ export class YowizPanel {
 
 	public async receiveIsWebviewReady() {
 		// TODO: loading generators takes a long time; consider prefetching list of generators
-		const generators: string[] = await YowizPanel.yowiz.getGenerators();
-		const response: string = await this._rpc.invoke("receiveGenerators", [generators]);
+		const generators: IPrompt | undefined = await YowizPanel.yowiz.getGenerators();
+
+		const response: string = await this._rpc.invoke("receiveQuestions", [
+			(generators ? generators.questions : []),
+			(generators ? generators.name : "")
+		]);
 		console.log(response);
 	}
 
@@ -159,7 +163,7 @@ export class YowizPanel {
 	}
 
 	public sendQuestions(questions: inquirer.QuestionCollection<any>): Promise<inquirer.Answers> {
-		return this._rpc.invoke("receiveQuestions", [questions]).then((response => {
+		return this._rpc.invoke("receiveQuestions", [questions, "Step"]).then((response => {
 			vscode.window.showInformationMessage(response);
 			return Promise.resolve([]);
 		}));
@@ -218,6 +222,7 @@ export class YowizPanel {
 			// specifically, doesn't work when building vue for development (vue-cli-service build --mode development)
 			indexHtml = indexHtml.replace(/<link href=/g, `<link href=${scriptUri.toString()}`);
 			indexHtml = indexHtml.replace(/<script src=/g, `<script src=${scriptUri.toString()}`);
+			indexHtml = indexHtml.replace(/<img src=/g, `<img src=${scriptUri.toString()}`);
 		}
 		return indexHtml;
 	}

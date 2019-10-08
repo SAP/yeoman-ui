@@ -34,7 +34,7 @@ export class WizAdapter implements Adapter {
       identical?: { (str: string): void }
     } = (value: string) => {
     console.log(value);
-  };
+  }
 
   get _colorDiffAdded() {
     return chalk.black.bgGreen;

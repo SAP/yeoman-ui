@@ -17,8 +17,7 @@
         </b-col>
         <b-col>
           <b-container>
-            <GeneratorSelection v-if="selectedGenerator" :generators="generators" />
-            <Step v-if="!selectedGenerator && steps.length" :currentStep="steps[stepIndex]" :next="next" />
+            <Step v-if="steps.length" :currentStep="steps[stepIndex]" :next="next" />
             <div class="navigation">
               <b-button @click="next" variant="success" :disabled="stepIndex===steps.length-1">Next</b-button>
               <b-button variant="primary" :disabled="stepIndex<steps.length-1">Finish</b-button>
@@ -32,7 +31,6 @@
 
 <script>
 import Header from "./components/Header.vue";
-import GeneratorSelection from "./components/GeneratorSelection.vue";
 import Navigation from "./components/Navigation.vue";
 import Step from "./components/Step.vue";
 import { RpcBrowser } from "./rpc/rpc-browser.js";
@@ -41,7 +39,6 @@ export default {
   name: "app",
   components: {
     Header,
-    GeneratorSelection,
     Navigation,
     Step
   },
@@ -54,9 +51,7 @@ export default {
       stepIndex: 0,
       index: 0,
       numTotal: 0,
-      rpc: Object,
-      selectedGenerator: true,
-      generators: []
+      rpc: Object
     };
   },
   methods: {
@@ -71,22 +66,22 @@ export default {
       // TODO: render generator tiles
       // eslint-disable-next-line
       console.dir(generators);
-      generators.forEach(element => {
-        this.generators.push({
-          name : element,
-          description: "Some quick example text of the generator description. This is a long text so that the example will look good.",
-          imageUrl : "https://picsum.photos/600/300/?image=22"
-        })
-      });
+      // generators.forEach(element => {
+      //   this.generators.push({
+      //     name : element,
+      //     description: "Some quick example text of the generator description. This is a long text so that the example will look good.",
+      //     imageUrl : "https://picsum.photos/600/300/?image=22"
+      //   })
+      // });
       return "received generators";
     },
-    receiveQuestions(questions) {
+    receiveQuestions(questions, name) {
       // eslint-disable-line no-unused-vars
       // eslint-disable-next-line
       console.dir(questions);
       // eslint-disable-next-line
       console.log("received questions");
-      const prompt = { questions: questions, name: Math.random() };
+      const prompt = { questions: questions, name: name };
       this.prompts.push(prompt);
       return "received questions";
     },
@@ -95,7 +90,12 @@ export default {
       this.rpc.invoke("runGenerator", [generatorName]);
     },
     initRpc() {
-      if (acquireVsCodeApi && typeof acquireVsCodeApi === "function") {
+      // eslint-disable-line no-undef
+      // eslint-disable-next-line
+      // eslint-disable-next-line
+      if (typeof acquireVsCodeApi !== 'undefined' && typeof acquireVsCodeApi === 'function') {
+        // eslint-disable-line no-undef
+        // eslint-disable-next-line
         const vscode = acquireVsCodeApi();
         const rpc = new RpcBrowser(window, vscode);
         this.rpc = rpc;
@@ -121,64 +121,74 @@ export default {
   mounted() {
     this.initRpc();
 
-    let generator1 = {
-      name: "generator 1",
-      description: "Some quick example text of the generator description. This is a long text so that the example will look good.",
-      imageUrl : "https://picsum.photos/600/300/?image=11"
-    }
+    // let generatorChoice1 = {
+    //   name: "generator 1",
+    //   message: "Some quick example text of the generator description. This is a long text so that the example will look good.",
+    //   imageUrl : "https://picsum.photos/600/300/?image=11"
+    // }
 
-    let generator2 = {
-      name: "generator 2",
-      description: "Some quick example text of the generator description. This is a long text so that the example will look good.",
-      imageUrl : "https://picsum.photos/600/300/?image=22"
-    }
+    // let generatorChoice2 = {
+    //   name: "generator 2",
+    //   message: "Some quick example text of the generator description. This is a long text so that the example will look good.",
+    //   imageUrl : "https://picsum.photos/600/300/?image=22"
+    // }
 
-    let generator3 = {
-      name: "generator 3",
-      description: "Some quick example text of the generator description. This is a long text so that the example will look good.",
-      imageUrl : "https://picsum.photos/600/300/?image=33"
-    }
+    // let generatorChoice3 = {
+    //   name: "generator 3",
+    //   message: "Some quick example text of the generator description. This is a long text so that the example will look good."
+    // }
 
-    this.generators = [];//[generator1, generator2, generator3];
+    // let gensQuestion1 = {
+    //   type: "generators",
+    //   message: "Choose a generator",
+    //   choices: [generatorChoice1, generatorChoice2, generatorChoice3]
+    // };
+    // let gensPrompt = {
+    //   name: "generators prompt",
+    //   questions: [gensQuestion1]
+    // };
+    // this.prompts.push(gensPrompt);
 
-    //todo: add validate support
-    this.yeomanName = "yeoman generator";
-    let checkboxQ = {
-      type: "checkbox",
-      message: "checkbox: what is checkbox?",
-      choices: ["a", "b", "c", "d"]
-    };
-    let inputQ = {
-      type: "input",
-      default_answer: "input: default answer",
-      message: "input: what is input?"
-    };
-    let listQ = {
-      type: "list",
-      default: 1,
-      message: "list: what is list?",
-      choices: ["a", "b", "c", "d"]
-    };
-    let confirmQ = {
-      type: "confirm",
-      default: "yes",
-      message: "confirm: what is list?"
-    };
+    // //todo: add validate support
+    // this.yeomanName = "yeoman generator";
+    // let checkboxQ = {
+    //   type: "checkbox",
+    //   message: "checkbox: what is checkbox?",
+    //   choices: ["a", "b", "c", "d"]
+    // };
+    // let inputQ = {
+    //   type: "input",
+    //   default_answer: "input: default answer",
+    //   message: "input: what is input?"
+    // };
+    // let listQ = {
+    //   type: "list",
+    //   default: 1,
+    //   message: "list: what is list?",
+    //   choices: ["a", "b", "c", "d"]
+    // };
+    // let confirmQ = {
+    //   type: "confirm",
+    //   default: "yes",
+    //   message: "confirm: what is list?"
+    // };
 
-    let prompt1 = {
-      name: "prompt 1",
-      questions: [checkboxQ, confirmQ, inputQ, listQ]
-    };
-    let prompt2 = {
-      name: "prompt 2",
-      questions: [checkboxQ, confirmQ, inputQ, listQ]
-    };
-    this.prompts.push(prompt1);
-    this.prompts.push(prompt2);
+    // let prompt1 = {
+    //   name: "prompt 1",
+    //   questions: [checkboxQ, confirmQ, inputQ, listQ]
+    // };
+    // let prompt2 = {
+    //   name: "prompt 2",
+    //   questions: [checkboxQ, confirmQ, inputQ, listQ]
+    // };
+    // this.prompts.push(prompt1);
+    // this.prompts.push(prompt2);
 
+    this.yeomanName = "<no generator selected>";
     this.steps = this.prompts;
 
-    this.questions = [checkboxQ, confirmQ, inputQ, listQ];
+    // this.questions = [gensPrompt];
+    this.questions = [];
     this.numTotal = this.questions.length;
   }
 };

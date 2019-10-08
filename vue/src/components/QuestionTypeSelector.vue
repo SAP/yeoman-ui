@@ -3,6 +3,8 @@
     <b-form-group :label="currentQuestion.message">
       <!-- TODO: support expand -->
 
+      <GeneratorSelection v-if="currentQuestion.type==='generators'" :currentQuestion="currentQuestion" />
+
       <QuestionInput v-if="currentQuestion.type==='input'" :currentQuestion="currentQuestion" />
 
       <QuestionList v-if="currentQuestion.type==='list'" :currentQuestion="currentQuestion" />
@@ -19,6 +21,7 @@ import QuestionList from "./QuestionTypes/QuestionList";
 import QuestionInput from "./QuestionTypes/QuestionInput";
 import QuestionConfirm from "./QuestionTypes/QuestionConfirm";
 import QuestionCheckbox from "./QuestionTypes/QuestionCheckbox";
+import GeneratorSelection from "./QuestionTypes/GeneratorSelection";
 
 export default {
   name: "QuestionTypeSelector",
@@ -26,7 +29,8 @@ export default {
     QuestionList,
     QuestionInput,
     QuestionConfirm,
-    QuestionCheckbox
+    QuestionCheckbox,
+    GeneratorSelection
   },
   props: {
     currentQuestion: Object,
