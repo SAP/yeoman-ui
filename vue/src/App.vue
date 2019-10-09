@@ -124,23 +124,26 @@ export default {
   },
   mounted() {
     this.initRpc();
-
     // let generatorChoice1 = {
-    //   name: "generator 1",
-    //   message: "Some quick example text of the generator description. This is a long text so that the example will look good.",
-    //   imageUrl : "https://picsum.photos/600/300/?image=11"
-    // }
+    //     name: "SAP Fiori List Report Object Page FE V2",
+    //     message: "Create an SAP Fiori Elements application which is based on a List Report Page abd Object Page Fiori elements in V2",
+    //     imageUrl: "https://picsum.photos/600/300/?image=11"
+      
+    // };
 
     // let generatorChoice2 = {
-    //   name: "generator 2",
-    //   message: "Some quick example text of the generator description. This is a long text so that the example will look good.",
-    //   imageUrl : "https://picsum.photos/600/300/?image=22"
-    // }
+    //     name: "SAP Fiori List Report Object Page FE V2",
+    //     message: "Create an SAP Fiori Elements application which is based on a List Report Page abd Object Page Fiori elements in V4",
+    //     imageUrl: "https://picsum.photos/600/300/?image=22"
+      
+    // };
 
     // let generatorChoice3 = {
-    //   name: "generator 3",
-    //   message: "Some quick example text of the generator description. This is a long text so that the example will look good."
-    // }
+    //     name: "CRUD Master Detail",
+    //     message: "A worklist displays a collection of items that a user needs to process. Working through the list usually involves reviewing details of the items and taking actions. In most cases the user has to either complete a work item or delegate it.",
+    //     imageUrl: "https://picsum.photos/600/300/?image=33"
+      
+    // };
 
     // let gensQuestion1 = {
     //   type: "generators",
@@ -153,8 +156,6 @@ export default {
     // };
     // this.prompts.push(gensPrompt);
 
-    // //todo: add validate support
-    // this.yeomanName = "yeoman generator";
     // let checkboxQ = {
     //   type: "checkbox",
     //   message: "checkbox: what is checkbox?",
@@ -187,11 +188,12 @@ export default {
     // };
     // this.prompts.push(prompt1);
     // this.prompts.push(prompt2);
+    // this.questions = [gensPrompt];
+    //todo: add validate support
 
     this.yeomanName = "<no generator selected>";
     this.steps = this.prompts;
 
-    // this.questions = [gensPrompt];
     this.questions = [];
     this.numTotal = this.questions.length;
   }
@@ -212,7 +214,8 @@ export default {
   font-size: var(--vscode-font-size);
 }
 
-html, body {
+html,
+body {
   background-color: var(--vscode-panel-background);
 }
 
@@ -224,5 +227,4 @@ html, body {
   color: var(--vscode-input-foreground);
   background-color: var(--vscode-input-background);
 }
-
 </style>
