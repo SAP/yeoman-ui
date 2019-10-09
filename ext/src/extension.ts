@@ -12,18 +12,6 @@ export function activate(context: vscode.ExtensionContext) {
 		})
 	);
 
-	context.subscriptions.push(
-		vscode.commands.registerCommand('sap.runYowiz', async () => {
-			// if (YowizPanel.currentPanel) {
-			// 	const selectedItem = await vscode.window.showQuickPick(YowizPanel.yowiz.getGenerators(), { placeHolder: "Choose a generator..." });
-			// 	if (selectedItem) {
-			// 		YowizPanel.currentPanel.sendGeneratorName(selectedItem);
-			// 		YowizPanel.yowiz.run(selectedItem);
-			// 	}
-			// }
-		})
-	);
-
 	if (vscode.window.registerWebviewPanelSerializer) {
 		// Make sure we register a serializer in activation event
 		vscode.window.registerWebviewPanelSerializer(YowizPanel.viewType, {
@@ -103,6 +91,7 @@ export class YowizPanel {
 		this._panel = panel;
 		this._extensionPath = extensionPath;
 		this._rpc = new RpcExtenstion(this._panel.webview);
+		this._rpc.setResponseTimeout(3600000);
 		this._rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
 		this._rpc.registerMethod({ func: this.showMessage, thisArg: this });
 		this._rpc.registerMethod({ func: this.runGenerator, thisArg: this });
@@ -151,11 +140,11 @@ export class YowizPanel {
 		// TODO: loading generators takes a long time; consider prefetching list of generators
 		const generators: IPrompt | undefined = await YowizPanel.yowiz.getGenerators();
 
-		const response: string = await this._rpc.invoke("receiveQuestions", [
+		const response: any = await this._rpc.invoke("receiveQuestions", [
 			(generators ? generators.questions : []),
 			(generators ? generators.name : "")
 		]);
-		console.log(response);
+		this.runGenerator(response);
 	}
 
 	public runGenerator(generatorName: string): void {

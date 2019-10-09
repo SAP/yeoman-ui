@@ -3,7 +3,7 @@
     <b-form-group :label="currentQuestion.message">
       <!-- TODO: support expand -->
 
-      <GeneratorSelection v-if="currentQuestion.type==='generators'" :currentQuestion="currentQuestion" />
+      <GeneratorSelection v-if="currentQuestion.type==='generators'" :currentQuestion="currentQuestion" v-on:generatorSelected="selectGenerator"/>
 
       <QuestionInput v-if="currentQuestion.type==='input'" :currentQuestion="currentQuestion" />
 
@@ -43,7 +43,13 @@ export default {
       shuffledAnswers: [],
       answered: false
     };
-  }
+  },
+  methods: {
+    selectGenerator: function(generatorName) {
+      this.$emit('generatorSelected', generatorName);
+    }
+  },
+  mount() {}
 };
 </script>
 <style scoped>

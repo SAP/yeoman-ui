@@ -6,6 +6,7 @@
         :key="index"
         :currentQuestion="item"
         :next="next"
+        v-on:generatorSelected="selectGenerator"
       />
     </b-form>
   </div>
@@ -26,6 +27,11 @@ export default {
   },
   data() {
     return {};
+  },
+  methods: {
+    selectGenerator: function(generatorName) {
+      this.$emit('generatorSelected', generatorName);
+    }
   }
 };
 </script>

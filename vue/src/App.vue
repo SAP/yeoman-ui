@@ -17,9 +17,14 @@
         </b-col>
         <b-col>
           <b-container>
-            <Step v-if="steps.length" :currentStep="steps[stepIndex]" :next="next" />
+            <Step
+              v-if="steps.length"
+              :currentStep="steps[stepIndex]"
+              :next="next"
+              v-on:generatorSelected="selectGenerator"
+            />
             <div class="navigation">
-              <b-button @click="next" variant="success" :disabled="stepIndex===steps.length-1">Next</b-button>
+              <b-button @click="next" variant="success" :disabled="stepIndex !== 0 && stepIndex===steps.length-1">Next</b-button>
               <b-button variant="primary" :disabled="stepIndex<steps.length-1">Finish</b-button>
             </div>
           </b-container>
@@ -51,39 +56,38 @@ export default {
       stepIndex: 0,
       index: 0,
       numTotal: 0,
-      rpc: Object
+      rpc: Object,
+      resolve: Object,
+      reject: Object,
+      currentGenerator: Object
     };
   },
   methods: {
     next() {
       this.stepIndex++;
+      if (this.resolve) {
+        this.resolve(this.currentGenerator);
+      }
     },
-
+    selectGenerator: function(generatorName) {
+      this.currentGenerator = generatorName;
+      this.yeomanName = generatorName;
+    },
     receiveGeneratorName(name) {
       this.yeomanName = name;
     },
-    receiveGenerators(generators) {
-      // TODO: render generator tiles
-      // eslint-disable-next-line
-      console.dir(generators);
-      // generators.forEach(element => {
-      //   this.generators.push({
-      //     name : element,
-      //     description: "Some quick example text of the generator description. This is a long text so that the example will look good.",
-      //     imageUrl : "https://picsum.photos/600/300/?image=22"
-      //   })
-      // });
-      return "received generators";
-    },
     receiveQuestions(questions, name) {
-      // eslint-disable-line no-unused-vars
       // eslint-disable-next-line
       console.dir(questions);
       // eslint-disable-next-line
       console.log("received questions");
       const prompt = { questions: questions, name: name };
       this.prompts.push(prompt);
-      return "received questions";
+      const promise = new Promise((resolve, reject) => {
+        this.resolve = resolve;
+        this.reject = reject;
+      });
+      return promise;
     },
     runGenerator(generatorName) {
       // TODO: call this method after user chose which generator to run

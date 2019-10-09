@@ -21,11 +21,6 @@
 				"command": "sap.loadYowiz",
 				"title": "Load yowiz",
 				"category": "Yowiz"
-			},
-			{
-				"command": "sap.runYowiz",
-				"title": "Run yowiz",
-				"category": "Yowiz"
 			}
 		]
 	},
