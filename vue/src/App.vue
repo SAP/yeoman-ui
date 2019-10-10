@@ -24,8 +24,8 @@
               v-on:generatorSelected="selectGenerator"
             />
             <div class="navigation">
-              <b-button class="mr-2 btn" @click="next" variant="success" :disabled="stepIndex !== 0 && stepIndex===steps.length-1">Next</b-button>
-              <b-button variant="primary btn" :disabled="stepIndex<steps.length-1">Finish</b-button>
+              <b-button class="mr-2 btn" @click="next" :disabled="stepIndex !== 0 && stepIndex===steps.length-1">Next</b-button>
+              <b-button :disabled="stepIndex<steps.length-1">Finish</b-button>
             </div>
           </b-container>
         </b-col>
@@ -213,7 +213,7 @@ export default {
   /* text-align: center; */
   /* margin-top: 60px; */
   color: var(--vscode-foreground);
-  background-color: var(--vscode-panel-background);
+  background-color: var(--vscode-panel-background, #303031);
   font-family: var(--vscode-font-family);
   font-weight: var(--vscode-font-weight);
   font-size: var(--vscode-font-size);
@@ -221,7 +221,7 @@ export default {
 
 html,
 body {
-  background-color: var(--vscode-panel-background);
+  background-color: var(--vscode-panel-background, #303031);
   padding: 0px;
 }
 
@@ -253,6 +253,8 @@ button.btn {
   border-color: var(--vscode-button-background, #0e639c);
   color: var(--vscode-button-foreground, white);
   border-radius: 0px;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.6rem;
 }
 
 button.btn:hover {

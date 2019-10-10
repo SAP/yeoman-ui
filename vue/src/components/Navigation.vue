@@ -16,12 +16,6 @@ export default {
   name: "Navigation",
   props: ["currentStep", "steps"],
   methods: {
-    isSelected(index) {
-      if (index === this.currentStep) {
-        return "active";
-      }
-      return "";
-    },
     select(event) {
       if (this.selectedItem) {
         this.selectedItem.classList.toggle("active");
@@ -59,8 +53,8 @@ export default {
 
 /* selected item */
 .list-group-item.active {
-  background-color: var(--vscode-list-focusBackground, #062f4a);
-  border-color: var(--vscode-list-focusBackground, #062f4a);
+  background-color: var(--vscode-list-activeSelectionBackground, #094771);
+  border-color: var(--vscode-list-activeSelectionBackground, #094771);
   color: var(--vscode-list-activeSelectionForeground, white);
 }
 

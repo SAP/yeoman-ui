@@ -4,14 +4,14 @@
       <b-card
         v-for="(choice, index) in currentQuestion.choices"
         v-on:click="emitSelection(choice.name)"
+        class="generator"
+        @click="select"
         :key="index"
         :title="choice.name"
         img-alt="Image"
         img-top
         tag="article"
         style="width: 15rem"
-        @click="selectChoice(index)"
-        :class="selectClass(index)"
       >
         <b-card-text>{{choice.message}}</b-card-text>
         <b-card-text
@@ -33,55 +33,60 @@ export default {
   data() {
     return {
       publicPath: process.env.BASE_URL,
-      selectedIndex: null,
-      selected: false
+      selectedItem: undefined
     };
   },
-  watch: {
-    currentQuestion: {
-      immediate: true,
-      handler() {
-        this.selectedIndex = null;
-        this.selected = false;
-      }
-    }
-  },
   methods: {
+    select(event) {
+      if (this.selectedItem) { // deselect old selection
+        this.selectedItem.classList.toggle("selected");
+        this.selectedItem.setAttribute("border-style", "none");
+      }
+      this.selectedItem = event.currentTarget;
+      this.selectedItem.setAttribute("border-style", "solid");
+      this.selectedItem.classList.toggle("selected");
+    },
     emitSelection(generatorName) {
       this.$emit('generatorSelected', generatorName);
-    },
-    selectClass(index) {
-      let selectClass = "";
-      if (!this.selected && this.selectedIndex === index) {
-        selectClass = "selected";
-      } else {
-        selectClass = "";
-      }
-      return selectClass;
-    },
-    selectChoice(index) {
-      this.selectedIndex = index;
     }
   },
   mounted() {}
 };
 </script>
 <style>
+.card-body {
+  color: var(--vscode-foreground, #cccccc);
+  border: none;
+}
+
 .card-title {
   font-size: 1rem;
   font-weight: bold
 }
+
 .card-text {
   font-size: 0.75rem;
 }
+
 .card-text.templateDocumentationClass {
   /* change this to vscode color for url */
-  color: blue;
+  color: var(--vscode-textLink-foreground, #3794ff);
 }
-.card:hover {
+
+.card.generator {
+  border-style: none;
+  border-width: 1px;
+  border-radius: 0px;
+  border-color: var(--vscode-list-activeSelectionForeground, white);
+  background-color: var(--vscode-notifications-border, #1e1e1e);
+}
+
+.card.generator:hover:not(.selected) {
+  background-color: var(--vscode-list-hoverBackground, #2a2d2e);
   cursor: pointer;
 }
-.card.selected {
-  border: solid;
+
+.card.generator.selected {
+  border-style: solid;
 }
 </style>
