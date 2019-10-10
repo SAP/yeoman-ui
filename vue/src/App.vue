@@ -8,15 +8,15 @@
       :stepName="steps[stepIndex].name"
     />
 
-    <b-container class="bv-example-row">
-      <b-row>
-        <b-col sm="auto">
-          <b-container>
+    <b-container class="bv-example-row m-0 p-0">
+      <b-row class="m-0 p-0">
+        <b-col class="m-0 p-0" sm="auto">
+          <b-container class="m-0 p-0">
             <Navigation v-if="steps.length" :currentStep="stepIndex" :steps="steps" />
           </b-container>
         </b-col>
-        <b-col>
-          <b-container>
+        <b-col class="m-0 p-0">
+          <b-container >
             <Step
               v-if="steps.length"
               :currentStep="steps[stepIndex]"
@@ -24,8 +24,8 @@
               v-on:generatorSelected="selectGenerator"
             />
             <div class="navigation">
-              <b-button @click="next" variant="success" :disabled="stepIndex !== 0 && stepIndex===steps.length-1">Next</b-button>
-              <b-button variant="primary" :disabled="stepIndex<steps.length-1">Finish</b-button>
+              <b-button class="mr-2 btn" @click="next" variant="success" :disabled="stepIndex !== 0 && stepIndex===steps.length-1">Next</b-button>
+              <b-button variant="primary btn" :disabled="stepIndex<steps.length-1">Finish</b-button>
             </div>
           </b-container>
         </b-col>
@@ -93,12 +93,11 @@ export default {
       // TODO: call this method after user chose which generator to run
       this.rpc.invoke("runGenerator", [generatorName]);
     },
+    isInVsCode() {
+      // eslint-disable-next-line
+      return typeof acquireVsCodeApi !== 'undefined';
+    },
     initRpc() {
-      // eslint-disable-line no-undef
-      // eslint-disable-next-line
-      // eslint-disable-next-line
-      if (typeof acquireVsCodeApi !== 'undefined' && typeof acquireVsCodeApi === 'function') {
-        // eslint-disable-line no-undef
         // eslint-disable-next-line
         const vscode = acquireVsCodeApi();
         const rpc = new RpcBrowser(window, vscode);
@@ -119,76 +118,82 @@ export default {
           name: "receiveGeneratorName"
         });
         rpc.invoke("receiveIsWebviewReady", []);
-      }
+    },
+    loadMocks() {
+    let generatorChoice1 = {
+        name: "SAP Fiori List Report Object Page FE V2",
+        message: "Create an SAP Fiori Elements application which is based on a List Report Page abd Object Page Fiori elements in V2",
+        imageUrl: "https://picsum.photos/600/300/?image=11"
+      
+    };
+
+    let generatorChoice2 = {
+        name: "SAP Fiori List Report Object Page FE V2",
+        message: "Create an SAP Fiori Elements application which is based on a List Report Page abd Object Page Fiori elements in V4",
+        imageUrl: "https://picsum.photos/600/300/?image=22"
+      
+    };
+
+    let generatorChoice3 = {
+        name: "CRUD Master Detail",
+        message: "A worklist displays a collection of items that a user needs to process. Working through the list usually involves reviewing details of the items and taking actions. In most cases the user has to either complete a work item or delegate it.",
+        imageUrl: "https://picsum.photos/600/300/?image=33"
+      
+    };
+
+    let gensQuestion1 = {
+      type: "generators",
+      message: "Choose a generator",
+      choices: [generatorChoice1, generatorChoice2, generatorChoice3]
+    };
+    let gensPrompt = {
+      name: "Generators",
+      questions: [gensQuestion1]
+    };
+    this.prompts.push(gensPrompt);
+
+    let checkboxQ = {
+      type: "checkbox",
+      message: "checkbox: what is checkbox?",
+      choices: ["a", "b", "c", "d"]
+    };
+    let inputQ = {
+      type: "input",
+      default_answer: "input: default answer",
+      message: "input: what is input?"
+    };
+    let listQ = {
+      type: "list",
+      default: 1,
+      message: "list: what is list?",
+      choices: ["a", "b", "c", "d"]
+    };
+    let confirmQ = {
+      type: "confirm",
+      default: "yes",
+      message: "confirm: what is list?"
+    };
+
+    let prompt1 = {
+      name: "Step 1",
+      questions: [checkboxQ, confirmQ, inputQ, listQ]
+    };
+    let prompt2 = {
+      name: "Step 2",
+      questions: [checkboxQ, confirmQ, inputQ, listQ]
+    };
+    this.prompts.push(prompt1);
+    this.prompts.push(prompt2);
+    this.questions = [gensPrompt];
     }
   },
   mounted() {
-    this.initRpc();
-    // let generatorChoice1 = {
-    //     name: "SAP Fiori List Report Object Page FE V2",
-    //     message: "Create an SAP Fiori Elements application which is based on a List Report Page abd Object Page Fiori elements in V2",
-    //     imageUrl: "https://picsum.photos/600/300/?image=11"
-      
-    // };
+    if (this.isInVsCode()) {
+      this.initRpc();
+    } else {
+      this.loadMocks();
+    }
 
-    // let generatorChoice2 = {
-    //     name: "SAP Fiori List Report Object Page FE V2",
-    //     message: "Create an SAP Fiori Elements application which is based on a List Report Page abd Object Page Fiori elements in V4",
-    //     imageUrl: "https://picsum.photos/600/300/?image=22"
-      
-    // };
-
-    // let generatorChoice3 = {
-    //     name: "CRUD Master Detail",
-    //     message: "A worklist displays a collection of items that a user needs to process. Working through the list usually involves reviewing details of the items and taking actions. In most cases the user has to either complete a work item or delegate it.",
-    //     imageUrl: "https://picsum.photos/600/300/?image=33"
-      
-    // };
-
-    // let gensQuestion1 = {
-    //   type: "generators",
-    //   message: "Choose a generator",
-    //   choices: [generatorChoice1, generatorChoice2, generatorChoice3]
-    // };
-    // let gensPrompt = {
-    //   name: "generators prompt",
-    //   questions: [gensQuestion1]
-    // };
-    // this.prompts.push(gensPrompt);
-
-    // let checkboxQ = {
-    //   type: "checkbox",
-    //   message: "checkbox: what is checkbox?",
-    //   choices: ["a", "b", "c", "d"]
-    // };
-    // let inputQ = {
-    //   type: "input",
-    //   default_answer: "input: default answer",
-    //   message: "input: what is input?"
-    // };
-    // let listQ = {
-    //   type: "list",
-    //   default: 1,
-    //   message: "list: what is list?",
-    //   choices: ["a", "b", "c", "d"]
-    // };
-    // let confirmQ = {
-    //   type: "confirm",
-    //   default: "yes",
-    //   message: "confirm: what is list?"
-    // };
-
-    // let prompt1 = {
-    //   name: "prompt 1",
-    //   questions: [checkboxQ, confirmQ, inputQ, listQ]
-    // };
-    // let prompt2 = {
-    //   name: "prompt 2",
-    //   questions: [checkboxQ, confirmQ, inputQ, listQ]
-    // };
-    // this.prompts.push(prompt1);
-    // this.prompts.push(prompt2);
-    // this.questions = [gensPrompt];
     //todo: add validate support
 
     this.yeomanName = "<no generator selected>";
@@ -217,6 +222,7 @@ export default {
 html,
 body {
   background-color: var(--vscode-panel-background);
+  padding: 0px;
 }
 
 .list-group-item.selected {
@@ -227,4 +233,31 @@ body {
   color: var(--vscode-input-foreground);
   background-color: var(--vscode-input-background);
 }
+
+.bv-example-row {
+  margin: 0px;
+  padding: 0px;
+}
+
+b-container {
+  margin: 0px;
+  padding: 0px;
+}
+
+b-row {
+  margin: 0px;
+}
+
+button.btn {
+  background-color: var(--vscode-button-background, #0e639c);
+  border-color: var(--vscode-button-background, #0e639c);
+  color: var(--vscode-button-foreground, white);
+  border-radius: 0px;
+}
+
+button.btn:hover {
+  background-color: var(--vscode-button-hoverBackground, #1177bb);
+  border-color: var(--vscode-button-hoverBackground, #1177bb);
+}
+
 </style>
