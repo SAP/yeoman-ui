@@ -1,10 +1,11 @@
 <template>
   <div class="question-confirm-container">
-
-    <b-list-group>
+    <button type="button" @click="selected = 'yes'" class="btn btn-primary btn-sm mr-1">Yes</button>
+    <button type="button" @click="selected = 'no'" class="btn btn-secondary btn-sm">No</button>
+    <!-- <b-list-group>
       <b-list-group-item @click="selected = 'yes'" :class="{selected:selected == 'yes'}">Yes</b-list-group-item>
       <b-list-group-item @click="selected = 'no'" :class="{selected:selected == 'no'}">No</b-list-group-item>
-    </b-list-group>
+    </b-list-group> -->
   </div>
 </template>
 <script>

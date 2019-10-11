@@ -10,7 +10,7 @@
       :stepName="steps[stepIndex].name"
     />
 
-    <b-container class="bv-example-row m-0 p-0">
+    <b-container class="bv-example-row p-0 mx-1 mt-10">
       <b-row class="m-0 p-0">
         <b-col class="m-0 p-0" sm="auto">
           <b-container class="m-0 p-0">
@@ -25,7 +25,7 @@
               :next="next"
               v-on:generatorSelected="selectGenerator"
             />
-            <div class="navigation" v-if="step">
+            <div class="navigation" v-if="steps.length > 0">
               <b-button
                 class="mr-2 btn"
                 @click="next"
@@ -149,7 +149,7 @@ export default {
 
       let gensQuestion1 = {
         type: "generators",
-        message: "Choose a generator",
+        message: "",
         choices: [generatorChoice1, generatorChoice2, generatorChoice3]
       };
       let gensPrompt = {
@@ -218,7 +218,7 @@ export default {
   /* -moz-osx-font-smoothing: grayscale; */
   /* text-align: center; */
   /* margin-top: 60px; */
-  color: var(--vscode-foreground);
+  color: var(--vscode-foreground, white);
   background-color: var(--vscode-panel-background, #303031);
   font-family: var(--vscode-font-family);
   font-weight: var(--vscode-font-weight);
@@ -242,6 +242,7 @@ body {
 
 .bv-example-row {
   margin: 0px;
+  margin-top: 1rem;
   padding: 0px;
 }
 

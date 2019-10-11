@@ -3,9 +3,10 @@
     <b-list-group flush>
       <b-list-group-item
         v-for="(step, index) in steps"
+        :ref="index"
         :key="index"
         :class="(index===0 ? 'active' : '')"
-        v-on:click="select"
+        v-on:click="onClick"
       >{{ step.name }}</b-list-group-item>
     </b-list-group>
   </div>
@@ -16,12 +17,20 @@ export default {
   name: "Navigation",
   props: ["currentStep", "steps"],
   methods: {
-    select(event) {
+    onClick(event) {
+      this.select(event.currentTarget);
+    },
+    select(element) {
       if (this.selectedItem) {
         this.selectedItem.classList.toggle("active");
       }
-      this.selectedItem = event.currentTarget;
+      this.selectedItem = element;
       this.selectedItem.classList.toggle("active");
+    }
+  },
+  watch: {
+    currentStep: function (val) {
+      this.select(this.$refs[val][0]);
     }
   },
   data() {
