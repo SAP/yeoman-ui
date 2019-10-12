@@ -3,13 +3,13 @@
     <b-form-group :label="currentQuestion.message">
       <!-- TODO: support expand -->
 
-      <GeneratorSelection v-if="currentQuestion.type==='generators'" :currentQuestion="currentQuestion" v-on:generatorSelected="selectGenerator"/>
+      <GeneratorSelection v-if="currentQuestion.type==='generators'" :currentQuestion="currentQuestion" v-on:answer="onAnswer" v-on:generatorSelected="onGeneratorSelected"/>
 
-      <QuestionInput v-if="currentQuestion.type==='input'" :currentQuestion="currentQuestion" />
+      <QuestionInput v-if="currentQuestion.type==='input'" :currentQuestion="currentQuestion" v-on:answer="onAnswer"/>
 
       <QuestionList v-if="currentQuestion.type==='list'" :currentQuestion="currentQuestion" />
 
-      <QuestionConfirm v-if="currentQuestion.type==='confirm'" :currentQuestion="currentQuestion" />
+      <QuestionConfirm v-if="currentQuestion.type==='confirm'" :currentQuestion="currentQuestion" v-on:answer="onAnswer" />
 
       <QuestionCheckbox v-if="currentQuestion.type==='checkbox'" :currentQuestion="currentQuestion" />
     </b-form-group>
@@ -45,7 +45,10 @@ export default {
     };
   },
   methods: {
-    selectGenerator: function(generatorName) {
+    onAnswer: function(answerObject) {
+      this.$emit('answer', answerObject);
+    },
+    onGeneratorSelected: function(generatorName) {
       this.$emit('generatorSelected', generatorName);
     }
   },

@@ -47,6 +47,7 @@ export default {
       this.selectedItem.classList.toggle("selected");
     },
     emitSelection(generatorName) {
+      this.$emit('answer', { generatorName: generatorName});
       this.$emit('generatorSelected', generatorName);
     }
   },

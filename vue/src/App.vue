@@ -21,9 +21,10 @@
           <b-container>
             <Step
               v-if="steps.length"
+              ref="step"
               :currentStep="steps[stepIndex]"
               :next="next"
-              v-on:generatorSelected="selectGenerator"
+              v-on:generatorSelected="onGeneratorSelected"
             />
             <div class="navigation" v-if="steps.length > 0">
               <b-button
@@ -31,7 +32,10 @@
                 @click="next"
                 :disabled="stepIndex !== 0 && stepIndex===steps.length-1"
               >Next</b-button>
-              <b-button :disabled="stepIndex<steps.length-1">Finish</b-button>
+              <b-button
+                :disabled="stepIndex<steps.length-1"
+                @click="next"
+              >Finish</b-button>
             </div>
           </b-container>
         </b-col>
@@ -72,15 +76,15 @@ export default {
     next() {
       this.stepIndex++;
       if (this.resolve) {
-        this.resolve(this.currentGenerator);
+        try {
+          this.resolve(this.$refs["step"].$data.answers);
+        } catch(e) {
+          this.reject(e);
+        }
       }
     },
-    selectGenerator: function(generatorName) {
-      this.currentGenerator = generatorName;
+    onGeneratorSelected: function(generatorName) {
       this.yeomanName = generatorName;
-    },
-    receiveGeneratorName(name) {
-      this.yeomanName = name;
     },
     receiveQuestions(questions, name) {
       // eslint-disable-next-line
@@ -109,19 +113,9 @@ export default {
       const rpc = new RpcBrowser(window, vscode);
       this.rpc = rpc;
       rpc.registerMethod({
-        func: this.receiveGenerators,
-        thisArg: this,
-        name: "receiveGenerators"
-      });
-      rpc.registerMethod({
         func: this.receiveQuestions,
         thisArg: this,
         name: "receiveQuestions"
-      });
-      rpc.registerMethod({
-        func: this.receiveGeneratorName,
-        thisArg: this,
-        name: "receiveGeneratorName"
       });
       rpc.invoke("receiveIsWebviewReady", []);
     },
@@ -134,7 +128,7 @@ export default {
       };
 
       let generatorChoice2 = {
-        name: "SAP Fiori List Report Object Page FE V2",
+        name: "SAP Fiori List Report Object Page FE V4",
         message:
           "Create an SAP Fiori Elements application which is based on a List Report Page abd Object Page Fiori elements in V4",
         imageUrl: "https://picsum.photos/600/300/?image=22"
@@ -160,22 +154,26 @@ export default {
 
       let checkboxQ = {
         type: "checkbox",
+        name: "cb1",
         message: "checkbox: what is checkbox?",
         choices: ["a", "b", "c", "d"]
       };
       let inputQ = {
         type: "input",
+        name: "in1",
         default_answer: "input: default answer",
         message: "input: what is input?"
       };
       let listQ = {
         type: "list",
+        name: "list1",
         default: 1,
         message: "list: what is list?",
         choices: ["a", "b", "c", "d"]
       };
       let confirmQ = {
         type: "confirm",
+        name: "conf1",
         default: "yes",
         message: "confirm: what is list?"
       };

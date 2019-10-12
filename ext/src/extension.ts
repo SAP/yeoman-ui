@@ -144,7 +144,7 @@ export class YowizPanel {
 			(generators ? generators.questions : []),
 			(generators ? generators.name : "")
 		]);
-		this.runGenerator(response);
+		this.runGenerator(response.generatorName);
 	}
 
 	public runGenerator(generatorName: string): void {

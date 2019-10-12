@@ -6,7 +6,8 @@
         :key="index"
         :currentQuestion="item"
         :next="next"
-        v-on:generatorSelected="selectGenerator"
+        v-on:answer="onAnswer"
+        v-on:generatorSelected="onGeneratorSelected"
       />
     </b-form>
   </div>
@@ -26,12 +27,32 @@ export default {
     next: Function
   },
   data() {
-    return {};
+    return {
+      answers: {}
+    };
   },
   methods: {
-    selectGenerator: function(generatorName) {
+    onAnswer: function(answerObject) {
+      Object.assign(this.answers, answerObject);
+    },
+    onGeneratorSelected: function(generatorName) {
       this.$emit('generatorSelected', generatorName);
     }
+  },
+  watch: {
+    currentStep: function (val) {
+      this.answers = {};
+      for (let i=0; i<val.questions.length-1; i++) {
+        const question = val.questions[i];
+        if (question.default) {
+          let answerObject = {};
+          answerObject[question.name] = question.default;
+          Object.assign(this.answers, answerObject);
+        }
+      }
+    }
+  },
+  mounted() {
   }
 };
 </script>

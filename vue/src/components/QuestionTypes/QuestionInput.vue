@@ -1,7 +1,11 @@
 <template>
   <div class="question-input-container">
 
-    <b-form-input v-model="text" v-bind:placeholder="currentQuestion.default_answer"></b-form-input>
+    <b-form-input
+      v-model="text"
+      @change="onChange"
+      v-bind:placeholder="currentQuestion.default"
+    ></b-form-input>
 
   </div>
 </template>
@@ -17,10 +21,12 @@ export default {
           text :null
       }
   },
-  watch: {
-      text: ()=>{
-          // console.log(te);
-      }
+  methods: {
+    onChange(val) {
+      let answerObject = {};
+      answerObject[this.currentQuestion.name] = val;
+      this.$emit('answer', answerObject);
+    }
   }
 };
 </script>
