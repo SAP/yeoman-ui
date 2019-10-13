@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div v-if="!steps.length" class=loading>Yowiz is loading...</div>
+    <div v-if="!steps.length" class="loading">Yowiz is loading...</div>
 
     <Header
       v-if="steps.length"
@@ -27,15 +27,8 @@
               v-on:generatorSelected="onGeneratorSelected"
             />
             <div class="navigation" v-if="steps.length > 0">
-              <b-button
-                class="mr-2 btn"
-                @click="next"
-                :disabled="stepIndex !== 0 && stepIndex===steps.length-1"
-              >Next</b-button>
-              <b-button
-                :disabled="stepIndex<steps.length-1"
-                @click="next"
-              >Finish</b-button>
+              <b-button class="mr-2 btn" @click="next" :disabled="stepIndex < steps.length - 1 && !steps[stepIndex].allAnswered">Next</b-button>
+              <b-button :disabled="stepIndex<steps.length-1" @click="next">Finish</b-button>
             </div>
           </b-container>
         </b-col>
@@ -74,11 +67,15 @@ export default {
   },
   methods: {
     next() {
+      this.prompts[this.stepIndex].questions.forEach(question => {
+        console.log("q" + question.message + ", " + question.answered);
+      });
+
       this.stepIndex++;
       if (this.resolve) {
         try {
           this.resolve(this.$refs["step"].$data.answers);
-        } catch(e) {
+        } catch (e) {
           this.reject(e);
         }
       }
@@ -161,7 +158,7 @@ export default {
       let inputQ = {
         type: "input",
         name: "in1",
-        default_answer: "input: default answer",
+        default: "input: default answer",
         message: "input: what is input?"
       };
       let listQ = {
@@ -180,7 +177,7 @@ export default {
 
       let prompt1 = {
         name: "Step 1",
-        questions: [checkboxQ, confirmQ, inputQ, listQ]
+        questions: [checkboxQ]
       };
       let prompt2 = {
         name: "Step 2",
@@ -201,7 +198,14 @@ export default {
     //todo: add validate support
 
     this.yeomanName = "<no generator selected>";
-    this.steps = this.prompts;
+
+    this.steps = this.prompts.map(prompt => {
+      this.$set(prompt, "allAnswered", false);
+      prompt.questions.forEach(question => {
+        this.$set(question, "answer", undefined);
+      });
+      return prompt;
+    });
 
     this.questions = [];
     this.numTotal = this.questions.length;
@@ -272,5 +276,4 @@ button.btn:hover {
   margin: 1.5rem;
   font-size: 1.5rem;
 }
-
 </style>

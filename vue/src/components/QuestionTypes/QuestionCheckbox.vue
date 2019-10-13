@@ -1,67 +1,37 @@
 <template>
   <div class="question-checkbox-container">
-
+    <b-form-checkbox-group v-model="selected" >
       <b-form-checkbox
         v-for="choice in currentQuestion.choices"
         :key="choice"
         :value="choice"
-        :options="choice"
-        name="flavour-3a"
       >{{ choice }}</b-form-checkbox>
-
+    </b-form-checkbox-group>
   </div>
 </template>
 <script>
 export default {
   name: "QuestionList",
   props: {
-    currentQuestion: Object,
-    selected: []
+    currentQuestion: Object
   },
   data() {
     return {
-      selectedIndex: null,
-      correctIndex: null,
-      answered: false
+      selected: []
     };
   },
   watch: {
-    currentQuestion: {
-      immediate: true,
-      handler() {
-        this.selectedIndex = null;
-        this.answered = false;
+    selected: {
+      handler(val) {
+        if (val.length === 0) {
+          this.currentQuestion.answer = undefined;
+        } else {
+          this.currentQuestion.answer = val;
+        }
       }
     }
   },
-  methods: {
-    answerClass(index) {
-      let answerClass = "";
-      if (!this.answered && this.selectedIndex === index) {
-        answerClass = "selected";
-      } else if (this.answered && this.correctIndex === index) {
-        answerClass = "correct";
-      } else if (
-        this.answered &&
-        this.selectedIndex === index &&
-        this.correctIndex !== index
-      ) {
-        answerClass = "incorrect";
-      }
-      return answerClass;
-    },
-    selectAnswer(index) {
-      this.selectedIndex = index;
-    },
-    submitAnswer() {
-      this.answered = true;
-    }
-  },
-  mounted() {
-    if (this.currentQuestion.default) {
-      this.selectedIndex = this.currentQuestion.default;
-    }
-  }
+  mounted() {}
 };
 </script>
 

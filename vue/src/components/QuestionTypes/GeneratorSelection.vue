@@ -45,13 +45,18 @@ export default {
       this.selectedItem = event.currentTarget;
       this.selectedItem.setAttribute("border-style", "solid");
       this.selectedItem.classList.toggle("selected");
+
+      
     },
     emitSelection(generatorName) {
-      this.$emit('answer', { generatorName: generatorName});
-      this.$emit('generatorSelected', generatorName);
+      this.currentQuestion.answer = generatorName;
+      // this.$emit('answer', { generatorName: generatorName});
+      // this.$emit('generatorSelected', generatorName);
     }
   },
-  mounted() {}
+  mounted() {
+    // this.currentQuestion.answer = undefined;
+  }
 };
 </script>
 <style>
