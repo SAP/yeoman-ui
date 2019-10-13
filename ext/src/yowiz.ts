@@ -1,3 +1,6 @@
+import * as os from "os";
+import * as path from "path";
+import * as fs from "fs";
 import * as Environment from "yeoman-environment";
 import { WizAdapter } from "./wiz-adapter";
 import { Messaging } from "./messaging";
@@ -27,7 +30,20 @@ export class Yowiz {
     const wizAdapter = new WizAdapter();
     const messaging = new Messaging(yowizPanel);
     wizAdapter.setMessaging(messaging);
-    this._env = Environment.createEnv(undefined, undefined, wizAdapter);
+    const cwd: string = path.join(os.homedir(), "projects", "wiz1");
+
+    // TODO: should create and set target dir only after user has selected a generator;
+    //  see issue: https://github.com/yeoman/environment/issues/55
+    //  process.chdir() doesn't work after environment has been created
+
+    // TODO: wait for dir to be created
+    fs.mkdir(cwd, {recursive: true}, (err) => {
+      if (err) {
+        console.error(err);
+      }
+    });
+    
+    this._env = Environment.createEnv(undefined, {cwd:cwd}, wizAdapter);
   }
 
   public getGenerators(): Promise<IPrompt | undefined> {
@@ -43,9 +59,7 @@ export class Yowiz {
               name: value,
               message: "Some quick example text of the generator description. This is a long text so that the example will look good.",
             };
-            // if (index !== 0) {
             choice.imageUrl = "https://yeoman.io/static/illustration-home-inverted.91b07808be.png";
-            // }
             return choice;
           });
           const generatorQuestion: IGeneratorQuestion = {

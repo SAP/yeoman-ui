@@ -132,10 +132,6 @@ export class YowizPanel {
 		);
 	}
 
-	public sendGeneratorName(generatorName: string) {
-		this._rpc.invoke("receieveGeneratorName", [generatorName]);
-	}
-
 	public async receiveIsWebviewReady() {
 		// TODO: loading generators takes a long time; consider prefetching list of generators
 		const generators: IPrompt | undefined = await YowizPanel.yowiz.getGenerators();
@@ -154,7 +150,7 @@ export class YowizPanel {
 	public sendQuestions(questions: inquirer.QuestionCollection<any>): Promise<inquirer.Answers> {
 		return this._rpc.invoke("receiveQuestions", [questions, "Step"]).then((response => {
 			vscode.window.showInformationMessage(response);
-			return Promise.resolve([]);
+			return Promise.resolve(response);
 		}));
 	}
 
