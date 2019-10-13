@@ -21,16 +21,13 @@ export default {
   },
   data() {
     return {
-      selectedIndex: null,
-      correctIndex: null,
-      answered: false
+      correctIndex: null
     };
   },
   watch: {
     currentQuestion: {
       immediate: true,
       handler() {
-        this.selectedIndex = null;
         this.answered = false;
       }
     }
@@ -38,13 +35,13 @@ export default {
   methods: {
     answerClass(index) {
       let answerClass = "";
-      if (!this.answered && this.selectedIndex === index) {
+      if (!this.answered && this.currentQuestion.answer === index) {
         answerClass = "selected";
       } else if (this.answered && this.correctIndex === index) {
         answerClass = "correct";
       } else if (
         this.answered &&
-        this.selectedIndex === index &&
+        this.currentQuestion.answer === index &&
         this.correctIndex !== index
       ) {
         answerClass = "incorrect";
@@ -52,7 +49,7 @@ export default {
       return answerClass;
     },
     selectAnswer(index) {
-      this.selectedIndex = index;
+      this.currentQuestion.answer = index;
     },
     submitAnswer() {
       this.answered = true;
@@ -60,7 +57,7 @@ export default {
   },
   mounted() {
       if (this.currentQuestion.default) {
-        this.selectedIndex = this.currentQuestion.default;
+        this.currentQuestion.answer = this.currentQuestion.default;
       }
   }
 };

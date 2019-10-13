@@ -47,7 +47,7 @@ export default {
         //count number of answers
         let counter = 0;
         this.currentStep.questions.forEach(question => {
-          if (question.answer) counter++;
+          if (question.answer!==undefined) counter++;
         });
         if (counter === this.currentStep.questions.length) {
           this.currentStep.allAnswered = true;
