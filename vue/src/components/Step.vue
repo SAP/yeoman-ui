@@ -36,23 +36,36 @@ export default {
       Object.assign(this.answers, answerObject);
     },
     onGeneratorSelected: function(generatorName) {
-      this.$emit('generatorSelected', generatorName);
+      this.$emit("generatorSelected", generatorName);
     }
   },
   watch: {
-    currentStep: function (val) {
-      this.answers = {};
-      for (let i=0; i<val.questions.length-1; i++) {
-        const question = val.questions[i];
-        if (question.default) {
-          let answerObject = {};
-          answerObject[question.name] = question.default;
-          Object.assign(this.answers, answerObject);
+    currentStep: {
+      //  immediate: true,
+      deep: true,
+      handler(val) {
+        //count number of answers
+        let counter = 0;
+        this.currentStep.questions.forEach(question => {
+          if (question.answer!==undefined) counter++;
+        });
+        if (counter === this.currentStep.questions.length) {
+          this.currentStep.allAnswered = true;
+        } else {
+          this.currentStep.allAnswered = false;
         }
+        // this.answers = {};
+        // for (let i = 0; i < val.questions.length - 1; i++) {
+        //   const question = val.questions[i];
+        //   if (question.default) {
+        //     let answerObject = {};
+        //     answerObject[question.name] = question.default;
+        //     Object.assign(this.answers, answerObject);
+        //   }
+        // }
       }
     }
   },
-  mounted() {
-  }
+  mounted() {}
 };
 </script>

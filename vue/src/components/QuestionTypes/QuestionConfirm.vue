@@ -17,9 +17,7 @@ export default {
   },
   methods: {
     onClick(answer) {
-      let answerObject = {};
-      answerObject[this.currentQuestion.name] = answer;
-      this.$emit('answer', answerObject);
+      this.currentQuestion.answer = answer;
     }
   },
   watch: {
