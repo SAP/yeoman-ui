@@ -177,7 +177,7 @@ export default {
 
       let prompt1 = {
         name: "Step 1",
-        questions: [confirmQ]
+        questions: [inputQ]
       };
       let prompt2 = {
         name: "Step 2",
