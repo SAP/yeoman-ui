@@ -2,12 +2,12 @@
   <div>
     <b-list-group flush>
       <b-list-group-item
-        v-for="(step, index) in steps"
+        v-for="(prompt, index) in prompts"
         :ref="index"
         :key="index"
         :class="(index===0 ? 'active' : '')"
         v-on:click="onClick"
-      >{{ step.name }}</b-list-group-item>
+      >{{ prompt.name }}</b-list-group-item>
     </b-list-group>
   </div>
 </template>
@@ -15,7 +15,7 @@
 <script>
 export default {
   name: "Navigation",
-  props: ["currentStep", "steps"],
+  props: ["currentStep", "prompts"],
   methods: {
     onClick(event) {
       this.select(event.currentTarget);

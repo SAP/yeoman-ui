@@ -1,34 +1,41 @@
 <template>
   <div id="app">
-    <div v-if="!steps.length" class="loading">Yowiz is loading...</div>
+    <div v-if="!prompts.length" class="loading">Yowiz is loading...</div>
 
     <Header
-      v-if="steps.length"
+      v-if="prompts.length"
       :currentStep="stepIndex+1"
-      :numOfSteps="steps.length"
+      :numOfSteps="prompts.length"
       :yeomanName="yeomanName"
-      :stepName="steps[stepIndex].name"
+      :stepName="prompts[stepIndex].name"
     />
 
     <b-container class="bv-example-row p-0 mx-1 mt-10">
       <b-row class="m-0 p-0">
         <b-col class="m-0 p-0" sm="auto">
           <b-container class="m-0 p-0">
-            <Navigation v-if="steps.length" :currentStep="stepIndex" :steps="steps" />
+            <Navigation v-if="prompts.length" :currentStep="stepIndex" :prompts="prompts" />
           </b-container>
         </b-col>
         <b-col class="m-0 p-0">
           <b-container>
             <Step
-              v-if="steps.length"
+              v-if="prompts.length"
               ref="step"
-              :currentStep="steps[stepIndex]"
+              :currentStep="prompts[stepIndex]"
               :next="next"
               v-on:generatorSelected="onGeneratorSelected"
             />
-            <div class="navigation" v-if="steps.length > 0">
-              <b-button class="mr-2 btn" @click="next" :disabled="stepIndex < steps.length - 1 && !steps[stepIndex].allAnswered">Next</b-button>
-              <b-button :disabled="stepIndex<steps.length-1" @click="next">Finish</b-button>
+            <div class="navigation" v-if="prompts.length > 0">
+              <b-button
+                class="mr-2 btn"
+                @click="next"
+                :disabled="stepIndex < prompts.length - 1 && !prompts[stepIndex].allAnswered"
+              >Next</b-button>
+              <!-- stepIndex = {{stepIndex}}
+              prompts.length - 1 = {{prompts.length - 1}}
+              !prompts[stepIndex].allAnswered = {{!prompts[stepIndex].allAnswered}} -->
+              <b-button :disabled="stepIndex<prompts.length-1" @click="next">Finish</b-button>
             </div>
           </b-container>
         </b-col>
@@ -54,7 +61,6 @@ export default {
     return {
       yeomanName: Object,
       prompts: [],
-      steps: [],
       questions: [],
       stepIndex: 0,
       index: 0,
@@ -67,9 +73,9 @@ export default {
   },
   methods: {
     next() {
-      this.prompts[this.stepIndex].questions.forEach(question => {
-        console.log("q" + question.message + ", " + question.answered);
-      });
+      // this.prompts[this.stepIndex].questions.forEach(question => {
+      //   console.log("q" + question.message + ", " + question.answered);
+      // });
 
       this.stepIndex++;
       if (this.resolve) {
@@ -117,24 +123,23 @@ export default {
       rpc.invoke("receiveIsWebviewReady", []);
     },
     loadMocks() {
+      const retPrompts = [];
+
       let generatorChoice1 = {
-        name: "SAP Fiori List Report Object Page FE V2",
-        message:
-          "Create an SAP Fiori Elements application which is based on a List Report Page abd Object Page Fiori elements in V2",
+        name: "Generator 1",
+        message: "Create an SAP project",
         imageUrl: "https://picsum.photos/600/300/?image=11"
       };
 
       let generatorChoice2 = {
-        name: "SAP Fiori List Report Object Page FE V4",
-        message:
-          "Create an SAP Fiori Elements application which is based on a List Report Page abd Object Page Fiori elements in V4",
+        name: "Generator 2",
+        message: "Create an SAP project",
         imageUrl: "https://picsum.photos/600/300/?image=22"
       };
 
       let generatorChoice3 = {
-        name: "CRUD Master Detail",
-        message:
-          "A worklist displays a collection of items that a user needs to process. Working through the list usually involves reviewing details of the items and taking actions. In most cases the user has to either complete a work item or delegate it.",
+        name: "Generator 3",
+        message: "Create an SAP project",
         imageUrl: "https://picsum.photos/600/300/?image=33"
       };
 
@@ -147,7 +152,7 @@ export default {
         name: "Generators",
         questions: [gensQuestion1]
       };
-      this.prompts.push(gensPrompt);
+      retPrompts.push(gensPrompt);
 
       let checkboxQ = {
         type: "checkbox",
@@ -164,7 +169,7 @@ export default {
       let listQ = {
         type: "list",
         name: "list1",
-        default: 1,
+        default: "c",
         message: "list: what is list?",
         choices: ["a", "b", "c", "d"]
       };
@@ -179,36 +184,33 @@ export default {
         name: "Step 1",
         questions: [checkboxQ, confirmQ, inputQ, listQ]
       };
-      let prompt2 = {
-        name: "Step 2",
-        questions: [checkboxQ, confirmQ, inputQ, listQ]
-      };
-      this.prompts.push(prompt1);
-      this.prompts.push(prompt2);
-      this.questions = [gensPrompt];
+
+      retPrompts.push(prompt1);
+      return retPrompts;
     }
   },
   mounted() {
+    let promptsTemp;
     if (this.isInVsCode()) {
       this.initRpc();
     } else {
-      this.loadMocks();
+      promptsTemp = this.loadMocks();
     }
 
     //todo: add validate support
 
     this.yeomanName = "<no generator selected>";
 
-    this.steps = this.prompts.map(prompt => {
+    promptsTemp.forEach(prompt => {
       this.$set(prompt, "allAnswered", false);
       prompt.questions.forEach(question => {
         this.$set(question, "answer", undefined);
       });
-      return prompt;
     });
 
-    this.questions = [];
     this.numTotal = this.questions.length;
+
+    this.prompts = promptsTemp;
   }
 };
 </script>
