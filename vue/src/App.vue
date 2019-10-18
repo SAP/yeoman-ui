@@ -65,35 +65,62 @@ export default {
       index: 0,
       rpc: Object,
       resolve: Object,
-      reject: Object,
-      currentGenerator: Object
+      reject: Object
     };
+  },
+  computed: {
+    currentPrompt: function() {
+      const response = this.prompts[this.stepIndex];
+      if (response) {
+        const answers = {};
+        response.questions.forEach((value) => {
+          answers[value.message] = value.answer;
+        });
+        response.answers = answers;
+      }
+      return response;
+    }
   },
   methods: {
     next() {
-      if (this.stepIndex >= this.prompts.length - 1) {
-        const prompt = { questions: [], name: "Step" };
-        this.prompts.push(prompt);
-      }
-      this.stepIndex++;
       if (this.resolve) {
         try {
-          this.resolve(this.$refs["step"].$data.answers);
+          this.resolve(this.currentPrompt.answers);
         } catch (e) {
           this.reject(e);
         }
       }
+      if (this.stepIndex >= this.prompts.length - 1) {
+        const prompt = { questions: [], name: "Step", status: "pending" };
+        this.addPrompt(prompt);
+      }
+      this.stepIndex++;
     },
     onGeneratorSelected: function(generatorName) {
       this.yeomanName = generatorName;
     },
+    addPrompt(prompt) {
+      // TODO:
+      //   if step/prompt name is provided, find an existing prompt based on key or name:
+      //     if found then update it
+      //     if not found then create a step/prompts
+      //   if no step/prompt name is provided, assign incoming question to current prompt
+      const currentPrompt = this.currentPrompt;
+      if (currentPrompt && currentPrompt.status === "pending") {
+        currentPrompt.questions = prompt.questions;
+        currentPrompt.name = prompt.name;
+        delete currentPrompt.status;
+      } else {
+        this.$set(prompt, "allAnswered", false);
+        prompt.questions.forEach(question => {
+          this.$set(question, "answer", undefined);
+        });
+        this.prompts.push(prompt);
+      }
+    },
     receiveQuestions(questions, name) {
-      // eslint-disable-next-line
-      console.dir(questions);
-      // eslint-disable-next-line
-      console.log("received questions");
       const prompt = { questions: questions, name: name };
-      this.prompts.push(prompt);
+      this.addPrompt(prompt);
       const promise = new Promise((resolve, reject) => {
         this.resolve = resolve;
         this.reject = reject;
@@ -128,101 +155,21 @@ export default {
         name: "receiveQuestions"
       });
       this.rpc.invoke("receiveIsWebviewReady", []);
-    },
-    loadMocks() {
-      const retPrompts = [];
-
-      let generatorChoice1 = {
-        name: "Generator 1",
-        message: "Create an SAP project",
-        imageUrl: "https://picsum.photos/600/300/?image=11"
-      };
-
-      let generatorChoice2 = {
-        name: "Generator 2",
-        message: "Create an SAP project",
-        imageUrl: "https://picsum.photos/600/300/?image=22"
-      };
-
-      let generatorChoice3 = {
-        name: "Generator 3",
-        message: "Create an SAP project",
-        imageUrl: "https://picsum.photos/600/300/?image=33"
-      };
-
-      let gensQuestion1 = {
-        type: "generators",
-        message: "",
-        choices: [generatorChoice1, generatorChoice2, generatorChoice3]
-      };
-      let gensPrompt = {
-        name: "Generators",
-        questions: [gensQuestion1]
-      };
-      retPrompts.push(gensPrompt);
-
-      let checkboxQ = {
-        type: "checkbox",
-        name: "cb1",
-        message: "checkbox: what is checkbox?",
-        choices: ["a", "b", "c", "d"]
-      };
-      let inputQ = {
-        type: "input",
-        name: "in1",
-        default: "input: default answer",
-        message: "input: what is input?"
-      };
-      let listQ = {
-        type: "list",
-        name: "list1",
-        default: "c",
-        message: "list: what is list?",
-        choices: ["a", "b", "c", "d"]
-      };
-      let confirmQ = {
-        type: "confirm",
-        name: "conf1",
-        default: "yes",
-        message: "confirm: what is list?"
-      };
-
-      let prompt1 = {
-        name: "Step 1",
-        questions: [checkboxQ, confirmQ, inputQ, listQ]
-      };
-
-      retPrompts.push(prompt1);
-      return retPrompts;
     }
   },
   mounted() {
-    let promptsTemp = [];
     this.setupRpc();
 
     //todo: add validate support
 
     this.yeomanName = "<no generator selected>";
-
-    promptsTemp.forEach(prompt => {
-      this.$set(prompt, "allAnswered", false);
-      prompt.questions.forEach(question => {
-        this.$set(question, "answer", undefined);
-      });
-    });
-
-    this.prompts = promptsTemp;
+    this.prompts = [];
   }
 };
 </script>
 
 <style>
 #app {
-  /* font-family: "Avenir", Helvetica, Arial, sans-serif; */
-  /* -webkit-font-smoothing: antialiased; */
-  /* -moz-osx-font-smoothing: grayscale; */
-  /* text-align: center; */
-  /* margin-top: 60px; */
   color: var(--vscode-foreground, white);
   background-color: var(--vscode-panel-background, #303031);
   font-family: var(--vscode-font-family);

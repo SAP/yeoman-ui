@@ -3,10 +3,8 @@
     <b-list-group flush>
       <b-list-group-item
         v-for="(prompt, index) in prompts"
-        :ref="index"
+        href="#"
         :key="index"
-        :class="(index===0 ? 'active' : '')"
-        v-on:click="onClick"
       >{{ prompt.name }}</b-list-group-item>
     </b-list-group>
   </div>
@@ -17,29 +15,29 @@ export default {
   name: "Navigation",
   props: ["currentStep", "prompts"],
   methods: {
-    onClick(event) {
-      this.select(event.currentTarget);
-    },
-    select(element) {
-      if (this.selectedItem) {
-        this.selectedItem.classList.toggle("active");
-      }
-      this.selectedItem = element;
-      this.selectedItem.classList.toggle("active");
-    }
+    // onClick(event) {
+    //   this.select(event.currentTarget);
+    // },
+    // select(element) {
+    //   if (this.selectedItem) {
+    //     this.selectedItem.classList.toggle("active");
+    //   }
+    //   this.selectedItem = element;
+    //   this.selectedItem.classList.toggle("active");
+    // }
   },
   watch: {
-    currentStep: function (val) {
-      this.select(this.$refs[val][0]);
-    }
+    // currentStep: function (val) {
+    //   this.select(this.$refs[val][0]);
+    // }
   },
   data() {
     return {
-      selectedItem: undefined
+      // selectedItem: undefined
     }
   },
   mounted() {
-    this.selectedItem = document.getElementsByClassName("list-group-item")[0];
+    // this.selectedItem = document.getElementsByClassName("list-group-item")[0];
   }
 };
 </script>

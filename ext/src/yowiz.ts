@@ -67,7 +67,7 @@ export class Yowiz {
           });
           const generatorQuestion: IGeneratorQuestion = {
             type: "generators",
-            message: "",
+            message: "name",
             choices: generatorChoices
           };
           resolve({ name: "Choose Generator", questions: [generatorQuestion] });

@@ -31,7 +31,7 @@ export class Messaging {
         (generators ? generators.questions : []),
         (generators ? generators.name : "")
       ]);
-      this.runGenerator(response.generatorName);
+      this.runGenerator(response.name);
     }
 	}
 
@@ -41,7 +41,7 @@ export class Messaging {
     }
 	}
 
-	public sendQuestions(questions: inquirer.QuestionCollection<any>): Promise<inquirer.Answers> {
+  public async askQuestions(questions: Adapter.Questions<any>): Promise<inquirer.Answers> {
     if (this._rpc) {
       return this._rpc.invoke("receiveQuestions", [questions, "Step"]).then((response => {
         return Promise.resolve(response);
@@ -49,10 +49,5 @@ export class Messaging {
     } else {
       return Promise.resolve({});
     }
-	}
-
-  public async askQuestions(questions: Adapter.Questions<any>): Promise<inquirer.Answers> {
-    const answers = await this.sendQuestions(questions);
-    return answers;
   }
 }
