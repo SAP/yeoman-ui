@@ -4,7 +4,16 @@
 // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
 {
 	"version": "0.2.0",
-	"configurations": [{
+	"configurations": [
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "WebSockets Server (dev)",
+			"program": "${workspaceFolder}/src/test/index.ts",
+			"outFiles": ["${workspaceFolder}/out/**/*.js"],
+			"preLaunchTask": "npm: watch"
+		},
+		{
 			"name": "Run Extension",
 			"type": "extensionHost",
 			"request": "launch",

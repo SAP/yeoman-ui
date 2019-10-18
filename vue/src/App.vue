@@ -9,7 +9,6 @@
       :yeomanName="yeomanName"
       :stepName="prompts[stepIndex].name"
     />
-
     <b-container class="bv-example-row p-0 mx-1 mt-10">
       <b-row class="m-0 p-0">
         <b-col class="m-0 p-0" sm="auto">
@@ -49,6 +48,7 @@ import Header from "./components/Header.vue";
 import Navigation from "./components/Navigation.vue";
 import Step from "./components/Step.vue";
 import { RpcBrowser } from "./rpc/rpc-browser.js";
+import { RpcBrowserWebSockets } from "./rpc/rpc-browser-ws.js";
 
 export default {
   name: "app",
@@ -61,10 +61,8 @@ export default {
     return {
       yeomanName: Object,
       prompts: [],
-      questions: [],
       stepIndex: 0,
       index: 0,
-      numTotal: 0,
       rpc: Object,
       resolve: Object,
       reject: Object,
@@ -73,10 +71,10 @@ export default {
   },
   methods: {
     next() {
-      // this.prompts[this.stepIndex].questions.forEach(question => {
-      //   console.log("q" + question.message + ", " + question.answered);
-      // });
-
+      if (this.stepIndex >= this.prompts.length - 1) {
+        const prompt = { questions: [], name: "Step" };
+        this.prompts.push(prompt);
+      }
       this.stepIndex++;
       if (this.resolve) {
         try {
@@ -107,20 +105,29 @@ export default {
       this.rpc.invoke("runGenerator", [generatorName]);
     },
     isInVsCode() {
-      // eslint-disable-next-line
       return typeof acquireVsCodeApi !== "undefined";
     },
+    setupRpc() {
+      if (this.isInVsCode()) {
+        // eslint-disable-next-line
+        const vscode = acquireVsCodeApi();
+        this.rpc = new RpcBrowser(window, vscode);
+        this.initRpc();
+      } else {
+        const ws = new WebSocket("ws://127.0.0.1:8081");
+        ws.onopen = () => {
+          this.rpc = new RpcBrowserWebSockets(ws);
+          this.initRpc();
+        }
+      }
+    },
     initRpc() {
-      // eslint-disable-next-line
-      const vscode = acquireVsCodeApi();
-      const rpc = new RpcBrowser(window, vscode);
-      this.rpc = rpc;
-      rpc.registerMethod({
+      this.rpc.registerMethod({
         func: this.receiveQuestions,
         thisArg: this,
         name: "receiveQuestions"
       });
-      rpc.invoke("receiveIsWebviewReady", []);
+      this.rpc.invoke("receiveIsWebviewReady", []);
     },
     loadMocks() {
       const retPrompts = [];
@@ -190,12 +197,8 @@ export default {
     }
   },
   mounted() {
-    let promptsTemp;
-    if (this.isInVsCode()) {
-      this.initRpc();
-    } else {
-      promptsTemp = this.loadMocks();
-    }
+    let promptsTemp = [];
+    this.setupRpc();
 
     //todo: add validate support
 
@@ -207,8 +210,6 @@ export default {
         this.$set(question, "answer", undefined);
       });
     });
-
-    this.numTotal = this.questions.length;
 
     this.prompts = promptsTemp;
   }

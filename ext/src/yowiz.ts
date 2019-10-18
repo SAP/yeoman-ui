@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as Environment from "yeoman-environment";
 import { WizAdapter } from "./wiz-adapter";
 import { Messaging } from "./messaging";
-import { YowizPanel } from "./extension";
+import { RpcCommon } from "./rpc/rpc-common";
 
 export interface IGeneratorChoice {
   name: string;
@@ -26,9 +26,11 @@ export interface IPrompt {
 export class Yowiz {
   private _env: Environment;
 
-  constructor(yowizPanel: YowizPanel) {
+  constructor(rpc: RpcCommon) {
     const wizAdapter = new WizAdapter();
-    const messaging = new Messaging(yowizPanel);
+    const messaging = new Messaging();
+    messaging.setRpc(rpc);
+    messaging.setYowiz(this);
     wizAdapter.setMessaging(messaging);
     const cwd: string = path.join(os.homedir(), "projects", "wiz1");
 
@@ -51,6 +53,7 @@ export class Yowiz {
     // on the other hand, we never look for newly installed generators...
 
     const promise: Promise<IPrompt | undefined> = new Promise((resolve, reject) => {
+      let genMeta = this._env.getGeneratorsMeta();
       this._env.lookup((err) => {
         const generatorNames: string[] = this._env.getGeneratorNames();
         if (generatorNames.length > 0) {

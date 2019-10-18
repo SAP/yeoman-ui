@@ -32,15 +32,14 @@ export class YowizPanel {
 	 */
 	public static currentPanel: YowizPanel | undefined;
 	private _rpc: RpcExtenstion;
+	public _yowiz: Yowiz;
 
 	public static readonly viewType = 'yowiz';
 
-	public static yowiz: Yowiz;
 	private readonly _panel: vscode.WebviewPanel;
 	private readonly _extensionPath: string;
 	private _disposables: vscode.Disposable[] = [];
 	private _questionsResolutions: Map<number, any>;
-	private _taskId: number;
 
 	public static createOrShow(extensionPath: string) {
 		const column = vscode.window.activeTextEditor
@@ -68,33 +67,18 @@ export class YowizPanel {
 		);
 
 		YowizPanel.currentPanel = new YowizPanel(panel, extensionPath);
-		this.yowiz = new Yowiz(YowizPanel.currentPanel);
 	}
 
 	public static revive(panel: vscode.WebviewPanel, extensionPath: string) {
 		YowizPanel.currentPanel = new YowizPanel(panel, extensionPath);
-		this.yowiz = new Yowiz(YowizPanel.currentPanel);
-	}
-
-	showMessage(message: string) {
-		let _vscode = vscode;
-		return new Promise((resolve, reject) => {
-			_vscode.window.showInformationMessage(message, "yes", "no").then((res) => {
-				resolve(res);
-			});
-		});
 	}
 
 	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
 		this._questionsResolutions = new Map();
-		this._taskId = 0;
 		this._panel = panel;
 		this._extensionPath = extensionPath;
 		this._rpc = new RpcExtenstion(this._panel.webview);
-		this._rpc.setResponseTimeout(3600000);
-		this._rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
-		this._rpc.registerMethod({ func: this.showMessage, thisArg: this });
-		this._rpc.registerMethod({ func: this.runGenerator, thisArg: this });
+		this._yowiz = new Yowiz(this._rpc);
 
 		// Set the webview's initial html content
 		this._update();
@@ -130,28 +114,6 @@ export class YowizPanel {
 			null,
 			this._disposables
 		);
-	}
-
-	public async receiveIsWebviewReady() {
-		// TODO: loading generators takes a long time; consider prefetching list of generators
-		const generators: IPrompt | undefined = await YowizPanel.yowiz.getGenerators();
-
-		const response: any = await this._rpc.invoke("receiveQuestions", [
-			(generators ? generators.questions : []),
-			(generators ? generators.name : "")
-		]);
-		this.runGenerator(response.generatorName);
-	}
-
-	public runGenerator(generatorName: string): void {
-		YowizPanel.yowiz.run(generatorName);
-	}
-
-	public sendQuestions(questions: inquirer.QuestionCollection<any>): Promise<inquirer.Answers> {
-		return this._rpc.invoke("receiveQuestions", [questions, "Step"]).then((response => {
-			vscode.window.showInformationMessage(response);
-			return Promise.resolve(response);
-		}));
 	}
 
 	public dispose() {

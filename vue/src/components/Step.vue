@@ -43,16 +43,18 @@ export default {
     currentStep: {
       //  immediate: true,
       deep: true,
-      handler(val) {
+      handler() {
         //count number of answers
         let counter = 0;
-        this.currentStep.questions.forEach(question => {
-          if (question.answer!==undefined) counter++;
-        });
-        if (counter === this.currentStep.questions.length) {
-          this.currentStep.allAnswered = true;
-        } else {
-          this.currentStep.allAnswered = false;
+        if (this.currentStep) {
+          this.currentStep.questions.forEach(question => {
+            if (question.answer!==undefined) counter++;
+          });
+          if (counter === this.currentStep.questions.length) {
+            this.currentStep.allAnswered = true;
+          } else {
+            this.currentStep.allAnswered = false;
+          }
         }
         // this.answers = {};
         // for (let i = 0; i < val.questions.length - 1; i++) {
