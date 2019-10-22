@@ -74,7 +74,7 @@ export default {
       if (response) {
         const answers = {};
         response.questions.forEach((value) => {
-          answers[value.message] = value.answer;
+          answers[value.name] = value.answer;
         });
         response.answers = answers;
       }

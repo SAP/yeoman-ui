@@ -14,6 +14,7 @@ export interface IGeneratorChoice {
 
 export interface IGeneratorQuestion {
   type: string;
+  name: string;
   message: string;
   choices: IGeneratorChoice[];
 }
@@ -24,28 +25,19 @@ export interface IPrompt {
 }
 
 export class Yowiz {
-  private _env: Environment;
+  private _rpc: RpcCommon;
+  private _genMeta: { [namespace: string]: Environment.GeneratorMeta };
+  private _wizAdapter: WizAdapter;
 
   constructor(rpc: RpcCommon) {
-    const wizAdapter = new WizAdapter();
+    this._rpc = rpc;
+    this._wizAdapter = new WizAdapter();
     const messaging = new Messaging();
-    messaging.setRpc(rpc);
+    messaging.setRpc(this._rpc);
     messaging.setYowiz(this);
-    wizAdapter.setMessaging(messaging);
-    const cwd: string = path.join(os.homedir(), "projects", "wiz1");
+    this._wizAdapter.setMessaging(messaging);
 
-    // TODO: should create and set target dir only after user has selected a generator;
-    //  see issue: https://github.com/yeoman/environment/issues/55
-    //  process.chdir() doesn't work after environment has been created
-
-    // TODO: wait for dir to be created
-    fs.mkdir(cwd, {recursive: true}, (err) => {
-      if (err) {
-        console.error(err);
-      }
-    });
-    
-    this._env = Environment.createEnv(undefined, {cwd:cwd}, wizAdapter);
+    this._genMeta = {};
   }
 
   public getGenerators(): Promise<IPrompt | undefined> {
@@ -53,9 +45,10 @@ export class Yowiz {
     // on the other hand, we never look for newly installed generators...
 
     const promise: Promise<IPrompt | undefined> = new Promise((resolve, reject) => {
-      let genMeta = this._env.getGeneratorsMeta();
-      this._env.lookup((err) => {
-        const generatorNames: string[] = this._env.getGeneratorNames();
+      const env = Environment.createEnv();
+      env.lookup((err) => {
+        const generatorNames: string[] = env.getGeneratorNames();
+        this._genMeta = env.getGeneratorsMeta();
         if (generatorNames.length > 0) {
           const generatorChoices: IGeneratorChoice[] = generatorNames.map((value, index, array) => {
             const choice: IGeneratorChoice = {
@@ -67,6 +60,7 @@ export class Yowiz {
           });
           const generatorQuestion: IGeneratorQuestion = {
             type: "generators",
+            name: "name",
             message: "name",
             choices: generatorChoices
           };
@@ -80,11 +74,39 @@ export class Yowiz {
   }
 
   public run(generatorName: string) {
-    this._env.run(generatorName, { 'skip-install': true }, err => {
+
+    // TODO: ensure generatorName is a valid dir name
+    const cwd: string = path.join(os.homedir(), "projects", generatorName);
+
+    // TODO: wait for dir to be created
+    fs.mkdir(cwd, { recursive: true }, (err) => {
       if (err) {
         console.error(err);
       }
-      console.log('done running yowiz');
     });
+
+    // TODO: should create and set target dir only after user has selected a generator;
+    //  see issue: https://github.com/yeoman/environment/issues/55
+    //  process.chdir() doesn't work after environment has been created
+
+    const env: Environment = Environment.createEnv(undefined, { cwd: cwd }, this._wizAdapter);
+    try {
+      let meta: Environment.GeneratorMeta = this._genMeta[`${generatorName}:app`];
+      // TODO: support sub-generators
+      env.register(meta.resolved);
+      const gen = env.create(`${generatorName}:app`, {});
+      if ((gen as any)["getPrompts"] !== undefined) {
+        const prompts: Object[] = (gen as any)["getPrompts"]();
+      }
+
+      env.run(generatorName, { 'skip-install': true }, err => {
+        if (err) {
+          console.error(err);
+        }
+        console.log('done running yowiz');
+      });
+    } catch (err) {
+      console.error(err);
+    }
   }
 }
