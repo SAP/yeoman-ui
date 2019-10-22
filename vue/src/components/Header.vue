@@ -4,7 +4,7 @@
       <b-nav-item disabled>
         <b>Yeoman UI:</b> {{yeomanName}}
       </b-nav-item>
-      <b-nav-item disabled>Step: {{ currentStep }}/{{ numOfSteps }}</b-nav-item>
+      <b-nav-item disabled>Step: {{ currentPrompt }}/{{ numOfSteps }}</b-nav-item>
       <b-nav-item disabled>{{ stepName }}</b-nav-item>
     </b-nav>
   </div>
@@ -16,7 +16,7 @@ export default {
   name: "Header",
   props: [
     'yeomanName',
-    'currentStep',
+    'currentPrompt',
     'numOfSteps',
     'stepName'
   ]

@@ -2,7 +2,7 @@
   <div>
     <b-form>
       <QuestionTypeSelector
-        v-for="(item, index) in currentStep.questions"
+        v-for="(item, index) in currentPrompt.questions"
         :key="index"
         :currentQuestion="item"
         :next="next"
@@ -22,7 +22,7 @@ export default {
     QuestionTypeSelector
   },
   props: {
-    currentStep: Object,
+    currentPrompt: Object,
     currentQuestion: Object,
     next: Function
   },
@@ -40,20 +40,21 @@ export default {
     }
   },
   watch: {
-    currentStep: {
+    currentPrompt: {
       //  immediate: true,
       deep: true,
       handler() {
+        // TODO: this is currently not trigerred when pending prompt receives actual questions, so Next button does not get enabled
         //count number of answers
         let counter = 0;
-        if (this.currentStep) {
-          this.currentStep.questions.forEach(question => {
+        if (this.currentPrompt) {
+          this.currentPrompt.questions.forEach(question => {
             if (question.answer!==undefined) counter++;
           });
-          if (counter === this.currentStep.questions.length) {
-            this.currentStep.allAnswered = true;
+          if (counter === this.currentPrompt.questions.length) {
+            this.currentPrompt.allAnswered = true;
           } else {
-            this.currentStep.allAnswered = false;
+            this.currentPrompt.allAnswered = false;
           }
         }
         // this.answers = {};

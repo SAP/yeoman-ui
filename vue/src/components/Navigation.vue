@@ -13,31 +13,15 @@
 <script>
 export default {
   name: "Navigation",
-  props: ["currentStep", "prompts"],
+  props: ["currentPrompt", "prompts"],
   methods: {
-    // onClick(event) {
-    //   this.select(event.currentTarget);
-    // },
-    // select(element) {
-    //   if (this.selectedItem) {
-    //     this.selectedItem.classList.toggle("active");
-    //   }
-    //   this.selectedItem = element;
-    //   this.selectedItem.classList.toggle("active");
-    // }
   },
   watch: {
-    // currentStep: function (val) {
-    //   this.select(this.$refs[val][0]);
-    // }
   },
   data() {
-    return {
-      // selectedItem: undefined
-    }
+    return {}
   },
   mounted() {
-    // this.selectedItem = document.getElementsByClassName("list-group-item")[0];
   }
 };
 </script>

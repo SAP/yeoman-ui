@@ -1,7 +1,6 @@
 'use strict';
 import { Adapter } from "yeoman-environment";
-import inquirer = require("inquirer");
-import { Messaging } from "./messaging";
+import { Yowiz } from "./yowiz";
 
 const chalk = require('chalk');
 
@@ -18,11 +17,11 @@ export class WizAdapter implements Adapter {
     this.log.identical = this._log.identical;
   }
 
-  public setMessaging(messaging: Messaging) {
-    this._messaging = messaging;
+  public setYowiz(yowiz: Yowiz) {
+    this._yowiz = yowiz;
   }
 
-  private _messaging: Messaging | undefined = undefined;
+  private _yowiz: Yowiz | undefined = undefined;
   private _log: WizAdapterLog;
 
   public log: {
@@ -56,8 +55,8 @@ export class WizAdapter implements Adapter {
     questions: Adapter.Questions<T1>,
     cb?: (res: T1) => T2
   ): Promise<T2> {
-    if (this._messaging && questions) {
-      return (<Promise<T2>>this._messaging.askQuestions(questions));
+    if (this._yowiz && questions) {
+      return (<Promise<T2>>this._yowiz.askQuestions(questions));
     } else {
       return Promise.resolve(<T2>{});
     }

@@ -2,8 +2,8 @@ import * as os from "os";
 import * as path from "path";
 import * as fs from "fs";
 import * as Environment from "yeoman-environment";
+import * as inquirer from "inquirer";
 import { WizAdapter } from "./wiz-adapter";
-import { Messaging } from "./messaging";
 import { RpcCommon } from "./rpc/rpc-common";
 
 export interface IGeneratorChoice {
@@ -31,11 +31,11 @@ export class Yowiz {
 
   constructor(rpc: RpcCommon) {
     this._rpc = rpc;
+		this._rpc.setResponseTimeout(3600000);
+		this._rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
+		this._rpc.registerMethod({ func: this.runGenerator, thisArg: this });
     this._wizAdapter = new WizAdapter();
-    const messaging = new Messaging();
-    messaging.setRpc(this._rpc);
-    messaging.setYowiz(this);
-    this._wizAdapter.setMessaging(messaging);
+    this._wizAdapter.setYowiz(this);
 
     this._genMeta = {};
   }
@@ -73,7 +73,7 @@ export class Yowiz {
     return promise;
   }
 
-  public run(generatorName: string) {
+  public runGenerator(generatorName: string) {
 
     // TODO: ensure generatorName is a valid dir name
     const cwd: string = path.join(os.homedir(), "projects", generatorName);
@@ -96,7 +96,12 @@ export class Yowiz {
       env.register(meta.resolved);
       const gen = env.create(`${generatorName}:app`, {});
       if ((gen as any)["getPrompts"] !== undefined) {
-        const prompts: Object[] = (gen as any)["getPrompts"]();
+        const promptNames: Object[] = (gen as any)["getPrompts"]();
+        const prompts: IPrompt[] = promptNames.map((value)=> {
+          let prompt: IPrompt = Object.assign({questions:[], name:""}, value);
+          return prompt;
+        });
+        this.sendPrompts(prompts);
       }
 
       env.run(generatorName, { 'skip-install': true }, err => {
@@ -107,6 +112,37 @@ export class Yowiz {
       });
     } catch (err) {
       console.error(err);
+    }
+  }
+
+  public async receiveIsWebviewReady() {
+		// TODO: loading generators takes a long time; consider prefetching list of generators
+    if (this._rpc) {
+      const generators: IPrompt | undefined = await this.getGenerators();
+
+      const response: any = await this._rpc.invoke("receivePrompt", [
+        (generators ? generators.questions : []),
+        (generators ? generators.name : "")
+      ]);
+      this.runGenerator(response.name);
+    }
+	}
+
+  public async askQuestions(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
+    if (this._rpc) {
+      return this._rpc.invoke("receivePrompt", [questions, ""]).then((response => {
+        return Promise.resolve(response);
+      }));
+    } else {
+      return Promise.resolve({});
+    }
+  }
+
+  private sendPrompts(prompts: IPrompt[]): Promise<void> {
+    if (this._rpc) {
+      return this._rpc.invoke("setPrompts", [prompts]);
+    } else {
+      return Promise.resolve();
     }
   }
 }

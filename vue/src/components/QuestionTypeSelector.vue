@@ -12,6 +12,8 @@
       <QuestionConfirm v-if="currentQuestion.type==='confirm'" :currentQuestion="currentQuestion" v-on:answer="onAnswer" />
 
       <QuestionCheckbox v-if="currentQuestion.type==='checkbox'" :currentQuestion="currentQuestion" />
+
+      <QuestionExpand v-if="currentQuestion.type==='expand'" :currentQuestion="currentQuestion" />
     </b-form-group>
   </div>
 </template>
@@ -21,6 +23,7 @@ import QuestionList from "./QuestionTypes/QuestionList";
 import QuestionInput from "./QuestionTypes/QuestionInput";
 import QuestionConfirm from "./QuestionTypes/QuestionConfirm";
 import QuestionCheckbox from "./QuestionTypes/QuestionCheckbox";
+import QuestionExpand from "./QuestionTypes/QuestionExpand";
 import GeneratorSelection from "./QuestionTypes/GeneratorSelection";
 
 export default {
@@ -30,6 +33,7 @@ export default {
     QuestionInput,
     QuestionConfirm,
     QuestionCheckbox,
+    QuestionExpand,
     GeneratorSelection
   },
   props: {

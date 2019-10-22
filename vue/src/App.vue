@@ -4,16 +4,16 @@
 
     <Header
       v-if="prompts.length"
-      :currentStep="stepIndex+1"
+      :currentPrompt="promptIndex+1"
       :numOfSteps="prompts.length"
       :yeomanName="yeomanName"
-      :stepName="prompts[stepIndex].name"
+      :stepName="prompts[promptIndex].name"
     />
     <b-container class="bv-example-row p-0 mx-1 mt-10">
       <b-row class="m-0 p-0">
         <b-col class="m-0 p-0" sm="auto">
           <b-container class="m-0 p-0">
-            <Navigation v-if="prompts.length" :currentStep="stepIndex" :prompts="prompts" />
+            <Navigation v-if="prompts.length" :currentPrompt="promptIndex" :prompts="prompts" />
           </b-container>
         </b-col>
         <b-col class="m-0 p-0">
@@ -21,20 +21,17 @@
             <Step
               v-if="prompts.length"
               ref="step"
-              :currentStep="prompts[stepIndex]"
+              :currentPrompt="prompts[promptIndex]"
               :next="next"
               v-on:generatorSelected="onGeneratorSelected"
             />
             <div class="navigation" v-if="prompts.length > 0">
-              <b-button
-                class="mr-2 btn"
-                @click="next"
-                :disabled="stepIndex < prompts.length - 1 && !prompts[stepIndex].allAnswered"
-              >Next</b-button>
-              <!-- stepIndex = {{stepIndex}}
+              <b-button class="mr-2 btn" @click="next">Next</b-button>
+              <!-- :disabled="promptIndex < prompts.length - 1 && !currentPrompt.allAnswered" -->
+              <!-- promptIndex = {{promptIndex}}
               prompts.length - 1 = {{prompts.length - 1}}
-              !prompts[stepIndex].allAnswered = {{!prompts[stepIndex].allAnswered}} -->
-              <b-button :disabled="stepIndex<prompts.length-1" @click="next">Finish</b-button>
+              !prompts[promptIndex].allAnswered = {{!prompts[promptIndex].allAnswered}}-->
+              <b-button :disabled="promptIndex<prompts.length-1" @click="next">Finish</b-button>
             </div>
           </b-container>
         </b-col>
@@ -61,7 +58,7 @@ export default {
     return {
       yeomanName: Object,
       prompts: [],
-      stepIndex: 0,
+      promptIndex: 0,
       index: 0,
       rpc: Object,
       resolve: Object,
@@ -70,10 +67,10 @@ export default {
   },
   computed: {
     currentPrompt: function() {
-      const response = this.prompts[this.stepIndex];
+      const response = this.prompts[this.promptIndex];
       if (response) {
         const answers = {};
-        response.questions.forEach((value) => {
+        response.questions.forEach(value => {
           answers[value.name] = value.answer;
         });
         response.answers = answers;
@@ -90,37 +87,64 @@ export default {
           this.reject(e);
         }
       }
-      if (this.stepIndex >= this.prompts.length - 1) {
+      if (this.promptIndex >= this.prompts.length - 1) {
         const prompt = { questions: [], name: "Step", status: "pending" };
-        this.addPrompt(prompt);
+        this.setPrompts([prompt]);
       }
-      this.stepIndex++;
+      this.promptIndex++;
     },
     onGeneratorSelected: function(generatorName) {
       this.yeomanName = generatorName;
     },
-    addPrompt(prompt) {
+    setPrompts(prompts) {
       // TODO:
-      //   if step/prompt name is provided, find an existing prompt based on key or name:
+      //   if prompt name is provided, find an existing prompt based on key or name:
       //     if found then update it
-      //     if not found then create a step/prompts
-      //   if no step/prompt name is provided, assign incoming question to current prompt
+      //     if not found then create a prompt
+      //   if no prompt name is provided, assign incoming question to current prompt
+
       const currentPrompt = this.currentPrompt;
-      if (currentPrompt && currentPrompt.status === "pending") {
-        currentPrompt.questions = prompt.questions;
-        currentPrompt.name = prompt.name;
-        delete currentPrompt.status;
-      } else {
-        this.$set(prompt, "allAnswered", false);
-        prompt.questions.forEach(question => {
-          this.$set(question, "answer", undefined);
+
+      if (prompts) {
+        prompts.forEach((prompt, index) => {
+          if (index === 0) {
+            if (prompt.status === "pending") {
+              // new pending prompt
+              this.setPromptAttributes(prompt);
+              this.prompts.push(prompt);
+            } else {
+              if (currentPrompt) {
+                currentPrompt.questions = prompt.questions;
+                if (!!prompt.name) {
+                  currentPrompt.name = prompt.name;
+                }
+                // if questions are provided, remote the pending status
+                if (prompt.questions.length > 0) {
+                  delete currentPrompt.status;
+                }
+              } else {
+                // first prompt (choose generator)
+                this.setPromptAttributes(prompt);
+                this.prompts.push(prompt);
+              }
+            }
+          } else {
+            // multiple prompts provided -- simply add them
+            this.setPromptAttributes(prompt);
+            this.prompts.push(prompt);
+          }
         });
-        this.prompts.push(prompt);
       }
     },
-    receiveQuestions(questions, name) {
+    setPromptAttributes(prompt) {
+      this.$set(prompt, "allAnswered", false);
+      prompt.questions.forEach(question => {
+        this.$set(question, "answer", undefined);
+      });
+    },
+    receivePrompt(questions, name) {
       const prompt = { questions: questions, name: name };
-      this.addPrompt(prompt);
+      this.setPrompts([prompt]);
       const promise = new Promise((resolve, reject) => {
         this.resolve = resolve;
         this.reject = reject;
@@ -145,14 +169,19 @@ export default {
         ws.onopen = () => {
           this.rpc = new RpcBrowserWebSockets(ws);
           this.initRpc();
-        }
+        };
       }
     },
     initRpc() {
       this.rpc.registerMethod({
-        func: this.receiveQuestions,
+        func: this.receivePrompt,
         thisArg: this,
-        name: "receiveQuestions"
+        name: "receivePrompt"
+      });
+      this.rpc.registerMethod({
+        func: this.setPrompts,
+        thisArg: this,
+        name: "setPrompts"
       });
       this.rpc.invoke("receiveIsWebviewReady", []);
     }
