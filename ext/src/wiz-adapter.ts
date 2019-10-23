@@ -15,6 +15,7 @@ export class WizAdapter implements Adapter {
     this.log.create = this._log.create;
     this.log.force = this._log.force;
     this.log.identical = this._log.identical;
+    this.log.skip = this._log.skip;
   }
 
   public setYowiz(yowiz: Yowiz) {
@@ -30,7 +31,8 @@ export class WizAdapter implements Adapter {
       conflict?: { (str: string): void },
       create?: { (str: string): void },
       force?: { (str: string): void },
-      identical?: { (str: string): void }
+      identical?: { (str: string): void },
+      skip?: { (str: string): void }
     } = (value: string) => {
     console.log(value);
   }
@@ -55,7 +57,18 @@ export class WizAdapter implements Adapter {
     cb?: (res: T1) => T2
   ): Promise<T2> {
     if (this._yowiz && questions) {
-      return (<Promise<T2>>this._yowiz.showPrompt(questions));
+      return (<Promise<T2>>this._yowiz.showPrompt(questions)).then((result) => {
+        if (cb) {
+          const response = cb(result as any);
+          return response;
+        } else {
+          return result;
+        }
+      }).catch((reason) => {
+        return Promise.reject(reason);
+      });
+
+      // return (<Promise<T2>>this._yowiz.showPrompt(questions));
     } else {
       return Promise.resolve(<T2>{});
     }
@@ -91,5 +104,9 @@ class WizAdapterLog {
 
   public identical(str: string):void {
     console.log(`*** in identical(): ${str}`);
+  }
+
+  public skip(str: string):void {
+    console.log(`*** in skip(): ${str}`);
   }
 }
