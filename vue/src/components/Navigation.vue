@@ -4,6 +4,7 @@
       <b-list-group-item
         v-for="(prompt, index) in prompts"
         href="#"
+        :active="prompt.active"
         :key="index"
       >{{ prompt.name }}</b-list-group-item>
     </b-list-group>
@@ -39,7 +40,7 @@ export default {
   background-color: var(--vscode-sideBar-background, #252526);
   border-color: var(--vscode-sideBar-background, #252526);
   color: var(--vscode-foreground, #cccccc);
-  cursor: pointer;
+  cursor: default;
 }
 
 /* selected item */

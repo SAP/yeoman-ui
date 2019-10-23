@@ -94,6 +94,8 @@ export default {
         this.setPrompts([prompt]);
       }
       this.promptIndex++;
+      this.prompts[this.promptIndex-1].active = false;
+      this.prompts[this.promptIndex].active = true;
     },
     onGeneratorSelected: function(generatorName) {
       this.generatorName = generatorName;
@@ -128,6 +130,7 @@ export default {
               } else {
                 // first prompt (choose generator)
                 this.setPromptAttributes(prompt);
+                prompt.active = true;
                 this.prompts.push(prompt);
               }
             }
@@ -141,6 +144,7 @@ export default {
     },
     setPromptAttributes(prompt) {
       this.$set(prompt, "allAnswered", false);
+      this.$set(prompt, "active", false);
       prompt.questions.forEach(question => {
         this.$set(question, "answer", question.default);
       });
