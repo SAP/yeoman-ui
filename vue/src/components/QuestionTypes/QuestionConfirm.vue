@@ -1,7 +1,13 @@
 <template>
   <div class="question-confirm-container">
-    <button type="button" v-on:click="onClick('yes')" @click="selected = 'yes'" class="btn btn-primary btn-sm mr-1">Yes</button>
-    <button type="button" v-on:click="onClick('no')" @click="selected = 'no'" class="btn btn-secondary btn-sm">No</button>
+    <b-form-radio-group v-model="currentQuestion.answer">
+      <b-form-radio
+        value="yes"
+      >Yes</b-form-radio>
+      <b-form-radio
+        value="no"
+      >No</b-form-radio>
+    </b-form-radio-group>
   </div>
 </template>
 <script>
@@ -12,24 +18,13 @@ export default {
   },
   data() {
     return {
-      selected: undefined
     };
   },
   methods: {
-    onClick(answer) {
-      this.currentQuestion.answer = answer;
-    }
   },
   watch: {
   },
   mounted() {
-      if (this.currentQuestion.default === "yes") {
-        this.selected = "yes";
-      } else if (this.currentQuestion.default === "no") {
-        this.selected = "no";
-      } else {
-        this.selected = undefined;
-      }
   }
 };
 </script>

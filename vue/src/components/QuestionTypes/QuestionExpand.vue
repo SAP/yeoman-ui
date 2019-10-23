@@ -1,9 +1,9 @@
 <template>
   <div class="question-expand-container">
-    <b-button-group>
+    <b-button-group vertical>
       <b-button
         v-for="(choice, index) in currentQuestion.choices"
-        @click="onClick()"
+        @click="onClick(choice.value)"
         :key="index"
       >{{ choice.name }}
       </b-button>
@@ -29,13 +29,6 @@ export default {
   watch: {
   },
   mounted() {
-      if (this.currentQuestion.default === "yes") {
-        this.selected = "yes";
-      } else if (this.currentQuestion.default === "no") {
-        this.selected = "no";
-      } else {
-        this.selected = undefined;
-      }
   }
 };
 </script>

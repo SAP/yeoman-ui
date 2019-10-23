@@ -5,6 +5,7 @@ import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
 import { WizAdapter } from "./wiz-adapter";
 import { RpcCommon } from "./rpc/rpc-common";
+import Generator = require("yeoman-generator");
 
 export interface IGeneratorChoice {
   name: string;
@@ -28,6 +29,8 @@ export class Yowiz {
   private _rpc: RpcCommon;
   private _genMeta: { [namespace: string]: Environment.GeneratorMeta };
   private _wizAdapter: WizAdapter;
+  private _gen: Generator | undefined;
+  private _promptCount: number;
 
   constructor(rpc: RpcCommon) {
     this._rpc = rpc;
@@ -36,7 +39,7 @@ export class Yowiz {
 		this._rpc.registerMethod({ func: this.runGenerator, thisArg: this });
     this._wizAdapter = new WizAdapter();
     this._wizAdapter.setYowiz(this);
-
+    this._promptCount = 0;
     this._genMeta = {};
   }
 
@@ -76,10 +79,10 @@ export class Yowiz {
   public runGenerator(generatorName: string) {
 
     // TODO: ensure generatorName is a valid dir name
-    const cwd: string = path.join(os.homedir(), "projects", generatorName);
+    const destinationRoot: string = path.join(os.homedir(), "projects", generatorName);
 
     // TODO: wait for dir to be created
-    fs.mkdir(cwd, { recursive: true }, (err) => {
+    fs.mkdir(destinationRoot, { recursive: true }, (err) => {
       if (err) {
         console.error(err);
       }
@@ -89,12 +92,12 @@ export class Yowiz {
     //  see issue: https://github.com/yeoman/environment/issues/55
     //  process.chdir() doesn't work after environment has been created
 
-    const env: Environment = Environment.createEnv(undefined, { cwd: cwd }, this._wizAdapter);
+    const env: Environment = Environment.createEnv(undefined, {}, this._wizAdapter);
     try {
       let meta: Environment.GeneratorMeta = this._genMeta[`${generatorName}:app`];
       // TODO: support sub-generators
       env.register(meta.resolved);
-      const gen = env.create(`${generatorName}:app`, {});
+      const gen: any = env.create(`${generatorName}:app`, {});
       if ((gen as any)["getPrompts"] !== undefined) {
         const promptNames: Object[] = (gen as any)["getPrompts"]();
         const prompts: IPrompt[] = promptNames.map((value)=> {
@@ -104,11 +107,19 @@ export class Yowiz {
         this.sendPrompts(prompts);
       }
 
-      env.run(generatorName, { 'skip-install': true }, err => {
+      this._promptCount = 0;
+      this._gen = <Generator>gen;
+      this._gen.destinationRoot(destinationRoot);
+      this._gen.run((err) => {
+        let message: string;
         if (err) {
           console.error(err);
+          message = `${generatorName} failed: ${err}.`;
+          this._rpc.invoke("generatorDone", [true, message]);
         }
         console.log('done running yowiz');
+        message = `${generatorName} is done. Destination directory is ${destinationRoot}`;
+        this._rpc.invoke("generatorDone", [true, message]);
       });
     } catch (err) {
       console.error(err);
@@ -120,7 +131,7 @@ export class Yowiz {
     if (this._rpc) {
       const generators: IPrompt | undefined = await this.getGenerators();
 
-      const response: any = await this._rpc.invoke("receivePrompt", [
+      const response: any = await this._rpc.invoke("showPrompt", [
         (generators ? generators.questions : []),
         (generators ? generators.name : "")
       ]);
@@ -128,9 +139,14 @@ export class Yowiz {
     }
 	}
 
-  public async askQuestions(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
+  public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
     if (this._rpc) {
-      return this._rpc.invoke("receivePrompt", [questions, ""]).then((response => {
+      this._promptCount++;
+      let promptName: string = `Step ${this._promptCount}`;
+      if (Array.isArray(questions) && questions.length === 1) {
+        promptName = questions[0].name.replace(/(.)/,(match: string, p1: string)=>{return p1.toUpperCase()});
+      }
+      return this._rpc.invoke("showPrompt", [questions, promptName]).then((response => {
         return Promise.resolve(response);
       }));
     } else {

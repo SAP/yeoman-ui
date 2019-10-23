@@ -50,8 +50,7 @@ export default {
     },
     emitSelection(generatorName) {
       this.currentQuestion.answer = generatorName;
-      // this.$emit('answer', { generatorName: generatorName});
-      // this.$emit('generatorSelected', generatorName);
+      this.$emit('generatorSelected', generatorName);
     }
   },
   mounted() {

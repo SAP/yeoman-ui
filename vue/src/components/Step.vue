@@ -57,15 +57,6 @@ export default {
             this.currentPrompt.allAnswered = false;
           }
         }
-        // this.answers = {};
-        // for (let i = 0; i < val.questions.length - 1; i++) {
-        //   const question = val.questions[i];
-        //   if (question.default) {
-        //     let answerObject = {};
-        //     answerObject[question.name] = question.default;
-        //     Object.assign(this.answers, answerObject);
-        //   }
-        // }
       }
     }
   },

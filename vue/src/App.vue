@@ -6,7 +6,7 @@
       v-if="prompts.length"
       :currentPrompt="promptIndex+1"
       :numOfSteps="prompts.length"
-      :yeomanName="yeomanName"
+      :generatorName="generatorName"
       :stepName="prompts[promptIndex].name"
     />
     <b-container class="bv-example-row p-0 mx-1 mt-10">
@@ -18,6 +18,7 @@
         </b-col>
         <b-col class="m-0 p-0">
           <b-container>
+            <div v-if="isDone" class="loading">{{doneMessage}}</div>
             <Step
               v-if="prompts.length"
               ref="step"
@@ -25,13 +26,12 @@
               :next="next"
               v-on:generatorSelected="onGeneratorSelected"
             />
-            <div class="navigation" v-if="prompts.length > 0">
+            <div class="navigation" v-if="prompts.length > 0 && !isDone">
               <b-button class="mr-2 btn" @click="next">Next</b-button>
               <!-- :disabled="promptIndex < prompts.length - 1 && !currentPrompt.allAnswered" -->
               <!-- promptIndex = {{promptIndex}}
               prompts.length - 1 = {{prompts.length - 1}}
               !prompts[promptIndex].allAnswered = {{!prompts[promptIndex].allAnswered}}-->
-              <b-button :disabled="promptIndex<prompts.length-1" @click="next">Finish</b-button>
             </div>
           </b-container>
         </b-col>
@@ -56,13 +56,15 @@ export default {
   },
   data() {
     return {
-      yeomanName: Object,
+      generatorName: "<none>",
       prompts: [],
       promptIndex: 0,
       index: 0,
       rpc: Object,
       resolve: Object,
-      reject: Object
+      reject: Object,
+      isDone: false,
+      doneMessage: Object
     };
   },
   computed: {
@@ -88,13 +90,13 @@ export default {
         }
       }
       if (this.promptIndex >= this.prompts.length - 1) {
-        const prompt = { questions: [], name: "Step", status: "pending" };
+        const prompt = { questions: [], name: "Pending...", status: "pending" };
         this.setPrompts([prompt]);
       }
       this.promptIndex++;
     },
     onGeneratorSelected: function(generatorName) {
-      this.yeomanName = generatorName;
+      this.generatorName = generatorName;
     },
     setPrompts(prompts) {
       // TODO:
@@ -114,8 +116,9 @@ export default {
               this.prompts.push(prompt);
             } else {
               if (currentPrompt) {
+                this.setPromptAttributes(prompt);
                 currentPrompt.questions = prompt.questions;
-                if (!!prompt.name) {
+                if (prompt.name && currentPrompt.name === 'Pending...') {
                   currentPrompt.name = prompt.name;
                 }
                 // if questions are provided, remote the pending status
@@ -139,10 +142,10 @@ export default {
     setPromptAttributes(prompt) {
       this.$set(prompt, "allAnswered", false);
       prompt.questions.forEach(question => {
-        this.$set(question, "answer", undefined);
+        this.$set(question, "answer", question.default);
       });
     },
-    receivePrompt(questions, name) {
+    showPrompt(questions, name) {
       const prompt = { questions: questions, name: name };
       this.setPrompts([prompt]);
       const promise = new Promise((resolve, reject) => {
@@ -150,6 +153,13 @@ export default {
         this.reject = reject;
       });
       return promise;
+    },
+    generatorDone(success, message) {
+      if (this.currentPrompt.status === 'pending') {
+        this.currentPrompt.name = "Done";
+      }
+      this.doneMessage = message;
+      this.isDone = true;
     },
     runGenerator(generatorName) {
       // TODO: call this method after user chose which generator to run
@@ -174,14 +184,19 @@ export default {
     },
     initRpc() {
       this.rpc.registerMethod({
-        func: this.receivePrompt,
+        func: this.showPrompt,
         thisArg: this,
-        name: "receivePrompt"
+        name: "showPrompt"
       });
       this.rpc.registerMethod({
         func: this.setPrompts,
         thisArg: this,
         name: "setPrompts"
+      });
+      this.rpc.registerMethod({
+        func: this.generatorDone,
+        thisArg: this,
+        name: "generatorDone"
       });
       this.rpc.invoke("receiveIsWebviewReady", []);
     }

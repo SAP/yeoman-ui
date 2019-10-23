@@ -44,7 +44,6 @@ export class WizAdapter implements Adapter {
   }
 
   _colorLines(name: string, str: string) {
-    // return str.split('\n').map(line => this[`_colorDiff${name}`](line)).join('\n');
   }
 
   /**
@@ -56,7 +55,7 @@ export class WizAdapter implements Adapter {
     cb?: (res: T1) => T2
   ): Promise<T2> {
     if (this._yowiz && questions) {
-      return (<Promise<T2>>this._yowiz.askQuestions(questions));
+      return (<Promise<T2>>this._yowiz.showPrompt(questions));
     } else {
       return Promise.resolve(<T2>{});
     }
@@ -69,29 +68,6 @@ export class WizAdapter implements Adapter {
    * @param {string} expected
    */
   diff(actual: string, expected: string): string {
-    // let msg = diff.diffLines(actual, expected).map(str => {
-    //   if (str.added) {
-    //     return this._colorLines('Added', str.value);
-    //   }
-
-    //   if (str.removed) {
-    //     return this._colorLines('Removed', str.value);
-    //   }
-
-    //   return str.value;
-    // }).join('');
-
-    // // Legend
-    // msg = '\n' +
-    //   this._colorDiffRemoved('removed') +
-    //   ' ' +
-    //   this._colorDiffAdded('added') +
-    //   '\n\n' +
-    //   msg +
-    //   '\n';
-
-    // console.log(msg);
-    // return msg;
     return "";
   }
 }

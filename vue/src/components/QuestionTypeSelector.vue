@@ -1,8 +1,6 @@
 <template>
   <div>
     <b-form-group :label="currentQuestion.message">
-      <!-- TODO: support expand -->
-
       <GeneratorSelection v-if="currentQuestion.type==='generators'" :currentQuestion="currentQuestion" v-on:answer="onAnswer" v-on:generatorSelected="onGeneratorSelected"/>
 
       <QuestionInput v-if="currentQuestion.type==='input'" :currentQuestion="currentQuestion" v-on:answer="onAnswer"/>

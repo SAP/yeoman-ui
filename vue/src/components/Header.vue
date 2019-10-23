@@ -2,7 +2,7 @@
   <div>
     <b-nav tabs>
       <b-nav-item disabled>
-        <b>Yeoman UI:</b> {{yeomanName}}
+        <b>Generator:</b> {{generatorName}}
       </b-nav-item>
       <b-nav-item disabled>Step: {{ currentPrompt }}/{{ numOfSteps }}</b-nav-item>
       <b-nav-item disabled>{{ stepName }}</b-nav-item>
@@ -15,7 +15,7 @@
 export default {
   name: "Header",
   props: [
-    'yeomanName',
+    'generatorName',
     'currentPrompt',
     'numOfSteps',
     'stepName'
