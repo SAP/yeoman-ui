@@ -98,6 +98,7 @@ export class Yowiz {
       // TODO: support sub-generators
       env.register(meta.resolved);
       const gen: any = env.create(`${generatorName}:app`, {});
+      // check if generator defined a helper function called getPrompts()
       if ((gen as any)["getPrompts"] !== undefined) {
         const promptNames: Object[] = (gen as any)["getPrompts"]();
         const prompts: IPrompt[] = promptNames.map((value)=> {
@@ -144,7 +145,7 @@ export class Yowiz {
       this._promptCount++;
       let promptName: string = `Step ${this._promptCount}`;
       if (Array.isArray(questions) && questions.length === 1) {
-        promptName = questions[0].name.replace(/(.)/,(match: string, p1: string)=>{return p1.toUpperCase()});
+        promptName = questions[0].name.replace(/(.)/,(match: string, p1: string)=>{return p1.toUpperCase();});
       }
       return this._rpc.invoke("showPrompt", [questions, promptName]).then((response => {
         return Promise.resolve(response);
