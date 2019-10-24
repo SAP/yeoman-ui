@@ -80,6 +80,25 @@ export default {
       return response;
     }
   },
+  watch: {
+    'currentPrompt.answers': {
+      deep: true,
+      handler() {
+        if (this.currentPrompt) {
+          // TODO: detect other functions (e.g. filter, choices that call functions, etc.)
+          const questionWithWhen = this.currentPrompt.questions.find((question) => {
+            return (question.when);
+          });
+          if (questionWithWhen) {
+            this.rpc.invoke("evaluateMethod", [this.currentPrompt.answers, questionWithWhen.name, "when"]).then((response) => {
+              questionWithWhen.shouldShow = (response == 'true');
+              console.log(`visibility of question ${questionWithWhen.name} is ${response}`);
+            });
+          }
+        }
+      }
+    }
+  },
   methods: {
     next() {
       if (this.resolve) {
@@ -146,7 +165,11 @@ export default {
       this.$set(prompt, "allAnswered", false);
       this.$set(prompt, "active", false);
       prompt.questions.forEach(question => {
+        if (question.type === 'confirm' && question.default) {
+          question.default = (question.default === 'yes' ? true : false);
+        }
         this.$set(question, "answer", question.default);
+        this.$set(question, "shouldShow", true);
       });
     },
     showPrompt(questions, name) {

@@ -31,16 +31,19 @@ export class Yowiz {
   private _wizAdapter: WizAdapter;
   private _gen: Generator | undefined;
   private _promptCount: number;
+  private _currentQuestions: Environment.Adapter.Questions<any>;
 
   constructor(rpc: RpcCommon) {
     this._rpc = rpc;
 		this._rpc.setResponseTimeout(3600000);
 		this._rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
 		this._rpc.registerMethod({ func: this.runGenerator, thisArg: this });
+		this._rpc.registerMethod({ func: this.evaluateMethod, thisArg: this });
     this._wizAdapter = new WizAdapter();
     this._wizAdapter.setYowiz(this);
     this._promptCount = 0;
     this._genMeta = {};
+    this._currentQuestions = {};
   }
 
   public getGenerators(): Promise<IPrompt | undefined> {
@@ -105,7 +108,7 @@ export class Yowiz {
           let prompt: IPrompt = Object.assign({questions:[], name:""}, value);
           return prompt;
         });
-        this.sendPrompts(prompts);
+        this.setPrompts(prompts);
       }
 
       this._promptCount = 0;
@@ -127,6 +130,23 @@ export class Yowiz {
     }
   }
 
+  /**
+   * 
+   * @param answers - partial answers for the current prompt -- the input parameter to the method to be evaluated
+   * @param method
+   */
+  public evaluateMethod(answers: Generator.Answers, questionName: string, methodName: string): any {
+    // TODO: handle case where return value is a promise
+    if (this._currentQuestions) {
+      const relevantQuestion: any = (this._currentQuestions as Array<any>).find((question) => {
+        return (question.name === questionName);
+      });
+      if (relevantQuestion) {
+        return relevantQuestion[methodName].call(this._gen, answers);
+      }
+    }
+  }
+  
   public async receiveIsWebviewReady() {
 		// TODO: loading generators takes a long time; consider prefetching list of generators
     if (this._rpc) {
@@ -140,22 +160,43 @@ export class Yowiz {
     }
 	}
 
+  /**
+   * 
+   * @param quesions 
+   * returns a deep copy of the original questions, but replaces Function properties with a placeholder
+   * 
+   * Functions are lost when being passed to client (using JSON.Stringify)
+   * Also functions cannot be evaluated on client)
+   */
+  private mapQuestions(questions: Environment.Adapter.Questions<any>): Environment.Adapter.Questions<any> {
+    const mappedQuestions: Environment.Adapter.Questions<any> = (questions as Array<any>).map((question) => {
+      let mappedQuestion: any = JSON.parse(JSON.stringify(question));
+      if (question.when) {
+        mappedQuestion.when = "__Function";
+      }
+      return mappedQuestion;
+    });
+    return mappedQuestions;
+  }
+
   public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
+    this._currentQuestions = questions;
     if (this._rpc) {
       this._promptCount++;
       let promptName: string = `Step ${this._promptCount}`;
       if (Array.isArray(questions) && questions.length === 1) {
         promptName = questions[0].name.replace(/(.)/,(match: string, p1: string)=>{return p1.toUpperCase();});
       }
-      return this._rpc.invoke("showPrompt", [questions, promptName]).then((response => {
-        return Promise.resolve(response);
+      const mappedQuestions: Environment.Adapter.Questions<any> = this.mapQuestions(questions);
+      return this._rpc.invoke("showPrompt", [mappedQuestions, promptName]).then((response => {
+        return response;
       }));
     } else {
       return Promise.resolve({});
     }
   }
 
-  private sendPrompts(prompts: IPrompt[]): Promise<void> {
+  private setPrompts(prompts: IPrompt[]): Promise<void> {
     if (this._rpc) {
       return this._rpc.invoke("setPrompts", [prompts]);
     } else {
