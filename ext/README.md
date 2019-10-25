@@ -12,3 +12,4 @@ Launch the WebSocket server configuration for development purposes. This will no
 * send log output to vue application, specifically, the wiz-adapter logs and errors
 * ensure callback of `Generator.run()` is called when user aborts during conflict resolution and when exceptions occur.
 * support server/extension-side evaluation mid-prompt (e.g. `when()`, `choices` that are functions, etc)
+* when client sends properties to be evaulated on server, a valid answers object must be sent

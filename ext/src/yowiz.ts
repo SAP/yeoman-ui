@@ -168,11 +168,13 @@ export class Yowiz {
    * Functions are lost when being passed to client (using JSON.Stringify)
    * Also functions cannot be evaluated on client)
    */
-  private mapQuestions(questions: Environment.Adapter.Questions<any>): Environment.Adapter.Questions<any> {
+  private normalizeFunctions(questions: Environment.Adapter.Questions<any>): Environment.Adapter.Questions<any> {
     const mappedQuestions: Environment.Adapter.Questions<any> = (questions as Array<any>).map((question) => {
       let mappedQuestion: any = JSON.parse(JSON.stringify(question));
-      if (question.when) {
-        mappedQuestion.when = "__Function";
+      for (let prop in question) {
+        if (typeof question[prop] === 'function') {
+          mappedQuestion[prop] = "__Function";
+        }
       }
       return mappedQuestion;
     });
@@ -187,7 +189,7 @@ export class Yowiz {
       if (Array.isArray(questions) && questions.length === 1) {
         promptName = questions[0].name.replace(/(.)/,(match: string, p1: string)=>{return p1.toUpperCase();});
       }
-      const mappedQuestions: Environment.Adapter.Questions<any> = this.mapQuestions(questions);
+      const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
       return this._rpc.invoke("showPrompt", [mappedQuestions, promptName]).then((response => {
         return response;
       }));

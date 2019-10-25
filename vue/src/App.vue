@@ -85,6 +85,7 @@ export default {
       deep: true,
       handler() {
         if (this.currentPrompt) {
+          // TODO: consider using debounce (especially for questions of type 'input') to limit roundtrips
           // TODO: detect other functions (e.g. filter, choices that call functions, etc.)
           const questionWithWhen = this.currentPrompt.questions.find((question) => {
             return (question.when);
@@ -92,7 +93,6 @@ export default {
           if (questionWithWhen) {
             this.rpc.invoke("evaluateMethod", [this.currentPrompt.answers, questionWithWhen.name, "when"]).then((response) => {
               questionWithWhen.shouldShow = (response == 'true');
-              console.log(`visibility of question ${questionWithWhen.name} is ${response}`);
             });
           }
         }
@@ -173,6 +173,19 @@ export default {
       });
     },
     showPrompt(questions, name) {
+      // evaluate message property on server if it is a function
+      // TODO: prepare answers object first
+      // TODO: message should be reevaluated everytime the answers change (watch already exists for currentPrompt)
+      for (let i=0; i<questions.length; i++) {
+        let question = questions[i];
+        if (question.message === '__Function') {
+          question.message = 'loading...';
+            this.rpc.invoke("evaluateMethod", [question.answers, question.name, "message"]).then((response) => {
+              question.message = response;
+            });
+        }
+      }
+
       const prompt = { questions: questions, name: name };
       this.setPrompts([prompt]);
       const promise = new Promise((resolve, reject) => {
