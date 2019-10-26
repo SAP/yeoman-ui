@@ -201,8 +201,6 @@ export default {
       const prompt = this.createPrompt(questions, name);
 
       // evaluate message property on server if it is a function
-      // TODO: prepare answers object first
-      // TODO: message should be reevaluated everytime the answers change (watch already exists for currentPrompt)
 
       this.setPrompts([prompt]);
       const promise = new Promise((resolve, reject) => {
@@ -230,7 +228,6 @@ export default {
       this.isDone = true;
     },
     runGenerator(generatorName) {
-      // TODO: call this method after user chose which generator to run
       this.rpc.invoke("runGenerator", [generatorName]);
     },
     isInVsCode() {
