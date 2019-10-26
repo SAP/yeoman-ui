@@ -22,7 +22,7 @@
             <Step
               v-if="prompts.length"
               ref="step"
-              :currentPrompt="prompts[promptIndex]"
+              :currentPrompt="currentPrompt"
               :next="next"
               v-on:generatorSelected="onGeneratorSelected"
             />
@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 import Header from "./components/Header.vue";
 import Navigation from "./components/Navigation.vue";
 import Step from "./components/Step.vue";
@@ -83,6 +84,7 @@ export default {
   watch: {
     'currentPrompt.answers': {
       deep: true,
+      immediate: true,
       handler() {
         if (this.currentPrompt) {
           // TODO: consider using debounce (especially for questions of type 'input') to limit roundtrips
@@ -92,7 +94,16 @@ export default {
           });
           if (questionWithWhen) {
             this.rpc.invoke("evaluateMethod", [this.currentPrompt.answers, questionWithWhen.name, "when"]).then((response) => {
-              questionWithWhen.shouldShow = (response == 'true');
+              questionWithWhen.shouldShow = (typeof response === 'string' ? String(response) === 'true' : response);
+            });
+          }
+
+          const questionWithMessage = this.currentPrompt.questions.find((question) => {
+            return (question._message === '__Function');
+          });
+          if (questionWithMessage) {
+            this.rpc.invoke("evaluateMethod", [this.currentPrompt.answers, questionWithMessage.name, "message"]).then((response) => {
+              questionWithMessage.message = response;
             });
           }
         }
@@ -127,17 +138,15 @@ export default {
       //   if no prompt name is provided, assign incoming question to current prompt
 
       const currentPrompt = this.currentPrompt;
-
+      
       if (prompts) {
         prompts.forEach((prompt, index) => {
           if (index === 0) {
             if (prompt.status === "pending") {
               // new pending prompt
-              this.setPromptAttributes(prompt);
               this.prompts.push(prompt);
             } else {
               if (currentPrompt) {
-                this.setPromptAttributes(prompt);
                 currentPrompt.questions = prompt.questions;
                 if (prompt.name && currentPrompt.name === 'Pending...') {
                   currentPrompt.name = prompt.name;
@@ -148,51 +157,59 @@ export default {
                 }
               } else {
                 // first prompt (choose generator)
-                this.setPromptAttributes(prompt);
                 prompt.active = true;
                 this.prompts.push(prompt);
               }
             }
           } else {
             // multiple prompts provided -- simply add them
-            this.setPromptAttributes(prompt);
             this.prompts.push(prompt);
           }
         });
       }
     },
-    setPromptAttributes(prompt) {
-      this.$set(prompt, "allAnswered", false);
-      this.$set(prompt, "active", false);
+    setQuestionProps(prompt) {
       prompt.questions.forEach(question => {
         if (question.type === 'confirm' && question.default) {
           question.default = (question.default === 'yes' ? true : false);
         }
+
+        if (question.message === '__Function') {
+          question.message = 'loading...';
+          this.$set(question, "_message", '__Function');
+          this.rpc.invoke("evaluateMethod", [prompt.answers, question.name, "message"]).then((response) => {
+            question.message = response;
+          });
+        }
+
         this.$set(question, "answer", question.default);
         this.$set(question, "shouldShow", true);
       });
     },
     showPrompt(questions, name) {
+      const prompt = this.createPrompt(questions, name);
+
       // evaluate message property on server if it is a function
       // TODO: prepare answers object first
       // TODO: message should be reevaluated everytime the answers change (watch already exists for currentPrompt)
-      for (let i=0; i<questions.length; i++) {
-        let question = questions[i];
-        if (question.message === '__Function') {
-          question.message = 'loading...';
-            this.rpc.invoke("evaluateMethod", [question.answers, question.name, "message"]).then((response) => {
-              question.message = response;
-            });
-        }
-      }
 
-      const prompt = { questions: questions, name: name };
       this.setPrompts([prompt]);
       const promise = new Promise((resolve, reject) => {
         this.resolve = resolve;
         this.reject = reject;
       });
       return promise;
+    },
+    createPrompt(questions, name) {
+      const prompt = Vue.observable({
+        questions: questions,
+        name: name,
+        answers: {},
+        allAnswered: false,
+        active: true
+      });
+      this.setQuestionProps(prompt);
+      return prompt;
     },
     generatorDone(success, message) {
       if (this.currentPrompt.status === 'pending') {
