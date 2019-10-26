@@ -94,7 +94,7 @@ export default {
           });
           if (questionWithWhen) {
             this.rpc.invoke("evaluateMethod", [this.currentPrompt.answers, questionWithWhen.name, "when"]).then((response) => {
-              questionWithWhen.shouldShow = (typeof response === 'string' ? String(response) === 'true' : response);
+              questionWithWhen.shouldShow = response;
             });
           }
 
@@ -104,6 +104,15 @@ export default {
           if (questionWithMessage) {
             this.rpc.invoke("evaluateMethod", [this.currentPrompt.answers, questionWithMessage.name, "message"]).then((response) => {
               questionWithMessage.message = response;
+            });
+          }
+
+          const questionWithChoices = this.currentPrompt.questions.find((question) => {
+            return (question._choices === '__Function');
+          });
+          if (questionWithChoices) {
+            this.rpc.invoke("evaluateMethod", [this.currentPrompt.answers, questionWithChoices.name, "choices"]).then((response) => {
+              questionWithChoices.choices = response;
             });
           }
         }
@@ -177,9 +186,11 @@ export default {
         if (question.message === '__Function') {
           question.message = 'loading...';
           this.$set(question, "_message", '__Function');
-          this.rpc.invoke("evaluateMethod", [prompt.answers, question.name, "message"]).then((response) => {
-            question.message = response;
-          });
+        }
+
+        if (question.choices === '__Function') {
+          question.choices = ['loading...'];
+          this.$set(question, "_choices", '__Function');
         }
 
         this.$set(question, "answer", question.default);

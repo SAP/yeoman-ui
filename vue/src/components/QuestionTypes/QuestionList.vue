@@ -8,12 +8,14 @@ export default {
   name: "QuestionList",
   filters: {
     formatList: function(value) {
-      return value.map((currentValue) => {
-        if (currentValue.hasOwnProperty('name') && !currentValue.hasOwnProperty('text')) {
-          currentValue.text = currentValue.name;
-        }
-        return currentValue;
-      });
+      if (Array.isArray(value)) {
+        return value.map((currentValue) => {
+          if (currentValue.hasOwnProperty('name') && !currentValue.hasOwnProperty('text')) {
+            currentValue.text = currentValue.name;
+          }
+          return currentValue;
+        });
+      }
     }
   },
   props: {
