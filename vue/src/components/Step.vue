@@ -5,7 +5,6 @@
         v-for="(item, index) in currentPrompt.questions"
         :key="index"
         :currentQuestion="item"
-        :next="next"
         v-on:answer="onAnswer"
         v-on:generatorSelected="onGeneratorSelected"
       />
@@ -22,9 +21,7 @@ export default {
     QuestionTypeSelector
   },
   props: {
-    currentPrompt: Object,
-    currentQuestion: Object,
-    next: Function
+    currentPrompt: Object
   },
   data() {
     return {
@@ -40,7 +37,7 @@ export default {
     }
   },
   watch: {
-    currentPrompt: {
+    'currentPrompt.questions': {
       //  immediate: true,
       deep: true,
       handler() {
@@ -48,14 +45,11 @@ export default {
         //count number of answers
         let counter = 0;
         if (this.currentPrompt) {
+          // TODO: ignore when questions where when() returns false
           this.currentPrompt.questions.forEach(question => {
             if (question.answer!==undefined) counter++;
           });
-          if (counter === this.currentPrompt.questions.length) {
-            this.currentPrompt.allAnswered = true;
-          } else {
-            this.currentPrompt.allAnswered = false;
-          }
+          this.currentPrompt.allAnswered = (counter === this.currentPrompt.questions.length);
         }
       }
     }

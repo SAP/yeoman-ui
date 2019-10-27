@@ -23,15 +23,12 @@
               v-if="prompts.length"
               ref="step"
               :currentPrompt="currentPrompt"
-              :next="next"
               v-on:generatorSelected="onGeneratorSelected"
             />
             <div class="navigation" v-if="prompts.length > 0 && !isDone">
-              <b-button class="mr-2 btn" @click="next">Next</b-button>
-              <!-- :disabled="promptIndex < prompts.length - 1 && !currentPrompt.allAnswered" -->
-              <!-- promptIndex = {{promptIndex}}
-              prompts.length - 1 = {{prompts.length - 1}}
-              !prompts[promptIndex].allAnswered = {{!prompts[promptIndex].allAnswered}}-->
+              <b-button class="mr-2 btn" @click="next"
+              >Next</b-button>
+                <!-- :disabled="!currentPrompt.allAnswered" -->
             </div>
           </b-container>
         </b-col>
@@ -72,7 +69,7 @@ export default {
     currentPrompt: function() {
       const response = this.prompts[this.promptIndex];
       if (response) {
-        const answers = {};
+        const answers = response.answers || {};
         response.questions.forEach(value => {
           answers[value.name] = value.answer;
         });
@@ -89,12 +86,14 @@ export default {
         if (this.currentPrompt) {
           // TODO: consider using debounce (especially for questions of type 'input') to limit roundtrips
           // TODO: detect other functions (e.g. filter, choices that call functions, etc.)
+          // TODO: handle multiple questions with same property as function
+
           const questionWithWhen = this.currentPrompt.questions.find((question) => {
             return (question.when);
           });
           if (questionWithWhen) {
-            this.rpc.invoke("evaluateMethod", [this.currentPrompt.answers, questionWithWhen.name, "when"]).then((response) => {
-              questionWithWhen.shouldShow = response;
+            this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], questionWithWhen.name, "when"]).then((response) => {
+              questionWithWhen.isWhen = response;
             });
           }
 
@@ -102,7 +101,7 @@ export default {
             return (question._message === '__Function');
           });
           if (questionWithMessage) {
-            this.rpc.invoke("evaluateMethod", [this.currentPrompt.answers, questionWithMessage.name, "message"]).then((response) => {
+            this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], questionWithMessage.name, "message"]).then((response) => {
               questionWithMessage.message = response;
             });
           }
@@ -111,8 +110,18 @@ export default {
             return (question._choices === '__Function');
           });
           if (questionWithChoices) {
-            this.rpc.invoke("evaluateMethod", [this.currentPrompt.answers, questionWithChoices.name, "choices"]).then((response) => {
+            this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], questionWithChoices.name, "choices"]).then((response) => {
               questionWithChoices.choices = response;
+            });
+          }
+
+          const questionWithValidate = this.currentPrompt.questions.find((question) => {
+            return (question.validate === '__Function');
+          });
+          if (questionWithValidate) {
+            this.rpc.invoke("evaluateMethod", [[questionWithValidate.answer, this.currentPrompt.answers], questionWithValidate.name, "validate"]).then((response) => {
+              questionWithValidate.isValid = (typeof response === 'string' ? false : response);
+              questionWithValidate.validationMessage = (typeof response === 'string' ? response : undefined);
             });
           }
         }
@@ -179,10 +188,6 @@ export default {
     },
     setQuestionProps(prompt) {
       prompt.questions.forEach(question => {
-        if (question.type === 'confirm' && question.default) {
-          question.default = (question.default === 'yes' ? true : false);
-        }
-
         if (question.message === '__Function') {
           question.message = 'loading...';
           this.$set(question, "_message", '__Function');
@@ -194,7 +199,9 @@ export default {
         }
 
         this.$set(question, "answer", question.default);
-        this.$set(question, "shouldShow", true);
+        this.$set(question, "isWhen", true);
+        this.$set(question, "isValid", true);
+        this.$set(question, "validationMessage", true);
       });
     },
     showPrompt(questions, name) {

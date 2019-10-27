@@ -135,14 +135,14 @@ export class Yowiz {
    * @param answers - partial answers for the current prompt -- the input parameter to the method to be evaluated
    * @param method
    */
-  public evaluateMethod(answers: Generator.Answers, questionName: string, methodName: string): any {
+  public evaluateMethod(params: Array<any>, questionName: string, methodName: string): any {
     // TODO: handle case where return value is a promise
     if (this._currentQuestions) {
       const relevantQuestion: any = (this._currentQuestions as Array<any>).find((question) => {
         return (question.name === questionName);
       });
       if (relevantQuestion) {
-        return relevantQuestion[methodName].call(this._gen, answers);
+        return relevantQuestion[methodName].apply(this._gen, params);
       }
     }
   }

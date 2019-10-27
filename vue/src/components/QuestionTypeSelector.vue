@@ -1,13 +1,13 @@
 <template>
   <div>
-    <b-form-group :label="currentQuestion.message" v-if="currentQuestion.shouldShow">
-      <GeneratorSelection v-if="currentQuestion.type==='generators'" :currentQuestion="currentQuestion" v-on:answer="onAnswer" v-on:generatorSelected="onGeneratorSelected"/>
+    <b-form-group :label="currentQuestion.message" :disabled="!currentQuestion.isWhen">
+      <GeneratorSelection v-if="currentQuestion.type==='generators'" :currentQuestion="currentQuestion" v-on:generatorSelected="onGeneratorSelected"/>
 
-      <QuestionInput v-if="currentQuestion.type==='input'" :currentQuestion="currentQuestion" v-on:answer="onAnswer"/>
+      <QuestionInput v-if="currentQuestion.type==='input'" :currentQuestion="currentQuestion" />
 
       <QuestionList v-if="currentQuestion.type==='list'" :currentQuestion="currentQuestion" />
 
-      <QuestionConfirm v-if="currentQuestion.type==='confirm'" :currentQuestion="currentQuestion" v-on:answer="onAnswer" />
+      <QuestionConfirm v-if="currentQuestion.type==='confirm'" :currentQuestion="currentQuestion" />
 
       <QuestionCheckbox v-if="currentQuestion.type==='checkbox'" :currentQuestion="currentQuestion" />
 
@@ -35,8 +35,7 @@ export default {
     GeneratorSelection
   },
   props: {
-    currentQuestion: Object,
-    next: Function
+    currentQuestion: Object
   },
   data() {
     return {
@@ -47,9 +46,6 @@ export default {
     };
   },
   methods: {
-    onAnswer: function(answerObject) {
-      this.$emit('answer', answerObject);
-    },
     onGeneratorSelected: function(generatorName) {
       this.$emit('generatorSelected', generatorName);
     }
