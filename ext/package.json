@@ -31,6 +31,7 @@
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"postinstall": "node ./node_modules/vscode/bin/install",
+		"package": "vsce package .",
 		"test": "npm run compile && node ./node_modules/vscode/bin/test"
 	},
 	"dependencies": {
@@ -46,6 +47,7 @@
 		"cpx": "^1.5.0",
 		"tslint": "^5.12.1",
 		"typescript": "^3.6.1",
+		"vsce": "^1.68.0",
 		"vscode": "^1.1.28"
 	}
 }

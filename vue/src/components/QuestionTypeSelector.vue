@@ -12,6 +12,9 @@
       <QuestionCheckbox v-if="currentQuestion.type==='checkbox'" :currentQuestion="currentQuestion" />
 
       <QuestionExpand v-if="currentQuestion.type==='expand'" :currentQuestion="currentQuestion" />
+  
+      <div id='validation-message' class='invalid-feedback'>{{currentQuestion.validationMessage}}</div>
+
     </b-form-group>
   </div>
 </template>

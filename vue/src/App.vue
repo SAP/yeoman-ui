@@ -13,7 +13,7 @@
       <b-row class="m-0 p-0">
         <b-col class="m-0 p-0" sm="auto">
           <b-container class="m-0 p-0">
-            <Navigation v-if="prompts.length" :currentPrompt="promptIndex" :prompts="prompts" />
+            <Navigation v-if="prompts.length" :promptIndex="promptIndex" :prompts="prompts" />
           </b-container>
         </b-col>
         <b-col class="m-0 p-0">
@@ -28,6 +28,7 @@
             <div class="navigation" v-if="prompts.length > 0 && !isDone">
               <b-button class="mr-2 btn" @click="next"
               >Next</b-button>
+              <!-- disable when invalid answers -->
                 <!-- :disabled="!currentPrompt.allAnswered" -->
             </div>
           </b-container>

@@ -1,13 +1,23 @@
 <template>
-  <div class="question-list-container">
-    <b-form-select v-model="currentQuestion.answer" :options="currentQuestion.choices | formatList"></b-form-select>
-  </div>
+  <b-form-select v-model="currentQuestion.answer" :options="currentQuestion.choices | listFilter" aria-describedby="validation-message"></b-form-select>
 </template>
 <script>
 export default {
   name: "QuestionList",
   filters: {
-    formatList: function(value) {
+    listFilter: (value) => {
+      if (Array.isArray(value)) {
+        return value.map((currentValue) => {
+          if (currentValue.hasOwnProperty('name') && !currentValue.hasOwnProperty('text')) {
+            currentValue.text = currentValue.name;
+          }
+          return currentValue;
+        });
+      }
+    }
+  },
+  methods: {
+    formatList: (value) => {
       if (Array.isArray(value)) {
         return value.map((currentValue) => {
           if (currentValue.hasOwnProperty('name') && !currentValue.hasOwnProperty('text')) {
@@ -21,8 +31,22 @@ export default {
   props: {
     currentQuestion: Object
   },
+  watch: {
+    'currentQuestion.choices': {
+      handler() {
+        if (typeof this.currentQuestion.default === 'number') {
+          const formattedList = this.formatList(this.currentQuestion.choices);
+          if (formattedList) {
+            const choiceObject = formattedList[this.currentQuestion.default];
+            if (choiceObject) {
+              this.currentQuestion.answer = choiceObject.text;
+            }
+          }
+        }
+      }
+    }
+  },
   mounted() {
-    this.currentQuestion.default ? this.currentQuestion.answer = this.currentQuestion.default : undefined;
   }
 };
 </script>

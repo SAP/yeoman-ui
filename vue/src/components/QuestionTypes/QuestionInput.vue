@@ -1,8 +1,5 @@
 <template>
-  <div class="question-input-container">
-    <b-form-input v-model="text" v-bind:placeholder="currentQuestion.default" :state="validateInput" aria-describedby="validation-message"></b-form-input>
-    <div id='validation-message' class='invalid-feedback'>{{currentQuestion.validationMessage}}</div>
-  </div>
+  <b-form-input v-model="text" v-bind:placeholder="currentQuestion.default" :state="currentQuestion.isValid" aria-describedby="validation-message"></b-form-input>
 </template>
 <script>
 export default {
@@ -29,13 +26,6 @@ export default {
         }
       }
     }
-  },
-  computed: {
-    validateInput() {
-      return this.currentQuestion.isValid;
-    }
-  },
-  mounted() {
   }
 };
 </script>

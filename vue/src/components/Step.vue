@@ -49,6 +49,7 @@ export default {
           this.currentPrompt.questions.forEach(question => {
             if (question.answer!==undefined) counter++;
           });
+          // TODO: do not enable next button when invalid answers exist
           this.currentPrompt.allAnswered = (counter === this.currentPrompt.questions.length);
         }
       }

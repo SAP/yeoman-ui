@@ -4,7 +4,7 @@
       <b-list-group-item
         v-for="(prompt, index) in prompts"
         href="#"
-        :active="prompt.active"
+        :active="promptIndex === index"
         :key="index"
       >{{ prompt.name }}</b-list-group-item>
     </b-list-group>
@@ -14,7 +14,7 @@
 <script>
 export default {
   name: "Navigation",
-  props: ["currentPrompt", "prompts"],
+  props: ["promptIndex", "prompts"],
   methods: {
   },
   watch: {
