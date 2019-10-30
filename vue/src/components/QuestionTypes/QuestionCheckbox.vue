@@ -1,17 +1,24 @@
 <template>
   <div class="question-checkbox-container">
-    <b-form-checkbox-group v-model="selected">
-      <b-form-checkbox
-        v-for="choice in currentQuestion.choices"
-        :key="choice.name"
-        :value="choice.value"
-      >{{ choice.name }}</b-form-checkbox>
+    <b-form-checkbox-group v-model="selected" :options="currentQuestion.choices | checkboxFilter">
     </b-form-checkbox-group>
   </div>
 </template>
 <script>
 export default {
-  name: "QuestionList",
+  name: "QuestionCheckbox",
+  filters: {
+    checkboxFilter: (value) => {
+      if (Array.isArray(value)) {
+        return value.map((currentValue) => {
+          if (currentValue.hasOwnProperty('name') && !currentValue.hasOwnProperty('text')) {
+            currentValue.text = currentValue.name;
+          }
+          return currentValue;
+        });
+      }
+    }
+  },
   props: {
     currentQuestion: Object
   },
