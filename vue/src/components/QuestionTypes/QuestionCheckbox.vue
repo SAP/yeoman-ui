@@ -1,11 +1,11 @@
 <template>
   <div class="question-checkbox-container">
-    <b-form-checkbox-group v-model="selected" >
+    <b-form-checkbox-group v-model="selected">
       <b-form-checkbox
         v-for="choice in currentQuestion.choices"
-        :key="choice"
-        :value="choice"
-      >{{ choice }}</b-form-checkbox>
+        :key="choice.name"
+        :value="choice.value"
+      >{{ choice.name }}</b-form-checkbox>
     </b-form-checkbox-group>
   </div>
 </template>
@@ -16,18 +16,22 @@ export default {
     currentQuestion: Object
   },
   data() {
+    const selected = [];
+    this.currentQuestion.choices.forEach(choice => {
+      if (choice.checked) {
+        selected.push(choice.value);
+      }
+    });
+    this.currentQuestion.answer =  selected;
+
     return {
-      selected: []
+      selected: selected
     };
   },
   watch: {
     selected: {
       handler(val) {
-        if (val.length === 0) {
-          this.currentQuestion.answer = undefined;
-        } else {
           this.currentQuestion.answer = val;
-        }
       }
     }
   },
