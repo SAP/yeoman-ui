@@ -1,5 +1,5 @@
 <template>
-  <b-form-input v-model="text" v-bind:placeholder="currentQuestion.default" :state="currentQuestion.isValid" aria-describedby="validation-message"></b-form-input>
+  <b-form-input v-model="text" :type="currentQuestion.type" v-bind:placeholder="currentQuestion.default" :state="currentQuestion.isValid" aria-describedby="validation-message"></b-form-input>
 </template>
 <script>
 export default {
