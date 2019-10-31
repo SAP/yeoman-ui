@@ -7,5 +7,12 @@
 			"path": "ext"
 		}
 	],
-	"settings": {}
+	"settings": {},
+	"launch": {
+		"configurations": [],
+		"compounds": [{
+			"name": "Run in browser",
+			"configurations": ["WebSockets Server (dev)", "Launch Vue"]
+		}]
+	}
 }
