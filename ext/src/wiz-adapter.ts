@@ -1,6 +1,7 @@
 'use strict';
 import { Adapter } from "yeoman-environment";
 import { Yowiz } from "./yowiz";
+import { WizLog } from "./wiz-log";
 
 const chalk = require('chalk');
 
@@ -8,14 +9,14 @@ const chalk = require('chalk');
  * @constructor
  */
 export class WizAdapter implements Adapter {
-  constructor() {
-    this._log = new WizAdapterLog();
-    this.log.writeln = this._log.writeln;
-    this.log.conflict = this._log.conflict;
-    this.log.create = this._log.create;
-    this.log.force = this._log.force;
-    this.log.identical = this._log.identical;
-    this.log.skip = this._log.skip;
+  constructor(logger : WizLog) {
+    this._log = logger;
+    this.log.writeln = logger.writeln;
+    this.log.conflict = logger.conflict;
+    this.log.create = logger.create;
+    this.log.force = logger.force;
+    this.log.identical = logger.identical;
+    this.log.skip = logger.skip;
   }
 
   public setYowiz(yowiz: Yowiz) {
@@ -23,7 +24,7 @@ export class WizAdapter implements Adapter {
   }
 
   private _yowiz: Yowiz | undefined = undefined;
-  private _log: WizAdapterLog;
+  private _log: WizLog;
 
   public log: {
       (value: string):void,
@@ -34,7 +35,7 @@ export class WizAdapter implements Adapter {
       identical?: { (str: string): void },
       skip?: { (str: string): void }
     } = (value: string) => {
-    console.log(value);
+      this._log.log(value);
   }
 
   get _colorDiffAdded() {
@@ -85,28 +86,4 @@ export class WizAdapter implements Adapter {
   }
 }
 
-class WizAdapterLog {
-  public writeln(str: string):void {
-    console.log(`*** in writeln(): ${str}`);
-  }
 
-  public create(str: string):void {
-    console.log(`*** in create(): ${str}`);
-  }
-
-  public force(str: string):void {
-    console.log(`*** in force(): ${str}`);
-  }
-
-  public conflict(str: string):void {
-    console.log(`*** in conflict(): ${str}`);
-  }
-
-  public identical(str: string):void {
-    console.log(`*** in identical(): ${str}`);
-  }
-
-  public skip(str: string):void {
-    console.log(`*** in skip(): ${str}`);
-  }
-}

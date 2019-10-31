@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
 import { WizAdapter } from "./wiz-adapter";
+import { WizLog } from "./wiz-log";
 import { RpcCommon } from "./rpc/rpc-common";
 import Generator = require("yeoman-generator");
 
@@ -33,13 +34,13 @@ export class Yowiz {
   private _promptCount: number;
   private _currentQuestions: Environment.Adapter.Questions<any>;
 
-  constructor(rpc: RpcCommon) {
+  constructor(rpc: RpcCommon, logger: WizLog) {
     this._rpc = rpc;
 		this._rpc.setResponseTimeout(3600000);
 		this._rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
 		this._rpc.registerMethod({ func: this.runGenerator, thisArg: this });
 		this._rpc.registerMethod({ func: this.evaluateMethod, thisArg: this });
-    this._wizAdapter = new WizAdapter();
+    this._wizAdapter = new WizAdapter(logger);
     this._wizAdapter.setYowiz(this);
     this._promptCount = 0;
     this._genMeta = {};

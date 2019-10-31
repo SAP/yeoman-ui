@@ -4,6 +4,8 @@ import * as vscode from 'vscode';
 import { Yowiz, IGeneratorChoice, IGeneratorQuestion, IPrompt } from "./yowiz";
 import inquirer = require('inquirer');
 import { RpcExtenstion } from './rpc/rpc-extension';
+import { WizLog } from "./wiz-log";
+import { OutputChannelLog } from './output-channel-log';
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
@@ -78,7 +80,8 @@ export class YowizPanel {
 		this._panel = panel;
 		this._extensionPath = extensionPath;
 		this._rpc = new RpcExtenstion(this._panel.webview);
-		this._yowiz = new Yowiz(this._rpc);
+		let logger: WizLog = new OutputChannelLog();
+		this._yowiz = new Yowiz(this._rpc, logger);
 
 		// Set the webview's initial html content
 		this._update();
@@ -173,4 +176,12 @@ export class YowizPanel {
 		}
 		return indexHtml;
 	}
+}
+
+let _channel: vscode.OutputChannel;
+export function getOutputChannel(): vscode.OutputChannel {
+	if (!_channel) {
+		_channel = vscode.window.createOutputChannel('YoWiz');
+	}
+	return _channel;
 }
