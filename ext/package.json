@@ -32,7 +32,8 @@
 		"watch": "tsc -watch -p ./",
 		"postinstall": "node ./node_modules/vscode/bin/install",
 		"package": "vsce package .",
-		"test": "npm run compile && node ./node_modules/vscode/bin/test"
+		"test": "npm run compile && node ./node_modules/vscode/bin/test",
+		"run:ws": "node ./out/test/index.js"
 	},
 	"dependencies": {
 		"ws": "^7.1.2",
