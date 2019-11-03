@@ -34,7 +34,7 @@ export default {
   watch: {
     'currentQuestion.choices': {
       handler() {
-        if (typeof this.currentQuestion.default === 'number') {
+        if (typeof this.currentQuestion.default === 'number' && typeof this.currentQuestion.answer === 'number') {
           const formattedList = this.formatList(this.currentQuestion.choices);
           if (formattedList) {
             const choiceObject = formattedList[this.currentQuestion.default];
