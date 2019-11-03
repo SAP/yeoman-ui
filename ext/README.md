@@ -10,32 +10,53 @@ Launch the WebSocket server configuration for development purposes. This will no
 
 ## TODO
 * disable next when not all answered or if some questions are invalid
+* layout
+    * move next button to flush with bottom of page
+    * navbar (replace?)
 * cleanup code
-* send log output to vue application, specifically, the wiz-adapter logs and errors
-* support show console (show the running npm i after yeoman)
-* support console (collapsed) for output
-* ensure callback of `Generator.run()` is called when user aborts during conflict resolution and when exceptions occur.
-* error handling in general (e.g. promise rejects while performing rpc calls)
+    * remove redundant css
+* send log output to vue application
+    * specifically, the wiz-adapter logs and errors
+    * support show console (show the running npm i after yeoman)
+    * support console (collapsed) for output
+* error handling
+    * promise rejects while performing rpc calls
+    * ensure callback of `Generator.run()` is called when user aborts during conflict resolution and when exceptions occur.
+* provide better handling of timoutes in rpc 
+* upload rpc to npm
 * support server/extension-side evaluation mid-prompt (e.g. `when()`, `choices` that are functions, etc). See [here](https://github.com/SBoudrias/Inquirer.js/blob/master/README.md#question) for more details on question properties that can be functions
   * Done: `when`, `choices` and `message`
   * Todo: `default`, `validate` (paritaliy done), `filter` and `transformer` (also a choice with `new Separator()`)
-  * When support: what to do when "when" returns false. disabled? invisible? selected by generator?
+* suport for `validate()`
+    * support `validate()` for none input type
+    * do not show indication when input is valid
+* when `when()` returns false, hide instead of disable
 * use `debounce` when watching changes to input fields
-* support validate for none input type
 * support all inquirer question types
-* support custom question rendering: generator set the ui renderer, example: tiles instead of dropdown, radio buttons instead of dropdown, etc.
-* support extensible question type custom user interfaces for complex operations (e.g. choose odata source)
+  * questions types required by devx in Q4
+  * support custom question rendering: generator set the ui renderer, example: tiles instead of dropdown, radio buttons instead of dropdown, etc.
+  * support extensible question type custom user interfaces for complex operations (e.g. choose odata source)
+  * support inquirer plugins (e.g. date/time)
 * support async functions in generator
 * provide yeoman generator best practice guide (also provide example)
-* support back and start over
-* support custom destination root
-* support open workspace in destination
-* support open readme.md file by default (with turn off setting)
+* provide reference yeoman generator
+* support back
+* support start over
+* enable configuring destination root
 * implement ability for yowiz to call methods in vscode extensions
-* support hook for executing commands after finish
-
-* CI
-* testing
+    * support hook for executing commands after finish
+    * show ouput in conolse (see separate backlog item)
+    * support open workspace in destination
+    * support open readme.md file by default (with turn off setting)
+* automation
+    * CI
+    * linter
+    * tests
+    * build
+* make it run in theia
+    * ensure styles match vscode themes
+* support 3 default themes (vscode-black, vscode-white, non-vscode)
+* check gaps when running fiori generator
 
 ## Learning
 * support all inquirer question types
