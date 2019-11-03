@@ -57,6 +57,7 @@ Launch the WebSocket server configuration for development purposes. This will no
     * ensure styles match vscode themes
 * support 3 default themes (vscode-black, vscode-white, non-vscode)
 * check gaps when running fiori generator
+* align with mockup
 
 ## Learning
 * support all inquirer question types
