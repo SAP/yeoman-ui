@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="d-flex flex-column">
     <div v-if="!prompts.length" class="loading">Yowiz is loading...</div>
 
     <Header
@@ -10,7 +10,7 @@
       :stepName="prompts[promptIndex].name"
       :rpc="rpc"
     />
-    <b-container class="bv-example-row p-0 mx-1 mt-10">
+    <b-container class="content mb-auto p-0 mx-1 mt-10">
       <b-row class="m-0 p-0">
         <b-col class="m-0 p-0" sm="auto">
           <b-container class="m-0 p-0">
@@ -37,15 +37,11 @@
       </b-row>
     </b-container>
     <div>
-      <div id="terminal"></div>
-    
-    <b-collapse visible id="showLogId" v-model="showLog">
-        <b-form-textarea
-      id="logTextarea"
-      placeholder="No log entry"
-      v-model="logText"
-      rows="6"
-    ></b-form-textarea>
+    <b-collapse visible id="showLogId" style="height: 100px; overflow-y: auto;" v-model="showLog" class="mt-auto">
+      <div
+        id="logArea"
+        placeholder="No log entry"
+      >{{logText}}</div>
     </b-collapse>
     
 </div>
@@ -301,9 +297,6 @@ export default {
     }
   },
   mounted() {
-    // var term = new Terminal();
-    //     term.open(document.getElementById('terminal'));
-    //     term.write('Hello from \x1B[1;3;31mxterm.js\x1B[0m $ ')
     this.setupRpc();
 
     //todo: add validate support
@@ -316,6 +309,7 @@ export default {
 
 <style>
 #app {
+  height: 100%;
   color: var(--vscode-foreground, white);
   background-color: var(--vscode-panel-background, #303031);
   font-family: var(--vscode-font-family);
@@ -325,6 +319,7 @@ export default {
 
 html,
 body {
+  height: 100%;
   background-color: var(--vscode-panel-background, #303031);
   padding: 0px;
 }
@@ -338,7 +333,7 @@ body {
   background-color: var(--vscode-input-background);
 }
 
-.bv-example-row {
+.content {
   margin: 0px;
   margin-top: 1rem;
   padding: 0px;
@@ -372,4 +367,11 @@ button.btn:hover {
   margin: 1.5rem;
   font-size: 1.5rem;
 }
+
+#logArea {
+  font-family: monospace;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
 </style>
