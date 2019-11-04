@@ -171,6 +171,15 @@ export class Yowiz {
     return false;
   }
 
+  private static funcReplacer(key: any, value: any) {
+    if (typeof value === 'function') {
+      console.log(value);
+      return '__Function';
+    } else {
+      return value;
+    }
+  }
+    
   /**
    * 
    * @param quesions 
@@ -179,16 +188,8 @@ export class Yowiz {
    * Functions are lost when being passed to client (using JSON.Stringify)
    * Also functions cannot be evaluated on client)
    */
-  private normalizeFunctions(questions: Environment.Adapter.Questions<any>): Environment.Adapter.Questions<any> {
-    const mappedQuestions: Environment.Adapter.Questions<any> = (questions as Array<any>).map((question) => {
-      let mappedQuestion: any = JSON.parse(JSON.stringify(question));
-      for (let prop in question) {
-        if (typeof question[prop] === 'function') {
-          mappedQuestion[prop] = "__Function";
-        }
-      }
-      return mappedQuestion;
-    });
+   private normalizeFunctions(questions: Environment.Adapter.Questions<any>): Environment.Adapter.Questions<any> {
+    const mappedQuestions = JSON.parse(JSON.stringify(questions, Yowiz.funcReplacer));
     return mappedQuestions;
   }
 
