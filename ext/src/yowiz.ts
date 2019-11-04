@@ -28,6 +28,7 @@ export interface IPrompt {
 
 export class Yowiz {
   private _rpc: RpcCommon;
+  private _logger: WizLog;
   private _genMeta: { [namespace: string]: Environment.GeneratorMeta };
   private _wizAdapter: WizAdapter;
   private _gen: Generator | undefined;
@@ -36,10 +37,12 @@ export class Yowiz {
 
   constructor(rpc: RpcCommon, logger: WizLog) {
     this._rpc = rpc;
+    this._logger = logger;
 		this._rpc.setResponseTimeout(3600000);
 		this._rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
 		this._rpc.registerMethod({ func: this.runGenerator, thisArg: this });
-		this._rpc.registerMethod({ func: this.evaluateMethod, thisArg: this });
+    this._rpc.registerMethod({ func: this.evaluateMethod, thisArg: this });
+    this._rpc.registerMethod({ func: this.toggleLog, thisArg: this });
     this._wizAdapter = new WizAdapter(logger);
     this._wizAdapter.setYowiz(this);
     this._promptCount = 0;
@@ -159,7 +162,14 @@ export class Yowiz {
       ]);
       this.runGenerator(response.name);
     }
-	}
+  }
+  
+  public toggleLog() : boolean {
+    if (this._rpc) {
+      return this._logger.showLog();
+    }
+    return false;
+  }
 
   /**
    * 

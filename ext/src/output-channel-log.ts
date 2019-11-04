@@ -23,6 +23,10 @@ export class OutputChannelLog implements WizLog {
     skip(value: string): void {
         getOutputChannel().appendLine(value);
     }
+    showLog():boolean {
+        getOutputChannel().show();
+        return true;
+    }
 
 
 }

@@ -8,6 +8,7 @@
       :numOfSteps="prompts.length"
       :generatorName="generatorName"
       :stepName="prompts[promptIndex].name"
+      :rpc="rpc"
     />
     <b-container class="bv-example-row p-0 mx-1 mt-10">
       <b-row class="m-0 p-0">
@@ -35,6 +36,20 @@
         </b-col>
       </b-row>
     </b-container>
+    <div>
+      <div id="terminal"></div>
+    
+    <b-collapse visible id="showLogId" v-model="showLog">
+        <b-form-textarea
+      id="logTextarea"
+      placeholder="No log entry"
+      v-model="logText"
+      rows="6"
+    ></b-form-textarea>
+    </b-collapse>
+    
+</div>
+
   </div>
 </template>
 
@@ -63,7 +78,9 @@ export default {
       resolve: Object,
       reject: Object,
       isDone: false,
-      doneMessage: Object
+      doneMessage: Object,
+      showLog: false,
+      logText: ""
     };
   },
   computed: {
@@ -228,6 +245,10 @@ export default {
       this.setQuestionProps(prompt);
       return prompt;
     },
+    log(log) {
+      this.logText += log;
+      return true;
+    },
     generatorDone(success, message) {
       if (this.currentPrompt.status === 'pending') {
         this.currentPrompt.name = "Done";
@@ -271,10 +292,18 @@ export default {
         thisArg: this,
         name: "generatorDone"
       });
+      this.rpc.registerMethod({
+        func: this.log,
+        thisArg: this,
+        name: "log"
+      });
       this.rpc.invoke("receiveIsWebviewReady", []);
     }
   },
   mounted() {
+    // var term = new Terminal();
+    //     term.open(document.getElementById('terminal'));
+    //     term.write('Hello from \x1B[1;3;31mxterm.js\x1B[0m $ ')
     this.setupRpc();
 
     //todo: add validate support
