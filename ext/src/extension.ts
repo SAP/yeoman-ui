@@ -166,7 +166,8 @@ export class YowizPanel {
 			const scriptPathOnDisk = vscode.Uri.file(
 				path.join(this._extensionPath, 'out/media')
 			);
-			const scriptUri = webview.asWebviewUri(scriptPathOnDisk);
+			// TODO: call 'webview.asWebviewUri' when we have a theia verion contains PR - https://github.com/eclipse-theia/theia/pull/6465
+			const scriptUri = /* webview.asWebviewUri(scriptPathOnDisk) */ "vscode-resource:" + scriptPathOnDisk.path;
 
 			// TODO: very fragile: assuming double quotes and src is first attribute
 			// specifically, doesn't work when building vue for development (vue-cli-service build --mode development)
