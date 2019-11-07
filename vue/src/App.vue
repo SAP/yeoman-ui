@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="d-flex flex-column">
     <div v-if="!prompts.length" class="loading">Yowiz is loading...</div>
 
     <Header
@@ -8,8 +8,9 @@
       :numOfSteps="prompts.length"
       :generatorName="generatorName"
       :stepName="prompts[promptIndex].name"
+      :rpc="rpc"
     />
-    <b-container class="bv-example-row p-0 mx-1 mt-10">
+    <b-container class="content mb-auto p-0 mx-1 mt-10">
       <b-row class="m-0 p-0">
         <b-col class="m-0 p-0" sm="auto">
           <b-container class="m-0 p-0">
@@ -26,15 +27,22 @@
               v-on:generatorSelected="onGeneratorSelected"
             />
             <div class="navigation" v-if="prompts.length > 0 && !isDone">
-              <b-button class="mr-2 btn" @click="next"
-              >Next</b-button>
+              <b-button class="mr-2 btn" @click="next">Next</b-button>
               <!-- disable when invalid answers -->
-                <!-- :disabled="!currentPrompt.allAnswered" -->
+              <!-- :disabled="!currentPrompt.allAnswered" -->
             </div>
           </b-container>
         </b-col>
       </b-row>
     </b-container>
+    <div>
+      <div :class="consoleClass">
+        <b-collapse id="showLogId" style="height: 100px; overflow-y: auto;" class="mt-auto">
+          <hr />
+          <div id="logArea" placeholder="No log entry">{{logText}}</div>
+        </b-collapse>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -63,7 +71,9 @@ export default {
       resolve: Object,
       reject: Object,
       isDone: false,
-      doneMessage: Object
+      doneMessage: Object,
+      consoleClass: "",
+      logText: ""
     };
   },
   computed: {
@@ -80,7 +90,7 @@ export default {
     }
   },
   watch: {
-    'currentPrompt.answers': {
+    "currentPrompt.answers": {
       deep: true,
       immediate: true,
       handler() {
@@ -89,41 +99,75 @@ export default {
           // TODO: detect other functions (e.g. filter, choices that call functions, etc.)
           // TODO: handle multiple questions with same property as function
 
-          const questionWithWhen = this.currentPrompt.questions.find((question) => {
-            return (question.when);
-          });
+          const questionWithWhen = this.currentPrompt.questions.find(
+            question => {
+              return question.when;
+            }
+          );
           if (questionWithWhen) {
-            this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], questionWithWhen.name, "when"]).then((response) => {
-              questionWithWhen.isWhen = response;
-            });
+            this.rpc
+              .invoke("evaluateMethod", [
+                [this.currentPrompt.answers],
+                questionWithWhen.name,
+                "when"
+              ])
+              .then(response => {
+                questionWithWhen.isWhen = response;
+              });
           }
 
-          const questionWithMessage = this.currentPrompt.questions.find((question) => {
-            return (question._message === '__Function');
-          });
+          const questionWithMessage = this.currentPrompt.questions.find(
+            question => {
+              return question._message === "__Function";
+            }
+          );
           if (questionWithMessage) {
-            this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], questionWithMessage.name, "message"]).then((response) => {
-              questionWithMessage.message = response;
-            });
+            this.rpc
+              .invoke("evaluateMethod", [
+                [this.currentPrompt.answers],
+                questionWithMessage.name,
+                "message"
+              ])
+              .then(response => {
+                questionWithMessage.message = response;
+              });
           }
 
-          const questionWithChoices = this.currentPrompt.questions.find((question) => {
-            return (question._choices === '__Function');
-          });
+          const questionWithChoices = this.currentPrompt.questions.find(
+            question => {
+              return question._choices === "__Function";
+            }
+          );
           if (questionWithChoices) {
-            this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], questionWithChoices.name, "choices"]).then((response) => {
-              questionWithChoices.choices = response;
-            });
+            this.rpc
+              .invoke("evaluateMethod", [
+                [this.currentPrompt.answers],
+                questionWithChoices.name,
+                "choices"
+              ])
+              .then(response => {
+                questionWithChoices.choices = response;
+              });
           }
 
-          const questionWithValidate = this.currentPrompt.questions.find((question) => {
-            return (question.validate === '__Function');
-          });
+          const questionWithValidate = this.currentPrompt.questions.find(
+            question => {
+              return question.validate === "__Function";
+            }
+          );
           if (questionWithValidate) {
-            this.rpc.invoke("evaluateMethod", [[questionWithValidate.answer, this.currentPrompt.answers], questionWithValidate.name, "validate"]).then((response) => {
-              questionWithValidate.isValid = (typeof response === 'string' ? false : response);
-              questionWithValidate.validationMessage = (typeof response === 'string' ? response : undefined);
-            });
+            this.rpc
+              .invoke("evaluateMethod", [
+                [questionWithValidate.answer, this.currentPrompt.answers],
+                questionWithValidate.name,
+                "validate"
+              ])
+              .then(response => {
+                questionWithValidate.isValid =
+                  typeof response === "string" ? false : response;
+                questionWithValidate.validationMessage =
+                  typeof response === "string" ? response : undefined;
+              });
           }
         }
       }
@@ -143,7 +187,7 @@ export default {
         this.setPrompts([prompt]);
       }
       this.promptIndex++;
-      this.prompts[this.promptIndex-1].active = false;
+      this.prompts[this.promptIndex - 1].active = false;
       this.prompts[this.promptIndex].active = true;
     },
     onGeneratorSelected: function(generatorName) {
@@ -157,7 +201,7 @@ export default {
       //   if no prompt name is provided, assign incoming question to current prompt
 
       const currentPrompt = this.currentPrompt;
-      
+
       if (prompts) {
         prompts.forEach((prompt, index) => {
           if (index === 0) {
@@ -167,7 +211,7 @@ export default {
             } else {
               if (currentPrompt) {
                 currentPrompt.questions = prompt.questions;
-                if (prompt.name && currentPrompt.name === 'Pending...') {
+                if (prompt.name && currentPrompt.name === "Pending...") {
                   currentPrompt.name = prompt.name;
                 }
                 // if questions are provided, remote the pending status
@@ -189,14 +233,14 @@ export default {
     },
     setQuestionProps(prompt) {
       prompt.questions.forEach(question => {
-        if (question.message === '__Function') {
-          question.message = 'loading...';
-          this.$set(question, "_message", '__Function');
+        if (question.message === "__Function") {
+          question.message = "loading...";
+          this.$set(question, "_message", "__Function");
         }
 
-        if (question.choices === '__Function') {
-          question.choices = ['loading...'];
-          this.$set(question, "_choices", '__Function');
+        if (question.choices === "__Function") {
+          question.choices = ["loading..."];
+          this.$set(question, "_choices", "__Function");
         }
 
         this.$set(question, "answer", question.default);
@@ -228,8 +272,12 @@ export default {
       this.setQuestionProps(prompt);
       return prompt;
     },
+    log(log) {
+      this.logText += log;
+      return true;
+    },
     generatorDone(success, message) {
-      if (this.currentPrompt.status === 'pending') {
+      if (this.currentPrompt.status === "pending") {
         this.currentPrompt.name = "Done";
       }
       this.doneMessage = message;
@@ -271,6 +319,11 @@ export default {
         thisArg: this,
         name: "generatorDone"
       });
+      this.rpc.registerMethod({
+        func: this.log,
+        thisArg: this,
+        name: "log"
+      });
       this.rpc.invoke("receiveIsWebviewReady", []);
     }
   },
@@ -281,12 +334,15 @@ export default {
 
     this.yeomanName = "<no generator selected>";
     this.prompts = [];
+
+    this.isInVsCode() ? this.consoleClass = "consoleClassHidden" : this.consoleClass = "consoleClassVisible";
   }
 };
 </script>
 
 <style>
 #app {
+  height: 100%;
   color: var(--vscode-foreground, white);
   background-color: var(--vscode-panel-background, #303031);
   font-family: var(--vscode-font-family);
@@ -296,6 +352,7 @@ export default {
 
 html,
 body {
+  height: 100%;
   background-color: var(--vscode-panel-background, #303031);
   padding: 0px;
 }
@@ -309,7 +366,7 @@ body {
   background-color: var(--vscode-input-background);
 }
 
-.bv-example-row {
+.content {
   margin: 0px;
   margin-top: 1rem;
   padding: 0px;
@@ -342,5 +399,19 @@ button.btn:hover {
   color: var(--vscode-foreground, white);
   margin: 1.5rem;
   font-size: 1.5rem;
+}
+
+.consoleClassVisible {
+  visibility: visible;
+}
+.consoleClassHidden {
+  visibility: hidden;
+}
+
+#logArea {
+  font-family: monospace;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  background-color: red;
 }
 </style>

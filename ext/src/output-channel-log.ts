@@ -1,5 +1,6 @@
 import { WizLog } from "./wiz-log";
 import { getOutputChannel } from "./extension";
+const stripAnsi = require("strip-ansi");
 
 export class OutputChannelLog implements WizLog {
     public log(value: string): void {
@@ -28,5 +29,9 @@ export class OutputChannelLog implements WizLog {
     
     public skip(value: string): void {
         getOutputChannel().appendLine(value);
+    }
+    public showLog():boolean {
+        getOutputChannel().show();
+        return true;
     }
 }

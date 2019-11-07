@@ -1,25 +1,39 @@
 <template>
   <div>
-    <b-nav tabs>
-      <b-nav-item disabled>
-        <b>Generator:</b> {{generatorName}}
-      </b-nav-item>
-      <b-nav-item disabled>Step: {{ currentPrompt }}/{{ numOfSteps }}</b-nav-item>
-      <b-nav-item disabled>{{ stepName }}</b-nav-item>
-    </b-nav>
+    <b-navbar>
+      <b-navbar-brand>Generator: {{generatorName}}</b-navbar-brand>
+
+      <b-navbar-nav>
+        <b-nav-text>Step: {{ currentPrompt }}/{{ numOfSteps }}</b-nav-text>
+        <b-nav-text>{{ stepName }}</b-nav-text>
+      </b-navbar-nav>
+
+      <!-- Right aligned nav items -->
+      <b-navbar-nav class="ml-auto">
+        <b-nav-form>
+          <b-button v-b-toggle.showLogId @click="collapseLog">▤</b-button>
+        </b-nav-form>
+      </b-navbar-nav>
+    </b-navbar>
   </div>
 </template>
 
 <script>
-
 export default {
   name: "Header",
-  props: [
-    'generatorName',
-    'currentPrompt',
-    'numOfSteps',
-    'stepName'
-  ]
-}
-
+  props: ["generatorName", "currentPrompt", "numOfSteps", "stepName", "rpc"],
+  methods: {
+    collapseLog() {
+      this.rpc.invoke("toggleLog", [{}]);
+    }
+  }
+};
 </script>
+<style>
+.navbar-brand {
+  color: var(--vscode-foreground, white) !important;
+}
+.navbar-text {
+  color: var(--vscode-foreground, white) !important;
+}
+</style>

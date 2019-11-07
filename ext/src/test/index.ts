@@ -2,6 +2,7 @@ import * as WebSocket from 'ws';
 import { RpcExtenstionWebSockets } from '../rpc/rpc-extension-ws';
 import { IPrompt, Yowiz } from '../yowiz';
 import { WizLog } from "../wiz-log";
+import { ServerLog } from './server-log';
 
 class YowizTest {
   private rpc: RpcExtenstionWebSockets | undefined;
@@ -18,29 +19,7 @@ class YowizTest {
 
       this.rpc = new RpcExtenstionWebSockets(ws);
       //TODO: Use RPC to send it to the browser log (as a collapsed pannel in Vue)
-      let logger: WizLog = {
-        log(str: string): void {
-          console.log(`*** in log(): ${str}`);
-        },
-        writeln(str: string): void {
-          console.log(`*** in writeln(): ${str}`);
-        },
-        create(str: string): void {
-          console.log(`*** in create(): ${str}`);
-        },
-        force(str: string): void {
-          console.log(`*** in force(): ${str}`);
-        },
-        conflict(str: string): void {
-          console.log(`*** in conflict(): ${str}`);
-        },
-        identical(str: string): void {
-          console.log(`*** in identical(): ${str}`);
-        },
-        skip(str: string): void {
-          console.log(`*** in skip(): ${str}`);
-        }
-      };
+      const logger: WizLog = new ServerLog(this.rpc);
       this.yowiz = new Yowiz(this.rpc, logger);
     });
   }

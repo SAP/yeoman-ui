@@ -38,6 +38,7 @@ export class Yowiz {
   }
 
   private rpc: RpcCommon;
+  private logger: WizLog;
   private genMeta: { [namespace: string]: Environment.GeneratorMeta };
   private wizAdapter: WizAdapter;
   private gen: Generator | undefined;
@@ -46,10 +47,12 @@ export class Yowiz {
 
   constructor(rpc: RpcCommon, logger: WizLog) {
     this.rpc = rpc;
+    this.logger = logger;
     this.rpc.setResponseTimeout(3600000);
     this.rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
     this.rpc.registerMethod({ func: this.runGenerator, thisArg: this });
     this.rpc.registerMethod({ func: this.evaluateMethod, thisArg: this });
+    this.rpc.registerMethod({ func: this.toggleLog, thisArg: this });
     this.wizAdapter = new WizAdapter(logger);
     this.wizAdapter.setYowiz(this);
     this.promptCount = 0;
@@ -168,6 +171,13 @@ export class Yowiz {
       ]);
       this.runGenerator(response.name);
     }
+  }
+
+  public toggleLog() : boolean {
+    if (this._rpc) {
+      return this._logger.showLog();
+    }
+    return false;
   }
 
   public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
