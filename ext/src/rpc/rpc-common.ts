@@ -3,7 +3,7 @@ export interface IRpc {
   sendRequest(id: number, method: string, params?: any[]): void;
   sendResponse(id: number, response: any, success?: boolean): void;
   handleResponse(message: any): void;
-  handleRequest(message: any): void
+  handleRequest(message: any): void;
 }
 
 export interface IPromiseCallbacks {
@@ -18,8 +18,6 @@ export interface IMethod {
 }
 
 export abstract class RpcCommon implements IRpc {
-  abstract sendRequest(id: number, method: string, params?: any[]): void;
-  abstract sendResponse(id: number, response: any, success?: boolean): void;
   protected promiseCallbacks: Map<number, IPromiseCallbacks>; // promise resolve and reject callbacks that are called when returning fron the webview
   protected methods: Map<string, IMethod>;
   protected timeout: number = 15000; // timeout for response from remote in milliseconds
@@ -29,6 +27,10 @@ export abstract class RpcCommon implements IRpc {
     this.methods = new Map();
     this.registerMethod({ func: this.listLocalMethods, thisArg: this });
   }
+
+  public abstract sendRequest(id: number, method: string, params?: any[]): void;
+  public abstract sendResponse(id: number, response: any, success?: boolean): void;
+  
 
   public setResponseTimeout(timeout: number) {
     this.timeout = timeout;
@@ -50,18 +52,18 @@ export abstract class RpcCommon implements IRpc {
     return this.invoke("listLocalMethods");
   }
 
-  invoke(method: string, params?: any[]): Promise<any> {
+  public invoke(method: string, params?: any[]): Promise<any> {
     // TODO: change to something more unique (or check to see if id doesn't alreday exist in this.promiseCallbacks)
     const id = Math.random();
     const promise = new Promise((resolve, reject) => {
-      this.promiseCallbacks.set(id, { resolve: resolve, reject: reject });
+      this.promiseCallbacks.set(id, { "resolve": resolve, "reject": reject });
     });
 
     this.sendRequest(id, method, params);
     return promise;
   }
 
-  handleResponse(message: any): void {
+  public handleResponse(message: any): void {
     const promiseCallbacks: IPromiseCallbacks | undefined = this.promiseCallbacks.get(message.id);
     if (promiseCallbacks) {
       if (message.success) {
@@ -73,7 +75,7 @@ export abstract class RpcCommon implements IRpc {
     }
   }
 
-  async handleRequest(message: any): Promise<void> {
+  public async handleRequest(message: any): Promise<void> {
     const method: IMethod | undefined = this.methods.get(message.method);
     if (method) {
       const func: Function = method.func;

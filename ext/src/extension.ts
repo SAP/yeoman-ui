@@ -1,8 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { Yowiz, IGeneratorChoice, IGeneratorQuestion, IPrompt } from "./yowiz";
-import inquirer = require('inquirer');
+import { Yowiz } from "./yowiz";
 import { RpcExtenstion } from './rpc/rpc-extension';
 import { WizLog } from "./wiz-log";
 import { OutputChannelLog } from './output-channel-log';
@@ -32,16 +31,8 @@ export class YowizPanel {
 	/**
 	 * Track the currently panel. Only allow a single panel to exist at a time.
 	 */
-	public static currentPanel: YowizPanel | undefined;
-	private _rpc: RpcExtenstion;
-	public _yowiz: Yowiz;
-
 	public static readonly viewType = 'yowiz';
-
-	private readonly _panel: vscode.WebviewPanel;
-	private readonly _extensionPath: string;
-	private _disposables: vscode.Disposable[] = [];
-	private _questionsResolutions: Map<number, any>;
+	public static currentPanel: YowizPanel | undefined;
 
 	public static createOrShow(extensionPath: string) {
 		const column = vscode.window.activeTextEditor
@@ -50,7 +41,7 @@ export class YowizPanel {
 
 		// If we already have a panel, show it.
 		if (YowizPanel.currentPanel) {
-			YowizPanel.currentPanel._panel.reveal(column);
+			YowizPanel.currentPanel.panel.reveal(column);
 			return;
 		}
 
@@ -75,47 +66,54 @@ export class YowizPanel {
 		YowizPanel.currentPanel = new YowizPanel(panel, extensionPath);
 	}
 
+	public yowiz: Yowiz;
+	private rpc: RpcExtenstion;
+	private readonly panel: vscode.WebviewPanel;
+	private readonly extensionPath: string;
+	private disposables: vscode.Disposable[] = [];
+	private questionsResolutions: Map<number, any>;
+
 	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
-		this._questionsResolutions = new Map();
-		this._panel = panel;
-		this._extensionPath = extensionPath;
-		this._rpc = new RpcExtenstion(this._panel.webview);
-		let logger: WizLog = new OutputChannelLog();
-		this._yowiz = new Yowiz(this._rpc, logger);
+		this.questionsResolutions = new Map();
+		this.panel = panel;
+		this.extensionPath = extensionPath;
+		this.rpc = new RpcExtenstion(this.panel.webview);
+		const logger: WizLog = new OutputChannelLog();
+		this.yowiz = new Yowiz(this.rpc, logger);
 
 		// Set the webview's initial html content
 		this._update();
 
 		// Listen for when the panel is disposed
 		// This happens when the user closes the panel or when the panel is closed programatically
-		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+		this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
 
 		// Update the content based on view changes
-		this._panel.onDidChangeViewState(
+		this.panel.onDidChangeViewState(
 			e => {
-				if (this._panel.visible) {
+				if (this.panel.visible) {
 					this._update();
 				}
 			},
 			null,
-			this._disposables
+			this.disposables
 		);
 
 		// Handle messages from the webview
-		this._panel.webview.onDidReceiveMessage(
+		this.panel.webview.onDidReceiveMessage(
 			message => {
 				switch (message.command) {
 					case 'alert':
 						vscode.window.showErrorMessage(message.text);
 						return;
 					case 'answers':
-						const resolve = this._questionsResolutions.get(message.taskId);
+						const resolve = this.questionsResolutions.get(message.taskId);
 						resolve(message.data);
 						return;
 				}
 			},
 			null,
-			this._disposables
+			this.disposables
 		);
 	}
 
@@ -123,10 +121,10 @@ export class YowizPanel {
 		YowizPanel.currentPanel = undefined;
 
 		// Clean up our resources
-		this._panel.dispose();
+		this.panel.dispose();
 
-		while (this._disposables.length) {
-			const x = this._disposables.pop();
+		while (this.disposables.length) {
+			const x = this.disposables.pop();
 			if (x) {
 				x.dispose();
 			}
@@ -134,10 +132,10 @@ export class YowizPanel {
 	}
 
 	private _update() {
-		const webview = this._panel.webview;
+		const webview = this.panel.webview;
 
 		// Vary the webview's content based on where it is located in the editor.
-		switch (this._panel.viewColumn) {
+		switch (this.panel.viewColumn) {
 			case vscode.ViewColumn.Two:
 				this._updateSpecificColumn(webview, 'Compiling');
 				return;
@@ -154,8 +152,8 @@ export class YowizPanel {
 	}
 
 	private _updateSpecificColumn(webview: vscode.Webview, name: string) {
-		this._panel.title = name;
-		this._panel.webview.html = this._getHtmlForWebview(webview, name);
+		this.panel.title = name;
+		this.panel.webview.html = this._getHtmlForWebview(webview, name);
 	}
 
 	private _getHtmlForWebview(webview: vscode.Webview, name: string) {
@@ -164,7 +162,7 @@ export class YowizPanel {
 		if (indexHtml) {
 			// Local path to main script run in the webview
 			const scriptPathOnDisk = vscode.Uri.file(
-				path.join(this._extensionPath, 'out/media')
+				path.join(this.extensionPath, 'out/media')
 			);
 			const scriptUri = webview.asWebviewUri(scriptPathOnDisk);
 
@@ -178,10 +176,10 @@ export class YowizPanel {
 	}
 }
 
-let _channel: vscode.OutputChannel;
+let channel: vscode.OutputChannel;
 export function getOutputChannel(): vscode.OutputChannel {
-	if (!_channel) {
-		_channel = vscode.window.createOutputChannel('YoWiz');
+	if (!channel) {
+		channel = vscode.window.createOutputChannel('YoWiz');
 	}
-	return _channel;
+	return channel;
 }
