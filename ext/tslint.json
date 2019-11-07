@@ -3,6 +3,9 @@
 		"no-string-throw": true,
 		"no-unused-expression": true,
 		"no-duplicate-variable": true,
+		"ordered-imports": false,
+		"object-literal-sort-keys": false,
+		"no-string-literal": false,
 		"curly": true,
 		"class-name": true,
 		"semicolon": [

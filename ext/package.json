@@ -33,20 +33,25 @@
 		"postinstall": "node ./node_modules/vscode/bin/install",
 		"package": "vsce package .",
 		"test": "npm run compile && node ./node_modules/vscode/bin/test",
-		"run:ws": "node ./out/test/index.js"
+		"run:ws": "node ./out/test/index.js",
+		"lint": "tslint '*/*.{ts,tsx}' -c ./tslint.yml"
 	},
 	"dependencies": {
 		"ws": "^7.1.2",
-		"yeoman-environment": "^2.4.0"
+		"yeoman-environment": "^2.4.0",
+		"lodash": "^4.17.15"
 	},
 	"devDependencies": {
+		"@types/lodash": "^4.14.145",
 		"@types/inquirer": "^6.5.0",
 		"@types/mocha": "^2.2.42",
 		"@types/node": "^10.12.21",
 		"@types/ws": "^6.0.3",
 		"@types/yeoman-environment": "^2.3.2",
 		"cpx": "^1.5.0",
-		"tslint": "^5.12.1",
+		"tslint": "^5.20.1",
+		"tslint-config-prettier": "^1.18.0",
+		"tslint-no-unused-expression-chai": "^0.1.4",
 		"typescript": "^3.6.1",
 		"vsce": "^1.68.0",
 		"vscode": "^1.1.28"
