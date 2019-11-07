@@ -174,8 +174,8 @@ export class Yowiz {
   }
 
   public toggleLog() : boolean {
-    if (this._rpc) {
-      return this._logger.showLog();
+    if (this.rpc) {
+      return this.logger.showLog();
     }
     return false;
   }

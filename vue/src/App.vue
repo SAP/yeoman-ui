@@ -412,6 +412,5 @@ button.btn:hover {
   font-family: monospace;
   word-wrap: break-word;
   white-space: pre-wrap;
-  background-color: red;
 }
 </style>
