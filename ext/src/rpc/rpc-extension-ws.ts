@@ -2,7 +2,7 @@ import { RpcCommon, IPromiseCallbacks } from './rpc-common';
 import * as WebSocket from 'ws';
 
 export class RpcExtenstionWebSockets extends RpcCommon {
-  ws: WebSocket;
+  public ws: WebSocket;
 
   constructor(ws: WebSocket) {
     super();
@@ -21,7 +21,7 @@ export class RpcExtenstionWebSockets extends RpcCommon {
     });
   }
 
-  sendRequest(id: number, method: string, params: any[]) {
+  public sendRequest(id: number, method: string, params: any[]) {
     // consider cancelling the timer if the promise if fulfilled before timeout is reached
     setTimeout(() => {
       const promiseCallbacks: IPromiseCallbacks | undefined = this.promiseCallbacks.get(id);
@@ -33,20 +33,20 @@ export class RpcExtenstionWebSockets extends RpcCommon {
 
     const requestObject: any = {
       command: 'rpc-request',
-      id: id,
-      method: method,
-      params: params
+      "id": id,
+      "method": method,
+      "params": params
     };
 
     this.ws.send(JSON.stringify(requestObject));
   }
 
-  sendResponse(id: number, response: any, success: boolean = true): void {
+  public sendResponse(id: number, response: any, success: boolean = true): void {
     const responseObject: any = {
       command: 'rpc-response',
-      id: id,
-      response: response,
-      success: success
+      "id": id,
+      "response": response,
+      "success": success
     };
 
     this.ws.send(JSON.stringify(responseObject));

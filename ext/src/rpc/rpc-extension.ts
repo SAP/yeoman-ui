@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { RpcCommon, IPromiseCallbacks } from './rpc-common';
 
 export class RpcExtenstion extends RpcCommon {
-  webview: vscode.Webview;
+  public webview: vscode.Webview;
 
   constructor(webview: vscode.Webview) {
     super();
@@ -19,7 +19,7 @@ export class RpcExtenstion extends RpcCommon {
     });
   }
 
-  sendRequest(id: number, method: string, params: any[]) {
+  public sendRequest(id: number, method: string, params: any[]) {
     // consider cancelling the timer if the promise if fulfilled before timeout is reached
     setTimeout(() => {
       const promiseCallbacks: IPromiseCallbacks | undefined = this.promiseCallbacks.get(id);
@@ -31,18 +31,18 @@ export class RpcExtenstion extends RpcCommon {
 
     this.webview.postMessage({
       command: 'rpc-request',
-      id: id,
-      method: method,
-      params: params
+      "id": id,
+      "method": method,
+      "params": params
     });
   }
 
-  sendResponse(id: number, response: any, success: boolean = true): void {
+  public sendResponse(id: number, response: any, success: boolean = true): void {
     this.webview.postMessage({
       command: 'rpc-response',
-      id: id,
-      response: response,
-      success: success
+      "id": id,
+      "response": response,
+      "success": success
     });
   }
 }
