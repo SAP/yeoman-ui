@@ -21,24 +21,10 @@
 <script>
 export default {
   name: "Header",
-  props: [
-    "generatorName",
-    "currentPrompt",
-    "numOfSteps",
-    "stepName",
-    "rpc"
-  ],
-  data() {
-    return {
-      visibleLog : false
-    };
-  },
+  props: ["generatorName", "currentPrompt", "numOfSteps", "stepName", "rpc"],
   methods: {
     collapseLog() {
-      let that = this;
-      this.rpc.invoke("toggleLog", [{}]).then(value => {
-        that.visibleLog = value;
-      });
+      this.rpc.invoke("toggleLog", [{}]);
     }
   }
 };
