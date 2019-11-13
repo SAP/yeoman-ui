@@ -26,12 +26,6 @@ export default {
   methods: {
     onGeneratorSelected: function(generatorName) {
       this.$emit("generatorSelected", generatorName);
-    },
-    isAllValidated() {
-      const invalidQuestions = _.filter(this.currentPrompt.questions, question => {
-        return question.isValid === false;
-      });
-      return _.isEmpty(invalidQuestions);
     }
   },
   watch: {
