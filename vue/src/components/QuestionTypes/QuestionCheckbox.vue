@@ -1,6 +1,6 @@
 <template>
   <div class="question-checkbox-container">
-    <b-form-checkbox-group v-model="selected" :options="currentQuestion.choices | checkboxFilter">
+    <b-form-checkbox-group v-model="selected" stacked :options="currentQuestion.choices | checkboxFilter">
     </b-form-checkbox-group>
   </div>
 </template>
