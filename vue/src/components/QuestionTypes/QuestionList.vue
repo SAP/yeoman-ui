@@ -1,5 +1,6 @@
 <template>
-  <b-form-select v-model="currentQuestion.answer" :options="currentQuestion.choices | listFilter" aria-describedby="validation-message"></b-form-select>
+  <b-form-select v-model="currentQuestion.answer" :options="currentQuestion.choices | listFilter" aria-describedby="validation-message">
+  </b-form-select>
 </template>
 <script>
 export default {
