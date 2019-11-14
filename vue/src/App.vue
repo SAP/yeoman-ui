@@ -24,12 +24,11 @@
               v-if="prompts.length"
               ref="step"
               :currentPrompt="currentPrompt"
-              v-on:generatorSelected="onGeneratorSelected"
+              @generatorSelected="onGeneratorSelected"
+              @stepvalidated="onStepValidated"
             />
-            <div class="navigation" v-if="prompts.length > 0 && !isDone">
-              <b-button class="mr-2 btn" @click="next">Next</b-button>
-              <!-- disable when invalid answers -->
-              <!-- :disabled="!currentPrompt.allAnswered" -->
+            <div class="navigation" v-if="prompts.length > 0 && !isDone" >
+              <b-button class="mr-2 btn" :disabled="!stepValidated" @click="next">Next</b-button>
             </div>
           </b-container>
         </b-col>
@@ -53,7 +52,7 @@ import Navigation from "./components/Navigation.vue";
 import Step from "./components/Step.vue";
 import { RpcBrowser } from "./rpc/rpc-browser.js";
 import { RpcBrowserWebSockets } from "./rpc/rpc-browser-ws.js";
-
+import * as _ from "lodash";
 export default {
   name: "app",
   components: {
@@ -64,6 +63,7 @@ export default {
   data() {
     return {
       generatorName: "<none>",
+      stepValidated:false,
       prompts: [],
       promptIndex: 0,
       index: 0,
@@ -80,7 +80,7 @@ export default {
     currentPrompt: function() {
       const response = this.prompts[this.promptIndex];
       if (response) {
-        const answers = response.answers || {};
+        const answers = _.get(response, "answers", {});
         response.questions.forEach(value => {
           answers[value.name] = value.answer;
         });
@@ -97,78 +97,29 @@ export default {
         if (this.currentPrompt) {
           // TODO: consider using debounce (especially for questions of type 'input') to limit roundtrips
           // TODO: detect other functions (e.g. filter, choices that call functions, etc.)
-          // TODO: handle multiple questions with same property as function
-
-          const questionWithWhen = this.currentPrompt.questions.find(
-            question => {
-              return question.when;
-            }
-          );
-          if (questionWithWhen) {
-            this.rpc
-              .invoke("evaluateMethod", [
-                [this.currentPrompt.answers],
-                questionWithWhen.name,
-                "when"
-              ])
-              .then(response => {
-                questionWithWhen.isWhen = response;
+          _.forEach(this.currentPrompt.questions, question => {
+            if (question.when === "__Function") {
+              this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "when"]).then(response => {
+                question.isWhen = response;
               });
-          }
-
-          const questionWithMessage = this.currentPrompt.questions.find(
-            question => {
-              return question._message === "__Function";
             }
-          );
-          if (questionWithMessage) {
-            this.rpc
-              .invoke("evaluateMethod", [
-                [this.currentPrompt.answers],
-                questionWithMessage.name,
-                "message"
-              ])
-              .then(response => {
-                questionWithMessage.message = response;
+            if (question._message === "__Function") {
+              this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "message"]).then(response => {
+                question.message = response;
               });
-          }
-
-          const questionWithChoices = this.currentPrompt.questions.find(
-            question => {
-              return question._choices === "__Function";
             }
-          );
-          if (questionWithChoices) {
-            this.rpc
-              .invoke("evaluateMethod", [
-                [this.currentPrompt.answers],
-                questionWithChoices.name,
-                "choices"
-              ])
-              .then(response => {
-                questionWithChoices.choices = response;
+            if (question._choices === "__Function") {
+              this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "choices"]).then(response => {
+                question.choices = response;
               });
-          }
-
-          const questionWithValidate = this.currentPrompt.questions.find(
-            question => {
-              return question.validate === "__Function";
             }
-          );
-          if (questionWithValidate) {
-            this.rpc
-              .invoke("evaluateMethod", [
-                [questionWithValidate.answer, this.currentPrompt.answers],
-                questionWithValidate.name,
-                "validate"
-              ])
-              .then(response => {
-                questionWithValidate.isValid =
-                  typeof response === "string" ? false : response;
-                questionWithValidate.validationMessage =
-                  typeof response === "string" ? response : undefined;
+            if (question.validate === "__Function") {
+              this.rpc.invoke("evaluateMethod", [[question.answer, this.currentPrompt.answers], question.name, "validate"]).then(response => {
+                question.isValid = (typeof response === 'string' ? false : response);
+                question.validationMessage = (typeof response === 'string' ? response : undefined);
               });
-          }
+            }
+          });
         }
       }
     }
@@ -193,15 +144,16 @@ export default {
     onGeneratorSelected: function(generatorName) {
       this.generatorName = generatorName;
     },
+    onStepValidated: function(stepValidated) {
+      this.stepValidated = stepValidated;
+    },
     setPrompts(prompts) {
       // TODO:
       //   if prompt name is provided, find an existing prompt based on key or name:
       //     if found then update it
       //     if not found then create a prompt
       //   if no prompt name is provided, assign incoming question to current prompt
-
       const currentPrompt = this.currentPrompt;
-
       if (prompts) {
         prompts.forEach((prompt, index) => {
           if (index === 0) {
@@ -237,12 +189,10 @@ export default {
           question.message = "loading...";
           this.$set(question, "_message", "__Function");
         }
-
         if (question.choices === "__Function") {
           question.choices = ["loading..."];
           this.$set(question, "_choices", "__Function");
         }
-
         this.$set(question, "answer", question.default);
         this.$set(question, "isWhen", true);
         this.$set(question, "isValid", true);
@@ -251,9 +201,7 @@ export default {
     },
     showPrompt(questions, name) {
       const prompt = this.createPrompt(questions, name);
-
       // evaluate message property on server if it is a function
-
       this.setPrompts([prompt]);
       const promise = new Promise((resolve, reject) => {
         this.resolve = resolve;
@@ -266,7 +214,6 @@ export default {
         questions: questions,
         name: name,
         answers: {},
-        allAnswered: false,
         active: true
       });
       this.setQuestionProps(prompt);
@@ -329,12 +276,9 @@ export default {
   },
   mounted() {
     this.setupRpc();
-
     //todo: add validate support
-
     this.yeomanName = "<no generator selected>";
     this.prompts = [];
-
     this.isInVsCode() ? this.consoleClass = "consoleClassHidden" : this.consoleClass = "consoleClassVisible";
   }
 };
@@ -349,38 +293,31 @@ export default {
   font-weight: var(--vscode-font-weight);
   font-size: var(--vscode-font-size);
 }
-
 html,
 body {
   height: 100%;
   background-color: var(--vscode-panel-background, #303031);
   padding: 0px;
 }
-
 .list-group-item.selected {
   background-color: var(--vscode-list-active-selection-background);
 }
-
 .form-control {
   color: var(--vscode-input-foreground);
   background-color: var(--vscode-input-background);
 }
-
 .content {
   margin: 0px;
   margin-top: 1rem;
   padding: 0px;
 }
-
 b-container {
   margin: 0px;
   padding: 0px;
 }
-
 b-row {
   margin: 0px;
 }
-
 button.btn {
   background-color: var(--vscode-button-background, #0e639c);
   border-color: var(--vscode-button-background, #0e639c);
@@ -389,25 +326,21 @@ button.btn {
   font-size: 0.8rem;
   padding: 0.2rem 0.6rem;
 }
-
 button.btn:hover {
   background-color: var(--vscode-button-hoverBackground, #1177bb);
   border-color: var(--vscode-button-hoverBackground, #1177bb);
 }
-
 .loading {
   color: var(--vscode-foreground, white);
   margin: 1.5rem;
   font-size: 1.5rem;
 }
-
 .consoleClassVisible {
   visibility: visible;
 }
 .consoleClassHidden {
   visibility: hidden;
 }
-
 #logArea {
   font-family: monospace;
   word-wrap: break-word;

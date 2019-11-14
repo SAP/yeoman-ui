@@ -5,16 +5,16 @@
         v-for="(item, index) in currentPrompt.questions"
         :key="index"
         :currentQuestion="item"
-        v-on:answer="onAnswer"
         v-on:generatorSelected="onGeneratorSelected"
       />
     </b-form>
+
   </div>
 </template>
 
 <script>
 import QuestionTypeSelector from "./QuestionTypeSelector.vue";
-
+import * as _ from "lodash";
 export default {
   name: "Step",
   components: {
@@ -23,34 +23,22 @@ export default {
   props: {
     currentPrompt: Object
   },
-  data() {
-    return {
-      answers: {}
-    };
-  },
   methods: {
-    onAnswer: function(answerObject) {
-      Object.assign(this.answers, answerObject);
-    },
     onGeneratorSelected: function(generatorName) {
       this.$emit("generatorSelected", generatorName);
     }
   },
   watch: {
     'currentPrompt.questions': {
-      //  immediate: true,
+      //immediate: true,
       deep: true,
       handler() {
-        // TODO: this is currently not trigerred when pending prompt receives actual questions, so Next button does not get enabled
-        //count number of answers
-        let counter = 0;
         if (this.currentPrompt) {
-          // TODO: ignore when questions where when() returns false
-          this.currentPrompt.questions.forEach(question => {
-            if (question.answer!==undefined) counter++;
+          const invalidQuestions = _.filter(this.currentPrompt.questions, question => {
+          return question.isValid === false;
           });
-          // TODO: do not enable next button when invalid answers exist
-          this.currentPrompt.allAnswered = (counter === this.currentPrompt.questions.length);
+          let isValidated = _.isEmpty(invalidQuestions);
+          this.$emit('stepvalidated', isValidated);
         }
       }
     }
