@@ -289,5 +289,65 @@ export default {
 </script>
 
 <style>
-@import './style/index.css';
-</style>
+#app {
+    height: 100%;
+    color: var(--vscode-foreground, white);
+    background-color: var(--vscode-panel-background, #303031);
+    font-family: var(--vscode-font-family);
+    font-weight: var(--vscode-font-weight);
+    font-size: var(--vscode-font-size);
+  }
+  html,
+  body {
+    height: 100%;
+    background-color: var(--vscode-panel-background, #303031);
+    padding: 0px;
+  }
+  .list-group-item.selected {
+    background-color: var(--vscode-list-active-selection-background);
+  }
+  .form-control {
+    color: var(--vscode-input-foreground);
+    background-color: var(--vscode-input-background);
+  }
+  .content {
+    margin: 0px;
+    margin-top: 1rem;
+    padding: 0px;
+  }
+  b-container {
+    margin: 0px;
+    padding: 0px;
+  }
+  b-row {
+    margin: 0px;
+  }
+  button.btn {
+    background-color: var(--vscode-button-background, #0e639c);
+    border-color: var(--vscode-button-background, #0e639c);
+    color: var(--vscode-button-foreground, white);
+    border-radius: 0px;
+    font-size: 0.8rem;
+    padding: 0.2rem 0.6rem;
+  }
+  button.btn:hover {
+    background-color: var(--vscode-button-hoverBackground, #1177bb);
+    border-color: var(--vscode-button-hoverBackground, #1177bb);
+  }
+  .loading {
+    color: var(--vscode-foreground, white);
+    margin: 1.5rem;
+    font-size: 1.5rem;
+  }
+  .consoleClassVisible {
+    visibility: visible;
+  }
+  .consoleClassHidden {
+    visibility: hidden;
+  }
+  #logArea {
+    font-family: monospace;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }
+  </style>
