@@ -1,5 +1,7 @@
 # Yeoman UI
 
+![](screenshot.png)
+
 ## Description
 Provide rich user experience for Yeoman generators using VSCode extension or the browser.
 The repository contains three main packages:
