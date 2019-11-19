@@ -96,7 +96,6 @@ export default {
       handler() {
         if (this.currentPrompt) {
           // TODO: consider using debounce (especially for questions of type 'input') to limit roundtrips
-          // TODO: detect other functions (e.g. filter, choices that call functions, etc.)
           _.forEach(this.currentPrompt.questions, question => {
             if (question.when === "__Function") {
               this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "when"]).then(response => {
@@ -114,7 +113,7 @@ export default {
               });
             }
             if (question.filter === "__Function") {
-              this.rpc.invoke("evaluateMethod", [[question.answer, this.currentPrompt.answers], question.name, "filter"]).then(response => {
+              this.rpc.invoke("evaluateMethod", [[question.answer], question.name, "filter"]).then(response => {
                 question.answer = response;
               });
             }
