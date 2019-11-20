@@ -97,11 +97,6 @@ export default {
         if (this.currentPrompt) {
           // TODO: consider using debounce (especially for questions of type 'input') to limit roundtrips
           _.forEach(this.currentPrompt.questions, question => {
-            if (question.default === "__Function") {
-              this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "default"]).then(response => {
-                question.answer = response;
-              });
-            }
             if (question.when === "__Function") {
               this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "when"]).then(response => {
                 question.isWhen = response;
