@@ -82,7 +82,7 @@ export default {
       if (response) {
         const answers = _.get(response, "answers", {});
         response.questions.forEach(value => {
-          answers[value.name] = value.answer;
+          answers[value.name] = value.isWhen === false ? undefined : value.answer;
         });
         response.answers = answers;
       }
@@ -97,6 +97,12 @@ export default {
         if (this.currentPrompt) {
           // TODO: consider using debounce (especially for questions of type 'input') to limit roundtrips
           _.forEach(this.currentPrompt.questions, question => {
+            if (question._default === "__Function") {
+              this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "default"]).then(response => {
+                question.default = response;
+                question.answer = response;
+              });
+            }
             if (question.when === "__Function") {
               this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "when"]).then(response => {
                 question.isWhen = response;
@@ -189,6 +195,10 @@ export default {
     },
     setQuestionProps(prompt) {
       prompt.questions.forEach(question => {
+        if (question.default === "__Function") {
+          question.default = undefined;
+          this.$set(question, "_default", "__Function");
+        }
         if (question.message === "__Function") {
           question.message = "loading...";
           this.$set(question, "_message", "__Function");
