@@ -82,7 +82,7 @@ export default {
       if (response) {
         const answers = _.get(response, "answers", {});
         response.questions.forEach(value => {
-          answers[value.name] = value.answer;
+          answers[value.name] = value.isWhen === false ? undefined : value.answer;
         });
         response.answers = answers;
       }
