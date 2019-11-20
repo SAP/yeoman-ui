@@ -34,7 +34,7 @@
 		"package": "vsce package .",
 		"test": "npm run compile && node ./node_modules/vscode/bin/test",
 		"run:ws": "node ./out/test/index.js",
-		"lint": "tslint '*/*.{ts,tsx}' -c ./tslint.yml"
+		"lint": "eslint ./**/*.ts"
 	},
 	"dependencies": {
 		"strip-ansi": "^5.2.0",
@@ -43,14 +43,18 @@
 		"lodash": "^4.17.15"
 	},
 	"devDependencies": {
-		"@types/lodash": "^4.14.145",
 		"@types/inquirer": "^6.5.0",
+		"@types/lodash": "^4.14.145",
 		"@types/mocha": "^2.2.42",
 		"@types/node": "^10.12.21",
 		"@types/strip-ansi": "^5.2.1",
 		"@types/ws": "^6.0.3",
 		"@types/yeoman-environment": "^2.3.2",
+		"@typescript-eslint/eslint-plugin": "^2.8.0",
+		"@typescript-eslint/parser": "^2.8.0",
 		"cpx": "^1.5.0",
+		"eslint": "^6.6.0",
+		"rimraf": "^3.0.0",
 		"tslint": "^5.20.1",
 		"tslint-config-prettier": "^1.18.0",
 		"tslint-no-unused-expression-chai": "^0.1.4",
