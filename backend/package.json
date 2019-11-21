@@ -25,8 +25,8 @@
 		]
 	},
 	"scripts": {
-		"vue:prep": "cd ../vue && npm i",
-		"vue:cp": "cd ../vue && npm run build && cd ../ext && rm -rf out/media && cp -r  ../vue/dist/ out/media",
+		"vue:prep": "cd ../frontend && npm i",
+		"vue:cp": "cd ../frontend && npm run build && cd ../backend && rm -rf out/media && cp -r  ../frontend/dist/ out/media",
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
