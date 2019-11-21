@@ -25,8 +25,8 @@
 		]
 	},
 	"scripts": {
-		"vue:prep": "cd ../vue && npm i",
-		"vue:cp": "cd ../vue && npm run build && cd ../ext && rm -rf out/media && cp -r  ../vue/dist/ out/media",
+		"vue:prep": "cd ../frontend && npm i",
+		"vue:cp": "cd ../frontend && npm run build && cd ../backend && rm -rf out/media && cp -r  ../frontend/dist/ out/media",
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
@@ -35,7 +35,7 @@
 		"test_old": "npm run compile && node ./node_modules/vscode/bin/test",
 		"test": "nyc mocha -p tsconfig.json --opts ./mocha.opts",
 		"run:ws": "node ./out/test/index.js",
-		"lint": "tslint '*/*.{ts,tsx}' -c ./tslint.yml"
+		"lint": "eslint ./**/*.ts"
 	},
 	"dependencies": {
 		"strip-ansi": "^5.2.0",
@@ -53,7 +53,10 @@
 		"@types/strip-ansi": "^5.2.1",
 		"@types/ws": "^6.0.3",
 		"@types/yeoman-environment": "^2.3.2",
-		"cpx": "^1.5.0",
+		"@typescript-eslint/eslint-plugin": "^2.8.0",
+		"@typescript-eslint/parser": "^2.8.0",
+		"eslint": "^6.6.0",
+		"rimraf": "^3.0.0",
 		"tslint": "^5.20.1",
 		"tslint-config-prettier": "^1.18.0",
 		"tslint-no-unused-expression-chai": "^0.1.4",

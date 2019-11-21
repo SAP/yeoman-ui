@@ -13,6 +13,13 @@ class YowizTest {
     const wss = new WebSocket.Server({ port: 8081 }, () => {
       console.log('websocket server is listening on port 8081');
     });
+    wss.on('listening', () => {
+      console.log('listening to websocket on port 8081');
+    });
+
+    wss.on('error', (error) => {
+      console.error(error);
+    });
 
     wss.on('connection', (ws) => {
       console.log('new ws connection');
