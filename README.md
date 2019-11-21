@@ -5,9 +5,9 @@
 ## Description
 Provide rich user experience for Yeoman generators using VSCode extension or the browser.
 The repository contains three main packages:
-* **UI (vue)** - The Yeoman UI as a standalone vue.js application.
-* **Backend (ext)** - The backend part which communicate with Yeoman and the system. Runs as a VSCode extension or node.js application.
-* **Yeoman example (gen)** - Example generator to show usages and test the platform.
+* **Frontend** - The Yeoman UI as a standalone vue.js application.
+* **Backend** - The backend part which communicate with Yeoman and the system. Runs as a VSCode extension or node.js application.
+* **Yeoman example generator** - Example generator to show usages and test the platform.
 
 ## Requirements
 * [node.js](https://www.npmjs.com/package/node) version 10 or higher.
@@ -19,7 +19,7 @@ To test run the framework you only need to build & install the backend package, 
 * Clone this repository
 * cd into the backend folder
     ```bash
-    cd ext
+    cd backend
     ```
 * To install, compile and prepare the static resources run the following commands:
     ```bash
@@ -27,16 +27,29 @@ To test run the framework you only need to build & install the backend package, 
     npm run vue:prep
     npm run vue:cp
     ```
-### Usage
+### Usage & Development
+#### Run the dev mode
+Dev mode allows you to run the framework in the browser, using vue cli for fast development cycles, and easy debug tools.
+To run it do the following:
+* In the backend folder run compile or watch, then run the server.
+    ```bash
+    npm run watch
+    npm run run:ws
+    ```
+* In the frontend folder run serve
+    ```bash
+    npm run serve
+    ```
+* Open the broswer on localhost:8080 to access the framework.
+
+#### Run the VSCode extension
 * Start VSCode on your local machine, and click on open workspace. Select this repo folder.
 * On the debug panel choose "Run Extension", and click on the "Run" button.
 
- For more detailed explanation on running the backend package see in the backend [readme.md]().
-
-### Developing and advanced running scenarios
+#### Advanced scenarios
 To develop and contribute you can build & install each package seperatly. Instruction on each package in the dedicated readme.md file.
-* [Build & install the client]()
-* [Build & install the backend]()
+* [Build & install the client](frontend/README.md)
+* [Build & install the backend](backend/README.md)
 * [Build & install the yeoman example generator]()
 
 ## Known Issues
