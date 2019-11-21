@@ -100,7 +100,9 @@ export default {
             if (question._default === "__Function") {
               this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "default"]).then(response => {
                 question.default = response;
-                question.answer = response;
+                if (question.answer === undefined) {
+                  question.answer = question.default;
+                }
               });
             }
             if (question.when === "__Function") {

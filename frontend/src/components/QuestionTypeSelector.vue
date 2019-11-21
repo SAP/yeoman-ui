@@ -5,6 +5,8 @@
 
       <QuestionInput v-if="!currentQuestion.type || currentQuestion.type==='input' || currentQuestion.type==='password' || currentQuestion.type==='number'" :currentQuestion="currentQuestion" />
 
+      <QuestionEditor v-if="currentQuestion.type==='editor'" :currentQuestion="currentQuestion" />
+
       <QuestionList v-if="currentQuestion.type==='list'" :currentQuestion="currentQuestion" />
 
       <QuestionConfirm v-if="currentQuestion.type==='confirm'" :currentQuestion="currentQuestion" />
@@ -22,6 +24,7 @@
 <script>
 import QuestionList from "./QuestionTypes/QuestionList";
 import QuestionInput from "./QuestionTypes/QuestionInput";
+import QuestionEditor from "./QuestionTypes/QuestionEditor";
 import QuestionConfirm from "./QuestionTypes/QuestionConfirm";
 import QuestionCheckbox from "./QuestionTypes/QuestionCheckbox";
 import QuestionExpand from "./QuestionTypes/QuestionExpand";
@@ -32,6 +35,7 @@ export default {
   components: {
     QuestionList,
     QuestionInput,
+    QuestionEditor,
     QuestionConfirm,
     QuestionCheckbox,
     QuestionExpand,
