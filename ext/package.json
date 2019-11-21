@@ -32,7 +32,8 @@
 		"watch": "tsc -watch -p ./",
 		"postinstall": "node ./node_modules/vscode/bin/install",
 		"package": "vsce package .",
-		"test": "npm run compile && node ./node_modules/vscode/bin/test",
+		"test_old": "npm run compile && node ./node_modules/vscode/bin/test",
+		"test": "nyc mocha -p tsconfig.json --opts ./mocha.opts",
 		"run:ws": "node ./out/test/index.js",
 		"lint": "tslint '*/*.{ts,tsx}' -c ./tslint.yml"
 	},
@@ -45,7 +46,9 @@
 	"devDependencies": {
 		"@types/lodash": "^4.14.145",
 		"@types/inquirer": "^6.5.0",
-		"@types/mocha": "^2.2.42",
+		"@types/chai": "^4.2.5",
+		"@types/sinon": "^7.5.0",
+		"@types/mocha": "^5.2.7",
 		"@types/node": "^10.12.21",
 		"@types/strip-ansi": "^5.2.1",
 		"@types/ws": "^6.0.3",
@@ -56,6 +59,11 @@
 		"tslint-no-unused-expression-chai": "^0.1.4",
 		"typescript": "^3.6.1",
 		"vsce": "^1.68.0",
-		"vscode": "^1.1.28"
+		"vscode": "^1.1.28",
+		"chai": "^4.2.0",
+		"sinon": "^7.5.0",
+		"mocha": "^6.2.2",
+		"nyc": "^14.1.1",
+		"ts-node": "^8.5.2"
 	}
 }

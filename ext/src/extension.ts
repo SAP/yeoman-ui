@@ -182,5 +182,6 @@ export function getOutputChannel(): vscode.OutputChannel {
 	if (!channel) {
 		channel = vscode.window.createOutputChannel('YoWiz');
 	}
+	
 	return channel;
 }
