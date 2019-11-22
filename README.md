@@ -50,7 +50,7 @@ To run it do the following:
 To develop and contribute you can build & install each package seperatly. Instruction on each package in the dedicated readme.md file.
 * [Build & install the client](frontend/README.md)
 * [Build & install the backend](backend/README.md)
-* [Build & install the yeoman example generator]()
+* [Build & install the yeoman example generator](generator-foodq/README.md)
 
 ## Known Issues
 * Not all inquirer.js types are supported.
@@ -61,7 +61,7 @@ To develop and contribute you can build & install each package seperatly. Instru
 To get more help, support and information please open a github issue.
 
 ## Contributing
-Contributing information can be found in the CONTRIBUTING.md file.
+Contributing information can be found in the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 ## TODO
 * layout
