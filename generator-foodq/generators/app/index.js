@@ -174,7 +174,7 @@ module.exports = class extends Generator {
 
     prompts = [
       {
-        type: 'list',
+        type: 'rawlist',
         name: 'repotype',
         message: 'Git repo type',
         choices: [

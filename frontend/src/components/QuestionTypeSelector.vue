@@ -7,7 +7,7 @@
 
       <QuestionEditor v-if="currentQuestion.type==='editor'" :currentQuestion="currentQuestion" />
 
-      <QuestionList v-if="currentQuestion.type==='list'" :currentQuestion="currentQuestion" />
+      <QuestionList v-if="currentQuestion.type==='list' || currentQuestion.type==='rawlist'" :currentQuestion="currentQuestion" />
 
       <QuestionConfirm v-if="currentQuestion.type==='confirm'" :currentQuestion="currentQuestion" />
 
