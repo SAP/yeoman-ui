@@ -16,7 +16,7 @@ jobs: # a collection of steps
       - run: cd backend && npm install
       - run:
           name: compile
-          command: npm run compile
+          command: cd backend && npm run compile
       - run:
           name: npm install frontend
           command: cd backend && run vue:prep
