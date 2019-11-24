@@ -1,0 +1,101 @@
+version: 2.1 # use CircleCI 2.1
+
+defaults: &defaults
+  working_directory: ~/repo
+  docker:
+    - image: circleci/node:10.17.0
+
+jobs: # a collection of steps
+  test-frontend:
+    <<: *defaults  
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run: cd frontend && npm install
+      - run:
+          name: build
+          command: npm run build
+      - run:
+          name: Run tests
+          command: npm test
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+
+      - persist_to_workspace:
+          root: ~/repo
+          paths: .
+      - store_artifacts: # special step to save test results as as artifact
+          # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
+          path: frontend-test-results.xml
+          prefix: tests
+      - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
+          path: frontend-test-results.xml
+
+  test-backend:
+    <<: *defaults  
+    steps:
+      - attach_workspace:
+          at: ~/repo
+
+      - run: cd backend && npm install
+      - run:
+          name: copy frontend
+          command: cp -r  ../frontend/dist/ out/media
+      - run:
+          name: compile
+          command: npm run compile
+      - run:
+          name: Run tests
+          command: npm test
+      - run:
+          name: Package
+          command: vsce package .
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+
+      - persist_to_workspace:
+          root: ~/repo
+          paths: .
+      - store_artifacts: # special step to save test results as as artifact
+          # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
+          path: backend-test-results.xml
+          prefix: tests
+      - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
+          path: backend-test-results.xml
+
+  deploy:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Authenticate with registry
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+      # - run:
+      #     name: Publish package
+      #     command: npm publish
+
+workflows:
+  version: 2
+  test-deploy:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /^v.*/
+      - deploy:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
