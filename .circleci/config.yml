@@ -6,56 +6,23 @@ defaults: &defaults
     - image: circleci/node:10.17.0
 
 jobs: # a collection of steps
-  test-frontend:
+  test:
     <<: *defaults  
     steps:
       - checkout
 
       - restore_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
-      - run: cd frontend && npm install
-      - run:
-          name: build
-          command: npm run build
-      - run:
-          name: Run tests
-          command: npm test
-
-      - save_cache:
-          paths:
-            - node_modules
-          key: dependency-cache-{{ checksum "package-lock.json" }}
-
-      - persist_to_workspace:
-          root: ~/repo
-          paths: .
-      - store_artifacts: # special step to save test results as as artifact
-          # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
-          path: frontend-test-results.xml
-          prefix: tests
-      - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
-          path: frontend-test-results.xml
-
-  test-backend:
-    <<: *defaults  
-    steps:
-      - attach_workspace:
-          at: ~/repo
-
       - run: cd backend && npm install
-      - run:
-          name: copy frontend
-          command: cp -r  ../frontend/dist/ out/media
       - run:
           name: compile
           command: npm run compile
       - run:
-          name: Run tests
-          command: npm test
+          name: npm install frontend
+          command: run vue:prep
       - run:
-          name: Package
-          command: vsce package .
-
+          name: copy frontend resources
+          command: run vue:cp
       - save_cache:
           paths:
             - node_modules
@@ -66,10 +33,10 @@ jobs: # a collection of steps
           paths: .
       - store_artifacts: # special step to save test results as as artifact
           # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
-          path: backend-test-results.xml
+          path: test-results.xml
           prefix: tests
       - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
-          path: backend-test-results.xml
+          path: test-results.xml
 
   deploy:
     <<: *defaults
