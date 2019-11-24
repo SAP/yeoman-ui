@@ -34,7 +34,7 @@
 		"package": "vsce package .",
 		"test_old": "npm run compile && node ./node_modules/vscode/bin/test",
 		"test": "nyc mocha -p tsconfig.json --opts ./mocha.opts",
-		"run:ws": "node ./out/test/index.js",
+		"run:ws": "node ./out/src/test/index.js",
 		"lint": "eslint ./**/*.ts"
 	},
 	"dependencies": {
