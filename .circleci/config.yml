@@ -12,7 +12,7 @@ jobs: # a collection of steps
       - checkout
 
       - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
+          key: dependency-cache-{{ checksum "backend/package-lock.json" }}
       - run: cd backend && npm install
       - run:
           name: compile
@@ -26,7 +26,7 @@ jobs: # a collection of steps
       - save_cache:
           paths:
             - node_modules
-          key: dependency-cache-{{ checksum "package-lock.json" }}
+          key: dependency-cache-{{ checksum "backend/package-lock.json" }}
 
       - persist_to_workspace:
           root: ~/repo
