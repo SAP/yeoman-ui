@@ -24,6 +24,7 @@ To test run the framework you only need to build & install the backend package, 
 * To install, compile and prepare the static resources run the following commands:
     ```bash
     npm install
+    npm run compile
     npm run vue:prep
     npm run vue:cp
     ```
