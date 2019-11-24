@@ -11,6 +11,11 @@ export default {
         return value.map((currentValue) => {
           if (currentValue.hasOwnProperty('name') && !currentValue.hasOwnProperty('text')) {
             currentValue.text = currentValue.name;
+          } else if (currentValue.hasOwnProperty('type') && currentValue.type === "separator") {
+            if (currentValue.hasOwnProperty('line')) {
+              currentValue.text = currentValue.line;
+              currentValue.disabled = true;
+            }
           }
           return currentValue;
         });
