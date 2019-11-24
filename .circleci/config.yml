@@ -19,10 +19,10 @@ jobs: # a collection of steps
           command: cd backend && npm run compile
       - run:
           name: npm install frontend
-          command: cd backend && run vue:prep
+          command: cd backend && npm run vue:prep
       - run:
           name: copy frontend resources
-          command: cd backend && run vue:cp
+          command: cd backend && npm run vue:cp
       - save_cache:
           paths:
             - node_modules
