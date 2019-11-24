@@ -1,5 +1,5 @@
-# Sample Yeoman Generator for Yowiz
-[Yowiz](https://github.wdf.sap.corp/i034929/yowiz) is a graphical user interface for running Yeoman generators. It runs as a [Visual Studio Code extension](https://code.visualstudio.com/api), or as a standalone web application for *development* purposes.
+# Sample Yeoman Generator for yeoman-ui
+[yeoman-ui](https://github.com/SAP/yeoman-ui) is a graphical user interface for running Yeoman generators. It runs as a [Visual Studio Code extension](https://code.visualstudio.com/api), or as a standalone web application for *development* purposes.
 
 This repo contains a sample Yeoman generator that includes different Yeoman capabilities, including different Inquirer [prompt types](https://github.com/SBoudrias/Inquirer.js/blob/master/README.md#prompt-types), [question properties](https://github.com/SBoudrias/Inquirer.js/blob/master/README.md#question).
 
@@ -18,5 +18,3 @@ npm link
 yo foodq
 ```
 
-# Running in Yowiz
-See the [Yowiz readme](https://github.wdf.sap.corp/i034929/yowiz/blob/master/ext/README.md).
