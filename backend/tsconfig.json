@@ -12,8 +12,7 @@
 	  "outDir": "./out",
 	  "removeComments": true,
 	  "experimentalDecorators": true,
-	  "rootDir": ".",
-	  "rootDirs": ["./src", "./tests"],
+	  "rootDir": "src",
 	  "skipLibCheck": true,
 	  "sourceMap": true,
 	  "target": "es6",
@@ -21,7 +20,7 @@
 	  "declaration": true,
 	  "alwaysStrict": true
 	},
-	"include": ["./src/**/*", "./tests/**/*"],
+	"include": ["./src/**/*"],
 	"exclude": [
 		"node_modules",
 		".vscode-test"

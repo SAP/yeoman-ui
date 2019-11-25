@@ -12,7 +12,7 @@
 			"program": "${workspaceFolder}/backend/src/test/index.ts",
 			"outFiles": ["${workspaceFolder}/backend/out/**/*.js"],
 			"cwd": "${workspaceFolder}/backend",
-			"preLaunchTask": "dev"
+			"preLaunchTask": "watch backend"
 		},
 		{
 			"name": "Run Extension",
@@ -34,12 +34,12 @@
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}/backend",
-				"--extensionTestsPath=${workspaceFolder}/backend/out/test"
+				"--extensionTestsPath=${workspaceFolder}/backend/out/tests"
 			],
 			"outFiles": [
-				"${workspaceFolder}/backend/out/test/**/*.js"
+				"${workspaceFolder}/backend/out/tests/**/*.js"
 			],
-			"preLaunchTask": "npm: watch"
+			"preLaunchTask": "watch backend"
 		}
 	]
 }

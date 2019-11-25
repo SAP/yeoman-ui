@@ -10,7 +10,7 @@ const testVscode = {
     }
 };
 mockVscode(testVscode, "src/extension.ts");
-import * as extension from "../src/extension";
+import * as extension from "../extension";
 
 describe('Extension unit test', () => {
     let sandbox: any;
