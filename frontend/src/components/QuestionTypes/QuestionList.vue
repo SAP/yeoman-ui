@@ -12,7 +12,7 @@ export default {
           if (currentValue.hasOwnProperty('name') && !currentValue.hasOwnProperty('text')) {
             currentValue.text = currentValue.name;
           } else if (currentValue.type === "separator") {
-            currentValue.text = currentValue.hasOwnProperty('line') ? currentValue.line : currentValue.text = '──────────────';
+            currentValue.text = currentValue.hasOwnProperty('line') ? currentValue.line : '──────────────';
             currentValue.disabled = true;
           }
           return currentValue;
