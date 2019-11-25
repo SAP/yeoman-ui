@@ -57,7 +57,7 @@ jobs: # a collection of steps
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
       - run:
           name: Publish package
-          command: cd backend/out && npm publish
+          command: cd backend/publish && npm publish
 
 workflows:
   version: 2
