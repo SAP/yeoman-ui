@@ -6,7 +6,7 @@ import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
 import { WizAdapter } from "./wiz-adapter";
 import { WizLog } from "./wiz-log";
-import { RpcCommon } from "./rpc/rpc-common";
+import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 
 export interface IGeneratorChoice {

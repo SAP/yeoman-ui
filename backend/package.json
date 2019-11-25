@@ -39,10 +39,11 @@
 		"lint": "eslint ./**/*.ts"
 	},
 	"dependencies": {
+		"@sap-devx/webview-rpc": "^0.1.2",
+		"lodash": "^4.17.15",
 		"strip-ansi": "^5.2.0",
 		"ws": "^7.1.2",
-		"yeoman-environment": "^2.4.0",
-		"lodash": "^4.17.15"
+		"yeoman-environment": "^2.4.0"
 	},
 	"devDependencies": {
 		"@types/chai": "^4.2.5",

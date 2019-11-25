@@ -1,5 +1,5 @@
 import * as WebSocket from 'ws';
-import { RpcExtenstionWebSockets } from '../rpc/rpc-extension-ws';
+import { RpcExtenstionWebSockets } from '@sap-devx/webview-rpc/out.ext/rpc-extension-ws';
 import { IPrompt, Yowiz } from '../yowiz';
 import { WizLog } from "../wiz-log";
 import { ServerLog } from './server-log';

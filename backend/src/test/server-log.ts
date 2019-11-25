@@ -1,5 +1,5 @@
 import { WizLog } from "../wiz-log";
-import { RpcCommon } from "../rpc/rpc-common";
+import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 const stripAnsi = require("strip-ansi");
 
 export class ServerLog implements WizLog {

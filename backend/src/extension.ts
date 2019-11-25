@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { Yowiz } from "./yowiz";
-import { RpcExtenstion } from './rpc/rpc-extension';
+import { RpcExtenstion } from '@sap-devx/webview-rpc/out.ext/rpc-extension';
 import { WizLog } from "./wiz-log";
 import { OutputChannelLog } from './output-channel-log';
 
