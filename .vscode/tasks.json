@@ -4,11 +4,12 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			// not working. see https://github.com/microsoft/vscode/issues/70283
 			"label": "dev",
 			"dependsOrder": "parallel",
 			"dependsOn": [
-				"serve frontend",
-				"watch backend"
+				"watch backend",
+				"serve frontend"
 			]
 		},
 		{

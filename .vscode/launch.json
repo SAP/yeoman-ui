@@ -11,8 +11,7 @@
 			"name": "Dev",
 			"program": "${workspaceFolder}/backend/src/test/index.ts",
 			"outFiles": ["${workspaceFolder}/backend/out/**/*.js"],
-			"cwd": "${workspaceFolder}/backend",
-			"preLaunchTask": "dev"
+			"preLaunchTask": "watch backend"
 		},
 		{
 			"name": "Run Extension",
