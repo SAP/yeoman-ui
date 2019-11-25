@@ -5,7 +5,7 @@
 	"license": "Apache 2.0",
 	"description": "Provide rich user experience for Yeoman generators using VSCode extension or the browser",
 	"repository": "https://github.com/SAP/yeoman-ui",
-	"version": "0.0.7",
+	"version": "0.0.8",
 	"engines": {
 		"vscode": "^1.38.0"
 	},
@@ -32,7 +32,7 @@
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"postinstall": "node ./node_modules/vscode/bin/install",
-		"package": "vsce package . && copyfiles -u 1 *.vsix ./publish/",
+		"package": "vsce package . && copyfiles *.vsix ./publish/",
 		"test_old": "npm run compile && node ./node_modules/vscode/bin/test",
 		"test": "nyc mocha -p tsconfig.json --opts ./mocha.opts",
 		"run:ws": "node ./out/src/test/index.js",
