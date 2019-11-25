@@ -29,9 +29,7 @@ jobs: # a collection of steps
       - run:
           name: test backend 
           command: cd backend && npm run test
-      - run:
-          name: package 
-          command: cd backend && npm run package
+
       - save_cache:
           paths:
             - node_modules
@@ -52,6 +50,9 @@ jobs: # a collection of steps
     steps:
       - attach_workspace:
           at: ~/repo
+      - run:
+          name: package 
+          command: cd backend && npm run package
       - run:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
