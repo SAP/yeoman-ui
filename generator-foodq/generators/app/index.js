@@ -1,5 +1,6 @@
 var Generator = require('yeoman-generator');
 var chalkPipe = require('chalk-pipe');
+var Inquirer = require('inquirer');
 
 module.exports = class extends Generator {
   constructor(args, opts) {
@@ -173,9 +174,21 @@ module.exports = class extends Generator {
 
     prompts = [
       {
-        type: 'expand',
-        message: 'Type of git repo: ',
+        type: 'list',
         name: 'repotype',
+        message: 'Git repo type',
+        choices: [
+          'Github',
+          'GitLab',
+          new Inquirer.Separator(),
+          'Bitbucket',
+          'Gitea'
+        ]
+      },
+      {
+        type: 'expand',
+        name: 'repoperms',
+        message: 'Git repo permission',
         choices: [
           {
             key: 'u',
