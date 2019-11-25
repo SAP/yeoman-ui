@@ -33,7 +33,7 @@
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"postinstall": "node ./node_modules/vscode/bin/install",
-		"package": "vsce package . && mkdir out && cp yeoan-ui* out",
+		"package": "vsce package . && cp *.vsix publish && cd publish && npm publish",
 		"test_old": "npm run compile && node ./node_modules/vscode/bin/test",
 		"test": "nyc mocha -p tsconfig.json --opts ./mocha.opts",
 		"run:ws": "node ./out/src/test/index.js",
