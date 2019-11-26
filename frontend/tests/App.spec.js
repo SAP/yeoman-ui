@@ -1,6 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
 import App from '../src/App.vue';
-import expect from 'expect'
 import Vue from 'vue'
 import BootstrapVue from 'bootstrap-vue'
 import { WebSocket } from 'mock-socket'
