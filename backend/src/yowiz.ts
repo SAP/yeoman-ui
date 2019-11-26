@@ -149,7 +149,6 @@ export class Yowiz {
    * @param method
    */
   public evaluateMethod(params: any[], questionName: string, methodName: string): any {
-    // TODO: handle case where return value is a promise
     if (this.currentQuestions) {
       const relevantQuestion: any = (this.currentQuestions as any[]).find((question) => {
         return (question.name === questionName);
