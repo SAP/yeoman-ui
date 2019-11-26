@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/SAP/yeomanui.svg?style=svg)](https://circleci.com/gh/SAP/yeomanui)
+[![CircleCI](https://circleci.com/gh/SAP/yeoman-ui.svg?style=svg)](https://circleci.com/gh/SAP/yeoman-ui)
 ![GitHub license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)
 
 # Yeoman UI
@@ -81,7 +81,7 @@ Contributing information can be found in the [CONTRIBUTING.md](CONTRIBUTING.md) 
 * use debounce when watching changes to input fields
 * cleanup code
     * remove redundant css
-* implement ability for yeomanui to call methods in vscode extensions
+* implement ability for yeoman-ui to call methods in vscode extensions
     * support hook for executing commands after finish
     * support open workspace in destination
     * support open readme.md file by default (with turn off setting)
