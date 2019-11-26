@@ -1,10 +1,10 @@
 {
-	"name": "yeoman-ui",
+	"name": "yeomanui",
 	"displayName": "Yeoman UI",
 	"publisher": "SAP",
 	"license": "Apache 2.0",
 	"description": "Provide rich user experience for Yeoman generators using VSCode extension or the browser",
-	"repository": "https://github.com/SAP/yeoman-ui",
+	"repository": "https://github.com/SAP/yeomanui",
 	"version": "0.0.8",
 	"engines": {
 		"vscode": "^1.38.0"
@@ -14,15 +14,15 @@
 	],
 	"activationEvents": [
 		"*",
-		"onCommand:sap.loadYowiz"
+		"onCommand:sap.loadYeomanUI"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "sap.loadYowiz",
-				"title": "Load yowiz",
-				"category": "Yowiz"
+				"command": "sap.loadYeomanUI",
+				"title": "Load YeomanUI",
+				"category": "YeomanUI"
 			}
 		]
 	},

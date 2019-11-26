@@ -1,17 +1,17 @@
 import { Adapter } from "yeoman-environment";
-import { Yowiz } from "./yowiz";
-import { WizLog } from "./wiz-log";
+import { YeomanUI } from "./yeomanui";
+import { YouiLog } from "./youi-log";
 const chalk = require('chalk');
 
 /**
  * @constructor
  */
-export class WizAdapter implements Adapter {
-  private yowiz: Yowiz | undefined = undefined;
-  private wizLog: WizLog;
+export class YouiAdapter implements Adapter {
+  private yeomanui: YeomanUI | undefined = undefined;
+  private youiLog: YouiLog;
 
-  constructor(logger: WizLog) {
-    this.wizLog = logger;
+  constructor(logger: YouiLog) {
+    this.youiLog = logger;
     this.log.writeln = logger.writeln;
     this.log.conflict = logger.conflict;
     this.log.create = logger.create;
@@ -20,8 +20,8 @@ export class WizAdapter implements Adapter {
     this.log.skip = logger.skip;
   }
 
-  public setYowiz(yowiz: Yowiz) {
-    this.yowiz = yowiz;
+  public setYeomanUI(yeomanui: YeomanUI) {
+    this.yeomanui = yeomanui;
   }
 
   public log: {
@@ -33,7 +33,7 @@ export class WizAdapter implements Adapter {
     identical?: (str: string) => void,
     skip?: (str: string) => void
   } = (value: string) => {
-    this.wizLog.log(value);
+    this.youiLog.log(value);
   }
 
   get colorDiffAdded() {
@@ -56,13 +56,13 @@ export class WizAdapter implements Adapter {
     questions: Adapter.Questions<T1>,
     cb?: (res: T1) => T2
   ): Promise<T2> {
-    if (this.yowiz && questions) {
-      return (<Promise<T2>>this.yowiz.showPrompt(questions)).then(result => {
+    if (this.yeomanui && questions) {
+      return (<Promise<T2>>this.yeomanui.showPrompt(questions)).then(result => {
         return cb ?  cb(result as any) : result;
       }).catch((reason) => {
         return Promise.reject(reason);
       });
-      // return (<Promise<T2>>this._yowiz.showPrompt(questions));
+      // return (<Promise<T2>>this._yeomanui.showPrompt(questions));
     }
 
     return Promise.resolve(({} as T2));

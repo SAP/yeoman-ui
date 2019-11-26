@@ -1,9 +1,9 @@
 {
-	"name": "@sap-devx/yeoman-ui",
+	"name": "@sap-devx/yeomanui",
 	"displayName": "Yeoman UI",
 	"publisher": "SAP",
 	"license": "Apache 2.0",
 	"description": "Provide rich user experience for Yeoman generators using VSCode extension or the browser",
-	"repository": "https://github.com/SAP/yeoman-ui",
+	"repository": "https://github.com/SAP/yeomanui",
 	"version": "0.0.8"
 }

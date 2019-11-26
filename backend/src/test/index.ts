@@ -1,12 +1,12 @@
 import * as WebSocket from 'ws';
 import { RpcExtenstionWebSockets } from '@sap-devx/webview-rpc/out.ext/rpc-extension-ws';
-import { IPrompt, Yowiz } from '../yowiz';
-import { WizLog } from "../wiz-log";
+import { IPrompt, YeomanUI } from '../yeomanui';
+import { YouiLog } from "../youi-log";
 import { ServerLog } from './server-log';
 
-class YowizTest {
+class YeomanUITest {
   private rpc: RpcExtenstionWebSockets | undefined;
-  private yowiz: Yowiz | undefined;
+  private yeomanui: YeomanUI | undefined;
 
   init() {
     // web socket server
@@ -26,11 +26,11 @@ class YowizTest {
 
       this.rpc = new RpcExtenstionWebSockets(ws);
       //TODO: Use RPC to send it to the browser log (as a collapsed pannel in Vue)
-      const logger: WizLog = new ServerLog(this.rpc);
-      this.yowiz = new Yowiz(this.rpc, logger);
+      const logger: YouiLog = new ServerLog(this.rpc);
+      this.yeomanui = new YeomanUI(this.rpc, logger);
     });
   }
 }
 
-const yowizTest = new YowizTest();
-yowizTest.init();
+const yeomanuiTest = new YeomanUITest();
+yeomanuiTest.init();
