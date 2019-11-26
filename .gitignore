@@ -4,3 +4,4 @@ reports
 **/dist
 **/out
 **/*.vsix
+**/coverage
