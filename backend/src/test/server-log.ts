@@ -1,8 +1,8 @@
-import { WizLog } from "../wiz-log";
+import { YouiLog } from "../youi-log";
 import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 const stripAnsi = require("strip-ansi");
 
-export class ServerLog implements WizLog {
+export class ServerLog implements YouiLog {
     private rpc: RpcCommon;
     private isLogVisible: boolean = false;
     /**

@@ -3,7 +3,7 @@
 
 This repo contains a sample Yeoman generator that includes different Yeoman capabilities, including different Inquirer [prompt types](https://github.com/SBoudrias/Inquirer.js/blob/master/README.md#prompt-types), [question properties](https://github.com/SBoudrias/Inquirer.js/blob/master/README.md#question).
 
-Specifically, it includes dynamic questions (`message`, `when()`, `validate()`, etc.). It also includes a sub-generator, prompts with multiple questions and metadata for Yowiz (`getPrompts()`).
+Specifically, it includes dynamic questions (`message`, `when()`, `validate()`, etc.). It also includes a sub-generator, prompts with multiple questions and metadata for YeomanUI (`getPrompts()`).
 
 ## Running Locally
 In the terminal type:

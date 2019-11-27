@@ -1,4 +1,4 @@
-export interface WizLog {
+export interface YouiLog {
   log(str: string): void;
   writeln(str: string): void;
   create(str: string): void;

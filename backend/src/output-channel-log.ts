@@ -1,8 +1,8 @@
-import { WizLog } from "./wiz-log";
+import { YouiLog } from "./youi-log";
 import { getOutputChannel } from "./extension";
 const stripAnsi = require("strip-ansi");
 
-export class OutputChannelLog implements WizLog {
+export class OutputChannelLog implements YouiLog {
     public log(value: string): void {
         getOutputChannel().appendLine(stripAnsi(value));
     }

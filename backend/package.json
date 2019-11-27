@@ -14,15 +14,15 @@
 	],
 	"activationEvents": [
 		"*",
-		"onCommand:sap.loadYowiz"
+		"onCommand:sap.loadYeomanUI"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "sap.loadYowiz",
-				"title": "Load yowiz",
-				"category": "Yowiz"
+				"command": "sap.loadYeomanUI",
+				"title": "Load YeomanUI",
+				"category": "YeomanUI"
 			}
 		]
 	},
