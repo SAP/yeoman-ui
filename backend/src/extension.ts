@@ -162,7 +162,7 @@ export class YeomanUIPanel {
 		if (indexHtml) {
 			// Local path to main script run in the webview
 			const scriptPathOnDisk = vscode.Uri.file(
-				path.join(this.extensionPath, 'out/media')
+				path.join(this.extensionPath, 'out/media/')
 			);
 			// TODO: call 'webview.asWebviewUri' when we have a theia verion contains PR - https://github.com/eclipse-theia/theia/pull/6465
 			const scriptUri = /* webview.asWebviewUri(scriptPathOnDisk) */ "vscode-resource:" + scriptPathOnDisk.path;
@@ -180,7 +180,7 @@ export class YeomanUIPanel {
 let channel: vscode.OutputChannel;
 export function getOutputChannel(): vscode.OutputChannel {
 	if (!channel) {
-		channel = vscode.window.createOutputChannel('YoWiz');
+		channel = vscode.window.createOutputChannel('YeomanUI');
 	}
 	
 	return channel;
