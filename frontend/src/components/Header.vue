@@ -1,11 +1,11 @@
 <template>
   <div>
     <b-navbar>
-      <b-navbar-brand>Generator: {{generatorName}}</b-navbar-brand>
+      <b-navbar-brand id="genBrand">Generator: {{generatorName}}</b-navbar-brand>
 
       <b-navbar-nav>
-        <b-nav-text>Step: {{ currentPrompt }}/{{ numOfSteps }}</b-nav-text>
-        <b-nav-text>{{ stepName }}</b-nav-text>
+        <b-nav-text id="textStep">Step: {{ currentPrompt }}/{{ numOfSteps }}</b-nav-text>
+        <b-nav-text id="textStepName">{{ stepName }}</b-nav-text>
       </b-navbar-nav>
 
       <!-- Right aligned nav items -->
@@ -20,7 +20,7 @@
 
 <script>
 export default {
-  name: "Header",
+  name: 'Header',
   props: ["generatorName", "currentPrompt", "numOfSteps", "stepName", "rpc"],
   methods: {
     collapseLog() {
