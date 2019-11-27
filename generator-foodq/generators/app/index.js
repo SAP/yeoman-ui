@@ -57,7 +57,13 @@ module.exports = class extends Generator {
       {
         when: (response) => {
           this.log(response.hungry);
-          return response.hungry;
+          const promise = new Promise((resolve, reject) => {
+            this.log(`Purposely delaying response for 2 seconds...`);
+            setTimeout(() => {
+              resolve(response.hungry);
+            }, 2000);
+          });
+          return promise;
         },
         type: "checkbox",
         name: "beers",
