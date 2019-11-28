@@ -1,10 +1,11 @@
 import { shallowMount } from '@vue/test-utils'
 import Header from '../../src/components/Header.vue'
 import Vue from 'vue'
-import BootstrapVue from 'bootstrap-vue'
+import BootstrapVue, { BButton } from 'bootstrap-vue'
 import _ from 'lodash'
 
 Vue.use(BootstrapVue)
+Vue.component('b-button', BButton)
 
 describe('Header.vue', () => {
     test('component name', () => {
@@ -20,7 +21,7 @@ describe('Header.vue', () => {
     test('generator brand', () => {
         const testGen = 'testGenerator'
         const wrapper = shallowMount(Header, {
-            propsData: {generatorName: testGen}
+            propsData: { generatorName: testGen }
         })
         expect(wrapper.find('#genBrand').text()).toBe(`Generator: ${testGen}`)
     })
@@ -29,7 +30,7 @@ describe('Header.vue', () => {
         const testPrompt = 'testPrompt'
         const testNumOfSteps = 3
         const wrapper = shallowMount(Header, {
-            propsData: {currentPrompt: testPrompt, numOfSteps: testNumOfSteps}
+            propsData: { currentPrompt: testPrompt, numOfSteps: testNumOfSteps }
         })
         expect(wrapper.find('#textStep').text()).toBe(`Step: ${testPrompt}/${testNumOfSteps}`)
     })
@@ -37,8 +38,22 @@ describe('Header.vue', () => {
     test('step name text', () => {
         const testStepName = 'testStepName'
         const wrapper = shallowMount(Header, {
-            propsData: {stepName: testStepName}
+            propsData: { stepName: testStepName }
         })
         expect(wrapper.find('#textStepName').text()).toBe(testStepName)
+    })
+
+    test('click triggers collapseLog method', () => {
+        const rpcInvokeMockFunction = jest.fn()
+        const wrapper = shallowMount(Header, {
+            propsData: {
+                rpc: {
+                    invoke: rpcInvokeMockFunction
+                }
+            }
+        })
+        debugger
+        wrapper.find('#collapseLog').trigger('click')
+        //expect(rpcInvokeMockFunction).toBeCalled()  
     })
 })

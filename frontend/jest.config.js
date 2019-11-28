@@ -18,8 +18,11 @@ module.exports = {
       "<rootDir>/node_modules"
     ],
     transform: {
-      "^.+\\.js$": "babel-jest",
-      ".*\\.(vue)$": "vue-jest"
+      ".*\\.(vue)$": "vue-jest",
+      '^.+\\.vue$': 'vue-jest',
+      '.+\\.(css|styl|less|sass|scss|svg|png|jpg|ttf|woff|woff2)$': 'jest-transform-stub',
+      '^.+\\.tsx?$': 'ts-jest',
+      "^.+\\.js$": "<rootDir>/node_modules/babel-jest"
     },
     snapshotSerializers: [
       "<rootDir>/node_modules/jest-serializer-vue"

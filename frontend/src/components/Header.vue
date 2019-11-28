@@ -11,7 +11,7 @@
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
         <b-nav-form>
-          <b-button v-b-toggle.showLogId @click="collapseLog">▤</b-button>
+          <b-button v-b-toggle.showLogId id="collapseLog" @click="collapseLog">▤</b-button>
         </b-nav-form>
       </b-navbar-nav>
     </b-navbar>
@@ -24,6 +24,7 @@ export default {
   props: ["generatorName", "currentPrompt", "numOfSteps", "stepName", "rpc"],
   methods: {
     collapseLog() {
+      console.log("PRIVET");
       this.rpc.invoke("toggleLog", [{}]);
     }
   }
