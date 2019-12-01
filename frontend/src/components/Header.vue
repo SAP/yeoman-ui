@@ -1,10 +1,10 @@
 <template>
   <div>
     <b-navbar>
-      <b-navbar-brand id="genBrand">Generator: {{generatorName}}</b-navbar-brand>
+      <b-navbar-brand>Generator: {{generatorName}}</b-navbar-brand>
 
       <b-navbar-nav>
-        <b-nav-text id="textStep">Step: {{ currentPrompt }}/{{ numOfSteps }}</b-nav-text>
+        <b-nav-text>Step: {{ currentPrompt }}/{{ numOfSteps }}</b-nav-text>
         <b-nav-text id="textStepName">{{ stepName }}</b-nav-text>
       </b-navbar-nav>
 

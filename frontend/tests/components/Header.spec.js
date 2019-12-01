@@ -1,7 +1,7 @@
 import { shallowMount, mount } from '@vue/test-utils'
 import Header from '../../src/components/Header.vue'
 import Vue from 'vue'
-import BootstrapVue, { BButton } from 'bootstrap-vue'
+import BootstrapVue, { BButton, BNavbarBrand, BNavText } from 'bootstrap-vue'
 import _ from 'lodash'
 
 Vue.use(BootstrapVue)
@@ -31,24 +31,19 @@ describe('Header.vue', () => {
         wrapper = shallowMount(Header, {
             propsData: { generatorName: testGen }
         })
-        expect(wrapper.find('#genBrand').text()).toBe(`Generator: ${testGen}`)
+        expect(wrapper.find(BNavbarBrand).text()).toBe(`Generator: ${testGen}`)
     })
 
-    test('step text', () => {
+    test('find step text and step text name', () => {
         const testPrompt = 'testPrompt'
+        const testStepName = 'testStepName'
         const testNumOfSteps = 3
         wrapper = shallowMount(Header, {
-            propsData: { currentPrompt: testPrompt, numOfSteps: testNumOfSteps }
+            propsData: { currentPrompt: testPrompt, numOfSteps: testNumOfSteps, stepName: testStepName }
         })
-        expect(wrapper.find('#textStep').text()).toBe(`Step: ${testPrompt}/${testNumOfSteps}`)
-    })
-
-    test('step name text', () => {
-        const testStepName = 'testStepName'
-        wrapper = shallowMount(Header, {
-            propsData: { stepName: testStepName }
-        })
-        expect(wrapper.find('#textStepName').text()).toBe(testStepName)
+        const bNavTexts = wrapper.findAll(BNavText)
+        expect(bNavTexts.wrappers[0].element.textContent).toBe(`Step: ${testPrompt}/${testNumOfSteps}`)
+        expect(bNavTexts.wrappers[1].element.textContent).toBe(testStepName)
     })
 
     test('click triggers collapseLog method', async () => {
