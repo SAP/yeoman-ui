@@ -1,10 +1,10 @@
 import * as WebSocket from 'ws';
 import { RpcExtenstionWebSockets } from '@sap-devx/webview-rpc/out.ext/rpc-extension-ws';
-import { IPrompt, Yowiz } from '../yowiz';
+import { Yowiz } from '../yowiz';
 import { WizLog } from "../wiz-log";
 import { ServerLog } from './server-log';
 
-class YowizTest {
+class YowizWebSocketServer {
   private rpc: RpcExtenstionWebSockets | undefined;
   private yowiz: Yowiz | undefined;
 
@@ -32,5 +32,5 @@ class YowizTest {
   }
 }
 
-const yowizTest = new YowizTest();
+const yowizTest = new YowizWebSocketServer();
 yowizTest.init();

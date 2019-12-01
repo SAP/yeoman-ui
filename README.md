@@ -28,16 +28,17 @@ To test run the framework you only need to build & install the backend package, 
     ```bash
     npm install
     npm run compile
-    npm run vue:prep
-    npm run vue:cp
+    npm run frontend:install
+    npm run frontend:build
+    npm run frontend:copy
     ```
 ### Usage & Development
 #### Run the dev mode
 Dev mode allows you to run the framework in the browser, using vue cli for fast development cycles, and easy debug tools.
 To run it do the following:
-* In the backend folder run compile or watch, then run the server.
+* In the backend folder run webpack or webpack-dev, then run the server.
     ```bash
-    npm run watch
+    npm run webpack-dev
     npm run run:ws
     ```
 * In the frontend folder run serve

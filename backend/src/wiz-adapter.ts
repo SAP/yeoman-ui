@@ -12,12 +12,12 @@ export class WizAdapter implements Adapter {
 
   constructor(logger: WizLog) {
     this.wizLog = logger;
-    this.log.writeln = logger.writeln;
-    this.log.conflict = logger.conflict;
-    this.log.create = logger.create;
-    this.log.force = logger.force;
-    this.log.identical = logger.identical;
-    this.log.skip = logger.skip;
+    this.log.writeln = logger.writeln.bind(this.wizLog);
+    this.log.conflict = logger.conflict.bind(this.wizLog);
+    this.log.create = logger.create.bind(this.wizLog);
+    this.log.force = logger.force.bind(this.wizLog);
+    this.log.identical = logger.identical.bind(this.wizLog);
+    this.log.skip = logger.skip.bind(this.wizLog);
   }
 
   public setYowiz(yowiz: Yowiz) {
@@ -33,7 +33,7 @@ export class WizAdapter implements Adapter {
     identical?: (str: string) => void,
     skip?: (str: string) => void
   } = (value: string) => {
-    this.wizLog.log(value);
+    this.wizLog.log.call(this.wizLog, value);
   }
 
   get colorDiffAdded() {

@@ -104,6 +104,11 @@ module.exports = class extends Generator {
     this.answers = await this.prompt(prompts);
     this.log("Food", this.answers.food);
 
+    // currently not supported:
+    const ui = new Inquirer.ui.BottomBar();
+    this.log("xx");
+    ui.updateBottomBar("This is written to the bottom bar");
+
     prompts = [
       {
         when: (response) => {

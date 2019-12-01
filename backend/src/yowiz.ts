@@ -30,7 +30,6 @@ export interface IPrompt {
 export class Yowiz {
   private static funcReplacer(key: any, value: any) {
     if (typeof value === 'function') {
-      console.log(value);
       return '__Function';
     } else {
       return value;

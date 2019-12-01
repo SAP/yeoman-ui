@@ -1,28 +1,26 @@
-
 {
 	"compilerOptions": {
-	  "allowJs": false,
-	  "lib": ["es6"],
-	  "listEmittedFiles": false,
-	  "listFiles": false,
-	  "module": "commonjs",
-	  "noFallthroughCasesInSwitch": true,
-	  "noImplicitAny": true,
-	  "noImplicitThis": true,
-	  "outDir": "./out",
-	  "removeComments": true,
-	  "experimentalDecorators": true,
-	  "rootDir": "src",
-	  "skipLibCheck": true,
-	  "sourceMap": true,
-	  "target": "es6",
-	  "traceResolution": false,
-	  "declaration": true,
-	  "alwaysStrict": true
+		"module": "commonjs",
+		"target": "es6",
+		"outDir": "./out",
+		"sourceMap": true,
+		"rootDir": "src",
+		"alwaysStrict": true,
+		"allowJs": false,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitAny": true,
+		"noImplicitThis": true,
+		"removeComments": true,
+		"experimentalDecorators": true,
+		"skipLibCheck": true,
+		"traceResolution": false,
+		"declaration": true
 	},
-	"include": ["./src/**/*"],
+	"include": [
+		"./src/**/*"
+	],
 	"exclude": [
 		"node_modules",
 		".vscode-test"
 	]
-  }
+}

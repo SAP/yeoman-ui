@@ -5,7 +5,7 @@
 	"license": "Apache 2.0",
 	"description": "Provide rich user experience for Yeoman generators using VSCode extension or the browser",
 	"repository": "https://github.com/SAP/yeoman-ui",
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"engines": {
 		"vscode": "^1.38.0"
 	},
@@ -16,26 +16,28 @@
 		"*",
 		"onCommand:sap.loadYowiz"
 	],
-	"main": "./out/extension.js",
+	"main": "./dist/extension",
 	"contributes": {
 		"commands": [
 			{
 				"command": "sap.loadYowiz",
-				"title": "Load yowiz",
-				"category": "Yowiz"
+				"title": "Yeoman User Interface"
 			}
 		]
 	},
 	"scripts": {
-		"vue:prep": "cd ../frontend && npm i",
-		"vue:cp": "cd ../frontend && npm run build && cd ../backend && rimraf out/media && cd ../frontend/dist && copyfiles ** **/** ../../backend/out/media",
+		"frontend:install": "cd ../frontend && npm i",
+		"frontend:build": "cd ../frontend && npm run build",
+		"frontend:copy": "webpack --mode none --config copy.frontend.webpack.config.js",
+		"webpack": "webpack --mode development",
+		"webpack-dev": "webpack --mode development --watch",
+		"webpack-prod": "webpack --mode production",
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"postinstall": "node ./node_modules/vscode/bin/install",
-		"package": "vsce package . && copyfiles *.vsix ../ && copyfiles package.json ../",
-		"test_old": "npm run compile && node ./node_modules/vscode/bin/test",
+		"package": "vsce package .",
 		"test": "nyc mocha -p tsconfig.json --opts ./mocha.opts",
-		"run:ws": "node ./out/src/test/index.js",
+		"ws:run": "node ./out/webSocketServer/index.js",
 		"lint": "eslint ./**/*.ts"
 	},
 	"dependencies": {
@@ -58,18 +60,20 @@
 		"@typescript-eslint/eslint-plugin": "^2.8.0",
 		"@typescript-eslint/parser": "^2.8.0",
 		"chai": "^4.2.0",
-		"copyfiles": "^2.1.1",
+		"copy-webpack-plugin": "^5.0.5",
 		"eslint": "^6.6.0",
 		"mocha": "^6.2.2",
 		"nyc": "^14.1.1",
-		"rimraf": "^3.0.0",
 		"sinon": "^7.5.0",
+		"ts-loader": "^6.2.1",
 		"ts-node": "^8.5.2",
 		"tslint": "^5.20.1",
 		"tslint-config-prettier": "^1.18.0",
 		"tslint-no-unused-expression-chai": "^0.1.4",
 		"typescript": "^3.6.1",
 		"vsce": "^1.68.0",
-		"vscode": "^1.1.28"
+		"vscode": "^1.1.28",
+		"webpack": "^4.41.2",
+		"webpack-cli": "^3.3.10"
 	}
 }
