@@ -15,7 +15,7 @@ jobs: # a collection of steps
   build-test-frontend:
     <<: *defaults  
     steps:
-      - working_directory: frontend
+      working_directory: frontend
       - run:
           name: install frontend
           command: npm install
@@ -33,7 +33,7 @@ jobs: # a collection of steps
     steps:
       - attach_workspace:
           at: ~/repo
-      - working_directory: backend
+      working_directory: backend
       - run:
           name: install backend
           command: npm install
