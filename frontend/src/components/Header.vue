@@ -5,7 +5,7 @@
 
       <b-navbar-nav>
         <b-nav-text>Step: {{ currentPrompt }}/{{ numOfSteps }}</b-nav-text>
-        <b-nav-text id="textStepName">{{ stepName }}</b-nav-text>
+        <b-nav-text>{{ stepName }}</b-nav-text>
       </b-navbar-nav>
 
       <!-- Right aligned nav items -->
