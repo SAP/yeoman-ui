@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-form-group :label="currentQuestion.message" v-if="currentQuestion.isWhen">
-      <GeneratorSelection v-if="currentQuestion.type==='generators'" :currentQuestion="currentQuestion" v-on:generatorSelected="onGeneratorSelected"/>
+      <GeneratorSelection v-if="currentQuestion.type==='generators'" :currentQuestion="currentQuestion" @generatorSelected="onGeneratorSelected"/>
 
       <QuestionInput v-if="!currentQuestion.type || currentQuestion.type==='input' || currentQuestion.type==='password' || currentQuestion.type==='number'" :currentQuestion="currentQuestion" />
 
@@ -56,8 +56,7 @@ export default {
     onGeneratorSelected: function(generatorName) {
       this.$emit('generatorSelected', generatorName);
     }
-  },
-  mount() {}
+  }
 };
 </script>
 <style scoped>

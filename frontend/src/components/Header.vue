@@ -20,20 +20,20 @@
 
 <script>
 export default {
-  name: "Header",
+  name: 'Header',
   props: ["generatorName", "currentPrompt", "numOfSteps", "stepName", "rpc"],
   methods: {
     collapseLog() {
-      this.rpc.invoke("toggleLog", [{}]);
+      this.rpc.invoke("toggleLog", [{}])
     }
   }
 };
 </script>
 <style>
 .navbar-brand {
-  color: var(--vscode-foreground, white) !important;
+  color: var(--vscode-foreground, white) !important
 }
 .navbar-text {
-  color: var(--vscode-foreground, white) !important;
+  color: var(--vscode-foreground, white) !important
 }
 </style>
