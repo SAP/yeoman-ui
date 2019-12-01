@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils'
+import { shallowMount, mount } from '@vue/test-utils'
 import Header from '../../src/components/Header.vue'
 import Vue from 'vue'
 import BootstrapVue, { BButton } from 'bootstrap-vue'
@@ -43,17 +43,18 @@ describe('Header.vue', () => {
         expect(wrapper.find('#textStepName').text()).toBe(testStepName)
     })
 
-    test('click triggers collapseLog method', () => {
+    test('click triggers collapseLog method', async () => {
         const rpcInvokeMockFunction = jest.fn()
-        const wrapper = shallowMount(Header, {
+        const wrapper = mount(Header, {
             propsData: {
                 rpc: {
                     invoke: rpcInvokeMockFunction
                 }
             }
         })
-        debugger
-        wrapper.find('#collapseLog').trigger('click')
-        //expect(rpcInvokeMockFunction).toBeCalled()  
+        
+        wrapper.find(BButton).trigger('click')
+        await wrapper.vm.$nextTick();
+        expect(rpcInvokeMockFunction).toHaveBeenCalled()  
     })
 })
