@@ -14,16 +14,7 @@
 <script>
 export default {
   name: "Navigation",
-  props: ["promptIndex", "prompts"],
-  methods: {
-  },
-  watch: {
-  },
-  data() {
-    return {}
-  },
-  mounted() {
-  }
+  props: ["promptIndex", "prompts"]
 };
 </script>
 <style scoped>
