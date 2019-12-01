@@ -1,5 +1,5 @@
 <template>
-  <b-form-select v-model="currentQuestion.answer" :options="currentQuestion.choices | listFilter" aria-describedby="validation-message">
+  <b-form-select v-model="currentQuestion.answer" :options="currentQuestion.choices | listFilter" class="custom-yeoman-select" aria-describedby="validation-message">
   </b-form-select>
 </template>
 <script>
@@ -66,6 +66,11 @@ export default {
 
 .selected {
   background-color: var(--vscode-list-active-selection-background);
+}
+
+.custom-select.custom-yeoman-select {
+  color: var(--vscode-input-foreground, #cccccc);
+  background-color: var(--vscode-input-background, #3c3c3c);
 }
 
 </style>
