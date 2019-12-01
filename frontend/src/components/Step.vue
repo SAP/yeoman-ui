@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import QuestionTypeSelector from "./QuestionTypeSelector.vue"
-import * as _ from "lodash"
+import QuestionTypeSelector from "./QuestionTypeSelector.vue";
+import * as _ from "lodash";
 export default {
   name: "Step",
   components: {
@@ -31,18 +31,12 @@ export default {
     "currentPrompt.questions": {
       deep: true,
       handler() {
-        if (this.currentPrompt) {
-          const invalidQuestions = _.filter(
-            this.currentPrompt.questions,
-            question => {
-              return question.isValid === false
-            }
-          );
-          let isValidated = _.isEmpty(invalidQuestions)
-          this.$emit("stepvalidated", isValidated)
-        }
+        const invalidQuestions = _.filter(this.currentPrompt.questions, question => {
+            return question.isValid === false
+        })
+        this.$emit("stepvalidated", _.isEmpty(invalidQuestions))
       }
     }
   }
-};
+}
 </script>
