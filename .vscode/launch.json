@@ -39,6 +39,24 @@
 				"${workspaceFolder}/backend/out/tests/**/*.js"
 			],
 			"preLaunchTask": "watch backend"
-		}
+		},
+		{
+			"name": "frontend-jest-tests",
+			"type": "node",
+			"request": "launch",
+			"runtimeArgs": [
+			  "--inspect-brk",
+			  "./node_modules/@vue/cli-service/bin/vue-cli-service.js",
+			  "test:unit",
+			  "--runInBand"
+			],
+			"cwd": "${workspaceFolder}/frontend",
+			"protocol": "inspector",
+			"disableOptimisticBPs": true,
+			"console": "integratedTerminal",    
+			"internalConsoleOptions": "neverOpen",
+			"outFiles": [ "${workspaceFolder}/frontend/src/**/*.js"],
+			"port": 9229
+		  }
 	]
 }
