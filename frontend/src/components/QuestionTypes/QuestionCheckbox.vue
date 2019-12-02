@@ -1,17 +1,24 @@
 <template>
   <div class="question-checkbox-container">
-    <b-form-checkbox-group v-model="selected" stacked :options="currentQuestion.choices | checkboxFilter">
-    </b-form-checkbox-group>
+    <b-form-checkbox-group
+      v-model="selected"
+      stacked
+      :options="currentQuestion.choices | checkboxFilter"
+    ></b-form-checkbox-group>
   </div>
 </template>
+
 <script>
 export default {
   name: "QuestionCheckbox",
   filters: {
-    checkboxFilter: (value) => {
+    checkboxFilter: value => {
       if (Array.isArray(value)) {
-        return value.map((currentValue) => {
-          if (currentValue.hasOwnProperty('name') && !currentValue.hasOwnProperty('text')) {
+        return value.map(currentValue => {
+          if (
+            currentValue.hasOwnProperty("name") &&
+            !currentValue.hasOwnProperty("text")
+          ) {
             currentValue.text = currentValue.name;
           }
           return currentValue;
@@ -29,7 +36,7 @@ export default {
         selected.push(choice.value);
       }
     });
-    this.currentQuestion.answer =  selected;
+    this.currentQuestion.answer = selected;
 
     return {
       selected: selected
@@ -38,11 +45,10 @@ export default {
   watch: {
     selected: {
       handler(val) {
-          this.currentQuestion.answer = val;
+        this.currentQuestion.answer = val;
       }
     }
-  },
-  mounted() {}
+  }
 };
 </script>
 

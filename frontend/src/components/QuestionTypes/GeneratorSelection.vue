@@ -4,10 +4,10 @@
       <b-card
         v-for="(choice, index) in currentQuestion.choices"
         @click="emitSelection(choice.name)"
+        v-on:click="select"
         class="generator"
         :key="index"
         :title="choice.name"
-        v-on:click = "select"
         img-alt="Image"
         img-top
         tag="article"
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import _ from "lodash";
 
 export default {
   name: "GeneratorSelection",
@@ -34,27 +34,27 @@ export default {
     return {
       publicPath: process.env.BASE_URL,
       selectedItem: undefined
-    }
+    };
   },
   methods: {
     getImageUrl(choice) {
-      return _.get(choice, "imageUrl", `${this.publicPath}generator.png`)
+      return _.get(choice, "imageUrl", `${this.publicPath}generator.png`);
     },
     select(event) {
       if (this.selectedItem) {
         // deselect old selection
-        this.selectedItem.setAttribute("border-style", "none")
+        this.selectedItem.setAttribute("border-style", "none");
       }
       this.selectedItem = event.currentTarget;
-      this.selectedItem.setAttribute("border-style", "solid")
-      this.selectedItem.classList.toggle("selected")
+      this.selectedItem.setAttribute("border-style", "solid");
+      this.selectedItem.classList.toggle("selected");
     },
     emitSelection(generatorName) {
-      this.currentQuestion.answer = generatorName
-      this.$emit("generatorSelected", generatorName)
+      this.currentQuestion.answer = generatorName;
+      this.$emit("generatorSelected", generatorName);
     }
   }
-}
+};
 </script>
 
 <style>
@@ -93,4 +93,4 @@ export default {
 .card.generator.selected {
   border-style: solid;
 }
-</style
+</style>

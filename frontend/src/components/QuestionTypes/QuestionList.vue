@@ -1,18 +1,27 @@
 <template>
-  <b-form-select v-model="currentQuestion.answer" :options="currentQuestion.choices | listFilter" aria-describedby="validation-message">
-  </b-form-select>
+  <b-form-select
+    v-model="currentQuestion.answer"
+    :options="currentQuestion.choices | listFilter"
+    aria-describedby="validation-message"
+  ></b-form-select>
 </template>
+
 <script>
 export default {
   name: "QuestionList",
   filters: {
-    listFilter: (value) => {
+    listFilter: value => {
       if (Array.isArray(value)) {
-        return value.map((currentValue) => {
-          if (currentValue.hasOwnProperty('name') && !currentValue.hasOwnProperty('text')) {
+        return value.map(currentValue => {
+          if (
+            currentValue.hasOwnProperty("name") &&
+            !currentValue.hasOwnProperty("text")
+          ) {
             currentValue.text = currentValue.name;
           } else if (currentValue.type === "separator") {
-            currentValue.text = currentValue.hasOwnProperty('line') ? currentValue.line : '──────────────';
+            currentValue.text = currentValue.hasOwnProperty("line")
+              ? currentValue.line
+              : "──────────────";
             currentValue.disabled = true;
           }
           return currentValue;
@@ -21,10 +30,13 @@ export default {
     }
   },
   methods: {
-    formatList: (value) => {
+    formatList: value => {
       if (Array.isArray(value)) {
-        return value.map((currentValue) => {
-          if (currentValue.hasOwnProperty('name') && !currentValue.hasOwnProperty('text')) {
+        return value.map(currentValue => {
+          if (
+            currentValue.hasOwnProperty("name") &&
+            !currentValue.hasOwnProperty("text")
+          ) {
             currentValue.text = currentValue.name;
           }
           return currentValue;
@@ -36,9 +48,12 @@ export default {
     currentQuestion: Object
   },
   watch: {
-    'currentQuestion.choices': {
+    "currentQuestion.choices": {
       handler() {
-        if (typeof this.currentQuestion.default === 'number' && typeof this.currentQuestion.answer === 'number') {
+        if (
+          typeof this.currentQuestion.default === "number" &&
+          typeof this.currentQuestion.answer === "number"
+        ) {
           const formattedList = this.formatList(this.currentQuestion.choices);
           if (formattedList) {
             const choiceObject = formattedList[this.currentQuestion.default];
@@ -65,5 +80,4 @@ export default {
 .selected {
   background-color: var(--vscode-list-active-selection-background);
 }
-
 </style>

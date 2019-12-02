@@ -46,13 +46,14 @@
 </template>
 
 <script>
-import Vue from "vue";
-import Header from "./components/Header.vue";
-import Navigation from "./components/Navigation.vue";
-import Step from "./components/Step.vue";
-import { RpcBrowser } from "./rpc/rpc-browser.js";
-import { RpcBrowserWebSockets } from "./rpc/rpc-browser-ws.js";
-import * as _ from "lodash";
+import Vue from "vue"
+import Header from "./components/Header.vue"
+import Navigation from "./components/Navigation.vue"
+import Step from "./components/Step.vue"
+import { RpcBrowser } from "./rpc/rpc-browser.js"
+import { RpcBrowserWebSockets } from "./rpc/rpc-browser-ws.js"
+import * as _ from "lodash"
+
 export default {
   name: "app",
   components: {

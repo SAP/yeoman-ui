@@ -5,11 +5,11 @@
         v-for="(choice, index) in currentQuestion.choices"
         @click="onClick(choice.value)"
         :key="index"
-      >{{ choice.name }}
-      </b-button>
+      >{{ choice.name }}</b-button>
     </b-button-group>
   </div>
 </template>
+
 <script>
 export default {
   name: "QuestionExpand",
@@ -23,6 +23,7 @@ export default {
   }
 };
 </script>
+
 <style scoped>
 .list-group {
   margin-bottom: 15px;
@@ -35,5 +36,4 @@ export default {
 .selected {
   background-color: lightblue;
 }
-
 </style>
