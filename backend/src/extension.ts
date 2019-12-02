@@ -1,24 +1,24 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { Yowiz } from "./yowiz";
+import { YeomanUI } from "./yeomanui";
 import { RpcExtenstion } from '@sap-devx/webview-rpc/out.ext/rpc-extension';
-import { WizLog } from "./wiz-log";
+import { YouiLog } from "./youi-log";
 import { OutputChannelLog } from './output-channel-log';
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
-		vscode.commands.registerCommand('sap.loadYowiz', () => {
-			YowizPanel.createOrShow(context.extensionPath);
+		vscode.commands.registerCommand('sap.loadYeomanUI', () => {
+			YeomanUIPanel.createOrShow(context.extensionPath);
 		})
 	);
 
 	if (vscode.window.registerWebviewPanelSerializer) {
 		// Make sure we register a serializer in activation event
-		vscode.window.registerWebviewPanelSerializer(YowizPanel.viewType, {
+		vscode.window.registerWebviewPanelSerializer(YeomanUIPanel.viewType, {
 			async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
 				console.log(`Got state: ${state}`);
-				YowizPanel.revive(webviewPanel, context.extensionPath);
+				YeomanUIPanel.revive(webviewPanel, context.extensionPath);
 			}
 		});
 	}
@@ -27,12 +27,12 @@ export function activate(context: vscode.ExtensionContext) {
 /**
  * Manages webview panels
  */
-export class YowizPanel {
+export class YeomanUIPanel {
 	/**
 	 * Track the currently panel. Only allow a single panel to exist at a time.
 	 */
-	public static readonly viewType = 'yowiz';
-	public static currentPanel: YowizPanel | undefined;
+	public static readonly viewType = 'yeomanui';
+	public static currentPanel: YeomanUIPanel | undefined;
 
 	public static createOrShow(extensionPath: string) {
 		const column = vscode.window.activeTextEditor
@@ -40,14 +40,14 @@ export class YowizPanel {
 			: undefined;
 
 		// If we already have a panel, show it.
-		if (YowizPanel.currentPanel) {
-			YowizPanel.currentPanel.panel.reveal(column);
+		if (YeomanUIPanel.currentPanel) {
+			YeomanUIPanel.currentPanel.panel.reveal(column);
 			return;
 		}
 
 		// Otherwise, create a new panel.
 		const panel = vscode.window.createWebviewPanel(
-			YowizPanel.viewType,
+			YeomanUIPanel.viewType,
 			'Yeoman UI',
 			column || vscode.ViewColumn.One,
 			{
@@ -59,14 +59,14 @@ export class YowizPanel {
 			}
 		);
 
-		YowizPanel.currentPanel = new YowizPanel(panel, extensionPath);
+		YeomanUIPanel.currentPanel = new YeomanUIPanel(panel, extensionPath);
 	}
 
 	public static revive(panel: vscode.WebviewPanel, extensionPath: string) {
-		YowizPanel.currentPanel = new YowizPanel(panel, extensionPath);
+		YeomanUIPanel.currentPanel = new YeomanUIPanel(panel, extensionPath);
 	}
 
-	public yowiz: Yowiz;
+	public yeomanui: YeomanUI;
 	private rpc: RpcExtenstion;
 	private readonly panel: vscode.WebviewPanel;
 	private readonly extensionPath: string;
@@ -78,8 +78,8 @@ export class YowizPanel {
 		this.panel = panel;
 		this.extensionPath = extensionPath;
 		this.rpc = new RpcExtenstion(this.panel.webview);
-		const logger: WizLog = new OutputChannelLog();
-		this.yowiz = new Yowiz(this.rpc, logger);
+		const logger: YouiLog = new OutputChannelLog();
+		this.yeomanui = new YeomanUI(this.rpc, logger);
 
 		// Set the webview's initial html content
 		this._update();
@@ -118,7 +118,7 @@ export class YowizPanel {
 	}
 
 	public dispose() {
-		YowizPanel.currentPanel = undefined;
+		YeomanUIPanel.currentPanel = undefined;
 
 		// Clean up our resources
 		this.panel.dispose();

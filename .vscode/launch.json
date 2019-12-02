@@ -8,13 +8,13 @@
 		{
 			"type": "node",
 			"request": "launch",
-			"name": "Run Dev Server",
+			"name": "Run websocket server",
 			"program": "${workspaceFolder}/backend/src/webSocketServer/index.ts",
 			"outFiles": ["${workspaceFolder}/backend/out/**/*.js"],
 			"preLaunchTask": "watch backend (tsc)"
 		},
 		{
-			"name": "Run Extension",
+			"name": "Run extension",
 			"type": "extensionHost",
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
@@ -27,7 +27,7 @@
 			"preLaunchTask": "watch backend (webpack)"
 		},
 		{
-			"name": "Test Extension",
+			"name": "Test extension",
 			"type": "extensionHost",
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
@@ -43,7 +43,7 @@
 		{
 			"type": "node",
 			"request": "launch",
-			"name": "Run Reference Generator (foodq)",
+			"name": "Run reference generator (foodq)",
 			"program": "${workspaceFolder}/generator-foodq/node_modules/yo/lib/cli.js",
 			"args": [
 				"foodq"
@@ -53,6 +53,24 @@
 			"skipFiles": [
 				"<node_internals>/**"
 			]
-		}
+		},
+		{
+			"name": "Test frontend",
+			"type": "node",
+			"request": "launch",
+			"runtimeArgs": [
+			  "--inspect-brk",
+			  "./node_modules/@vue/cli-service/bin/vue-cli-service.js",
+			  "test:unit",
+			  "--runInBand"
+			],
+			"cwd": "${workspaceFolder}/frontend",
+			"protocol": "inspector",
+			"disableOptimisticBPs": true,
+			"console": "integratedTerminal",    
+			"internalConsoleOptions": "neverOpen",
+			"outFiles": [ "${workspaceFolder}/frontend/src/**/*.js"],
+			"port": 9229
+		  }
 	]
 }

@@ -20,10 +20,10 @@ jobs: # a collection of steps
           name: build frontend
           working_directory: frontend
           command: npm run build
-      # - run:
-      #     name: test frontend
-          # working_directory: backend
-      #     command: npm run test
+      - run:
+          name: test frontend
+          working_directory: frontend
+          command: npm run test
       - run:
           name: install backend
           working_directory: backend

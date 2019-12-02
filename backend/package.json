@@ -14,13 +14,13 @@
 	],
 	"activationEvents": [
 		"*",
-		"onCommand:sap.loadYowiz"
+		"onCommand:sap.loadYeomanUI"
 	],
 	"main": "./dist/extension",
 	"contributes": {
 		"commands": [
 			{
-				"command": "sap.loadYowiz",
+				"command": "sap.loadYeomanUI",
 				"title": "Yeoman User Interface"
 			}
 		]

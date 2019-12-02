@@ -4,8 +4,8 @@ import * as fs from "fs";
 import * as _ from "lodash";
 import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
-import { WizAdapter } from "./wiz-adapter";
-import { WizLog } from "./wiz-log";
+import { YouiAdapter } from "./youi-adapter";
+import { YouiLog } from "./youi-log";
 import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 
@@ -27,7 +27,7 @@ export interface IPrompt {
   questions: any[];
 }
 
-export class Yowiz {
+export class YeomanUI {
   private static funcReplacer(key: any, value: any) {
     if (typeof value === 'function') {
       return '__Function';
@@ -37,14 +37,14 @@ export class Yowiz {
   }
 
   private rpc: RpcCommon;
-  private logger: WizLog;
+  private logger: YouiLog;
   private genMeta: { [namespace: string]: Environment.GeneratorMeta };
-  private wizAdapter: WizAdapter;
+  private youiAdapter: YouiAdapter;
   private gen: Generator | undefined;
   private promptCount: number;
   private currentQuestions: Environment.Adapter.Questions<any>;
 
-  constructor(rpc: RpcCommon, logger: WizLog) {
+  constructor(rpc: RpcCommon, logger: YouiLog) {
     this.rpc = rpc;
     this.logger = logger;
     this.rpc.setResponseTimeout(3600000);
@@ -52,8 +52,8 @@ export class Yowiz {
     this.rpc.registerMethod({ func: this.runGenerator, thisArg: this });
     this.rpc.registerMethod({ func: this.evaluateMethod, thisArg: this });
     this.rpc.registerMethod({ func: this.toggleLog, thisArg: this });
-    this.wizAdapter = new WizAdapter(logger);
-    this.wizAdapter.setYowiz(this);
+    this.youiAdapter = new YouiAdapter(logger);
+    this.youiAdapter.setYeomanUI(this);
     this.promptCount = 0;
     this.genMeta = {};
     this.currentQuestions = {};
@@ -108,7 +108,7 @@ export class Yowiz {
     //  see issue: https://github.com/yeoman/environment/issues/55
     //  process.chdir() doesn't work after environment has been created
 
-    const env: Environment = Environment.createEnv(undefined, {}, this.wizAdapter);
+    const env: Environment = Environment.createEnv(undefined, {}, this.youiAdapter);
     try {
       const meta: Environment.GeneratorMeta = this.genMeta[`${generatorName}:app`];
       // TODO: support sub-generators
@@ -133,7 +133,7 @@ export class Yowiz {
           message = `${generatorName} failed: ${err}.`;
           this.rpc.invoke("generatorDone", [true, message]);
         }
-        console.log('done running yowiz');
+        console.log('done running yeomanui');
         message = `${generatorName} is done. Destination directory is ${destinationRoot}`;
         this.rpc.invoke("generatorDone", [true, message]);
       });
@@ -206,7 +206,7 @@ export class Yowiz {
    * Also functions cannot be evaluated on client)
    */
   private normalizeFunctions(questions: Environment.Adapter.Questions<any>): Environment.Adapter.Questions<any> {
-    const mappedQuestions = JSON.parse(JSON.stringify(questions, Yowiz.funcReplacer));
+    const mappedQuestions = JSON.parse(JSON.stringify(questions, YeomanUI.funcReplacer));
     return mappedQuestions;
   }
 

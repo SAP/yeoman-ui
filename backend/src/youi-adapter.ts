@@ -1,27 +1,27 @@
 import { Adapter } from "yeoman-environment";
-import { Yowiz } from "./yowiz";
-import { WizLog } from "./wiz-log";
+import { YeomanUI } from "./yeomanui";
+import { YouiLog } from "./youi-log";
 const chalk = require('chalk');
 
 /**
  * @constructor
  */
-export class WizAdapter implements Adapter {
-  private yowiz: Yowiz | undefined = undefined;
-  private wizLog: WizLog;
+export class YouiAdapter implements Adapter {
+  private yeomanui: YeomanUI | undefined = undefined;
+  private youiLog: YouiLog;
 
-  constructor(logger: WizLog) {
-    this.wizLog = logger;
-    this.log.writeln = logger.writeln.bind(this.wizLog);
-    this.log.conflict = logger.conflict.bind(this.wizLog);
-    this.log.create = logger.create.bind(this.wizLog);
-    this.log.force = logger.force.bind(this.wizLog);
-    this.log.identical = logger.identical.bind(this.wizLog);
-    this.log.skip = logger.skip.bind(this.wizLog);
+  constructor(logger: YouiLog) {
+    this.youiLog = logger;
+    this.log.writeln = logger.writeln.bind(this.youiLog);
+    this.log.conflict = logger.conflict.bind(this.youiLog);
+    this.log.create = logger.create.bind(this.youiLog);
+    this.log.force = logger.force.bind(this.youiLog);
+    this.log.identical = logger.identical.bind(this.youiLog);
+    this.log.skip = logger.skip.bind(this.youiLog);
   }
 
-  public setYowiz(yowiz: Yowiz) {
-    this.yowiz = yowiz;
+  public setYeomanUI(yeomanui: YeomanUI) {
+    this.yeomanui = yeomanui;
   }
 
   public log: {
@@ -33,7 +33,7 @@ export class WizAdapter implements Adapter {
     identical?: (str: string) => void,
     skip?: (str: string) => void
   } = (value: string) => {
-    this.wizLog.log.call(this.wizLog, value);
+    this.youiLog.log.call(this.youiLog, value);
   }
 
   get colorDiffAdded() {
@@ -56,13 +56,13 @@ export class WizAdapter implements Adapter {
     questions: Adapter.Questions<T1>,
     cb?: (res: T1) => T2
   ): Promise<T2> {
-    if (this.yowiz && questions) {
-      return (<Promise<T2>>this.yowiz.showPrompt(questions)).then(result => {
+    if (this.yeomanui && questions) {
+      return (<Promise<T2>>this.yeomanui.showPrompt(questions)).then(result => {
         return cb ?  cb(result as any) : result;
       }).catch((reason) => {
         return Promise.reject(reason);
       });
-      // return (<Promise<T2>>this._yowiz.showPrompt(questions));
+      // return (<Promise<T2>>this._yeomanui.showPrompt(questions));
     }
 
     return Promise.resolve(({} as T2));

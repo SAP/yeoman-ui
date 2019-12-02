@@ -69,10 +69,10 @@ module.exports = class extends Generator {
         name: "beers",
         message: "What beer would you like?",
         choices: [
-          "GoldStar",
-          "Polner",
-          "WhineStephan",
-          "Malka"
+          "Chimay Trappist Ales",
+          "Paulaner Salvator",
+          "Weihenstephaner Korbinian",
+          "Hoegaarden Belguim White"
         ]
       },
       {

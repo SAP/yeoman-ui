@@ -1,4 +1,4 @@
-# vue-wizard-ui
+# Yeoman UI Frontend
 
 ## Project setup
 ```
