@@ -39,7 +39,7 @@ To run it do the following:
 * In the backend folder run webpack or webpack-dev, then run the server.
     ```bash
     npm run webpack-dev
-    npm run run:ws
+    npm run ws:run
     ```
 * In the frontend folder run serve
     ```bash
