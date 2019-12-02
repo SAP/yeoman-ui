@@ -14,6 +14,9 @@ module.exports = {
     "vue",
     "json"
   ],
+  transformIgnorePatterns: [
+    "<rootDir>/node_modules/(?!(@sap-devx)/)"
+  ],
   modulePaths: [
     "<rootDir>/src",
     "<rootDir>/node_modules"
