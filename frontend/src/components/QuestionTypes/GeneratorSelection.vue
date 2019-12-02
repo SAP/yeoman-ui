@@ -3,30 +3,30 @@
     <b-card-group deck>
       <b-card
         v-for="(choice, index) in currentQuestion.choices"
-        v-on:click="emitSelection(choice.name)"
+        @click="emitSelection(choice.name)"
         class="generator"
-        @click="select"
         :key="index"
         :title="choice.name"
+        v-on:click = "select"
         img-alt="Image"
         img-top
         tag="article"
         style="width: 15rem"
       >
         <b-card-text>{{choice.message}}</b-card-text>
-        <b-card-text
-          class="templateDocumentationClass">Template Documentation</b-card-text>
+        <b-card-text class="templateDocumentationClass">Template Documentation</b-card-text>
 
-        <b-card-img :src="(choice.imageUrl ? choice.imageUrl : `${publicPath}generator.png`)"></b-card-img>
+        <b-card-img :src="getImageUrl(choice)"></b-card-img>
       </b-card>
     </b-card-group>
   </div>
 </template>
 
 <script>
+import _ from 'lodash'
+
 export default {
   name: "GeneratorSelection",
-  components: {},
   props: {
     currentQuestion: Object
   },
@@ -34,30 +34,29 @@ export default {
     return {
       publicPath: process.env.BASE_URL,
       selectedItem: undefined
-    };
-  },
-  methods: {
-    select(event) {
-      if (this.selectedItem) { // deselect old selection
-        this.selectedItem.classList.toggle("selected");
-        this.selectedItem.setAttribute("border-style", "none");
-      }
-      this.selectedItem = event.currentTarget;
-      this.selectedItem.setAttribute("border-style", "solid");
-      this.selectedItem.classList.toggle("selected");
-
-      
-    },
-    emitSelection(generatorName) {
-      this.currentQuestion.answer = generatorName;
-      this.$emit('generatorSelected', generatorName);
     }
   },
-  mounted() {
-    // this.currentQuestion.answer = undefined;
+  methods: {
+    getImageUrl(choice) {
+      return _.get(choice, "imageUrl", `${this.publicPath}generator.png`)
+    },
+    select(event) {
+      if (this.selectedItem) {
+        // deselect old selection
+        this.selectedItem.setAttribute("border-style", "none")
+      }
+      this.selectedItem = event.currentTarget;
+      this.selectedItem.setAttribute("border-style", "solid")
+      this.selectedItem.classList.toggle("selected")
+    },
+    emitSelection(generatorName) {
+      this.currentQuestion.answer = generatorName
+      this.$emit("generatorSelected", generatorName)
+    }
   }
-};
+}
 </script>
+
 <style>
 .card-body {
   color: var(--vscode-foreground, #cccccc);
@@ -66,7 +65,7 @@ export default {
 
 .card-title {
   font-size: 1rem;
-  font-weight: bold
+  font-weight: bold;
 }
 
 .card-text {
@@ -94,4 +93,4 @@ export default {
 .card.generator.selected {
   border-style: solid;
 }
-</style>
+</style

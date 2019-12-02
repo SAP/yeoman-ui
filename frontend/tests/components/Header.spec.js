@@ -1,36 +1,29 @@
-import { shallowMount, mount } from '@vue/test-utils'
+import {initComponent, destroy} from '../Utils'
 import Header from '../../src/components/Header.vue'
-import Vue from 'vue'
-import BootstrapVue, { BButton, BNavbarBrand, BNavText } from 'bootstrap-vue'
+import { BButton, BNavbarBrand, BNavText } from 'bootstrap-vue'
 import _ from 'lodash'
-
-Vue.use(BootstrapVue)
-
 
 let wrapper
 
+
 describe('Header.vue', () => {
     afterEach(() => {
-        if (wrapper) {
-            wrapper.destroy();
-        }
-    })
+        destroy(wrapper)
+    });
 
     test('component name', () => {
-        wrapper = shallowMount(Header)
+        wrapper = initComponent(Header)
         expect(wrapper.name()).toBe('Header')
     })
 
     test('component props', () => {
-        wrapper = shallowMount(Header)
+        wrapper = initComponent(Header)
         expect(_.keys(wrapper.props())).toHaveLength(5)
     })
 
     test('generator brand', () => {
         const testGen = 'testGenerator'
-        wrapper = shallowMount(Header, {
-            propsData: { generatorName: testGen }
-        })
+        wrapper = initComponent(Header, { generatorName: testGen })
         expect(wrapper.find(BNavbarBrand).text()).toBe(`Generator: ${testGen}`)
     })
 
@@ -38,9 +31,7 @@ describe('Header.vue', () => {
         const testPrompt = 'testPrompt'
         const testStepName = 'testStepName'
         const testNumOfSteps = 3
-        wrapper = shallowMount(Header, {
-            propsData: { currentPrompt: testPrompt, numOfSteps: testNumOfSteps, stepName: testStepName }
-        })
+        wrapper = initComponent(Header, { currentPrompt: testPrompt, numOfSteps: testNumOfSteps, stepName: testStepName })
         const bNavTexts = wrapper.findAll(BNavText)
         expect(bNavTexts.wrappers[0].element.textContent).toBe(`Step: ${testPrompt}/${testNumOfSteps}`)
         expect(bNavTexts.wrappers[1].element.textContent).toBe(testStepName)
@@ -48,13 +39,11 @@ describe('Header.vue', () => {
 
     test('click triggers collapseLog method', async () => {
         const rpcInvokeMockFunction = jest.fn()
-        wrapper = mount(Header, {
-            propsData: {
-                rpc: {
-                    invoke: rpcInvokeMockFunction
-                }
+        wrapper = initComponent(Header, {
+            rpc: {
+                invoke: rpcInvokeMockFunction
             }
-        })
+        }, true)
         
         wrapper.find(BButton).trigger('click')
         await wrapper.vm.$nextTick()
