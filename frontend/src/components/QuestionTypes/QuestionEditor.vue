@@ -1,7 +1,7 @@
 <template>
   <b-form-textarea
     v-model="text"
-    v-bind:placeholder="currentQuestion.default"
+    :placeholder="currentQuestion.default"
     aria-describedby="validation-message"
   ></b-form-textarea>
 </template>
@@ -13,6 +13,11 @@ export default {
   name: "QuestionEditor",
   props: {
     currentQuestion: Object
+  },
+  data() {
+    return {
+      text: undefined
+    }
   },
   watch: {
     text: {
