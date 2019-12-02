@@ -2,7 +2,7 @@
   <b-form-input
     v-model="text"
     :type="currentQuestion.type | typeMapper"
-    v-bind:placeholder="currentQuestion.default"
+    :placeholder="currentQuestion.default"
     class="yeoman-form-control"
     aria-describedby="validation-message"
   ></b-form-input>
@@ -15,6 +15,11 @@ export default {
   name: "QuestionInput",
   props: {
     currentQuestion: Object
+  },
+  data() {
+    return {
+      text: undefined
+    }
   },
   filters: {
     typeMapper: val => {
