@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import _ from "lodash";
+import _ from "lodash"
 
 export default {
   name: "QuestionEditor",
@@ -18,7 +18,7 @@ export default {
     text: {
       handler(val) {
         this.currentQuestion.answer =
-          _.size(val) === 0 ? _.get(this.currentQuestion, "default") : val;
+          _.size(val) === 0 ? _.get(this.currentQuestion, "default") : val
       }
     }
   }

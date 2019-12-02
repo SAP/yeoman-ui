@@ -8,6 +8,8 @@
 </template>
 
 <script>
+import _ from 'lodash'
+
 export default {
   name: "QuestionList",
   filters: {
@@ -18,15 +20,15 @@ export default {
             currentValue.hasOwnProperty("name") &&
             !currentValue.hasOwnProperty("text")
           ) {
-            currentValue.text = currentValue.name;
+            currentValue.text = currentValue.name
           } else if (currentValue.type === "separator") {
             currentValue.text = currentValue.hasOwnProperty("line")
               ? currentValue.line
-              : "──────────────";
-            currentValue.disabled = true;
+              : "──────────────"
+            currentValue.disabled = true
           }
-          return currentValue;
-        });
+          return currentValue
+        })
       }
     }
   },
@@ -38,10 +40,10 @@ export default {
             currentValue.hasOwnProperty("name") &&
             !currentValue.hasOwnProperty("text")
           ) {
-            currentValue.text = currentValue.name;
+            currentValue.text = currentValue.name
           }
-          return currentValue;
-        });
+          return currentValue
+        })
       }
     }
   },
@@ -51,22 +53,19 @@ export default {
   watch: {
     "currentQuestion.choices": {
       handler() {
-        if (
-          typeof this.currentQuestion.default === "number" &&
-          typeof this.currentQuestion.answer === "number"
-        ) {
-          const formattedList = this.formatList(this.currentQuestion.choices);
+        if (_.isNumber(this.currentQuestion.default) && _.isNumber(this.currentQuestion.answer)) {
+          const formattedList = this.formatList(this.currentQuestion.choices)
           if (formattedList) {
-            const choiceObject = formattedList[this.currentQuestion.default];
+            const choiceObject = formattedList[this.currentQuestion.default]
             if (choiceObject) {
-              this.currentQuestion.answer = choiceObject.text;
+              this.currentQuestion.answer = choiceObject.text
             }
           }
         }
       }
     }
   }
-};
+}
 </script>
 
 <style scoped>

@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import _ from "lodash";
+import _ from "lodash"
 
 export default {
   name: "QuestionInput",
@@ -22,16 +22,16 @@ export default {
       //   https://www.npmjs.com/package/inquirer#question
       // and
       //   https://bootstrap-vue.js.org/docs/components/form-input/
-      return val === "input" ? "text" : val;
+      return val === "input" ? "text" : val
     }
   },
   watch: {
     text: {
       handler(val) {
         this.currentQuestion.answer =
-          _.size(val) === 0 ? _.get(this.currentQuestion, "default") : val;
+          _.size(val) === 0 ? _.get(this.currentQuestion, "default") : val
       }
     }
   }
-};
+}
 </script>

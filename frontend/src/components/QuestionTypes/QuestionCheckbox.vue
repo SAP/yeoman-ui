@@ -19,10 +19,10 @@ export default {
             currentValue.hasOwnProperty("name") &&
             !currentValue.hasOwnProperty("text")
           ) {
-            currentValue.text = currentValue.name;
+            currentValue.text = currentValue.name
           }
-          return currentValue;
-        });
+          return currentValue
+        })
       }
     }
   },
@@ -30,26 +30,26 @@ export default {
     currentQuestion: Object
   },
   data() {
-    const selected = [];
+    const selected = []
     this.currentQuestion.choices.forEach(choice => {
       if (choice.checked) {
-        selected.push(choice.value);
+        selected.push(choice.value)
       }
-    });
-    this.currentQuestion.answer = selected;
+    })
+    this.currentQuestion.answer = selected
 
     return {
       selected: selected
-    };
+    }
   },
   watch: {
     selected: {
       handler(val) {
-        this.currentQuestion.answer = val;
+        this.currentQuestion.answer = val
       }
     }
   }
-};
+}
 </script>
 
 <style scoped>
