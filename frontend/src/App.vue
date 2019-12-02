@@ -46,13 +46,14 @@
 </template>
 
 <script>
-import Vue from "vue";
-import Header from "./components/Header.vue";
-import Navigation from "./components/Navigation.vue";
-import Step from "./components/Step.vue";
+import Vue from "vue"
+import Header from "./components/Header.vue"
+import Navigation from "./components/Navigation.vue"
+import Step from "./components/Step.vue"
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
-import * as _ from "lodash";
+import * as _ from "lodash"
+
 export default {
   name: "app",
   components: {
@@ -74,19 +75,19 @@ export default {
       doneMessage: Object,
       consoleClass: "",
       logText: ""
-    };
+    }
   },
   computed: {
     currentPrompt: function() {
-      const response = this.prompts[this.promptIndex];
+      const response = this.prompts[this.promptIndex]
       if (response) {
-        const answers = _.get(response, "answers", {});
+        const answers = _.get(response, "answers", {})
         response.questions.forEach(value => {
-          answers[value.name] = value.isWhen === false ? undefined : value.answer;
-        });
-        response.answers = answers;
+          answers[value.name] = value.isWhen === false ? undefined : value.answer
+        })
+        response.answers = answers
       }
-      return response;
+      return response
     }
   },
   watch: {
@@ -99,39 +100,39 @@ export default {
           _.forEach(this.currentPrompt.questions, question => {
             if (question._default === "__Function") {
               this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "default"]).then(response => {
-                question.default = response;
+                question.default = response
                 if (question.answer === undefined) {
-                  question.answer = question.default;
+                  question.answer = question.default
                 }
-              });
+              })
             }
             if (question.when === "__Function") {
               this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "when"]).then(response => {
-                question.isWhen = response;
-              });
+                question.isWhen = response
+              })
             }
             if (question._message === "__Function") {
               this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "message"]).then(response => {
-                question.message = response;
-              });
+                question.message = response
+              })
             }
             if (question._choices === "__Function") {
               this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "choices"]).then(response => {
-                question.choices = response;
-              });
+                question.choices = response
+              })
             }
             if (question.filter === "__Function") {
               this.rpc.invoke("evaluateMethod", [[question.answer], question.name, "filter"]).then(response => {
-                question.answer = response;
-              });
+                question.answer = response
+              })
             }
             if (question.validate === "__Function") {
               this.rpc.invoke("evaluateMethod", [[question.answer, this.currentPrompt.answers], question.name, "validate"]).then(response => {
-                question.isValid = (typeof response === 'string' ? false : response);
-                question.validationMessage = (typeof response === 'string' ? response : undefined);
-              });
+                question.isValid = (typeof response === 'string' ? false : response)
+                question.validationMessage = (typeof response === 'string' ? response : undefined)
+              })
             }
-          });
+          })
         }
       }
     }
@@ -140,24 +141,24 @@ export default {
     next() {
       if (this.resolve) {
         try {
-          this.resolve(this.currentPrompt.answers);
+          this.resolve(this.currentPrompt.answers)
         } catch (e) {
-          this.reject(e);
+          this.reject(e)
         }
       }
       if (this.promptIndex >= this.prompts.length - 1) {
-        const prompt = { questions: [], name: "Pending...", status: "pending" };
-        this.setPrompts([prompt]);
+        const prompt = { questions: [], name: "Pending...", status: "pending" }
+        this.setPrompts([prompt])
       }
-      this.promptIndex++;
-      this.prompts[this.promptIndex - 1].active = false;
-      this.prompts[this.promptIndex].active = true;
+      this.promptIndex++
+      this.prompts[this.promptIndex - 1].active = false
+      this.prompts[this.promptIndex].active = true
     },
     onGeneratorSelected: function(generatorName) {
-      this.generatorName = generatorName;
+      this.generatorName = generatorName
     },
     onStepValidated: function(stepValidated) {
-      this.stepValidated = stepValidated;
+      this.stepValidated = stepValidated
     },
     setPrompts(prompts) {
       // TODO:
@@ -165,50 +166,51 @@ export default {
       //     if found then update it
       //     if not found then create a prompt
       //   if no prompt name is provided, assign incoming question to current prompt
-      const currentPrompt = this.currentPrompt;
+      const currentPrompt = this.currentPrompt
       if (prompts) {
         prompts.forEach((prompt, index) => {
           if (index === 0) {
             if (prompt.status === "pending") {
               // new pending prompt
-              this.prompts.push(prompt);
+              this.prompts.push(prompt)
             } else {
               if (currentPrompt) {
-                currentPrompt.questions = prompt.questions;
+                currentPrompt.questions = prompt.questions
                 if (prompt.name && currentPrompt.name === "Pending...") {
-                  currentPrompt.name = prompt.name;
+                  currentPrompt.name = prompt.name
                 }
                 // if questions are provided, remote the pending status
                 if (prompt.questions.length > 0) {
-                  delete currentPrompt.status;
+                  delete currentPrompt.status
                 }
               } else {
                 // first prompt (choose generator)
-                prompt.active = true;
-                this.prompts.push(prompt);
+                prompt.active = true
+                this.prompts.push(prompt)
               }
             }
           } else {
             // multiple prompts provided -- simply add them
-            this.prompts.push(prompt);
+            this.prompts.push(prompt)
           }
-        });
+        })
       }
     },
     setQuestionProps(prompt) {
       prompt.questions.forEach(question => {
         if (question.default === "__Function") {
-          question.default = undefined;
-          this.$set(question, "_default", "__Function");
+          question.default = undefined
+          this.$set(question, "_default", "__Function")
         }
         if (question.message === "__Function") {
-          question.message = "loading...";
-          this.$set(question, "_message", "__Function");
+          question.message = "loading..."
+          this.$set(question, "_message", "__Function")
         }
         if (question.choices === "__Function") {
-          question.choices = ["loading..."];
-          this.$set(question, "_choices", "__Function");
+          question.choices = ["loading..."]
+          this.$set(question, "_choices", "__Function")
         }
+        
         let answer = question.default;
         if (question.default === undefined && question.type !== "confirm") {
           answer = "";
@@ -220,14 +222,14 @@ export default {
       });
     },
     showPrompt(questions, name) {
-      const prompt = this.createPrompt(questions, name);
+      const prompt = this.createPrompt(questions, name)
       // evaluate message property on server if it is a function
-      this.setPrompts([prompt]);
+      this.setPrompts([prompt])
       const promise = new Promise((resolve, reject) => {
-        this.resolve = resolve;
-        this.reject = reject;
-      });
-      return promise;
+        this.resolve = resolve
+        this.reject = reject
+      })
+      return promise
     },
     createPrompt(questions, name) {
       const prompt = Vue.observable({
@@ -235,39 +237,39 @@ export default {
         name: name,
         answers: {},
         active: true
-      });
-      this.setQuestionProps(prompt);
-      return prompt;
+      })
+      this.setQuestionProps(prompt)
+      return prompt
     },
     log(log) {
-      this.logText += log;
-      return true;
+      this.logText += log
+      return true
     },
     generatorDone(success, message) {
       if (this.currentPrompt.status === "pending") {
-        this.currentPrompt.name = "Done";
+        this.currentPrompt.name = "Done"
       }
-      this.doneMessage = message;
-      this.isDone = true;
+      this.doneMessage = message
+      this.isDone = true
     },
     runGenerator(generatorName) {
-      this.rpc.invoke("runGenerator", [generatorName]);
+      this.rpc.invoke("runGenerator", [generatorName])
     },
     isInVsCode() {
-      return typeof acquireVsCodeApi !== "undefined";
+      return typeof acquireVsCodeApi !== "undefined"
     },
     setupRpc() {
       if (this.isInVsCode()) {
         // eslint-disable-next-line
-        const vscode = acquireVsCodeApi();
-        this.rpc = new RpcBrowser(window, vscode);
-        this.initRpc();
+        const vscode = acquireVsCodeApi()
+        this.rpc = new RpcBrowser(window, vscode)
+        this.initRpc()
       } else {
-        const ws = new WebSocket("ws://127.0.0.1:8081");
+        const ws = new WebSocket("ws://127.0.0.1:8081")
         ws.onopen = () => {
-          this.rpc = new RpcBrowserWebSockets(ws);
-          this.initRpc();
-        };
+          this.rpc = new RpcBrowserWebSockets(ws)
+          this.initRpc()
+        }
       }
     },
     initRpc() {
@@ -275,33 +277,33 @@ export default {
         func: this.showPrompt,
         thisArg: this,
         name: "showPrompt"
-      });
+      })
       this.rpc.registerMethod({
         func: this.setPrompts,
         thisArg: this,
         name: "setPrompts"
-      });
+      })
       this.rpc.registerMethod({
         func: this.generatorDone,
         thisArg: this,
         name: "generatorDone"
-      });
+      })
       this.rpc.registerMethod({
         func: this.log,
         thisArg: this,
         name: "log"
-      });
-      this.rpc.invoke("receiveIsWebviewReady", []);
+      })
+      this.rpc.invoke("receiveIsWebviewReady", [])
     }
   },
   mounted() {
-    this.setupRpc();
+    this.setupRpc()
     //todo: add validate support
-    this.yeomanName = "<no generator selected>";
-    this.prompts = [];
-    this.isInVsCode() ? this.consoleClass = "consoleClassHidden" : this.consoleClass = "consoleClassVisible";
+    this.yeomanName = "<no generator selected>"
+    this.prompts = []
+    this.isInVsCode() ? this.consoleClass = "consoleClassHidden" : this.consoleClass = "consoleClassVisible"
   }
-};
+}
 </script>
 
 <style>

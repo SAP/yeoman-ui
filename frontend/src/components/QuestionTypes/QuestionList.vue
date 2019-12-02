@@ -1,34 +1,49 @@
 <template>
-  <b-form-select v-model="currentQuestion.answer" :options="currentQuestion.choices | listFilter" class="custom-yeoman-select" aria-describedby="validation-message">
-  </b-form-select>
+  <b-form-select
+    v-model="currentQuestion.answer"
+    :options="currentQuestion.choices | listFilter"
+    class="custom-yeoman-select"
+    aria-describedby="validation-message"
+  ></b-form-select>
 </template>
+
 <script>
+import _ from 'lodash'
+
 export default {
   name: "QuestionList",
   filters: {
-    listFilter: (value) => {
+    listFilter: value => {
       if (Array.isArray(value)) {
-        return value.map((currentValue) => {
-          if (currentValue.hasOwnProperty('name') && !currentValue.hasOwnProperty('text')) {
-            currentValue.text = currentValue.name;
+        return value.map(currentValue => {
+          if (
+            currentValue.hasOwnProperty("name") &&
+            !currentValue.hasOwnProperty("text")
+          ) {
+            currentValue.text = currentValue.name
           } else if (currentValue.type === "separator") {
-            currentValue.text = currentValue.hasOwnProperty('line') ? currentValue.line : '──────────────';
-            currentValue.disabled = true;
+            currentValue.text = currentValue.hasOwnProperty("line")
+              ? currentValue.line
+              : "──────────────"
+            currentValue.disabled = true
           }
-          return currentValue;
-        });
+          return currentValue
+        })
       }
     }
   },
   methods: {
-    formatList: (value) => {
+    formatList: value => {
       if (Array.isArray(value)) {
-        return value.map((currentValue) => {
-          if (currentValue.hasOwnProperty('name') && !currentValue.hasOwnProperty('text')) {
-            currentValue.text = currentValue.name;
+        return value.map(currentValue => {
+          if (
+            currentValue.hasOwnProperty("name") &&
+            !currentValue.hasOwnProperty("text")
+          ) {
+            currentValue.text = currentValue.name
           }
-          return currentValue;
-        });
+          return currentValue
+        })
       }
     }
   },
@@ -36,23 +51,21 @@ export default {
     currentQuestion: Object
   },
   watch: {
-    'currentQuestion.choices': {
+    "currentQuestion.choices": {
       handler() {
-        if (typeof this.currentQuestion.default === 'number' && typeof this.currentQuestion.answer === 'number') {
-          const formattedList = this.formatList(this.currentQuestion.choices);
+        if (_.isNumber(this.currentQuestion.default) && _.isNumber(this.currentQuestion.answer)) {
+          const formattedList = this.formatList(this.currentQuestion.choices)
           if (formattedList) {
-            const choiceObject = formattedList[this.currentQuestion.default];
+            const choiceObject = formattedList[this.currentQuestion.default]
             if (choiceObject) {
-              this.currentQuestion.answer = choiceObject.text;
+              this.currentQuestion.answer = choiceObject.text
             }
           }
         }
       }
     }
-  },
-  mounted() {
   }
-};
+}
 </script>
 
 <style scoped>
@@ -72,5 +85,4 @@ export default {
   color: var(--vscode-input-foreground, #cccccc);
   background-color: var(--vscode-input-background, #3c3c3c);
 }
-
 </style>

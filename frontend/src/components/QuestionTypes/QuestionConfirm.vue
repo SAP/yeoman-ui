@@ -1,30 +1,17 @@
 <template>
   <div class="question-confirm-container">
     <b-form-radio-group v-model="currentQuestion.answer">
-      <b-form-radio
-        :value="true"
-      >Yes</b-form-radio>
-      <b-form-radio
-        :value="false"
-      >No</b-form-radio>
+      <b-form-radio :value="true">Yes</b-form-radio>
+      <b-form-radio :value="false">No</b-form-radio>
     </b-form-radio-group>
   </div>
 </template>
+
 <script>
 export default {
   name: "QuestionConfirm",
   props: {
     currentQuestion: Object
-  },
-  data() {
-    return {
-    };
-  },
-  methods: {
-  },
-  watch: {
-  },
-  mounted() {
   }
 };
 </script>
@@ -40,5 +27,4 @@ export default {
 .selected {
   background-color: lightblue;
 }
-
 </style>

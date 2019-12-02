@@ -46,5 +46,4 @@ export default {
   background-color: var(--vscode-list-hoverBackground, #2a2d2e);
   color: var(--vscode-foreground, #cccccc);
 }
-
 </style>
