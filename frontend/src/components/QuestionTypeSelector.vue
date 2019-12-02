@@ -1,22 +1,38 @@
 <template>
   <div>
     <b-form-group :label="currentQuestion.message" v-if="currentQuestion.isWhen">
-      <GeneratorSelection v-if="currentQuestion.type==='generators'" :currentQuestion="currentQuestion" @generatorSelected="onGeneratorSelected"/>
+      <GeneratorSelection
+        v-if="currentQuestion.type==='generators'"
+        :currentQuestion="currentQuestion"
+        @generatorSelected="onGeneratorSelected"
+      />
 
-      <QuestionInput v-if="!currentQuestion.type || currentQuestion.type==='input' || currentQuestion.type==='password' || currentQuestion.type==='number'" :currentQuestion="currentQuestion" />
+      <QuestionInput
+        v-if="!currentQuestion.type || currentQuestion.type==='input' || currentQuestion.type==='password' || currentQuestion.type==='number'"
+        :currentQuestion="currentQuestion"
+      />
 
       <QuestionEditor v-if="currentQuestion.type==='editor'" :currentQuestion="currentQuestion" />
 
-      <QuestionList v-if="currentQuestion.type==='list' || currentQuestion.type==='rawlist'" :currentQuestion="currentQuestion" />
+      <QuestionList
+        v-if="currentQuestion.type==='list' || currentQuestion.type==='rawlist'"
+        :currentQuestion="currentQuestion"
+      />
 
       <QuestionConfirm v-if="currentQuestion.type==='confirm'" :currentQuestion="currentQuestion" />
 
-      <QuestionCheckbox v-if="currentQuestion.type==='checkbox'" :currentQuestion="currentQuestion" />
+      <QuestionCheckbox
+        v-if="currentQuestion.type==='checkbox'"
+        :currentQuestion="currentQuestion"
+      />
 
       <QuestionExpand v-if="currentQuestion.type==='expand'" :currentQuestion="currentQuestion" />
-  
-      <b-form-invalid-feedback id='validation-message' class='invalid-feedback' :state="currentQuestion.isValid">{{currentQuestion.validationMessage}}</b-form-invalid-feedback>
 
+      <b-form-invalid-feedback
+        id="validation-message"
+        class="invalid-feedback"
+        :state="currentQuestion.isValid"
+      >{{currentQuestion.validationMessage}}</b-form-invalid-feedback>
     </b-form-group>
   </div>
 </template>
@@ -54,7 +70,7 @@ export default {
   },
   methods: {
     onGeneratorSelected: function(generatorName) {
-      this.$emit('generatorSelected', generatorName);
+      this.$emit("generatorSelected", generatorName);
     }
   }
 };

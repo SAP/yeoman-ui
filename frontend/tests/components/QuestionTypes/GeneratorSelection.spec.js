@@ -8,7 +8,7 @@ let wrapper
 describe('GeneratorSelection.vue', () => {
     afterEach(() => {
         destroy(wrapper)
-    });
+    })
 
     describe('getImageUrl - method', () => {
         test('imageUrl is defined on currentQuestion', () => {
@@ -18,7 +18,7 @@ describe('GeneratorSelection.vue', () => {
                     choices: [{imageUrl: 'testImageUrl', name: 'testName'}]
                 }
             }, true)
-            expect(getImageUrlSpy).toHaveReturnedWith('testImageUrl');
+            expect(getImageUrlSpy).toHaveReturnedWith('testImageUrl')
         })
         
         test('imageUrl is not defined on currentQuestion', async () => {

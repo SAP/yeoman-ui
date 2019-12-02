@@ -18,10 +18,10 @@ export default {
   },
   methods: {
     onClick(answer) {
-      this.currentQuestion.answer = answer;
+      this.currentQuestion.answer = answer
     }
   }
-};
+}
 </script>
 
 <style scoped>
