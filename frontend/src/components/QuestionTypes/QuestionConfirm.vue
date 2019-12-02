@@ -15,16 +15,6 @@ export default {
   name: "QuestionConfirm",
   props: {
     currentQuestion: Object
-  },
-  data() {
-    return {
-    };
-  },
-  methods: {
-  },
-  watch: {
-  },
-  mounted() {
   }
 };
 </script>

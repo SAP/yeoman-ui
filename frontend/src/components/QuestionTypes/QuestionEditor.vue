@@ -7,13 +7,6 @@ export default {
   props: {
     currentQuestion: Object
   },
-  data() {
-    return {
-      text: null
-    };
-  },
-  filters: {
-  },
   watch: {
     text: {
       handler(val) {

@@ -7,11 +7,6 @@ export default {
   props: {
     currentQuestion: Object
   },
-  data() {
-    return {
-      text: null
-    };
-  },
   filters: {
     typeMapper: (val) => {
       // mapping between

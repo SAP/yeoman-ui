@@ -16,19 +16,10 @@ export default {
   props: {
     currentQuestion: Object
   },
-  data() {
-    return {
-      selected: undefined
-    };
-  },
   methods: {
     onClick(answer) {
       this.currentQuestion.answer = answer;
     }
-  },
-  watch: {
-  },
-  mounted() {
   }
 };
 </script>
