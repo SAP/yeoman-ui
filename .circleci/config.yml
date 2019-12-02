@@ -6,46 +6,40 @@ defaults: &defaults
     - image: circleci/node:10.17.0
 
 jobs: # a collection of steps
-  setup:
+  build-and-test:
     <<: *defaults  
     steps:
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}
-  build-test-frontend:
-    <<: *defaults  
-    steps:
-      working_directory: frontend
       - run:
           name: install frontend
+          working_directory: frontend
           command: npm install
       - run:
           name: build frontend
+          working_directory: frontend
           command: npm run build
       # - run:
       #     name: test frontend
+          # working_directory: backend
       #     command: npm run test
-      - persist_to_workspace:
-          root: ~/repo
-          paths: .
-  build-test-backend:
-    <<: *defaults  
-    steps:
-      - attach_workspace:
-          at: ~/repo
-      working_directory: backend
       - run:
           name: install backend
+          working_directory: backend
           command: npm install
       - run:
           name: build backend
+          working_directory: backend
           command: npm run webpack-prod
       - run:
           name: test backend 
+          working_directory: backend
           command: npm run test
       - save_cache:
           paths:
-            - node_modules
+            - backend/node_modules
+            - frontend/node_modules
           key: dependency-cache-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}
       - persist_to_workspace:
           root: ~/repo
@@ -64,58 +58,31 @@ jobs: # a collection of steps
           at: ~/repo
       - run:
           name: compile for package
-          command: cd backend && npm run compile-dist
-      - run:
-          name: copy frontend to dist
-          command: cd backend && rm -rf dist/media && cp -r ../frontend/dist/ ./dist/media/
-      - run:
-          name: copy LICENSE file
-          command: cp LICENSE ./backend/LICENSE
-      - run:
-          name: prune npm for production
-          command: cd backend && npm prune --production
-      - run:
-          name: bump package.json version
-          command: cd backend && npm version patch
+          working_directory: backend
+          command: npm run webpack-prod
       - run:
           name: create .vsix
-          command: cd backend && npx vsce package .
-      - run:
-          name: clean LICENSE file
-          command: rm backend/LICENSE
-      - run:
-          name: clean LICENSE file
-          command: rm backend/LICENSE
+          working_directory: backend
+          command: npx vsce package .
       - run:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
       - run:
           name: Publish package
+          working_directory: backend
           command: npm publish
 
 workflows:
   version: 2
   test-deploy:
     jobs:
-      - setup:
-          filters:
-            tags:
-              only: /.*/
-      - build-test-frontend:
-          requires:
-            - setup
-          filters:
-            tags:
-              only: /.*/
-      - build-test-backend:
-          requires:
-            - build-test-frontend
+      - build-and-test:
           filters:
             tags:
               only: /.*/
       - deploy:
           requires:
-            - build-test-backend
+            - build-and-test
           filters:
             tags:
               only: /^v.*/
