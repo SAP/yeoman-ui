@@ -2,6 +2,7 @@
   <b-form-textarea
     v-model="text"
     :placeholder="currentQuestion.default"
+    class="yeoman-form-control"
     aria-describedby="validation-message"
   ></b-form-textarea>
 </template>

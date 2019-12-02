@@ -329,6 +329,7 @@ body {
   background-color: var(--vscode-input-background, #3c3c3c);
 }
 .form-control:focus.yeoman-form-control:focus {
+  color: var(--vscode-input-foreground, #cccccc);
   background-color: var(--vscode-input-background, #3c3c3c);
 }
 .content {
