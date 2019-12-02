@@ -209,7 +209,11 @@ export default {
           question.choices = ["loading..."];
           this.$set(question, "_choices", "__Function");
         }
-        this.$set(question, "answer", question.default);
+        let answer = question.default;
+        if (question.default === undefined && question.type !== "confirm") {
+          answer = "";
+        }
+        this.$set(question, "answer", answer);
         this.$set(question, "isWhen", true);
         this.$set(question, "isValid", true);
         this.$set(question, "validationMessage", true);
