@@ -35,7 +35,7 @@ describe('QuestionInput.vue', () => {
     })
 
     describe('text - watcher', () => {
-        test('text size is 0', () => {
+        test('text size is 0', async () => {
             wrapper = initComponent(QuestionInput, {
                 currentQuestion: {
                     type: 'time', default: 'testDefault', answer: 'testAnswer'
@@ -43,10 +43,11 @@ describe('QuestionInput.vue', () => {
             })
             
             wrapper.vm.$data.text = ''
+            await wrapper.vm.$nextTick()
             expect(wrapper.vm.currentQuestion.answer).toBe('testDefault')
         })
 
-        test('text size is not 0', () => {
+        test('text size is not 0', async () => {
             wrapper = initComponent(QuestionInput, {
                 currentQuestion: {
                     type: 'time', default: 'testDefault', answer: 'testAnswer'
@@ -54,6 +55,7 @@ describe('QuestionInput.vue', () => {
             })
             
             wrapper.vm.$data.text = 'test_value'
+            await wrapper.vm.$nextTick()
             expect(wrapper.vm.currentQuestion.answer).toBe('test_value')
         })
     })
