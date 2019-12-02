@@ -1,5 +1,5 @@
 <template>
-  <b-form-textarea v-model="text" v-bind:placeholder="currentQuestion.default" aria-describedby="validation-message"></b-form-textarea>
+  <b-form-textarea v-model="text" v-bind:placeholder="currentQuestion.default" class="yeoman-form-control" aria-describedby="validation-message"></b-form-textarea>
 </template>
 <script>
 export default {
