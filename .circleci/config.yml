@@ -6,35 +6,41 @@ defaults: &defaults
     - image: circleci/node:10.17.0
 
 jobs: # a collection of steps
-  test:
+  build-and-test:
     <<: *defaults  
     steps:
       - checkout
-
       - restore_cache:
-          key: dependency-cache-{{ checksum "backend/package.json" }}
-      - run: cd backend && npm install
+          key: dependency-cache-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}
       - run:
-          name: compile
-          command: cd backend && npm run compile
+          name: install frontend
+          working_directory: frontend
+          command: npm install
       - run:
-          name: npm install frontend
-          command: cd backend && npm run vue:prep
+          name: build frontend
+          working_directory: frontend
+          command: npm run build
       - run:
-          name: copy frontend resources
-          command: cd backend && npm run vue:cp
+          name: test frontend
+          working_directory: frontend
+          command: npm run test
       - run:
-          name: test frontend 
-          command: cd frontend && npm run test
+          name: install backend
+          working_directory: backend
+          command: npm install
+      - run:
+          name: build backend
+          working_directory: backend
+          command: npm run webpack-prod
       - run:
           name: test backend 
-          command: cd backend && npm run test
-
+          working_directory: backend
+          command: npm run test
       - save_cache:
           paths:
-            - node_modules
-          key: dependency-cache-{{ checksum "backend/package.json" }}
-
+            - backend/node_modules
+            - frontend/node_modules
+          key: dependency-cache-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}
       - persist_to_workspace:
           root: ~/repo
           paths: .
@@ -51,26 +57,32 @@ jobs: # a collection of steps
       - attach_workspace:
           at: ~/repo
       - run:
-          name: package 
-          command: cd backend && npm run package
+          name: compile for package
+          working_directory: backend
+          command: npm run webpack-prod
+      - run:
+          name: create .vsix
+          working_directory: backend
+          command: npx vsce package .
       - run:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
       - run:
           name: Publish package
+          working_directory: backend
           command: npm publish
 
 workflows:
   version: 2
   test-deploy:
     jobs:
-      - test:
+      - build-and-test:
           filters:
             tags:
-              only: /^v.*/
+              only: /.*/
       - deploy:
           requires:
-            - test
+            - build-and-test
           filters:
             tags:
               only: /^v.*/

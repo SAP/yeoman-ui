@@ -1,4 +1,4 @@
-# vue-yeoman-ui
+# Yeoman UI Frontend
 
 ## Project setup
 ```

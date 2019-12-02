@@ -18,3 +18,5 @@ npm link
 yo foodq
 ```
 
+## Debugging in VS Code
+Run the *Foodq* launch configuration.

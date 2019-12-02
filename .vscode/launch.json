@@ -8,13 +8,13 @@
 		{
 			"type": "node",
 			"request": "launch",
-			"name": "Dev",
-			"program": "${workspaceFolder}/backend/src/test/index.ts",
+			"name": "Run websocket server",
+			"program": "${workspaceFolder}/backend/src/webSocketServer/index.ts",
 			"outFiles": ["${workspaceFolder}/backend/out/**/*.js"],
-			"preLaunchTask": "watch backend"
+			"preLaunchTask": "watch backend (tsc)"
 		},
 		{
-			"name": "Run Extension",
+			"name": "Run extension",
 			"type": "extensionHost",
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
@@ -22,12 +22,12 @@
 				"--extensionDevelopmentPath=${workspaceFolder}/backend"
 			],
 			"outFiles": [
-				"${workspaceFolder}/backend/out/**/*.js"
+				"${workspaceFolder}/backend/dist/**/*.js"
 			],
-			"preLaunchTask": "watch backend"
+			"preLaunchTask": "watch backend (webpack)"
 		},
 		{
-			"name": "Extension Tests",
+			"name": "Test extension",
 			"type": "extensionHost",
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
@@ -36,12 +36,26 @@
 				"--extensionTestsPath=${workspaceFolder}/backend/out/tests"
 			],
 			"outFiles": [
-				"${workspaceFolder}/backend/out/tests/**/*.js"
+				"${workspaceFolder}/backend/dist/**/*.js"
 			],
 			"preLaunchTask": "watch backend"
 		},
 		{
-			"name": "frontend-jest-tests",
+			"type": "node",
+			"request": "launch",
+			"name": "Run reference generator (foodq)",
+			"program": "${workspaceFolder}/generator-foodq/node_modules/yo/lib/cli.js",
+			"args": [
+				"foodq"
+			],
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"skipFiles": [
+				"<node_internals>/**"
+			]
+		},
+		{
+			"name": "Test frontend",
 			"type": "node",
 			"request": "launch",
 			"runtimeArgs": [

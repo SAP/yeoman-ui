@@ -48,14 +48,14 @@ export class YeomanUIPanel {
 		// Otherwise, create a new panel.
 		const panel = vscode.window.createWebviewPanel(
 			YeomanUIPanel.viewType,
-			'YeomanUI',
+			'Yeoman UI',
 			column || vscode.ViewColumn.One,
 			{
 				// Enable javascript in the webview
 				enableScripts: true,
 
 				// And restrict the webview to only loading content from our extension's `media` directory.
-				localResourceRoots: [vscode.Uri.file(path.join(extensionPath, '/out/media'))]
+				localResourceRoots: [vscode.Uri.file(path.join(extensionPath, 'dist', 'media'))]
 			}
 		);
 
@@ -132,37 +132,12 @@ export class YeomanUIPanel {
 	}
 
 	private _update() {
-		const webview = this.panel.webview;
-
-		// Vary the webview's content based on where it is located in the editor.
-		switch (this.panel.viewColumn) {
-			case vscode.ViewColumn.Two:
-				this._updateSpecificColumn(webview, 'Compiling');
-				return;
-
-			case vscode.ViewColumn.Three:
-				this._updateSpecificColumn(webview, 'Testing');
-				return;
-
-			case vscode.ViewColumn.One:
-			default:
-				this._updateSpecificColumn(webview, 'YeomanUI');
-				return;
-		}
-	}
-
-	private _updateSpecificColumn(webview: vscode.Webview, name: string) {
-		this.panel.title = name;
-		this.panel.webview.html = this._getHtmlForWebview(webview, name);
-	}
-
-	private _getHtmlForWebview(webview: vscode.Webview, name: string) {
 		// TODO: don't use sync
-		let indexHtml: string = fs.readFileSync(path.join(__dirname, "media", "index.html"), "utf8");
+		let indexHtml: string = fs.readFileSync(path.join(this.extensionPath, 'dist', 'media', 'index.html'), "utf8");
 		if (indexHtml) {
 			// Local path to main script run in the webview
 			const scriptPathOnDisk = vscode.Uri.file(
-				path.join(this.extensionPath, 'out/media/')
+				path.join(this.extensionPath, 'dist', 'media')
 			);
 			// TODO: call 'webview.asWebviewUri' when we have a theia verion contains PR - https://github.com/eclipse-theia/theia/pull/6465
 			const scriptUri = /* webview.asWebviewUri(scriptPathOnDisk) */ "vscode-resource:" + scriptPathOnDisk.path;
@@ -173,14 +148,15 @@ export class YeomanUIPanel {
 			indexHtml = indexHtml.replace(/<script src=/g, `<script src=${scriptUri.toString()}`);
 			indexHtml = indexHtml.replace(/<img src=/g, `<img src=${scriptUri.toString()}`);
 		}
-		return indexHtml;
+		this.panel.title = 'Yeoman UI';
+		this.panel.webview.html = indexHtml;
 	}
 }
 
 let channel: vscode.OutputChannel;
 export function getOutputChannel(): vscode.OutputChannel {
 	if (!channel) {
-		channel = vscode.window.createOutputChannel('YeomanUI');
+		channel = vscode.window.createOutputChannel('Yeoman UI');
 	}
 	
 	return channel;

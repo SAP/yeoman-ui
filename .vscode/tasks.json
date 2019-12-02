@@ -8,13 +8,35 @@
 			"label": "dev",
 			"dependsOrder": "parallel",
 			"dependsOn": [
-				"watch backend",
+				"watch backend (webpack)",
 				"serve frontend"
 			]
 		},
 		{
 			"type": "npm",
-			"label": "watch backend",
+			"label": "watch backend (webpack)",
+			"isBackground": true,
+			"options": {
+				"cwd": "${workspaceFolder}/backend"
+			},
+			"script": "webpack-dev",
+			"problemMatcher": {
+				"pattern": {
+					"regexp": ""
+				},
+				"background": {
+					"beginsPattern": "webpack is watching the files",
+					"endsPattern": "Built at"
+				}
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"type": "npm",
+			"label": "watch backend (tsc)",
 			"isBackground": true,
 			"options": {
 				"cwd": "${workspaceFolder}/backend"

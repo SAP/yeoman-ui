@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="d-flex flex-column">
-    <div v-if="!prompts.length" class="loading">YeomanUI is loading...</div>
+    <div v-if="!prompts.length" class="loading">Yeoman User Interface is loading...</div>
 
     <Header
       v-if="prompts.length"
