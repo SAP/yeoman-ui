@@ -12,12 +12,12 @@ export class YouiAdapter implements Adapter {
 
   constructor(logger: YouiLog) {
     this.youiLog = logger;
-    this.log.writeln = logger.writeln;
-    this.log.conflict = logger.conflict;
-    this.log.create = logger.create;
-    this.log.force = logger.force;
-    this.log.identical = logger.identical;
-    this.log.skip = logger.skip;
+    this.log.writeln = logger.writeln.bind(this.youiLog);
+    this.log.conflict = logger.conflict.bind(this.youiLog);
+    this.log.create = logger.create.bind(this.youiLog);
+    this.log.force = logger.force.bind(this.youiLog);
+    this.log.identical = logger.identical.bind(this.youiLog);
+    this.log.skip = logger.skip.bind(this.youiLog);
   }
 
   public setYeomanUI(yeomanui: YeomanUI) {
@@ -33,7 +33,7 @@ export class YouiAdapter implements Adapter {
     identical?: (str: string) => void,
     skip?: (str: string) => void
   } = (value: string) => {
-    this.youiLog.log(value);
+    this.youiLog.log.call(this.youiLog, value);
   }
 
   get colorDiffAdded() {

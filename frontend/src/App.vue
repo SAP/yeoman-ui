@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="d-flex flex-column">
-    <div v-if="!prompts.length" class="loading">YeomanUI is loading...</div>
+    <div v-if="!prompts.length" class="loading">Yeoman User Interface is loading...</div>
 
     <Header
       v-if="prompts.length"
@@ -28,7 +28,7 @@
               @stepvalidated="onStepValidated"
             />
             <div class="navigation" v-if="prompts.length > 0 && !isDone" >
-              <b-button class="mr-2 btn" :disabled="!stepValidated" @click="next">Next</b-button>
+              <b-button class="btn" :disabled="!stepValidated" @click="next">Next</b-button>
             </div>
           </b-container>
         </b-col>
@@ -304,7 +304,7 @@ export default {
 <style>
 #app {
   height: 100%;
-  color: var(--vscode-foreground, white);
+  color: var(--vscode-foreground, #cccccc);
   background-color: var(--vscode-panel-background, #303031);
   font-family: var(--vscode-font-family);
   font-weight: var(--vscode-font-weight);
@@ -319,9 +319,12 @@ body {
 .list-group-item.selected {
   background-color: var(--vscode-list-active-selection-background);
 }
-.form-control {
-  color: var(--vscode-input-foreground);
-  background-color: var(--vscode-input-background);
+.form-control.yeoman-form-control {
+  color: var(--vscode-input-foreground, #cccccc);
+  background-color: var(--vscode-input-background, #3c3c3c);
+}
+.form-control:focus.yeoman-form-control:focus {
+  background-color: var(--vscode-input-background, #3c3c3c);
 }
 .content {
   margin: 0px;
@@ -362,5 +365,9 @@ button.btn:hover {
   font-family: monospace;
   word-wrap: break-word;
   white-space: pre-wrap;
+}
+.navigation {
+  display: flex; justify-content: flex-end;
+  padding: 10px; 
 }
 </style>

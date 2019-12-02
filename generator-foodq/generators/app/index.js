@@ -69,10 +69,10 @@ module.exports = class extends Generator {
         name: "beers",
         message: "What beer would you like?",
         choices: [
-          "GoldStar",
-          "Polner",
-          "WhineStephan",
-          "Malka"
+          "Chimay Trappist Ales",
+          "Paulaner Salvator",
+          "Weihenstephaner Korbinian",
+          "Hoegaarden Belguim White"
         ]
       },
       {
@@ -103,6 +103,11 @@ module.exports = class extends Generator {
 
     this.answers = await this.prompt(prompts);
     this.log("Food", this.answers.food);
+
+    // currently not supported:
+    const ui = new Inquirer.ui.BottomBar();
+    this.log("xx");
+    ui.updateBottomBar("This is written to the bottom bar");
 
     prompts = [
       {

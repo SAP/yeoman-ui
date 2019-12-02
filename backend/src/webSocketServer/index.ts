@@ -1,10 +1,10 @@
 import * as WebSocket from 'ws';
 import { RpcExtenstionWebSockets } from '@sap-devx/webview-rpc/out.ext/rpc-extension-ws';
-import { IPrompt, YeomanUI } from '../yeomanui';
+import { YeomanUI } from '../yeomanui';
 import { YouiLog } from "../youi-log";
 import { ServerLog } from './server-log';
 
-class YeomanUITest {
+class YeomanUIWebSocketServer {
   private rpc: RpcExtenstionWebSockets | undefined;
   private yeomanui: YeomanUI | undefined;
 
@@ -32,5 +32,5 @@ class YeomanUITest {
   }
 }
 
-const yeomanuiTest = new YeomanUITest();
-yeomanuiTest.init();
+const wsServer = new YeomanUIWebSocketServer();
+wsServer.init();

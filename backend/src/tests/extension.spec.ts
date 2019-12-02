@@ -3,7 +3,6 @@ import { expect } from "chai";
 import * as _ from "lodash";
 import { mockVscode } from "./mockUtil";
 
-
 const testVscode = {
     window: {
         createOutputChannel: () => ""

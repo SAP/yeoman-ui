@@ -2,16 +2,17 @@
   <b-form-input
     v-model="text"
     :type="currentQuestion.type | typeMapper"
-    :placeholder="currentQuestion.default"
+    v-bind:placeholder="currentQuestion.default"
+    class="yeoman-form-control"
     aria-describedby="validation-message"
   ></b-form-input>
 </template>
 
 <script>
-import _ from 'lodash'
+import _ from "lodash";
 
 export default {
-  name: 'QuestionInput',
+  name: "QuestionInput",
   props: {
     currentQuestion: Object
   },
@@ -27,7 +28,8 @@ export default {
   watch: {
     text: {
       handler(val) {
-        this.currentQuestion.answer = (_.size(val) === 0 ? _.get(this.currentQuestion, "default") : val)
+        this.currentQuestion.answer =
+          _.size(val) === 0 ? _.get(this.currentQuestion, "default") : val;
       }
     }
   }
