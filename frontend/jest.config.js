@@ -14,6 +14,9 @@ module.exports = {
     "vue",
     "json"
   ],
+  transformIgnorePatterns: [
+    "<rootDir>/node_modules/(?!(@sap-devx)/)"
+  ],
   modulePaths: [
     "<rootDir>/src",
     "<rootDir>/node_modules"
@@ -30,10 +33,10 @@ module.exports = {
   ],
   coverageThreshold: {
     "global": {
-      "branches": 3,
-      "functions": 17,
-      "lines": 14,
-      "statements": 14
+      "branches": 14,
+      "functions": 34,
+      "lines": 25,
+      "statements": 25
     }
   }
 }

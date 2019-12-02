@@ -1,21 +1,27 @@
 <template>
   <div class="question-checkbox-container">
-    <b-form-checkbox-group v-model="selected" stacked :options="currentQuestion.choices | checkboxFilter">
-    </b-form-checkbox-group>
+    <b-form-checkbox-group
+      v-model="selected"
+      stacked
+      :options="currentQuestion.choices | checkboxFilter"
+    ></b-form-checkbox-group>
   </div>
 </template>
+
 <script>
+import _ from "lodash"
+
 export default {
   name: "QuestionCheckbox",
   filters: {
-    checkboxFilter: (value) => {
-      if (Array.isArray(value)) {
-        return value.map((currentValue) => {
-          if (currentValue.hasOwnProperty('name') && !currentValue.hasOwnProperty('text')) {
-            currentValue.text = currentValue.name;
+    checkboxFilter: value => {
+      if (_.isArray(value)) {
+        return value.map(currentValue => {
+          if (_.has(currentValue, "name") && !_.has(currentValue, "text")) {
+            currentValue.text = currentValue.name
           }
-          return currentValue;
-        });
+          return currentValue
+        })
       }
     }
   },
@@ -23,27 +29,28 @@ export default {
     currentQuestion: Object
   },
   data() {
-    const selected = [];
-    this.currentQuestion.choices.forEach(choice => {
-      if (choice.checked) {
-        selected.push(choice.value);
-      }
-    });
-    this.currentQuestion.answer =  selected;
+    const selected = _.compact(
+      _.map(this.currentQuestion.choices, choice => {
+        if (choice.checked) {
+          return choice.value
+        }
+      })
+    )
+
+    this.currentQuestion.answer = selected
 
     return {
       selected: selected
-    };
+    }
   },
   watch: {
     selected: {
       handler(val) {
-          this.currentQuestion.answer = val;
+        this.currentQuestion.answer = val
       }
     }
-  },
-  mounted() {}
-};
+  }
+}
 </script>
 
 <style scoped>
