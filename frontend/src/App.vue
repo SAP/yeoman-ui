@@ -78,12 +78,12 @@ export default {
     }
   },
   computed: {
-    currentPrompt: function() {
+    currentPrompt() {
       const response = this.prompts[this.promptIndex]
       if (response) {
         const answers = _.get(response, "answers", {})
-        response.questions.forEach(value => {
-          answers[value.name] = value.isWhen === false ? undefined : value.answer
+        _.forEach(response.questions, question => {
+          answers[question.name] = question.isWhen === false ? undefined : question.answer
         })
         response.answers = answers
       }
@@ -156,10 +156,10 @@ export default {
       this.prompts[this.promptIndex - 1].active = false
       this.prompts[this.promptIndex].active = true
     },
-    onGeneratorSelected: function(generatorName) {
+    onGeneratorSelected(generatorName) {
       this.generatorName = generatorName
     },
-    onStepValidated: function(stepValidated) {
+    onStepValidated(stepValidated) {
       this.stepValidated = stepValidated
     },
     setPrompts(prompts) {

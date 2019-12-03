@@ -69,7 +69,7 @@ export default {
     };
   },
   methods: {
-    onGeneratorSelected: function(generatorName) {
+    onGeneratorSelected(generatorName) {
       this.$emit("generatorSelected", generatorName);
     }
   }
