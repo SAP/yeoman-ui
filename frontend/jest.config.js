@@ -3,7 +3,8 @@ module.exports = {
   collectCoverage: true,
   collectCoverageFrom: [
     "src/**/*.{js,vue}",
-    "!**/node_modules/**"
+    "!**/node_modules/**",
+    "!<rootDir>/src/main.js"
   ],
   coverageReporters: [
     "html",
