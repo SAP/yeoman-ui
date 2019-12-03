@@ -10,8 +10,8 @@ describe('QuestionInput.vue', () => {
         destroy(wrapper)
     })
 
-    describe('typeMapper - filter', () => {
-        test('type should not be formatted', () => {
+    describe('type - computed', () => {
+        test('type should remain the same', () => {
             wrapper = initComponent(QuestionInput, {
                 currentQuestion: {
                     type: 'time', default: 'testDefault', answer: 'testAnswer'
@@ -22,7 +22,7 @@ describe('QuestionInput.vue', () => {
             expect(bFormInput.vm.type).toBe('time')
         })
 
-        test('type should be formatted', () => {
+        test('type should be changed to text', () => {
             wrapper = initComponent(QuestionInput, {
                 currentQuestion: {
                     type: 'input', default: 'testDefault', answer: 'testAnswer'

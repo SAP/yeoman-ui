@@ -98,8 +98,10 @@ export default {
         if (this.currentPrompt) {
           // TODO: consider using debounce (especially for questions of type 'input') to limit roundtrips
           _.forEach(this.currentPrompt.questions, question => {
+            const curentPromptAnswers = this.currentPrompt.answers
+            const questionName = question.name
             if (question._default === "__Function") {
-              this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "default"]).then(response => {
+              this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "default"]).then(response => {
                 question.default = response
                 if (question.answer === undefined) {
                   question.answer = question.default
@@ -107,27 +109,27 @@ export default {
               })
             }
             if (question.when === "__Function") {
-              this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "when"]).then(response => {
+              this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "when"]).then(response => {
                 question.isWhen = response
               })
             }
             if (question._message === "__Function") {
-              this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "message"]).then(response => {
+              this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "message"]).then(response => {
                 question.message = response
               })
             }
             if (question._choices === "__Function") {
-              this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "choices"]).then(response => {
+              this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "choices"]).then(response => {
                 question.choices = response
               })
             }
             if (question.filter === "__Function") {
-              this.rpc.invoke("evaluateMethod", [[question.answer], question.name, "filter"]).then(response => {
+              this.rpc.invoke("evaluateMethod", [[question.answer], questionName, "filter"]).then(response => {
                 question.answer = response
               })
             }
             if (question.validate === "__Function") {
-              this.rpc.invoke("evaluateMethod", [[question.answer, this.currentPrompt.answers], question.name, "validate"]).then(response => {
+              this.rpc.invoke("evaluateMethod", [[question.answer, curentPromptAnswers], questionName, "validate"]).then(response => {
                 question.isValid = (typeof response === 'string' ? false : response)
                 question.validationMessage = (typeof response === 'string' ? response : undefined)
               })

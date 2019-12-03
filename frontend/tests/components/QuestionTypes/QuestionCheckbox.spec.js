@@ -1,7 +1,6 @@
 import QuestionCheckbox from '../../../src/components/QuestionTypes/QuestionCheckbox.vue'
-import { BFormCheckboxGroup } from 'bootstrap-vue'
 import { initComponent, destroy } from '../../Utils'
-import _ from 'lodash'
+import {BFormCheckboxGroup} from 'bootstrap-vue'
 
 let wrapper
 
@@ -56,7 +55,7 @@ describe('QuestionCheckbox.vue', () => {
         expect(wrapper.vm.currentQuestion.answer[0]).toBe('testValue1')
     })
 
-    describe('checkboxFilter - filter', () => {
+    describe('getOptions - computed', () => {
         test('choice without text property', () => {
             wrapper = initComponent(QuestionCheckbox, {
                 currentQuestion: {
@@ -64,7 +63,8 @@ describe('QuestionCheckbox.vue', () => {
                 }
             })
 
-            expect(wrapper.vm.currentQuestion.choices[0].text).toBe('testName1')
+            const bFormCheckboxGroup = wrapper.find(BFormCheckboxGroup)
+            expect(bFormCheckboxGroup.vm.options[0].text).toBe('testName1')
         })
 
         test('choices is not array', () => {
@@ -74,7 +74,8 @@ describe('QuestionCheckbox.vue', () => {
                 }
             })
 
-            expect(wrapper.vm.currentQuestion.choices.text).toBeUndefined()
+            const bFormCheckboxGroup = wrapper.find(BFormCheckboxGroup)
+            expect(bFormCheckboxGroup.vm.options).toHaveLength(0)
         })
     })
 })

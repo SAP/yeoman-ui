@@ -1,7 +1,7 @@
 <template>
   <b-form-input
     v-model="text"
-    :type="currentQuestion.type | typeMapper"
+    :type="getType"
     :placeholder="currentQuestion.default"
     class="yeoman-form-control"
     aria-describedby="validation-message"
@@ -21,13 +21,15 @@ export default {
       text: undefined
     }
   },
-  filters: {
-    typeMapper: val => {
+  computed: {
+    getType() {
       // mapping between
       //   https://www.npmjs.com/package/inquirer#question
       // and
       //   https://bootstrap-vue.js.org/docs/components/form-input/
-      return val === "input" ? "text" : val
+      // const questionType = _.get(this.currentQuestion, "type")
+      const type = this.currentQuestion.type
+      return type === "input" ? "text" : type
     }
   },
   watch: {

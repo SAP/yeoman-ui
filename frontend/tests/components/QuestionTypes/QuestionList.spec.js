@@ -36,18 +36,32 @@ describe('QuestionList.vue', () => {
     })
 
     describe('currentQuestion.choices', () => {
-        test.skip('', () => {
+        test('currentQuestion.answer and currentQuestion.default are numbers', async () => {
+            wrapper = initComponent(QuestionList, {
+                currentQuestion: {
+                    choices: [
+                        { value: 'testValue1', name: 'testName1', checked: true, text: 'testText1' },
+                        { value: 'testValue2', name: 'testName2', checked: true, text: 'testText2' }
+                    ],
+                    default: '456',
+                    answer: '123'
+                }
+            })
 
+            wrapper.vm.currentQuestion.answer = '567'
+            await wrapper.vm.$nextTick()
+            expect(wrapper.vm.currentQuestion.answer).toBe('567')
         })
     })
 
-    describe('listFilter - filter', () => {
+    describe('getOptions - computed', () => {
         test('values parameter is not an array', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     value: 'testValue1', name: 'testName1', checked: true, text: 'testText1'
                 }
             })
+            
             const options = wrapper.find(BFormSelect).vm.options
             expect(options).toHaveLength(0)
         })
@@ -63,6 +77,7 @@ describe('QuestionList.vue', () => {
                     ]
                 }
             })
+
             const options = wrapper.find(BFormSelect).vm.options
             expect(options).toHaveLength(4)
             expect(options[0].name).toBe('testName1')
