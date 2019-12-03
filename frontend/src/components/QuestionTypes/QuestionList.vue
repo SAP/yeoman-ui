@@ -15,9 +15,9 @@ export default {
   filters: {
     listFilter: values => {
       if (_.isArray(values)) {
-        return values.map(value => {
+        return _.map(values, value => {
           if (_.has(value, "name") && !_.has(value, "text")) {
-            value.text = currentValue.name
+            value.text = value.name
           } else if (value.type === "separator") {
             value.text = _.has(value, "line") ? value.line : "──────────────"
             value.disabled = true
