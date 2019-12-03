@@ -58,11 +58,19 @@ export class YouiAdapter implements Adapter {
   ): Promise<T2> {
     if (this.yeomanui && questions) {
       return (<Promise<T2>>this.yeomanui.showPrompt(questions)).then(result => {
-        return cb ?  cb(result as any) : result;
+        if (cb) {
+          try {
+            return cb(result as any);
+          } catch (err) {
+            this.yeomanui.doGeneratorDone(false, (err.message ? err.message : 'Yeoman UI detected an error'));
+            return Promise.reject(err);
+          }
+        } else {
+          return result;
+        }
       }).catch((reason) => {
         return Promise.reject(reason);
       });
-      // return (<Promise<T2>>this._yeomanui.showPrompt(questions));
     }
 
     return Promise.resolve(({} as T2));
