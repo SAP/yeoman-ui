@@ -1,7 +1,7 @@
 <template>
   <b-form-select
     v-model="currentQuestion.answer"
-    :options="currentQuestion.choices | listFilter"
+    :options="getOptions"
     class="custom-yeoman-select"
     aria-describedby="validation-message"
   ></b-form-select>
@@ -12,37 +12,30 @@ import _ from 'lodash'
 
 export default {
   name: "QuestionList",
-  filters: {
-    listFilter: value => {
-      if (Array.isArray(value)) {
-        return value.map(currentValue => {
-          if (
-            currentValue.hasOwnProperty("name") &&
-            !currentValue.hasOwnProperty("text")
-          ) {
-            currentValue.text = currentValue.name
-          } else if (currentValue.type === "separator") {
-            currentValue.text = currentValue.hasOwnProperty("line")
-              ? currentValue.line
-              : "──────────────"
-            currentValue.disabled = true
+  computed: {
+    getOptions() {
+      const values = this.currentQuestion.choices
+      if (_.isArray(values)) {
+        return _.map(values, value => {
+          if (_.has(value, "name") && !_.has(value, "text")) {
+            value.text = value.name
+          } else if (value.type === "separator") {
+            value.text = _.has(value, "line") ? value.line : "──────────────"
+            value.disabled = true
           }
-          return currentValue
+          return value
         })
       }
     }
   },
   methods: {
-    formatList: value => {
-      if (Array.isArray(value)) {
-        return value.map(currentValue => {
-          if (
-            currentValue.hasOwnProperty("name") &&
-            !currentValue.hasOwnProperty("text")
-          ) {
-            currentValue.text = currentValue.name
+    formatList: values => {
+      if (_.isArray(values)) {
+        return _.map(values, value => {
+          if (_.has(value, "name") && !_.has(value, "text")) {
+            value.text = value.name
           }
-          return currentValue
+          return value
         })
       }
     }
@@ -54,18 +47,16 @@ export default {
     "currentQuestion.choices": {
       handler() {
         if (_.isNumber(this.currentQuestion.default) && _.isNumber(this.currentQuestion.answer)) {
-          const formattedList = this.formatList(this.currentQuestion.choices)
-          if (formattedList) {
-            const choiceObject = formattedList[this.currentQuestion.default]
-            if (choiceObject) {
-              this.currentQuestion.answer = choiceObject.text
-            }
+        const formattedList = this.formatList(this.currentQuestion.choices)
+        if (formattedList) {
+          const choiceObject = formattedList[this.currentQuestion.default]
+          if (choiceObject) {
+            this.currentQuestion.answer = choiceObject.text
           }
         }
       }
     }
-  }
-}
+  }}}
 </script>
 
 <style scoped>
