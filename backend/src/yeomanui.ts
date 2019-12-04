@@ -5,6 +5,7 @@ import * as _ from "lodash";
 import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
 import { promise as DataURI } from "datauri";
+require("./datauri");
 import * as defaultImage from "./defaultImage";
 import { YouiAdapter } from "./youi-adapter";
 import { YouiLog } from "./youi-log";
