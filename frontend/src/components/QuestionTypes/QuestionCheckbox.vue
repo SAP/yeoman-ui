@@ -3,7 +3,7 @@
     <b-form-checkbox-group
       v-model="selected"
       stacked
-      :options="currentQuestion.choices | checkboxFilter"
+      :options="getOptions"
     ></b-form-checkbox-group>
   </div>
 </template>
@@ -13,14 +13,15 @@ import _ from "lodash"
 
 export default {
   name: "QuestionCheckbox",
-  filters: {
-    checkboxFilter: value => {
-      if (_.isArray(value)) {
-        return value.map(currentValue => {
-          if (_.has(currentValue, "name") && !_.has(currentValue, "text")) {
-            currentValue.text = currentValue.name
+  computed: {
+    getOptions() {
+      const values = this.currentQuestion.choices 
+      if (_.isArray(values)) {
+        return _.map(values, value => {
+          if (_.has(value, "name") && !_.has(value, "text")) {
+            value.text = value.name
           }
-          return currentValue
+          return value
         })
       }
     }

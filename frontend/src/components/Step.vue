@@ -23,7 +23,7 @@ export default {
     currentPrompt: Object
   },
   methods: {
-    onGeneratorSelected: function(generatorName) {
+    onGeneratorSelected(generatorName) {
       this.$emit("generatorSelected", generatorName)
     }
   },
