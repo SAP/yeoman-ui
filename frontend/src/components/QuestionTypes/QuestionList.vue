@@ -14,7 +14,7 @@ export default {
   name: "QuestionList",
   computed: {
     getOptions() {
-      const values = this.currentQuestion.choices;
+      const values = this.currentQuestion.choices
       if (_.isArray(values)) {
         return _.map(values, value => {
           if (_.has(value, "name") && !_.has(value, "text")) {
@@ -38,9 +38,15 @@ export default {
           return value
         })
       }
-    },
-    updateQuestionAnswer: () => {
-      if (_.isNumber(this.currentQuestion.default) && _.isNumber(this.currentQuestion.answer)) {
+    }
+  },
+  props: {
+    currentQuestion: Object
+  },
+  watch: {
+    "currentQuestion.choices": {
+      handler() {
+        if (_.isNumber(this.currentQuestion.default) && _.isNumber(this.currentQuestion.answer)) {
         const formattedList = this.formatList(this.currentQuestion.choices)
         if (formattedList) {
           const choiceObject = formattedList[this.currentQuestion.default]
@@ -50,16 +56,7 @@ export default {
         }
       }
     }
-  },
-  props: {
-    currentQuestion: Object
-  },
-  watch: {
-    "currentQuestion.choices": {
-      handler: 'updateQuestionAnswer'
-    }
-  }
-}
+  }}}
 </script>
 
 <style scoped>
