@@ -251,6 +251,12 @@ export default {
       }
       this.doneMessage = message
       this.isDone = true
+
+      const promise = new Promise((resolve, reject) => {
+        this.resolve = resolve
+        this.reject = reject
+      })
+      return promise
     },
     runGenerator(generatorName) {
       this.rpc.invoke("runGenerator", [generatorName])

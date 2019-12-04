@@ -151,7 +151,11 @@ export class YeomanUI {
   }
 
   public doGeneratorDone(success: boolean, message: string): Promise<any> {
-    return this.rpc.invoke("generatorDone", [true, message]);
+    if (this.rpc) {
+      return this.rpc.invoke("generatorDone", [true, message]);
+    } else {
+      return Promise.resolve();
+    }
   }
 
   /**
