@@ -43,6 +43,7 @@ export default {
     select(event) {
       if (this.selectedItem) {
         // deselect old selection
+        this.selectedItem.classList.toggle("selected")
         this.selectedItem.setAttribute("border-style", "none")
       }
       this.selectedItem = event.currentTarget
