@@ -12,14 +12,6 @@ import _ from "lodash"
 
 export default {
   name: "QuestionList",
-  beforeUpdate() {
-    this.setDefaultAnswer()
-  },
-  data() {
-    return {
-      firstTime: true
-    }
-  },
   computed: {
     options() {
       const values = this.currentQuestion.choices
@@ -40,25 +32,28 @@ export default {
   },
   methods: {
     setDefaultAnswer() {
-      if (this.firstTime) {
-        
-        let defaultIndex = -1
-        const defaultValue = this.currentQuestion.default
-        
-        if (_.isNumber(defaultValue)) {
-          defaultIndex = defaultValue
-        } else if (_.isString(defaultValue)) {
-          defaultIndex = _.findIndex(this.options, {'name': defaultValue})
-        }
-        
-        const defaultAnswer = _.get(this.options, "[" + defaultIndex + "].text")
-        if (defaultAnswer) {
-          this.currentQuestion.answer = defaultAnswer
-        }
-        
-        this.firstTime = false
+      let defaultIndex = -1
+      const defaultValue = this.currentQuestion.default
+      
+      if (_.isNumber(defaultValue)) {
+        defaultIndex = defaultValue
+      } else if (_.isString(defaultValue)) {
+        defaultIndex = _.findIndex(this.options, {'value': defaultValue})
+      }
+      
+      const defaultAnswer = _.get(this.options, "[" + defaultIndex + "].text")
+      if (defaultAnswer) {
+        this.currentQuestion.answer = defaultAnswer
       }
     }
+  },
+  watch: {
+    'currentQuestion.choices': {
+      handler: 'setDefaultAnswer'
+    },
+    'currentQuestion.default': {
+      handler: 'setDefaultAnswer'
+    } 
   },
   props: {
     currentQuestion: Object

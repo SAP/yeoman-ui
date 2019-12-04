@@ -15,8 +15,8 @@ describe('QuestionList.vue', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: [
-                        { name: 'testName1' },
-                        { name: 'testName2' }
+                        { name: 'testName1', value: 'testName1' },
+                        { name: 'testName2', value: 'testName2' }
                     ],
                     default: 1
                 }
@@ -30,8 +30,8 @@ describe('QuestionList.vue', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: [
-                        { name: 'testName1' },
-                        { name: 'testName2' }
+                        { name: 'testName1', value: 'testName1' },
+                        { name: 'testName2', value: 'testName2' }
                     ],
                     default: 'testName1'
                 }
@@ -44,8 +44,8 @@ describe('QuestionList.vue', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: [
-                        { name: 'testName1' },
-                        { name: 'testName2' }
+                        { name: 'testName1', value: 'testName1' },
+                        { name: 'testName2', value: 'testName2' }
                     ],
                     default: true
                 }
@@ -58,8 +58,8 @@ describe('QuestionList.vue', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: [
-                        { name: 'testName1' },
-                        { name: 'testName2' }
+                        { name: 'testName1', value: 'testName1' },
+                        { name: 'testName2', value: 'testName2' }
                     ],
                     default: 1
                 }
