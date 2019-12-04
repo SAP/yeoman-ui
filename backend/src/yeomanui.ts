@@ -4,6 +4,9 @@ import * as fs from "fs";
 import * as _ from "lodash";
 import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
+import { promise as DataURI } from "datauri";
+require("./datauri");
+import * as defaultImage from "./defaultImage";
 import { YouiAdapter } from "./youi-adapter";
 import { YouiLog } from "./youi-log";
 import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
@@ -59,24 +62,40 @@ export class YeomanUI {
     this.currentQuestions = {};
   }
 
-  public getGenerators(): Promise<IPrompt | undefined> {
+  public async getGenerators(): Promise<IPrompt | undefined> {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
 
     const promise: Promise<IPrompt | undefined> = new Promise((resolve, reject) => {
       const env = Environment.createEnv();
-      env.lookup((err) => {
+      env.lookup(async (err) => {
         const generatorNames: string[] = env.getGeneratorNames();
         this.genMeta = env.getGeneratorsMeta();
         if (generatorNames.length > 0) {
-          const generatorChoices: IGeneratorChoice[] = generatorNames.map((value, index, array) => {
+          const generatorChoices: IGeneratorChoice[] = [];
+          for (let i=0; i<generatorNames.length; i++) {
+            let genName: string = generatorNames[i];
             const choice: IGeneratorChoice = {
-              name: value,
+              name: genName,
               message: "Some quick example text of the generator description. This is a long text so that the example will look good.",
             };
-            choice.imageUrl = "https://yeoman.io/static/illustration-home-inverted.91b07808be.png";
-            return choice;
-          });
+
+            const meta: Environment.GeneratorMeta = this.genMeta[`${genName}:app`];
+            try {
+              const imgSrc = await DataURI(path.join((meta as any).packagePath, 'yeoman.png'));
+              choice.imageUrl = imgSrc;
+            } catch (err) {
+              choice.imageUrl = defaultImage.default;
+            }
+
+            try {
+              const packageJson: any = require(path.join((meta as any).packagePath, 'package.json'));
+              choice.message = packageJson["description"];
+            } catch (err) {
+              // no description found -- falling back to generator name
+            }
+            generatorChoices.push(choice);
+          }
           const generatorQuestion: IGeneratorQuestion = {
             type: "generators",
             name: "name",
@@ -121,6 +140,17 @@ export class YeomanUI {
           return _.assign({ questions: [], name: "" }, value);
         });
         this.setPrompts(prompts);
+      }
+
+      if ((gen as any)["getImage"] !== undefined) {
+        const image: string | Promise<string> | undefined = (gen as any)["getImage"]();
+        if ((image as any)["then"]) {
+          (image as any)["then"]((contents: string) => {
+            console.log(`image contents: ${contents}`);
+          });
+        } else if (image !== undefined) {
+          console.log(`image contents: ${image}`);
+        }
       }
 
       this.promptCount = 0;
