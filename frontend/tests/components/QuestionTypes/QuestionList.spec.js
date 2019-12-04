@@ -11,49 +11,64 @@ describe('QuestionList.vue', () => {
     })
 
     describe('setDefaultAnswer - method', () => {
-        test('answer and default are numbers', () => {
+        test('default is number', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: [
                         { name: 'testName1' },
                         { name: 'testName2' }
                     ],
-                    default: 1,
-                    answer: 1
+                    default: 1
                 }
             })
+            
             wrapper.vm.setDefaultAnswer()
             expect(wrapper.vm.currentQuestion.answer).toBe('testName2')
         })
 
-        test('default is numbers, nswer is string', () => {
+        test('default is string', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: [
                         { name: 'testName1' },
                         { name: 'testName2' }
                     ],
-                    default: 1,
-                    answer: 'testName1'
+                    default: 'testName1'
                 }
             })
             wrapper.vm.setDefaultAnswer()
             expect(wrapper.vm.currentQuestion.answer).toBe('testName1')
         })
 
-        test('default is bigger than options quantity', () => {
+        test('default is boolean', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: [
                         { name: 'testName1' },
                         { name: 'testName2' }
                     ],
-                    default: 3,
-                    answer: 3
+                    default: true
                 }
             })
             wrapper.vm.setDefaultAnswer()
-            expect(wrapper.vm.currentQuestion.answer).toBe(3)
+            expect(wrapper.vm.currentQuestion.answer).toBeUndefined()
+        })
+
+        test('call setDefaultAnswer twice', () => {
+            wrapper = initComponent(QuestionList, {
+                currentQuestion: {
+                    choices: [
+                        { name: 'testName1' },
+                        { name: 'testName2' }
+                    ],
+                    default: 1
+                }
+            })
+            wrapper.vm.setDefaultAnswer()
+            expect(wrapper.vm.currentQuestion.answer).toBe('testName2')
+            wrapper.vm.currentQuestion.choices.pop()
+            wrapper.vm.setDefaultAnswer()
+            expect(wrapper.vm.currentQuestion.answer).toBe('testName2')
         })
     })
 
@@ -61,7 +76,7 @@ describe('QuestionList.vue', () => {
         test('values parameter is not an array', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
-                    value: 'testValue1', name: 'testName1', checked: true, text: 'testText1'
+                    name: 'testName1', checked: true, text: 'testText1'
                 }
             })
             
@@ -73,10 +88,10 @@ describe('QuestionList.vue', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: [
-                        { value: 'testValue1', name: 'testName1', type: 'number', text: 'testText1' },
-                        { value: 'testValue2', name: 'testName2', type: 'separator', text: 'testText2', disabled: false, line: '===' },
-                        { value: 'testValue3', name: 'testName3', type: 'string' },
-                        { value: 'testValue4', name: 'testName4', type: 'separator', text: 'testText4', disabled: false },
+                        { name: 'testName1', type: 'number', text: 'testText1' },
+                        { name: 'testName2', type: 'separator', text: 'testText2', disabled: false, line: '===' },
+                        { name: 'testName3', type: 'string' },
+                        { name: 'testName4', type: 'separator', text: 'testText4', disabled: false },
                     ]
                 }
             })

@@ -8,18 +8,23 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import _ from "lodash"
 
 export default {
   name: "QuestionList",
   beforeUpdate() {
     this.setDefaultAnswer()
   },
+  data() {
+    return {
+      firstTime: true
+    }
+  },
   computed: {
     options() {
       const values = this.currentQuestion.choices
       if (_.isArray(values)) {
-        return _.map(values, (value) => {
+        return _.map(values, value => {
           if (_.has(value, "name") && !_.has(value, "text")) {
             value.text = value.name
           } else if (value.type === "separator") {
@@ -35,11 +40,23 @@ export default {
   },
   methods: {
     setDefaultAnswer() {
-      if (_.isNumber(this.currentQuestion.answer)) {
-        const defaultAnswer = _.get(this.options, "[" + this.currentQuestion.default + "].text")
+      if (this.firstTime) {
+        
+        let defaultIndex = -1
+        const defaultValue = this.currentQuestion.default
+        
+        if (_.isNumber(defaultValue)) {
+          defaultIndex = defaultValue
+        } else if (_.isString(defaultValue)) {
+          defaultIndex = _.findIndex(this.options, {'name': defaultValue})
+        }
+        
+        const defaultAnswer = _.get(this.options, "[" + defaultIndex + "].text")
         if (defaultAnswer) {
           this.currentQuestion.answer = defaultAnswer
         }
+        
+        this.firstTime = false
       }
     }
   },
