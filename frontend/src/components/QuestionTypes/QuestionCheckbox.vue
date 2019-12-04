@@ -3,7 +3,7 @@
     <b-form-checkbox-group
       v-model="selected"
       stacked
-      :options="getOptions"
+      :options="options"
     ></b-form-checkbox-group>
   </div>
 </template>
@@ -14,7 +14,7 @@ import _ from "lodash"
 export default {
   name: "QuestionCheckbox",
   computed: {
-    getOptions() {
+    options() {
       const values = this.currentQuestion.choices 
       if (_.isArray(values)) {
         return _.map(values, value => {
@@ -24,6 +24,8 @@ export default {
           return value
         })
       }
+
+      return []
     }
   },
   props: {
