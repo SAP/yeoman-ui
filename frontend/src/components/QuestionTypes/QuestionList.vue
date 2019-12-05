@@ -35,18 +35,19 @@ export default {
       return []
     },
     default() {
-      const defaultValue = this.currentQuestion.default
+      const defaultValue = _.get(this.currentQuestion, "default", 0)
       if (_.isNumber(defaultValue)) {
-        return _.get(this.options, "[" + defaultValue + "].name")
+        const choice = _.get(this.options, "[" + defaultValue + "]")
+        return _.get(choice, "name", choice)
       } else if (_.isString(defaultValue)) {
         return defaultValue
       }
-      
       return undefined
     }
   },
   watch: {
     'default': {
+      immediate: true,
       handler: function(defaultValue) {
         this.selected = defaultValue
       }
