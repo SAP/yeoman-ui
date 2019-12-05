@@ -13,8 +13,9 @@ export default {
   props: {
     currentQuestion: Object
   }
-};
+}
 </script>
+
 <style scoped>
 .list-group {
   margin-bottom: 15px;

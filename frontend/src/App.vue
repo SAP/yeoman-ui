@@ -78,16 +78,16 @@ export default {
     }
   },
   computed: {
-    currentPrompt: function() {
-      const response = this.prompts[this.promptIndex]
-      if (response) {
-        const answers = _.get(response, "answers", {})
-        response.questions.forEach(value => {
-          answers[value.name] = value.isWhen === false ? undefined : value.answer
+    currentPrompt() {
+      const prompt = _.get(this.prompts, "[" + this.promptIndex +"]")
+      if (prompt) {
+        const answers = _.get(prompt, "answers", {})
+        _.forEach(prompt.questions, question => {
+          answers[question.name] = question.isWhen === false ? undefined : question.answer
         })
-        response.answers = answers
+        prompt.answers = answers
       }
-      return response
+      return prompt
     }
   },
   watch: {
@@ -98,8 +98,10 @@ export default {
         if (this.currentPrompt) {
           // TODO: consider using debounce (especially for questions of type 'input') to limit roundtrips
           _.forEach(this.currentPrompt.questions, question => {
+            const curentPromptAnswers = this.currentPrompt.answers
+            const questionName = question.name
             if (question._default === "__Function") {
-              this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "default"]).then(response => {
+              this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "default"]).then(response => {
                 question.default = response
                 if (question.answer === undefined) {
                   question.answer = question.default
@@ -107,27 +109,27 @@ export default {
               })
             }
             if (question.when === "__Function") {
-              this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "when"]).then(response => {
+              this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "when"]).then(response => {
                 question.isWhen = response
               })
             }
             if (question._message === "__Function") {
-              this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "message"]).then(response => {
+              this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "message"]).then(response => {
                 question.message = response
               })
             }
             if (question._choices === "__Function") {
-              this.rpc.invoke("evaluateMethod", [[this.currentPrompt.answers], question.name, "choices"]).then(response => {
+              this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "choices"]).then(response => {
                 question.choices = response
               })
             }
             if (question.filter === "__Function") {
-              this.rpc.invoke("evaluateMethod", [[question.answer], question.name, "filter"]).then(response => {
+              this.rpc.invoke("evaluateMethod", [[question.answer], questionName, "filter"]).then(response => {
                 question.answer = response
               })
             }
             if (question.validate === "__Function") {
-              this.rpc.invoke("evaluateMethod", [[question.answer, this.currentPrompt.answers], question.name, "validate"]).then(response => {
+              this.rpc.invoke("evaluateMethod", [[question.answer, curentPromptAnswers], questionName, "validate"]).then(response => {
                 question.isValid = (typeof response === 'string' ? false : response)
                 question.validationMessage = (typeof response === 'string' ? response : undefined)
               })
@@ -154,10 +156,10 @@ export default {
       this.prompts[this.promptIndex - 1].active = false
       this.prompts[this.promptIndex].active = true
     },
-    onGeneratorSelected: function(generatorName) {
+    onGeneratorSelected(generatorName) {
       this.generatorName = generatorName
     },
-    onStepValidated: function(stepValidated) {
+    onStepValidated(stepValidated) {
       this.stepValidated = stepValidated
     },
     setPrompts(prompts) {
@@ -197,7 +199,7 @@ export default {
       }
     },
     setQuestionProps(prompt) {
-      prompt.questions.forEach(question => {
+      _.forEach(prompt.questions, question => {
         if (question.default === "__Function") {
           question.default = undefined
           this.$set(question, "_default", "__Function")
@@ -213,13 +215,13 @@ export default {
         
         let answer = question.default;
         if (question.default === undefined && question.type !== "confirm") {
-          answer = "";
+          answer = ""
         }
-        this.$set(question, "answer", answer);
-        this.$set(question, "isWhen", true);
-        this.$set(question, "isValid", true);
-        this.$set(question, "validationMessage", true);
-      });
+        this.$set(question, "answer", answer)
+        this.$set(question, "isWhen", true)
+        this.$set(question, "isValid", true)
+        this.$set(question, "validationMessage", true)
+      })
     },
     showPrompt(questions, name) {
       const prompt = this.createPrompt(questions, name)

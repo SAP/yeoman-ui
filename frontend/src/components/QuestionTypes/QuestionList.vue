@@ -1,69 +1,66 @@
 <template>
   <b-form-select
-    v-model="currentQuestion.answer"
-    :options="currentQuestion.choices | listFilter"
+    v-model="selected"
+    :options="options"
     class="custom-yeoman-select"
     aria-describedby="validation-message"
   ></b-form-select>
 </template>
 
 <script>
-import _ from 'lodash'
+import _ from "lodash"
 
 export default {
   name: "QuestionList",
-  filters: {
-    listFilter: value => {
-      if (Array.isArray(value)) {
-        return value.map(currentValue => {
-          if (
-            currentValue.hasOwnProperty("name") &&
-            !currentValue.hasOwnProperty("text")
-          ) {
-            currentValue.text = currentValue.name
-          } else if (currentValue.type === "separator") {
-            currentValue.text = currentValue.hasOwnProperty("line")
-              ? currentValue.line
-              : "──────────────"
-            currentValue.disabled = true
-          }
-          return currentValue
-        })
-      }
+  data() {
+    return {
+      selected: null
     }
   },
-  methods: {
-    formatList: value => {
-      if (Array.isArray(value)) {
-        return value.map(currentValue => {
-          if (
-            currentValue.hasOwnProperty("name") &&
-            !currentValue.hasOwnProperty("text")
-          ) {
-            currentValue.text = currentValue.name
+  computed: {
+    options() {
+      const values = this.currentQuestion.choices
+      if (_.isArray(values)) {
+        return _.map(values, value => {
+          if (_.has(value, "name") && !_.has(value, "text")) {
+            value.text = value.name
+          } else if (value.type === "separator") {
+            value.text = _.has(value, "line") ? value.line : "──────────────"
+            value.disabled = true
           }
-          return currentValue
+          return value
         })
+      }
+
+      return []
+    },
+    default() {
+      const defaultValue = _.get(this.currentQuestion, "default", 0)
+      if (_.isNumber(defaultValue)) {
+        const choice = _.get(this.options, "[" + defaultValue + "]")
+        return _.get(choice, "value", _.get(choice, "name", choice))
+      } else if (_.isString(defaultValue)) {
+        return defaultValue
+      }
+      return undefined
+    }
+  },
+  watch: {
+    'default': {
+      immediate: true,
+      handler: function(defaultValue) {
+        this.selected = defaultValue
+      }
+    },
+    'selected': {
+      immediate: true,
+      handler: function(selectedvalue) {
+        this.currentQuestion.answer = selectedvalue
       }
     }
   },
   props: {
     currentQuestion: Object
-  },
-  watch: {
-    "currentQuestion.choices": {
-      handler() {
-        if (_.isNumber(this.currentQuestion.default) && _.isNumber(this.currentQuestion.answer)) {
-          const formattedList = this.formatList(this.currentQuestion.choices)
-          if (formattedList) {
-            const choiceObject = formattedList[this.currentQuestion.default]
-            if (choiceObject) {
-              this.currentQuestion.answer = choiceObject.text
-            }
-          }
-        }
-      }
-    }
   }
 }
 </script>

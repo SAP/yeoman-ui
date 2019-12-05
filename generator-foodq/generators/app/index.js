@@ -152,7 +152,9 @@ module.exports = class extends Generator {
         type: 'list',
         name: 'enjoy',
         message: 'Did you enjoy your meal?',
-        default: 'ok',
+        default: (answers) => {
+          return (answers.hungerLevel === "A bit hungry" ? "ok" : "michelin");
+        },
         choices: [
           { name: 'Not at all', value: 'no' },
           { name: 'It was ok', value: 'ok' },
