@@ -179,8 +179,7 @@ export class YeomanUI {
            https://yeoman.github.io/generator/Generator.html#run
          ... but .d.ts hasn't been updated for a while:
            https://www.npmjs.com/package/@types/yeoman-generator */
-      const runPromise: Promise<any> = <Promise<any>><unknown>this.gen.run();
-      runPromise.then((err) => {
+      this.gen.run((err) => {
         let message: string;
         if (err) {
           console.error(err);
@@ -191,8 +190,6 @@ export class YeomanUI {
         console.log('done running yeomanui');
         message = `${generatorName} is done. Destination directory is ${destinationRoot}`;
         this.doGeneratorDone(true, message);
-      }).catch((reason) => {
-        console.error(reason);
       });
     } catch (err) {
       console.error(err);
