@@ -38,7 +38,7 @@ export default {
       const defaultValue = _.get(this.currentQuestion, "default", 0)
       if (_.isNumber(defaultValue)) {
         const choice = _.get(this.options, "[" + defaultValue + "]")
-        return _.get(choice, "name", choice)
+        return _.get(choice, "value", _.get(choice, "name", choice))
       } else if (_.isString(defaultValue)) {
         return defaultValue
       }
