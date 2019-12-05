@@ -62,6 +62,25 @@ export class YeomanUI {
     this.currentQuestions = {};
   }
 
+  private static async getDescription(fileName: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      try {
+        let chunks: string = "";
+        fs.createReadStream(fileName, { 'encoding': 'utf8' })
+          .on('data', chunk => chunks += chunk)
+          .on('error', err => {
+            reject(err);
+          })
+          .on('end', () => {
+            const packageJSON = JSON.parse(chunks);
+            resolve(packageJSON.description);
+          });
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
   public async getGenerators(): Promise<IPrompt | undefined> {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
@@ -73,7 +92,7 @@ export class YeomanUI {
         this.genMeta = env.getGeneratorsMeta();
         if (generatorNames.length > 0) {
           const generatorChoices: IGeneratorChoice[] = [];
-          for (let i=0; i<generatorNames.length; i++) {
+          for (let i = 0; i < generatorNames.length; i++) {
             let genName: string = generatorNames[i];
             const choice: IGeneratorChoice = {
               name: genName,
@@ -89,8 +108,8 @@ export class YeomanUI {
             }
 
             try {
-              const packageJson: any = require(path.join((meta as any).packagePath, 'package.json'));
-              choice.message = packageJson["description"];
+              const packageJsonFile: string = path.join((meta as any).packagePath, 'package.json');
+              choice.message = await YeomanUI.getDescription(packageJsonFile);
             } catch (err) {
               // no description found -- falling back to generator name
             }
@@ -213,7 +232,7 @@ export class YeomanUI {
     }
   }
 
-  public toggleLog() : boolean {
+  public toggleLog(): boolean {
     if (this.rpc) {
       return this.logger.showLog();
     }
