@@ -53,6 +53,29 @@ describe('QuestionList.vue', () => {
             expect(wrapper.vm.default).toBeUndefined()
         })
 
+        test('default is undefined', () => {
+            wrapper = initComponent(QuestionList, {
+                currentQuestion: {
+                    choices: [
+                        { name: 'testName1' },
+                        { name: 'testName2' }
+                    ]
+                }
+            })
+            
+            expect(wrapper.vm.default).toBe('testName1')
+        })
+
+        test('default is undefined and choices are strings', () => {
+            wrapper = initComponent(QuestionList, {
+                currentQuestion: {
+                    choices: ['testName1', 'testName2']
+                }
+            })
+            
+            expect(wrapper.vm.default).toBe('testName1')
+        })
+
         test('change selected', async () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
@@ -65,6 +88,7 @@ describe('QuestionList.vue', () => {
             })
             expect(wrapper.vm.default).toBe('testName2')
             wrapper.vm.$options.watch.default.handler.call(wrapper.vm, 'testName1')
+            await wrapper.vm.$nextTick()
             expect(wrapper.vm.currentQuestion.answer).toBe('testName1')
         })
     })
