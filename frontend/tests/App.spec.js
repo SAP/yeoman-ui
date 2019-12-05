@@ -12,18 +12,18 @@ describe('App.vue', () => {
   afterEach(() => {
     destroy(wrapper)
   })
+  
+  it('createPrompt - method', () => {
+    wrapper = initComponent(App)
+    expect(wrapper.vm.createPrompt()).toBeDefined()
+  })
 
-  describe('createPrompt - method', () => {
-    it('prompt is not defined', () => {
-      wrapper = initComponent(App)
-      expect(wrapper.vm.createPrompt()).toBeDefined()
-    })
-
+  describe('currentPrompt - computed', () => {
     it('questions are not defined', () => {
       wrapper = initComponent(App)
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.promptIndex = 1
-      expect(wrapper.vm.createPrompt().answers).toEqual({})
+      expect(wrapper.vm.currentPrompt.answers).toEqual({})
     })
 
     it('questions are defined', () => {
