@@ -84,7 +84,7 @@ export default {
       const answers = _.get(prompt, "answers", {})
       const questions = _.get(prompt, "questions", [])
       _.forEach(questions, question => {
-        answers[question.name] = question.isWhen === false ? undefined : question.answer
+        _.set(answers, [question.name], (question.isWhen === false ? undefined : question.answer))
       })
       _.set(prompt, "answers", answers)
       
