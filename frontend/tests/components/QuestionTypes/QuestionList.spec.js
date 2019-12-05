@@ -91,6 +91,20 @@ describe('QuestionList.vue', () => {
             await wrapper.vm.$nextTick()
             expect(wrapper.vm.currentQuestion.answer).toBe('testName1')
         })
+
+        test('default is calculated from choice value', () => {
+            wrapper = initComponent(QuestionList, {
+                currentQuestion: {
+                    choices: [
+                        { name: 'testName1', value: 't1' },
+                        { name: 'testName2', value: 't2' }
+                    ],
+                    default: 1
+                }
+            })
+            
+            expect(wrapper.vm.default).toBe('t2')
+        })
     })
 
     describe('options - computed', () => {
