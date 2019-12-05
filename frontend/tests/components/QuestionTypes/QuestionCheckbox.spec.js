@@ -55,7 +55,7 @@ describe('QuestionCheckbox.vue', () => {
         expect(wrapper.vm.currentQuestion.answer[0]).toBe('testValue1')
     })
 
-    describe('getOptions - computed', () => {
+    describe('options - computed', () => {
         test('choice without text property', () => {
             wrapper = initComponent(QuestionCheckbox, {
                 currentQuestion: {

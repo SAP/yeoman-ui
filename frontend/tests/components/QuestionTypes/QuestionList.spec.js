@@ -10,55 +10,108 @@ describe('QuestionList.vue', () => {
         destroy(wrapper)
     })
 
-    describe('formatList - method', () => {
-        beforeEach(() => {
+    describe('default - computed', () => {
+        test('default is number', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: [
-                        { value: 'testValue1', name: 'testName1', checked: true, text: 'testText1' },
-                        { value: 'testValue2', name: 'testName2', checked: true, text: 'testText2' }
+                        { name: 'testName1' },
+                        { name: 'testName2' }
+                    ],
+                    default: 1
+                }
+            })
+            
+            expect(wrapper.vm.default).toBe('testName2')
+        })
+
+        test('default is string', () => {
+            wrapper = initComponent(QuestionList, {
+                currentQuestion: {
+                    choices: [
+                        { name: 'testName1' },
+                        { name: 'testName2' }
+                    ],
+                    default: 'testName1'
+                }
+            })
+            
+            expect(wrapper.vm.default).toBe('testName1')
+        })
+
+        test('default is boolean', () => {
+            wrapper = initComponent(QuestionList, {
+                currentQuestion: {
+                    choices: [
+                        { name: 'testName1' },
+                        { name: 'testName2' }
+                    ],
+                    default: true
+                }
+            })
+            
+            expect(wrapper.vm.default).toBeUndefined()
+        })
+
+        test('default is undefined', () => {
+            wrapper = initComponent(QuestionList, {
+                currentQuestion: {
+                    choices: [
+                        { name: 'testName1' },
+                        { name: 'testName2' }
                     ]
                 }
             })
+            
+            expect(wrapper.vm.default).toBe('testName1')
         })
 
-        test('input values parameteris not an array', async () => {
-            expect(wrapper.vm.formatList({})).toBeUndefined()
+        test('default is undefined and choices are strings', () => {
+            wrapper = initComponent(QuestionList, {
+                currentQuestion: {
+                    choices: ['testName1', 'testName2']
+                }
+            })
+            
+            expect(wrapper.vm.default).toBe('testName1')
         })
 
-        test('input values have no name attribute', async () => {
-            expect(wrapper.vm.formatList([{}])).toEqual([{}])
-        })
-
-        test('input values have no text attribute', async () => {
-            expect(wrapper.vm.formatList([{name: 'testName'}])).toEqual([{name: 'testName', text: 'testName'}])
-        })
-    })
-
-    describe('currentQuestion.choices', () => {
-        test('currentQuestion.answer and currentQuestion.default are numbers', async () => {
+        test('change selected', async () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: [
-                        { value: 'testValue1', name: 'testName1', checked: true, text: 'testText1' },
-                        { value: 'testValue2', name: 'testName2', checked: true, text: 'testText2' }
+                        { name: 'testName1' },
+                        { name: 'testName2' }
                     ],
-                    default: '456',
-                    answer: '123'
+                    default: 1
                 }
             })
-
-            wrapper.vm.currentQuestion.answer = '567'
+            expect(wrapper.vm.default).toBe('testName2')
+            wrapper.vm.$options.watch.default.handler.call(wrapper.vm, 'testName1')
             await wrapper.vm.$nextTick()
-            expect(wrapper.vm.currentQuestion.answer).toBe('567')
+            expect(wrapper.vm.currentQuestion.answer).toBe('testName1')
+        })
+
+        test('default is calculated from choice value', () => {
+            wrapper = initComponent(QuestionList, {
+                currentQuestion: {
+                    choices: [
+                        { name: 'testName1', value: 't1' },
+                        { name: 'testName2', value: 't2' }
+                    ],
+                    default: 1
+                }
+            })
+            
+            expect(wrapper.vm.default).toBe('t2')
         })
     })
 
-    describe('getOptions - computed', () => {
+    describe('options - computed', () => {
         test('values parameter is not an array', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
-                    value: 'testValue1', name: 'testName1', checked: true, text: 'testText1'
+                    name: 'testName1', checked: true, text: 'testText1'
                 }
             })
             
@@ -70,10 +123,10 @@ describe('QuestionList.vue', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: [
-                        { value: 'testValue1', name: 'testName1', type: 'number', text: 'testText1' },
-                        { value: 'testValue2', name: 'testName2', type: 'separator', text: 'testText2', disabled: false, line: '===' },
-                        { value: 'testValue3', name: 'testName3', type: 'string' },
-                        { value: 'testValue4', name: 'testName4', type: 'separator', text: 'testText4', disabled: false },
+                        { name: 'testName1', type: 'number', text: 'testText1' },
+                        { name: 'testName2', type: 'separator', text: 'testText2', disabled: false, line: '===' },
+                        { name: 'testName3', type: 'string' },
+                        { name: 'testName4', type: 'separator', text: 'testText4', disabled: false },
                     ]
                 }
             })

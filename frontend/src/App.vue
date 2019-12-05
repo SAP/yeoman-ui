@@ -79,15 +79,15 @@ export default {
   },
   computed: {
     currentPrompt() {
-      const response = this.prompts[this.promptIndex]
-      if (response) {
-        const answers = _.get(response, "answers", {})
-        _.forEach(response.questions, question => {
+      const prompt = _.get(this.prompts, "[" + this.promptIndex +"]")
+      if (prompt) {
+        const answers = _.get(prompt, "answers", {})
+        _.forEach(prompt.questions, question => {
           answers[question.name] = question.isWhen === false ? undefined : question.answer
         })
-        response.answers = answers
+        prompt.answers = answers
       }
-      return response
+      return prompt
     }
   },
   watch: {
@@ -199,7 +199,7 @@ export default {
       }
     },
     setQuestionProps(prompt) {
-      prompt.questions.forEach(question => {
+      _.forEach(prompt.questions, question => {
         if (question.default === "__Function") {
           question.default = undefined
           this.$set(question, "_default", "__Function")
@@ -215,13 +215,13 @@ export default {
         
         let answer = question.default;
         if (question.default === undefined && question.type !== "confirm") {
-          answer = "";
+          answer = ""
         }
-        this.$set(question, "answer", answer);
-        this.$set(question, "isWhen", true);
-        this.$set(question, "isValid", true);
-        this.$set(question, "validationMessage", true);
-      });
+        this.$set(question, "answer", answer)
+        this.$set(question, "isWhen", true)
+        this.$set(question, "isValid", true)
+        this.$set(question, "validationMessage", true)
+      })
     },
     showPrompt(questions, name) {
       const prompt = this.createPrompt(questions, name)

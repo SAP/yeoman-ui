@@ -1,7 +1,7 @@
 <template>
   <b-form-input
     v-model="text"
-    :type="getType"
+    :type="type"
     :placeholder="currentQuestion.default"
     class="yeoman-form-control"
     aria-describedby="validation-message"
@@ -22,7 +22,7 @@ export default {
     }
   },
   computed: {
-    getType() {
+    type() {
       // mapping between
       //   https://www.npmjs.com/package/inquirer#question
       // and
