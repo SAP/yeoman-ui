@@ -42,11 +42,12 @@ describe('App.vue', () => {
   })
 
   describe('currentPrompt.answers - watcher', () => {
-    test('', () => {
+    test('invoke', async () => {
       wrapper = initComponent(App)
       wrapper.vm.rpc = {
         invoke: () => Promise.resolve()
       }
+      const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
       wrapper.vm.prompts = [{ 
         questions: [{
           name: 'defaultQ', _default: '__Function', answer: true
@@ -66,6 +67,8 @@ describe('App.vue', () => {
       }]
       wrapper.vm.promptIndex = 0
       wrapper.vm.$options.watch["currentPrompt.answers"].handler.call(wrapper.vm)
+      await wrapper.vm.$nextTick()
+      expect(invokeSpy).toHaveBeenCalledTimes(7)
     })
   })
 })
