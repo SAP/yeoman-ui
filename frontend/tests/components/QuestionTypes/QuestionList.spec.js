@@ -53,27 +53,7 @@ describe('QuestionList.vue', () => {
             expect(wrapper.vm.default).toBeUndefined()
         })
 
-        test.skip('change default', async () => {
-            const currentQuestion = {
-                choices: [
-                    { name: 'testName1' },
-                    { name: 'testName2' }
-                ],
-                default: 1
-            }
-            wrapper = initComponent(QuestionList, {
-                currentQuestion: currentQuestion
-            })
-            
-            expect(wrapper.vm.default).toBe('testName2')
-            currentQuestion.default = 3
-            wrapper.vm.currentQuestion.default = 3
-            await wrapper.vm.$nextTick()
-            expect(wrapper.vm.default).toBe('testName1')
-        })
-
-        test.skip('change selected', async () => {
-            const setDefaultAnswerSpy = jest.spyOn(QuestionList.methods, 'setDefaultAnswer')
+        test('change selected', async () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: [
@@ -83,9 +63,9 @@ describe('QuestionList.vue', () => {
                     default: 1
                 }
             })
-            wrapper.vm.currentQuestion.choices.pop()
-            await wrapper.vm.$nextTick()
-            expect(setDefaultAnswerSpy).toHaveBeenCalled()
+            expect(wrapper.vm.default).toBe('testName2')
+            wrapper.vm.$options.watch.default.handler.call(wrapper.vm, 'testName1')
+            expect(wrapper.vm.currentQuestion.answer).toBe('testName1')
         })
     })
 
