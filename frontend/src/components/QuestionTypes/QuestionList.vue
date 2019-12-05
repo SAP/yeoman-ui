@@ -53,6 +53,7 @@ export default {
       }
     },
     'selected': {
+      immediate: true,
       handler: function(selectedvalue) {
         this.currentQuestion.answer = selectedvalue
       }
