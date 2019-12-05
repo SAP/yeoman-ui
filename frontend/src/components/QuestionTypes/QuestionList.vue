@@ -1,6 +1,6 @@
 <template>
   <b-form-select
-    v-model="currentQuestion.answer"
+    v-model="selected"
     :options="options"
     class="custom-yeoman-select"
     aria-describedby="validation-message"
@@ -12,6 +12,11 @@ import _ from "lodash"
 
 export default {
   name: "QuestionList",
+  data() {
+    return {
+      selected: null
+    }
+  },
   computed: {
     options() {
       const values = this.currentQuestion.choices
@@ -28,32 +33,29 @@ export default {
       }
 
       return []
-    }
-  },
-  methods: {
-    setDefaultAnswer() {
-      let defaultIndex = -1
+    },
+    default() {
       const defaultValue = this.currentQuestion.default
-      
       if (_.isNumber(defaultValue)) {
-        defaultIndex = defaultValue
+        return _.get(this.options, "[" + defaultValue + "].name")
       } else if (_.isString(defaultValue)) {
-        defaultIndex = _.findIndex(this.options, {'value': defaultValue})
+        return defaultValue
       }
       
-      const defaultAnswer = _.get(this.options, "[" + defaultIndex + "].text")
-      if (defaultAnswer) {
-        this.currentQuestion.answer = defaultAnswer
-      }
+      return undefined
     }
   },
   watch: {
-    'currentQuestion.choices': {
-      handler: 'setDefaultAnswer'
+    'default': {
+      handler: function(defaultValue) {
+        this.selected = defaultValue
+      }
     },
-    'currentQuestion.default': {
-      handler: 'setDefaultAnswer'
-    } 
+    'selected': {
+      handler: function(selectedvalue) {
+        this.currentQuestion.answer = selectedvalue
+      }
+    }
   },
   props: {
     currentQuestion: Object

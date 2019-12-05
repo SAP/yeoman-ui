@@ -10,65 +10,82 @@ describe('QuestionList.vue', () => {
         destroy(wrapper)
     })
 
-    describe('setDefaultAnswer - method', () => {
+    describe('default - computed', () => {
         test('default is number', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: [
-                        { name: 'testName1', value: 'testName1' },
-                        { name: 'testName2', value: 'testName2' }
+                        { name: 'testName1' },
+                        { name: 'testName2' }
                     ],
                     default: 1
                 }
             })
             
-            wrapper.vm.setDefaultAnswer()
-            expect(wrapper.vm.currentQuestion.answer).toBe('testName2')
+            expect(wrapper.vm.default).toBe('testName2')
         })
 
         test('default is string', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: [
-                        { name: 'testName1', value: 'testName1' },
-                        { name: 'testName2', value: 'testName2' }
+                        { name: 'testName1' },
+                        { name: 'testName2' }
                     ],
                     default: 'testName1'
                 }
             })
-            wrapper.vm.setDefaultAnswer()
-            expect(wrapper.vm.currentQuestion.answer).toBe('testName1')
+            
+            expect(wrapper.vm.default).toBe('testName1')
         })
 
         test('default is boolean', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: [
-                        { name: 'testName1', value: 'testName1' },
-                        { name: 'testName2', value: 'testName2' }
+                        { name: 'testName1' },
+                        { name: 'testName2' }
                     ],
                     default: true
                 }
             })
-            wrapper.vm.setDefaultAnswer()
-            expect(wrapper.vm.currentQuestion.answer).toBeUndefined()
+            
+            expect(wrapper.vm.default).toBeUndefined()
         })
 
-        test('call setDefaultAnswer twice', () => {
+        test.skip('change default', async () => {
+            const currentQuestion = {
+                choices: [
+                    { name: 'testName1' },
+                    { name: 'testName2' }
+                ],
+                default: 1
+            }
+            wrapper = initComponent(QuestionList, {
+                currentQuestion: currentQuestion
+            })
+            
+            expect(wrapper.vm.default).toBe('testName2')
+            currentQuestion.default = 3
+            wrapper.vm.currentQuestion.default = 3
+            await wrapper.vm.$nextTick()
+            expect(wrapper.vm.default).toBe('testName1')
+        })
+
+        test.skip('change selected', async () => {
+            const setDefaultAnswerSpy = jest.spyOn(QuestionList.methods, 'setDefaultAnswer')
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: [
-                        { name: 'testName1', value: 'testName1' },
-                        { name: 'testName2', value: 'testName2' }
+                        { name: 'testName1' },
+                        { name: 'testName2' }
                     ],
                     default: 1
                 }
             })
-            wrapper.vm.setDefaultAnswer()
-            expect(wrapper.vm.currentQuestion.answer).toBe('testName2')
             wrapper.vm.currentQuestion.choices.pop()
-            wrapper.vm.setDefaultAnswer()
-            expect(wrapper.vm.currentQuestion.answer).toBe('testName2')
+            await wrapper.vm.$nextTick()
+            expect(setDefaultAnswerSpy).toHaveBeenCalled()
         })
     })
 
