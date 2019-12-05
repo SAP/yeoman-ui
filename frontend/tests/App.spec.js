@@ -40,4 +40,32 @@ describe('App.vue', () => {
       expect(testPrompt.answers.q22).toBeUndefined()
     })
   })
+
+  describe('currentPrompt.answers - watcher', () => {
+    test('', () => {
+      wrapper = initComponent(App)
+      wrapper.vm.rpc = {
+        invoke: () => Promise.resolve()
+      }
+      wrapper.vm.prompts = [{ 
+        questions: [{
+          name: 'defaultQ', _default: '__Function', answer: true
+        }, {
+          name: 'whenQ', when: '__Function', answer: true
+        }, {
+          name: 'messageQ', _message: '__Function', answer: true
+        }, {
+          name: 'choicesQ', _choices: '__Function', answer: true
+        }, {
+          name: 'filterQ', filter: '__Function', answer: true
+        }, {
+          name: 'validateQ', validate: '__Function', answer: true
+        }]
+      }, {
+        name: 'defaultQ', _default: '__Function', default: true
+      }]
+      wrapper.vm.promptIndex = 0
+      wrapper.vm.$options.watch["currentPrompt.answers"].handler.call(wrapper.vm)
+    })
+  })
 })

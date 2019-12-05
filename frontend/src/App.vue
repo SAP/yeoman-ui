@@ -131,8 +131,8 @@ export default {
           }
           if (question.validate === "__Function") {
             this.rpc.invoke("evaluateMethod", [[question.answer, curentPromptAnswers], questionName, "validate"]).then(response => {
-              question.isValid = (typeof response === 'string' ? false : response)
-              question.validationMessage = (typeof response === 'string' ? response : undefined)
+              question.isValid = (_.isString(response) ? false : response)
+              question.validationMessage = (_.isString(response) ? response : undefined)
             })
           }
         })
