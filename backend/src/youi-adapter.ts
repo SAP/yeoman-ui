@@ -63,13 +63,13 @@ export class YouiAdapter implements Adapter {
             return cb(result as any);
           } catch (err) {
             this.yeomanui.doGeneratorDone(false, (err.message ? err.message : 'Yeoman UI detected an error'));
-            return err; // return Promise.reject(err);
+            return;
           }
         } else {
           return result;
         }
       }).catch((reason) => {
-        return Promise.reject(reason);
+        throw reason;
       });
     }
 
