@@ -253,12 +253,8 @@ export default {
       }
       this.doneMessage = message
       this.isDone = true
-
-      const promise = new Promise((resolve, reject) => {
-        this.resolve = resolve
-        this.reject = reject
-      })
-      return promise
+      // TODO: remove return value once this change is published to npm: https://github.com/SAP/vscode-webview-rpc-lib/pull/5
+      return true;
     },
     runGenerator(generatorName) {
       this.rpc.invoke("runGenerator", [generatorName])
