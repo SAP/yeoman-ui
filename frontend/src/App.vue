@@ -253,6 +253,8 @@ export default {
       }
       this.doneMessage = message
       this.isDone = true
+      // TODO: remove return value once this change is published to npm: https://github.com/SAP/vscode-webview-rpc-lib/pull/5
+      return true;
     },
     runGenerator(generatorName) {
       this.rpc.invoke("runGenerator", [generatorName])
