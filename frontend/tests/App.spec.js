@@ -54,7 +54,9 @@ describe('App.vue', () => {
     })
 
     afterEach(() => {
-      invokeSpy.mockRestore()
+      if (invokeSpy) {
+        invokeSpy.mockRestore()
+      }
     })
 
     test('invoke', () => {
@@ -199,5 +201,32 @@ describe('App.vue', () => {
       expect(questions[6].isValid).toBe(true)
       expect(questions[6].validationMessage).toBe(true)
     })
+  })
+
+  test('initRpc - method', () => {
+    wrapper = initComponent(App)
+    wrapper.vm.rpc = {
+      invoke: jest.fn(),
+      registerMethod: jest.fn()
+    }
+
+    
+    wrapper.vm.showPrompt = jest.fn()
+    wrapper.vm.setPrompts = jest.fn()
+    wrapper.vm.generatorDone = jest.fn()
+    wrapper.vm.log = jest.fn()
+
+    const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
+    const registerMethodSpy = jest.spyOn(wrapper.vm.rpc, 'registerMethod')
+    wrapper.vm.initRpc();
+    
+    expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.showPrompt, thisArg: wrapper.vm, name: 'showPrompt'})
+    expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.setPrompts, thisArg: wrapper.vm, name: 'setPrompts'})
+    expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.generatorDone, thisArg: wrapper.vm, name: 'generatorDone'})
+    expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.log, thisArg: wrapper.vm, name: 'log'})
+    expect(invokeSpy).toHaveBeenCalledWith("receiveIsWebviewReady", [])
+    
+    invokeSpy.mockRestore()
+    registerMethodSpy.mockRestore()
   })
 })

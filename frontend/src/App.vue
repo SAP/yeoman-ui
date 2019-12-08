@@ -55,6 +55,8 @@ import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-brow
 import * as _ from "lodash"
 
 const functionType = '__Function'
+const loading = 'loading...'
+const pending = 'Pending...'
 
 export default {
   name: "app",
@@ -151,7 +153,7 @@ export default {
         }
       }
       if (this.promptIndex >= this.prompts.length - 1) {
-        const prompt = { questions: [], name: "Pending...", status: "pending" }
+        const prompt = { questions: [], name: pending, status: "pending" }
         this.setPrompts([prompt])
       }
       this.promptIndex++
@@ -180,7 +182,7 @@ export default {
             } else {
               if (currentPrompt) {
                 currentPrompt.questions = prompt.questions
-                if (prompt.name && currentPrompt.name === "Pending...") {
+                if (prompt.name && currentPrompt.name === pending) {
                   currentPrompt.name = prompt.name
                 }
                 // if questions are provided, remote the pending status
@@ -208,11 +210,11 @@ export default {
           this.$set(question, "_default", functionType)
         }
         if (question.message === functionType) {
-          question.message = "loading..."
+          question.message = loading
           this.$set(question, "_message", functionType)
         }
         if (question.choices === functionType) {
-          question.choices = ["loading..."]
+          question.choices = [loading]
           this.$set(question, "_choices", functionType)
         }
         
@@ -263,7 +265,7 @@ export default {
       this.rpc.invoke("runGenerator", [generatorName])
     },
     isInVsCode() {
-      return typeof acquireVsCodeApi !== "undefined"
+      return typeof acquireVsCodeApi !== 'undefined'
     },
     setupRpc() {
       if (this.isInVsCode()) {
@@ -280,26 +282,15 @@ export default {
       }
     },
     initRpc() {
-      this.rpc.registerMethod({
-        func: this.showPrompt,
-        thisArg: this,
-        name: "showPrompt"
+      const functions = ["showPrompt", "setPrompts", "generatorDone", "log"]
+      _.forEach(functions, funcName => {
+        this.rpc.registerMethod({
+          func: this[funcName],
+          thisArg: this,
+          name: funcName
+        })
       })
-      this.rpc.registerMethod({
-        func: this.setPrompts,
-        thisArg: this,
-        name: "setPrompts"
-      })
-      this.rpc.registerMethod({
-        func: this.generatorDone,
-        thisArg: this,
-        name: "generatorDone"
-      })
-      this.rpc.registerMethod({
-        func: this.log,
-        thisArg: this,
-        name: "log"
-      })
+      
       this.rpc.invoke("receiveIsWebviewReady", [])
     }
   },
