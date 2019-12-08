@@ -70,9 +70,13 @@ module.exports = class extends Generator {
         message: "What beer would you like?",
         choices: [
           "Chimay Trappist Ales",
-          "Paulaner Salvator",
+          "Paulaner Salvator Doppel Bock",
           "Weihenstephaner Korbinian",
-          "Hoegaarden Belguim White"
+          "Hoegaarden Belguim White",
+          "Allagash White Ale",
+          "ST. FEUILLIEN BLONDE",
+          "HOUBLON CHOUFFE DOBBELEN IPA TRIPEL",
+          "Augustiner Hell"
         ]
       },
       {
