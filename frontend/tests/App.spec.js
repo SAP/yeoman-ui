@@ -209,7 +209,6 @@ describe('App.vue', () => {
       invoke: jest.fn(),
       registerMethod: jest.fn()
     }
-
     
     wrapper.vm.showPrompt = jest.fn()
     wrapper.vm.setPrompts = jest.fn()
@@ -225,8 +224,51 @@ describe('App.vue', () => {
     expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.generatorDone, thisArg: wrapper.vm, name: 'generatorDone'})
     expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.log, thisArg: wrapper.vm, name: 'log'})
     expect(invokeSpy).toHaveBeenCalledWith("receiveIsWebviewReady", [])
-    
+
     invokeSpy.mockRestore()
     registerMethodSpy.mockRestore()
+  })
+
+  test('runGenerator - method', () => {
+    wrapper = initComponent(App)
+    wrapper.vm.rpc = {
+      invoke: jest.fn()
+    }
+
+    const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
+    wrapper.vm.runGenerator('testGenerator');
+    
+    expect(invokeSpy).toHaveBeenCalledWith("runGenerator", ['testGenerator'])
+    
+    invokeSpy.mockRestore()
+  })
+
+  test('log - method', () => {
+    wrapper = initComponent(App)
+    wrapper.vm.logText = 'test_'
+
+    wrapper.vm.log('test_log');
+    
+    expect(wrapper.vm.logText).toBe('test_test_log')
+  })
+
+  test('onGeneratorSelected - method', () => {
+    wrapper = initComponent(App)
+    wrapper.vm.generatorName = 'test_ge_name'
+
+    wrapper.vm.onGeneratorSelected('testGeneratorName');
+    
+    expect(wrapper.vm.generatorName).toBe('testGeneratorName')
+  })
+
+  test('onStepValidated - method', () => {
+    wrapper = initComponent(App)
+    wrapper.vm.stepValidated = false
+
+    wrapper.vm.onStepValidated(false);
+    expect(wrapper.vm.stepValidated).toBeFalsy()
+
+    wrapper.vm.onStepValidated(true);
+    expect(wrapper.vm.stepValidated).toBeTruthy()
   })
 })
