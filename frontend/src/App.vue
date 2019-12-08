@@ -54,6 +54,8 @@ import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import * as _ from "lodash"
 
+const functionType = '__Function'
+
 export default {
   name: "app",
   components: {
@@ -101,7 +103,7 @@ export default {
         const questions = _.get(this.currentPrompt, "questions", []);
         _.forEach(questions, question => {
           const questionName = question.name
-          if (question._default === "__Function") {
+          if (question._default === functionType) {
             this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "default"]).then(response => {
               question.default = response
               if (question.answer === undefined) {
@@ -109,27 +111,27 @@ export default {
               }
             })
           }
-          if (question.when === "__Function") {
+          if (question.when === functionType) {
             this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "when"]).then(response => {
               question.isWhen = response
             })
           }
-          if (question._message === "__Function") {
+          if (question._message === functionType) {
             this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "message"]).then(response => {
               question.message = response
             })
           }
-          if (question._choices === "__Function") {
+          if (question._choices === functionType) {
             this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "choices"]).then(response => {
               question.choices = response
             })
           }
-          if (question.filter === "__Function") {
+          if (question.filter === functionType) {
             this.rpc.invoke("evaluateMethod", [[question.answer], questionName, "filter"]).then(response => {
               question.answer = response
             })
           }
-          if (question.validate === "__Function") {
+          if (question.validate === functionType) {
             this.rpc.invoke("evaluateMethod", [[question.answer, curentPromptAnswers], questionName, "validate"]).then(response => {
               question.isValid = (_.isString(response) ? false : response)
               question.validationMessage = (_.isString(response) ? response : undefined)
@@ -201,17 +203,17 @@ export default {
     setQuestionProps(prompt) {
       const questions = _.get(prompt, "questions", [])
       _.forEach(questions, question => {
-        if (question.default === "__Function") {
+        if (question.default === functionType) {
           question.default = undefined
-          this.$set(question, "_default", "__Function")
+          this.$set(question, "_default", functionType)
         }
-        if (question.message === "__Function") {
+        if (question.message === functionType) {
           question.message = "loading..."
-          this.$set(question, "_message", "__Function")
+          this.$set(question, "_message", functionType)
         }
-        if (question.choices === "__Function") {
+        if (question.choices === functionType) {
           question.choices = ["loading..."]
-          this.$set(question, "_choices", "__Function")
+          this.$set(question, "_choices", functionType)
         }
         
         let answer = question.default;

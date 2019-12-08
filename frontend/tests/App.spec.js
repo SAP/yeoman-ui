@@ -159,4 +159,45 @@ describe('App.vue', () => {
       expect(wrapper.vm.prompts[0].questions[0].validationMessage ).toBeUndefined()
     })
   })
+
+  describe('setQuestionProps - method', () => {
+    test('set props', () => {
+      wrapper = initComponent(App)
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockResolvedValue()
+      }
+      const questions = [{
+        name: 'defaultQ', default: '__Function', answer: 'defaultAnswer'
+      }, {
+        name: 'whenQ', when: '__Function', answer: 'whenAnswer'
+      }, {
+        name: 'messageQ', message: '__Function', answer: 'messageAnswer'
+      }, {
+        name: 'choicesQ', choices: '__Function', answer: 'choicesAnswer'
+      }, {
+        name: 'filterQ', filter: '__Function', answer: 'filterAnswer'
+      }, {
+        name: 'validateQ', validate: '__Function', answer: 'validateAnswer'
+      }, {
+        name: 'whenQ6', default: 'whenAnswer6', type: 'confirm'
+      }]
+      wrapper.vm.showPrompt(questions, 'promptName')
+      expect(questions[0].default).toBeUndefined()
+      expect(questions[0]._default).toBe('__Function')
+      expect(questions[2].message).toBe('loading...')
+      expect(questions[2]._message).toBe('__Function')
+      expect(questions[3].choices).toEqual(['loading...'])
+      expect(questions[3]._choices).toBe('__Function')
+
+      expect(questions[1].answer).toBe('')
+      expect(questions[1].isWhen).toBe(true)
+      expect(questions[1].isValid).toBe(true)
+      expect(questions[1].validationMessage).toBe(true)
+
+      expect(questions[6].answer).toBe('whenAnswer6')
+      expect(questions[6].isWhen).toBe(true)
+      expect(questions[6].isValid).toBe(true)
+      expect(questions[6].validationMessage).toBe(true)
+    })
+  })
 })
