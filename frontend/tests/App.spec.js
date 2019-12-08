@@ -12,11 +12,61 @@ describe('App.vue', () => {
   afterEach(() => {
     destroy(wrapper)
   })
+  
+  it('createPrompt - method', () => {
+    wrapper = initComponent(App)
+    expect(wrapper.vm.createPrompt()).toBeDefined()
+  })
 
-  describe('createPrompt - method', () => {
-    it('create default prompt', () => {
+  describe('currentPrompt - computed', () => {
+    it('questions are not defined', () => {
       wrapper = initComponent(App)
-      expect(wrapper.vm.createPrompt()).toBeDefined()
+      wrapper.vm.prompts = [{}, {}]
+      wrapper.vm.promptIndex = 1
+      expect(wrapper.vm.currentPrompt.answers).toEqual({})
+    })
+
+    it('questions are defined', () => {
+      wrapper = initComponent(App)
+      wrapper.vm.prompts = [{
+          answers: {}, questions: []
+        }, {
+          answers: {name: 'test'}, 
+          questions: [{name: 'q12', isWhen: true, answer: 'a12'}, {name: 'q22', isWhen: false, answer: 'a22'}]
+      }]
+      wrapper.vm.promptIndex = 1
+      const testPrompt = wrapper.vm.currentPrompt
+      expect(testPrompt.answers.q12).toBe('a12')
+      expect(testPrompt.answers.q22).toBeUndefined()
+    })
+  })
+
+  describe('currentPrompt.answers - watcher', () => {
+    test('invoke', () => {
+      wrapper = initComponent(App)
+      wrapper.vm.rpc = {
+        invoke: () => Promise.resolve()
+      }
+      
+      wrapper.vm.prompts = [{ 
+        questions: [{
+          name: 'defaultQ', _default: '__Function', answer: true
+        }, {
+          name: 'whenQ', when: '__Function', answer: true
+        }, {
+          name: 'messageQ', _message: '__Function', answer: true
+        }, {
+          name: 'choicesQ', _choices: '__Function', answer: true
+        }, {
+          name: 'filterQ', filter: '__Function', answer: true
+        }, {
+          name: 'validateQ', validate: '__Function', answer: true
+        }]
+      }]
+      wrapper.vm.promptIndex = 0
+      const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
+      wrapper.vm.$options.watch["currentPrompt.answers"].handler.call(wrapper.vm)
+      expect(invokeSpy).toHaveBeenCalledTimes(6)
     })
   })
 })
