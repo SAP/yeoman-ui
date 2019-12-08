@@ -38,7 +38,8 @@
     "mock-socket": "^9.0.2",
     "vue-jest": "^3.0.5",
     "vue-template-compiler": "^2.6.10",
-    "webpack": "^4.41.2"
+    "webpack": "^4.41.2",
+    "flush-promises": "^1.0.2"
   },
   "eslintConfig": {
     "root": true,
