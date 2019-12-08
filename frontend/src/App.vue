@@ -150,9 +150,10 @@ export default {
           this.resolve(this.currentPrompt.answers)
         } catch (e) {
           this.reject(e)
+          return
         }
       }
-      if (this.promptIndex >= this.prompts.length - 1) {
+      if (this.promptIndex >= _.size(this.prompts) - 1) {
         const prompt = { questions: [], name: pending, status: "pending" }
         this.setPrompts([prompt])
       }

@@ -271,4 +271,80 @@ describe('App.vue', () => {
     wrapper.vm.onStepValidated(true);
     expect(wrapper.vm.stepValidated).toBeTruthy()
   })
+
+  describe('next - method', () => {
+    test('promptIndex is greater than prompt quantity, resolve is defined', () => {
+      wrapper = initComponent(App)
+      wrapper.vm.resolve = jest.fn()
+      wrapper.vm.reject = jest.fn()
+      wrapper.vm.promptIndex = 1 
+      wrapper.vm.prompts = [{}, {}]
+      const resolveSpy = jest.spyOn(wrapper.vm, 'resolve')
+
+      wrapper.vm.next()
+
+      expect(resolveSpy).toHaveBeenCalled()
+      expect(wrapper.vm.promptIndex).toBe(2)
+      expect(wrapper.vm.prompts[0].active).toBeFalsy()
+      expect(wrapper.vm.prompts[2].active).toBeTruthy()
+      resolveSpy.mockRestore()
+    })
+
+    test('resolve method throws an exception', () => {
+      wrapper = initComponent(App)
+     
+      wrapper.vm.resolve = () => {
+        throw new Error('test_error')
+      }
+      wrapper.vm.reject = jest.fn()
+      const rejectSpy = jest.spyOn(wrapper.vm, 'reject')
+      wrapper.vm.promptIndex = 1 
+      wrapper.vm.prompts = [{}, {}]
+
+      wrapper.vm.next()
+
+      expect(rejectSpy).toHaveBeenCalledWith(new Error('test_error'))
+      rejectSpy.mockRestore()
+    })
+
+    test('resolve method does not exist', () => {
+      wrapper = initComponent(App)
+     
+      wrapper.vm.resolve = undefined
+      wrapper.vm.promptIndex = 1 
+      wrapper.vm.prompts = [{}, {}]
+
+      wrapper.vm.next()
+
+      expect(wrapper.vm.promptIndex).toBe(2)
+      expect(wrapper.vm.prompts[0].active).toBeFalsy()
+      expect(wrapper.vm.prompts[2].active).toBeTruthy()
+    })
+  })
+
+  describe('generatorDone - method', () => {
+    test('status is not pending', () => {
+      wrapper = initComponent(App)
+      wrapper.vm.prompts = [{}, {}]
+      wrapper.vm.promptIndex = 1
+
+      wrapper.vm.generatorDone(true, 'testMessage')
+
+      expect(wrapper.vm.doneMessage).toBe('testMessage')
+      expect(wrapper.vm.isDone).toBeTruthy()
+    })
+
+    test('status is pending', () => {
+      wrapper = initComponent(App)
+      wrapper.vm.prompts = [{}, {}]
+      wrapper.vm.promptIndex = 1
+      wrapper.vm.currentPrompt.status = 'pending'
+
+      wrapper.vm.generatorDone(true, 'testMessage')
+
+      expect(wrapper.vm.doneMessage).toBe('testMessage')
+      expect(wrapper.vm.isDone).toBeTruthy()
+      expect(wrapper.vm.currentPrompt.name).toBe('Done')
+    })
+  })
 })
