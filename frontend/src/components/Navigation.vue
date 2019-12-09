@@ -28,8 +28,8 @@ export default {
   padding-right: 0.5em;
   padding-top: 0.2em;
   padding-bottom: 0.2em;
-  background-color: var(--vscode-sideBar-background, #252526);
-  border-color: var(--vscode-sideBar-background, #252526);
+  background-color: var(--vscode-editorWidget-background, #252526);
+  border-color: var(--vscode-editorWidget-background, #252526);
   color: var(--vscode-foreground, #cccccc);
   cursor: default;
 }
