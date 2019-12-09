@@ -26,6 +26,7 @@
 		]
 	},
 	"scripts": {
+		"frontend": "npm run frontend:install && npm run frontend:build && npm run frontend:copy",
 		"frontend:install": "cd ../frontend && npm i",
 		"frontend:build": "cd ../frontend && npm run build",
 		"frontend:copy": "webpack --mode none --config copy.frontend.webpack.config.js",
