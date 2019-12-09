@@ -54,9 +54,9 @@ import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import * as _ from "lodash"
 
-const functionType = '__Function'
-const loading = 'loading...'
-const pending = 'Pending...'
+const FUNCTION = '__Function'
+const LOADING = 'loading...'
+const PENDING = 'Pending...'
 
 export default {
   name: "app",
@@ -105,7 +105,7 @@ export default {
         const questions = _.get(this.currentPrompt, "questions", []);
         _.forEach(questions, question => {
           const questionName = question.name
-          if (question._default === functionType) {
+          if (question._default === FUNCTION) {
             this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "default"]).then(response => {
               question.default = response
               if (question.answer === undefined) {
@@ -113,27 +113,27 @@ export default {
               }
             })
           }
-          if (question.when === functionType) {
+          if (question.when === FUNCTION) {
             this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "when"]).then(response => {
               question.isWhen = response
             })
           }
-          if (question._message === functionType) {
+          if (question._message === FUNCTION) {
             this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "message"]).then(response => {
               question.message = response
             })
           }
-          if (question._choices === functionType) {
+          if (question._choices === FUNCTION) {
             this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "choices"]).then(response => {
               question.choices = response
             })
           }
-          if (question.filter === functionType) {
+          if (question.filter === FUNCTION) {
             this.rpc.invoke("evaluateMethod", [[question.answer], questionName, "filter"]).then(response => {
               question.answer = response
             })
           }
-          if (question.validate === functionType) {
+          if (question.validate === FUNCTION) {
             this.rpc.invoke("evaluateMethod", [[question.answer, curentPromptAnswers], questionName, "validate"]).then(response => {
               question.isValid = (_.isString(response) ? false : response)
               question.validationMessage = (_.isString(response) ? response : undefined)
@@ -154,7 +154,7 @@ export default {
         }
       }
       if (this.promptIndex >= _.size(this.prompts) - 1) {
-        const prompt = { questions: [], name: pending, status: "pending" }
+        const prompt = { questions: [], name: PENDING, status: "pending" }
         this.setPrompts([prompt])
       }
       this.promptIndex++
@@ -183,7 +183,7 @@ export default {
             } else {
               if (currentPrompt) {
                 currentPrompt.questions = prompt.questions
-                if (prompt.name && currentPrompt.name === pending) {
+                if (prompt.name && currentPrompt.name === PENDING) {
                   currentPrompt.name = prompt.name
                 }
                 // if questions are provided, remote the pending status
@@ -206,17 +206,17 @@ export default {
     setQuestionProps(prompt) {
       const questions = _.get(prompt, "questions", [])
       _.forEach(questions, question => {
-        if (question.default === functionType) {
+        if (question.default === FUNCTION) {
           question.default = undefined
-          this.$set(question, "_default", functionType)
+          this.$set(question, "_default", FUNCTION)
         }
-        if (question.message === functionType) {
-          question.message = loading
-          this.$set(question, "_message", functionType)
+        if (question.message === FUNCTION) {
+          question.message = LOADING
+          this.$set(question, "_message", FUNCTION)
         }
-        if (question.choices === functionType) {
-          question.choices = [loading]
-          this.$set(question, "_choices", functionType)
+        if (question.choices === FUNCTION) {
+          question.choices = [LOADING]
+          this.$set(question, "_choices", FUNCTION)
         }
         
         let answer = question.default;
