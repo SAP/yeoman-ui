@@ -25,7 +25,7 @@ jobs: # a collection of steps
           working_directory: frontend
           command: npm run test
       - store_artifacts:
-          path: coverage
+          path: frontend/coverage
       - run:
           name: install backend
           working_directory: backend
