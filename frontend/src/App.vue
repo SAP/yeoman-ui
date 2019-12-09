@@ -309,7 +309,7 @@ export default {
 #app {
   height: 100%;
   color: var(--vscode-foreground, #cccccc);
-  background-color: var(--vscode-panel-background, #303031);
+  background-color: var(--vscode-editor-inactiveSelectionBackground, #3a3d41);
   font-family: var(--vscode-font-family);
   font-weight: var(--vscode-font-weight);
   font-size: var(--vscode-font-size);
@@ -317,7 +317,7 @@ export default {
 html,
 body {
   height: 100%;
-  background-color: var(--vscode-panel-background, #303031);
+  background-color: var(--vscode-editor-inactiveSelectionBackground, #3a3d41);
   padding: 0px;
 }
 .list-group-item.selected {

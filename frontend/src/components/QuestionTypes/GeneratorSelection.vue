@@ -83,7 +83,7 @@ export default {
   border-width: 1px;
   border-radius: 0px;
   border-color: var(--vscode-list-activeSelectionForeground, white);
-  background-color: var(--vscode-notifications-border, #1e1e1e);
+  background-color: var(--vscode-editor-background, #1e1e1e);
 }
 
 .card.generator:hover:not(.selected) {
