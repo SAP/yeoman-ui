@@ -54,6 +54,10 @@ import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import * as _ from "lodash"
 
+const FUNCTION = '__Function'
+const LOADING = 'loading...'
+const PENDING = 'Pending...'
+
 export default {
   name: "app",
   components: {
@@ -101,8 +105,7 @@ export default {
         const questions = _.get(this.currentPrompt, "questions", []);
         _.forEach(questions, question => {
           const questionName = question.name
-          if (question._default === "__Function") {
-            console.error('question._default - ' + question._default);
+          if (question._default === FUNCTION) {
             this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "default"]).then(response => {
               question.default = response
               if (question.answer === undefined) {
@@ -110,32 +113,27 @@ export default {
               }
             })
           }
-          if (question.when === "__Function") {
-            console.error('question.when - ' + question.when);
+          if (question.when === FUNCTION) {
             this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "when"]).then(response => {
               question.isWhen = response
             })
           }
-          if (question._message === "__Function") {
-            console.error('question._message - ' + question._message);
+          if (question._message === FUNCTION) {
             this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "message"]).then(response => {
               question.message = response
             })
           }
-          if (question._choices === "__Function") {
-            console.error('question._choices - ' + question._choices);
+          if (question._choices === FUNCTION) {
             this.rpc.invoke("evaluateMethod", [[curentPromptAnswers], questionName, "choices"]).then(response => {
               question.choices = response
             })
           }
-          if (question.filter === "__Function") {
-            console.error('question.filter - ' + question.filter);
+          if (question.filter === FUNCTION) {
             this.rpc.invoke("evaluateMethod", [[question.answer], questionName, "filter"]).then(response => {
               question.answer = response
             })
           }
-          if (question.validate === "__Function") {
-            console.error('question.validate - ' + question.validate);
+          if (question.validate === FUNCTION) {
             this.rpc.invoke("evaluateMethod", [[question.answer, curentPromptAnswers], questionName, "validate"]).then(response => {
               question.isValid = (_.isString(response) ? false : response)
               question.validationMessage = (_.isString(response) ? response : undefined)
@@ -152,10 +150,11 @@ export default {
           this.resolve(this.currentPrompt.answers)
         } catch (e) {
           this.reject(e)
+          return
         }
       }
-      if (this.promptIndex >= this.prompts.length - 1) {
-        const prompt = { questions: [], name: "Pending...", status: "pending" }
+      if (this.promptIndex >= _.size(this.prompts) - 1) {
+        const prompt = { questions: [], name: PENDING, status: "pending" }
         this.setPrompts([prompt])
       }
       this.promptIndex++
@@ -184,7 +183,7 @@ export default {
             } else {
               if (currentPrompt) {
                 currentPrompt.questions = prompt.questions
-                if (prompt.name && currentPrompt.name === "Pending...") {
+                if (prompt.name && currentPrompt.name === PENDING) {
                   currentPrompt.name = prompt.name
                 }
                 // if questions are provided, remote the pending status
@@ -207,17 +206,17 @@ export default {
     setQuestionProps(prompt) {
       const questions = _.get(prompt, "questions", [])
       _.forEach(questions, question => {
-        if (question.default === "__Function") {
+        if (question.default === FUNCTION) {
           question.default = undefined
-          this.$set(question, "_default", "__Function")
+          this.$set(question, "_default", FUNCTION)
         }
-        if (question.message === "__Function") {
-          question.message = "loading..."
-          this.$set(question, "_message", "__Function")
+        if (question.message === FUNCTION) {
+          question.message = LOADING
+          this.$set(question, "_message", FUNCTION)
         }
-        if (question.choices === "__Function") {
-          question.choices = ["loading..."]
-          this.$set(question, "_choices", "__Function")
+        if (question.choices === FUNCTION) {
+          question.choices = [LOADING]
+          this.$set(question, "_choices", FUNCTION)
         }
         
         let answer = question.default;
@@ -267,7 +266,7 @@ export default {
       this.rpc.invoke("runGenerator", [generatorName])
     },
     isInVsCode() {
-      return typeof acquireVsCodeApi !== "undefined"
+      return typeof acquireVsCodeApi !== 'undefined'
     },
     setupRpc() {
       if (this.isInVsCode()) {
@@ -284,26 +283,15 @@ export default {
       }
     },
     initRpc() {
-      this.rpc.registerMethod({
-        func: this.showPrompt,
-        thisArg: this,
-        name: "showPrompt"
+      const functions = ["showPrompt", "setPrompts", "generatorDone", "log"]
+      _.forEach(functions, funcName => {
+        this.rpc.registerMethod({
+          func: this[funcName],
+          thisArg: this,
+          name: funcName
+        })
       })
-      this.rpc.registerMethod({
-        func: this.setPrompts,
-        thisArg: this,
-        name: "setPrompts"
-      })
-      this.rpc.registerMethod({
-        func: this.generatorDone,
-        thisArg: this,
-        name: "generatorDone"
-      })
-      this.rpc.registerMethod({
-        func: this.log,
-        thisArg: this,
-        name: "log"
-      })
+      
       this.rpc.invoke("receiveIsWebviewReady", [])
     }
   },
