@@ -1,0 +1,14 @@
+coverage:
+  status:
+    project:
+      frontend:
+        target: 90%
+        flags: frontend
+flags:
+  components:
+    paths:
+      - frontend
+    assume: true
+  tests:
+    paths:
+      - frontend/tests/
