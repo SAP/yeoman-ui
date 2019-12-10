@@ -1,5 +1,8 @@
 version: 2.1 # use CircleCI 2.1
 
+orbs:
+  codecov: codecov/codecov@1.0.4
+
 defaults: &defaults
   working_directory: ~/repo
   docker:
@@ -24,6 +27,9 @@ jobs: # a collection of steps
           name: test frontend
           working_directory: frontend
           command: npm run test
+      - codecov/upload:
+          file: frontend/coverage/*.json
+          flags: frontend
       - run:
           name: install backend
           working_directory: backend
