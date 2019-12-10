@@ -1,6 +1,5 @@
 [![CircleCI](https://circleci.com/gh/SAP/yeoman-ui.svg?style=svg)](https://circleci.com/gh/SAP/yeoman-ui)
 ![GitHub license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)
-[![codecov.io](https://circleci.com/gh/SAP/yeoman-ui/coverage.svg?branch=master)](https://circleci.com/gh/SAP/yeoman-ui)
 
 ![Coverage lines](https://circleci.com/gh/SAP/yeoman-ui/coverage/frontend/badge-lines.svg)
 ![Coverage functions](https://circleci.com/gh/SAP/yeoman-ui/coverage/frontend/badge-functions.svg)
