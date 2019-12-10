@@ -2,10 +2,10 @@
 ![GitHub license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)
 [![codecov.io](https://circleci.com/gh/SAP/yeoman-ui/coverage.svg?branch=master)](https://circleci.com/gh/SAP/yeoman-ui)
 
-![Coverage lines](https://circleci.com/gh/SAP/yeoman-ui/frontend/badge-lines.svg)
-![Coverage functions](https://circleci.com/gh/SAP/yeoman-ui/frontend/badge-functions.svg)
-![Coverage branches](https://circleci.com/gh/SAP/yeoman-ui/frontend/badge-branches.svg)
-![Coverage statements](https://circleci.com/gh/SAP/yeoman-ui/frontend/badge-statements.svg)
+![Coverage lines](https://circleci.com/gh/SAP/yeoman-ui/coverage/frontend/badge-lines.svg)
+![Coverage functions](https://circleci.com/gh/SAP/yeoman-ui/coverage/frontend/badge-functions.svg)
+![Coverage branches](https://circleci.com/gh/SAP/yeoman-ui/coverage/frontend/badge-branches.svg)
+![Coverage statements](https://circleci.com/gh/SAP/yeoman-ui/frontend/coverage/badge-statements.svg)
 
 # Yeoman UI
 
