@@ -39,7 +39,8 @@
     "vue-jest": "^3.0.5",
     "vue-template-compiler": "^2.6.10",
     "webpack": "^4.41.2",
-    "flush-promises": "^1.0.2"
+    "flush-promises": "^1.0.2",
+    "codecov": "^3.6.1"
   },
   "eslintConfig": {
     "root": true,

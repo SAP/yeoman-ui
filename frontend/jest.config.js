@@ -1,6 +1,7 @@
 module.exports = {
   verbose: true,
   collectCoverage: true,
+  coverageDirectory: "./coverage/",
   collectCoverageFrom: [
     "src/**/*.{js,vue}",
     "!**/node_modules/**",
