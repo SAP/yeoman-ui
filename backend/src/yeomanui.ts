@@ -32,8 +32,8 @@ export interface IPrompt {
 
 export class YeomanUI {
   private static funcReplacer(key: any, value: any) {
-    if (typeof value === 'function') {
-      return '__Function';
+    if (typeof value === "function") {
+      return "__Function";
     } else {
       return value;
     }
@@ -66,12 +66,12 @@ export class YeomanUI {
     return new Promise((resolve, reject) => {
       try {
         let chunks: string = "";
-        fs.createReadStream(fileName, { 'encoding': 'utf8' })
-          .on('data', chunk => chunks += chunk)
-          .on('error', err => {
+        fs.createReadStream(fileName, { "encoding": "utf8" })
+          .on("data", chunk => chunks += chunk)
+          .on("error", err => {
             reject(err);
           })
-          .on('end', () => {
+          .on("end", () => {
             const packageJSON = JSON.parse(chunks);
             resolve(packageJSON.description);
           });
@@ -85,36 +85,18 @@ export class YeomanUI {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
 
-    const promise: Promise<IPrompt | undefined> = new Promise((resolve, reject) => {
+    const promise: Promise<IPrompt | undefined> = new Promise(resolve => {
       const env = Environment.createEnv();
-      env.lookup(async (err) => {
-        const generatorNames: string[] = env.getGeneratorNames();
+      env.lookup(async () => {
         this.genMeta = env.getGeneratorsMeta();
-        if (generatorNames.length > 0) {
-          const generatorChoices: IGeneratorChoice[] = [];
-          for (let i = 0; i < generatorNames.length; i++) {
-            let genName: string = generatorNames[i];
-            const choice: IGeneratorChoice = {
-              name: genName,
-              message: "Some quick example text of the generator description. This is a long text so that the example will look good.",
-            };
 
-            const meta: Environment.GeneratorMeta = this.genMeta[`${genName}:app`];
-            try {
-              const imgSrc = await DataURI(path.join((meta as any).packagePath, 'yeoman.png'));
-              choice.imageUrl = imgSrc;
-            } catch (err) {
-              choice.imageUrl = defaultImage.default;
-            }
+        const generatorNames: string[] = env.getGeneratorNames();
+        if (_.size(generatorNames) > 0) {
+          const generatorChoicePromises = _.map(generatorNames, (genName: string) => {
+            return this.createGeneratorChoice(genName);
+          });
 
-            try {
-              const packageJsonFile: string = path.join((meta as any).packagePath, 'package.json');
-              choice.message = await YeomanUI.getDescription(packageJsonFile);
-            } catch (err) {
-              // no description found -- falling back to generator name
-            }
-            generatorChoices.push(choice);
-          }
+          const generatorChoices = await Promise.all(generatorChoicePromises);
           const generatorQuestion: IGeneratorQuestion = {
             type: "generators",
             name: "name",
@@ -122,12 +104,35 @@ export class YeomanUI {
             choices: generatorChoices
           };
           resolve({ name: "Choose Generator", questions: [generatorQuestion] });
-        } else {
-          return resolve(undefined);
-        }
+        } 
+
+        return resolve();
       });
     });
+
     return promise;
+  }
+
+  private async createGeneratorChoice(genName: string): Promise<IGeneratorChoice> {
+    const choice: IGeneratorChoice = {
+      name: genName,
+      message: "Some quick example text of the generator description. This is a long text so that the example will look good.",
+    };
+
+    const metaPackagePath: string = _.get(this.genMeta, [`[${genName}:app]`, "packagePath"]);
+    try {
+      choice.imageUrl = await DataURI(path.join(metaPackagePath, "yeoman.png"));
+    } catch (err) {
+      choice.imageUrl = defaultImage.default;
+    }
+
+    try {
+      choice.message = await YeomanUI.getDescription(path.join(metaPackagePath, "package.json"));
+    } catch (err) {
+      // no description found -- falling back to generator name
+    }
+
+    return choice;
   }
 
   public runGenerator(generatorName: string) {
@@ -187,7 +192,7 @@ export class YeomanUI {
           this.doGeneratorDone(false, message);
         }
 
-        console.log('done running yeomanui');
+        console.log("done running yeomanui");
         message = `${generatorName} is done. Destination directory is ${destinationRoot}`;
         this.doGeneratorDone(true, message);
       });
@@ -199,9 +204,9 @@ export class YeomanUI {
   public doGeneratorDone(success: boolean, message: string): Promise<any> {
     if (this.rpc) {
       return this.rpc.invoke("generatorDone", [true, message]);
-    } else {
-      return Promise.resolve();
-    }
+    } 
+
+    return Promise.resolve();
   }
 
   /**
@@ -255,8 +260,6 @@ export class YeomanUI {
     }
   }
 
-
-
   /**
    * 
    * @param quesions 
@@ -266,15 +269,14 @@ export class YeomanUI {
    * Also functions cannot be evaluated on client)
    */
   private normalizeFunctions(questions: Environment.Adapter.Questions<any>): Environment.Adapter.Questions<any> {
-    const mappedQuestions = JSON.parse(JSON.stringify(questions, YeomanUI.funcReplacer));
-    return mappedQuestions;
+    return JSON.parse(JSON.stringify(questions, YeomanUI.funcReplacer));
   }
 
   private setPrompts(prompts: IPrompt[]): Promise<void> {
     if (this.rpc) {
       return this.rpc.invoke("setPrompts", [prompts]);
-    } else {
-      return Promise.resolve();
-    }
+    } 
+
+    return Promise.resolve();
   }
 }

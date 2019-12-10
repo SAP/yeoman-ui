@@ -76,6 +76,7 @@
 		"vsce": "^1.68.0",
 		"vscode": "^1.1.28",
 		"webpack": "^4.41.2",
-		"webpack-cli": "^3.3.10"
+		"webpack-cli": "^3.3.10",
+		"lodash": "^4.17.15"
 	}
 }
