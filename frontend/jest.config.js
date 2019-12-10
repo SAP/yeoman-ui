@@ -8,7 +8,10 @@ module.exports = {
   ],
   coverageReporters: [
     "html",
-    "text-summary"
+    "text-summary",
+    "json-summary", 
+    "text",
+    "lcov"
   ],
   moduleFileExtensions: [
     "js",

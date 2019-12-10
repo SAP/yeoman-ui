@@ -23,7 +23,7 @@ jobs: # a collection of steps
       - run:
           name: test frontend
           working_directory: frontend
-          command: npm run test
+          command: npm run test:badges
       - run:
           name: install backend
           working_directory: backend

@@ -11,15 +11,17 @@
     "build": "vue-cli-service build",
     "build-dev": "vue-cli-service build --mode development",
     "lint": "vue-cli-service lint",
-    "test": "vue-cli-service test:unit"
+    "test": "vue-cli-service test:unit",
+    "test:coverage": "npm test -- --coverage",
+    "test:badges": "npm run test:coverage  && jest-coverage-badges"
   },
   "dependencies": {
     "bootstrap": "^4.3.1",
     "bootstrap-vue": "^2.0.2",
-    "lodash": "^4.17.15",
-    "vue": "^2.6.10",
     "core-js": "2.6.6",
-    "jquery": "3.4.1"
+    "jquery": "3.4.1",
+    "lodash": "^4.17.15",
+    "vue": "^2.6.10"
   },
   "devDependencies": {
     "@sap-devx/webview-rpc": "^0.1.2",
@@ -39,7 +41,8 @@
     "vue-jest": "^3.0.5",
     "vue-template-compiler": "^2.6.10",
     "webpack": "^4.41.2",
-    "flush-promises": "^1.0.2"
+    "flush-promises": "^1.0.2",
+    "jest-coverage-badges": "^1.1.2"
   },
   "eslintConfig": {
     "root": true,
