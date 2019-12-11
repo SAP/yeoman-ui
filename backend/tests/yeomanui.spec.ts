@@ -14,13 +14,27 @@ describe('yeomanui unit test', () => {
         public  timeout: number;
         public promiseCallbacks: Map<number, IPromiseCallbacks>;
         public methods: Map<string, IMethod>;
-        public sendRequest: () => void;             
-        public sendResponse: () => void; 
-        public setResponseTimeout: () => void; 
-        public registerMethod: () => void; 
-        public unregisterMethod: () => void; 
-        public listLocalMethods: () => [];
-        public handleResponse: () => void; 
+        public sendRequest(): void {
+            return;
+        }            
+        public sendResponse(): void {
+            return;
+        } 
+        public setResponseTimeout(): void {
+            return;
+        }
+        public registerMethod(): void {
+            return;
+        } 
+        public unregisterMethod(): void {
+            return;
+        } 
+        public listLocalMethods(): string[] {
+            return [];
+        }
+        public handleResponse(): void {
+            return;
+        } 
         public listRemoteMethods(): Promise<string[]> {
             return Promise.resolve([]);
         }
@@ -33,14 +47,30 @@ describe('yeomanui unit test', () => {
     }
 
     class TestLog implements YouiLog {
-        public log: () => void;            
-        public writeln: () => void; 
-        public create: () => void; 
-        public force: () => void; 
-        public conflict: () => void; 
-        public identical: () => void; 
-        public skip: () => void; 
-        public showLog: () => true; 
+        public log(): void {
+            return;
+        }            
+        public writeln(): void {
+            return;
+        } 
+        public create(): void {
+            return;
+        }  
+        public force(): void {
+            return;
+        } 
+        public conflict(): void {
+            return;
+        }  
+        public identical(): void {
+            return;
+        }  
+        public skip(): void {
+            return;
+        } 
+        public showLog(): boolean {
+            return false;
+        }  
     }
 
     before(() => {
@@ -93,4 +123,4 @@ describe('yeomanui unit test', () => {
             expect(result).to.be.deep.equal({ name: "Choose Generator", questions: [generatorQuestion] });
         });
     });
-})
+});
