@@ -9,7 +9,7 @@ require("./datauri");
 import * as defaultImage from "./defaultImage";
 import { YouiAdapter } from "./youi-adapter";
 import { YouiLog } from "./youi-log";
-import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
+import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 
 export interface IGeneratorChoice {
@@ -39,7 +39,7 @@ export class YeomanUI {
     }
   }
 
-  private rpc: RpcCommon;
+  private rpc: IRpc;
   private logger: YouiLog;
   private genMeta: { [namespace: string]: Environment.GeneratorMeta };
   private youiAdapter: YouiAdapter;
@@ -47,7 +47,7 @@ export class YeomanUI {
   private promptCount: number;
   private currentQuestions: Environment.Adapter.Questions<any>;
 
-  constructor(rpc: RpcCommon, logger: YouiLog) {
+  constructor(rpc: IRpc, logger: YouiLog) {
     this.rpc = rpc;
     this.logger = logger;
     this.rpc.setResponseTimeout(3600000);

@@ -39,7 +39,7 @@
 		"package": "vsce package .",
 		"test": "nyc mocha -p tsconfig.json --opts ./mocha.opts",
 		"ws:run": "node ./out/webSocketServer/index.js",
-		"lint": "eslint ./**/*.ts"
+		"lint": "tslint '*/*.{ts,tsx}' -c ./tslint.yml"
 	},
 	"dependencies": {
 		"@sap-devx/webview-rpc": "^0.1.2",
@@ -63,20 +63,19 @@
 		"@typescript-eslint/parser": "^2.8.0",
 		"chai": "^4.2.0",
 		"copy-webpack-plugin": "^5.0.5",
-		"eslint": "^6.6.0",
+		"lodash": "^4.17.15",
 		"mocha": "^6.2.2",
 		"nyc": "^14.1.1",
 		"sinon": "^7.5.0",
 		"ts-loader": "^6.2.1",
-		"ts-node": "^8.5.2",
+		"ts-node": "^8.5.4",
 		"tslint": "^5.20.1",
 		"tslint-config-prettier": "^1.18.0",
 		"tslint-no-unused-expression-chai": "^0.1.4",
-		"typescript": "^3.6.1",
+		"typescript": "^3.7.3",
 		"vsce": "^1.68.0",
 		"vscode": "^1.1.28",
 		"webpack": "^4.41.2",
-		"webpack-cli": "^3.3.10",
-		"lodash": "^4.17.15"
+		"webpack-cli": "^3.3.10"
 	}
 }
