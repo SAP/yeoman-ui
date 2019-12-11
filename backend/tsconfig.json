@@ -4,7 +4,8 @@
 		"target": "es6",
 		"outDir": "./out",
 		"sourceMap": true,
-		"rootDir": "src",
+		"rootDir": ".",
+		"rootDirs": ["./src", "./tests"],
 		"alwaysStrict": true,
 		"allowJs": false,
 		"noFallthroughCasesInSwitch": true,
@@ -16,9 +17,7 @@
 		"traceResolution": false,
 		"declaration": true
 	},
-	"include": [
-		"./src/**/*"
-	],
+	"include": ["./src/**/*", "./tests/**/*"],
 	"exclude": [
 		"node_modules",
 		".vscode-test"

@@ -81,36 +81,33 @@ export class YeomanUI {
     });
   }
 
-  public async getGenerators(): Promise<IPrompt | undefined> {
+  public async getGenerators(): Promise<IPrompt> {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
 
-    const promise: Promise<IPrompt | undefined> = new Promise(resolve => {
-      const env = Environment.createEnv();
-      env.lookup(async () => {
-        this.genMeta = env.getGeneratorsMeta();
-
-        const generatorNames: string[] = env.getGeneratorNames();
-        if (_.size(generatorNames) > 0) {
-          const generatorChoicePromises = _.map(generatorNames, (genName: string) => {
-            return this.createGeneratorChoice(genName);
-          });
-
-          const generatorChoices = await Promise.all(generatorChoicePromises);
-          const generatorQuestion: IGeneratorQuestion = {
-            type: "generators",
-            name: "name",
-            message: "name",
-            choices: generatorChoices
-          };
-          resolve({ name: "Choose Generator", questions: [generatorQuestion] });
-        } 
-
-        return resolve();
-      });
+    const promise: Promise<IPrompt> = new Promise(resolve => {
+      const env: Environment.Options = Environment.createEnv();
+      env.lookup(async () => this.onEnvLookup(env, resolve));
     });
 
     return promise;
+  }
+
+  private async onEnvLookup(env: Environment.Options, resolve: any) {
+    this.genMeta = env.getGeneratorsMeta();
+    const generatorNames: string[] = env.getGeneratorNames();
+      const generatorChoicePromises = _.map(generatorNames, (genName: string) => {
+        return this.createGeneratorChoice(genName);
+      });
+
+      const generatorChoices = await Promise.all(generatorChoicePromises);
+      const generatorQuestion: IGeneratorQuestion = {
+        type: "generators",
+        name: "name",
+        message: "name",
+        choices: generatorChoices
+      };
+      resolve({ name: "Choose Generator", questions: [generatorQuestion] });
   }
 
   private async createGeneratorChoice(genName: string): Promise<IGeneratorChoice> {
@@ -119,7 +116,7 @@ export class YeomanUI {
       message: "Some quick example text of the generator description. This is a long text so that the example will look good.",
     };
 
-    const metaPackagePath: string = _.get(this.genMeta, [`[${genName}:app]`, "packagePath"]);
+    const metaPackagePath: string = _.get(this.genMeta, [`${genName}:app`, "packagePath"]);
     try {
       choice.imageUrl = await DataURI(path.join(metaPackagePath, "yeoman.png"));
     } catch (err) {
@@ -228,12 +225,8 @@ export class YeomanUI {
   public async receiveIsWebviewReady() {
     // TODO: loading generators takes a long time; consider prefetching list of generators
     if (this.rpc) {
-      const generators: IPrompt | undefined = await this.getGenerators();
-
-      const response: any = await this.rpc.invoke("showPrompt", [
-        (generators ? generators.questions : []),
-        (generators ? generators.name : "")
-      ]);
+      const generators: IPrompt = await this.getGenerators();
+      const response: any = await this.rpc.invoke("showPrompt", [generators.questions, generators.name]);
       this.runGenerator(response.name);
     }
   }
