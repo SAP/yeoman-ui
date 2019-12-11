@@ -40,3 +40,4 @@ linterOptions:
   exclude:
     # Not our own sources
     - typings/**
+    - out/**
