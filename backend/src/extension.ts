@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { YeomanUI } from "./yeomanui";
-import { RpcExtenstion } from '@sap-devx/webview-rpc/out.ext/rpc-extension';
+import {RpcExtension} from '@sap-devx/webview-rpc/out.ext/rpc-extension';
 import { YouiLog } from "./youi-log";
 import { OutputChannelLog } from './output-channel-log';
 
@@ -67,7 +67,7 @@ export class YeomanUIPanel {
 	}
 
 	public yeomanui: YeomanUI;
-	private rpc: RpcExtenstion;
+	private rpc: RpcExtension;
 	private readonly panel: vscode.WebviewPanel;
 	private readonly extensionPath: string;
 	private disposables: vscode.Disposable[] = [];
@@ -77,7 +77,7 @@ export class YeomanUIPanel {
 		this.questionsResolutions = new Map();
 		this.panel = panel;
 		this.extensionPath = extensionPath;
-		this.rpc = new RpcExtenstion(this.panel.webview);
+		this.rpc = new RpcExtension(this.panel.webview);
 		const logger: YouiLog = new OutputChannelLog();
 		this.yeomanui = new YeomanUI(this.rpc, logger);
 
