@@ -1,6 +1,7 @@
 import * as os from "os";
 import * as path from "path";
 import * as fs from "fs";
+import * as fsextra from "fs-extra";
 import * as _ from "lodash";
 import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
@@ -39,23 +40,10 @@ export class YeomanUI {
     }
   }
 
-  private static async getDescription(fileName: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      try {
-        let chunks: string = "";
-        fs.createReadStream(fileName, { "encoding": "utf8" })
-          .on("data", chunk => chunks += chunk)
-          .on("error", err => {
-            reject(err);
-          })
-          .on("end", () => {
-            const packageJSON = JSON.parse(chunks);
-            resolve(packageJSON.description);
-          });
-      } catch (err) {
-        reject(err);
-      }
-    });
+  private static async getDescription(filePath: string): Promise<string> {
+    const packageJsonString: string = await fsextra.readFile(filePath, "utf8");
+    const packageJson = JSON.parse(packageJsonString);
+    return _.get(packageJson, "description", "");
   }
 
   private rpc: IRpc;

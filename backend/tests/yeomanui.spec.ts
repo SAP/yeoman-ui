@@ -1,8 +1,11 @@
 import * as sinon from "sinon";
 import * as mocha from "mocha";
+import * as fsextra from "fs-extra";
 import { expect } from "chai";
 import * as _ from "lodash";
+import * as path from "path";
 import {YeomanUI, IGeneratorQuestion} from "../src/yeomanui";
+import * as defaultImage from "../src/defaultImage";
 import * as yeomanEnv from "yeoman-environment";
 import { YouiLog } from "../src/youi-log";
 import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
@@ -10,6 +13,12 @@ import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/
 describe('yeomanui unit test', () => {
     let sandbox: any;
     let yeomanEnvMock: any;
+    let fsExtraMock: any;
+    const UTF8: string = "utf8";
+    const PACKAGE_JSON: string = "package.json";
+
+    const choiceMessage = 
+        "Some quick example text of the generator description. This is a long text so that the example will look good.";
     class TestRpc implements IRpc {
         public  timeout: number;
         public promiseCallbacks: Map<number, IPromiseCallbacks>;
@@ -45,7 +54,6 @@ describe('yeomanui unit test', () => {
             return Promise.resolve();
         }
     }
-
     class TestLog implements YouiLog {
         public log(): void {
             return;
@@ -83,10 +91,12 @@ describe('yeomanui unit test', () => {
 
     beforeEach(() => {
         yeomanEnvMock = sandbox.mock(yeomanEnv);
+        fsExtraMock = sandbox.mock(fsextra);
     });
 
     afterEach(() => {
         yeomanEnvMock.verify();
+        fsExtraMock.verify();
     });
 
     describe("getGenerators", () => {
@@ -140,14 +150,25 @@ describe('yeomanui unit test', () => {
                 },
             });
             envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3"]);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test1Description"}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test3Description"}`);
+
             const result = await yeomanUi.getGenerators();
-            const generatorQuestion: IGeneratorQuestion = {
-                type: "generators",
-                name: "name",
-                message: "name",
-                choices: []
-              };
-            expect(result.questions[0].choices).to.have.lengthOf(3);
+
+            const test1Choice = result.questions[0].choices[0];
+            expect(test1Choice.name).to.be.equal("test1");
+            expect(test1Choice.message).to.be.equal("test1Description");
+            expect(test1Choice.imageUrl).to.be.equal(defaultImage.default);
+
+            const test2Choice = result.questions[0].choices[1];
+            expect(test2Choice.name).to.be.equal("test2");
+            expect(test2Choice.message).to.be.equal(choiceMessage);
+            expect(test2Choice.imageUrl).to.be.equal(defaultImage.default);
+
+            const test3Choice = result.questions[0].choices[2];
+            expect(test3Choice.name).to.be.equal("test3");
+            expect(test3Choice.message).to.be.equal("test3Description");
+            expect(test3Choice.imageUrl).to.be.equal(defaultImage.default);
         });
     });
 });
