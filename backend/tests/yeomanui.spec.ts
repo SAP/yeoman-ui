@@ -3,13 +3,13 @@ import * as mocha from "mocha";
 import { expect } from "chai";
 import * as _ from "lodash";
 import {YeomanUI, IGeneratorQuestion} from "../src/yeomanui";
-import * as Environment from "yeoman-environment";
+import * as yeomanEnv from "yeoman-environment";
 import { YouiLog } from "../src/youi-log";
 import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 
 describe('yeomanui unit test', () => {
     let sandbox: any;
-    let envMock: any;
+    let yeomanEnvMock: any;
     class TestRpc implements IRpc {
         public  timeout: number;
         public promiseCallbacks: Map<number, IPromiseCallbacks>;
@@ -82,38 +82,42 @@ describe('yeomanui unit test', () => {
     });
 
     beforeEach(() => {
-        envMock = sandbox.mock(Environment);
+        yeomanEnvMock = sandbox.mock(yeomanEnv);
     });
 
     afterEach(() => {
-        envMock.verify();
+        yeomanEnvMock.verify();
     });
 
     describe("getGenerators", () => {
-        let yeomanUi: YeomanUI;
-        
         const rpc = new TestRpc();
         const logger = new TestLog();
+        const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
+        let envMock: any;
+
+        const environment = {
+            lookup: async (cb: any) => {
+                return cb.call();
+            },
+            getGeneratorsMeta: (): any => {
+                return {};
+            },
+            getGeneratorNames: (): string[] => {
+                return [];
+            }
+        };
 
         beforeEach(() => {
-            yeomanUi = new YeomanUI(rpc, logger);
+            envMock = sandbox.mock(environment);
+            yeomanEnvMock.expects("createEnv").returns(environment);
         });
 
-        it("no generators", async () => {
-            const environment = {
-                lookup: async (cb: any) => {
-                    return cb.call();
-                },
-                getGeneratorsMeta: (): any => {
-                    return {};
-                },
-                getGeneratorNames: (): string[] => {
-                    return [];
-                }
-            };
-            envMock.expects("createEnv").returns(environment);
+        afterEach(() => {
+            envMock.verify();
+        });
+
+        it("there are no generators", async () => {
             const result = await yeomanUi.getGenerators();
-            // tslint:disable-next-line: no-unused-expression
             const generatorQuestion: IGeneratorQuestion = {
                 type: "generators",
                 name: "name",
@@ -121,6 +125,29 @@ describe('yeomanui unit test', () => {
                 choices: []
               };
             expect(result).to.be.deep.equal({ name: "Choose Generator", questions: [generatorQuestion] });
+        });
+
+        it("there are generators", async () => {
+            envMock.expects("getGeneratorsMeta").returns({
+                "test1:app": {
+                    packagePath: "test1Path"
+                },
+                "test2:app2": {
+                    packagePath: "test2Path"
+                },
+                "test3:app": {
+                    packagePath: "test3Path"
+                },
+            });
+            envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3"]);
+            const result = await yeomanUi.getGenerators();
+            const generatorQuestion: IGeneratorQuestion = {
+                type: "generators",
+                name: "name",
+                message: "name",
+                choices: []
+              };
+            expect(result.questions[0].choices).to.have.lengthOf(3);
         });
     });
 });
