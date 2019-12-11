@@ -89,7 +89,6 @@ describe('yeomanui unit test', () => {
         it("no generators", async () => {
             const environment = {
                 lookup: async (cb: any) => {
-                    console.error("callback");
                     return cb.call();
                 },
                 getGeneratorsMeta: (): any => {
