@@ -33,11 +33,7 @@ export interface IPrompt {
 
 export class YeomanUI {
   private static funcReplacer(key: any, value: any) {
-    if (typeof value === "function") {
-      return "__Function";
-    } else {
-      return value;
-    }
+    return _.isFunction(value) ? "__Function" : value;
   }
 
   private static defaultMessage = 
