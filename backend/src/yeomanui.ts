@@ -42,6 +42,8 @@ export class YeomanUI {
 
   private static defaultMessage = 
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
+  private static YEOMAN_PNG = "yeoman.png";
+
   private rpc: IRpc;
   private logger: YouiLog;
   private genMeta: { [namespace: string]: Environment.GeneratorMeta };
@@ -201,18 +203,18 @@ export class YeomanUI {
   private async onEnvLookup(env: Environment.Options, resolve: any, type?: Type) {
     this.genMeta = env.getGeneratorsMeta();
     const generatorNames: string[] = env.getGeneratorNames();
-      const generatorChoicePromises = _.map(generatorNames, (genName: string) => {
-        return this.createGeneratorChoice(genName, type);
-      });
+    const generatorChoicePromises = _.map(generatorNames, genName => {
+      return this.createGeneratorChoice(genName, type);
+    });
 
-      const generatorChoices = await Promise.all(generatorChoicePromises);
-      const generatorQuestion: IGeneratorQuestion = {
-        type: "generators",
-        name: "name",
-        message: "name",
-        choices: generatorChoices
-      };
-      resolve({ name: "Choose Generator", questions: [generatorQuestion] });
+    const generatorChoices = await Promise.all(generatorChoicePromises);
+    const generatorQuestion: IGeneratorQuestion = {
+      type: "generators",
+      name: "name",
+      message: "name",
+      choices: generatorChoices
+    };
+    resolve({ name: "Choose Generator", questions: [generatorQuestion] });
   }
 
   private async createGeneratorChoice(genName: string, type?: Type): Promise<IGeneratorChoice> {
@@ -221,7 +223,7 @@ export class YeomanUI {
     let genMessage;
       
     try {
-      genImageUrl = await datauri.promise(path.join(genPackagePath, "yeoman.png"));
+      genImageUrl = await datauri.promise(path.join(genPackagePath, YeomanUI.YEOMAN_PNG));
     } catch (err) {
       genImageUrl = defaultImage.default;
     }
