@@ -29,16 +29,16 @@ export default {
   padding-top: 0.2em;
   padding-bottom: 0.2em;
   background-color: var(--vscode-editorWidget-background, #252526);
-  border-color: var(--vscode-editorWidget-background, #252526);
+  border-color: var(--vscode-editorWidget-border, #454545);
   color: var(--vscode-foreground, #cccccc);
   cursor: default;
 }
 
 /* selected item */
 .list-group-item.active {
-  background-color: var(--vscode-list-activeSelectionBackground, #094771);
-  border-color: var(--vscode-list-activeSelectionBackground, #094771);
-  color: var(--vscode-list-activeSelectionForeground, white);
+  background-color: var(--vscode-titleBar-activeBackground, #3c3c3c);
+  border-color: var(--vscode-editorWidget-border, #454545);
+  color: var(--vscode-checkbox-foreground, #f0f0f0);
 }
 
 /* hovered item */

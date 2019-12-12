@@ -60,17 +60,19 @@ export default {
 
 <style>
 .card-body {
-  color: var(--vscode-foreground, #cccccc);
+  color: var(--vscode-editorWidget-foreground, #cccccc);
   border: none;
 }
 
 .card-title {
   font-size: 1rem;
   font-weight: bold;
+  color: var(--vscode-editor-foreground, #d4d4d4);
 }
 
 .card-text {
   font-size: 0.75rem;
+  color: var(--vscode-editorCodeLens-foreground, #999999)
 }
 
 .card-text.templateDocumentationClass {
@@ -82,8 +84,8 @@ export default {
   border-style: none;
   border-width: 1px;
   border-radius: 0px;
-  border-color: var(--vscode-list-activeSelectionForeground, white);
-  background-color: var(--vscode-editor-background, #1e1e1e);
+  border-color: var(--vscode-button-background, #0e639c);
+  background-color: var(--vscode-titleBar-activeBackground, #3c3c3c);
 }
 
 .card.generator:hover:not(.selected) {
@@ -93,5 +95,6 @@ export default {
 
 .card.generator.selected {
   border-style: solid;
+  background-color: var(--vscode-menu-background, #3c3c3c);
 }
 </style>

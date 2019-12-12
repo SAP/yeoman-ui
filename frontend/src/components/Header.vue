@@ -31,9 +31,9 @@ export default {
 </script>
 <style>
 .navbar-brand {
-  color: var(--vscode-foreground, white) !important;
+  color: var(--vscode-editorSuggestWidget-foreground, #d4d4d4) !important;
 }
 .navbar-text {
-  color: var(--vscode-foreground, white) !important;
+  color: var(--vscode-editorCodeLens-foreground, #999999) !important;
 }
 </style>
