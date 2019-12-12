@@ -218,7 +218,7 @@ export class YeomanUI {
   }
 
   private async createGeneratorChoice(genName: string, type?: Type): Promise<IGeneratorChoice> {
-    const genPackagePath = _.get(this, ["genMeta", `${genName}:app`, "packagePath"]);
+    const genPackagePath = this.getGenPackagePath(genName);
     let genImageUrl;
     let genMessage;
       
