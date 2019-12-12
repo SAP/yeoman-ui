@@ -1,11 +1,11 @@
 import * as WebSocket from 'ws';
-import { RpcExtenstionWebSockets } from '@sap-devx/webview-rpc/out.ext/rpc-extension-ws';
+import { RpcExtensionWebSockets } from '@sap-devx/webview-rpc/out.ext/rpc-extension-ws';
 import { YeomanUI } from '../yeomanui';
 import { YouiLog } from "../youi-log";
 import { ServerLog } from './server-log';
 
 class YeomanUIWebSocketServer {
-  private rpc: RpcExtenstionWebSockets | undefined;
+  private rpc: RpcExtensionWebSockets | undefined;
   private yeomanui: YeomanUI | undefined;
 
   init() {
@@ -24,7 +24,7 @@ class YeomanUIWebSocketServer {
     wss.on('connection', (ws) => {
       console.log('new ws connection');
 
-      this.rpc = new RpcExtenstionWebSockets(ws);
+      this.rpc = new RpcExtensionWebSockets(ws);
       //TODO: Use RPC to send it to the browser log (as a collapsed pannel in Vue)
       const logger: YouiLog = new ServerLog(this.rpc);
       this.yeomanui = new YeomanUI(this.rpc, logger);

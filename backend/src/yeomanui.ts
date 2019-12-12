@@ -1,16 +1,17 @@
 import * as os from "os";
 import * as path from "path";
 import * as fs from "fs";
+import * as fsextra from "fs-extra";
 import * as _ from "lodash";
 import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
-import { promise as DataURI } from "datauri";
-require("./datauri");
+import * as datauri from "datauri";
 import * as defaultImage from "./defaultImage";
 import { YouiAdapter } from "./youi-adapter";
 import { YouiLog } from "./youi-log";
-import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
+import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
+import { Type } from "./filter";
 
 export interface IGeneratorChoice {
   name: string;
@@ -32,14 +33,14 @@ export interface IPrompt {
 
 export class YeomanUI {
   private static funcReplacer(key: any, value: any) {
-    if (typeof value === 'function') {
-      return '__Function';
-    } else {
-      return value;
-    }
+    return _.isFunction(value) ? "__Function" : value;
   }
 
-  private rpc: RpcCommon;
+  private static defaultMessage = 
+    "Some quick example text of the generator description. This is a long text so that the example will look good.";
+  private static YEOMAN_PNG = "yeoman.png";
+
+  private rpc: IRpc;
   private logger: YouiLog;
   private genMeta: { [namespace: string]: Environment.GeneratorMeta };
   private youiAdapter: YouiAdapter;
@@ -47,7 +48,7 @@ export class YeomanUI {
   private promptCount: number;
   private currentQuestions: Environment.Adapter.Questions<any>;
 
-  constructor(rpc: RpcCommon, logger: YouiLog) {
+  constructor(rpc: IRpc, logger: YouiLog) {
     this.rpc = rpc;
     this.logger = logger;
     this.rpc.setResponseTimeout(3600000);
@@ -62,71 +63,15 @@ export class YeomanUI {
     this.currentQuestions = {};
   }
 
-  private static async getDescription(fileName: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      try {
-        let chunks: string = "";
-        fs.createReadStream(fileName, { 'encoding': 'utf8' })
-          .on('data', chunk => chunks += chunk)
-          .on('error', err => {
-            reject(err);
-          })
-          .on('end', () => {
-            const packageJSON = JSON.parse(chunks);
-            resolve(packageJSON.description);
-          });
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
-
-  public async getGenerators(): Promise<IPrompt | undefined> {
+  public async getGenerators(type?: Type): Promise<IPrompt> {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
 
-    const promise: Promise<IPrompt | undefined> = new Promise((resolve, reject) => {
-      const env = Environment.createEnv();
-      env.lookup(async (err) => {
-        const generatorNames: string[] = env.getGeneratorNames();
-        this.genMeta = env.getGeneratorsMeta();
-        if (generatorNames.length > 0) {
-          const generatorChoices: IGeneratorChoice[] = [];
-          for (let i = 0; i < generatorNames.length; i++) {
-            let genName: string = generatorNames[i];
-            const choice: IGeneratorChoice = {
-              name: genName,
-              message: "Some quick example text of the generator description. This is a long text so that the example will look good.",
-            };
-
-            const meta: Environment.GeneratorMeta = this.genMeta[`${genName}:app`];
-            try {
-              const imgSrc = await DataURI(path.join((meta as any).packagePath, 'yeoman.png'));
-              choice.imageUrl = imgSrc;
-            } catch (err) {
-              choice.imageUrl = defaultImage.default;
-            }
-
-            try {
-              const packageJsonFile: string = path.join((meta as any).packagePath, 'package.json');
-              choice.message = await YeomanUI.getDescription(packageJsonFile);
-            } catch (err) {
-              // no description found -- falling back to generator name
-            }
-            generatorChoices.push(choice);
-          }
-          const generatorQuestion: IGeneratorQuestion = {
-            type: "generators",
-            name: "name",
-            message: "name",
-            choices: generatorChoices
-          };
-          resolve({ name: "Choose Generator", questions: [generatorQuestion] });
-        } else {
-          return resolve(undefined);
-        }
-      });
+    const promise: Promise<IPrompt> = new Promise(resolve => {
+      const env: Environment.Options = Environment.createEnv();
+      env.lookup(async () => this.onEnvLookup(env, resolve, type));
     });
+
     return promise;
   }
 
@@ -187,7 +132,7 @@ export class YeomanUI {
           this.doGeneratorDone(false, message);
         }
 
-        console.log('done running yeomanui');
+        console.log("done running yeomanui");
         message = `${generatorName} is done. Destination directory is ${destinationRoot}`;
         this.doGeneratorDone(true, message);
       });
@@ -199,9 +144,9 @@ export class YeomanUI {
   public doGeneratorDone(success: boolean, message: string): Promise<any> {
     if (this.rpc) {
       return this.rpc.invoke("generatorDone", [true, message]);
-    } else {
-      return Promise.resolve();
-    }
+    } 
+
+    return Promise.resolve();
   }
 
   /**
@@ -220,15 +165,11 @@ export class YeomanUI {
     }
   }
 
-  public async receiveIsWebviewReady() {
+  public async receiveIsWebviewReady(type?: Type) {
     // TODO: loading generators takes a long time; consider prefetching list of generators
     if (this.rpc) {
-      const generators: IPrompt | undefined = await this.getGenerators();
-
-      const response: any = await this.rpc.invoke("showPrompt", [
-        (generators ? generators.questions : []),
-        (generators ? generators.name : "")
-      ]);
+      const generators: IPrompt = await this.getGenerators(type);
+      const response: any = await this.rpc.invoke("showPrompt", [generators.questions, generators.name]);
       this.runGenerator(response.name);
     }
   }
@@ -254,8 +195,57 @@ export class YeomanUI {
       return Promise.resolve({});
     }
   }
+  
+  private async onEnvLookup(env: Environment.Options, resolve: any, type?: Type) {
+    this.genMeta = env.getGeneratorsMeta();
+    const generatorNames: string[] = env.getGeneratorNames();
+    const generatorChoicePromises = _.map(generatorNames, genName => {
+      return this.createGeneratorChoice(genName, type);
+    });
 
+    const generatorChoices = await Promise.all(generatorChoicePromises);
+    const generatorQuestion: IGeneratorQuestion = {
+      type: "generators",
+      name: "name",
+      message: "name",
+      choices: generatorChoices
+    };
+    resolve({ name: "Choose Generator", questions: [generatorQuestion] });
+  }
 
+  private async createGeneratorChoice(genName: string, type?: Type): Promise<IGeneratorChoice> {
+    const genPackagePath = this.getGenPackagePath(genName);
+    let genImageUrl;
+    let genMessage;
+      
+    try {
+      genImageUrl = await datauri.promise(path.join(genPackagePath, YeomanUI.YEOMAN_PNG));
+    } catch (err) {
+      genImageUrl = defaultImage.default;
+    }
+
+    try {
+      const packageJson: any = await this.getGenPackageJson(genPackagePath);
+      genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
+    } catch (err) {
+      genMessage = YeomanUI.defaultMessage;
+    }
+
+    return {
+      name: genName,
+      message: genMessage,
+      imageUrl: genImageUrl
+    };
+  }
+
+  private async getGenPackageJson(genPackagePath: string): Promise<any> {
+      const packageJsonString: string = await fsextra.readFile(path.join(genPackagePath, "package.json"), "utf8");
+      return JSON.parse(packageJsonString);
+  }
+
+  private getGenPackagePath(genName: string): string {
+    return _.get(this, ["genMeta", `${genName}:app`, "packagePath"]);
+  }
 
   /**
    * 
@@ -266,15 +256,14 @@ export class YeomanUI {
    * Also functions cannot be evaluated on client)
    */
   private normalizeFunctions(questions: Environment.Adapter.Questions<any>): Environment.Adapter.Questions<any> {
-    const mappedQuestions = JSON.parse(JSON.stringify(questions, YeomanUI.funcReplacer));
-    return mappedQuestions;
+    return JSON.parse(JSON.stringify(questions, YeomanUI.funcReplacer));
   }
 
   private setPrompts(prompts: IPrompt[]): Promise<void> {
     if (this.rpc) {
       return this.rpc.invoke("setPrompts", [prompts]);
-    } else {
-      return Promise.resolve();
-    }
+    } 
+
+    return Promise.resolve();
   }
 }

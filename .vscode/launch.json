@@ -10,8 +10,27 @@
 			"request": "launch",
 			"name": "Run websocket server",
 			"program": "${workspaceFolder}/backend/src/webSocketServer/index.ts",
-			"outFiles": ["${workspaceFolder}/backend/out/**/*.js"],
+			"outFiles": [
+				"${workspaceFolder}/backend/out/**/*.js"
+			],
 			"preLaunchTask": "watch backend (tsc)"
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Mocha Tests",
+			"program": "${workspaceFolder}/backend/node_modules/mocha/bin/mocha",
+			"args": [
+				"-r",
+				"ts-node/register",
+				"--timeout",
+				"999999",
+				"--colors",
+				"${workspaceFolder}/backend/tests/**/*.spec.ts"
+			],
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"protocol": "inspector"
 		},
 		{
 			"name": "Run extension",
@@ -59,18 +78,20 @@
 			"type": "node",
 			"request": "launch",
 			"runtimeArgs": [
-			  "--inspect-brk",
-			  "./node_modules/@vue/cli-service/bin/vue-cli-service.js",
-			  "test:unit",
-			  "--runInBand"
+				"--inspect-brk",
+				"./node_modules/@vue/cli-service/bin/vue-cli-service.js",
+				"test:unit",
+				"--runInBand"
 			],
 			"cwd": "${workspaceFolder}/frontend",
 			"protocol": "inspector",
 			"disableOptimisticBPs": true,
-			"console": "integratedTerminal",    
+			"console": "integratedTerminal",
 			"internalConsoleOptions": "neverOpen",
-			"outFiles": [ "${workspaceFolder}/frontend/src/**/*.js"],
+			"outFiles": [
+				"${workspaceFolder}/frontend/src/**/*.js"
+			],
 			"port": 9229
-		  }
+		}
 	]
 }
