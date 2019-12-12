@@ -10,6 +10,7 @@ import * as defaultImage from "../src/defaultImage";
 import * as yeomanEnv from "yeoman-environment";
 import { YouiLog } from "../src/youi-log";
 import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
+import { Type } from "../src/filter";
 
 describe('yeomanui unit test', () => {
     let sandbox: any;
@@ -142,36 +143,106 @@ describe('yeomanui unit test', () => {
             expect(result).to.be.deep.equal({ name: "Choose Generator", questions: [generatorQuestion] });
         });
 
-        it("there are generators", async () => {
+        it("get generators with type project", async () => {
             envMock.expects("getGeneratorsMeta").returns({
                 "test1:app": {
                     packagePath: "test1Path"
                 },
-                "test2:app2": {
+                "test2:app": {
                     packagePath: "test2Path"
                 },
                 "test3:app": {
                     packagePath: "test3Path"
                 },
+                "test4:app": {
+                    packagePath: "test4Path"
+                },
+                "test5:app": {
+                    packagePath: "test5Path"
+                }
             });
-            envMock.expects("getGeneratorNames").returns(["test1", "test3"]);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).throws(new Error("description_error"));
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test3Description"}`);
+            envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5"]);
 
-            datauriMock.expects("promise").withExactArgs(path.join("test1Path", YEOMAN_PNG)).resolves("yeomanPngData");
-            datauriMock.expects("promise").withExactArgs(path.join("test3Path", YEOMAN_PNG)).throws(new Error("yeomanpng_error"));
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project_test"}}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
+
+            const result = await yeomanUi.getGenerators(Type.project);
+
+            expect(result.questions[0].choices).to.have.lengthOf(2);
+            const test1Choice = result.questions[0].choices[0];
+            const test2Choice = result.questions[0].choices[1];
+            expect(test1Choice.name).to.be.equal("test1");
+            expect(test1Choice.message).to.be.equal("test1Description");
+            expect(test2Choice.name).to.be.equal("test4");
+            expect(test2Choice.message).to.be.equal("test4Description");
+        });
+
+        it("get generators with type module", async () => {
+            envMock.expects("getGeneratorsMeta").returns({
+                "test1:app": {
+                    packagePath: "test1Path"
+                },
+                "test2:app": {
+                    packagePath: "test2Path"
+                },
+                "test3:app": {
+                    packagePath: "test3Path"
+                },
+                "test4:app": {
+                    packagePath: "test4Path"
+                },
+                "test5:app": {
+                    packagePath: "test5Path"
+                }
+            });
+            envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5"]);
+
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project_test"}}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
+
+            const result = await yeomanUi.getGenerators(Type.module);
+
+            expect(result.questions[0].choices).to.have.lengthOf(1);
+            const test1Choice = result.questions[0].choices[0];
+            expect(test1Choice.name).to.be.equal("test3");
+            expect(test1Choice.message).to.be.equal(choiceMessage);
+        });
+
+        it("get generators all generators", async () => {
+            envMock.expects("getGeneratorsMeta").returns({
+                "test1:app": {
+                    packagePath: "test1Path"
+                },
+                "test2:app": {
+                    packagePath: "test2Path"
+                },
+                "test3:app": {
+                    packagePath: "test3Path"
+                },
+                "test4:app": {
+                    packagePath: "test4Path"
+                },
+                "test5:app": {
+                    packagePath: "test5Path"
+                }
+            });
+            envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5"]);
+
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project_test"}}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
 
             const result = await yeomanUi.getGenerators();
 
-            const test1Choice = result.questions[0].choices[0];
-            expect(test1Choice.name).to.be.equal("test1");
-            expect(test1Choice.message).to.be.equal(choiceMessage);
-            expect(test1Choice.imageUrl).to.be.equal("yeomanPngData");
-
-            const test3Choice = result.questions[0].choices[1];
-            expect(test3Choice.name).to.be.equal("test3");
-            expect(test3Choice.message).to.be.equal("test3Description");
-            expect(test3Choice.imageUrl).to.be.equal(defaultImage.default);
+            expect(result.questions[0].choices).to.have.lengthOf(5);
         });
     });
 });

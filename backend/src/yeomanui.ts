@@ -195,7 +195,7 @@ export class YeomanUI {
     this.genMeta = env.getGeneratorsMeta();
     const generatorNames: string[] = env.getGeneratorNames();
     const generatorChoicePromises = _.map(generatorNames, genName => {
-      return this.createGeneratorChoice(genName, type);
+      return this.getGeneratorChoice(genName, type);
     });
 
     const generatorChoices = await Promise.all(generatorChoicePromises);
@@ -203,28 +203,41 @@ export class YeomanUI {
       type: "generators",
       name: "name",
       message: "name",
-      choices: generatorChoices
+      choices: _.compact(generatorChoices)
     };
     resolve({ name: "Choose Generator", questions: [generatorQuestion] });
   }
 
-  private async createGeneratorChoice(genName: string, type?: Type): Promise<IGeneratorChoice> {
+  private async getGeneratorChoice(genName: string, type?: Type): Promise<IGeneratorChoice | undefined> {
+    let packageJson: any;
+    
     const genPackagePath = this.getGenMetaPackagePath(genName);
+    try {
+      packageJson = await this.getGenPackageJson(genPackagePath);
+    } catch (error) {
+      return;
+    }
+    
+    if (type) {
+      const genType: string = _.get(packageJson, ["generator-filter", "type"]);
+      if (type === genType) {
+        return this.createGeneratorChoice(genName, genPackagePath, packageJson);
+      }
+    } else {
+      return this.createGeneratorChoice(genName, genPackagePath, packageJson);
+    }
+  }
+
+  private async createGeneratorChoice(genName: string, genPackagePath: string, packageJson: any): Promise<IGeneratorChoice> {
     let genImageUrl;
-    let genMessage;
-      
+
     try {
       genImageUrl = await datauri.promise(path.join(genPackagePath, YeomanUI.YEOMAN_PNG));
-    } catch (err) {
+    } catch (error) {
       genImageUrl = defaultImage.default;
     }
 
-    try {
-      const packageJson: any = await this.getGenPackageJson(genPackagePath);
-      genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
-    } catch (err) {
-      genMessage = YeomanUI.defaultMessage;
-    }
+    const genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
 
     return {
       name: genName,
