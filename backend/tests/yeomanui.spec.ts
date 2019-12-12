@@ -155,23 +155,18 @@ describe('yeomanui unit test', () => {
                 },
             });
             envMock.expects("getGeneratorNames").returns(["test1", "test3"]);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test1Description"}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).throws(new Error("description_error"));
             fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test3Description"}`);
 
             datauriMock.expects("promise").withExactArgs(path.join("test1Path", YEOMAN_PNG)).resolves("yeomanPngData");
-            datauriMock.expects("promise").withExactArgs(path.join("test3Path", YEOMAN_PNG)).throws(new Error("testError"));
+            datauriMock.expects("promise").withExactArgs(path.join("test3Path", YEOMAN_PNG)).throws(new Error("yeomanpng_error"));
 
             const result = await yeomanUi.getGenerators();
 
             const test1Choice = result.questions[0].choices[0];
             expect(test1Choice.name).to.be.equal("test1");
-            expect(test1Choice.message).to.be.equal("test1Description");
+            expect(test1Choice.message).to.be.equal(choiceMessage);
             expect(test1Choice.imageUrl).to.be.equal("yeomanPngData");
-
-            // const test2Choice = result.questions[0].choices[1];
-            // expect(test2Choice.name).to.be.equal("test2");
-            // expect(test2Choice.message).to.be.equal(choiceMessage);
-            // expect(test2Choice.imageUrl).to.be.equal(defaultImage.default);
 
             const test3Choice = result.questions[0].choices[1];
             expect(test3Choice.name).to.be.equal("test3");

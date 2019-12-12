@@ -98,16 +98,18 @@ export class YeomanUI {
       env.register(meta.resolved);
       const gen: any = env.create(`${generatorName}:app`, {});
       // check if generator defined a helper function called getPrompts()
-      if (gen["getPrompts"] !== undefined) {
-        const promptNames: any[] = gen["getPrompts"]();
+      const genGetPrompts = _.get(gen, "getPromts");
+      if (genGetPrompts) {
+        const promptNames: any[] = genGetPrompts();
         const prompts: IPrompt[] = promptNames.map((value) => {
           return _.assign({ questions: [], name: "" }, value);
         });
         this.setPrompts(prompts);
       }
 
-      if ((gen as any)["getImage"] !== undefined) {
-        const image: string | Promise<string> | undefined = gen["getImage"]();
+      const genGetImage = _.get(gen, "getImage");
+      if (genGetImage) {
+        const image: string | Promise<string> | undefined = genGetImage();
         if ((image as any)["then"]) {
           (image as any)["then"]((contents: string) => {
             console.log(`image contents: ${contents}`);
@@ -152,8 +154,8 @@ export class YeomanUI {
    */
   public evaluateMethod(params: any[], questionName: string, methodName: string): any {
     if (this.currentQuestions) {
-      const relevantQuestion: any = (this.currentQuestions as any[]).find((question) => {
-        return (question.name === questionName);
+      const relevantQuestion: any = _.find(this.currentQuestions, question => {
+        return (_.get(question, "name") === questionName);
       });
       if (relevantQuestion) {
         return relevantQuestion[methodName].apply(this.gen, params);
