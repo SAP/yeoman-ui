@@ -5,13 +5,13 @@ import * as fsextra from "fs-extra";
 import * as _ from "lodash";
 import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
-import { promise as DataURI } from "datauri";
-require("./datauri");
+import * as datauri from "datauri";
 import * as defaultImage from "./defaultImage";
 import { YouiAdapter } from "./youi-adapter";
 import { YouiLog } from "./youi-log";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
+import { Type } from "./filter";
 
 export interface IGeneratorChoice {
   name: string;
@@ -40,12 +40,8 @@ export class YeomanUI {
     }
   }
 
-  private static async getDescription(filePath: string): Promise<string> {
-    const packageJsonString: string = await fsextra.readFile(filePath, "utf8");
-    const packageJson = JSON.parse(packageJsonString);
-    return _.get(packageJson, "description", "");
-  }
-
+  private static defaultMessage = 
+    "Some quick example text of the generator description. This is a long text so that the example will look good.";
   private rpc: IRpc;
   private logger: YouiLog;
   private genMeta: { [namespace: string]: Environment.GeneratorMeta };
@@ -69,13 +65,13 @@ export class YeomanUI {
     this.currentQuestions = {};
   }
 
-  public async getGenerators(): Promise<IPrompt> {
+  public async getGenerators(type?: Type): Promise<IPrompt> {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
 
     const promise: Promise<IPrompt> = new Promise(resolve => {
       const env: Environment.Options = Environment.createEnv();
-      env.lookup(async () => this.onEnvLookup(env, resolve));
+      env.lookup(async () => this.onEnvLookup(env, resolve, type));
     });
 
     return promise;
@@ -171,10 +167,10 @@ export class YeomanUI {
     }
   }
 
-  public async receiveIsWebviewReady() {
+  public async receiveIsWebviewReady(type?: Type) {
     // TODO: loading generators takes a long time; consider prefetching list of generators
     if (this.rpc) {
-      const generators: IPrompt = await this.getGenerators();
+      const generators: IPrompt = await this.getGenerators(type);
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, generators.name]);
       this.runGenerator(response.name);
     }
@@ -202,11 +198,11 @@ export class YeomanUI {
     }
   }
   
-  private async onEnvLookup(env: Environment.Options, resolve: any) {
+  private async onEnvLookup(env: Environment.Options, resolve: any, type?: Type) {
     this.genMeta = env.getGeneratorsMeta();
     const generatorNames: string[] = env.getGeneratorNames();
       const generatorChoicePromises = _.map(generatorNames, (genName: string) => {
-        return this.createGeneratorChoice(genName);
+        return this.createGeneratorChoice(genName, type);
       });
 
       const generatorChoices = await Promise.all(generatorChoicePromises);
@@ -219,26 +215,38 @@ export class YeomanUI {
       resolve({ name: "Choose Generator", questions: [generatorQuestion] });
   }
 
-  private async createGeneratorChoice(genName: string): Promise<IGeneratorChoice> {
-    const choice: IGeneratorChoice = {
+  private async createGeneratorChoice(genName: string, type?: Type): Promise<IGeneratorChoice> {
+    const genPackagePath = _.get(this, ["genMeta", `${genName}:app`, "packagePath"]);
+    let genImageUrl;
+    let genMessage;
+      
+    try {
+      genImageUrl = await datauri.promise(path.join(genPackagePath, "yeoman.png"));
+    } catch (err) {
+      genImageUrl = defaultImage.default;
+    }
+
+    try {
+      const packageJson: any = await this.getGenPackageJson(genPackagePath);
+      genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
+    } catch (err) {
+      genMessage = YeomanUI.defaultMessage;
+    }
+
+    return {
       name: genName,
-      message: "Some quick example text of the generator description. This is a long text so that the example will look good.",
+      message: genMessage,
+      imageUrl: genImageUrl
     };
+  }
 
-    const metaPackagePath: string = _.get(this.genMeta, [`${genName}:app`, "packagePath"]);
-    try {
-      choice.imageUrl = await DataURI(path.join(metaPackagePath, "yeoman.png"));
-    } catch (err) {
-      choice.imageUrl = defaultImage.default;
-    }
+  private async getGenPackageJson(genPackagePath: string): Promise<any> {
+      const packageJsonString: string = await fsextra.readFile(path.join(genPackagePath, "package.json"), "utf8");
+      return JSON.parse(packageJsonString);
+  }
 
-    try {
-      choice.message = await YeomanUI.getDescription(path.join(metaPackagePath, "package.json"));
-    } catch (err) {
-      // no description found -- falling back to generator name
-    }
-
-    return choice;
+  private getGenPackagePath(genName: string): string {
+    return _.get(this, ["genMeta", `${genName}:app`, "packagePath"]);
   }
 
   /**
