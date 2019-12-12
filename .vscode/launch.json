@@ -18,7 +18,7 @@
 		{
 			"type": "node",
 			"request": "launch",
-			"name": "Mocha Tests",
+			"name": "backend unit tests",
 			"program": "${workspaceFolder}/backend/node_modules/mocha/bin/mocha",
 			"args": [
 				"-r",
@@ -74,7 +74,7 @@
 			]
 		},
 		{
-			"name": "Test frontend",
+			"name": "frontend unit tests",
 			"type": "node",
 			"request": "launch",
 			"runtimeArgs": [

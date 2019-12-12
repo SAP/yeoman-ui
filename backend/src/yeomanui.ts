@@ -93,13 +93,13 @@ export class YeomanUI {
 
     const env: Environment = Environment.createEnv(undefined, {}, this.youiAdapter);
     try {
-      const meta: Environment.GeneratorMeta = this.genMeta[`${generatorName}:app`];
+      const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
       // TODO: support sub-generators
       env.register(meta.resolved);
       const gen: any = env.create(`${generatorName}:app`, {});
       // check if generator defined a helper function called getPrompts()
-      if ((gen as any)["getPrompts"] !== undefined) {
-        const promptNames: any[] = (gen as any)["getPrompts"]();
+      if (gen["getPrompts"] !== undefined) {
+        const promptNames: any[] = gen["getPrompts"]();
         const prompts: IPrompt[] = promptNames.map((value) => {
           return _.assign({ questions: [], name: "" }, value);
         });
@@ -107,7 +107,7 @@ export class YeomanUI {
       }
 
       if ((gen as any)["getImage"] !== undefined) {
-        const image: string | Promise<string> | undefined = (gen as any)["getImage"]();
+        const image: string | Promise<string> | undefined = gen["getImage"]();
         if ((image as any)["then"]) {
           (image as any)["then"]((contents: string) => {
             console.log(`image contents: ${contents}`);
@@ -142,11 +142,7 @@ export class YeomanUI {
   }
 
   public doGeneratorDone(success: boolean, message: string): Promise<any> {
-    if (this.rpc) {
-      return this.rpc.invoke("generatorDone", [true, message]);
-    } 
-
-    return Promise.resolve();
+    return this.rpc ? this.rpc.invoke("generatorDone", [true, message]) : Promise.resolve();
   }
 
   /**
@@ -175,10 +171,7 @@ export class YeomanUI {
   }
 
   public toggleLog(): boolean {
-    if (this.rpc) {
-      return this.logger.showLog();
-    }
-    return false;
+    return this.rpc ? this.logger.showLog() : false;
   }
 
   public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
@@ -191,9 +184,9 @@ export class YeomanUI {
       }
       const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
       return this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
-    } else {
-      return Promise.resolve({});
-    }
+    } 
+
+    return Promise.resolve({});
   }
   
   private async onEnvLookup(env: Environment.Options, resolve: any, type?: Type) {
@@ -214,7 +207,7 @@ export class YeomanUI {
   }
 
   private async createGeneratorChoice(genName: string, type?: Type): Promise<IGeneratorChoice> {
-    const genPackagePath = this.getGenPackagePath(genName);
+    const genPackagePath = this.getGenMetaPackagePath(genName);
     let genImageUrl;
     let genMessage;
       
@@ -239,12 +232,16 @@ export class YeomanUI {
   }
 
   private async getGenPackageJson(genPackagePath: string): Promise<any> {
-      const packageJsonString: string = await fsextra.readFile(path.join(genPackagePath, "package.json"), "utf8");
-      return JSON.parse(packageJsonString);
+    const packageJsonString: string = await fsextra.readFile(path.join(genPackagePath, "package.json"), "utf8");
+    return JSON.parse(packageJsonString);
   }
 
-  private getGenPackagePath(genName: string): string {
-    return _.get(this, ["genMeta", `${genName}:app`, "packagePath"]);
+  private getGenMetaPackagePath(genName: string): string {
+    return _.get(this.getGenMetadata(genName), "packagePath");
+  }
+
+  private getGenMetadata(genName: string): Environment.GeneratorMeta {
+    return _.get(this, ["genMeta", `${genName}:app`]);
   }
 
   /**
@@ -260,10 +257,6 @@ export class YeomanUI {
   }
 
   private setPrompts(prompts: IPrompt[]): Promise<void> {
-    if (this.rpc) {
-      return this.rpc.invoke("setPrompts", [prompts]);
-    } 
-
-    return Promise.resolve();
+    return this.rpc ? this.rpc.invoke("setPrompts", [prompts]) : Promise.resolve();
   }
 }
