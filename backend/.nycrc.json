@@ -7,8 +7,8 @@
     "temp-dir": "./reports/.nyc_output",
     "report-dir": "./reports/coverage",
     "check-coverage": true,
-    "branches": 0,
-    "lines": 25,
-    "functions": 18,
-    "statements": 26
+    "branches": 9,
+    "lines": 28,
+    "functions": 20,
+    "statements": 28
   }
