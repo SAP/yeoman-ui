@@ -1,12 +1,10 @@
 import * as sinon from "sinon";
-import * as mocha from "mocha";
-import * as datauri from "datauri";
+const datauri = require("datauri");
 import * as fsextra from "fs-extra";
 import { expect } from "chai";
 import * as _ from "lodash";
 import * as path from "path";
 import {YeomanUI, IGeneratorQuestion} from "../src/yeomanui";
-import * as defaultImage from "../src/defaultImage";
 import * as yeomanEnv from "yeoman-environment";
 import { YouiLog } from "../src/youi-log";
 import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";

@@ -5,7 +5,7 @@ import * as fsextra from "fs-extra";
 import * as _ from "lodash";
 import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
-import * as datauri from "datauri";
+const datauri = require("datauri");
 import * as defaultImage from "./defaultImage";
 import { YouiAdapter } from "./youi-adapter";
 import { YouiLog } from "./youi-log";
@@ -96,12 +96,13 @@ export class YeomanUI {
       const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
       // TODO: support sub-generators
       env.register(meta.resolved);
-      const gen: any = env.create(`${generatorName}:app`, {});
+      const getGenMetadataName = this.getGenMetaName(generatorName);
+      const gen: any = env.create(getGenMetadataName, {});
       // check if generator defined a helper function called getPrompts()
       const genGetPrompts = _.get(gen, "getPromts");
       if (genGetPrompts) {
         const promptNames: any[] = genGetPrompts();
-        const prompts: IPrompt[] = promptNames.map((value) => {
+        const prompts: IPrompt[] = promptNames.map(value => {
           return _.assign({ questions: [], name: "" }, value);
         });
         this.setPrompts(prompts);
@@ -109,9 +110,9 @@ export class YeomanUI {
 
       const genGetImage = _.get(gen, "getImage");
       if (genGetImage) {
-        const image: string | Promise<string> | undefined = genGetImage();
-        if ((image as any)["then"]) {
-          (image as any)["then"]((contents: string) => {
+        const image: any = genGetImage();
+        if (image.then) {
+          image.then((contents: string) => {
             console.log(`image contents: ${contents}`);
           });
         } else if (image !== undefined) {
@@ -257,7 +258,12 @@ export class YeomanUI {
   }
 
   private getGenMetadata(genName: string): Environment.GeneratorMeta {
-    return _.get(this, ["genMeta", `${genName}:app`]);
+    const metadataName: string = this.getGenMetaName(genName);
+    return _.get(this, ["genMeta", metadataName]);
+  }
+
+  private getGenMetaName(genName: string): string {
+    return `${genName}:app`;
   }
 
   /**
