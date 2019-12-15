@@ -6,10 +6,15 @@ export enum GeneratorType {
 }
 
 export class GeneratorFilter {
-    public constructor(public readonly type?: GeneratorType,
-    public readonly cetegories: string[] = []) {}
+    private constructor(public type?: GeneratorType,
+    public cetegories: string[] = []) {}
 
     public static create(filterObject: any) {
-        return new GeneratorFilter(_.get(filterObject, "type"), _.get(filterObject, "cetegories"));
+        const genType: GeneratorType = _.get(filterObject, "type");
+        if (_.includes(_.values(GeneratorType), genType)) {
+            return new GeneratorFilter(genType);
+        }
+
+        return new GeneratorFilter();
     }
 }

@@ -226,8 +226,8 @@ export class YeomanUI {
     
     const filterType = _.get(filter, "type");
     if (filterType) {
-      const genType: string = _.get(packageJson, ["generator-filter", "type"]);
-      if (filterType === genType) {
+      const genFilter: GeneratorFilter = GeneratorFilter.create(_.get(packageJson, ["generator-filter"]));
+      if (filterType === genFilter.type) {
         return this.createGeneratorChoice(genName, genPackagePath, packageJson);
       }
     } else {

@@ -1,3 +1,4 @@
+import * as mocha from "mocha";
 import * as sinon from "sinon";
 const datauri = require("datauri");
 import * as fsextra from "fs-extra";
@@ -277,6 +278,23 @@ describe('yeomanui unit test', () => {
             const result = await yeomanUi.getGenerators();
 
             expect(result.questions[0].choices).to.have.lengthOf(3);
+        });
+
+        it("wrong generators filter type is provided", async () => {
+            envMock.expects("getGeneratorsMeta").returns({
+                "test1:app": {
+                    packagePath: "test1Path"
+                }
+            });
+            envMock.expects("getGeneratorNames").returns(["test1"]);
+
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project123"}, "description": "test4Description"}`);
+
+            yeomanUi.setGenFilter(GeneratorFilter.create({type: GeneratorType.project}));
+            const result = await yeomanUi.getGenerators();
+
+            // tslint:disable-next-line: no-unused-expression
+            expect(result.questions[0].choices).to.be.empty;
         });
     });
 });
