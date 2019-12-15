@@ -6,7 +6,7 @@ export enum GeneratorType {
 }
 
 export class GeneratorFilter {
-    private constructor(public readonly type?: GeneratorType,
+    public constructor(public readonly type?: GeneratorType,
     public readonly cetegories: string[] = []) {}
 
     public static create(filterObject: any) {

@@ -167,7 +167,7 @@ describe('yeomanui unit test', () => {
             fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
 
-            const genFilter = GeneratorFilter.create({type: GeneratorType.project});
+            const genFilter: GeneratorFilter = GeneratorFilter.create({type: GeneratorType.project});
             yeomanUi.setGenFilter(genFilter);
             const result = await yeomanUi.getGenerators();
 
