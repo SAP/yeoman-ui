@@ -167,7 +167,7 @@ describe('yeomanui unit test', () => {
             fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
 
-            const genFilter = new GeneratorFilter(GeneratorType.project);
+            const genFilter = GeneratorFilter.create({type: GeneratorType.project});
             yeomanUi.setGenFilter(genFilter);
             const result = await yeomanUi.getGenerators();
 
@@ -206,7 +206,7 @@ describe('yeomanui unit test', () => {
             fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
 
-            const genFilter = new GeneratorFilter(GeneratorType.module);
+            const genFilter = GeneratorFilter.create({type: GeneratorType.module});
             yeomanUi.setGenFilter(genFilter);
             const result = await yeomanUi.getGenerators();
 

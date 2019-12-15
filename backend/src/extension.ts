@@ -6,18 +6,20 @@ import { YeomanUI } from "./yeomanui";
 import {RpcExtension} from '@sap-devx/webview-rpc/out.ext/rpc-extension';
 import { YouiLog } from "./youi-log";
 import { OutputChannelLog } from './output-channel-log';
-import { GeneratorFilter, GeneratorType } from './filter';
+import { GeneratorFilter } from './filter';
 
-
+let thisContext: vscode.ExtensionContext;
 export function activate(context: vscode.ExtensionContext) {
+	thisContext = context;
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand('sap.loadYeomanUI_projects', () => {
-			YeomanUIPanel.createOrShow(context.extensionPath, new GeneratorFilter(GeneratorType.project));
+			openYeomanUi({"type": "project"});
 	}));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('sap.loadYeomanUI_all', () => {
-			YeomanUIPanel.createOrShow(context.extensionPath);
+			openYeomanUi();
 	}));
 
 	if (vscode.window.registerWebviewPanelSerializer) {
@@ -29,6 +31,13 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		});
 	}
+	
+	// expose method to all vsix extensions
+	return {"openYeomanUi": openYeomanUi};
+}
+
+export function openYeomanUi(genFilter?: any) {
+	YeomanUIPanel.createOrShow(thisContext.extensionPath, GeneratorFilter.create(genFilter));
 }
 
 /**
