@@ -11,8 +11,13 @@ import { GeneratorFilter, GeneratorType } from './filter';
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
-	vscode.commands.registerCommand('sap.loadYeomanUI_projects', () => {
-		YeomanUIPanel.createOrShow(context.extensionPath, new GeneratorFilter(GeneratorType.project));
+		vscode.commands.registerCommand('sap.loadYeomanUI_projects', () => {
+			YeomanUIPanel.createOrShow(context.extensionPath, new GeneratorFilter(GeneratorType.project));
+	}));
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('sap.loadYeomanUI_all', () => {
+			YeomanUIPanel.createOrShow(context.extensionPath);
 	}));
 
 	if (vscode.window.registerWebviewPanelSerializer) {
@@ -44,6 +49,7 @@ export class YeomanUIPanel {
 
 		// If we already have a panel, show it.
 		if (YeomanUIPanel.currentPanel) {
+			YeomanUIPanel.currentPanel.yeomanui.setGenFilter(YeomanUIPanel.genFilter);
 			YeomanUIPanel.currentPanel.panel.reveal(column);
 			return;
 		}
@@ -76,7 +82,7 @@ export class YeomanUIPanel {
 	private disposables: vscode.Disposable[] = [];
 	private questionsResolutions: Map<number, any>;
 
-	private constructor(panel: vscode.WebviewPanel, extensionPath: string, genFilter?: GeneratorFilter) {
+	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
 		this.questionsResolutions = new Map();
 		this.panel = panel;
 		this.extensionPath = extensionPath;
@@ -84,7 +90,7 @@ export class YeomanUIPanel {
 		const logger: YouiLog = new OutputChannelLog();
 		
 		this.yeomanui = new YeomanUI(this.rpc, logger);
-		this.yeomanui.setGenFilter(genFilter);
+		this.yeomanui.setGenFilter(YeomanUIPanel.genFilter);
 
 		// Set the webview's initial html content
 		this._update();
