@@ -11,7 +11,7 @@ import { YouiAdapter } from "./youi-adapter";
 import { YouiLog } from "./youi-log";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
-import { Type } from "./filter";
+import { GeneratorType, GeneratorFilter } from "./filter";
 
 export interface IGeneratorChoice {
   name: string;
@@ -63,13 +63,13 @@ export class YeomanUI {
     this.currentQuestions = {};
   }
 
-  public async getGenerators(type?: Type): Promise<IPrompt> {
+  public async getGenerators(filter?: GeneratorFilter): Promise<IPrompt> {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
 
     const promise: Promise<IPrompt> = new Promise(resolve => {
       const env: Environment.Options = Environment.createEnv();
-      env.lookup(async () => this.onEnvLookup(env, resolve, type));
+      env.lookup(async () => this.onEnvLookup(env, resolve, filter));
     });
 
     return promise;
@@ -163,10 +163,10 @@ export class YeomanUI {
     }
   }
 
-  public async receiveIsWebviewReady(type?: Type) {
+  public async receiveIsWebviewReady(filter?: GeneratorFilter) {
     // TODO: loading generators takes a long time; consider prefetching list of generators
     if (this.rpc) {
-      const generators: IPrompt = await this.getGenerators(type);
+      const generators: IPrompt = await this.getGenerators(filter);
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, generators.name]);
       this.runGenerator(response.name);
     }
@@ -191,11 +191,11 @@ export class YeomanUI {
     return Promise.resolve({});
   }
   
-  private async onEnvLookup(env: Environment.Options, resolve: any, type?: Type) {
+  private async onEnvLookup(env: Environment.Options, resolve: any, filter?: GeneratorFilter) {
     this.genMeta = env.getGeneratorsMeta();
     const generatorNames: string[] = env.getGeneratorNames();
     const generatorChoicePromises = _.map(generatorNames, genName => {
-      return this.getGeneratorChoice(genName, type);
+      return this.getGeneratorChoice(genName, filter);
     });
 
     const generatorChoices = await Promise.all(generatorChoicePromises);
@@ -208,7 +208,7 @@ export class YeomanUI {
     resolve({ name: "Choose Generator", questions: [generatorQuestion] });
   }
 
-  private async getGeneratorChoice(genName: string, type?: Type): Promise<IGeneratorChoice | undefined> {
+  private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<IGeneratorChoice | undefined> {
     let packageJson: any;
     
     const genPackagePath = this.getGenMetaPackagePath(genName);
@@ -218,9 +218,10 @@ export class YeomanUI {
       return;
     }
     
-    if (type) {
+    const filterType = _.get(filter, "type");
+    if (filterType) {
       const genType: string = _.get(packageJson, ["generator-filter", "type"]);
-      if (type === genType) {
+      if (filterType === genType) {
         return this.createGeneratorChoice(genName, genPackagePath, packageJson);
       }
     } else {

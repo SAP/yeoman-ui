@@ -10,7 +10,7 @@ import * as defaultImage from "../src/defaultImage";
 import * as yeomanEnv from "yeoman-environment";
 import { YouiLog } from "../src/youi-log";
 import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-import { Type } from "../src/filter";
+import { GeneratorType, GeneratorFilter } from "../src/filter";
 
 describe('yeomanui unit test', () => {
     let sandbox: any;
@@ -169,7 +169,9 @@ describe('yeomanui unit test', () => {
             fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
 
-            const result = await yeomanUi.getGenerators(Type.project);
+            const genFilter = new GeneratorFilter();
+            genFilter.type = GeneratorType.project;
+            const result = await yeomanUi.getGenerators(genFilter);
 
             expect(result.questions[0].choices).to.have.lengthOf(2);
             const test1Choice = result.questions[0].choices[0];
@@ -206,7 +208,9 @@ describe('yeomanui unit test', () => {
             fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
 
-            const result = await yeomanUi.getGenerators(Type.module);
+            const genFilter = new GeneratorFilter();
+            genFilter.type = GeneratorType.module;
+            const result = await yeomanUi.getGenerators(genFilter);
 
             expect(result.questions[0].choices).to.have.lengthOf(1);
             const test1Choice = result.questions[0].choices[0];
