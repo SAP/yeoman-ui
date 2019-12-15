@@ -1,17 +1,19 @@
-import * as fs from 'fs';
+import * as fsextra from 'fs-extra';
+import * as _ from 'lodash';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { YeomanUI } from "./yeomanui";
 import {RpcExtension} from '@sap-devx/webview-rpc/out.ext/rpc-extension';
 import { YouiLog } from "./youi-log";
 import { OutputChannelLog } from './output-channel-log';
+import { GeneratorFilter, GeneratorType } from './filter';
+
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
-		vscode.commands.registerCommand('sap.loadYeomanUI', () => {
-			YeomanUIPanel.createOrShow(context.extensionPath);
-		})
-	);
+	vscode.commands.registerCommand('sap.loadYeomanUI_projects', () => {
+		YeomanUIPanel.createOrShow(context.extensionPath, new GeneratorFilter(GeneratorType.project));
+	}));
 
 	if (vscode.window.registerWebviewPanelSerializer) {
 		// Make sure we register a serializer in activation event
@@ -33,11 +35,12 @@ export class YeomanUIPanel {
 	 */
 	public static readonly viewType = 'yeomanui';
 	public static currentPanel: YeomanUIPanel | undefined;
+	public static genFilter: GeneratorFilter;
 
-	public static createOrShow(extensionPath: string) {
-		const column = vscode.window.activeTextEditor
-			? vscode.window.activeTextEditor.viewColumn
-			: undefined;
+	public static createOrShow(extensionPath: string, genFilter?: GeneratorFilter) {
+		YeomanUIPanel.genFilter = genFilter;
+
+		const column = _.get(vscode.window, "activeTextEditor.viewColumn");
 
 		// If we already have a panel, show it.
 		if (YeomanUIPanel.currentPanel) {
@@ -55,7 +58,7 @@ export class YeomanUIPanel {
 				enableScripts: true,
 
 				// And restrict the webview to only loading content from our extension's `media` directory.
-				localResourceRoots: [vscode.Uri.file(path.join(extensionPath, 'dist', 'media'))]
+				localResourceRoots: [vscode.Uri.file(YeomanUIPanel.getMediaPath(extensionPath))]
 			}
 		);
 
@@ -73,13 +76,15 @@ export class YeomanUIPanel {
 	private disposables: vscode.Disposable[] = [];
 	private questionsResolutions: Map<number, any>;
 
-	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
+	private constructor(panel: vscode.WebviewPanel, extensionPath: string, genFilter?: GeneratorFilter) {
 		this.questionsResolutions = new Map();
 		this.panel = panel;
 		this.extensionPath = extensionPath;
 		this.rpc = new RpcExtension(this.panel.webview);
 		const logger: YouiLog = new OutputChannelLog();
+		
 		this.yeomanui = new YeomanUI(this.rpc, logger);
+		this.yeomanui.setGenFilter(genFilter);
 
 		// Set the webview's initial html content
 		this._update();
@@ -131,14 +136,16 @@ export class YeomanUIPanel {
 		}
 	}
 
+	private static getMediaPath(extensionPath: string): string {
+		return path.join(extensionPath, 'dist', 'media');
+	}
+
 	private _update() {
 		// TODO: don't use sync
-		let indexHtml: string = fs.readFileSync(path.join(this.extensionPath, 'dist', 'media', 'index.html'), "utf8");
+		let indexHtml: string = fsextra.readFileSync(path.join(YeomanUIPanel.getMediaPath(this.extensionPath), 'index.html'), "utf8");
 		if (indexHtml) {
 			// Local path to main script run in the webview
-			const scriptPathOnDisk = vscode.Uri.file(
-				path.join(this.extensionPath, 'dist', 'media', path.sep)
-			);
+			const scriptPathOnDisk = vscode.Uri.file(path.join(YeomanUIPanel.getMediaPath(this.extensionPath), path.sep));
 			const scriptUri = this.panel.webview.asWebviewUri(scriptPathOnDisk);
 
 			// TODO: very fragile: assuming double quotes and src is first attribute

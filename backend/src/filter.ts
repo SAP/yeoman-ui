@@ -4,6 +4,6 @@ export enum GeneratorType {
 }
 
 export class GeneratorFilter {
-    type?: GeneratorType;
-    category?: string[];
+    constructor(public readonly type?: GeneratorType,
+    public readonly category: string[] = []) {}
 }

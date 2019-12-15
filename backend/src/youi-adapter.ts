@@ -1,6 +1,7 @@
 import { Adapter } from "yeoman-environment";
 import { YeomanUI } from "./yeomanui";
 import { YouiLog } from "./youi-log";
+import * as _ from "lodash";
 const chalk = require('chalk');
 
 /**
@@ -62,12 +63,12 @@ export class YouiAdapter implements Adapter {
           try {
             return cb(result as any);
           } catch (err) {
-            this.yeomanui.doGeneratorDone(false, (err.message ? err.message : 'Yeoman UI detected an error'));
+            this.yeomanui.doGeneratorDone(false, (_.get(err, "message", 'Yeoman UI detected an error')));
             return;
           }
-        } else {
-          return result;
-        }
+        } 
+
+        return result;
       }).catch((reason) => {
         throw reason;
       });

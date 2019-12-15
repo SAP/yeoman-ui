@@ -47,6 +47,7 @@ export class YeomanUI {
   private gen: Generator | undefined;
   private promptCount: number;
   private currentQuestions: Environment.Adapter.Questions<any>;
+  private genFilter: GeneratorFilter;
 
   constructor(rpc: IRpc, logger: YouiLog) {
     this.rpc = rpc;
@@ -63,19 +64,23 @@ export class YeomanUI {
     this.currentQuestions = {};
   }
 
-  public async getGenerators(filter?: GeneratorFilter): Promise<IPrompt> {
+  public setGenFilter(genFilter?: GeneratorFilter) {
+    this.genFilter = genFilter;
+  }
+
+  public async getGenerators(): Promise<IPrompt> {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
 
     const promise: Promise<IPrompt> = new Promise(resolve => {
       const env: Environment.Options = Environment.createEnv();
-      env.lookup(async () => this.onEnvLookup(env, resolve, filter));
+      env.lookup(async () => this.onEnvLookup(env, resolve, this.genFilter));
     });
 
     return promise;
   }
 
-  public runGenerator(generatorName: string) {
+  public async runGenerator(generatorName: string) {
 
     // TODO: ensure generatorName is a valid dir name
     const destinationRoot: string = path.join(os.homedir(), "projects", generatorName);
@@ -164,12 +169,12 @@ export class YeomanUI {
     }
   }
 
-  public async receiveIsWebviewReady(filter?: GeneratorFilter) {
+  public async receiveIsWebviewReady() {
     // TODO: loading generators takes a long time; consider prefetching list of generators
     if (this.rpc) {
-      const generators: IPrompt = await this.getGenerators(filter);
+      const generators: IPrompt = await this.getGenerators();
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, generators.name]);
-      this.runGenerator(response.name);
+      await this.runGenerator(response.name);
     }
   }
 

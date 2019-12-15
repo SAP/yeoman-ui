@@ -22,5 +22,8 @@
     "yeoman-generator": "^1.1.1",
     "chalk": "^2.0.0",
     "inquirer": "^6.2.2"
+  },
+  "generator-filter": {
+    "type": "project"
   }
 }

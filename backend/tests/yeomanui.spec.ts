@@ -167,9 +167,9 @@ describe('yeomanui unit test', () => {
             fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
 
-            const genFilter = new GeneratorFilter();
-            genFilter.type = GeneratorType.project;
-            const result = await yeomanUi.getGenerators(genFilter);
+            const genFilter = new GeneratorFilter(GeneratorType.project);
+            yeomanUi.setGenFilter(genFilter);
+            const result = await yeomanUi.getGenerators();
 
             expect(result.questions[0].choices).to.have.lengthOf(2);
             const test1Choice = result.questions[0].choices[0];
@@ -206,9 +206,9 @@ describe('yeomanui unit test', () => {
             fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
 
-            const genFilter = new GeneratorFilter();
-            genFilter.type = GeneratorType.module;
-            const result = await yeomanUi.getGenerators(genFilter);
+            const genFilter = new GeneratorFilter(GeneratorType.module);
+            yeomanUi.setGenFilter(genFilter);
+            const result = await yeomanUi.getGenerators();
 
             expect(result.questions[0].choices).to.have.lengthOf(1);
             const test1Choice = result.questions[0].choices[0];
@@ -242,6 +242,7 @@ describe('yeomanui unit test', () => {
             fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
 
+            yeomanUi.setGenFilter();
             const result = await yeomanUi.getGenerators();
 
             expect(result.questions[0].choices).to.have.lengthOf(5);
