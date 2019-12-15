@@ -5,3 +5,5 @@
 # however, it contains many dependencies that are not needed
 !node_modules
 !dist
+out/tests/**
+tests/**

@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="d-flex flex-column">
+  <div id="app" class="d-flex flex-column yeoman-ui">
     <div v-if="!prompts.length" class="loading">Yeoman User Interface is loading...</div>
 
     <Header
@@ -309,10 +309,13 @@ export default {
 #app {
   height: 100%;
   color: var(--vscode-foreground, #cccccc);
-  background-color: var(--vscode-editor-inactiveSelectionBackground, #3a3d41);
+  background-color: var(--vscode-terminal-background, #1e1e1e);
   font-family: var(--vscode-font-family);
   font-weight: var(--vscode-font-weight);
   font-size: var(--vscode-font-size);
+}
+.yeoman-ui *:focus {
+  outline-color: transparent;
 }
 html,
 body {
