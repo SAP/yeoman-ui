@@ -8,7 +8,7 @@ import { YouiLog } from "./youi-log";
 import { OutputChannelLog } from './output-channel-log';
 import { GeneratorFilter } from './filter';
 
-let thisContext: vscode.ExtensionContext;
+
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand('loadYeomanUI', (genFilter?: GeneratorFilter) => {
