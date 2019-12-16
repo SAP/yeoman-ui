@@ -11,7 +11,7 @@ import { GeneratorFilter } from './filter';
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
-		vscode.commands.registerCommand('loadYeomanUI', (genFilter?: GeneratorFilter) => {
+		vscode.commands.registerCommand('loadYeomanUI', (genFilter?: any) => {
 			YeomanUIPanel.createOrShow(context.extensionPath, GeneratorFilter.create(genFilter));
 	}));
 
