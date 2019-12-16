@@ -2,12 +2,12 @@
   <div>
     <b-card-group deck>
       <b-container fluid>
-        <b-row v-for="(chunk, chunkIndex) in getChunks()" :key="chunkIndex">
-          <b-col v-for="(item, itemIndex) in chunk" :key="itemIndex" col=true class="col-generator">
+        <b-row v-for="(chunk, chunkIndex) in getChunks()" :key="chunkIndex" class="align-self-md-stretch">
+          <b-col v-for="(item, itemIndex) in chunk" :key="itemIndex" cols="4" col class="col-generator">
             <b-card
               @click="emitSelection(item.name)"
               v-on:click="select"
-              class="generator"
+              class="generator h-100"
               :title="item.name"
               img-alt="Image"
               img-top
@@ -107,8 +107,6 @@ export default {
 .card.generator {
   width: 100%;
   height: 100%;
-  max-width: 500px;
-  max-height: 500px;
   border-style: none;
   border-width: 1px;
   border-radius: 0px;
