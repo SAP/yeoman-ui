@@ -309,7 +309,7 @@ export default {
 #app {
   height: 100%;
   color: var(--vscode-foreground, #cccccc);
-  background-color: var(--vscode-terminal-background, #1e1e1e);
+  background-color: var(--vscode-editor-background, #1e1e1e);
   font-family: var(--vscode-font-family);
   font-weight: var(--vscode-font-weight);
   font-size: var(--vscode-font-size);

@@ -1,23 +1,25 @@
 <template>
   <div>
     <b-card-group deck>
-      <b-card
-        v-for="(choice, index) in currentQuestion.choices"
-        @click="emitSelection(choice.name)"
-        v-on:click="select"
-        class="generator"
-        :key="index"
-        :title="choice.name"
-        img-alt="Image"
-        img-top
-        tag="article"
-        style="width: 15rem"
-      >
-        <b-card-text>{{choice.message}}</b-card-text>
-        <b-card-text class="templateDocumentationClass">Template Documentation</b-card-text>
-
-        <b-card-img :src="getImageUrl(choice)"></b-card-img>
-      </b-card>
+      <b-container fluid>
+        <b-row v-for="(chunk, chunkIndex) in getChunks()" :key="chunkIndex">
+          <b-col v-for="(item, itemIndex) in chunk" :key="itemIndex" col=true class="col-generator">
+            <b-card
+              @click="emitSelection(item.name)"
+              v-on:click="select"
+              class="generator"
+              :title="item.name"
+              img-alt="Image"
+              img-top
+              tag="article"
+            >
+              <b-card-text>{{item.message}}</b-card-text>
+              <b-card-text class="templateDocumentationClass">Template Documentation</b-card-text>
+              <b-card-img :src="getImageUrl(item)"></b-card-img>
+            </b-card>
+          </b-col>
+        </b-row>
+      </b-container>
     </b-card-group>
   </div>
 </template>
@@ -33,7 +35,9 @@ export default {
   data() {
     return {
       publicPath: process.env.BASE_URL,
-      selectedItem: undefined
+      selectedItem: undefined,
+      nColumns: 3, // number of groups/columns
+      groupedItems: []
     }
   },
   methods: {
@@ -53,12 +57,29 @@ export default {
     emitSelection(generatorName) {
       this.currentQuestion.answer = generatorName
       this.$emit("generatorSelected", generatorName)
+    },
+    chunk: function(arr, size) {
+      var newArr = [];
+      for (var i=0; i<arr.length; i+=size) {
+        newArr.push(arr.slice(i, i+size));
+      }
+      return newArr;
+    },
+    getChunks: function() {
+      // divide into n groups
+      // return this.chunk(this.currentQuestion.choices, Math.ceil(this.currentQuestion.choices.length/this.nColumns)); 
+      return this.chunk(this.currentQuestion.choices, this.nColumns); 
     }
-  }
+  },
 }
+
 </script>
 
 <style>
+.col.col-generator {
+  padding: 11px;
+}
+
 .card-body {
   color: var(--vscode-editorWidget-foreground, #cccccc);
   border: none;
@@ -80,12 +101,20 @@ export default {
   color: var(--vscode-textLink-foreground, #3794ff);
 }
 
+.card-deck {
+  margin: 0rem;
+}
+
 .card.generator {
+  width: 100%;
+  height: 100%;
+  max-width: 500px;
+  max-height: 500px;
   border-style: none;
   border-width: 1px;
   border-radius: 0px;
   border-color: var(--vscode-button-background, #0e639c);
-  background-color: var(--vscode-titleBar-activeBackground, #3c3c3c);
+  background-color: var(--vscode-input-background, #3c3c3c);
 }
 
 .card.generator:hover:not(.selected) {
