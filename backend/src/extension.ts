@@ -10,16 +10,14 @@ import { GeneratorFilter } from './filter';
 
 let thisContext: vscode.ExtensionContext;
 export function activate(context: vscode.ExtensionContext) {
-	thisContext = context;
-
 	context.subscriptions.push(
-		vscode.commands.registerCommand('sap.loadYeomanUI_projects', () => {
-			openYeomanUi({"type": "project"});
+		vscode.commands.registerCommand('loadYeomanUI', (genFilter?: GeneratorFilter) => {
+			YeomanUIPanel.createOrShow(context.extensionPath, GeneratorFilter.create(genFilter));
 	}));
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('sap.loadYeomanUI_all', () => {
-			openYeomanUi();
+		vscode.commands.registerCommand('loadYeomanUI_projects', () => {
+			vscode.commands.executeCommand("loadYeomanUI", GeneratorFilter.create({"type": "project"}));
 	}));
 
 	if (vscode.window.registerWebviewPanelSerializer) {
@@ -31,13 +29,6 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		});
 	}
-	
-	// expose method to all vsix extensions
-	return {"openYeomanUi": openYeomanUi};
-}
-
-export function openYeomanUi(genFilter?: any) {
-	YeomanUIPanel.createOrShow(thisContext.extensionPath, GeneratorFilter.create(genFilter));
 }
 
 /**

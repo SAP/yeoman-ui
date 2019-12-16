@@ -14,17 +14,17 @@
 	],
 	"activationEvents": [
 		"*",
-		"onCommand:sap.loadYeomanUI_projects",
-		"onCommand:sap.loadYeomanUI_all"
+		"onCommand:loadYeomanUI_projects",
+		"onCommand:loadYeomanUI"
 	],
 	"main": "./dist/extension",
 	"contributes": {
 		"commands": [{
-			"command": "sap.loadYeomanUI_projects",
-			"title": "Yeoman User Interface (projects)"
+			"command": "loadYeomanUI_projects",
+			"title": "Yeoman UI Project Generators"
 		}, {
-			"command": "sap.loadYeomanUI_all",
-			"title": "Yeoman User Interface"
+			"command": "loadYeomanUI",
+			"title": "Yeoman UI Generators"
 		}]
 	},
 	"scripts": {
