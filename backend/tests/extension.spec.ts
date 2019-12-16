@@ -66,7 +66,7 @@ describe('extension unit test', () => {
             extension.activate(testContext);
             
             const loadYeomanUIProjectsCommand = _.get(oRegisteredCommands, "loadYeomanUI_projects");
-            commandsMock.expects("executeCommand").withExactArgs("loadYeomanUI", GeneratorFilter.create({"type": "project"}));
+            commandsMock.expects("executeCommand").withExactArgs("loadYeomanUI", {"type": "project"});
             loadYeomanUIProjectsCommand();
         });
     });

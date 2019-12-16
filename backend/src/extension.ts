@@ -11,13 +11,13 @@ import { GeneratorFilter } from './filter';
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
-		vscode.commands.registerCommand('loadYeomanUI', (genFilter?: any) => {
-			YeomanUIPanel.createOrShow(context.extensionPath, GeneratorFilter.create(genFilter));
+		vscode.commands.registerCommand('loadYeomanUI', (filterObj?: any) => {
+			YeomanUIPanel.createOrShow(context.extensionPath, GeneratorFilter.create(filterObj));
 	}));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('loadYeomanUI_projects', () => {
-			vscode.commands.executeCommand("loadYeomanUI", GeneratorFilter.create({"type": "project"}));
+			vscode.commands.executeCommand("loadYeomanUI", {"type": "project"});
 	}));
 
 	if (vscode.window.registerWebviewPanelSerializer) {
