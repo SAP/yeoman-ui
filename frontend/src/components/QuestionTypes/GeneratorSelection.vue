@@ -67,7 +67,6 @@ export default {
     },
     getChunks: function() {
       // divide into n groups
-      // return this.chunk(this.currentQuestion.choices, Math.ceil(this.currentQuestion.choices.length/this.nColumns)); 
       return this.chunk(this.currentQuestion.choices, this.nColumns); 
     }
   },
