@@ -65,7 +65,7 @@ export class YeomanUI {
   }
 
   public setGenFilter(genFilter: GeneratorFilter) {
-    this.genFilter = genFilter;
+    this.genFilter = genFilter ? genFilter : GeneratorFilter.create();
   }
 
   public async getGenerators(): Promise<IPrompt> {
