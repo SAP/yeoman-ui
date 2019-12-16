@@ -2,7 +2,8 @@ import * as _ from "lodash";
 
 export enum GeneratorType {
     project = "project", 
-    module = "module"
+    module = "module",
+    all = "all"
 }
 
 function getCategories(filterObject?: any): string[] {
@@ -20,15 +21,17 @@ function getCategories(filterObject?: any): string[] {
 }
 
 function getType(filterObject?: any): GeneratorType {
-    const genType: GeneratorType = _.get(filterObject, "type");
+    const genType: GeneratorType = _.get(filterObject, "type", GeneratorType.all);
     if (_.includes(_.values(GeneratorType), genType)) {
-        return GeneratorType[genType];
+        return genType;
     }
+
+    return GeneratorType.all;
 }
 
 export class GeneratorFilter {
-    constructor(public readonly  type?: GeneratorType,
-                public readonly categories: string[] = []) {}
+    constructor(public readonly  type: GeneratorType,
+                public readonly categories: string[]) {}
 
     public static create(filterObject?: any) {
         const categories: string[] = getCategories(filterObject); 

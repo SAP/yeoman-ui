@@ -64,7 +64,7 @@ export class YeomanUI {
     this.currentQuestions = {};
   }
 
-  public setGenFilter(genFilter?: GeneratorFilter) {
+  public setGenFilter(genFilter: GeneratorFilter) {
     this.genFilter = genFilter;
   }
 
@@ -221,18 +221,17 @@ export class YeomanUI {
     try {
       packageJson = await this.getGenPackageJson(genPackagePath);
     } catch (error) {
-      return;
+      return Promise.resolve(undefined);
     }
     
-    const filterType = _.get(filter, "type");
-    if (filterType) {
-      const genFilter: GeneratorFilter = GeneratorFilter.create(_.get(packageJson, ["generator-filter"]));
-      if (filterType === genFilter.type) {
+    const genFilter: GeneratorFilter = GeneratorFilter.create(_.get(packageJson, ["generator-filter"]));
+    const typeEqual: boolean = (filter.type === GeneratorType.all || filter.type === genFilter.type);
+    const categoriesHasIntersection: boolean = (_.isEmpty(filter.categories) || !_.isEmpty(_.intersection(filter.categories, genFilter.categories)));
+    if (typeEqual && categoriesHasIntersection) {
         return this.createGeneratorChoice(genName, genPackagePath, packageJson);
-      }
-    } else {
-      return this.createGeneratorChoice(genName, genPackagePath, packageJson);
     }
+
+    return Promise.resolve(undefined);
   }
 
   private async createGeneratorChoice(genName: string, genPackagePath: string, packageJson: any): Promise<IGeneratorChoice> {

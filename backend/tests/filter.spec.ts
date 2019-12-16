@@ -18,7 +18,7 @@ describe('filter unit test', () => {
         const testCategories: string[] = ["test1", "test2"];
         const genFilter: GeneratorFilter = GeneratorFilter.create({type: "test123", categories: testCategories});
         // tslint:disable-next-line: no-unused-expression
-        expect(genFilter.type).to.be.undefined;
+        expect(genFilter.type).to.be.equal(GeneratorType.all);
         expect(genFilter.categories).to.be.deep.equal(testCategories);
     });
 

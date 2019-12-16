@@ -233,20 +233,24 @@ describe('yeomanui unit test', () => {
                 },
                 "test5:app": {
                     packagePath: "test5Path"
+                },
+                "test6:app": {
+                    packagePath: "test6Path"
                 }
             });
-            envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5"]);
+            envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5", "test6"]);
 
             fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project_test"}}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test6Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "all"}}`);
 
-            yeomanUi.setGenFilter();
+            yeomanUi.setGenFilter(GeneratorFilter.create());
             const result = await yeomanUi.getGenerators();
 
-            expect(result.questions[0].choices).to.have.lengthOf(5);
+            expect(result.questions[0].choices).to.have.lengthOf(6);
         });
 
         it("get generators with accessible package.json", async () => {
@@ -295,6 +299,45 @@ describe('yeomanui unit test', () => {
 
             // tslint:disable-next-line: no-unused-expression
             expect(result.questions[0].choices).to.be.empty;
+        });
+
+        it("get generators with type project and categories cat1 and cat2", async () => {
+            envMock.expects("getGeneratorsMeta").returns({
+                "test1:app": {
+                    packagePath: "test1Path"
+                },
+                "test2:app": {
+                    packagePath: "test2Path"
+                },
+                "test3:app": {
+                    packagePath: "test3Path"
+                },
+                "test4:app": {
+                    packagePath: "test4Path"
+                },
+                "test5:app": {
+                    packagePath: "test5Path"
+                }
+            });
+            envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5"]);
+
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project", "categories": ["cat2"]}, "description": "test1Description"}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project", "categories": ["cat2", "cat1"]}}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project", "categories": ["cat1"]}, "description": "test4Description"}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
+
+            const genFilter: GeneratorFilter = GeneratorFilter.create({type: GeneratorType.project, categories: ["cat1", "cat2"]});
+            yeomanUi.setGenFilter(genFilter);
+            const result = await yeomanUi.getGenerators();
+
+            expect(result.questions[0].choices).to.have.lengthOf(3);
+            const test1Choice = result.questions[0].choices[0];
+            const test2Choice = result.questions[0].choices[1];
+            const test3Choice = result.questions[0].choices[2];
+            expect(test1Choice.name).to.be.equal("test1");
+            expect(test2Choice.name).to.be.equal("test2");
+            expect(test3Choice.name).to.be.equal("test4");
         });
     });
 });
