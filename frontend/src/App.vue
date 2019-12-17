@@ -320,7 +320,7 @@ export default {
 html,
 body {
   height: 100%;
-  background-color: var(--vscode-editor-inactiveSelectionBackground, #3a3d41);
+  background-color: var(--vscode-editor-background, #1e1e1e);
   padding: 0px;
 }
 .list-group-item.selected {
