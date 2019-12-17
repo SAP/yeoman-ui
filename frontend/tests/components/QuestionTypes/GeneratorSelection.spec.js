@@ -82,4 +82,40 @@ describe('GeneratorSelection.vue', () => {
             expect(bCards.wrappers[1].attributes()['border-style']).toBe('solid')
         })
     })
+
+    describe('getChunks - method', () => {
+        test('getChunks - 2 Generators -> 1 row ', () => {
+            const getChunksSpy = jest.spyOn(GeneratorSelection.methods, 'getChunks')
+            wrapper = initComponent(GeneratorSelection, {
+                currentQuestion: {
+                    choices: [{name: 'testName-01'},{name: 'testName-02'}]
+                }
+            }, true)
+            expect(getChunksSpy).toHaveReturnedWith([[{"name": "testName-01"}, {"name": "testName-02"}]])
+        })
+
+        test('getChunks - 3 Generators -> 1 row ', () => {
+            const getChunksSpy = jest.spyOn(GeneratorSelection.methods, 'getChunks')
+            wrapper = initComponent(GeneratorSelection, {
+                currentQuestion: {
+                    choices: [{name: 'testName-01'},{name: 'testName-02'},{name: 'testName-03'}]
+                }
+            }, true)
+            expect(getChunksSpy).toHaveReturnedWith([[{"name": "testName-01"}, {"name": "testName-02"}, {"name": "testName-03"}]])
+        })
+
+        test('getChunks - 7 Generators -> 3 rows ', () => {
+            const getChunksSpy = jest.spyOn(GeneratorSelection.methods, 'getChunks')
+            wrapper = initComponent(GeneratorSelection, {
+                currentQuestion: {
+                    choices: [{name: 'testName-01'},{name: 'testName-02'},{name: 'testName-03'},
+                              {name: 'testName-04'},{name: 'testName-05'},{name: 'testName-06'},
+                              {name: 'testName-07'}]
+                }
+            }, true)
+            expect(getChunksSpy).toHaveReturnedWith([[{"name": "testName-01"}, {"name": "testName-02"}, {"name": "testName-03"}], 
+                                                     [{"name": "testName-04"}, {"name": "testName-05"}, {"name": "testName-06"}], 
+                                                     [{"name": "testName-07"}]])
+        })
+    })
 })

@@ -36,7 +36,7 @@ export default {
 
 /* selected item */
 .list-group-item.active {
-  background-color: var(--vscode-titleBar-activeBackground, #3c3c3c);
+  background-color: var(--vscode-input-background, #3c3c3c);
   border-color: var(--vscode-editorWidget-border, #454545);
   color: var(--vscode-checkbox-foreground, #f0f0f0);
 }

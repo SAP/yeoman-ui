@@ -13,7 +13,7 @@ describe('Step.vue', () => {
     test('onGeneratorSelected event handler method', async () => {
         wrapper = initComponent(Step, {
             currentPrompt: {
-                questions: [{isWhen: true, message: "testMessage", type: 'generators'}]
+                questions: [{isWhen: true, message: "testMessage", type: 'generators', choices: [{name:"testGenerator"}]}]
             }
         }, true)
         wrapper.find(GeneratorSelection).vm.$emit('generatorSelected', "testGenerator")
