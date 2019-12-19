@@ -24,16 +24,7 @@ describe('Header.vue', () => {
     test('generator brand', () => {
         const testGen = 'testGenerator'
         wrapper = initComponent(Header, { generatorName: testGen })
-        expect(wrapper.find(BNavbarBrand).text()).toBe(`Yeoman UI Wizzard: ${testGen}`)
-    })
-
-    test('find step text and step text name', () => {
-        const testPrompt = 'testPrompt'
-        const testStepName = 'testStepName'
-        const testNumOfSteps = 3
-        wrapper = initComponent(Header, { stepName: testStepName })
-        const bNavTexts = wrapper.findAll(BNavText)
-        expect(bNavTexts.wrappers[0].element.textContent).toBe(`${testStepName}`)
+        expect(wrapper.find(BNavbarBrand).text()).toBe(`Yeoman UI Wizard: ${testGen}`)
     })
 
     test('click triggers collapseLog method', async () => {

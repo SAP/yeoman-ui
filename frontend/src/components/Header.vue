@@ -1,11 +1,7 @@
 <template>
   <div>
     <b-navbar>
-      <b-navbar-brand>Yeoman UI Wizzard: {{generatorName}}</b-navbar-brand>
-
-      <b-navbar-nav>
-        <b-nav-text>{{ stepName }}</b-nav-text>
-      </b-navbar-nav>
+      <b-navbar-brand>Yeoman UI Wizard: {{generatorName}}</b-navbar-brand>
 
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
