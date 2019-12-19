@@ -13,8 +13,7 @@ import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 import { GeneratorType, GeneratorFilter } from "./filter";
 
-const uniq = require('array-uniq');
-const win32 = process.platform === 'win32';
+const isWin32 = process.platform === 'win32';
 
 export interface IGeneratorChoice {
   name: string;
@@ -78,7 +77,7 @@ export class YeomanUI {
     const promise: Promise<IPrompt> = new Promise(resolve => {
       const cwd = path.join(os.homedir(), "projects");
       const env: Environment.Options = Environment.createEnv();
-      const envGetNpmPaths: Function = env.getNpmPaths;
+      const envGetNpmPaths: () => any = env.getNpmPaths;
       env.getNpmPaths = function (localOnly:any = false) {
         // Start with the local paths derived by cwd in vscode 
         // (as opposed to cwd of the plugin host process which is what is used by yeoman/environment)
@@ -88,7 +87,7 @@ export class YeomanUI {
         cwd.split(path.sep).forEach((part, i, parts) => {
           let lookup = path.join(...parts.slice(0, i + 1), 'node_modules');
     
-          if (!win32) {
+          if (!isWin32) {
             lookup = `/${lookup}`;
           }
     
@@ -96,7 +95,7 @@ export class YeomanUI {
         });
         const defaultPaths = envGetNpmPaths.call(this, localOnly);
         
-        return uniq(localPaths.concat(defaultPaths));
+        return  _.uniq(localPaths.concat(defaultPaths));
       };
       env.lookup(async () => this.onEnvLookup(env, resolve, this.genFilter));
     });
