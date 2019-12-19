@@ -136,10 +136,10 @@ describe('yeomanui unit test', () => {
             const generatorQuestion: IGeneratorQuestion = {
                 type: "generators",
                 name: "name",
-                message: "name",
+                message: "",
                 choices: []
               };
-            expect(result).to.be.deep.equal({ name: "Choose Generator", questions: [generatorQuestion] });
+            expect(result).to.be.deep.equal({ name: "Generator Selection", questions: [generatorQuestion] });
         });
 
         it("get generators with type project", async () => {

@@ -4,8 +4,6 @@
 
     <Header
       v-if="prompts.length"
-      :currentPrompt="promptIndex+1"
-      :numOfSteps="prompts.length"
       :generatorName="generatorName"
       :stepName="prompts[promptIndex].name"
       :rpc="rpc"
@@ -67,7 +65,7 @@ export default {
   },
   data() {
     return {
-      generatorName: "<none>",
+      generatorName: "",
       stepValidated:false,
       prompts: [],
       promptIndex: 0,
@@ -191,7 +189,7 @@ export default {
                   delete currentPrompt.status
                 }
               } else {
-                // first prompt (choose generator)
+                // first prompt (Generator Selection)
                 prompt.active = true
                 this.prompts.push(prompt)
               }
