@@ -1,10 +1,9 @@
 <template>
   <div>
     <b-navbar>
-      <b-navbar-brand>Generator: {{generatorName}}</b-navbar-brand>
+      <b-navbar-brand>Yeoman UI Wizzard: {{generatorName}}</b-navbar-brand>
 
       <b-navbar-nav>
-        <b-nav-text>Step: {{ currentPrompt }}/{{ numOfSteps }}</b-nav-text>
         <b-nav-text>{{ stepName }}</b-nav-text>
       </b-navbar-nav>
 
@@ -21,7 +20,7 @@
 <script>
 export default {
   name: "Header",
-  props: ["generatorName", "currentPrompt", "numOfSteps", "stepName", "rpc"],
+  props: ["generatorName", "stepName", "rpc"],
   methods: {
     collapseLog() {
       this.rpc.invoke("toggleLog", [{}])

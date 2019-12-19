@@ -92,12 +92,14 @@ export default {
 
 .card-text {
   font-size: 0.75rem;
-  color: var(--vscode-editorCodeLens-foreground, #999999)
+  color: var(--vscode-editorCodeLens-foreground, #999999);
+  margin: 0;
 }
 
 .card-text.templateDocumentationClass {
   /* change this to vscode color for url */
   color: var(--vscode-textLink-foreground, #3794ff);
+  margin-bottom: 1rem;
 }
 
 .card-deck {

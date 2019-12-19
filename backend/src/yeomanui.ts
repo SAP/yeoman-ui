@@ -208,10 +208,10 @@ export class YeomanUI {
     const generatorQuestion: IGeneratorQuestion = {
       type: "generators",
       name: "name",
-      message: "name",
+      message: "",
       choices: _.compact(generatorChoices)
     };
-    resolve({ name: "Choose Generator", questions: [generatorQuestion] });
+    resolve({ name: "Generator Selection", questions: [generatorQuestion] });
   }
 
   private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<IGeneratorChoice | undefined> {
