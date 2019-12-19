@@ -139,7 +139,7 @@ describe('yeomanui unit test', () => {
                 message: "",
                 choices: []
               };
-            expect(result).to.be.deep.equal({ name: "Generator Selection", questions: [generatorQuestion] });
+            expect(result).to.be.deep.equal({ name: "Select Generator", questions: [generatorQuestion] });
         });
 
         it("get generators with type project", async () => {

@@ -13,6 +13,9 @@ import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 import { GeneratorType, GeneratorFilter } from "./filter";
 
+const uniq = require('array-uniq');
+const win32 = process.platform === 'win32';
+
 export interface IGeneratorChoice {
   name: string;
   message: string;
@@ -74,7 +77,28 @@ export class YeomanUI {
     // on the other hand, we never look for newly installed generators...
 
     const promise: Promise<IPrompt> = new Promise(resolve => {
+      const cwd = path.join(os.homedir(), "projects");
       const env: Environment.Options = Environment.createEnv();
+      const envGetNpmPaths: Function = env.getNpmPaths;
+      env.getNpmPaths = function (localOnly:any = false) {
+        // Start with the local paths derived by cwd in vscode 
+        // (as opposed to cwd of the plugin host process which is what is used by yeoman/environment)
+        const localPaths: any[] = [];
+    
+        // Walk up the CWD and add `node_modules/` folder lookup on each level
+        cwd.split(path.sep).forEach((part, i, parts) => {
+          let lookup = path.join(...parts.slice(0, i + 1), 'node_modules');
+    
+          if (!win32) {
+            lookup = `/${lookup}`;
+          }
+    
+          localPaths.push(lookup);
+        });
+        const defaultPaths = envGetNpmPaths.call(this, localOnly);
+        
+        return uniq(localPaths.concat(defaultPaths));
+      };
       env.lookup(async () => this.onEnvLookup(env, resolve, this.genFilter));
     });
 
@@ -142,7 +166,7 @@ export class YeomanUI {
         }
 
         console.log("done running yeomanui");
-        message = `${generatorName} is done. Destination directory is ${destinationRoot}`;
+        message = `The '${generatorName}' project has been generated. You can find it at ${destinationRoot}`;
         this.doGeneratorDone(true, message);
       });
     } catch (err) {
@@ -212,7 +236,7 @@ export class YeomanUI {
       message: "",
       choices: _.compact(generatorChoices)
     };
-    resolve({ name: "Generator Selection", questions: [generatorQuestion] });
+    resolve({ name: "Select Generator", questions: [generatorQuestion] });
   }
 
   private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<IGeneratorChoice | undefined> {
