@@ -83,8 +83,8 @@ export class YeomanUI {
 
   public async runGenerator(generatorName: string) {
 
-    // TODO: ensure generatorName is a valid dir name
-    const destinationRoot: string = path.join(os.homedir(), "projects", generatorName);
+    // TODO: ensure projects folder exist
+    const destinationRoot: string = path.join(os.homedir(), "projects");
 
     // TODO: wait for dir to be created
     fs.mkdir(destinationRoot, { recursive: true }, (err) => {
