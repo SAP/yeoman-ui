@@ -76,33 +76,38 @@ export class YeomanUI {
     // on the other hand, we never look for newly installed generators...
 
     const promise: Promise<IPrompt> = new Promise(resolve => {
-      const cwd = path.join(os.homedir(), "projects");
-      const env: Environment.Options = Environment.createEnv();
-      const envGetNpmPaths: () => any = env.getNpmPaths;
-      env.getNpmPaths = function (localOnly:any = false) {
-        // Start with the local paths derived by cwd in vscode 
-        // (as opposed to cwd of the plugin host process which is what is used by yeoman/environment)
-        const localPaths: any[] = [];
-    
-        // Walk up the CWD and add `node_modules/` folder lookup on each level
-        cwd.split(path.sep).forEach((part, i, parts) => {
-          let lookup = path.join(...parts.slice(0, i + 1), 'node_modules');
-    
-          if (!isWin32) {
-            lookup = `/${lookup}`;
-          }
-    
-          localPaths.push(lookup);
-        });
-        const defaultPaths = envGetNpmPaths.call(this, localOnly);
-        
-        return  _.uniq(localPaths.concat(defaultPaths));
-      };
+      const env: Environment.Options = this.getEnv();
       env.lookup(async () => this.onEnvLookup(env, resolve, this.genFilter));
     });
 
     return promise;
   }
+
+  private getEnv(): Environment.Options {
+    const cwd = path.join(os.homedir(), "projects");
+    const env: Environment.Options = Environment.createEnv();
+    const envGetNpmPaths: () => any = env.getNpmPaths;
+    env.getNpmPaths = function (localOnly:any = false) {
+      // Start with the local paths derived by cwd in vscode 
+      // (as opposed to cwd of the plugin host process which is what is used by yeoman/environment)
+      const localPaths: any[] = [];
+  
+      // Walk up the CWD and add `node_modules/` folder lookup on each level
+      cwd.split(path.sep).forEach((part, i, parts) => {
+        let lookup = path.join(...parts.slice(0, i + 1), 'node_modules');
+  
+        if (!isWin32) {
+          lookup = `/${lookup}`;
+        }
+  
+        localPaths.push(lookup);
+      });
+      const defaultPaths = envGetNpmPaths.call(this, localOnly);
+      
+      return  _.uniq(localPaths.concat(defaultPaths));
+    };
+    return env;
+}
 
   public async runGenerator(generatorName: string) {
 
