@@ -49,7 +49,7 @@ export class YeomanUI {
   private currentQuestions: Environment.Adapter.Questions<any>;
   private genFilter: GeneratorFilter;
 
-  constructor(rpc: IRpc, logger: YouiLog) {
+  constructor(rpc: IRpc, logger: YouiLog, genFilter?: GeneratorFilter) {
     this.rpc = rpc;
     this.logger = logger;
     this.rpc.setResponseTimeout(3600000);
@@ -62,6 +62,7 @@ export class YeomanUI {
     this.promptCount = 0;
     this.genMeta = {};
     this.currentQuestions = {};
+		this.setGenFilter(genFilter);
   }
 
   public setGenFilter(genFilter: GeneratorFilter) {

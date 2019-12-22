@@ -89,8 +89,7 @@ export class YeomanUIPanel {
 		this.rpc = new RpcExtension(this.panel.webview);
 		const logger: YouiLog = new OutputChannelLog();
 		
-		this.yeomanui = new YeomanUI(this.rpc, logger);
-		this.yeomanui.setGenFilter(YeomanUIPanel.genFilter);
+		this.yeomanui = new YeomanUI(this.rpc, logger, YeomanUIPanel.genFilter);
 
 		// Set the webview's initial html content
 		this._update();
