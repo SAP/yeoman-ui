@@ -13,8 +13,6 @@ import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 import { GeneratorType, GeneratorFilter } from "./filter";
 
-const isWin32 = process.platform === 'win32';
-
 export interface IGeneratorChoice {
   name: string;
   message: string;
@@ -41,6 +39,9 @@ export class YeomanUI {
   private static defaultMessage = 
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
   private static YEOMAN_PNG = "yeoman.png";
+  private static isWin32 = (process.platform === 'win32');
+  private static CWD = path.join(os.homedir(), 'projects');
+  private static NODE_MODULES = 'node_modules';
 
   private rpc: IRpc;
   private logger: YouiLog;
@@ -84,35 +85,28 @@ export class YeomanUI {
   }
 
   private getEnv(): Environment.Options {
-    const cwd = path.join(os.homedir(), "projects");
     const env: Environment.Options = Environment.createEnv();
     const envGetNpmPaths: () => any = env.getNpmPaths;
-    env.getNpmPaths = function (localOnly:any = false) {
+    env.getNpmPaths = function (localOnly:boolean = false) {
       // Start with the local paths derived by cwd in vscode 
       // (as opposed to cwd of the plugin host process which is what is used by yeoman/environment)
-      const localPaths: any[] = [];
-  
       // Walk up the CWD and add `node_modules/` folder lookup on each level
-      cwd.split(path.sep).forEach((part, i, parts) => {
-        let lookup = path.join(...parts.slice(0, i + 1), 'node_modules');
-  
-        if (!isWin32) {
-          lookup = `/${lookup}`;
-        }
-  
-        localPaths.push(lookup);
+      const parts: string[] = YeomanUI.CWD.split(path.sep);
+      const localPaths = _.map(parts, (part, index) => {
+        const resrpath = path.join(...parts.slice(0, index + 1), YeomanUI.NODE_MODULES);
+        return YeomanUI.isWin32 ? resrpath : path.join(path.sep, resrpath);
       });
       const defaultPaths = envGetNpmPaths.call(this, localOnly);
       
       return  _.uniq(localPaths.concat(defaultPaths));
     };
     return env;
-}
+  }
 
   public async runGenerator(generatorName: string) {
 
     // TODO: ensure generatorName is a valid dir name
-    const destinationRoot: string = path.join(os.homedir(), "projects", generatorName);
+    const destinationRoot: string = path.join(YeomanUI.CWD, generatorName);
 
     // TODO: wait for dir to be created
     fs.mkdir(destinationRoot, { recursive: true }, (err) => {

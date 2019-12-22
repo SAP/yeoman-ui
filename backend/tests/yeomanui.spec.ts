@@ -84,6 +84,10 @@ describe('yeomanui unit test', () => {
         }  
     }
 
+    const rpc = new TestRpc();
+    const logger = new TestLog();
+    const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
+
     before(() => {
         sandbox = sinon.createSandbox();
     });
@@ -105,9 +109,6 @@ describe('yeomanui unit test', () => {
     });
 
     describe("getGenerators", () => {
-        const rpc = new TestRpc();
-        const logger = new TestLog();
-        const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
         let envMock: any;
 
         const environment = {
@@ -338,6 +339,74 @@ describe('yeomanui unit test', () => {
             expect(test1Choice.name).to.be.equal("test1");
             expect(test2Choice.name).to.be.equal("test2");
             expect(test3Choice.name).to.be.equal("test4");
+        });
+    });
+
+    describe("getEnv", () => {
+        const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
+        const testEnv = yeomanUi["getEnv"]();
+        const nodemodules = YeomanUI["NODE_MODULES"];
+        testEnv.getNpmPaths = (localOnly: boolean = false): string[] => {
+            return localOnly ? 
+                [path.join("localPath1", nodemodules), path.join("localPath2", nodemodules)] : 
+                [path.join("path1", nodemodules), path.join("path2", nodemodules), path.join("localPath1", nodemodules), path.join("localPath2", nodemodules)];
+        };
+
+        beforeEach(() => {
+            YeomanUI["CWD"] = path.join("root/project/folder");
+            yeomanEnvMock.expects("createEnv").returns(testEnv);
+        });
+
+        it("env.getNpmPaths - localOnly is false, isWin32 is true", () => {
+            YeomanUI["isWin32"] = true;
+            const env = yeomanUi["getEnv"]();
+            const res = env.getNpmPaths();
+            expect(res).to.have.lengthOf(7);
+            expect(res).to.include(path.join("root", nodemodules));
+            expect(res).to.include(path.join("root", "project", nodemodules));
+            expect(res).to.include(path.join("root", "project", "folder", nodemodules));
+            expect(res).to.include(path.join("path1", nodemodules));
+            expect(res).to.include(path.join("path2", nodemodules));
+            expect(res).to.include(path.join("localPath1", nodemodules));
+            expect(res).to.include(path.join("localPath2", nodemodules));
+        });
+
+        it("env.getNpmPaths - localOnly is true, isWin32 is true", () => {
+            YeomanUI["isWin32"] = true;
+            const env = yeomanUi["getEnv"]();
+            const res = env.getNpmPaths(true);
+            expect(res).to.have.lengthOf(5);
+            expect(res).to.include(path.join("root", nodemodules));
+            expect(res).to.include(path.join("root", "project", nodemodules));
+            expect(res).to.include(path.join("root", "project", "folder", nodemodules));
+            expect(res).to.include(path.join("localPath1", nodemodules));
+            expect(res).to.include(path.join("localPath2", nodemodules));
+        });
+
+        it("env.getNpmPaths - localOnly is false, isWin32 is false", () => {
+            YeomanUI["isWin32"] = false;
+            const env = yeomanUi["getEnv"]();
+            const res = env.getNpmPaths();
+            expect(res).to.have.lengthOf(7);
+            expect(res).to.include(path.join(path.sep, "root", nodemodules));
+            expect(res).to.include(path.join(path.sep, "root", "project", nodemodules));
+            expect(res).to.include(path.join(path.sep, "root", "project", "folder", nodemodules));
+            expect(res).to.include(path.join("path1", nodemodules));
+            expect(res).to.include(path.join("path2", nodemodules));
+            expect(res).to.include(path.join("localPath1", nodemodules));
+            expect(res).to.include(path.join("localPath2", nodemodules));
+        });
+
+        it("env.getNpmPaths - localOnly is true, isWin32 is false", () => {
+            YeomanUI["isWin32"] = false;
+            const env = yeomanUi["getEnv"]();
+            const res = env.getNpmPaths(true);
+            expect(res).to.have.lengthOf(5);
+            expect(res).to.include(path.join(path.sep, "root", nodemodules));
+            expect(res).to.include(path.join(path.sep, "root", "project", nodemodules));
+            expect(res).to.include(path.join(path.sep, "root", "project", "folder", nodemodules));
+            expect(res).to.include(path.join("localPath1", nodemodules));
+            expect(res).to.include(path.join("localPath2", nodemodules));
         });
     });
 });
