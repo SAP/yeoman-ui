@@ -13,6 +13,8 @@ import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 import { GeneratorType, GeneratorFilter } from "./filter";
 
+const isWin32 = process.platform === 'win32';
+
 export interface IGeneratorChoice {
   name: string;
   message: string;
@@ -95,6 +97,7 @@ export class YeomanUI {
       const localPaths = _.map(parts, (part, index) => {
         const resrpath = path.join(...parts.slice(0, index + 1), YeomanUI.NODE_MODULES);
         return YeomanUI.isWin32 ? resrpath : path.join(path.sep, resrpath);
+
       });
       const defaultPaths = envGetNpmPaths.call(this, localOnly);
       
