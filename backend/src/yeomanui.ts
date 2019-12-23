@@ -149,7 +149,7 @@ export class YeomanUI {
 
       this.promptCount = 0;
       this.gen = (gen as Generator);
-      this.gen.destinationRoot(destinationRoot);
+      this.gen.destinationRoot(YeomanUI.CWD);
       /* Generator.run() returns promise. Sending a callback is deprecated:
            https://yeoman.github.io/generator/Generator.html#run
          ... but .d.ts hasn't been updated for a while:
@@ -163,7 +163,7 @@ export class YeomanUI {
         }
 
         console.log("done running yeomanui");
-        message = `The '${generatorName}' project has been generated. You can find it at ${destinationRoot}`;
+        message = `The '${generatorName}' project has been generated. You can find it at ${YeomanUI.CWD}`;
         this.doGeneratorDone(true, message);
       });
     } catch (err) {
