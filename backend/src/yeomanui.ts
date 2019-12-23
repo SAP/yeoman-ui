@@ -39,6 +39,9 @@ export class YeomanUI {
   private static defaultMessage = 
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
   private static YEOMAN_PNG = "yeoman.png";
+  private static isWin32 = (process.platform === 'win32');
+  private static CWD = path.join(os.homedir(), 'projects');
+  private static NODE_MODULES = 'node_modules';
 
   private rpc: IRpc;
   private logger: YouiLog;
@@ -74,20 +77,36 @@ export class YeomanUI {
     // on the other hand, we never look for newly installed generators...
 
     const promise: Promise<IPrompt> = new Promise(resolve => {
-      const env: Environment.Options = Environment.createEnv();
+      const env: Environment.Options = this.getEnv();
       env.lookup(async () => this.onEnvLookup(env, resolve, this.genFilter));
     });
 
     return promise;
   }
 
+  private getEnv(): Environment.Options {
+    const env: Environment.Options = Environment.createEnv();
+    const envGetNpmPaths: () => any = env.getNpmPaths;
+    env.getNpmPaths = function (localOnly:boolean = false) {
+      // Start with the local paths derived by cwd in vscode 
+      // (as opposed to cwd of the plugin host process which is what is used by yeoman/environment)
+      // Walk up the CWD and add `node_modules/` folder lookup on each level
+      const parts: string[] = YeomanUI.CWD.split(path.sep);
+      const localPaths = _.map(parts, (part, index) => {
+        const resrpath = path.join(...parts.slice(0, index + 1), YeomanUI.NODE_MODULES);
+        return YeomanUI.isWin32 ? resrpath : path.join(path.sep, resrpath);
+
+      });
+      const defaultPaths = envGetNpmPaths.call(this, localOnly);
+      
+      return  _.uniq(localPaths.concat(defaultPaths));
+    };
+    return env;
+  }
+
   public async runGenerator(generatorName: string) {
-
-    // TODO: ensure projects folder exist
-    const destinationRoot: string = path.join(os.homedir(), "projects");
-
     // TODO: wait for dir to be created
-    fs.mkdir(destinationRoot, { recursive: true }, (err) => {
+    fs.mkdir(YeomanUI.CWD, { recursive: true }, (err) => {
       if (err) {
         console.error(err);
       }
@@ -128,7 +147,7 @@ export class YeomanUI {
 
       this.promptCount = 0;
       this.gen = (gen as Generator);
-      this.gen.destinationRoot(destinationRoot);
+      this.gen.destinationRoot(YeomanUI.CWD);
       /* Generator.run() returns promise. Sending a callback is deprecated:
            https://yeoman.github.io/generator/Generator.html#run
          ... but .d.ts hasn't been updated for a while:
@@ -142,7 +161,7 @@ export class YeomanUI {
         }
 
         console.log("done running yeomanui");
-        message = `${generatorName} is done. Destination directory is ${destinationRoot}`;
+        message = `The '${generatorName}' project has been generated. You can find it at ${YeomanUI.CWD}`;
         this.doGeneratorDone(true, message);
       });
     } catch (err) {
@@ -212,7 +231,7 @@ export class YeomanUI {
       message: "",
       choices: _.compact(generatorChoices)
     };
-    resolve({ name: "Generator Selection", questions: [generatorQuestion] });
+    resolve({ name: "Select Generator", questions: [generatorQuestion] });
   }
 
   private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<IGeneratorChoice | undefined> {

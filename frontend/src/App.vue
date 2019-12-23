@@ -189,7 +189,7 @@ export default {
                   delete currentPrompt.status
                 }
               } else {
-                // first prompt (Generator Selection)
+                // first prompt (Select Generator)
                 prompt.active = true
                 this.prompts.push(prompt)
               }
@@ -253,7 +253,7 @@ export default {
     },
     generatorDone(success, message) {
       if (this.currentPrompt.status === "pending") {
-        this.currentPrompt.name = "Done"
+        this.currentPrompt.name = "Confirmation"
       }
       this.doneMessage = message
       this.isDone = true

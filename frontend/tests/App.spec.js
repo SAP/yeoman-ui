@@ -344,7 +344,7 @@ describe('App.vue', () => {
 
       expect(wrapper.vm.doneMessage).toBe('testMessage')
       expect(wrapper.vm.isDone).toBeTruthy()
-      expect(wrapper.vm.currentPrompt.name).toBe('Done')
+      expect(wrapper.vm.currentPrompt.name).toBe('Confirmation')
     })
   })
 })
