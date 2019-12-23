@@ -120,7 +120,19 @@ export class YeomanUIPanel {
 						const resolve = this.questionsResolutions.get(message.taskId);
 						resolve(message.data);
 						return;
-				}
+					case 'vscodecommand':
+						let commandName = message.commandName;
+						let commandParam = (message.commandParams !== undefined && message.commandParams.length > 0 ? message.commandParams[0] : undefined);
+						if (commandName === "vscode.open" || commandName === "vscode.openFolder") {
+							commandParam = vscode.Uri.file(commandParam);
+						}
+						vscode.commands.executeCommand(commandName, commandParam).then((success) => {
+							console.debug(`Execution of command ${commandName} returned ${success}`);
+						}, (failure) => {
+							console.debug(`Execution of command ${commandName} returned ${failure}`);
+						});
+						return;
+					}
 			},
 			null,
 			this.disposables

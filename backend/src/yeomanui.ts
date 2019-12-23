@@ -154,23 +154,24 @@ export class YeomanUI {
            https://www.npmjs.com/package/@types/yeoman-generator */
       this.gen.run((err) => {
         let message: string;
+        let destinationRoot = this.gen.destinationRoot();
         if (err) {
           console.error(err);
           message = `${generatorName} failed: ${err}.`;
-          this.doGeneratorDone(false, message);
+          this.doGeneratorDone(false, message, destinationRoot);
         }
 
-        console.log("done running yeomanui");
-        message = `The '${generatorName}' project has been generated. You can find it at ${YeomanUI.CWD}`;
-        this.doGeneratorDone(true, message);
+        message = `The '${generatorName}' project has been generated.`;
+        console.log("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
+        this.doGeneratorDone(true, message, destinationRoot);
       });
     } catch (err) {
       console.error(err);
     }
   }
 
-  public doGeneratorDone(success: boolean, message: string): Promise<any> {
-    return this.rpc ? this.rpc.invoke("generatorDone", [true, message]) : Promise.resolve();
+  public doGeneratorDone(success: boolean, message: string, targetPath: string): Promise<any> {
+    return this.rpc ? this.rpc.invoke("generatorDone", [true, message, targetPath]) : Promise.resolve();
   }
 
   /**
