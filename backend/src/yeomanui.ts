@@ -13,8 +13,6 @@ import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 import { GeneratorType, GeneratorFilter } from "./filter";
 
-const isWin32 = process.platform === 'win32';
-
 export interface IGeneratorChoice {
   name: string;
   message: string;
