@@ -1,6 +1,8 @@
 {
   "name": "generator-foodq",
+  "displayName": "Generator Food Q",
   "description": "Food questionnaire",
+  "homepage": "https://github.com/SAP/yeoman-ui/blob/master/generator-foodq/README.md",
   "version": "0.0.1",
   "license": "Apache 2.0",
   "repository": {

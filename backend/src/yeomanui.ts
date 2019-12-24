@@ -15,6 +15,7 @@ import { GeneratorType, GeneratorFilter } from "./filter";
 
 export interface IGeneratorChoice {
   name: string;
+  displayName: string;
   message: string;
   imageUrl?: string;
 }
@@ -264,9 +265,11 @@ export class YeomanUI {
     }
 
     const genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
+    const genDisplayName = _.get(packageJson, "displayName", genName);
 
     return {
       name: genName,
+      displayName: genDisplayName,
       message: genMessage,
       imageUrl: genImageUrl
     };
