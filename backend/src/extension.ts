@@ -12,13 +12,18 @@ import backendMessages from "./messages";
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
-		vscode.commands.registerCommand('loadYeomanUI', (filterObj?: any, messages?: any) => {
-			YeomanUIPanel.createOrShow(context.extensionPath, GeneratorFilter.create(filterObj), messages);
+		vscode.commands.registerCommand('loadYeomanUI', (options?: any) => {
+			const genFilter = _.get(options, "filter"); 
+			const messages = _.get(options, "messages");
+			YeomanUIPanel.createOrShow(context.extensionPath, GeneratorFilter.create(genFilter), messages);
 	}));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('loadYeomanUI_projects', () => {
-			vscode.commands.executeCommand("loadYeomanUI", {type: "project"}, {
+			vscode.commands.executeCommand("loadYeomanUI", {
+				filter: {
+					type: "project"
+				}, 
 				messages: {
 					generators_loading: "SAP Project Generators loading ...",
 					panel_title: "Project From Template"
@@ -173,7 +178,7 @@ export class YeomanUIPanel {
 			indexHtml = indexHtml.replace(/<script src=/g, `<script src=${scriptUri.toString()}`);
 			indexHtml = indexHtml.replace(/<img src=/g, `<img src=${scriptUri.toString()}`);
 		}
-		const uiMessages = _.get(YeomanUIPanel.messages, "messages", backendMessages);
+		const uiMessages = _.get(YeomanUIPanel, "messages", backendMessages);
 		this.panel.title = _.get(uiMessages, "panel_title");
 		
 		this.setMessages(uiMessages);
