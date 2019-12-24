@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="d-flex flex-column yeoman-ui">
-    <div v-if="!prompts.length" class="loading">Yeoman User Interface is loading...</div>
+    <div v-if="!prompts.length" class="loading">{{ uiMessages.generators_loading }}</div>
 
     <Header
       v-if="prompts.length"
@@ -52,9 +52,11 @@ import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import * as _ from "lodash"
 
+
 const FUNCTION = '__Function'
 const LOADING = 'loading...'
 const PENDING = 'Pending...'
+
 
 export default {
   name: "app",
@@ -76,7 +78,8 @@ export default {
       isDone: false,
       doneMessage: Object,
       consoleClass: "",
-      logText: ""
+      logText: "",
+      messages: {}
     }
   },
   computed: {
@@ -91,6 +94,9 @@ export default {
       _.set(prompt, "answers", answers)
       
       return prompt
+    },
+    uiMessages() {
+      return this.messages
     }
   },
   watch: {
@@ -164,6 +170,9 @@ export default {
     },
     onStepValidated(stepValidated) {
       this.stepValidated = stepValidated
+    },
+    setMessages(messages) {
+      this.messages = messages;
     },
     setPrompts(prompts) {
       // TODO:
@@ -281,7 +290,7 @@ export default {
       }
     },
     initRpc() {
-      const functions = ["showPrompt", "setPrompts", "generatorDone", "log"]
+      const functions = ["showPrompt", "setPrompts", "generatorDone", "log", "setMessages"]
       _.forEach(functions, funcName => {
         this.rpc.registerMethod({
           func: this[funcName],

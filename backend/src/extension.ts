@@ -7,17 +7,23 @@ import {RpcExtension} from '@sap-devx/webview-rpc/out.ext/rpc-extension';
 import { YouiLog } from "./youi-log";
 import { OutputChannelLog } from './output-channel-log';
 import { GeneratorFilter } from './filter';
+import backendMessages from "./messages";
 
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
-		vscode.commands.registerCommand('loadYeomanUI', (filterObj?: any) => {
-			YeomanUIPanel.createOrShow(context.extensionPath, GeneratorFilter.create(filterObj));
+		vscode.commands.registerCommand('loadYeomanUI', (filterObj?: any, messages?: any) => {
+			YeomanUIPanel.createOrShow(context.extensionPath, GeneratorFilter.create(filterObj), messages);
 	}));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('loadYeomanUI_projects', () => {
-			vscode.commands.executeCommand("loadYeomanUI", {"type": "project"});
+			vscode.commands.executeCommand("loadYeomanUI", {type: "project"}, {
+				messages: {
+					generators_loading: "SAP Project Generators loading ...",
+					panel_title: "Project From Template"
+				}
+			});
 	}));
 
 	if (vscode.window.registerWebviewPanelSerializer) {
@@ -41,10 +47,12 @@ export class YeomanUIPanel {
 	public static readonly viewType = 'yeomanui';
 	public static currentPanel: YeomanUIPanel | undefined;
 	public static genFilter: GeneratorFilter;
+	public static messages: any;
 
-	public static createOrShow(extensionPath: string, genFilter?: GeneratorFilter) {
+	public static createOrShow(extensionPath: string, genFilter?: GeneratorFilter, messages?: any) {
 		YeomanUIPanel.genFilter = genFilter;
-
+		YeomanUIPanel.messages = messages;
+		
 		const column = _.get(vscode.window, "activeTextEditor.viewColumn");
 
 		// If we already have a panel, show it.
@@ -57,7 +65,7 @@ export class YeomanUIPanel {
 		// Otherwise, create a new panel.
 		const panel = vscode.window.createWebviewPanel(
 			YeomanUIPanel.viewType,
-			'Yeoman UI',
+			"stam",
 			column || vscode.ViewColumn.One,
 			{
 				// Enable javascript in the webview
@@ -67,7 +75,7 @@ export class YeomanUIPanel {
 				localResourceRoots: [vscode.Uri.file(YeomanUIPanel.getMediaPath(extensionPath))]
 			}
 		);
-
+		
 		YeomanUIPanel.currentPanel = new YeomanUIPanel(panel, extensionPath);
 	}
 
@@ -145,7 +153,13 @@ export class YeomanUIPanel {
 		return path.join(extensionPath, 'dist', 'media');
 	}
 
+	
+	private setMessages(messages: any): Promise<void> {
+		return this.rpc ? this.rpc.invoke("setMessages", [messages]) : Promise.resolve();
+	}
+
 	private _update() {
+		
 		// TODO: don't use sync
 		let indexHtml: string = fsextra.readFileSync(path.join(YeomanUIPanel.getMediaPath(this.extensionPath), 'index.html'), "utf8");
 		if (indexHtml) {
@@ -159,7 +173,11 @@ export class YeomanUIPanel {
 			indexHtml = indexHtml.replace(/<script src=/g, `<script src=${scriptUri.toString()}`);
 			indexHtml = indexHtml.replace(/<img src=/g, `<img src=${scriptUri.toString()}`);
 		}
-		this.panel.title = 'Yeoman UI';
+		const uiMessages = _.get(YeomanUIPanel.messages, "messages", backendMessages);
+		this.panel.title = _.get(uiMessages, "panel_title");
+		
+		this.setMessages(uiMessages);
+		
 		this.panel.webview.html = indexHtml;
 	}
 }

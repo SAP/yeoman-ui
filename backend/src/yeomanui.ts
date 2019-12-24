@@ -65,7 +65,8 @@ export class YeomanUI {
     this.promptCount = 0;
     this.genMeta = {};
     this.currentQuestions = {};
-		this.setGenFilter(genFilter);
+    this.setGenFilter(genFilter);
+    
   }
 
   public setGenFilter(genFilter: GeneratorFilter) {
@@ -193,6 +194,7 @@ export class YeomanUI {
     // TODO: loading generators takes a long time; consider prefetching list of generators
     if (this.rpc) {
       const generators: IPrompt = await this.getGenerators();
+      
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, generators.name]);
       await this.runGenerator(response.name);
     }
