@@ -272,6 +272,14 @@ describe('App.vue', () => {
     expect(wrapper.vm.stepValidated).toBeTruthy()
   })
 
+  test('setMessages - method', () => {
+    wrapper = initComponent(App)
+    expect(wrapper.vm.messages).toEqual({})
+
+    wrapper.vm.setMessages({test: "test1"});
+    expect(wrapper.vm.messages).toEqual({test: "test1"})
+  })
+
   describe('next - method', () => {
     test('promptIndex is greater than prompt quantity, resolve is defined', () => {
       wrapper = initComponent(App)
