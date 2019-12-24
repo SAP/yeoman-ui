@@ -57,7 +57,7 @@ describe('extension unit test', () => {
         it("execution loadYeomanUI command", () => {
             extension.activate(testContext);
             const loadYeomanUICommand = _.get(oRegisteredCommands, "loadYeomanUI");
-            yeomanUiPanelMock.expects("createOrShow").withExactArgs(testContext.extensionPath, GeneratorFilter.create({}));
+            yeomanUiPanelMock.expects("createOrShow").withArgs(testContext.extensionPath);
             loadYeomanUICommand();
         });
     });
