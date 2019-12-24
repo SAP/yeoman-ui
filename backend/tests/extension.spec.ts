@@ -50,9 +50,8 @@ describe('extension unit test', () => {
 
         it("commands registration", () => {
             extension.activate(testContext);
-            expect(_.size(_.keys(oRegisteredCommands))).to.be.equal(2);
+            expect(_.size(_.keys(oRegisteredCommands))).to.be.equal(1);
             expect(_.keys(oRegisteredCommands)[0]).to.be.equal("loadYeomanUI");
-            expect(_.keys(oRegisteredCommands)[1]).to.be.equal("loadYeomanUI_projects");
         });
 
         it("execution loadYeomanUI command", () => {
@@ -60,14 +59,6 @@ describe('extension unit test', () => {
             const loadYeomanUICommand = _.get(oRegisteredCommands, "loadYeomanUI");
             yeomanUiPanelMock.expects("createOrShow").withExactArgs(testContext.extensionPath, GeneratorFilter.create({}));
             loadYeomanUICommand();
-        });
-
-        it("execution loadYeomanUI_projects command", () => {
-            extension.activate(testContext);
-            
-            const loadYeomanUIProjectsCommand = _.get(oRegisteredCommands, "loadYeomanUI_projects");
-            commandsMock.expects("executeCommand").withExactArgs("loadYeomanUI", {"type": "project"});
-            loadYeomanUIProjectsCommand();
         });
     });
 });

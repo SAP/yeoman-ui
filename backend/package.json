@@ -14,17 +14,11 @@
 	],
 	"activationEvents": [
 		"*",
-		"onCommand:loadYeomanUI_projects",
 		"onCommand:loadYeomanUI"
 	],
 	"main": "./dist/extension",
 	"contributes": {
-		"commands": [
-			{
-				"command": "loadYeomanUI_projects",
-				"title": "Yeoman UI Project Generators"
-			},
-			{
+		"commands": [{
 				"command": "loadYeomanUI",
 				"title": "Yeoman UI Generators"
 			}

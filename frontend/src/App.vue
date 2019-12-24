@@ -55,7 +55,7 @@ import * as _ from "lodash"
 
 const FUNCTION = '__Function'
 const LOADING = 'loading...'
-const PENDING = 'Pending...'
+//const PENDING = 'Pending...'
 
 
 export default {
@@ -158,7 +158,7 @@ export default {
         }
       }
       if (this.promptIndex >= _.size(this.prompts) - 1) {
-        const prompt = { questions: [], name: PENDING, status: "pending" }
+        const prompt = { questions: [], name: this.uiMessages.step_is_pending, status: "pending" }
         this.setPrompts([prompt])
       }
       this.promptIndex++
@@ -190,7 +190,7 @@ export default {
             } else {
               if (currentPrompt) {
                 currentPrompt.questions = prompt.questions
-                if (prompt.name && currentPrompt.name === PENDING) {
+                if (prompt.name && currentPrompt.name === this.uiMessages.step_is_pending) {
                   currentPrompt.name = prompt.name
                 }
                 // if questions are provided, remote the pending status

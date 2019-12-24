@@ -18,19 +18,6 @@ export function activate(context: vscode.ExtensionContext) {
 			YeomanUIPanel.createOrShow(context.extensionPath, GeneratorFilter.create(genFilter), messages);
 	}));
 
-	context.subscriptions.push(
-		vscode.commands.registerCommand('loadYeomanUI_projects', () => {
-			vscode.commands.executeCommand("loadYeomanUI", {
-				filter: {
-					type: "project"
-				}, 
-				messages: {
-					generators_loading: "SAP Project Generators loading ...",
-					panel_title: "Project From Template"
-				}
-			});
-	}));
-
 	if (vscode.window.registerWebviewPanelSerializer) {
 		// Make sure we register a serializer in activation event
 		vscode.window.registerWebviewPanelSerializer(YeomanUIPanel.viewType, {
