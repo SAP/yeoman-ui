@@ -3,6 +3,7 @@
   "description": "Food questionnaire",
   "version": "0.0.1",
   "license": "Apache 2.0",
+  "homepage": "https://github.com/SAP/yeoman-ui/tree/master/generator-foodq#readme",
   "repository": {
     "type": "git",
     "url": "https://github.com/SAP/yeoman-ui",

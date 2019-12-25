@@ -14,7 +14,7 @@
               tag="article"
             >
               <b-card-text>{{item.message}}</b-card-text>
-              <b-card-text class="templateDocumentationClass">Template Documentation</b-card-text>
+              <b-card-text class="templateDocumentationClass"><b-link :href="item.homepage">Generator Documentation</b-link></b-card-text>
               <b-card-img :src="getImageUrl(item)"></b-card-img>
             </b-card>
           </b-col>
