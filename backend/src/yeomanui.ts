@@ -19,6 +19,7 @@ export interface IGeneratorChoice {
   name: string;
   prettyName: string;
   message: string;
+  homepage: string;
   imageUrl?: string;
 }
 
@@ -268,11 +269,13 @@ export class YeomanUI {
 
     const genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
     const genPrettyName = titleize(humanizeString(genName));
+    const genHomepage = _.get(packageJson, "homepage", '');
 
     return {
       name: genName,
       prettyName: genPrettyName,
       message: genMessage,
+      homepage: genHomepage,
       imageUrl: genImageUrl
     };
   }
