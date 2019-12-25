@@ -5,6 +5,8 @@ import * as fsextra from "fs-extra";
 import * as _ from "lodash";
 import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
+const titleize = require('titleize');
+const humanizeString = require('humanize-string');
 const datauri = require("datauri");
 import * as defaultImage from "./defaultImage";
 import { YouiAdapter } from "./youi-adapter";
@@ -15,6 +17,7 @@ import { GeneratorType, GeneratorFilter } from "./filter";
 
 export interface IGeneratorChoice {
   name: string;
+  prettyName: string;
   message: string;
   imageUrl?: string;
 }
@@ -264,9 +267,11 @@ export class YeomanUI {
     }
 
     const genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
+    const genPrettyName = titleize(humanizeString(genName));
 
     return {
       name: genName,
+      prettyName: genPrettyName,
       message: genMessage,
       imageUrl: genImageUrl
     };

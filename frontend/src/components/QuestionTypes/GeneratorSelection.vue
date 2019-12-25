@@ -8,7 +8,7 @@
               @click="emitSelection(item.name)"
               v-on:click="select"
               class="generator h-100"
-              :title="item.name"
+              :title="item.prettyName"
               img-alt="Image"
               img-top
               tag="article"
