@@ -12,7 +12,7 @@
         <b-row>
           <b-col>Where would you like to open the project?</b-col>
           <b-col cols="12" md="auto">
-            <b-button class="btn" href="#">Current Workspace</b-button>
+            <b-button class="btn" :data-command-params="donePath" @click="close">Close</b-button>
           </b-col>
           <b-col cols="12" md="auto">
             <b-button class="btn" data-command-name="vscode.openFolder" :data-command-params="donePath" @click="executeCommand">New Workspace</b-button>
@@ -46,6 +46,15 @@ export default {
         }
       }
     },
+    close(event) {
+      event.currentTarget.dataset.commandName = "workbench.action.closeActiveEditor";
+      this.executeCommand(event);
+    },
+    openCurrentWorkspace(event) {
+      close(event);
+      event.currentTarget.dataset.commandName = "workbench.action.addRootFolder";
+      this.executeCommand(event);
+    }
   },
 }
 
