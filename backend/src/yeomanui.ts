@@ -128,7 +128,7 @@ export class YeomanUI {
       const getGenMetadataName = this.getGenMetaName(generatorName);
       const gen: any = env.create(getGenMetadataName, {});
       // check if generator defined a helper function called getPrompts()
-      const genGetPrompts = _.get(gen, "getPromts");
+      const genGetPrompts = _.get(gen, "getPrompts");
       if (genGetPrompts) {
         const promptNames: any[] = genGetPrompts();
         const prompts: IPrompt[] = promptNames.map(value => {
