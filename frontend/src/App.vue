@@ -17,7 +17,12 @@
         </b-col>
         <b-col class="m-0 p-0">
           <b-container>
-            <div v-if="isDone" class="loading">{{doneMessage}}</div>
+            <Done
+              v-if="isDone"
+              :doneMessage="doneMessage"
+              :donePath="donePath"
+              :isInVsCode="isInVsCode()"
+            />
             <Step
               v-if="prompts.length"
               ref="step"
@@ -48,6 +53,7 @@ import Vue from "vue"
 import Header from "./components/Header.vue"
 import Navigation from "./components/Navigation.vue"
 import Step from "./components/Step.vue"
+import Done from "./components/Done.vue"
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import * as _ from "lodash"
@@ -61,7 +67,8 @@ export default {
   components: {
     Header,
     Navigation,
-    Step
+    Step,
+    Done
   },
   data() {
     return {
@@ -251,11 +258,12 @@ export default {
       this.logText += log
       return true
     },
-    generatorDone(success, message) {
+    generatorDone(success, message, targetPath) {
       if (this.currentPrompt.status === "pending") {
         this.currentPrompt.name = "Confirmation"
       }
       this.doneMessage = message
+      this.donePath = targetPath
       this.isDone = true
       // TODO: remove return value once this change is published to npm: https://github.com/SAP/vscode-webview-rpc-lib/pull/5
       return true;
@@ -269,8 +277,8 @@ export default {
     setupRpc() {
       if (this.isInVsCode()) {
         // eslint-disable-next-line
-        const vscode = acquireVsCodeApi()
-        this.rpc = new RpcBrowser(window, vscode)
+        window.vscode = acquireVsCodeApi()
+        this.rpc = new RpcBrowser(window, window.vscode)
         this.initRpc()
       } else {
         const ws = new WebSocket("ws://127.0.0.1:8081")
@@ -344,15 +352,19 @@ b-container {
 b-row {
   margin: 0px;
 }
-button.btn {
+div[class^='col-'], div[class*='col-'] {
+  padding-right: 5px;
+  padding-left: 5px;  
+}
+button.btn, a.btn {
   background-color: var(--vscode-button-background, #0e639c);
   border-color: var(--vscode-button-background, #0e639c);
   color: var(--vscode-button-foreground, white);
-  border-radius: 0px;
+  border-radius: 0.2rem;
   font-size: 0.8rem;
   padding: 0.2rem 0.6rem;
 }
-button.btn:hover {
+button.btn:hover, a.btn:hover {
   background-color: var(--vscode-button-hoverBackground, #1177bb);
   border-color: var(--vscode-button-hoverBackground, #1177bb);
 }

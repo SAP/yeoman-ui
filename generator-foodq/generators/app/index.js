@@ -1,6 +1,7 @@
 var Generator = require('yeoman-generator');
 var chalkPipe = require('chalk-pipe');
 var Inquirer = require('inquirer');
+var path = require('path');
 
 module.exports = class extends Generator {
   constructor(args, opts) {
@@ -260,6 +261,8 @@ module.exports = class extends Generator {
 
   writing() {
     this.log('in writing');
+    this.destinationRoot(path.join(this.destinationRoot(), this.answers.food));
+    this.log('destinationRoot: ' + this.destinationRoot());
     this.fs.copyTpl(
       this.templatePath('index.html'),
       this.destinationPath('public/index.html'),
@@ -269,6 +272,10 @@ module.exports = class extends Generator {
         hungerLevel: this.answers.hungerLevel,
         fav_color: this.answers.fav_color
       }
+    );
+    this.fs.copy(
+      this.templatePath('README.md'),
+      this.destinationPath('README.md')
     );
   }
 
