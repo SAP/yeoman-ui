@@ -57,7 +57,7 @@ export class YeomanUIPanel {
 		// Otherwise, create a new panel.
 		const panel = vscode.window.createWebviewPanel(
 			YeomanUIPanel.viewType,
-			"stam",
+			'Yeoman UI',
 			column || vscode.ViewColumn.One,
 			{
 				// Enable javascript in the webview
