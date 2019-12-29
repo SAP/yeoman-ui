@@ -1,6 +1,6 @@
 import {initComponent, destroy} from '../Utils'
 import Header from '../../src/components/Header.vue'
-import { BButton, BNavbarBrand, BNavText } from 'bootstrap-vue'
+import { BButton, BNavbarBrand } from 'bootstrap-vue'
 import _ from 'lodash'
 
 let wrapper
@@ -22,9 +22,9 @@ describe('Header.vue', () => {
     })
 
     test('generator brand', () => {
-        const testGen = 'testGenerator'
-        wrapper = initComponent(Header, { generatorName: testGen })
-        expect(wrapper.find(BNavbarBrand).text()).toBe(`Yeoman UI Wizard: ${testGen}`)
+        const testGen = 'Selected Generator: testGenerator'
+        wrapper = initComponent(Header, { selectedGeneratorHeader: testGen })
+        expect(wrapper.find(BNavbarBrand).text()).toBe(testGen)
     })
 
     test('click triggers collapseLog method', async () => {
