@@ -1,6 +1,6 @@
 import {initComponent, destroy} from '../Utils'
 import Header from '../../src/components/Header.vue'
-import { BButton, BNavbarBrand, BNavText } from 'bootstrap-vue'
+import { BButton, BNavbarBrand } from 'bootstrap-vue'
 import _ from 'lodash'
 
 let wrapper
@@ -36,7 +36,6 @@ describe('Header.vue', () => {
         }, true)
         
         wrapper.find(BButton).trigger('click')
-        await wrapper.vm.$nextTick()
         expect(rpcInvokeMockFunction).toHaveBeenCalled()  
     })
 })

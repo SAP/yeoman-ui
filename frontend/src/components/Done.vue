@@ -22,31 +22,30 @@
     </b-jumbotron>
   </div>
 </template>
-
 <script>
+
 import _ from "lodash"
+
 export default {
   name: "Done",
-  props: ["doneMessage","donePath","isInVsCode"],
-  data() {
-    return {
-    }
-  },
+  props: ["doneMessage", "donePath", "isInVsCode"],
   methods: {
     executeCommand(event) {
-      if (event) {
-        let curTargetData = event.currentTarget.dataset;
-        if (curTargetData) {
-          window.vscode.postMessage({
-              command: 'vscodecommand',
-              commandName: curTargetData.commandName,
-              commandParams: (curTargetData.commandParams === undefined ? [] : [curTargetData.commandParams])
-          });
-        }
+      const curTargetData = _.get(event, "currentTarget.dataset");
+      if (curTargetData) {
+        let cParams = _.get(curTargetData, "commandParams", []);
+        if (!_.isEmpty(cParams)) {
+          cParams = [cParams]
+        } 
+        window.vscode.postMessage({
+            command: 'vscodecommand',
+            commandName: curTargetData.commandName,
+            commandParams: cParams
+        });
       }
     },
     close(event) {
-      event.currentTarget.dataset.commandName = "workbench.action.closeActiveEditor";
+      _.set(event, "currentTarget.dataset.commandName", "workbench.action.closeActiveEditor");
       this.executeCommand(event);
     },
     // ISSUE: workbench.action.addRootFolder doesn't get params.

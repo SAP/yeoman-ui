@@ -1,11 +1,15 @@
 import {initComponent, destroy} from '../Utils'
 import Done from '../../src/components/Done.vue'
-import { BButton, BJumbotron } from 'bootstrap-vue'
+import { BJumbotron, BButton, BContainer } from 'bootstrap-vue'
 import _ from 'lodash'
+
 
 let wrapper
 
-describe('Done.vue', () => {
+
+describe.only('Header.vue', () => {
+    const testDoneMessage = 'testDoneMessage'
+
     afterEach(() => {
         destroy(wrapper)
     });
@@ -20,41 +24,45 @@ describe('Done.vue', () => {
         expect(_.keys(wrapper.props())).toHaveLength(3)
     })
 
-    test('done message', () => {
-        const message = "The 'testGenerator' project has been generated."
-        wrapper = initComponent(Done, {
-            doneMessage: message,
-            donePath: 'c:/temp/donePath',
-            isInVsCode: true
-        }, true)
-        expect(wrapper.find(BJumbotron).text()).toContain(`${message}`)
+    test('doneMessage set', () => {
+        wrapper = initComponent(Done, { doneMessage: testDoneMessage })
+        expect(wrapper.find(BJumbotron).text()).toBe(testDoneMessage)
     })
 
-    test('executeCommand method', async () => {
-        const message = "The 'testGenerator' project has been generated."
-        wrapper = initComponent(Done, {
-            doneMessage: message,
-            donePath: 'c:/temp/donePath',
-            isInVsCode: true
-        }, true)
+    test('doneMessage set, isInVsCode is false', () => {
+        wrapper = initComponent(Done, { doneMessage: testDoneMessage, donePath: "", isInVsCode: false }, true)
+        expect(wrapper.find(BContainer).vnode).toBeUndefined()
+    })
+
+    test('doneMessage set, isInVsCode is true', () => {
+        wrapper = initComponent(Done, { doneMessage: testDoneMessage, donePath: "", isInVsCode: true }, true)
+        expect(wrapper.find(BContainer).vnode).toBeDefined()
+    })
+
+    test('click on Close button - closeActiveEditor should be set', async () => {
+        wrapper = initComponent(Done, { doneMessage: testDoneMessage, donePath: 'testDonePath', isInVsCode: true}, true)
+        wrapper.vm.executeCommand = clickEvent => {
+            expect(clickEvent.currentTarget.dataset.commandName).toBe('workbench.action.closeActiveEditor')
+        }
+        wrapper.find(BButton).trigger('click')
+    })
+
+    test('click on Close button - executeCommand should be called', async () => {
+        wrapper = initComponent(Done, { doneMessage: testDoneMessage, donePath: 'testDonePath', isInVsCode: true}, true)
         wrapper.vm.executeCommand = jest.fn()
-        const executeCommandSpy = jest.spyOn(wrapper.vm, 'executeCommand')
-
-        wrapper.vm.executeCommand()
-        expect(executeCommandSpy).toHaveBeenCalled()  
+        wrapper.find(BButton).trigger('click')
+        expect(wrapper.vm.executeCommand).toHaveBeenCalled()
     })
 
-    test('close method', async () => {
-        const message = "The 'testGenerator' project has been generated."
-        wrapper = initComponent(Done, {
-            doneMessage: message,
-            donePath: 'c:/temp/donePath',
-            isInVsCode: true
-        }, true)
-        wrapper.vm.close = jest.fn()
-        const closeCommandSpy = jest.spyOn(wrapper.vm, 'close')
-
-        wrapper.vm.close()
-        expect(closeCommandSpy).toHaveBeenCalled()  
+    // TODO: return branch coverage to 85 after adding more test for this button
+    test('click on New Workspace button - executeCommand should be called', async () => {
+        window.vscode = {
+            postMessage: jest.fn()
+        }
+        wrapper = initComponent(Done, { doneMessage: testDoneMessage, donePath: 'testDonePath', isInVsCode: true}, true)
+        const buttons = wrapper.findAll(BButton)
+        const nWorkspaceButton = buttons.wrappers[1]
+        nWorkspaceButton.trigger('click')
+        expect(window.vscode.postMessage).toHaveBeenCalled()
     })
 })
