@@ -5,7 +5,7 @@
 	"license": "Apache 2.0",
 	"description": "Provide rich user experience for Yeoman generators using VSCode extension or the browser",
 	"repository": "https://github.com/SAP/yeoman-ui",
-	"version": "0.0.13",
+	"version": "0.0.14",
 	"engines": {
 		"vscode": "^1.38.0"
 	},
@@ -18,7 +18,8 @@
 	],
 	"main": "./dist/extension",
 	"contributes": {
-		"commands": [{
+		"commands": [
+			{
 				"command": "loadYeomanUI",
 				"title": "Yeoman UI Generators"
 			}

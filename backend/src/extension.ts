@@ -165,7 +165,7 @@ export class YeomanUIPanel {
 			indexHtml = indexHtml.replace(/<script src=/g, `<script src=${scriptUri.toString()}`);
 			indexHtml = indexHtml.replace(/<img src=/g, `<img src=${scriptUri.toString()}`);
 		}
-		const uiMessages = _.get(YeomanUIPanel, "messages", backendMessages);
+		const uiMessages = _.assign(backendMessages, _.get(YeomanUIPanel, "messages", {}));
 		this.panel.title = _.get(uiMessages, "panel_title");
 		
 		this.setMessages(uiMessages);

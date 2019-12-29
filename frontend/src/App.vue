@@ -4,7 +4,7 @@
 
     <Header
       v-if="prompts.length"
-      :generatorName="generatorName"
+      :selectedGeneratorHeader="selectedGeneratorHeader"
       :stepName="prompts[promptIndex].name"
       :rpc="rpc"
     />
@@ -83,6 +83,9 @@ export default {
     }
   },
   computed: {
+    selectedGeneratorHeader() {
+      return this.uiMessages.selected_generator + this.generatorName
+    },
     currentPrompt() {
       const prompt = _.get(this.prompts, "[" + this.promptIndex +"]")
       
@@ -247,6 +250,7 @@ export default {
       return promise
     },
     createPrompt(questions, name) {
+      name = (name === 'select_generator') ? this.uiMessages.select_generator : name
       const prompt = Vue.observable({
         questions: questions,
         name: name,

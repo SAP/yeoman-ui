@@ -195,7 +195,7 @@ export class YeomanUI {
     if (this.rpc) {
       const generators: IPrompt = await this.getGenerators();
       
-      const response: any = await this.rpc.invoke("showPrompt", [generators.questions, generators.name]);
+      const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
       await this.runGenerator(response.name);
     }
   }
