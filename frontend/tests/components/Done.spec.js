@@ -39,19 +39,14 @@ describe.only('Header.vue', () => {
         expect(wrapper.find(BContainer).vnode).toBeDefined()
     })
 
-    test('click on Close button - closeActiveEditor should be set', async () => {
+    test('click on Close button - closeActiveEditor should be set and executeCommand should be called', async () => {
         wrapper = initComponent(Done, { doneMessage: testDoneMessage, donePath: 'testDonePath', isInVsCode: true}, true)
-        wrapper.vm.executeCommand = clickEvent => {
+        const executeCommandMock = jest.fn(clickEvent => {
             expect(clickEvent.currentTarget.dataset.commandName).toBe('workbench.action.closeActiveEditor')
-        }
+        })
+        wrapper.setMethods({executeCommand: executeCommandMock})
         wrapper.find(BButton).trigger('click')
-    })
-
-    test('click on Close button - executeCommand should be called', async () => {
-        wrapper = initComponent(Done, { doneMessage: testDoneMessage, donePath: 'testDonePath', isInVsCode: true}, true)
-        wrapper.vm.executeCommand = jest.fn()
-        wrapper.find(BButton).trigger('click')
-        expect(wrapper.vm.executeCommand).toHaveBeenCalled()
+        expect(executeCommandMock).toHaveBeenCalled()
     })
 
     // TODO: return branch coverage to 85 after adding more test for this button
@@ -64,5 +59,34 @@ describe.only('Header.vue', () => {
         const nWorkspaceButton = buttons.wrappers[1]
         nWorkspaceButton.trigger('click')
         expect(window.vscode.postMessage).toHaveBeenCalled()
+    })
+
+    test('executeCommand - method', async () => {
+        window.vscode = {
+            postMessage: jest.fn()
+        }
+        wrapper = initComponent(Done, { doneMessage: testDoneMessage, donePath: 'testDonePath', isInVsCode: true}, true)
+        // event currentTarget.dataset is not set
+        let testEvent = {};
+        wrapper.vm.executeCommand(testEvent);
+        expect(window.vscode.postMessage).not.toHaveBeenCalled()
+
+        // event currentTarget.dataset.commandParams is not set, 
+        testEvent = {currentTarget: {dataset: {commandName: 'testCommandName'}}};
+        wrapper.vm.executeCommand(testEvent);
+        expect(window.vscode.postMessage).toHaveBeenCalledWith({
+            command: 'vscodecommand',
+            commandName: 'testCommandName',
+            commandParams: []
+        })
+
+        // event currentTarget.dataset.commandParams is set, 
+        testEvent = {currentTarget: {dataset: {commandName: 'testCommandName', commandParams: {param1: 'value1', param2: 'value2'}}}};
+        wrapper.vm.executeCommand(testEvent);
+        expect(window.vscode.postMessage).toHaveBeenCalledWith({
+            command: 'vscodecommand',
+            commandName: 'testCommandName',
+            commandParams: [{param1: 'value1', param2: 'value2'}]
+        })
     })
 })
