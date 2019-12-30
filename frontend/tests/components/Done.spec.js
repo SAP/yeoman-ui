@@ -7,7 +7,7 @@ import _ from 'lodash'
 let wrapper
 
 
-describe.only('Header.vue', () => {
+describe('Header.vue', () => {
     const testDoneMessage = 'testDoneMessage'
 
     afterEach(() => {
