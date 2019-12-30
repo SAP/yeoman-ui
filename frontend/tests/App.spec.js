@@ -17,7 +17,10 @@ describe('App.vue', () => {
 
   it('createPrompt - method', () => {
     wrapper = initComponent(App)
-    expect(wrapper.vm.createPrompt()).toBeDefined()
+    expect(wrapper.vm.createPrompt().name).toBe()
+    expect(wrapper.vm.createPrompt([]).name).toBe()
+    expect(wrapper.vm.createPrompt([], 'name').name).toBe('name')
+    expect(wrapper.vm.createPrompt([], 'select_generator')).toBeDefined()
   })
 
   describe('currentPrompt - computed', () => {
@@ -270,6 +273,14 @@ describe('App.vue', () => {
 
     wrapper.vm.onStepValidated(true);
     expect(wrapper.vm.stepValidated).toBeTruthy()
+  })
+
+  test('setMessages - method', () => {
+    wrapper = initComponent(App)
+    expect(wrapper.vm.messages).toEqual({})
+
+    wrapper.vm.setMessages({test: "test1"});
+    expect(wrapper.vm.messages).toEqual({test: "test1"})
   })
 
   describe('next - method', () => {
