@@ -1,10 +1,10 @@
 <template>
   <div id="app" class="d-flex flex-column yeoman-ui">
-    <div v-if="!prompts.length" class="loading">Yeoman User Interface is loading...</div>
+    <div v-if="!prompts.length" class="loading">{{ messages.generators_loading }}</div>
 
     <Header
       v-if="prompts.length"
-      :generatorName="generatorName"
+      :selectedGeneratorHeader="selectedGeneratorHeader"
       :stepName="prompts[promptIndex].name"
       :rpc="rpc"
     />
@@ -54,7 +54,6 @@ import * as _ from "lodash"
 
 const FUNCTION = '__Function'
 const LOADING = 'loading...'
-const PENDING = 'Pending...'
 
 export default {
   name: "app",
@@ -76,10 +75,14 @@ export default {
       isDone: false,
       doneMessage: Object,
       consoleClass: "",
-      logText: ""
+      logText: "",
+      messages: {}
     }
   },
   computed: {
+    selectedGeneratorHeader() {
+      return this.messages.selected_generator + this.generatorName
+    },
     currentPrompt() {
       const prompt = _.get(this.prompts, "[" + this.promptIndex +"]")
       
@@ -152,7 +155,7 @@ export default {
         }
       }
       if (this.promptIndex >= _.size(this.prompts) - 1) {
-        const prompt = { questions: [], name: PENDING, status: "pending" }
+        const prompt = { questions: [], name: this.messages.step_is_pending, status: "pending" }
         this.setPrompts([prompt])
       }
       this.promptIndex++
@@ -164,6 +167,9 @@ export default {
     },
     onStepValidated(stepValidated) {
       this.stepValidated = stepValidated
+    },
+    setMessages(messages) {
+      this.messages = messages;
     },
     setPrompts(prompts) {
       // TODO:
@@ -181,7 +187,7 @@ export default {
             } else {
               if (currentPrompt) {
                 currentPrompt.questions = prompt.questions
-                if (prompt.name && currentPrompt.name === PENDING) {
+                if (prompt.name && currentPrompt.name === this.messages.step_is_pending) {
                   currentPrompt.name = prompt.name
                 }
                 // if questions are provided, remote the pending status
@@ -238,6 +244,7 @@ export default {
       return promise
     },
     createPrompt(questions, name) {
+      name = (name === 'select_generator') ? this.messages.select_generator : name
       const prompt = Vue.observable({
         questions: questions,
         name: name,
@@ -281,7 +288,7 @@ export default {
       }
     },
     initRpc() {
-      const functions = ["showPrompt", "setPrompts", "generatorDone", "log"]
+      const functions = ["showPrompt", "setPrompts", "generatorDone", "log", "setMessages"]
       _.forEach(functions, funcName => {
         this.rpc.registerMethod({
           func: this[funcName],

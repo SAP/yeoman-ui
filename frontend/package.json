@@ -1,7 +1,7 @@
 {
   "name": "yeoman-ui-frontend",
   "displayName": "Yeoman UI Frontend",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "publisher": "SAP",
   "license": "Apache 2.0",
   "description": "Frontend for the yeoman UI framework",
@@ -22,7 +22,7 @@
     "jquery": "3.4.1"
   },
   "devDependencies": {
-    "@sap-devx/webview-rpc": "^0.1.3",
+    "@sap-devx/webview-rpc": "^0.2.0",
     "@vue/cli-plugin-babel": "^3.11.0",
     "@vue/cli-plugin-eslint": "^3.11.0",
     "@vue/cli-plugin-unit-jest": "^4.1.1",

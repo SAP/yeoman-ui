@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-navbar>
-      <b-navbar-brand>Yeoman UI Wizard: {{generatorName}}</b-navbar-brand>
+      <b-navbar-brand>{{selectedGeneratorHeader}}</b-navbar-brand>
 
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
@@ -16,7 +16,7 @@
 <script>
 export default {
   name: "Header",
-  props: ["generatorName", "stepName", "rpc"],
+  props: ["selectedGeneratorHeader", "stepName", "rpc"],
   methods: {
     collapseLog() {
       this.rpc.invoke("toggleLog", [{}])
