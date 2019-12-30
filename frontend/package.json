@@ -22,7 +22,7 @@
     "jquery": "3.4.1"
   },
   "devDependencies": {
-    "@sap-devx/webview-rpc": "^0.1.3",
+    "@sap-devx/webview-rpc": "^0.2.0",
     "@vue/cli-plugin-babel": "^3.11.0",
     "@vue/cli-plugin-eslint": "^3.11.0",
     "@vue/cli-plugin-unit-jest": "^4.1.1",
