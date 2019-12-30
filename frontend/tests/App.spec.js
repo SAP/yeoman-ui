@@ -17,7 +17,10 @@ describe('App.vue', () => {
 
   it('createPrompt - method', () => {
     wrapper = initComponent(App)
-    expect(wrapper.vm.createPrompt()).toBeDefined()
+    expect(wrapper.vm.createPrompt().name).toBe()
+    expect(wrapper.vm.createPrompt([]).name).toBe()
+    expect(wrapper.vm.createPrompt([], 'name').name).toBe('name')
+    expect(wrapper.vm.createPrompt([], 'select_generator')).toBeDefined()
   })
 
   describe('currentPrompt - computed', () => {
@@ -272,6 +275,14 @@ describe('App.vue', () => {
     expect(wrapper.vm.stepValidated).toBeTruthy()
   })
 
+  test('setMessages - method', () => {
+    wrapper = initComponent(App)
+    expect(wrapper.vm.messages).toEqual({})
+
+    wrapper.vm.setMessages({test: "test1"});
+    expect(wrapper.vm.messages).toEqual({test: "test1"})
+  })
+
   describe('next - method', () => {
     test('promptIndex is greater than prompt quantity, resolve is defined', () => {
       wrapper = initComponent(App)
@@ -328,9 +339,10 @@ describe('App.vue', () => {
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.promptIndex = 1
 
-      wrapper.vm.generatorDone(true, 'testMessage')
+      wrapper.vm.generatorDone(true, 'testMessage', '/test/path')
 
       expect(wrapper.vm.doneMessage).toBe('testMessage')
+      expect(wrapper.vm.donePath).toBe('/test/path')
       expect(wrapper.vm.isDone).toBeTruthy()
     })
 
@@ -340,11 +352,12 @@ describe('App.vue', () => {
       wrapper.vm.promptIndex = 1
       wrapper.vm.currentPrompt.status = 'pending'
 
-      wrapper.vm.generatorDone(true, 'testMessage')
+      wrapper.vm.generatorDone(true, 'testMessage', '/test/path')
 
       expect(wrapper.vm.doneMessage).toBe('testMessage')
+      expect(wrapper.vm.donePath).toBe('/test/path')
       expect(wrapper.vm.isDone).toBeTruthy()
-      expect(wrapper.vm.currentPrompt.name).toBe('Done')
+      expect(wrapper.vm.currentPrompt.name).toBe('Confirmation')
     })
   })
 })

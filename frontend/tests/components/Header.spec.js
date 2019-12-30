@@ -1,6 +1,6 @@
 import {initComponent, destroy} from '../Utils'
 import Header from '../../src/components/Header.vue'
-import { BButton, BNavbarBrand, BNavText } from 'bootstrap-vue'
+import { BButton, BNavbarBrand } from 'bootstrap-vue'
 import _ from 'lodash'
 
 let wrapper
@@ -18,23 +18,13 @@ describe('Header.vue', () => {
 
     test('component props', () => {
         wrapper = initComponent(Header)
-        expect(_.keys(wrapper.props())).toHaveLength(5)
+        expect(_.keys(wrapper.props())).toHaveLength(3)
     })
 
     test('generator brand', () => {
-        const testGen = 'testGenerator'
-        wrapper = initComponent(Header, { generatorName: testGen })
-        expect(wrapper.find(BNavbarBrand).text()).toBe(`Generator: ${testGen}`)
-    })
-
-    test('find step text and step text name', () => {
-        const testPrompt = 'testPrompt'
-        const testStepName = 'testStepName'
-        const testNumOfSteps = 3
-        wrapper = initComponent(Header, { currentPrompt: testPrompt, numOfSteps: testNumOfSteps, stepName: testStepName })
-        const bNavTexts = wrapper.findAll(BNavText)
-        expect(bNavTexts.wrappers[0].element.textContent).toBe(`Step: ${testPrompt}/${testNumOfSteps}`)
-        expect(bNavTexts.wrappers[1].element.textContent).toBe(testStepName)
+        const testGen = 'Selected Generator: testGenerator'
+        wrapper = initComponent(Header, { selectedGeneratorHeader: testGen })
+        expect(wrapper.find(BNavbarBrand).text()).toBe(testGen)
     })
 
     test('click triggers collapseLog method', async () => {
@@ -46,7 +36,6 @@ describe('Header.vue', () => {
         }, true)
         
         wrapper.find(BButton).trigger('click')
-        await wrapper.vm.$nextTick()
         expect(rpcInvokeMockFunction).toHaveBeenCalled()  
     })
 })

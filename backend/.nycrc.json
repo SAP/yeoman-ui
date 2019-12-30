@@ -1,15 +1,14 @@
 {
     "require": ["ts-node/register/transpile-only"],
     "include": ["src/**/*.ts"],
-    "exclude": ["src/run-configuration*", "src/cfView.ts", "src/cfViewCommands.ts", "src/sql-tools.ts"],
     "reporter": ["lcov", "text"],
     "extension": [".ts"],
     "all": true,
     "temp-dir": "./reports/.nyc_output",
     "report-dir": "./reports/coverage",
     "check-coverage": true,
-    "branches": 0,
-    "lines": 24,
-    "functions": 17,
-    "statements": 25
+    "branches": 28,
+    "lines": 44,
+    "functions": 32,
+    "statements": 44
   }

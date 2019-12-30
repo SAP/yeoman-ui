@@ -1,12 +1,10 @@
 <template>
   <div id="app" class="d-flex flex-column yeoman-ui">
-    <div v-if="!prompts.length" class="loading">Yeoman User Interface is loading...</div>
+    <div v-if="!prompts.length" class="loading">{{ messages.generators_loading }}</div>
 
     <Header
       v-if="prompts.length"
-      :currentPrompt="promptIndex+1"
-      :numOfSteps="prompts.length"
-      :generatorName="generatorName"
+      :selectedGeneratorHeader="selectedGeneratorHeader"
       :stepName="prompts[promptIndex].name"
       :rpc="rpc"
     />
@@ -19,7 +17,12 @@
         </b-col>
         <b-col class="m-0 p-0">
           <b-container>
-            <div v-if="isDone" class="loading">{{doneMessage}}</div>
+            <Done
+              v-if="isDone"
+              :doneMessage="doneMessage"
+              :donePath="donePath"
+              :isInVsCode="isInVsCode()"
+            />
             <Step
               v-if="prompts.length"
               ref="step"
@@ -50,24 +53,25 @@ import Vue from "vue"
 import Header from "./components/Header.vue"
 import Navigation from "./components/Navigation.vue"
 import Step from "./components/Step.vue"
+import Done from "./components/Done.vue"
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import * as _ from "lodash"
 
 const FUNCTION = '__Function'
 const LOADING = 'loading...'
-const PENDING = 'Pending...'
 
 export default {
   name: "app",
   components: {
     Header,
     Navigation,
-    Step
+    Step,
+    Done
   },
   data() {
     return {
-      generatorName: "<none>",
+      generatorName: "",
       stepValidated:false,
       prompts: [],
       promptIndex: 0,
@@ -78,10 +82,14 @@ export default {
       isDone: false,
       doneMessage: Object,
       consoleClass: "",
-      logText: ""
+      logText: "",
+      messages: {}
     }
   },
   computed: {
+    selectedGeneratorHeader() {
+      return this.messages.selected_generator + this.generatorName
+    },
     currentPrompt() {
       const prompt = _.get(this.prompts, "[" + this.promptIndex +"]")
       
@@ -154,7 +162,7 @@ export default {
         }
       }
       if (this.promptIndex >= _.size(this.prompts) - 1) {
-        const prompt = { questions: [], name: PENDING, status: "pending" }
+        const prompt = { questions: [], name: this.messages.step_is_pending, status: "pending" }
         this.setPrompts([prompt])
       }
       this.promptIndex++
@@ -166,6 +174,9 @@ export default {
     },
     onStepValidated(stepValidated) {
       this.stepValidated = stepValidated
+    },
+    setMessages(messages) {
+      this.messages = messages;
     },
     setPrompts(prompts) {
       // TODO:
@@ -183,7 +194,7 @@ export default {
             } else {
               if (currentPrompt) {
                 currentPrompt.questions = prompt.questions
-                if (prompt.name && currentPrompt.name === PENDING) {
+                if (prompt.name && currentPrompt.name === this.messages.step_is_pending) {
                   currentPrompt.name = prompt.name
                 }
                 // if questions are provided, remote the pending status
@@ -191,7 +202,7 @@ export default {
                   delete currentPrompt.status
                 }
               } else {
-                // first prompt (choose generator)
+                // first prompt (Select Generator)
                 prompt.active = true
                 this.prompts.push(prompt)
               }
@@ -240,6 +251,7 @@ export default {
       return promise
     },
     createPrompt(questions, name) {
+      name = (name === 'select_generator') ? this.messages.select_generator : name
       const prompt = Vue.observable({
         questions: questions,
         name: name,
@@ -253,11 +265,12 @@ export default {
       this.logText += log
       return true
     },
-    generatorDone(success, message) {
+    generatorDone(success, message, targetPath) {
       if (this.currentPrompt.status === "pending") {
-        this.currentPrompt.name = "Done"
+        this.currentPrompt.name = "Confirmation"
       }
       this.doneMessage = message
+      this.donePath = targetPath
       this.isDone = true
       // TODO: remove return value once this change is published to npm: https://github.com/SAP/vscode-webview-rpc-lib/pull/5
       return true;
@@ -271,8 +284,8 @@ export default {
     setupRpc() {
       if (this.isInVsCode()) {
         // eslint-disable-next-line
-        const vscode = acquireVsCodeApi()
-        this.rpc = new RpcBrowser(window, vscode)
+        window.vscode = acquireVsCodeApi()
+        this.rpc = new RpcBrowser(window, window.vscode)
         this.initRpc()
       } else {
         const ws = new WebSocket("ws://127.0.0.1:8081")
@@ -283,7 +296,7 @@ export default {
       }
     },
     initRpc() {
-      const functions = ["showPrompt", "setPrompts", "generatorDone", "log"]
+      const functions = ["showPrompt", "setPrompts", "generatorDone", "log", "setMessages"]
       _.forEach(functions, funcName => {
         this.rpc.registerMethod({
           func: this[funcName],
@@ -309,7 +322,7 @@ export default {
 #app {
   height: 100%;
   color: var(--vscode-foreground, #cccccc);
-  background-color: var(--vscode-terminal-background, #1e1e1e);
+  background-color: var(--vscode-editor-background, #1e1e1e);
   font-family: var(--vscode-font-family);
   font-weight: var(--vscode-font-weight);
   font-size: var(--vscode-font-size);
@@ -320,7 +333,7 @@ export default {
 html,
 body {
   height: 100%;
-  background-color: var(--vscode-editor-inactiveSelectionBackground, #3a3d41);
+  background-color: var(--vscode-editor-background, #1e1e1e);
   padding: 0px;
 }
 .list-group-item.selected {
@@ -346,15 +359,19 @@ b-container {
 b-row {
   margin: 0px;
 }
-button.btn {
+div[class^='col-'], div[class*='col-'] {
+  padding-right: 5px;
+  padding-left: 5px;  
+}
+button.btn, a.btn {
   background-color: var(--vscode-button-background, #0e639c);
   border-color: var(--vscode-button-background, #0e639c);
   color: var(--vscode-button-foreground, white);
-  border-radius: 0px;
+  border-radius: 0.2rem;
   font-size: 0.8rem;
   padding: 0.2rem 0.6rem;
 }
-button.btn:hover {
+button.btn:hover, a.btn:hover {
   background-color: var(--vscode-button-hoverBackground, #1177bb);
   border-color: var(--vscode-button-hoverBackground, #1177bb);
 }

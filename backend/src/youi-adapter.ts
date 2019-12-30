@@ -1,6 +1,7 @@
 import { Adapter } from "yeoman-environment";
 import { YeomanUI } from "./yeomanui";
 import { YouiLog } from "./youi-log";
+import * as _ from "lodash";
 const chalk = require('chalk');
 
 /**
@@ -52,22 +53,22 @@ export class YouiAdapter implements Adapter {
    * @param {Array} questions
    * @param {Function} callback
    */
-  public prompt<T1, T2>(
+  public async prompt<T1, T2>(
     questions: Adapter.Questions<T1>,
     cb?: (res: T1) => T2
   ): Promise<T2> {
     if (this.yeomanui && questions) {
-      return (<Promise<T2>>this.yeomanui.showPrompt(questions)).then(result => {
+      return (<Promise<T2>>this.yeomanui.showPrompt(questions)).then(async (result: any) => {
         if (cb) {
           try {
-            return cb(result as any);
+            return await cb(result);
           } catch (err) {
-            this.yeomanui.doGeneratorDone(false, (err.message ? err.message : 'Yeoman UI detected an error'));
+            this.yeomanui.doGeneratorDone(false, (_.get(err, "message", 'Yeoman UI detected an error')), "");
             return;
           }
-        } else {
-          return result;
-        }
+        } 
+
+        return result;
       }).catch((reason) => {
         throw reason;
       });

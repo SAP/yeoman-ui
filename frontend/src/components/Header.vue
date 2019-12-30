@@ -1,12 +1,7 @@
 <template>
   <div>
     <b-navbar>
-      <b-navbar-brand>Generator: {{generatorName}}</b-navbar-brand>
-
-      <b-navbar-nav>
-        <b-nav-text>Step: {{ currentPrompt }}/{{ numOfSteps }}</b-nav-text>
-        <b-nav-text>{{ stepName }}</b-nav-text>
-      </b-navbar-nav>
+      <b-navbar-brand>{{selectedGeneratorHeader}}</b-navbar-brand>
 
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
@@ -21,7 +16,7 @@
 <script>
 export default {
   name: "Header",
-  props: ["generatorName", "currentPrompt", "numOfSteps", "stepName", "rpc"],
+  props: ["selectedGeneratorHeader", "stepName", "rpc"],
   methods: {
     collapseLog() {
       this.rpc.invoke("toggleLog", [{}])

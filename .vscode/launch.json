@@ -3,95 +3,95 @@
 // Hover to view descriptions of existing attributes.
 // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
 {
-	"version": "0.2.0",
-	"configurations": [
-		{
-			"type": "node",
-			"request": "launch",
-			"name": "Run websocket server",
-			"program": "${workspaceFolder}/backend/src/webSocketServer/index.ts",
-			"outFiles": [
-				"${workspaceFolder}/backend/out/**/*.js"
-			],
-			"preLaunchTask": "watch backend (tsc)"
-		},
-		{
-			"type": "node",
-			"request": "launch",
-			"name": "Mocha Tests",
-			"program": "${workspaceFolder}/backend/node_modules/mocha/bin/mocha",
-			"args": [
-				"-r",
-				"ts-node/register",
-				"--timeout",
-				"999999",
-				"--colors",
-				"${workspaceFolder}/backend/tests/**/*.spec.ts"
-			],
-			"console": "integratedTerminal",
-			"internalConsoleOptions": "neverOpen",
-			"protocol": "inspector"
-		},
-		{
-			"name": "Run extension",
-			"type": "extensionHost",
-			"request": "launch",
-			"runtimeExecutable": "${execPath}",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}/backend"
-			],
-			"outFiles": [
-				"${workspaceFolder}/backend/dist/**/*.js"
-			],
-			"preLaunchTask": "watch backend (webpack)"
-		},
-		{
-			"name": "Test extension",
-			"type": "extensionHost",
-			"request": "launch",
-			"runtimeExecutable": "${execPath}",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}/backend",
-				"--extensionTestsPath=${workspaceFolder}/backend/out/tests"
-			],
-			"outFiles": [
-				"${workspaceFolder}/backend/dist/**/*.js"
-			],
-			"preLaunchTask": "watch backend"
-		},
-		{
-			"type": "node",
-			"request": "launch",
-			"name": "Run reference generator (foodq)",
-			"program": "${workspaceFolder}/generator-foodq/node_modules/yo/lib/cli.js",
-			"args": [
-				"foodq"
-			],
-			"console": "integratedTerminal",
-			"internalConsoleOptions": "neverOpen",
-			"skipFiles": [
-				"<node_internals>/**"
-			]
-		},
-		{
-			"name": "Test frontend",
-			"type": "node",
-			"request": "launch",
-			"runtimeArgs": [
-				"--inspect-brk",
-				"./node_modules/@vue/cli-service/bin/vue-cli-service.js",
-				"test:unit",
-				"--runInBand"
-			],
-			"cwd": "${workspaceFolder}/frontend",
-			"protocol": "inspector",
-			"disableOptimisticBPs": true,
-			"console": "integratedTerminal",
-			"internalConsoleOptions": "neverOpen",
-			"outFiles": [
-				"${workspaceFolder}/frontend/src/**/*.js"
-			],
-			"port": 9229
-		}
-	]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Run websocket server",
+      "program": "${workspaceFolder}/backend/src/webSocketServer/index.ts",
+      "outFiles": [
+        "${workspaceFolder}/backend/out/**/*.js"
+      ],
+      "preLaunchTask": "watch backend (tsc)"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "backend unit tests",
+      "program": "${workspaceFolder}/backend/node_modules/mocha/bin/mocha",
+      "args": [
+        "-r",
+        "ts-node/register",
+        "--timeout",
+        "999999",
+        "--colors",
+        "${workspaceFolder}/backend/tests/**/*.spec.ts"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "protocol": "inspector"
+    },
+    {
+      "name": "Run extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/backend"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/backend/dist/**/*.js"
+      ],
+      "preLaunchTask": "watch backend (webpack)"
+    },
+    {
+      "name": "Test extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/backend",
+        "--extensionTestsPath=${workspaceFolder}/backend/out/tests"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/backend/dist/**/*.js"
+      ],
+      "preLaunchTask": "watch backend"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Run reference generator (foodq)",
+      "program": "${workspaceFolder}/generator-foodq/node_modules/yo/lib/cli.js",
+      "args": [
+        "foodq"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+    {
+      "name": "frontend unit tests",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "./node_modules/@vue/cli-service/bin/vue-cli-service.js",
+        "test:unit",
+        "--runInBand"
+      ],
+      "cwd": "${workspaceFolder}/frontend",
+      "protocol": "inspector",
+      "disableOptimisticBPs": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "outFiles": [
+        "${workspaceFolder}/frontend/src/**/*.js"
+      ],
+      "port": 9229
+    }
+  ]
 }
