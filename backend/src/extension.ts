@@ -8,6 +8,7 @@ import { YouiLog } from "./youi-log";
 import { OutputChannelLog } from './output-channel-log';
 import { GeneratorFilter } from './filter';
 import backendMessages from "./messages";
+import { Theia } from './theia';
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -81,6 +82,7 @@ export class YeomanUIPanel {
 	private readonly extensionPath: string;
 	private disposables: vscode.Disposable[] = [];
 	private questionsResolutions: Map<number, any>;
+	private theia: Theia;
 
 	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
 		this.questionsResolutions = new Map();
@@ -88,6 +90,7 @@ export class YeomanUIPanel {
 		this.extensionPath = extensionPath;
 		this.rpc = new RpcExtension(this.panel.webview);
 		const logger: YouiLog = new OutputChannelLog();
+		this.theia = new Theia();
 		
 		this.yeomanui = new YeomanUI(this.rpc, logger, YeomanUIPanel.genFilter);
 
@@ -121,17 +124,26 @@ export class YeomanUIPanel {
 						resolve(message.data);
 						return;
 					case 'vscodecommand':
-						const commandName = _.get(message, "commandName");
-						let commandParam = _.get(message, "commandParams[0]");
-						if (commandName === "vscode.open" || commandName === "vscode.openFolder") {
-							commandParam = vscode.Uri.file(commandParam);
-						}
-						vscode.commands.executeCommand(commandName, commandParam).then(success => {
-							console.debug(`Execution of command ${commandName} returned ${success}`);
-						}, failure => {
-							console.debug(`Execution of command ${commandName} returned ${failure}`);
+						this.theia.isInTheia().then((value) => {
+							let commandName = _.get(message, "commandName");
+							let commandParam = _.get(message, "commandParams[0]");
+							if (commandName === "vscode.open" || commandName === "vscode.openFolder") {
+								commandParam = vscode.Uri.file(commandParam);
+							}
+							if (value) {
+								const commandMappings: Map<string, string> = this.theia.getCommandMappings()
+								const theiaCommand = commandMappings.get(commandName);
+								if (theiaCommand !== undefined) {
+									commandName = theiaCommand;
+								}
+							}
+							vscode.commands.executeCommand(commandName, commandParam).then(success => {
+								console.debug(`Execution of command ${commandName} returned ${success}`);
+							}, failure => {
+								console.debug(`Execution of command ${commandName} returned ${failure}`);
+							});
+							return;
 						});
-						return;
 				}
 			},
 			null,
