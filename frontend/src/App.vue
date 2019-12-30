@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="d-flex flex-column yeoman-ui">
-    <div v-if="!prompts.length" class="loading">{{ uiMessages.generators_loading }}</div>
+    <div v-if="!prompts.length" class="loading">{{ messages.generators_loading }}</div>
 
     <Header
       v-if="prompts.length"
@@ -52,11 +52,8 @@ import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import * as _ from "lodash"
 
-
 const FUNCTION = '__Function'
 const LOADING = 'loading...'
-//const PENDING = 'Pending...'
-
 
 export default {
   name: "app",
@@ -84,7 +81,7 @@ export default {
   },
   computed: {
     selectedGeneratorHeader() {
-      return this.uiMessages.selected_generator + this.generatorName
+      return this.messages.selected_generator + this.generatorName
     },
     currentPrompt() {
       const prompt = _.get(this.prompts, "[" + this.promptIndex +"]")
@@ -97,9 +94,6 @@ export default {
       _.set(prompt, "answers", answers)
       
       return prompt
-    },
-    uiMessages() {
-      return this.messages
     }
   },
   watch: {
@@ -161,7 +155,7 @@ export default {
         }
       }
       if (this.promptIndex >= _.size(this.prompts) - 1) {
-        const prompt = { questions: [], name: this.uiMessages.step_is_pending, status: "pending" }
+        const prompt = { questions: [], name: this.messages.step_is_pending, status: "pending" }
         this.setPrompts([prompt])
       }
       this.promptIndex++
@@ -193,7 +187,7 @@ export default {
             } else {
               if (currentPrompt) {
                 currentPrompt.questions = prompt.questions
-                if (prompt.name && currentPrompt.name === this.uiMessages.step_is_pending) {
+                if (prompt.name && currentPrompt.name === this.messages.step_is_pending) {
                   currentPrompt.name = prompt.name
                 }
                 // if questions are provided, remote the pending status
@@ -250,7 +244,7 @@ export default {
       return promise
     },
     createPrompt(questions, name) {
-      name = (name === 'select_generator') ? this.uiMessages.select_generator : name
+      name = (name === 'select_generator') ? this.messages.select_generator : name
       const prompt = Vue.observable({
         questions: questions,
         name: name,

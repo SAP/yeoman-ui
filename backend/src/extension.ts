@@ -145,7 +145,6 @@ export class YeomanUIPanel {
 		return path.join(extensionPath, 'dist', 'media');
 	}
 
-	
 	private setMessages(messages: any): Promise<void> {
 		return this.rpc ? this.rpc.invoke("setMessages", [messages]) : Promise.resolve();
 	}
@@ -165,7 +164,7 @@ export class YeomanUIPanel {
 			indexHtml = indexHtml.replace(/<script src=/g, `<script src=${scriptUri.toString()}`);
 			indexHtml = indexHtml.replace(/<img src=/g, `<img src=${scriptUri.toString()}`);
 		}
-		const uiMessages = _.assign(backendMessages, _.get(YeomanUIPanel, "messages", {}));
+		const uiMessages = _.assign({}, backendMessages, _.get(YeomanUIPanel, "messages", {}));
 		this.panel.title = _.get(uiMessages, "panel_title");
 		
 		this.setMessages(uiMessages);
