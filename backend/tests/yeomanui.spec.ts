@@ -340,6 +340,66 @@ describe('yeomanui unit test', () => {
             expect(test2Choice.name).to.be.equal("test2");
             expect(test3Choice.name).to.be.equal("test4");
         });
+
+        it("get generators with displayName", async () => {
+            envMock.expects("getGeneratorsMeta").returns({
+                "test1-project:app": {
+                    packagePath: "test1Path"
+                },
+                "test2-module:app": {
+                    packagePath: "test2Path"
+                },
+                "test3:app": {
+                    packagePath: "test3Path"
+                }
+            });
+            envMock.expects("getGeneratorNames").returns(["test1-project", "test2-module", "test3"]);
+
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test3Description"}`);
+
+            yeomanUi.setGenFilter(GeneratorFilter.create());
+            const result = await yeomanUi.getGenerators();
+
+            expect(result.questions[0].choices).to.have.lengthOf(3);
+            const test1Choice = result.questions[0].choices[0];
+            const test2Choice = result.questions[0].choices[1];
+            const test3Choice = result.questions[0].choices[2];
+            expect(test1Choice.prettyName).to.be.equal("Test1 Project");
+            expect(test2Choice.prettyName).to.be.equal("Test2 Module");
+            expect(test3Choice.prettyName).to.be.equal("Test3");
+        });
+
+        it("get generators with homepage", async () => {
+            envMock.expects("getGeneratorsMeta").returns({
+                "test1-project:app": {
+                    packagePath: "test1Path"
+                },
+                "test2-module:app": {
+                    packagePath: "test2Path"
+                },
+                "test3:app": {
+                    packagePath: "test3Path"
+                }
+            });
+            envMock.expects("getGeneratorNames").returns(["test1-project", "test2-module", "test3"]);
+
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description", "homepage": "https://myhomepage.com/ANY/generator-test1-project#readme"}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}, "homepage": "https://myhomepage.com/ANY/generator-test2-module#readme"}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test3Description"}`);
+
+            yeomanUi.setGenFilter(GeneratorFilter.create());
+            const result = await yeomanUi.getGenerators();
+
+            expect(result.questions[0].choices).to.have.lengthOf(3);
+            const test1Choice = result.questions[0].choices[0];
+            const test2Choice = result.questions[0].choices[1];
+            const test3Choice = result.questions[0].choices[2];
+            expect(test1Choice.homepage).to.be.equal("https://myhomepage.com/ANY/generator-test1-project#readme");
+            expect(test2Choice.homepage).to.be.equal("https://myhomepage.com/ANY/generator-test2-module#readme");
+            expect(test3Choice.homepage).to.be.equal("");
+        });
     });
 
     describe("getEnv", () => {

@@ -6,9 +6,10 @@ module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts);
 
-    this.getPrompts = function() {
+    this.getPrompts = function () {
       console.log('in getPrompts()');
-      return [{name:"Prompt 1"},{name: "Prompt 2"},{name: "Registration"}];
+
+      return [{ name: "Prompt 1" }, { name: "Prompt 2" }, { name: "Registration" }, { name: "Take Away" }, { name: "Tip" }];
     }
 
     this.option('babel');
@@ -20,6 +21,10 @@ module.exports = class extends Generator {
 
     this.log(this.destinationPath('index.js'));
     // returns '~/projects/index.js'
+  }
+
+  async default() {
+    this.composeWith(require.resolve("../app2"), this.projectEnvironment);
   }
 
   async prompting() {
@@ -34,7 +39,7 @@ module.exports = class extends Generator {
         type: "confirm",
         name: "confirmConfirmHungry",
         message: (answers) => {
-          return `You said you are ${(answers.hungry ? '': 'not ')}hungry. Is that right?`;
+          return `You said you are ${(answers.hungry ? '' : 'not ')}hungry. Is that right?`;
         },
         store: true,
         validate: (value, answers) => {
@@ -83,7 +88,7 @@ module.exports = class extends Generator {
         type: 'input',
         name: 'fav_color',
         message: "What's your favorite napkin color",
-        transformer: function(color, answers, flags) {
+        transformer: function (color, answers, flags) {
           const text = chalkPipe(color)(color);
           if (flags.isFinal) {
             return text + '!';
@@ -123,9 +128,9 @@ module.exports = class extends Generator {
         message: "How hungry are you?",
         default: 1,
         choices: () => [
-          {name: "Very hungry"},
-          {name: "A bit hungry"},
-          {name: "Not hungry at all"}
+          { name: "Very hungry" },
+          { name: "A bit hungry" },
+          { name: "Not hungry at all" }
         ]
       },
       {
@@ -175,7 +180,7 @@ module.exports = class extends Generator {
         type: 'editor',
         name: 'comments',
         message: 'Comments.',
-        validate: function(text) {
+        validate: function (text) {
           if (!text || text.split('\n').length < 2) {
             return 'Must be at least 2 lines.';
           }
@@ -240,8 +245,10 @@ module.exports = class extends Generator {
 
     const answers_login = await this.prompt(prompts);
     this.answers = Object.assign({}, this.answers, answers_login);
-    this.log("Enail", this.answers.email);
+    this.log("Email", this.answers.email);
   }
+
+
 
   _requireLetterAndNumber(value) {
     if (/\w/.test(value) && /\d/.test(value)) {
@@ -260,7 +267,7 @@ module.exports = class extends Generator {
         title: 'Templating with Yeoman',
         food: this.answers.food,
         hungerLevel: this.answers.hungerLevel,
-        fav_color:  this.answers.fav_color
+        fav_color: this.answers.fav_color
       }
     );
   }
