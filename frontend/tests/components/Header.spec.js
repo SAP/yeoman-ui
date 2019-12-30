@@ -36,7 +36,6 @@ describe('Header.vue', () => {
         }, true)
         
         wrapper.find(BButton).trigger('click')
-        await wrapper.vm.$nextTick()
         expect(rpcInvokeMockFunction).toHaveBeenCalled()  
     })
 })

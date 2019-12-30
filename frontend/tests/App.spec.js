@@ -339,9 +339,10 @@ describe('App.vue', () => {
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.promptIndex = 1
 
-      wrapper.vm.generatorDone(true, 'testMessage')
+      wrapper.vm.generatorDone(true, 'testMessage', '/test/path')
 
       expect(wrapper.vm.doneMessage).toBe('testMessage')
+      expect(wrapper.vm.donePath).toBe('/test/path')
       expect(wrapper.vm.isDone).toBeTruthy()
     })
 
@@ -351,9 +352,10 @@ describe('App.vue', () => {
       wrapper.vm.promptIndex = 1
       wrapper.vm.currentPrompt.status = 'pending'
 
-      wrapper.vm.generatorDone(true, 'testMessage')
+      wrapper.vm.generatorDone(true, 'testMessage', '/test/path')
 
       expect(wrapper.vm.doneMessage).toBe('testMessage')
+      expect(wrapper.vm.donePath).toBe('/test/path')
       expect(wrapper.vm.isDone).toBeTruthy()
       expect(wrapper.vm.currentPrompt.name).toBe('Confirmation')
     })

@@ -58,6 +58,9 @@ export class YeomanUI {
 
   constructor(rpc: IRpc, logger: YouiLog, genFilter?: GeneratorFilter) {
     this.rpc = rpc;
+    if (!this.rpc) {
+      throw new Error("rpc must be set");
+    }
     this.logger = logger;
     this.rpc.setResponseTimeout(3600000);
     this.rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
@@ -159,23 +162,24 @@ export class YeomanUI {
            https://www.npmjs.com/package/@types/yeoman-generator */
       this.gen.run((err) => {
         let message: string;
+        let destinationRoot = this.gen.destinationRoot();
         if (err) {
           console.error(err);
           message = `${generatorName} failed: ${err}.`;
-          this.doGeneratorDone(false, message);
+          this.doGeneratorDone(false, message, destinationRoot);
         }
 
-        console.log("done running yeomanui");
-        message = `The '${generatorName}' project has been generated. You can find it at ${YeomanUI.CWD}`;
-        this.doGeneratorDone(true, message);
+        message = `The '${generatorName}' project has been generated.`;
+        console.log("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
+        this.doGeneratorDone(true, message, destinationRoot);
       });
     } catch (err) {
       console.error(err);
     }
   }
 
-  public doGeneratorDone(success: boolean, message: string): Promise<any> {
-    return this.rpc ? this.rpc.invoke("generatorDone", [true, message]) : Promise.resolve();
+  public doGeneratorDone(success: boolean, message: string, targetPath = ""): Promise<any> {
+    return this.rpc.invoke("generatorDone", [true, message, targetPath]);
   }
 
   /**
@@ -196,31 +200,26 @@ export class YeomanUI {
 
   public async receiveIsWebviewReady() {
     // TODO: loading generators takes a long time; consider prefetching list of generators
-    if (this.rpc) {
-      const generators: IPrompt = await this.getGenerators();
-      
-      const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
-      await this.runGenerator(response.name);
-    }
+    const generators: IPrompt = await this.getGenerators();
+    const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
+    await this.runGenerator(response.name);
   }
 
   public toggleLog(): boolean {
-    return this.rpc ? this.logger.showLog() : false;
+    return this.logger.showLog();
   }
 
   public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
     this.currentQuestions = questions;
-    if (this.rpc) {
+    
       this.promptCount++;
+      const firstQuestionName = _.get(questions, "[0].name");
       let promptName: string = `Step ${this.promptCount}`;
-      if (Array.isArray(questions) && questions.length === 1) {
-        promptName = questions[0].name.replace(/(.)/, (match: string, p1: string) => p1.toUpperCase());
+      if (firstQuestionName) {
+        promptName = firstQuestionName.replace(/(.)/, (match: string, p1: string) => p1.toUpperCase());
       }
       const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
       return this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
-    } 
-
-    return Promise.resolve({});
   }
   
   private async onEnvLookup(env: Environment.Options, resolve: any, filter?: GeneratorFilter) {
@@ -313,6 +312,6 @@ export class YeomanUI {
   }
 
   private setPrompts(prompts: IPrompt[]): Promise<void> {
-    return this.rpc ? this.rpc.invoke("setPrompts", [prompts]) : Promise.resolve();
+    return this.rpc.invoke("setPrompts", [prompts]);
   }
 }
