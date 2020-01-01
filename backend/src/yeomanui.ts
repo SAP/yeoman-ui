@@ -216,7 +216,7 @@ export class YeomanUI {
       const firstQuestionName = _.get(questions, "[0].name");
       let promptName: string = `Step ${this.promptCount}`;
       if (firstQuestionName) {
-        promptName = firstQuestionName.replace(/(.)/, (match: string, p1: string) => p1.toUpperCase());
+        promptName = _.startCase(firstQuestionName);
       }
       const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
       return this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);

@@ -10,7 +10,7 @@ module.exports = class extends Generator {
     this.getPrompts = function () {
       console.log('in getPrompts()');
 
-      return [{ name: "Prompt 1" }, { name: "Prompt 2" }, { name: "Registration" }, { name: "Take Away" }, { name: "Tip" }];
+      return [{ name: "Prompt 1" }, { name: "Prompt 2" }, { name: "Registration" }];
     }
 
     this.option('babel');
