@@ -1,7 +1,7 @@
 export default {
     panel_title: "Yeoman UI",
-    generators_loading: "Yeoman Generators loading ...",
-    step_is_pending: "Pending...",
+    generators_loading: "Loading the Yeoman generators...",
+    step_is_pending: "Loading...",
     selected_generator: "Selected Generator: ",
-    select_generator: "Select Generator"
+    select_generator: "Select generator"
 }; 
