@@ -4,14 +4,19 @@ module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts);
 
-    this.getPrompts = function() {
-      console.log('in getPrompts()');
-      return [{name:"Prompt 1 app2"},{name: "Prompt 2 app2"}];
+    this.getPrompts = () => {
+      this.log('in app2 getPrompts()');
+      return [{name:"Take Away"},{name: "Tip"}];
     }
   }
 
   async prompting() {
     let prompts = [
+      {
+        when: false,
+        name: "__promptName",
+        message: "Take Away"
+      },
       {
         type: "confirm",
         name: "isTakeaway",
@@ -30,6 +35,11 @@ module.exports = class extends Generator {
     this.answers = await this.prompt(prompts);
 
     let prompts2 = [
+      {
+        when: false,
+        name: "__promptName",
+        message: "Tip"
+      },
       {
         type: "number",
         name: "tip",

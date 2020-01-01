@@ -7,10 +7,11 @@ module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts);
 
-    this.getPrompts = function () {
-      console.log('in getPrompts()');
+    this.prompts = [{ name: "Basic info" }, { name: "Hunger" }, { name: "Registration" }, { name: "Take Away" }, { name: "Tip" }];
+    this.getPrompts = () => {
+      this.log('in getPrompts()');
 
-      return [{ name: "Prompt 1" }, { name: "Prompt 2" }, { name: "Registration" }, { name: "Take Away" }, { name: "Tip" }];
+      return this.prompts;
     }
 
     this.option('babel');
@@ -30,6 +31,11 @@ module.exports = class extends Generator {
 
   async prompting() {
     let prompts = [
+      {
+        when: false,
+        name: "__promptName",
+        message: "Basic info"
+      },
       {
         type: "confirm",
         name: "hungry",
@@ -116,10 +122,15 @@ module.exports = class extends Generator {
 
     // currently not supported:
     const ui = new Inquirer.ui.BottomBar();
-    this.log("xx");
+
     ui.updateBottomBar("This is written to the bottom bar");
 
     prompts = [
+      {
+        when: false,
+        name: "__promptName",
+        message: "Hunger"
+      },
       {
         when: (response) => {
           return this.answers.confirmConfirmHungry;
@@ -190,12 +201,40 @@ module.exports = class extends Generator {
       }
     ];
 
-
     const answers = await this.prompt(prompts);
+
+    // conditional prompt:
+    //   provide prompt name
+    prompts = [
+      {
+        when: false,
+        name: "__promptName",
+        message: "Vegetable-based"
+      },
+      {
+        type: "confirm",
+        name: "vegan",
+        message: "Vegan?"
+      },
+      {
+        type: "confirm",
+        name: "gluten_free",
+        message: "Gluten free?"
+      }
+    ];
+    if (answers.enjoy === 'michelin') {
+      await this.prompt(prompts);
+    }
+
     this.answers = Object.assign({}, this.answers, answers);
     this.log("Hunger level", this.answers.hungerLevel);
 
     prompts = [
+      {
+        when: false,
+        name: "__promptName",
+        message: "Registration"
+      },
       {
         type: 'rawlist',
         name: 'repotype',
@@ -242,7 +281,6 @@ module.exports = class extends Generator {
         validate: this._requireLetterAndNumber
       }
     ];
-
 
     const answers_login = await this.prompt(prompts);
     this.answers = Object.assign({}, this.answers, answers_login);

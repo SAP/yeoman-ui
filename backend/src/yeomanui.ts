@@ -5,9 +5,9 @@ import * as fsextra from "fs-extra";
 import * as _ from "lodash";
 import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
+const datauri = require("datauri");
 const titleize = require('titleize');
 const humanizeString = require('humanize-string');
-const datauri = require("datauri");
 import * as defaultImage from "./defaultImage";
 import { YouiAdapter } from "./youi-adapter";
 import { YouiLog } from "./youi-log";
@@ -182,6 +182,10 @@ export class YeomanUI {
     return this.rpc.invoke("generatorDone", [true, message, targetPath]);
   }
 
+  public setMessages(messages: any): Promise<void> {
+		return this.rpc ? this.rpc.invoke("setMessages", [messages]) : Promise.resolve();
+	}
+
   /**
    * 
    * @param answers - partial answers for the current prompt -- the input parameter to the method to be evaluated
@@ -213,15 +217,28 @@ export class YeomanUI {
     this.currentQuestions = questions;
     
       this.promptCount++;
-      const firstQuestionName = _.get(questions, "[0].name");
-      let promptName: string = `Step ${this.promptCount}`;
-      if (firstQuestionName) {
-        promptName = firstQuestionName.replace(/(.)/, (match: string, p1: string) => p1.toUpperCase());
-      }
+
+      const promptName: string = this.getPromptName(questions);
       const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
       return this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
   }
   
+  private getPromptName(questions: Environment.Adapter.Questions<any>): string {
+    const explicitPrompt: inquirer.Question | undefined = (questions as Array<any>).find((question) => {
+      return question.name === "__promptName";
+    });
+    if (explicitPrompt) {
+      return (explicitPrompt.message as string);
+    } else {
+      const firstQuestionName = _.get(questions, "[0].name");
+      if (firstQuestionName) {
+        return _.startCase(firstQuestionName);
+      } else {
+        return `Step ${this.promptCount}`;
+      }
+    }
+  }
+
   private async onEnvLookup(env: Environment.Options, resolve: any, filter?: GeneratorFilter) {
     this.genMeta = env.getGeneratorsMeta();
     const generatorNames: string[] = env.getGeneratorNames();
