@@ -222,6 +222,11 @@ export default {
     setMessages(messages) {
       this.messages = messages;
     },
+    setPromptList(prompts) {
+      // replace all existing prompts except 1st (generator selction)
+      //   and current prompt
+      this.prompts.splice(this.promptIndex + 1, this.prompts.length - this.promptIndex, ...prompts.splice(this.promptIndex, prompts.length));
+    },
     setPrompts(prompts) {
       const currentPrompt = this.currentPrompt;
       const firstIncomingPrompt = _.get(prompts, "[0]");
@@ -231,14 +236,15 @@ export default {
             // new pending prompt: when user presses next after last step
             this.prompts.push(...prompts);
           } else if (currentPrompt.status === "pending") {
-            // new actual prompt to replace pending prompt
-            this.prompts.splice(this.prompts.length - 1 , 1, ...prompts);
-          } else if (currentPrompt.name === firstIncomingPrompt.name) {
-            // new expected actual prompt
-            this.prompts.splice(this.promptIndex, 1, ...prompts);
+            this.prompts.splice(this.promptIndex , prompts.length, ...prompts);
           } else {
-            // new unexpected actual prompt: typically a conditional prompt
-            this.prompts.splice(this.promptIndex, 0, ...prompts);
+            // new prompt with questions to replace placeholder prompt
+            const mappedPrompts = prompts.map((prompt, index) => {
+              // ignore name
+              prompt.name = this.prompts[this.promptIndex + index].name;
+              return prompt;
+            });
+            this.prompts.splice(this.promptIndex , prompts.length, ...mappedPrompts);
           }
         } else {
           // first prompt: typically, generator selection
@@ -331,6 +337,7 @@ export default {
       const functions = [
         "showPrompt",
         "setPrompts",
+        "setPromptList",
         "generatorDone",
         "log",
         "setMessages"

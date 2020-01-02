@@ -3,16 +3,41 @@ var chalkPipe = require('chalk-pipe');
 var Inquirer = require('inquirer');
 var path = require('path');
 
+// TODO: externalize this class to library
+class Prompts {
+  constructor(items) {
+    this.items = items;
+
+    this.splice = (start, deleteCount, items) => {
+      if (items) {
+        this.items.splice(start, deleteCount, items);
+      } else {
+        this.items.splice(start, deleteCount);
+      }
+      if (this.callback) {
+        this.callback(this.items);
+      }
+    }
+
+    this.setCallback = (callback) => {
+      this.callback = callback;
+      callback(this.items);
+    }
+  }
+}
+
 module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts);
 
-    this.prompts = [{ name: "Basic info" }, { name: "Hunger" }, { name: "Registration" }, { name: "Take Away" }, { name: "Tip" }];
-    this.getPrompts = () => {
-      this.log('in getPrompts()');
+    this.setPromptsCallback = (fn) => {
+      if (this.prompts) {
+        this.prompts.setCallback(fn);
+      }
+    };
 
-      return this.prompts;
-    }
+    var prompts = [{ name: "Basic info" }, { name: "Hunger" }, { name: "Registration" }, { name: "Take Away" }, { name: "Tip" }];
+    this.prompts = new Prompts(prompts);
 
     this.option('babel');
   }
@@ -25,17 +50,12 @@ module.exports = class extends Generator {
     // returns '~/projects/index.js'
   }
 
-  async default() {
-    this.composeWith(require.resolve("../app2"), this.projectEnvironment);
+  async initializing() {
+    this.composeWith(require.resolve("../app2"), { prompts: this.prompts });
   }
 
   async prompting() {
     let prompts = [
-      {
-        when: false,
-        name: "__promptName",
-        message: "Basic info"
-      },
       {
         type: "confirm",
         name: "hungry",
@@ -118,6 +138,7 @@ module.exports = class extends Generator {
     ];
 
     this.answers = await this.prompt(prompts);
+
     this.log("Food", this.answers.food);
 
     // currently not supported:
@@ -126,11 +147,6 @@ module.exports = class extends Generator {
     ui.updateBottomBar("This is written to the bottom bar");
 
     prompts = [
-      {
-        when: false,
-        name: "__promptName",
-        message: "Hunger"
-      },
       {
         when: (response) => {
           return this.answers.confirmConfirmHungry;
@@ -203,38 +219,10 @@ module.exports = class extends Generator {
 
     const answers = await this.prompt(prompts);
 
-    // conditional prompt:
-    //   provide prompt name
-    prompts = [
-      {
-        when: false,
-        name: "__promptName",
-        message: "Vegetable-based"
-      },
-      {
-        type: "confirm",
-        name: "vegan",
-        message: "Vegan?"
-      },
-      {
-        type: "confirm",
-        name: "gluten_free",
-        message: "Gluten free?"
-      }
-    ];
-    if (answers.enjoy === 'michelin') {
-      await this.prompt(prompts);
-    }
-
     this.answers = Object.assign({}, this.answers, answers);
     this.log("Hunger level", this.answers.hungerLevel);
 
     prompts = [
-      {
-        when: false,
-        name: "__promptName",
-        message: "Registration"
-      },
       {
         type: 'rawlist',
         name: 'repotype',

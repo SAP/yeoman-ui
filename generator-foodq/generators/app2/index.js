@@ -3,43 +3,64 @@ var Generator = require('yeoman-generator');
 module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts);
-
-    this.getPrompts = () => {
-      this.log('in app2 getPrompts()');
-      return [{name:"Take Away"},{name: "Tip"}];
-    }
+    this.prompts = opts.prompts;
   }
 
   async prompting() {
+    // isTakeaway question appears twice in CLI: https://github.com/yeoman/generator/issues/1100
     let prompts = [
-      {
-        when: false,
-        name: "__promptName",
-        message: "Take Away"
-      },
       {
         type: "confirm",
         name: "isTakeaway",
         message: "Do you want to take away?"
       },
       {
-        when: (response)=>{
-          return response.isTakeaway;
-        },
-        type: "input",
-        name: "address",
-        message: "Your Address"
+        type: "list",
+        name: "deliveryMethod",
+        message: "Delivery method",
+        choices: [
+          "Car",
+          "Drone"
+        ],
+      when: async (answers) => {
+          let indexOfAddress = -1;
+        for await (let [i, prompt] of this.prompts.items.entries()) {
+          if (prompt && prompt.name === "Address") {
+            indexOfAddress = i;
+          }
+        }
+
+        if (answers.isTakeaway) {
+          // add address prompt if doesn't exist
+          if (indexOfAddress === -1) {
+            this.prompts.splice(4, 0, { name: "Address" });
+          }
+        } else {
+          // remove address prompt if exists
+          if (indexOfAddress > -1) {
+            this.prompts.splice(4, 1);
+          }
+        }
+
+          return true;
+        }
       }
     ];
 
     this.answers = await this.prompt(prompts);
 
+    if (this.answers.isTakeaway) {
+      let addressQuestions = [
+        {
+          type: "input",
+          name: "address",
+          message: "Your Address"
+        }
+      ];
+      this.answers = await this.prompt(addressQuestions);
+    }
+
     let prompts2 = [
-      {
-        when: false,
-        name: "__promptName",
-        message: "Tip"
-      },
       {
         type: "number",
         name: "tip",
