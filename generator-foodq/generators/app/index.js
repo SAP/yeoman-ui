@@ -61,7 +61,7 @@ module.exports = class extends Generator {
         default: "Junk food"
       },
       {
-        when: (response) => {
+        when: async (response) => {
           this.log(response.hungry);
           const promise = new Promise((resolve, reject) => {
             this.log(`Purposely delaying response for 2 seconds...`);

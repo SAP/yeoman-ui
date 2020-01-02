@@ -32,7 +32,7 @@ export default {
       deep: true,
       handler() {
         const invalidQuestions = _.filter(this.currentPrompt.questions, question => {
-            return question.isValid === false
+            return (question.isValid === false && question.isWhen === true)
         })
         this.$emit("stepvalidated", _.isEmpty(invalidQuestions))
       }
