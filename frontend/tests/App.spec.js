@@ -62,20 +62,20 @@ describe('App.vue', () => {
       }
     })
 
-    test('invoke - all answers have been cnanged', () => {
+    test('invoke - when is function', () => {
       wrapper.vm.prompts = [{ 
         questions: [{
-          name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer'
+          name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer', isWhen: true
         }, {
-          name: 'whenQ', when: '__Function', answer: 'whenAnswer'
+          name: 'whenQ', when: '__Function', answer: false
         }, {
-          name: 'messageQ', _message: '__Function', answer: 'messageAnswer'
+          name: 'messageQ', _message: '__Function', answer: 'messageAnswer', isWhen: true
         }, {
-          name: 'choicesQ', _choices: '__Function', answer: 'choicesAnswer'
+          name: 'choicesQ', _choices: '__Function', answer: 'choicesAnswer', isWhen: true
         }, {
-          name: 'filterQ', filter: '__Function', answer: 'filterAnswer'
+          name: 'filterQ', filter: '__Function', answer: 'filterAnswer', isWhen: true
         }, {
-          name: 'validateQ', validate: '__Function', answer: 'validateAnswer'
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
         }],
         answers: {}
      }]
@@ -86,7 +86,7 @@ describe('App.vue', () => {
         "filterQ": "old_filterAnswer",
         "messageQ": "old_messageAnswer",
         "validateQ": "old_validateAnswer",
-        "whenQ": "old_whenAnswer"
+        "whenQ": false
       }
 
       const expectedAnswers = {
@@ -95,7 +95,7 @@ describe('App.vue', () => {
         "filterQ": "filterAnswer",
         "messageQ": "messageAnswer",
         "validateQ": "validateAnswer",
-        "whenQ": "whenAnswer"
+        "whenQ": true
       }
       wrapper.vm.$options.watch["copyCurrentPromptAnswers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
       
@@ -112,15 +112,15 @@ describe('App.vue', () => {
         questions: [{
           name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer'
         }, {
-          name: 'whenQ', when: '__Function', answer: 'whenAnswer'
+          name: 'whenQ', when: '__Function', answer: true
         }, {
-          name: 'messageQ', _message: '__Function', answer: 'messageAnswer'
+          name: 'messageQ', _message: '__Function', answer: 'messageAnswer', isWhen: true
         }, {
           name: 'choicesQ', _choices: '__Function', answer: 'choicesAnswer'
         }, {
           name: 'filterQ', filter: '__Function', answer: 'filterAnswer'
         }, {
-          name: 'validateQ', validate: '__Function', answer: 'validateAnswer'
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
         }],
         answers: {}
      }]
@@ -131,7 +131,7 @@ describe('App.vue', () => {
         "filterQ": "filterAnswer",
         "messageQ": "old_messageAnswer",
         "validateQ": "old_validateAnswer",
-        "whenQ": "old_whenAnswer"
+        "whenQ": false
       }
 
       const expectedAnswers = {
@@ -140,7 +140,7 @@ describe('App.vue', () => {
         "filterQ": "filterAnswer",
         "messageQ": "messageAnswer",
         "validateQ": "validateAnswer",
-        "whenQ": "whenAnswer"
+        "whenQ": true
       }
       wrapper.vm.$options.watch["copyCurrentPromptAnswers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
       
@@ -149,20 +149,20 @@ describe('App.vue', () => {
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [['validateAnswer', expectedAnswers], 'validateQ', 'validate'])
     })
 
-    test('invoke - first answer have been changed, all invokes should be called', () => {
+    test('invoke - first answer have been changed, almost all invokes should be called', () => {
       wrapper.vm.prompts = [{ 
         questions: [{
-          name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer'
+          name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer', isWhen: true
         }, {
           name: 'whenQ', when: '__Function', answer: 'whenAnswer'
         }, {
-          name: 'messageQ', _message: '__Function', answer: 'messageAnswer'
+          name: 'messageQ', _message: '__Function', answer: 'messageAnswer', isWhen: true
         }, {
-          name: 'choicesQ', _choices: '__Function', answer: 'choicesAnswer'
+          name: 'choicesQ', _choices: '__Function', answer: 'choicesAnswer', isWhen: true
         }, {
-          name: 'filterQ', filter: '__Function', answer: 'filterAnswer'
+          name: 'filterQ', filter: '__Function', answer: 'filterAnswer', isWhen: true
         }, {
-          name: 'validateQ', validate: '__Function', answer: 'validateAnswer'
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: false
         }],
         answers: {}
      }]
@@ -173,7 +173,7 @@ describe('App.vue', () => {
         "filterQ": "filterAnswer",
         "messageQ": "messageAnswer",
         "validateQ": "_validateAnswer",
-        "whenQ": "whenAnswer"
+        "whenQ": "false"
       }
 
       const expectedAnswers = {
@@ -182,7 +182,7 @@ describe('App.vue', () => {
         "filterQ": "filterAnswer",
         "messageQ": "messageAnswer",
         "validateQ": "validateAnswer",
-        "whenQ": "whenAnswer"
+        "whenQ": "true"
       }
       wrapper.vm.$options.watch["copyCurrentPromptAnswers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
       
@@ -191,7 +191,6 @@ describe('App.vue', () => {
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'messageQ', 'message'])
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'choicesQ', 'choices'])
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [['filterAnswer'], 'filterQ', 'filter'])
-      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [['validateAnswer', expectedAnswers], 'validateQ', 'validate'])
     })
 
     test('invoke for question default, answer is defined', async () => {
@@ -200,7 +199,7 @@ describe('App.vue', () => {
       }
       wrapper.vm.prompts = [{ 
         questions: [{
-          name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer'
+          name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer', isWhen: true
         }],
         answers: {}
      }]
@@ -216,7 +215,7 @@ describe('App.vue', () => {
       }
       wrapper.vm.prompts = [{ 
         questions: [{
-          name: 'defaultQ', _default: '__Function'
+          name: 'defaultQ', _default: '__Function', isWhen: true
         }],
         answers: {}
      }]
@@ -233,7 +232,7 @@ describe('App.vue', () => {
       }
       wrapper.vm.prompts = [{ 
         questions: [{
-          name: 'validateQ', validate: '__Function', answer: 'validateAnswer'
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
         }],
         answers: {}
      }]
@@ -250,7 +249,7 @@ describe('App.vue', () => {
       }
       wrapper.vm.prompts = [{ 
         questions: [{
-          name: 'validateQ', validate: '__Function', answer: 'validateAnswer'
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
         }],
         answers: {}
      }]

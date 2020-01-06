@@ -114,6 +114,7 @@ export default {
         let isEqual = true
         // TODO: consider using debounce (especially for questions of type 'input') to limit roundtrips
         const questions = _.get(this, "currentPrompt.questions", []);
+        const that = this;
         _.forEach(questions, question => {
           const questionName = question.name
           
@@ -124,39 +125,15 @@ export default {
           }
           
           if (!isEqual) {
-            if (question._default === FUNCTION) {
-              this.rpc.invoke("evaluateMethod", [[newAnswers], questionName, "default"]).then(response => {
-                question.default = response
-                if (question.answer === undefined) {
-                  question.answer = question.default
+            if (question.when === FUNCTION) {
+              that.rpc.invoke("evaluateMethod", [[newAnswers], questionName, "when"]).then(response => {
+                question.isWhen = response
+                if (question.isWhen === true) {
+                  that.updateQuestion(question, questionName, newAnswers)
                 }
               })
-            }
-            if (question.when === FUNCTION) {
-              this.rpc.invoke("evaluateMethod", [[newAnswers], questionName, "when"]).then(response => {
-                question.isWhen = response
-              })
-            }
-            if (question._message === FUNCTION) {
-              this.rpc.invoke("evaluateMethod", [[newAnswers], questionName, "message"]).then(response => {
-                question.message = response
-              })
-            }
-            if (question._choices === FUNCTION) {
-              this.rpc.invoke("evaluateMethod", [[newAnswers], questionName, "choices"]).then(response => {
-                question.choices = response
-              })
-            }
-            if (question.filter === FUNCTION) {
-              this.rpc.invoke("evaluateMethod", [[question.answer], questionName, "filter"]).then(response => {
-                question.answer = response
-              })
-            }
-            if (question.validate === FUNCTION) {
-              this.rpc.invoke("evaluateMethod", [[question.answer, newAnswers], questionName, "validate"]).then(response => {
-                question.isValid = (_.isString(response) ? false : response)
-                question.validationMessage = (_.isString(response) ? response : undefined)
-              })
+            } else if (question.isWhen === true) {
+              that.updateQuestion(question, questionName, newAnswers)
             }
           }
         })
@@ -164,6 +141,37 @@ export default {
     }
   },
   methods: {
+    updateQuestion(question, questionName, newAnswers) {
+      if (question._default === FUNCTION) {
+        this.rpc.invoke("evaluateMethod", [[newAnswers], questionName, "default"]).then(response => {
+          question.default = response
+          if (question.answer === undefined) {
+            question.answer = question.default
+          }
+        })
+      }
+      if (question._message === FUNCTION) {
+        this.rpc.invoke("evaluateMethod", [[newAnswers], questionName, "message"]).then(response => {
+          question.message = response
+        })
+      }
+      if (question._choices === FUNCTION) {
+        this.rpc.invoke("evaluateMethod", [[newAnswers], questionName, "choices"]).then(response => {
+          question.choices = response
+        })
+      }
+      if (question.filter === FUNCTION) {
+        this.rpc.invoke("evaluateMethod", [[question.answer], questionName, "filter"]).then(response => {
+          question.answer = response
+        })
+      }
+      if (question.validate === FUNCTION) {
+        this.rpc.invoke("evaluateMethod", [[question.answer, newAnswers], questionName, "validate"]).then(response => {
+          question.isValid = (_.isString(response) ? false : response)
+          question.validationMessage = (_.isString(response) ? response : undefined)
+        })
+      }
+    },
     next() {
       if (this.resolve) {
         try {
