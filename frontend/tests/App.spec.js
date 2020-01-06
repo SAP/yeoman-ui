@@ -149,6 +149,51 @@ describe('App.vue', () => {
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [['validateAnswer', expectedAnswers], 'validateQ', 'validate'])
     })
 
+    test('invoke - first answer have been changed, all invokes should be called', () => {
+      wrapper.vm.prompts = [{ 
+        questions: [{
+          name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer'
+        }, {
+          name: 'whenQ', when: '__Function', answer: 'whenAnswer'
+        }, {
+          name: 'messageQ', _message: '__Function', answer: 'messageAnswer'
+        }, {
+          name: 'choicesQ', _choices: '__Function', answer: 'choicesAnswer'
+        }, {
+          name: 'filterQ', filter: '__Function', answer: 'filterAnswer'
+        }, {
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer'
+        }],
+        answers: {}
+     }]
+      wrapper.vm.promptIndex = 0
+      const oldAnswers = {
+        "choicesQ": "choicesAnswer",
+        "defaultQ": "old_defaultAnswer",
+        "filterQ": "filterAnswer",
+        "messageQ": "messageAnswer",
+        "validateQ": "_validateAnswer",
+        "whenQ": "whenAnswer"
+      }
+
+      const expectedAnswers = {
+        "choicesQ": "choicesAnswer",
+        "defaultQ": "defaultAnswer",
+        "filterQ": "filterAnswer",
+        "messageQ": "messageAnswer",
+        "validateQ": "validateAnswer",
+        "whenQ": "whenAnswer"
+      }
+      wrapper.vm.$options.watch["copyCurrentPromptAnswers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
+      
+      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'defaultQ', 'default'])
+      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'whenQ', 'when'])
+      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'messageQ', 'message'])
+      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'choicesQ', 'choices'])
+      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [['filterAnswer'], 'filterQ', 'filter'])
+      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [['validateAnswer', expectedAnswers], 'validateQ', 'validate'])
+    })
+
     test('invoke for question default, answer is defined', async () => {
       wrapper.vm.rpc = {
         invoke: jest.fn().mockResolvedValue('defaultResponse')
