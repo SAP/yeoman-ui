@@ -83,6 +83,9 @@ export default {
     };
   },
   computed: {
+    copyCurrentPromptAnswers() {
+      return _.cloneDeep(_.get(this, "currentPrompt.answers"))
+    },
     selectedGeneratorHeader() {
       return this.messages.selected_generator + this.generatorName;
     },
@@ -104,92 +107,66 @@ export default {
     }
   },
   watch: {
-    "currentPrompt.answers": {
+    "copyCurrentPromptAnswers": {
       deep: true,
       immediate: true,
-      handler() {
+      async handler(newAnswers, oldAnswers) {
+        let isEqual = true
         // TODO: consider using debounce (especially for questions of type 'input') to limit roundtrips
-        const curentPromptAnswers = _.get(this.currentPrompt, "answers");
-        const questions = _.get(this.currentPrompt, "questions", []);
-        _.forEach(questions, question => {
-          const questionName = question.name;
-          if (question._default === FUNCTION) {
-            this.rpc
-              .invoke("evaluateMethod", [
-                [curentPromptAnswers],
-                questionName,
-                "default"
-              ])
-              .then(response => {
-                question.default = response;
-                if (question.answer === undefined) {
-                  question.answer = question.default;
-                }
-              });
+        const questions = _.get(this, "currentPrompt.questions", []);
+        const that = this;
+        _.forEach(questions, async question => {
+          if (isEqual) {
+            const newAnswer = _.get(newAnswers, [question.name])
+            const oldAnswer = _.get(oldAnswers, [question.name])
+            isEqual = _.isEqual(newAnswer, oldAnswer)
           }
-          if (question.when === FUNCTION) {
-            this.rpc
-              .invoke("evaluateMethod", [
-                [curentPromptAnswers],
-                questionName,
-                "when"
-              ])
-              .then(response => {
-                question.isWhen = response;
-              });
-          }
-          if (question._message === FUNCTION) {
-            this.rpc
-              .invoke("evaluateMethod", [
-                [curentPromptAnswers],
-                questionName,
-                "message"
-              ])
-              .then(response => {
-                question.message = response;
-              });
-          }
-          if (question._choices === FUNCTION) {
-            this.rpc
-              .invoke("evaluateMethod", [
-                [curentPromptAnswers],
-                questionName,
-                "choices"
-              ])
-              .then(response => {
-                question.choices = response;
-              });
-          }
-          if (question.filter === FUNCTION) {
-            this.rpc
-              .invoke("evaluateMethod", [
-                [question.answer],
-                questionName,
-                "filter"
-              ])
-              .then(response => {
-                question.answer = response;
-              });
-          }
-          if (question.validate === FUNCTION) {
-            this.rpc
-              .invoke("evaluateMethod", [
-                [question.answer, curentPromptAnswers],
-                questionName,
-                "validate"
-              ])
-              .then(response => {
-                question.isValid = _.isString(response) ? false : response;
-                question.validationMessage = _.isString(response)
-                  ? response
-                  : undefined;
-              });
+          
+          if (!isEqual) {
+            await that.updateQuestion(question, newAnswers)  
           }
         });
       }
     }
   },
   methods: {
+    async updateQuestion(question, newAnswers) {
+      if (question.when === FUNCTION) {
+        question.isWhen = await this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "when"])
+      }
+
+      if (question.isWhen === true) {
+        if (question._default === FUNCTION) {
+          this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "default"]).then(response => {
+            question.default = response
+            if (question.answer === undefined) {
+              question.answer = question.default
+            }
+          })
+        }
+        if (question._message === FUNCTION) {
+          this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "message"]).then(response => {
+            question.message = response
+          })
+        }
+        if (question._choices === FUNCTION) {
+          this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "choices"]).then(response => {
+            question.choices = response
+          })
+        }
+        if (question.filter === FUNCTION) {
+          this.rpc.invoke("evaluateMethod", [[question.answer], question.name, "filter"]).then(response => {
+            question.answer = response
+          })
+        }
+        if (question.validate === FUNCTION) {
+          this.rpc.invoke("evaluateMethod", [[question.answer, newAnswers], question.name, "validate"]).then(response => {
+            question.isValid = (_.isString(response) ? false : response)
+            question.validationMessage = (_.isString(response) ? response : undefined)
+          })
+        }
+      }
+    },
     next() {
       if (this.resolve) {
         try {
@@ -279,11 +256,12 @@ export default {
         if (question.default === undefined && question.type !== "confirm") {
           answer = "";
         }
-        this.$set(question, "answer", answer);
-        this.$set(question, "isWhen", true);
-        this.$set(question, "isValid", true);
-        this.$set(question, "validationMessage", true);
-      });
+        this.$set(question, "answer", answer)
+        this.$set(question, "isValid", true)
+        this.$set(question, "validationMessage", true)
+
+        this.$set(question, "isWhen", question.when !== FUNCTION)
+      })
     },
     showPrompt(questions, name) {
       const prompt = this.createPrompt(questions, name);
