@@ -25,8 +25,8 @@ describe('Header.vue', () => {
     test('generator brand', () => {
         const testGen = 'Selected Generator: testGenerator'
         wrapper = initComponent(Header, { selectedGeneratorHeader: testGen })
-        expect(wrapper.find('v-toolbar-title').text()).toBe(testGen)
-        expect(wrapper.find('v-icon').text()).toBe("mdi-console")
+        expect(wrapper.find('v-toolbar-title-stub').text()).toBe(testGen)
+        expect(wrapper.find('v-icon-stub').text()).toBe("mdi-console")
     })
 
     test('click triggers collapseLog method', async () => {
@@ -37,7 +37,7 @@ describe('Header.vue', () => {
             }
         }, true)
         
-        wrapper.find("v-btn").trigger('click')
+        wrapper.find("button").trigger('click')
         expect(rpcInvokeMockFunction).toHaveBeenCalled()  
     })
 })
