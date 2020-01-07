@@ -62,7 +62,7 @@ describe('App.vue', () => {
       }
     })
 
-    test('invoke - when is function', () => {
+    test('invoke - when is function', async () => {
       wrapper.vm.prompts = [{ 
         questions: [{
           name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer', isWhen: true
@@ -97,7 +97,7 @@ describe('App.vue', () => {
         "validateQ": "validateAnswer",
         "whenQ": true
       }
-      wrapper.vm.$options.watch["copyCurrentPromptAnswers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
+      await wrapper.vm.$options.watch["copyCurrentPromptAnswers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
       
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'defaultQ', 'default'])
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'whenQ', 'when'])
@@ -107,7 +107,7 @@ describe('App.vue', () => {
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [['validateAnswer', expectedAnswers], 'validateQ', 'validate'])
     })
 
-    test('invoke - only 3 answers have been changed', () => {
+    test('invoke - only 3 answers have been changed', async () => {
       wrapper.vm.prompts = [{ 
         questions: [{
           name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer'
@@ -142,14 +142,14 @@ describe('App.vue', () => {
         "validateQ": "validateAnswer",
         "whenQ": true
       }
-      wrapper.vm.$options.watch["copyCurrentPromptAnswers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
+      await wrapper.vm.$options.watch["copyCurrentPromptAnswers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
       
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'whenQ', 'when'])
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'messageQ', 'message'])
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [['validateAnswer', expectedAnswers], 'validateQ', 'validate'])
     })
 
-    test('invoke - first answer have been changed, almost all invokes should be called', () => {
+    test('invoke - first answer have been changed, almost all invokes should be called', async () => {
       wrapper.vm.prompts = [{ 
         questions: [{
           name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer', isWhen: true
@@ -184,7 +184,7 @@ describe('App.vue', () => {
         "validateQ": "validateAnswer",
         "whenQ": "true"
       }
-      wrapper.vm.$options.watch["copyCurrentPromptAnswers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
+      await wrapper.vm.$options.watch["copyCurrentPromptAnswers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
       
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'defaultQ', 'default'])
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'whenQ', 'when'])

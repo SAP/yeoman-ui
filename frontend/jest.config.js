@@ -36,8 +36,8 @@ module.exports = {
     "global": {
       "branches": 87,
       "functions": 98,
-      "lines": 94,
-      "statements": 94
+      "lines": 95,
+      "statements": 95
     }
   }
 }
