@@ -116,30 +116,28 @@ export default {
         const questions = _.get(this, "currentPrompt.questions", []);
         const that = this;
         _.forEach(questions, async question => {
-          const questionName = question.name
-          
           if (isEqual) {
-            const newAnswer = _.get(newAnswers, [questionName])
-            const oldAnswer = _.get(oldAnswers, [questionName])
+            const newAnswer = _.get(newAnswers, [question.name])
+            const oldAnswer = _.get(oldAnswers, [question.name])
             isEqual = _.isEqual(newAnswer, oldAnswer)
           }
           
           if (!isEqual) {
-            await that.updateQuestion(question, questionName, newAnswers)  
+            await that.updateQuestion(question, newAnswers)  
           }
         })
       }
     }
   },
   methods: {
-    async updateQuestion(question, questionName, newAnswers) {
+    async updateQuestion(question, newAnswers) {
       if (question.when === FUNCTION) {
-        question.isWhen = await this.rpc.invoke("evaluateMethod", [[newAnswers], questionName, "when"])
+        question.isWhen = await this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "when"])
       }
 
       if (question.isWhen === true) {
         if (question._default === FUNCTION) {
-          this.rpc.invoke("evaluateMethod", [[newAnswers], questionName, "default"]).then(response => {
+          this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "default"]).then(response => {
             question.default = response
             if (question.answer === undefined) {
               question.answer = question.default
@@ -147,22 +145,22 @@ export default {
           })
         }
         if (question._message === FUNCTION) {
-          this.rpc.invoke("evaluateMethod", [[newAnswers], questionName, "message"]).then(response => {
+          this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "message"]).then(response => {
             question.message = response
           })
         }
         if (question._choices === FUNCTION) {
-          this.rpc.invoke("evaluateMethod", [[newAnswers], questionName, "choices"]).then(response => {
+          this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "choices"]).then(response => {
             question.choices = response
           })
         }
         if (question.filter === FUNCTION) {
-          this.rpc.invoke("evaluateMethod", [[question.answer], questionName, "filter"]).then(response => {
+          this.rpc.invoke("evaluateMethod", [[question.answer], question.name, "filter"]).then(response => {
             question.answer = response
           })
         }
         if (question.validate === FUNCTION) {
-          this.rpc.invoke("evaluateMethod", [[question.answer, newAnswers], questionName, "validate"]).then(response => {
+          this.rpc.invoke("evaluateMethod", [[question.answer, newAnswers], question.name, "validate"]).then(response => {
             question.isValid = (_.isString(response) ? false : response)
             question.validationMessage = (_.isString(response) ? response : undefined)
           })
