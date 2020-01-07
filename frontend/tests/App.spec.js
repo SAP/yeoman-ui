@@ -291,7 +291,7 @@ describe('App.vue', () => {
       expect(questions[3]._choices).toBe('__Function')
 
       expect(questions[1].answer).toBe('')
-      expect(questions[1].isWhen).toBe(true)
+      expect(questions[1].isWhen).toBe(false)
       expect(questions[1].isValid).toBe(true)
       expect(questions[1].validationMessage).toBe(true)
 

@@ -252,9 +252,10 @@ export default {
           answer = ""
         }
         this.$set(question, "answer", answer)
-        this.$set(question, "isWhen", true)
         this.$set(question, "isValid", true)
         this.$set(question, "validationMessage", true)
+
+        this.$set(question, "isWhen", question.when !== FUNCTION)
       })
     },
     showPrompt(questions, name) {
