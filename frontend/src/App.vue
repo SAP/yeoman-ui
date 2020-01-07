@@ -56,7 +56,6 @@
 <script>
 import Vue from "vue"
 import Loading from 'vue-loading-overlay';
-import 'vue-loading-overlay/dist/vue-loading.css';
 import Header from "./components/Header.vue"
 import Navigation from "./components/Navigation.vue"
 import Step from "./components/Step.vue"
@@ -350,6 +349,7 @@ export default {
 </script>
 
 <style>
+@import './../node_modules/vue-loading-overlay/dist/vue-loading.css';
 #app {
   height: 100%;
   color: var(--vscode-foreground, #cccccc);
