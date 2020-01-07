@@ -16,6 +16,7 @@
   "dependencies": {
     "bootstrap": "^4.3.1",
     "bootstrap-vue": "^2.0.2",
+    "vue-loading-overlay": "^3.2.0",
     "lodash": "^4.17.15",
     "vue": "^2.6.10",
     "core-js": "2.6.6",

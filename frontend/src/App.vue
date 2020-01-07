@@ -1,7 +1,12 @@
 <template>
-  <div id="app" class="d-flex flex-column yeoman-ui">
-    <div v-if="!prompts.length" class="loading">{{ messages.generators_loading }}</div>
-
+  <div id="app" class="d-flex flex-column yeoman-ui vld-parent">
+    <loading :active.sync="isLoading"
+             :is-full-page="true"
+             :height="128"
+             :width="128"
+             :color="isLoadingColor"
+             loader="dots">
+    </loading>
     <Header
       v-if="prompts.length"
       :selectedGeneratorHeader="selectedGeneratorHeader"
@@ -50,6 +55,8 @@
 
 <script>
 import Vue from "vue"
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
 import Header from "./components/Header.vue"
 import Navigation from "./components/Navigation.vue"
 import Step from "./components/Step.vue"
@@ -67,7 +74,8 @@ export default {
     Header,
     Navigation,
     Step,
-    Done
+    Done,
+    Loading
   },
   data() {
     return {
@@ -89,6 +97,13 @@ export default {
   computed: {
     copyCurrentPromptAnswers() {
       return _.cloneDeep(_.get(this, "currentPrompt.answers"))
+    },
+    isLoading() {
+      return !this.prompts.length || (this.currentPrompt.status === 'pending' && !this.isDone)
+    },
+    isLoadingColor() {
+      const propertyValue = getComputedStyle(document.documentElement).getPropertyValue("--vscode-progressBar-background");
+      return propertyValue ? propertyValue : "#0e70c0"
     },
     selectedGeneratorHeader() {
       return this.messages.selected_generator + this.generatorName
