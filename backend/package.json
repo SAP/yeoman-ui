@@ -77,6 +77,8 @@
 		"vsce": "^1.68.0",
 		"vscode": "^1.1.28",
 		"webpack": "^4.41.2",
-		"webpack-cli": "^3.3.10"
+		"webpack-cli": "^3.3.10",
+		"bufferutil": "^4.0.1",
+		"utf-8-validate": "^5.0.2"
 	}
 }

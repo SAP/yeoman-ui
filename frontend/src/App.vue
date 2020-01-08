@@ -110,21 +110,13 @@ export default {
     "copyCurrentPromptAnswers": {
       deep: true,
       immediate: true,
-      async handler(newAnswers, oldAnswers) {
-        let isEqual = true
+      async handler(newAnswers) {
         // TODO: consider using debounce (especially for questions of type 'input') to limit roundtrips
         const questions = _.get(this, "currentPrompt.questions", []);
-        for (const question of questions) {
-          if (isEqual) {
-            const newAnswer = _.get(newAnswers, [question.name], "someInitialAnswer") // needed to display questions for the first time
-            const oldAnswer = _.get(oldAnswers, [question.name])
-            isEqual = _.isEqual(newAnswer, oldAnswer)
-          }
-          
-          if (!isEqual) {
-            await this.updateQuestion(question, newAnswers)  
-          }
-        }
+        const that = this
+        return questions.reduce((p, question) => {
+          return p.then(() => that.updateQuestion(question, newAnswers))
+        }, Promise.resolve()); // initial
       }
     }
   },
