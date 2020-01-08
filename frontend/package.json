@@ -1,7 +1,7 @@
 {
   "name": "yeoman-ui-frontend",
   "displayName": "Yeoman UI Frontend",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "publisher": "SAP",
   "license": "Apache 2.0",
   "description": "Frontend for the yeoman UI framework",
@@ -19,6 +19,7 @@
     "bootstrap-vue": "^2.0.2",
     "core-js": "2.6.6",
     "jquery": "3.4.1",
+    "vue-loading-overlay": "^3.2.0",
     "lodash": "^4.17.15",
     "vue": "^2.6.10",
     "file-saver": "2.0.2",

@@ -48,7 +48,7 @@ describe('App.vue', () => {
     })
   })
 
-  describe('copyCurrentPromptAnswers - watcher', () => {
+  describe('currentPrompt.answers - watcher', () => {
     let invokeSpy
     beforeEach(() => {
       wrapper = initComponent(App)
@@ -99,7 +99,7 @@ describe('App.vue', () => {
         "validateQ": "validateAnswer",
         "whenQ": true
       }
-      await wrapper.vm.$options.watch["copyCurrentPromptAnswers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
+      await wrapper.vm.$options.watch["currentPrompt.answers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
       
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'defaultQ', 'default'])
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'whenQ', 'when'])
@@ -144,7 +144,7 @@ describe('App.vue', () => {
         "validateQ": "validateAnswer",
         "whenQ": true
       }
-      await wrapper.vm.$options.watch["copyCurrentPromptAnswers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
+      await wrapper.vm.$options.watch["currentPrompt.answers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
       
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'whenQ', 'when'])
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'messageQ', 'message'])
@@ -186,7 +186,7 @@ describe('App.vue', () => {
         "validateQ": "validateAnswer",
         "whenQ": "true"
       }
-      await wrapper.vm.$options.watch["copyCurrentPromptAnswers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
+      await wrapper.vm.$options.watch["currentPrompt.answers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
       
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'defaultQ', 'default'])
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'whenQ', 'when'])
@@ -206,7 +206,7 @@ describe('App.vue', () => {
         answers: {}
      }]
       wrapper.vm.promptIndex = 0
-      wrapper.vm.$options.watch["copyCurrentPromptAnswers"].handler.call(wrapper.vm)
+      wrapper.vm.$options.watch["currentPrompt.answers"].handler.call(wrapper.vm)
       await flushPromises()
       expect(wrapper.vm.prompts[0].questions[0].default).toBe('defaultResponse')
     })
@@ -222,7 +222,7 @@ describe('App.vue', () => {
         answers: {}
      }]
       wrapper.vm.promptIndex = 0
-      wrapper.vm.$options.watch["copyCurrentPromptAnswers"].handler.call(wrapper.vm, {'defaultQ': 1}, {'defaultQ': 2})
+      wrapper.vm.$options.watch["currentPrompt.answers"].handler.call(wrapper.vm, {'defaultQ': 1}, {'defaultQ': 2})
       await flushPromises()
       expect(wrapper.vm.prompts[0].questions[0].default).toBe('defaultResponse')
       expect(wrapper.vm.prompts[0].questions[0].answer).toBe('defaultResponse')
@@ -239,7 +239,7 @@ describe('App.vue', () => {
         answers: {}
      }]
       wrapper.vm.promptIndex = 0
-      wrapper.vm.$options.watch["copyCurrentPromptAnswers"].handler.call(wrapper.vm)
+      wrapper.vm.$options.watch["currentPrompt.answers"].handler.call(wrapper.vm)
       await flushPromises()
       expect(wrapper.vm.prompts[0].questions[0].isValid).toBe(false)
       expect(wrapper.vm.prompts[0].questions[0].validationMessage ).toBe('validateResponse')
@@ -256,7 +256,7 @@ describe('App.vue', () => {
         answers: {}
      }]
       wrapper.vm.promptIndex = 0
-      wrapper.vm.$options.watch["copyCurrentPromptAnswers"].handler.call(wrapper.vm)
+      wrapper.vm.$options.watch["currentPrompt.answers"].handler.call(wrapper.vm)
       await flushPromises()
       expect(wrapper.vm.prompts[0].questions[0].isValid).toBe(true)
       expect(wrapper.vm.prompts[0].questions[0].validationMessage ).toBeUndefined()

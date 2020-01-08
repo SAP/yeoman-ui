@@ -1,7 +1,12 @@
 <template>
-  <div id="app" class="d-flex flex-column yeoman-ui">
-    <div v-if="!prompts.length" class="loading">{{ messages.generators_loading }}</div>
-
+  <div id="app" class="d-flex flex-column yeoman-ui vld-parent">
+    <loading :active.sync="isLoading"
+             :is-full-page="true"
+             :height="128"
+             :width="128"
+             :color="isLoadingColor"
+             loader="dots">
+    </loading>
     <Header
       v-if="prompts.length"
       :selectedGeneratorHeader="selectedGeneratorHeader"
@@ -44,11 +49,12 @@
 </template>
 
 <script>
-import Vue from "vue";
-import Header from "./components/Header.vue";
-import Navigation from "./components/Navigation.vue";
-import Step from "./components/Step.vue";
-import Done from "./components/Done.vue";
+import Vue from "vue"
+import Loading from 'vue-loading-overlay';
+import Header from "./components/Header.vue"
+import Navigation from "./components/Navigation.vue"
+import Step from "./components/Step.vue"
+import Done from "./components/Done.vue"
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import * as _ from "lodash";
@@ -62,7 +68,8 @@ export default {
     Header,
     Navigation,
     Step,
-    Done
+    Done,
+    Loading
   },
   data() {
     return {
@@ -83,49 +90,40 @@ export default {
     };
   },
   computed: {
-    copyCurrentPromptAnswers() {
-      return _.cloneDeep(_.get(this, "currentPrompt.answers"))
+    isLoading() {
+      return !this.prompts.length || (this.currentPrompt.status === 'pending' && !this.isDone)
+    },
+    isLoadingColor() {
+      const propertyValue = getComputedStyle(document.documentElement).getPropertyValue("--vscode-progressBar-background");
+      return propertyValue ? propertyValue : "#0e70c0"
     },
     selectedGeneratorHeader() {
       return this.messages.selected_generator + this.generatorName;
     },
     currentPrompt() {
-      const prompt = _.get(this.prompts, "[" + this.promptIndex + "]");
-
-      const answers = _.get(prompt, "answers", {});
-      const questions = _.get(prompt, "questions", []);
-      _.forEach(questions, question => {
-        _.set(
-          answers,
-          [question.name],
-          question.isWhen === false ? undefined : question.answer
-        );
-      });
-      _.set(prompt, "answers", answers);
-
-      return prompt;
+      const prompt = _.get(this.prompts, "[" + this.promptIndex +"]")
+      
+      const answers = _.get(prompt, "answers", {})
+      const questions = _.get(prompt, "questions", [])
+      for(const question of questions) {
+        _.set(answers, [question.name], (question.isWhen === false ? undefined : question.answer))
+      }
+      _.set(prompt, "answers", answers)
+      
+      return prompt
     }
   },
   watch: {
-    "copyCurrentPromptAnswers": {
+    "currentPrompt.answers": {
       deep: true,
       immediate: true,
-      async handler(newAnswers, oldAnswers) {
-        let isEqual = true
+      async handler(newAnswers) {
         // TODO: consider using debounce (especially for questions of type 'input') to limit roundtrips
         const questions = _.get(this, "currentPrompt.questions", []);
-        const that = this;
-        _.forEach(questions, async question => {
-          if (isEqual) {
-            const newAnswer = _.get(newAnswers, [question.name])
-            const oldAnswer = _.get(oldAnswers, [question.name])
-            isEqual = _.isEqual(newAnswer, oldAnswer)
-          }
-          
-          if (!isEqual) {
-            await that.updateQuestion(question, newAnswers)  
-          }
-        });
+        const that = this
+        return questions.reduce((p, question) => {
+          return p.then(() => that.updateQuestion(question, newAnswers))
+        }, Promise.resolve()); // initial
       }
     }
   },
@@ -136,6 +134,9 @@ export default {
       }
 
       if (question.isWhen === true) {
+        if (question.filter === FUNCTION) {
+          question.answer = await this.rpc.invoke("evaluateMethod", [[question.answer], question.name, "filter"])
+        }
         if (question._default === FUNCTION) {
           this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "default"]).then(response => {
             question.default = response
@@ -145,25 +146,15 @@ export default {
           })
         }
         if (question._message === FUNCTION) {
-          this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "message"]).then(response => {
-            question.message = response
-          })
+          question.message = await this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "message"])
         }
         if (question._choices === FUNCTION) {
-          this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "choices"]).then(response => {
-            question.choices = response
-          })
-        }
-        if (question.filter === FUNCTION) {
-          this.rpc.invoke("evaluateMethod", [[question.answer], question.name, "filter"]).then(response => {
-            question.answer = response
-          })
+          question.choices = await this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "choices"])
         }
         if (question.validate === FUNCTION) {
-          this.rpc.invoke("evaluateMethod", [[question.answer, newAnswers], question.name, "validate"]).then(response => {
-            question.isValid = (_.isString(response) ? false : response)
-            question.validationMessage = (_.isString(response) ? response : undefined)
-          })
+          const response = await this.rpc.invoke("evaluateMethod", [[question.answer, newAnswers], question.name, "validate"])
+          question.isValid = (_.isString(response) ? false : response)
+          question.validationMessage = (_.isString(response) ? response : undefined)
         }
       }
     },
@@ -237,8 +228,8 @@ export default {
       }
     },
     setQuestionProps(prompt) {
-      const questions = _.get(prompt, "questions", []);
-      _.forEach(questions, question => {
+      const questions = _.get(prompt, "questions", [])
+      for(const question of questions) {
         if (question.default === FUNCTION) {
           question.default = undefined;
           this.$set(question, "_default", FUNCTION);
@@ -261,7 +252,7 @@ export default {
         this.$set(question, "validationMessage", true)
 
         this.$set(question, "isWhen", question.when !== FUNCTION)
-      })
+      }
     },
     showPrompt(questions, name) {
       const prompt = this.createPrompt(questions, name);
@@ -354,6 +345,7 @@ export default {
 </script>
 
 <style>
+@import './../node_modules/vue-loading-overlay/dist/vue-loading.css';
 #app {
   height: 100%;
   color: var(--vscode-foreground, #cccccc);
