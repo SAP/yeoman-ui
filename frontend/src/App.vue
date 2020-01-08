@@ -14,8 +14,8 @@
       :rpc="rpc"
     />
     <v-row class="m-0 p-0">
-      <v-col v-if="prompts.length > 0" class="navigaiton-row m-0 p-0" lg="3" sm="auto">
-          <Navigation  :promptIndex="promptIndex" :prompts="prompts" />
+      <v-col class="navigaiton-row m-0 p-0" lg="3" sm="auto">
+          <Navigation v-if="prompts.length > 0" :promptIndex="promptIndex" :prompts="prompts" />
       </v-col>
       <v-col class="">
           <Done
