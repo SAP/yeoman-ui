@@ -87,9 +87,6 @@ export default {
     }
   },
   computed: {
-    copyCurrentPromptAnswers() {
-      return _.cloneDeep(_.get(this, "currentPrompt.answers"))
-    },
     selectedGeneratorHeader() {
       return this.messages.selected_generator + this.generatorName
     },
@@ -98,16 +95,16 @@ export default {
       
       const answers = _.get(prompt, "answers", {})
       const questions = _.get(prompt, "questions", [])
-      _.forEach(questions, question => {
+      for(const question of questions) {
         _.set(answers, [question.name], (question.isWhen === false ? undefined : question.answer))
-      })
+      }
       _.set(prompt, "answers", answers)
       
       return prompt
     }
   },
   watch: {
-    "copyCurrentPromptAnswers": {
+    "currentPrompt.answers": {
       deep: true,
       immediate: true,
       async handler(newAnswers) {
@@ -215,7 +212,7 @@ export default {
     },
     setQuestionProps(prompt) {
       const questions = _.get(prompt, "questions", [])
-      _.forEach(questions, question => {
+      for(const question of questions) {
         if (question.default === FUNCTION) {
           question.default = undefined
           this.$set(question, "_default", FUNCTION)
@@ -238,7 +235,7 @@ export default {
         this.$set(question, "validationMessage", true)
 
         this.$set(question, "isWhen", question.when !== FUNCTION)
-      })
+      }
     },
     showPrompt(questions, name) {
       const prompt = this.createPrompt(questions, name)
