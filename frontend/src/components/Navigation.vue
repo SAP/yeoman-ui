@@ -52,13 +52,13 @@ div.v-stepper div.v-stepper__step {
 }
 
 .v-stepper__step--complete.v-stepper__step {
-  background: var(--vscode-editorCodeLens-foreground, #252426);
+  background: var(--vscode-menu-background, #252426);
 }
 .v-stepper__step--active.v-stepper__step {
   background: var(--vscode-titleBar-activeBackground, #383838);
 }
 .v-stepper__step--inactive.v-stepper__step {
-  background: var(--vscode-editorCodeLens-foreground, #252426);
+  background: var(--vscode-menu-background, #252426);
 }
 
 span.v-stepper__step__step {
