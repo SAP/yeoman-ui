@@ -55,7 +55,7 @@ div.v-stepper div.v-stepper__step {
   background: var(--vscode-menu-background, #252426);
 }
 .v-stepper__step--active.v-stepper__step {
-  background: var(--vscode-menu-foreground, #616161);
+  background: var(--vscode-list-dropBackground, #383b3d);
 }
 .v-stepper__step--inactive.v-stepper__step {
   background: var(--vscode-menu-background, #252426);
@@ -84,7 +84,7 @@ span.v-stepper__step__step {
 div.v-stepper
   div.v-stepper__step.v-stepper__step--complete
   div.v-stepper__label {
-  color: var(--vscode-menu-foreground, #616161);
+  color: var(--vscode-list-dropBackground, #383b3d);
 }
 div.v-stepper div.v-stepper__step.v-stepper__step--active div.v-stepper__label {
   color: var(--vscode-menu-background, #ffffff);
@@ -92,7 +92,7 @@ div.v-stepper div.v-stepper__step.v-stepper__step--active div.v-stepper__label {
 div.v-stepper
   div.v-stepper__step.v-stepper__step--inactive
   div.v-stepper__label {
-  color: var(--vscode-menu-foreground, #616161);
+  color: var(--vscode-list-dropBackground, #383b3d);
 }
 
 div.v-stepper.v-stepper--vertical .v-stepper__content:not(:last-child) {
