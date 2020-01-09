@@ -115,19 +115,34 @@ export default {
       _.set(prompt, "answers", answers)
       
       return prompt
+    },
+    clonedAnswers() {
+      return _.cloneDeep(_.get(this, "currentPrompt.answers"))
     }
   },
   watch: {
-    "currentPrompt.answers": {
+    "clonedAnswers": {
       deep: true,
       immediate: true,
-      async handler(newAnswers) {
+      async handler(newAnswers, oldAnswers) {
         // TODO: consider using debounce (especially for questions of type 'input') to limit roundtrips
-        const questions = _.get(this, "currentPrompt.questions", []);
-        const that = this
-        return questions.reduce((p, question) => {
-          return p.then(() => that.updateQuestion(question, newAnswers))
-        }, Promise.resolve()); // initial
+        if (!_.isEmpty(newAnswers)) {
+          const questions = _.get(this, "currentPrompt.questions", []);
+          
+          const questionWithNewAnswer = _.find(questions, question => {
+            const oldAnswer = _.get(oldAnswers, [question.name])
+            const newAnswer = _.get(newAnswers, [question.name])
+            return !_.isEqual(newAnswer, oldAnswer)
+          })
+
+          const indexOfQuestionWithNewAnswer = _.indexOf(questions, questionWithNewAnswer)
+          const relevantQuestionsToUpdate = questions.slice(indexOfQuestionWithNewAnswer)
+
+          const that = this
+          return relevantQuestionsToUpdate.reduce((p, question) => {
+            return p.then(() => that.updateQuestion(question, newAnswers))
+          }, Promise.resolve()); // initial
+        }
       }
     }
   },
@@ -142,12 +157,10 @@ export default {
           question.answer = await this.rpc.invoke("evaluateMethod", [[question.answer], question.name, "filter"])
         }
         if (question._default === FUNCTION) {
-          this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "default"]).then(response => {
-            question.default = response
-            if (question.answer === undefined) {
-              question.answer = question.default
-            }
-          })
+          question.default = await this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "default"])
+          if (question.answer === undefined) {
+            question.answer = question.default
+          }
         }
         if (question._message === FUNCTION) {
           question.message = await this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "message"])
