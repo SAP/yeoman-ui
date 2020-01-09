@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="d-flex flex-column yeoman-ui vld-parent">
-    <loading :active.sync="isLoading"
+    <loading :active.sync="showBusyIndicator"
              :is-full-page="true"
              :height="128"
              :width="128"
@@ -59,8 +59,9 @@ import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import * as _ from "lodash";
 
-const FUNCTION = "__Function";
-const LOADING = "loading...";
+const FUNCTION = "__Function"
+const LOADING = "loading..."
+const PENDING = 'pending'
 
 export default {
   name: "app",
@@ -86,13 +87,11 @@ export default {
       consoleClass: "",
       logText: "",
       showConsole: false,
-      messages: {}
+      messages: {},
+      showBusyIndicator: false
     };
   },
   computed: {
-    isLoading() {
-      return !this.prompts.length || (this.currentPrompt.status === 'pending' && !this.isDone)
-    },
     isLoadingColor() {
       const propertyValue = getComputedStyle(document.documentElement).getPropertyValue("--vscode-progressBar-background");
       return propertyValue ? propertyValue : "#0e70c0"
@@ -101,29 +100,83 @@ export default {
       return this.messages.selected_generator + this.generatorName;
     },
     currentPrompt() {
-      const prompt = _.get(this.prompts, "[" + this.promptIndex +"]")
-      
-      const answers = _.get(prompt, "answers", {})
-      const questions = _.get(prompt, "questions", [])
+      return _.get(this.prompts, "[" + this.promptIndex +"]")
+    },
+    currentPromptAnswers() {
+      const answers = _.get(this.currentPrompt, "answers", {})
+      const questions = _.get(this.currentPrompt, "questions", [])
       for(const question of questions) {
         _.set(answers, [question.name], (question.isWhen === false ? undefined : question.answer))
       }
-      _.set(prompt, "answers", answers)
-      
-      return prompt
+      return answers
+    },
+    clonedAnswers() {
+      return _.cloneDeep(this.currentPromptAnswers)
     }
   },
   watch: {
-    "currentPrompt.answers": {
+    "prompts": {
+      handler(promptsVal) {
+        if (!promptsVal.length) {
+          this.showBusyIndicator = true
+        } else {
+          this.showBusyIndicator = false
+        }
+      }
+    },
+    "currentPrompt.status": {
+      handler(statusVal) {
+        if (statusVal === PENDING && !this.isDone) {
+          this.showBusyIndicator = true
+        } else {
+          this.showBusyIndicator = false
+        }
+      }
+    },
+    "isDone": {
+      handler(isDoneVal) {
+        if (this.currentPrompt.status === PENDING && !isDoneVal) {
+          this.showBusyIndicator = true
+        } else {
+          this.showBusyIndicator = false
+        }
+      }
+    },
+    "clonedAnswers": {
       deep: true,
-      immediate: true,
-      async handler(newAnswers) {
+      async handler(newAnswers, oldAnswers) {
         // TODO: consider using debounce (especially for questions of type 'input') to limit roundtrips
-        const questions = _.get(this, "currentPrompt.questions", []);
-        const that = this
-        return questions.reduce((p, question) => {
-          return p.then(() => that.updateQuestion(question, newAnswers))
-        }, Promise.resolve()); // initial
+        if (!_.isEmpty(newAnswers)) {
+          const questions = _.get(this, "currentPrompt.questions", []);
+          
+          const questionWithNewAnswer = _.find(questions, question => {
+            const oldAnswer = _.get(oldAnswers, [question.name])
+            const newAnswer = _.get(newAnswers, [question.name])
+            return !_.isEqual(newAnswer, oldAnswer)
+          })
+
+          let relevantQuestionsToUpdate = questions // we should go over all questions for the first time
+          if (questionWithNewAnswer) {
+            const indexOfQuestionWithNewAnswer = _.indexOf(questions, questionWithNewAnswer)
+            relevantQuestionsToUpdate = questions.slice(indexOfQuestionWithNewAnswer)
+          } 
+          
+          let showBusy = true
+          const that = this
+          const finished = relevantQuestionsToUpdate.reduce((p, question) => {
+            return p.then(() => that.updateQuestion(question, newAnswers))
+          }, Promise.resolve()); // initial
+
+          setTimeout(() => {
+            if (showBusy) {
+              that.showBusyIndicator = true
+            }
+          }, 1000)
+
+          await finished
+          showBusy = false
+          this.showBusyIndicator = false
+        }
       }
     }
   },
@@ -138,12 +191,10 @@ export default {
           question.answer = await this.rpc.invoke("evaluateMethod", [[question.answer], question.name, "filter"])
         }
         if (question._default === FUNCTION) {
-          this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "default"]).then(response => {
-            question.default = response
-            if (question.answer === undefined) {
-              question.answer = question.default
-            }
-          })
+          question.default = await this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "default"])
+          if (question.answer === undefined) {
+            question.answer = question.default
+          }
         }
         if (question._message === FUNCTION) {
           question.message = await this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "message"])
@@ -161,7 +212,7 @@ export default {
     next() {
       if (this.resolve) {
         try {
-          this.resolve(this.currentPrompt.answers);
+          this.resolve(this.clonedAnswers);
         } catch (e) {
           this.reject(e);
           return;
@@ -171,7 +222,7 @@ export default {
         const prompt = {
           questions: [],
           name: this.messages.step_is_pending,
-          status: "pending"
+          status: PENDING
         };
         this.setPrompts([prompt]);
       }
@@ -198,7 +249,7 @@ export default {
       if (prompts) {
         _.forEach(prompts, (prompt, index) => {
           if (index === 0) {
-            if (prompt.status === "pending") {
+            if (prompt.status === PENDING) {
               // new pending prompt
               this.prompts.push(prompt);
             } else {
