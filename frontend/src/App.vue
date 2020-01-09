@@ -1,13 +1,12 @@
 <template>
-  <v-app id="app">
-        <loading :active.sync="isLoading"
+  <v-app id="app" class="vld-parent">
+    <loading :active.sync="isLoading"
              :is-full-page="true"
              :height="128"
              :width="128"
              :color="isLoadingColor"
              loader="dots">
     </loading>
-    <div v-if="!prompts.length" class="loading">{{ messages.generators_loading }}</div>
 
     <Header
       v-if="prompts.length"
