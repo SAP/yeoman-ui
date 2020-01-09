@@ -1,5 +1,4 @@
 import QuestionList from '../../../src/components/QuestionTypes/QuestionList.vue'
-import {BFormSelect} from 'bootstrap-vue'
 import {initComponent, destroy} from '../../Utils'
 
 let wrapper
@@ -115,7 +114,7 @@ describe('QuestionList.vue', () => {
                 }
             })
             
-            const options = wrapper.find(BFormSelect).vm.options
+            const options = wrapper.find('v-select-stub').vm.items
             expect(options).toHaveLength(0)
         })
 
@@ -131,7 +130,7 @@ describe('QuestionList.vue', () => {
                 }
             })
 
-            const options = wrapper.find(BFormSelect).vm.options
+            const options = wrapper.find('v-select-stub').vm.items
             expect(options).toHaveLength(4)
             expect(options[0].name).toBe('testName1')
             expect(options[0].text).toBe('testText1')

@@ -1,5 +1,4 @@
 import QuestionInput from '../../../src/components/QuestionTypes/QuestionInput.vue'
-import {BFormInput} from 'bootstrap-vue'
 import {initComponent, destroy} from '../../Utils'
 
 let wrapper
@@ -18,7 +17,7 @@ describe('QuestionInput.vue', () => {
                 }
             })
             
-            const bFormInput = wrapper.find(BFormInput)
+            const bFormInput = wrapper.find('v-text-field-stub')
             expect(bFormInput.vm.type).toBe('time')
         })
 
@@ -29,7 +28,7 @@ describe('QuestionInput.vue', () => {
                 }
             })
             
-            const bFormInput = wrapper.find(BFormInput)
+            const bFormInput = wrapper.find('v-text-field-stub')
             expect(bFormInput.vm.type).toBe('text')
         })
     })
