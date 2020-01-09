@@ -445,7 +445,7 @@ div.bottom-right-col
   .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
   background-color: var(--vscode-button-background, #0e639c);
   border-color: var(--vscode-button-background, #0e639c);
-  color: var(--vscode-button-foreground, white);
+  color: #cccccc !important;
   border-radius: 0px;
   font-size: 0.8rem;
   padding: 0.2rem 0.6rem;
