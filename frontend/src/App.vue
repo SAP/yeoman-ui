@@ -66,6 +66,7 @@ import * as _ from "lodash"
 
 const FUNCTION = '__Function'
 const LOADING = 'loading...'
+const PENDING = 'pending'
 
 export default {
   name: "app",
@@ -79,7 +80,7 @@ export default {
   data() {
     return {
       generatorName: "",
-      stepValidated:false,
+      stepValidated: false,
       prompts: [],
       promptIndex: 0,
       index: 0,
@@ -95,7 +96,7 @@ export default {
   },
   computed: {
     isLoading() {
-      return !this.prompts.length || (this.currentPrompt.status === 'pending' && !this.isDone)
+      return _.size(this.prompts) === 0 || (_.get(this, "currentPrompt.status") === PENDING && !this.isDone)
     },
     isLoadingColor() {
       const propertyValue = getComputedStyle(document.documentElement).getPropertyValue("--vscode-progressBar-background");
@@ -105,19 +106,19 @@ export default {
       return this.messages.selected_generator + this.generatorName
     },
     currentPrompt() {
-      const prompt = _.get(this.prompts, "[" + this.promptIndex +"]")
-      
-      const answers = _.get(prompt, "answers", {})
-      const questions = _.get(prompt, "questions", [])
+      return _.get(this.prompts, "[" + this.promptIndex +"]")
+    },
+    currentPromptAnswers() {
+      const answers = _.get(this.currentPrompt, "answers", {})
+      const questions = _.get(this.currentPrompt, "questions", [])
       for(const question of questions) {
         _.set(answers, [question.name], (question.isWhen === false ? undefined : question.answer))
       }
-      _.set(prompt, "answers", answers)
-      
-      return prompt
+
+      return answers
     },
     clonedAnswers() {
-      return _.cloneDeep(_.get(this, "currentPrompt.answers"))
+      return _.cloneDeep(this.currentPromptAnswers)
     }
   },
   watch: {
@@ -178,14 +179,14 @@ export default {
     next() {
       if (this.resolve) {
         try {
-          this.resolve(this.currentPrompt.answers)
+          this.resolve(this.currentPromptAnswers)
         } catch (e) {
           this.reject(e)
           return
         }
       }
       if (this.promptIndex >= _.size(this.prompts) - 1) {
-        const prompt = { questions: [], name: this.messages.step_is_pending, status: "pending" }
+        const prompt = { questions: [], name: this.messages.step_is_pending, status: PENDING }
         this.setPrompts([prompt])
       }
       this.promptIndex++
@@ -211,7 +212,7 @@ export default {
       if (prompts) {
         _.forEach(prompts, (prompt, index) => {
           if (index === 0) {
-            if (prompt.status === "pending") {
+            if (prompt.status === PENDING) {
               // new pending prompt
               this.prompts.push(prompt)
             } else {
@@ -290,7 +291,7 @@ export default {
       return true
     },
     generatorDone(success, message, targetPath) {
-      if (this.currentPrompt.status === "pending") {
+      if (this.currentPrompt.status === PENDING) {
         this.currentPrompt.name = "Confirmation"
       }
       this.doneMessage = message
