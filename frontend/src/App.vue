@@ -427,7 +427,7 @@ div.consoleClassVisible .v-footer {
   padding: 0 !important;
 }
 .bottom-right-col {
-  background: var(--vscode-titleBar-activeBackground, #383838);
+  background: var(--vscode-editorWidget-background, #252526);
   position: relative;
   overflow: hidden;
 }
