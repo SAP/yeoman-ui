@@ -52,13 +52,13 @@ div.v-stepper div.v-stepper__step {
 }
 
 .v-stepper__step--complete.v-stepper__step {
-  background: var(--vscode-menu-background, #252426);
+  background: var(--vscode-menu-background, #3c3c3c);
 }
 .v-stepper__step--active.v-stepper__step {
-  background: var(--vscode-list-dropBackground, #383b3d);
+  background: var(--vscode-editor-background, #1e1e1e);
 }
 .v-stepper__step--inactive.v-stepper__step {
-  background: var(--vscode-menu-background, #252426);
+  background: var(--vscode-menu-background, #3c3c3c);
 }
 
 span.v-stepper__step__step {
@@ -71,34 +71,34 @@ span.v-stepper__step__step {
 
 /* TODO Erez to give styles for completed step */
 .v-stepper__step--complete .v-stepper__step__step {
-  background: var(--vscode-editorCodeLens-foreground, #1d1d1d);
+  background: var(--vscode-editorCodeLens-foreground, #999999);
 }
 .v-stepper__step--active .v-stepper__step__step {
-  background: var(--vscode-editorCodeLens-foreground, #898989);
+  background: var(--vscode-foreground, #cccccc);
 }
 .v-stepper__step--inactive .v-stepper__step__step {
-  background: var(--vscode-editorCodeLens-foreground, #1d1d1d);
+  background: var(--vscode-editorCodeLens-foreground, #999999);
 }
 
 /* TODO Erez to give styles for completed step */
 div.v-stepper
   div.v-stepper__step.v-stepper__step--complete
   div.v-stepper__label {
-  color: var(--vscode-list-dropBackground, #383b3d);
+  color: var(--vscode-editorBracketMatch-border, #888888);
 }
 div.v-stepper div.v-stepper__step.v-stepper__step--active div.v-stepper__label {
-  color: var(--vscode-menu-background, #ffffff);
+  color: var(--vscode-editorBracketMatch-border, #888888);
 }
 div.v-stepper
   div.v-stepper__step.v-stepper__step--inactive
   div.v-stepper__label {
-  color: var(--vscode-list-dropBackground, #383b3d);
+  color: var(--vscode-editorCodeLens-foreground, #999999);
 }
 
 div.v-stepper.v-stepper--vertical .v-stepper__content:not(:last-child) {
   margin-left: 28px;
   margin-top: -16px;
-  border-left: 1px dotted var(--vscode-editorCodeLens-foreground, #737373);
+  border-left: 1px dotted var(--vscode-editorCodeLens-foreground, #999999);
   position: relative;
   z-index: 100;
 }
