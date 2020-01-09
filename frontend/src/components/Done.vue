@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="display:none">
     <b-jumbotron class="jumbo">
       <p>
         <b-img class="imgDone" src="https://icons-for-free.com/iconfiles/png/128/success-1319971786207747160.png"></b-img>
