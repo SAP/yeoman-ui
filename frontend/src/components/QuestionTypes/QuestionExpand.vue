@@ -35,6 +35,6 @@ div.v-btn-toggle:not(.v-btn-toggle--group) .v-btn.v-btn:not(.v-item--active) {
   background-color: var(--vscode-input-background, #3c3c3c);
 }
 div.v-btn-toggle:not(.v-btn-toggle--group) .v-btn.v-btn.v-item--active {
-  background-color: var(--vscode-input-background, #1976d2);
+  background-color: var(--vscode-button-background, #1976d2);
 }
 </style>
