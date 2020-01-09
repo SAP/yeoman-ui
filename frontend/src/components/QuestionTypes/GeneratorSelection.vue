@@ -1,9 +1,68 @@
 <template>
   <div>
+    <v-item-group mandatory>
+      <v-container class="pa-0">
+        <v-row>
+          <v-col v-for="(item, itemIndex) in getChunks()" :key="itemIndex" cols="12" md="4">
+            <v-item v-slot:default="{ active, toggle }">
+              <v-card
+    max-width="344"
+    class="mx-auto"
+          @click="emitSelection(item.name)"
+      v-on:click="select"
+  >
+              <!-- <v-card
+                :color="active ? 'primary' : ''"
+                class="d-flex align-center"
+                dark
+                height="200"
+                @click="emitSelection(item.name)"
+                max-width="344"
+              > -->
+                <v-list-item>
+                  <v-list-item-content>
+                    <v-list-item-title class="headline">"{{item.prettyName}}"</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+                  <v-card-text>
+                    "thrhrthtry"
+    </v-card-text>
+              </v-card>
+            </v-item>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-item-group>
+
+    <!-- <b-card
+      @click="emitSelection(item.name)"
+      v-on:click="select"
+      class="generator h-100"
+      :title="item.prettyName"
+      img-alt="Image"
+      img-top
+      tag="article"
+    >
+      <b-card-text>{{item.message}}</b-card-text>
+      <b-card-text class="templateDocumentationClass">
+        <b-link :href="item.homepage">Generator Documentation</b-link>
+      </b-card-text>
+      <b-card-img :src="getImageUrl(item)"></b-card-img>
+    </b-card>-->
     <b-card-group deck>
       <b-container fluid>
-        <b-row v-for="(chunk, chunkIndex) in getChunks()" :key="chunkIndex" class="align-self-md-stretch">
-          <b-col v-for="(item, itemIndex) in chunk" :key="itemIndex" cols="4" col class="col-generator">
+        <b-row
+          v-for="(chunk, chunkIndex) in getChunks()"
+          :key="chunkIndex"
+          class="align-self-md-stretch"
+        >
+          <b-col
+            v-for="(item, itemIndex) in chunk"
+            :key="itemIndex"
+            cols="4"
+            col
+            class="col-generator"
+          >
             <b-card
               @click="emitSelection(item.name)"
               v-on:click="select"
@@ -14,7 +73,9 @@
               tag="article"
             >
               <b-card-text>{{item.message}}</b-card-text>
-              <b-card-text class="templateDocumentationClass"><b-link :href="item.homepage">Generator Documentation</b-link></b-card-text>
+              <b-card-text class="templateDocumentationClass">
+                <b-link :href="item.homepage">Generator Documentation</b-link>
+              </b-card-text>
               <b-card-img :src="getImageUrl(item)"></b-card-img>
             </b-card>
           </b-col>
@@ -25,7 +86,7 @@
 </template>
 
 <script>
-import _ from "lodash"
+import _ from "lodash";
 
 export default {
   name: "GeneratorSelection",
@@ -36,42 +97,41 @@ export default {
     return {
       publicPath: process.env.BASE_URL,
       selectedItem: undefined,
-      nColumns: 3, // number of groups/columns
+      nColumns: 1, // number of groups/columns
       groupedItems: []
-    }
+    };
   },
   methods: {
     getImageUrl(choice) {
-      return _.get(choice, "imageUrl", `${this.publicPath}generator.png`)
+      return _.get(choice, "imageUrl", `${this.publicPath}generator.png`);
     },
     select(event) {
       if (this.selectedItem) {
         // deselect old selection
-        this.selectedItem.classList.toggle("selected")
-        this.selectedItem.setAttribute("border-style", "none")
+        this.selectedItem.classList.toggle("selected");
+        this.selectedItem.setAttribute("border-style", "none");
       }
-      this.selectedItem = event.currentTarget
-      this.selectedItem.setAttribute("border-style", "solid")
-      this.selectedItem.classList.toggle("selected")
+      this.selectedItem = event.currentTarget;
+      this.selectedItem.setAttribute("border-style", "solid");
+      this.selectedItem.classList.toggle("selected");
     },
     emitSelection(generatorName) {
-      this.currentQuestion.answer = generatorName
-      this.$emit("generatorSelected", generatorName)
+      this.currentQuestion.answer = generatorName;
+      this.$emit("generatorSelected", generatorName);
     },
     chunk: function(arr, size) {
       var newArr = [];
-      for (var i=0; i<arr.length; i+=size) {
-        newArr.push(arr.slice(i, i+size));
+      for (var i = 0; i < arr.length; i += size) {
+        newArr.push(arr.slice(i, i + size));
       }
       return newArr;
     },
     getChunks: function() {
       // divide into n groups
-      return this.chunk(this.currentQuestion.choices, this.nColumns); 
+      return this.chunk(this.currentQuestion.choices, this.nColumns);
     }
-  },
-}
-
+  }
+};
 </script>
 
 <style>

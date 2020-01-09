@@ -405,6 +405,7 @@ div.consoleClassVisible .v-footer {
 }
 .left-col {
   background-color: var(--vscode-menu-background, #252426);
+  border-right: 1px solid black;
 }
 .prompts-col {
   overflow-y: scroll;
