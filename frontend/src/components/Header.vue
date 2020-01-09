@@ -1,15 +1,12 @@
 <template>
   <div>
-    <b-navbar>
-      <b-navbar-brand>{{selectedGeneratorHeader}}</b-navbar-brand>
-
-      <!-- Right aligned nav items -->
-      <b-navbar-nav class="ml-auto">
-        <b-nav-form>
-          <b-button v-b-toggle.showLogId @click="collapseLog">▤</b-button>
-        </b-nav-form>
-      </b-navbar-nav>
-    </b-navbar>
+    <v-app-bar class="elevation-0">
+      <v-toolbar-title>{{selectedGeneratorHeader}}</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn @click="collapseLog" icon>
+        <v-icon>mdi-console</v-icon>
+      </v-btn>
+    </v-app-bar>
   </div>
 </template>
 
@@ -19,16 +16,19 @@ export default {
   props: ["selectedGeneratorHeader", "stepName", "rpc"],
   methods: {
     collapseLog() {
-      this.rpc.invoke("toggleLog", [{}])
+      this.rpc.invoke("toggleLog", [{}]);
+      this.$parent.showConsole = !this.$parent.showConsole; //TODO investigate why this.$emit is not working
     }
   }
 };
 </script>
 <style>
-.navbar-brand {
-  color: var(--vscode-editorSuggestWidget-foreground, #d4d4d4) !important;
+header.v-app-bar.v-toolbar, header.v-app-bar.v-toolbar .v-btn {
+  background-color: var(--vscode-editor-background, #1e1e1e);
+  color: var(--vscode-foreground, #cccccc);
 }
-.navbar-text {
-  color: var(--vscode-editorCodeLens-foreground, #999999) !important;
+header.v-app-bar.v-toolbar {
+  border-bottom: 1px solid var(--vscode-terminal-ansiBlack, #000000);
+  box-shadow: none;
 }
 </style>

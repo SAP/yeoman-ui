@@ -2,10 +2,12 @@ import {initComponent, destroy} from './Utils'
 import App from '../src/App.vue';
 import Vue from 'vue'
 import BootstrapVue from 'bootstrap-vue'
+import Vuetify from 'vuetify'
 import { WebSocket } from 'mock-socket'
 const flushPromises = require('flush-promises');
 
 Vue.use(BootstrapVue)
+Vue.use(Vuetify)
 global.WebSocket = WebSocket
 
 let wrapper
@@ -455,5 +457,16 @@ describe('App.vue', () => {
       expect(wrapper.vm.isDone).toBeTruthy()
       expect(wrapper.vm.currentPrompt.name).toBe('Confirmation')
     })
+  })
+
+  describe('toggleConsole - method', () => {
+    test('showConsole property updated from toggleConsole()', () => {
+      wrapper = initComponent(App)
+      wrapper.vm.toggleConsole()
+      expect(wrapper.vm.showConsole).toBeTruthy()
+      wrapper.vm.toggleConsole()
+      expect(wrapper.vm.showConsole).toBeFalsy()
+    })
+
   })
 })
