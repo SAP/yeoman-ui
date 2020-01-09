@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="d-flex flex-column yeoman-ui vld-parent">
-    <loading :active.sync="isLoading"
+    <loading :active.sync="showBusyIndicator"
              :is-full-page="true"
              :height="128"
              :width="128"
@@ -87,13 +87,11 @@ export default {
       consoleClass: "",
       logText: "",
       showConsole: false,
-      messages: {}
+      messages: {},
+      showBusyIndicator: false
     };
   },
   computed: {
-    isLoading() {
-      return _.size(this.prompts) === 0 || (_.get(this, "currentPrompt.status") === PENDING && !this.isDone)
-    },
     isLoadingColor() {
       const propertyValue = getComputedStyle(document.documentElement).getPropertyValue("--vscode-progressBar-background");
       return propertyValue ? propertyValue : "#0e70c0"
@@ -118,6 +116,16 @@ export default {
     }
   },
   watch: {
+    "prompts": {
+      handler() {
+        this.showBusyIndicator = _.size(this.prompts) === 0
+      }
+    },
+    "currentPrompt.status": {
+      handler(newStatus) {
+        this.showBusyIndicator = newStatus === PENDING && !this.isDone
+      }
+    },
     "clonedAnswers": {
       deep: true,
       immediate: true,
@@ -134,11 +142,23 @@ export default {
 
           const indexOfQuestionWithNewAnswer = _.indexOf(questions, questionWithNewAnswer)
           const relevantQuestionsToUpdate = questions.slice(indexOfQuestionWithNewAnswer)
+          
+          let showBusy = true
 
           const that = this
-          return relevantQuestionsToUpdate.reduce((p, question) => {
+          const finished = relevantQuestionsToUpdate.reduce((p, question) => {
             return p.then(() => that.updateQuestion(question, newAnswers))
           }, Promise.resolve()); // initial
+
+          setTimeout(() => {
+            if (showBusy) {
+              that.showBusyIndicator = true
+            }
+          }, 300)
+
+          await finished
+          showBusy = false
+          this.showBusyIndicator = false
         }
       }
     }
