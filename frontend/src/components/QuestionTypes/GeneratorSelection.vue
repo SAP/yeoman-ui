@@ -104,6 +104,7 @@ export default {
 
 .card-deck {
   margin: 0rem;
+  height: 100%;
 }
 
 .card.generator {

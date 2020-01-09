@@ -1,31 +1,33 @@
 <template>
-  <div class="question-checkbox-container">
-    <b-form-checkbox-group
-      v-model="selected"
-      stacked
-      :options="options"
-    ></b-form-checkbox-group>
+  <div>
+    <p class="question-label">{{currentQuestion.message}}</p>
+      <div v-for="(option,index) in options" :key="options[index].text">
+        <v-checkbox dense :label="option.text || option" v-model="option.selected"></v-checkbox>
+      </div>
+    <!-- <div class="question-checkbox-container">
+      <b-form-checkbox-group v-model="selected" stacked :options="options"></b-form-checkbox-group>
+    </div> -->
   </div>
 </template>
 
 <script>
-import _ from "lodash"
+import _ from "lodash";
 
 export default {
   name: "QuestionCheckbox",
   computed: {
     options() {
-      const values = this.currentQuestion.choices 
+      const values = this.currentQuestion.choices;
       if (_.isArray(values)) {
         return _.map(values, value => {
           if (_.has(value, "name") && !_.has(value, "text")) {
-            value.text = value.name
+            value.text = value.name;
           }
-          return value
-        })
+          return value;
+        });
       }
 
-      return []
+      return [];
     }
   },
   props: {
@@ -35,45 +37,33 @@ export default {
     const selected = _.compact(
       _.map(this.currentQuestion.choices, choice => {
         if (choice.checked) {
-          return choice.value
+          return choice.value;
         }
       })
-    )
+    );
 
-    this.currentQuestion.answer = selected
+    this.currentQuestion.answer = selected;
 
     return {
       selected: selected
-    }
+    };
   },
   watch: {
     selected: {
       handler(val) {
-        this.currentQuestion.answer = val
+        this.currentQuestion.answer = val;
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>
-.list-group {
-  margin-bottom: 15px;
+div.v-input--checkbox{
+  margin-top: 0;
 }
-.list-group-item:hover {
-  background: #eee;
-  cursor: pointer;
-}
-
-.selected {
-  background-color: lightblue;
-}
-
-.correct {
-  background-color: lightgreen;
-}
-
-.incorrect {
-  background-color: red;
+div.v-input--checkbox >>> div.v-input__slot{
+  margin-bottom: 0;
+  align-items: flex-start;
 }
 </style>

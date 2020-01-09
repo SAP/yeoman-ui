@@ -1,13 +1,9 @@
 <template>
-  <div>
-    <b-form>
+  <div id="step-component-div">
       <QuestionTypeSelector
-        v-for="(item, index) in currentPrompt.questions"
-        :key="index"
-        :currentQuestion="item"
+        :questions="currentPrompt.questions"
         @generatorSelected="onGeneratorSelected"
       />
-    </b-form>
   </div>
 </template>
 

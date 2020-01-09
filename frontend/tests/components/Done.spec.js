@@ -1,6 +1,6 @@
 import {initComponent, destroy} from '../Utils'
 import Done from '../../src/components/Done.vue'
-import { BJumbotron, BButton, BContainer } from 'bootstrap-vue'
+import { BJumbotron, BContainer } from 'bootstrap-vue'
 import _ from 'lodash'
 
 
@@ -45,7 +45,7 @@ describe('Done.vue', () => {
             expect(clickEvent.currentTarget.dataset.commandName).toBe('workbench.action.closeActiveEditor')
         })
         wrapper.setMethods({executeCommand: executeCommandMock})
-        wrapper.find(BButton).trigger('click')
+        wrapper.find('button').trigger('click')
         expect(executeCommandMock).toHaveBeenCalled()
     })
 
@@ -55,7 +55,7 @@ describe('Done.vue', () => {
             postMessage: jest.fn()
         }
         wrapper = initComponent(Done, { doneMessage: testDoneMessage, donePath: 'testDonePath', isInVsCode: true}, true)
-        const buttons = wrapper.findAll(BButton)
+        const buttons = wrapper.findAll('button')
         const nWorkspaceButton = buttons.wrappers[1]
         nWorkspaceButton.trigger('click')
         expect(window.vscode.postMessage).toHaveBeenCalled()

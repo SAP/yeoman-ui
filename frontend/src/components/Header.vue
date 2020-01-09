@@ -17,7 +17,7 @@ export default {
   methods: {
     collapseLog() {
       this.rpc.invoke("toggleLog", [{}]);
-      this.$parent.showConsole = !this.$parent.showConsole; //TODO investigate why this.$emit is not working
+      this.$emit("parentShowConsole");
     }
   }
 };
