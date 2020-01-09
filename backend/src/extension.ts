@@ -125,18 +125,18 @@ export class YeomanUIPanel {
 						return;
 					case 'showDoneMessage':
 						let Close = 'Close';
-						let NewWorkspace = 'New Workspace';
+						let OpenWorkspace = 'Open Workspace';
 						this.theia.isInTheia().then((value) => {
 							let commandName_Close = "workbench.action.closeActiveEditor";
-							let commandName_NewWorkspace = "vscode.openFolder";
+							let commandName_OpenWorkspace = "vscode.openFolder";
 							let commandParam = _.get(message, "commandParams[0]");
-							vscode.window.showInformationMessage('Where would you like to open the project?', Close , NewWorkspace)
+							vscode.window.showInformationMessage('Where would you like to open the project?', Close , OpenWorkspace)
 								.then(selection => {
 									if (selection === Close) {
 										this.executeCommand(commandName_Close, undefined);
 									}
-									if (selection === NewWorkspace) {
-										this.executeCommand(commandName_NewWorkspace, commandParam);
+									if (selection === OpenWorkspace) {
+										this.executeCommand(commandName_OpenWorkspace, commandParam);
 									}
 								});
 						});

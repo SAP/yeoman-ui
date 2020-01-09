@@ -432,6 +432,10 @@ describe('App.vue', () => {
   })
 
   describe('generatorDone - method', () => {
+    window.vscode = {
+      postMessage: jest.fn()
+    }
+      
     test('status is not pending', () => {
       wrapper = initComponent(App)
       wrapper.vm.prompts = [{}, {}]
