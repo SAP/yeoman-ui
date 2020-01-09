@@ -1,12 +1,12 @@
 <template>
-  <div>
-    <b-form-group :label="currentQuestion.message" v-if="currentQuestion.isWhen">
-      <GeneratorSelection
-        v-if="currentQuestion.type==='generators'"
-        :currentQuestion="currentQuestion"
-        @generatorSelected="onGeneratorSelected"
-      />
-
+  <div v-if="currentQuestion.isWhen">
+    
+    <GeneratorSelection
+      v-if="currentQuestion.type==='generators'"
+      :currentQuestion="currentQuestion"
+      @generatorSelected="onGeneratorSelected"
+    />
+    <b-form-group :label="currentQuestion.message">
       <QuestionInput
         v-if="!currentQuestion.type || currentQuestion.type==='input' || currentQuestion.type==='password' || currentQuestion.type==='number'"
         :currentQuestion="currentQuestion"
