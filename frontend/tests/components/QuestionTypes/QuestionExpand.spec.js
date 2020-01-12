@@ -13,6 +13,9 @@ describe('QuestionExpand.vue', () => {
         wrapper = initComponent(QuestionExpand, {
             currentQuestion: {
                 choices: [{value: 'testValue', name: 'testName'}]
+            },
+            isAnswerValid() {
+                return '';
             }
         }, true)
 

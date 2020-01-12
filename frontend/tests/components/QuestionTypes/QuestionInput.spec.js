@@ -14,6 +14,9 @@ describe('QuestionInput.vue', () => {
             wrapper = initComponent(QuestionInput, {
                 currentQuestion: {
                     type: 'time', default: 'testDefault', answer: 'testAnswer'
+                },
+                isAnswerValid() {
+                    return '';
                 }
             })
             
@@ -25,6 +28,9 @@ describe('QuestionInput.vue', () => {
             wrapper = initComponent(QuestionInput, {
                 currentQuestion: {
                     type: 'input', default: 'testDefault', answer: 'testAnswer'
+                },
+                isAnswerValid() {
+                    return '';
                 }
             })
             
@@ -38,6 +44,9 @@ describe('QuestionInput.vue', () => {
             wrapper = initComponent(QuestionInput, {
                 currentQuestion: {
                     type: 'time', default: 'testDefault', answer: 'testAnswer'
+                },
+                isAnswerValid() {
+                    return '';
                 }
             })
             
@@ -50,6 +59,9 @@ describe('QuestionInput.vue', () => {
             wrapper = initComponent(QuestionInput, {
                 currentQuestion: {
                     type: 'time', default: 'testDefault', answer: 'testAnswer'
+                },
+                isAnswerValid() {
+                    return '';
                 }
             })
             
