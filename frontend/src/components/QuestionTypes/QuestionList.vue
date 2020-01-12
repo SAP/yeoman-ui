@@ -1,9 +1,17 @@
 <template>
   <div id="question-list">
     <p class="question-label">{{currentQuestion.message}}</p>
-    <v-select v-model="selected" :items="options" aria-describedby="validation-message" solo dense></v-select>
+    <v-select
+      :error-messages="isValid"
+      v-model="selected"
+      :items="options"
+      aria-describedby="validation-message"
+      solo
+      dense
+    ></v-select>
   </div>
 </template>
+
 
 <script>
 import _ from "lodash";
@@ -41,6 +49,9 @@ export default {
         return defaultValue;
       }
       return undefined;
+    },
+    isValid() {
+      return this.isAnswerValid(this.currentQuestion);
     }
   },
   watch: {
@@ -58,7 +69,8 @@ export default {
     }
   },
   props: {
-    currentQuestion: Object
+    currentQuestion: Object,
+    isAnswerValid: Function
   }
 };
 </script>
@@ -66,6 +78,6 @@ export default {
 #question-list >>> div.v-input__slot {
   color: var(--vscode-input-foreground, #cccccc) !important;
   background-color: var(--vscode-input-background, #3c3c3c) !important;
-  border-radius: unset !important; 
+  border-radius: unset;
 }
 </style>

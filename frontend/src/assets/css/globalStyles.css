@@ -1,0 +1,57 @@
+html,
+body {
+  height: 100%;
+  background-color: var(--vscode-editor-background, #1e1e1e);
+}
+#app {
+  height: 100%;
+  color: var(--vscode-foreground, #cccccc); 
+  background-color: var(--vscode-editor-background, #1e1e1e);
+  font-family: var(--vscode-font-family);
+  font-weight: var(--vscode-font-weight);
+  font-size: var(--vscode-font-size);
+}
+/* Align v-card image to fit card */
+.v-card .v-image__image--cover {
+    background-size: contain;
+}
+.v-application button.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined){
+  background-color: var(--vscode-button-background, #0e639c);
+  border-color: var(--vscode-button-background, #0e639c);
+  color: #ffffff !important;
+  border-radius: 0px;
+}
+.v-application button.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined):hover {
+  background-color: var(--vscode-button-hoverBackground, #1177bb);
+  border-color: var(--vscode-button-hoverBackground, #1177bb);
+}
+/* Do not accept uppercase from vuetify */
+.v-btn {
+  text-transform: none;
+}
+
+div.v-application .primary {
+  background-color: var(--vscode-editorCodeLens-foreground, #898989) !important;
+}
+.theme--light {
+  color: var(--vscode-foreground, #cccccc) !important;
+}
+
+p.question-label{
+  margin-bottom: 0.25rem ;
+}
+
+div.v-input__slot .v-select__selection{
+  color: var(--vscode-input-foreground, #cccccc) ;
+}
+div.v-select-list div.v-list{
+  background-color: var(--vscode-input-background, #3c3c3c) !important;
+}
+div.v-select-list div.v-list div.v-list-item,
+div.v-select-list div.v-list div.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled)
+{
+  color: var(--vscode-input-foreground, #cccccc) !important;
+}
+div.v-input__slot input, div.v-input__slot textarea {
+  color: var(--vscode-input-foreground, #cccccc) !important;
+}

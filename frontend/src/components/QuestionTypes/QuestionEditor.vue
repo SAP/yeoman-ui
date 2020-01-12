@@ -7,6 +7,7 @@
     :placeholder="currentQuestion.default"
     class="yeoman-form-control"
     aria-describedby="validation-message"
+      :error-messages="isValid"
         ></v-textarea>
 </div>
 </template>
@@ -17,7 +18,13 @@ import _ from "lodash"
 export default {
   name: "QuestionEditor",
   props: {
-    currentQuestion: Object
+    currentQuestion: Object,
+    isAnswerValid: Function
+  },
+  computed: {
+    isValid() {
+        return this.isAnswerValid(this.currentQuestion)
+    }
   },
   data() {
     return {

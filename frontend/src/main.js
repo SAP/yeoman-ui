@@ -3,6 +3,7 @@ import App from './App'
 
 import vuetify from "./plugins/vuetify";
 import "material-design-icons-iconfont/dist/material-design-icons.css";
+import "./assets/css/globalStyles.css";
 
 Vue.config.productionTip = false
 

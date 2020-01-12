@@ -2,11 +2,9 @@
   <div>
     <p class="question-label">{{currentQuestion.message}}</p>
       <div v-for="(option,index) in options" :key="options[index].text">
-        <v-checkbox dense :label="option.text || option" v-model="option.selected"></v-checkbox>
+        <v-checkbox 
+      :error-messages="isValid" dense :label="option.text || option" v-model="option.selected"></v-checkbox>
       </div>
-    <!-- <div class="question-checkbox-container">
-      <b-form-checkbox-group v-model="selected" stacked :options="options"></b-form-checkbox-group>
-    </div> -->
   </div>
 </template>
 
@@ -28,10 +26,14 @@ export default {
       }
 
       return [];
+    },
+    isValid() {
+         return this.isAnswerValid(this.currentQuestion)
     }
   },
   props: {
-    currentQuestion: Object
+    currentQuestion: Object,
+    isAnswerValid: Function
   },
   data() {
     const selected = _.compact(

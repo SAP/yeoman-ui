@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-stepper v-model="currentStep" vertical>
+    <v-stepper v-model="currentStep" dark vertical>
       <template v-for="index in steps">
         <!-- Todo Check why there's an empty step -->
         <v-stepper-step
@@ -38,26 +38,25 @@ export default {
   }
 };
 </script>
+
 <style>
 div.v-stepper.v-stepper--vertical {
   background-color: transparent;
   box-shadow: none;
   border-radius: 0;
 }
-
 div.v-stepper div.v-stepper__step {
   padding: 24px;
-  border-bottom: 1px solid var(--vscode-terminal-ansiBlack, #000000);
+  border-bottom: 1px solid var(--vscode-editor-background, #1e1e1e);
 }
-
-.v-stepper__step--complete.v-stepper__step {
-  background: var(--vscode-menu-background, #3c3c3c);
+ .v-stepper__step--complete.v-stepper__step {
+  background: var(--vscode-editorWidget-background,#252426);
 }
 .v-stepper__step--active.v-stepper__step {
   background: var(--vscode-editor-background, #1e1e1e);
 }
 .v-stepper__step--inactive.v-stepper__step {
-  background: var(--vscode-menu-background, #3c3c3c);
+  background: var(--vscode-editorWidget-background,#252426);
 }
 
 span.v-stepper__step__step {
@@ -67,37 +66,31 @@ span.v-stepper__step__step {
   min-width: 10px;
   width: 10px;
 }
-
 span.v-stepper__step__step .v-icon.v-icon {
   font-size: 0;
 }
-
-/* TODO Erez to give styles for completed step */
 .v-stepper__step--complete .v-stepper__step__step {
   background: var(--vscode-editorCodeLens-foreground, #999999);
 }
 .v-stepper__step--active .v-stepper__step__step {
-  background: var(--vscode-foreground, #cccccc);
+  background: var(--vscode-foreground, #cccccc); ;
 }
 .v-stepper__step--inactive .v-stepper__step__step {
   background: var(--vscode-editorCodeLens-foreground, #999999);
 }
-
-/* TODO Erez to give styles for completed step */
 div.v-stepper
   div.v-stepper__step.v-stepper__step--complete
   div.v-stepper__label {
   color: var(--vscode-editorBracketMatch-border, #888888);
 }
 div.v-stepper div.v-stepper__step.v-stepper__step--active div.v-stepper__label {
-  color: var(--vscode-editorBracketMatch-border, #888888);
+  color: var(--vscode-foreground, #cccccc); ;
 }
 div.v-stepper
   div.v-stepper__step.v-stepper__step--inactive
   div.v-stepper__label {
   color: var(--vscode-editorCodeLens-foreground, #999999);
 }
-
 div.v-stepper.v-stepper--vertical .v-stepper__content:not(:last-child) {
   margin-left: 28px;
   margin-top: -16px;

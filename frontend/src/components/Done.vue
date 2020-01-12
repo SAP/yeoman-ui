@@ -59,7 +59,7 @@ export default {
 </script>
 
 <style>
-.jumbotron.jumbo {
+/* .jumbotron.jumbo {
   background-color: var(--vscode-editorWidget-background, #252526);
   padding: 1rem 0.5rem;
 }
@@ -79,5 +79,5 @@ img.imgDone {
 .jumbo button {
   background-color: var(--vscode-button-hoverBackground, #1177bb) !important;
   border-color: var(--vscode-button-hoverBackground, #1177bb) !important;
-}
+} */
 </style>
