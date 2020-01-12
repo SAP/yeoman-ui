@@ -460,7 +460,7 @@ describe('App.vue', () => {
       expect(wrapper.vm.doneMessage).toBe('testMessage')
       expect(wrapper.vm.donePath).toBe('/test/path')
       expect(wrapper.vm.isDone).toBeTruthy()
-      expect(wrapper.vm.currentPrompt.name).toBe('Confirmation')
+      expect(wrapper.vm.currentPrompt.name).toBe('Summary')
       expect(window.vscode.postMessage).toHaveBeenCalled()
     })
   })
