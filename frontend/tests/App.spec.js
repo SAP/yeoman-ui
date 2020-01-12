@@ -446,6 +446,7 @@ describe('App.vue', () => {
       expect(wrapper.vm.doneMessage).toBe('testMessage')
       expect(wrapper.vm.donePath).toBe('/test/path')
       expect(wrapper.vm.isDone).toBeTruthy()
+      expect(window.vscode.postMessage).toHaveBeenCalled()
     })
 
     test('status is pending', () => {
@@ -460,6 +461,7 @@ describe('App.vue', () => {
       expect(wrapper.vm.donePath).toBe('/test/path')
       expect(wrapper.vm.isDone).toBeTruthy()
       expect(wrapper.vm.currentPrompt.name).toBe('Confirmation')
+      expect(window.vscode.postMessage).toHaveBeenCalled()
     })
   })
 
