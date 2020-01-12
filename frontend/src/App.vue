@@ -101,8 +101,7 @@ export default {
   },
   computed: {
     isLoadingColor() {
-      const propertyValue = getComputedStyle(document.documentElement).getPropertyValue("--vscode-progressBar-background");
-      return propertyValue ? propertyValue : "#0e70c0"
+      return getComputedStyle(document.documentElement).getPropertyValue("--vscode-progressBar-background") || "#0e70c0"
     },
     selectedGeneratorHeader() {
       return this.messages.selected_generator + this.generatorName;
@@ -125,7 +124,7 @@ export default {
   watch: {
     "prompts": {
       handler(promptsVal) {
-        if (!promptsVal.length) {
+        if (_.isEmpty(promptsVal)) {
           this.showBusyIndicator = true
         } else {
           this.showBusyIndicator = false
@@ -163,7 +162,7 @@ export default {
             return !_.isEqual(newAnswer, oldAnswer)
           })
 
-          let relevantQuestionsToUpdate = questions // we should go over all questions for the first time
+          let relevantQuestionsToUpdate = questions // go esover all questions for the first time
           if (questionWithNewAnswer) {
             const indexOfQuestionWithNewAnswer = _.indexOf(questions, questionWithNewAnswer)
             relevantQuestionsToUpdate = questions.slice(indexOfQuestionWithNewAnswer)
