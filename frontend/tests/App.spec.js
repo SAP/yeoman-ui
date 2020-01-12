@@ -437,7 +437,8 @@ describe('App.vue', () => {
     }
       
     test('status is not pending', () => {
-      wrapper = initComponent(App)
+      wrapper = initComponent(App, {donePath: 'testDonePath'})
+      wrapper.vm.isInVsCode = jest.fn().mockResolvedValue(true)
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.promptIndex = 1
 
@@ -450,7 +451,8 @@ describe('App.vue', () => {
     })
 
     test('status is pending', () => {
-      wrapper = initComponent(App)
+      wrapper = initComponent(App, {donePath: 'testDonePath'})
+      wrapper.vm.isInVsCode = jest.fn().mockResolvedValue(true)
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.promptIndex = 1
       wrapper.vm.currentPrompt.status = 'pending'
