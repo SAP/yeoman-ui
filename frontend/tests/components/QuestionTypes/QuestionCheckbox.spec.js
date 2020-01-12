@@ -1,6 +1,5 @@
 import QuestionCheckbox from '../../../src/components/QuestionTypes/QuestionCheckbox.vue'
 import { initComponent, destroy } from '../../Utils'
-import {BFormCheckboxGroup} from 'bootstrap-vue'
 
 let wrapper
 
@@ -63,8 +62,8 @@ describe('QuestionCheckbox.vue', () => {
                 }
             })
 
-            const bFormCheckboxGroup = wrapper.find(BFormCheckboxGroup)
-            expect(bFormCheckboxGroup.vm.options[0].text).toBe('testName1')
+            const bFormCheckboxGroup = wrapper.find('v-checkbox-stub')
+            expect(bFormCheckboxGroup.vm.label).toBe('testName1')
         })
 
         test('choices is not array', () => {
@@ -74,8 +73,8 @@ describe('QuestionCheckbox.vue', () => {
                 }
             })
 
-            const bFormCheckboxGroup = wrapper.find(BFormCheckboxGroup)
-            expect(bFormCheckboxGroup.vm.options).toHaveLength(0)
+            const bFormCheckboxGroup = wrapper.find('v-checkbox-stub')
+            expect(bFormCheckboxGroup.vm).toBeUndefined()
         })
     })
 })

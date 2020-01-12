@@ -7,7 +7,6 @@
           :key="`${index}-step`"
           :step="index"
           :complete="currentStep > index"
-          complete-icon="circle-slice-8"
         >{{ prompts[index - 1] ? prompts[index - 1].name : "" }}</v-stepper-step>
         <v-stepper-content :step="index" :key="`${index}-content`"></v-stepper-content>
       </template>
@@ -67,6 +66,10 @@ span.v-stepper__step__step {
   height: 10px;
   min-width: 10px;
   width: 10px;
+}
+
+span.v-stepper__step__step .v-icon.v-icon {
+  font-size: 0;
 }
 
 /* TODO Erez to give styles for completed step */

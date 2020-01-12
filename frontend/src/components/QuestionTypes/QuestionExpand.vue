@@ -1,12 +1,15 @@
 <template>
-  <div class="question-expand-container">
-    <b-button-group vertical>
-      <b-button
+  <div id="question-expand">
+    <p class="question-label">{{currentQuestion.message}}</p>
+    <v-btn-toggle v-model="icon" tile color="deep-purple accent-3">
+      <v-btn
         v-for="(choice, index) in currentQuestion.choices"
         @click="onClick(choice.value)"
         :key="index"
-      >{{ choice.name }}</b-button>
-    </b-button-group>
+      >
+        <span class="hidden-sm-and-down">{{ choice.name }}</span>
+      </v-btn>
+    </v-btn-toggle>
   </div>
 </template>
 
@@ -18,22 +21,20 @@ export default {
   },
   methods: {
     onClick(answer) {
-      this.currentQuestion.answer = answer
+      this.currentQuestion.answer = answer;
     }
   }
-}
+};
 </script>
 
 <style scoped>
-.list-group {
-  margin-bottom: 15px;
+div#question-expand{
+  margin-bottom: 1.5rem;
 }
-.list-group-item:hover {
-  background: #eee;
-  cursor: pointer;
+div.v-btn-toggle:not(.v-btn-toggle--group) .v-btn.v-btn:not(.v-item--active) {
+  background-color: var(--vscode-input-background, #3c3c3c);
 }
-
-.selected {
-  background-color: lightblue;
+div.v-btn-toggle:not(.v-btn-toggle--group) .v-btn.v-btn.v-item--active {
+  background-color: var(--vscode-button-background, #1976d2);
 }
 </style>

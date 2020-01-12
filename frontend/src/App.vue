@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="d-flex flex-column yeoman-ui vld-parent">
+  <v-app id="app" class="vld-parent">
     <loading :active.sync="showBusyIndicator"
              :is-full-page="true"
              :height="128"
@@ -7,17 +7,21 @@
              :color="isLoadingColor"
              loader="dots">
     </loading>
+
     <Header
       v-if="prompts.length"
       :selectedGeneratorHeader="selectedGeneratorHeader"
       :stepName="prompts[promptIndex].name"
       :rpc="rpc"
+      @parentShowConsole="toggleConsole"
     />
-    <v-row class="m-0 p-0">
-      <v-col class="navigaiton-row m-0 p-0" lg="3" sm="auto">
-          <Navigation v-if="prompts.length > 0" :promptIndex="promptIndex" :prompts="prompts" />
+    <v-row class="main-row m-0 p-0">
+      <v-col class="left-col m-0 p-0" lg="3" sm="auto">
+        <Navigation v-if="prompts.length" :promptIndex="promptIndex" :prompts="prompts" />
       </v-col>
-      <v-col class="">
+      <v-col class="right-col">
+        <!-- <v-row class="right-row"> -->
+        <v-col class="prompts-col" lg="12">
           <Done
             v-if="isDone"
             :doneMessage="doneMessage"
@@ -31,13 +35,16 @@
             @generatorSelected="onGeneratorSelected"
             @stepvalidated="onStepValidated"
           />
-          <div class="navigation" v-if="prompts.length > 0 && !isDone">
-            <b-button class="btn" :disabled="!stepValidated" @click="next">Next</b-button>
-          </div>
+        </v-col>
+          <v-col v-if="prompts.length > 0 && !isDone" class="bottom-right-col" style="height: 4rem;" offset-lg="9" lg="3">
+            <v-row  class="progress-buttons-row" align="center" justify="end">
+              <v-btn :disabled="!stepValidated" @click="next">Next ></v-btn>
+            </v-row>
+        </v-col>
       </v-col>
     </v-row>
 
-  <!-- TODO Handle scroll of above content when console is visible -->
+    <!-- TODO Handle scroll of above content when console is visible. low priority because it is for localhost console only -->
     <v-card :class="consoleClass" v-show="showConsole">
       <v-footer absolute class="font-weight-medium" style="max-height: 300px; overflow-y: auto;">
         <v-col class cols="12">
@@ -45,8 +52,9 @@
         </v-col>
       </v-footer>
     </v-card>
-  </div>
+  </v-app>
 </template>
+
 
 <script>
 import Vue from "vue"
@@ -408,23 +416,14 @@ export default {
 .yeoman-ui *:focus {
   outline-color: transparent;
 }
+div.v-application .primary {
+  background-color: var(--vscode-editorCodeLens-foreground, #898989) !important;
+}
 html,
 body {
   height: 100%;
   background-color: var(--vscode-editor-background, #1e1e1e);
 }
-.list-group-item.selected {
-  background-color: var(--vscode-list-active-selection-background);
-}
-.form-control.yeoman-form-control {
-  color: var(--vscode-input-foreground, #cccccc);
-  background-color: var(--vscode-input-background, #3c3c3c);
-}
-.form-control:focus.yeoman-form-control:focus {
-  color: var(--vscode-input-foreground, #cccccc);
-  background-color: var(--vscode-input-background, #3c3c3c);
-}
-
 v-container {
   margin: 0px;
   padding: 0px;
@@ -432,24 +431,8 @@ v-container {
 v-row {
   margin: 0px;
 }
-div[class^="col-"],
-div[class*="col-"] {
-  padding-right: 5px;
-  padding-left: 5px;
-}
-button.btn,
-a.btn {
-  background-color: var(--vscode-button-background, #0e639c);
-  border-color: var(--vscode-button-background, #0e639c);
-  color: var(--vscode-button-foreground, white);
-  border-radius: 0.2rem;
-  font-size: 0.8rem;
-  padding: 0.2rem 0.6rem;
-}
-button.btn:hover,
-a.btn:hover {
-  background-color: var(--vscode-button-hoverBackground, #1177bb);
-  border-color: var(--vscode-button-hoverBackground, #1177bb);
+.theme--light {
+  color: var(--vscode-foreground, #cccccc) !important;
 }
 .loading {
   color: var(--vscode-foreground, white);
@@ -471,13 +454,62 @@ div.consoleClassVisible .v-footer {
   word-wrap: break-word;
   white-space: pre-wrap;
 }
-.navigation {
-  display: flex;
-  justify-content: flex-end;
-  padding: 10px;
+.left-col {
+  background-color: var(--vscode-menu-background, #252426);
+}
+.prompts-col {
+  overflow-y: scroll;
+  padding-right: 30px !important;
+}
+.main-row,
+.prompts-col {
+  height: calc(100% - 4rem);
+}
+.left-col,
+.right-col,
+.right-row,
+#step-component-div,
+#QuestionTypeSelector,
+#QuestionTypeSelector > .col,
+#QuestionTypeSelector > .col > div {
+  height: 100%;
+}
+.right-col {
+  padding: 0 !important;
+}
+.bottom-right-col {
+  background: var(--vscode-editorWidget-background, #252526);
+  position: relative;
+  overflow: hidden;
+}
+.bottom-right-col:before {
+  height: 100%;
+  width: 100%;
+  background-color: var(--vscode-editor-background, #1e1e1e);
+  position: absolute;
+  content: "";
+  transform: rotate(-60deg);
+  transform-origin: bottom left;
 }
 
-.navigaiton-row {
-  background-color: var(--vscode-menu-background, #252426);
+div.bottom-right-col 
+  .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
+  background-color: var(--vscode-button-background, #0e639c);
+  border-color: var(--vscode-button-background, #0e639c);
+  color: #cccccc !important;
+  border-radius: 0px;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.6rem;
+  width: 7rem;
+  height: 2rem;
+}
+div.bottom-right-col
+  .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined):hover {
+  background-color: var(--vscode-button-hoverBackground, #1177bb);
+  border-color: var(--vscode-button-hoverBackground, #1177bb);
+}
+div.bottom-right-col .progress-buttons-row  {
+  padding-right: 15px;
+  padding-top:4px;
 }
 </style>

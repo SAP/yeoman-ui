@@ -1,85 +1,71 @@
 <template>
-  <b-form-select
-    v-model="selected"
-    :options="options"
-    class="custom-yeoman-select"
-    aria-describedby="validation-message"
-  ></b-form-select>
+  <div id="question-list">
+    <p class="question-label">{{currentQuestion.message}}</p>
+    <v-select v-model="selected" :items="options" aria-describedby="validation-message" solo dense></v-select>
+  </div>
 </template>
 
 <script>
-import _ from "lodash"
+import _ from "lodash";
 
 export default {
   name: "QuestionList",
   data() {
     return {
       selected: null
-    }
+    };
   },
   computed: {
     options() {
-      const values = this.currentQuestion.choices
+      const values = this.currentQuestion.choices;
       if (_.isArray(values)) {
         return _.map(values, value => {
           if (_.has(value, "name") && !_.has(value, "text")) {
-            value.text = value.name
+            value.text = value.name;
           } else if (value.type === "separator") {
-            value.text = _.has(value, "line") ? value.line : "──────────────"
-            value.disabled = true
+            value.text = _.has(value, "line") ? value.line : "──────────────";
+            value.disabled = true;
           }
-          return value
-        })
+          return value;
+        });
       }
 
-      return []
+      return [];
     },
     default() {
-      const defaultValue = _.get(this.currentQuestion, "default", 0)
+      const defaultValue = _.get(this.currentQuestion, "default", 0);
       if (_.isNumber(defaultValue)) {
-        const choice = _.get(this.options, "[" + defaultValue + "]")
-        return _.get(choice, "value", _.get(choice, "name", choice))
+        const choice = _.get(this.options, "[" + defaultValue + "]");
+        return _.get(choice, "value", _.get(choice, "name", choice));
       } else if (_.isString(defaultValue)) {
-        return defaultValue
+        return defaultValue;
       }
-      return undefined
+      return undefined;
     }
   },
   watch: {
-    'default': {
+    default: {
       immediate: true,
       handler: function(defaultValue) {
-        this.selected = defaultValue
+        this.selected = defaultValue;
       }
     },
-    'selected': {
+    selected: {
       immediate: true,
       handler: function(selectedvalue) {
-        this.currentQuestion.answer = selectedvalue
+        this.currentQuestion.answer = selectedvalue;
       }
     }
   },
   props: {
     currentQuestion: Object
   }
-}
+};
 </script>
-
 <style scoped>
-.list-group {
-  margin-bottom: 15px;
-}
-.list-group-item:hover {
-  background: var(--vscode-list-hover-background);
-  cursor: pointer;
-}
-
-.selected {
-  background-color: var(--vscode-list-active-selection-background);
-}
-
-.custom-select.custom-yeoman-select {
-  color: var(--vscode-input-foreground, #cccccc);
-  background-color: var(--vscode-input-background, #3c3c3c);
+#question-list >>> div.v-input__slot {
+  color: var(--vscode-input-foreground, #cccccc) !important;
+  background-color: var(--vscode-input-background, #3c3c3c) !important;
+  border-radius: unset !important; 
 }
 </style>
