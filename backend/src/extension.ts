@@ -123,25 +123,28 @@ export class YeomanUIPanel {
 						const resolve = this.questionsResolutions.get(message.taskId);
 						resolve(message.data);
 						return;
+					case 'showDoneMessage':
+						let Close = 'Close';
+						let OpenWorkspace = 'Open Workspace';
+						this.theia.isInTheia().then((value) => {
+							let commandName_Close = "workbench.action.closeActiveEditor";
+							let commandName_OpenWorkspace = "vscode.openFolder";
+							let commandParam = _.get(message, "commandParams[0]");
+							vscode.window.showInformationMessage('Where would you like to open the project?', Close , OpenWorkspace)
+								.then(selection => {
+									if (selection === Close) {
+										this.executeCommand(commandName_Close, undefined);
+									} else if (selection === OpenWorkspace) {
+										this.executeCommand(commandName_OpenWorkspace, commandParam);
+									}
+								});
+						});
+						return;
 					case 'vscodecommand':
 						this.theia.isInTheia().then((value) => {
 							let commandName = _.get(message, "commandName");
 							let commandParam = _.get(message, "commandParams[0]");
-							if (commandName === "vscode.open" || commandName === "vscode.openFolder") {
-								commandParam = vscode.Uri.file(commandParam);
-							}
-							if (value) {
-								const commandMappings: Map<string, string> = this.theia.getCommandMappings()
-								const theiaCommand = commandMappings.get(commandName);
-								if (theiaCommand !== undefined) {
-									commandName = theiaCommand;
-								}
-							}
-							vscode.commands.executeCommand(commandName, commandParam).then(success => {
-								console.debug(`Execution of command ${commandName} returned ${success}`);
-							}, failure => {
-								console.debug(`Execution of command ${commandName} returned ${failure}`);
-							});
+							this.executeCommand(commandName, commandParam);
 							return;
 						});
 				}
@@ -149,6 +152,26 @@ export class YeomanUIPanel {
 			null,
 			this.disposables
 		);
+	}
+
+	private executeCommand(commandName: string, commandParam: any): Promise<any> {
+		return this.theia.isInTheia().then((value) => {
+			if (commandName === "vscode.open" || commandName === "vscode.openFolder") {
+				commandParam = vscode.Uri.file(commandParam);
+			}
+			if (value) {
+				const commandMappings: Map<string, string> = this.theia.getCommandMappings();
+				const theiaCommand = commandMappings.get(commandName);
+				if (theiaCommand !== undefined) {
+					commandName = theiaCommand;
+				}
+			}
+			return vscode.commands.executeCommand(commandName, commandParam).then(success => {
+				console.debug(`Execution of command ${commandName} returned ${success}`);
+			}, failure => {
+				console.debug(`Execution of command ${commandName} returned ${failure}`);
+			});
+		});
 	}
 
 	public dispose() {

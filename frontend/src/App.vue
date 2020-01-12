@@ -1,12 +1,13 @@
 <template>
   <v-app id="app" class="vld-parent">
     <loading
-      :active.sync="isLoading"
+      :active.sync="showBusyIndicator"
       :is-full-page="true"
-      :height="128"
-      :width="128"
+      :height="64"
+      :width="64"
       :color="isLoadingColor"
-      loader="dots"
+      background-color="transparent"
+      loader="spinner"
     ></loading>
 
     <Header
@@ -85,6 +86,7 @@ import * as _ from "lodash";
 
 const FUNCTION = "__Function";
 const LOADING = "loading...";
+const PENDING = "pending";
 
 export default {
   name: "app",
@@ -111,30 +113,27 @@ export default {
       logText: "",
       showConsole: false,
       messages: {},
+      showBusyIndicator: false,
       transitionToggle: false
     };
   },
   computed: {
-    isLoading() {
-      return (
-        !this.prompts.length ||
-        (this.currentPrompt.status === "pending" && !this.isDone)
-      );
-    },
     isLoadingColor() {
-      const propertyValue = getComputedStyle(
-        document.documentElement
-      ).getPropertyValue("--vscode-progressBar-background");
-      return propertyValue ? propertyValue : "#0e70c0";
+      return (
+        getComputedStyle(document.documentElement).getPropertyValue(
+          "--vscode-progressBar-background"
+        ) || "#0e70c0"
+      );
     },
     selectedGeneratorHeader() {
       return this.messages.selected_generator + this.generatorName;
     },
     currentPrompt() {
-      const prompt = _.get(this.prompts, "[" + this.promptIndex + "]");
-
-      const answers = _.get(prompt, "answers", {});
-      const questions = _.get(prompt, "questions", []);
+      return _.get(this.prompts, "[" + this.promptIndex + "]");
+    },
+    currentPromptAnswers() {
+      const answers = _.get(this.currentPrompt, "answers", {});
+      const questions = _.get(this.currentPrompt, "questions", []);
       for (const question of questions) {
         _.set(
           answers,
@@ -142,26 +141,77 @@ export default {
           question.isWhen === false ? undefined : question.answer
         );
       }
-      _.set(prompt, "answers", answers);
-
-      return prompt;
+      return answers;
+    },
+    clonedAnswers() {
+      return _.cloneDeep(this.currentPromptAnswers);
     }
   },
   watch: {
-    "currentPrompt.answers": {
+    prompts: {
+      handler() {
+        this.setBusyIndicator();
+      }
+    },
+    "currentPrompt.status": {
+      handler() {
+        this.setBusyIndicator();
+      }
+    },
+    isDone: {
+      handler() {
+        this.setBusyIndicator();
+      }
+    },
+    clonedAnswers: {
       deep: true,
-      immediate: true,
-      async handler(newAnswers) {
+      async handler(newAnswers, oldAnswers) {
         // TODO: consider using debounce (especially for questions of type 'input') to limit roundtrips
-        const questions = _.get(this, "currentPrompt.questions", []);
-        const that = this;
-        return questions.reduce((p, question) => {
-          return p.then(() => that.updateQuestion(question, newAnswers));
-        }, Promise.resolve()); // initial
+        if (!_.isEmpty(newAnswers)) {
+          const questions = _.get(this, "currentPrompt.questions", []);
+
+          const questionWithNewAnswer = _.find(questions, question => {
+            const oldAnswer = _.get(oldAnswers, [question.name]);
+            const newAnswer = _.get(newAnswers, [question.name]);
+            return !_.isEqual(newAnswer, oldAnswer);
+          });
+
+          let relevantQuestionsToUpdate = questions; // go esover all questions for the first time
+          if (questionWithNewAnswer) {
+            const indexOfQuestionWithNewAnswer = _.indexOf(
+              questions,
+              questionWithNewAnswer
+            );
+            relevantQuestionsToUpdate = questions.slice(
+              indexOfQuestionWithNewAnswer
+            );
+          }
+
+          let showBusy = true;
+          const that = this;
+          const finished = relevantQuestionsToUpdate.reduce((p, question) => {
+            return p.then(() => that.updateQuestion(question, newAnswers));
+          }, Promise.resolve()); // initial
+
+          setTimeout(() => {
+            if (showBusy) {
+              that.showBusyIndicator = true;
+            }
+          }, 1000);
+
+          await finished;
+          showBusy = false;
+          this.showBusyIndicator = false;
+        }
       }
     }
   },
   methods: {
+    setBusyIndicator() {
+      this.showBusyIndicator =
+        _.isEmpty(this.prompts) ||
+        (this.currentPrompt.status === PENDING && !this.isDone);
+    },
     async updateQuestion(question, newAnswers) {
       if (question.when === FUNCTION) {
         question.isWhen = await this.rpc.invoke("evaluateMethod", [
@@ -180,14 +230,14 @@ export default {
           ]);
         }
         if (question._default === FUNCTION) {
-          this.rpc
-            .invoke("evaluateMethod", [[newAnswers], question.name, "default"])
-            .then(response => {
-              question.default = response;
-              if (question.answer === undefined) {
-                question.answer = question.default;
-              }
-            });
+          question.default = await this.rpc.invoke("evaluateMethod", [
+            [newAnswers],
+            question.name,
+            "default"
+          ]);
+          if (question.answer === undefined) {
+            question.answer = question.default;
+          }
         }
         if (question._message === FUNCTION) {
           question.message = await this.rpc.invoke("evaluateMethod", [
@@ -217,26 +267,26 @@ export default {
       }
     },
     next() {
-        if (this.resolve) {
-          try {
-            this.resolve(this.currentPrompt.answers);
-          } catch (e) {
-            this.reject(e);
-            return;
-          }
+      if (this.resolve) {
+        try {
+          this.resolve(this.clonedAnswers);
+        } catch (e) {
+          this.reject(e);
+          return;
         }
-        if (this.promptIndex >= _.size(this.prompts) - 1) {
-          const prompt = {
-            questions: [],
-            name: this.messages.step_is_pending,
-            status: "pending"
-          };
-          this.setPrompts([prompt]);
-        }
-        this.promptIndex++;
-        this.prompts[this.promptIndex - 1].active = false;
-        this.prompts[this.promptIndex].active = true;
-        this.transitionToggle = !this.transitionToggle;
+      }
+      if (this.promptIndex >= _.size(this.prompts) - 1) {
+        const prompt = {
+          questions: [],
+          name: this.messages.step_is_pending,
+          status: PENDING
+        };
+        this.setPrompts([prompt]);
+      }
+      this.promptIndex++;
+      this.prompts[this.promptIndex - 1].active = false;
+      this.prompts[this.promptIndex].active = true;
+      this.transitionToggle = !this.transitionToggle;
     },
     onGeneratorSelected(generatorName) {
       this.generatorName = generatorName;
@@ -257,7 +307,7 @@ export default {
       if (prompts) {
         _.forEach(prompts, (prompt, index) => {
           if (index === 0) {
-            if (prompt.status === "pending") {
+            if (prompt.status === PENDING) {
               // new pending prompt
               this.prompts.push(prompt);
             } else {
@@ -341,13 +391,17 @@ export default {
     },
     generatorDone(success, message, targetPath) {
       if (this.currentPrompt.status === "pending") {
-        this.currentPrompt.name = "Confirmation";
+        this.currentPrompt.name = "Summary";
       }
       this.doneMessage = message;
       this.donePath = targetPath;
       this.isDone = true;
-      // TODO: remove return value once this change is published to npm: https://github.com/SAP/vscode-webview-rpc-lib/pull/5
-      return true;
+      if (this.isInVsCode()) {
+        window.vscode.postMessage({
+          command: "showDoneMessage",
+          commandParams: [this.donePath]
+        });
+      }
     },
     runGenerator(generatorName) {
       this.rpc.invoke("runGenerator", [generatorName]);
