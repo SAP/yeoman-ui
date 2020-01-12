@@ -124,29 +124,17 @@ export default {
   watch: {
     "prompts": {
       handler(promptsVal) {
-        if (_.isEmpty(promptsVal)) {
-          this.showBusyIndicator = true
-        } else {
-          this.showBusyIndicator = false
-        }
+        this.setBusyIndicator(_.isEmpty(promptsVal))
       }
     },
     "currentPrompt.status": {
       handler(statusVal) {
-        if (statusVal === PENDING && !this.isDone) {
-          this.showBusyIndicator = true
-        } else {
-          this.showBusyIndicator = false
-        }
+        this.setBusyIndicator(statusVal === PENDING && !this.isDone)
       }
     },
     "isDone": {
       handler(isDoneVal) {
-        if (this.currentPrompt.status === PENDING && !isDoneVal) {
-          this.showBusyIndicator = true
-        } else {
-          this.showBusyIndicator = false
-        }
+        this.setBusyIndicator(this.currentPrompt.status === PENDING && !isDoneVal)
       }
     },
     "clonedAnswers": {
@@ -188,6 +176,9 @@ export default {
     }
   },
   methods: {
+    setBusyIndicator(showBusyIndicator) {
+      this.showBusyIndicator = showBusyIndicator
+    },
     async updateQuestion(question, newAnswers) {
       if (question.when === FUNCTION) {
         question.isWhen = await this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "when"])
