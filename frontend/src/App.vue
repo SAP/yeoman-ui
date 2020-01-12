@@ -2,10 +2,11 @@
   <v-app id="app" class="vld-parent">
     <loading :active.sync="isLoading"
              :is-full-page="true"
-             :height="128"
-             :width="128"
+             :height="64"
+             :width="64"
              :color="isLoadingColor"
-             loader="dots">
+             background-color="transparent"
+             loader="spinner">
     </loading>
 
     <Header
@@ -295,8 +296,12 @@ export default {
       this.doneMessage = message;
       this.donePath = targetPath;
       this.isDone = true;
-      // TODO: remove return value once this change is published to npm: https://github.com/SAP/vscode-webview-rpc-lib/pull/5
-      return true;
+      if (this.isInVsCode()) {
+        window.vscode.postMessage({
+          command: "showDoneMessage",
+          commandParams: [this.donePath]
+        });
+      }
     },
     runGenerator(generatorName) {
       this.rpc.invoke("runGenerator", [generatorName]);

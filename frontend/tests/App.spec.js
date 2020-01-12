@@ -432,8 +432,13 @@ describe('App.vue', () => {
   })
 
   describe('generatorDone - method', () => {
+    window.vscode = {
+      postMessage: jest.fn()
+    }
+      
     test('status is not pending', () => {
-      wrapper = initComponent(App)
+      wrapper = initComponent(App, {donePath: 'testDonePath'})
+      wrapper.vm.isInVsCode = jest.fn().mockResolvedValue(true)
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.promptIndex = 1
 
@@ -442,10 +447,12 @@ describe('App.vue', () => {
       expect(wrapper.vm.doneMessage).toBe('testMessage')
       expect(wrapper.vm.donePath).toBe('/test/path')
       expect(wrapper.vm.isDone).toBeTruthy()
+      expect(window.vscode.postMessage).toHaveBeenCalled()
     })
 
     test('status is pending', () => {
-      wrapper = initComponent(App)
+      wrapper = initComponent(App, {donePath: 'testDonePath'})
+      wrapper.vm.isInVsCode = jest.fn().mockResolvedValue(true)
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.promptIndex = 1
       wrapper.vm.currentPrompt.status = 'pending'
@@ -456,6 +463,7 @@ describe('App.vue', () => {
       expect(wrapper.vm.donePath).toBe('/test/path')
       expect(wrapper.vm.isDone).toBeTruthy()
       expect(wrapper.vm.currentPrompt.name).toBe('Confirmation')
+      expect(window.vscode.postMessage).toHaveBeenCalled()
     })
   })
 
