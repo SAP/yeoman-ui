@@ -134,8 +134,7 @@ export class YeomanUIPanel {
 								.then(selection => {
 									if (selection === Close) {
 										this.executeCommand(commandName_Close, undefined);
-									}
-									if (selection === OpenWorkspace) {
+									} else if (selection === OpenWorkspace) {
 										this.executeCommand(commandName_OpenWorkspace, commandParam);
 									}
 								});
@@ -155,8 +154,8 @@ export class YeomanUIPanel {
 		);
 	}
 
-	private executeCommand(commandName: string, commandParam: any) {
-		this.theia.isInTheia().then((value) => {
+	private executeCommand(commandName: string, commandParam: any): Promise<any> {
+		return this.theia.isInTheia().then((value) => {
 			if (commandName === "vscode.open" || commandName === "vscode.openFolder") {
 				commandParam = vscode.Uri.file(commandParam);
 			}
@@ -167,7 +166,7 @@ export class YeomanUIPanel {
 					commandName = theiaCommand;
 				}
 			}
-			vscode.commands.executeCommand(commandName, commandParam).then(success => {
+			return vscode.commands.executeCommand(commandName, commandParam).then(success => {
 				console.debug(`Execution of command ${commandName} returned ${success}`);
 			}, failure => {
 				console.debug(`Execution of command ${commandName} returned ${failure}`);
