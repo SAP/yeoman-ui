@@ -332,7 +332,7 @@ export default {
     },
     generatorDone(success, message, targetPath) {
       if (this.currentPrompt.status === "pending") {
-        this.currentPrompt.name = "Confirmation";
+        this.currentPrompt.name = "Summary";
       }
       this.doneMessage = message;
       this.donePath = targetPath;
