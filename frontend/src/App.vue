@@ -2,10 +2,10 @@
   <v-app id="app" class="vld-parent">
     <loading :active.sync="isLoading"
              :is-full-page="true"
-             :height="128"
-             :width="128"
+             :height="64"
+             :width="64"
              :color="isLoadingColor"
-             loader="dots">
+             loader="spinner">
     </loading>
 
     <Header
@@ -295,10 +295,12 @@ export default {
       this.doneMessage = message;
       this.donePath = targetPath;
       this.isDone = true;
-      window.vscode.postMessage({
-        command: "showDoneMessage",
-        commandParams: [this.donePath]
-      });
+      if (this.isInVsCode()) {
+        window.vscode.postMessage({
+          command: "showDoneMessage",
+          commandParams: [this.donePath]
+        });
+      }
     },
     runGenerator(generatorName) {
       this.rpc.invoke("runGenerator", [generatorName]);
