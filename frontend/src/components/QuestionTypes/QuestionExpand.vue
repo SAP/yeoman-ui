@@ -3,8 +3,6 @@
     <p class="question-label">{{currentQuestion.message}}</p>
     <v-btn-toggle
       dense
-      :error="!currentQuestion.isValid"
-      :error-messages="isValid"
       tile
       color="deep-purple accent-3"
     >
@@ -48,5 +46,8 @@ div.v-btn-toggle:not(.v-btn-toggle--group) .v-btn.v-btn.v-item--active {
 .error--text{
   font-size: 12px;
   padding-left: 12px;
+}
+.v-btn-toggle {
+  flex-direction: column;
 }
 </style>
