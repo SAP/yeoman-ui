@@ -18,9 +18,6 @@ describe('QuestionList.vue', () => {
                         { name: 'testName2' }
                     ],
                     default: 1
-                },
-                isAnswerValid() {
-                    return '';
                 }
             })
             
@@ -35,9 +32,6 @@ describe('QuestionList.vue', () => {
                         { name: 'testName2' }
                     ],
                     default: 'testName1'
-                },
-                isAnswerValid() {
-                    return '';
                 }
             })
             
@@ -52,9 +46,6 @@ describe('QuestionList.vue', () => {
                         { name: 'testName2' }
                     ],
                     default: true
-                },
-                isAnswerValid() {
-                    return '';
                 }
             })
             
@@ -68,9 +59,6 @@ describe('QuestionList.vue', () => {
                         { name: 'testName1' },
                         { name: 'testName2' }
                     ]
-                },
-                isAnswerValid() {
-                    return '';
                 }
             })
             
@@ -81,9 +69,6 @@ describe('QuestionList.vue', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: ['testName1', 'testName2']
-                },
-                isAnswerValid() {
-                    return '';
                 }
             })
             
@@ -98,9 +83,6 @@ describe('QuestionList.vue', () => {
                         { name: 'testName2' }
                     ],
                     default: 1
-                },
-                isAnswerValid() {
-                    return '';
                 }
             })
             expect(wrapper.vm.default).toBe('testName2')
@@ -117,9 +99,6 @@ describe('QuestionList.vue', () => {
                         { name: 'testName2', value: 't2' }
                     ],
                     default: 1
-                },
-                isAnswerValid() {
-                    return '';
                 }
             })
             
@@ -132,9 +111,6 @@ describe('QuestionList.vue', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     name: 'testName1', checked: true, text: 'testText1'
-                },
-                isAnswerValid() {
-                    return '';
                 }
             })
             
@@ -151,9 +127,6 @@ describe('QuestionList.vue', () => {
                         { name: 'testName3', type: 'string' },
                         { name: 'testName4', type: 'separator', text: 'testText4', disabled: false },
                     ]
-                },
-                isAnswerValid() {
-                    return '';
                 }
             })
 

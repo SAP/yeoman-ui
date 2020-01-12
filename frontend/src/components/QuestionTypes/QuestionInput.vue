@@ -9,7 +9,7 @@
       aria-describedby="validation-message"
       solo
       dense
-      :error-messages="isValid"
+      :error-messages="currentQuestion.isValid ? '' : currentQuestion.validationMessage"
     ></v-text-field>
   </div>
 </template>
@@ -20,8 +20,7 @@ import _ from "lodash";
 export default {
   name: "QuestionInput",
   props: {
-    currentQuestion: Object,
-    isAnswerValid: Function
+    currentQuestion: Object
   },
 
   data() {
@@ -38,9 +37,6 @@ export default {
       // const questionType = _.get(this.currentQuestion, "type")
       const type = this.currentQuestion.type;
       return type === "input" ? "text" : type;
-    },
-    isValid() {
-      return this.isAnswerValid(this.currentQuestion)
     }
   },
   watch: {
@@ -61,5 +57,8 @@ export default {
 }
 #question-input >>> div.v-input__slot .v-select__selection {
   color: var(--vscode-input-foreground, #cccccc) !important;
+}
+.theme--light.v-input:not(.v-input--is-disabled) >>> input{
+  color: var(--vscode-input-foreground, #cccccc);
 }
 </style>

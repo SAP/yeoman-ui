@@ -2,7 +2,7 @@
   <div id="question-list">
     <p class="question-label">{{currentQuestion.message}}</p>
     <v-select
-      :error-messages="isValid"
+      :error-messages="currentQuestion.isValid ? '' : currentQuestion.validationMessage"
       v-model="selected"
       :items="options"
       aria-describedby="validation-message"
@@ -49,9 +49,6 @@ export default {
         return defaultValue;
       }
       return undefined;
-    },
-    isValid() {
-      return this.isAnswerValid(this.currentQuestion);
     }
   },
   watch: {
@@ -69,8 +66,7 @@ export default {
     }
   },
   props: {
-    currentQuestion: Object,
-    isAnswerValid: Function
+    currentQuestion: Object
   }
 };
 </script>
@@ -80,4 +76,5 @@ export default {
   background-color: var(--vscode-input-background, #3c3c3c) !important;
   border-radius: unset;
 }
+
 </style>

@@ -15,11 +15,13 @@ body {
 .v-card .v-image__image--cover {
     background-size: contain;
 }
-.v-application button.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined){
+div.v-application button.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined){
   background-color: var(--vscode-button-background, #0e639c);
   border-color: var(--vscode-button-background, #0e639c);
-  color: #ffffff !important;
   border-radius: 0px;
+}
+div.v-application button.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) .v-btn__content{
+  color: var(--vscode-button-foreground, #ffffff);
 }
 .v-application button.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined):hover {
   background-color: var(--vscode-button-hoverBackground, #1177bb);
@@ -29,40 +31,38 @@ body {
 .v-btn {
   text-transform: none;
 }
-
-div.v-application .primary {
-  background-color: var(--vscode-editorCodeLens-foreground, #898989) !important;
-}
 .theme--light {
   color: var(--vscode-foreground, #cccccc) !important;
 }
-
 p.question-label{
   margin-bottom: 0.25rem ;
 }
 
-div.v-input__slot .v-select__selection{
-  color: var(--vscode-input-foreground, #cccccc) ;
+div.v-input__slot .v-select__selection,
+.v-input div label.v-label{
+  color: var(--vscode-input-foreground, #cccccc);
 }
 div.v-select-list div.v-list{
-  background-color: var(--vscode-input-background, #3c3c3c) !important;
+  background-color: var(--vscode-input-background, #3c3c3c);
 }
+
+/* Have to be important since vuetify itself define this color important */
 div.v-select-list div.v-list div.v-list-item,
 div.v-select-list div.v-list div.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled)
 {
   color: var(--vscode-input-foreground, #cccccc) !important;
 }
-div.v-input__slot input, div.v-input__slot textarea {
-  color: var(--vscode-input-foreground, #cccccc) !important;
+
+.v-textarea.v-input:not(.v-input--is-disabled) input{
+  color: var(--vscode-input-foreground, #cccccc);
 }
-.v-input--has-state.error--text .v-label,
-.v-input--selection-controls__ripple .error--text{
-  color: var(--vscode-input-foreground, #cccccc) !important;
-}
+
 /* Override error state colors on input components  */
 div.v-messages__message {
-  color: #ff5252 !important;
+  color: #ff5252;
 }
+/* Have to be important since vuetify itself define this color important */
+/* prevent controls from being red when thet're in error stare */
 div.v-application .error--text {
   color: var(--vscode-input-foreground, #cccccc) !important;
   caret-color: var(--vscode-input-foreground, #cccccc) !important;

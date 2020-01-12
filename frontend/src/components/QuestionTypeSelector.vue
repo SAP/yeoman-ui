@@ -10,38 +10,31 @@
             <QuestionInput
               v-if="!currentQuestion.type || currentQuestion.type==='input' || currentQuestion.type==='password' || currentQuestion.type==='number'"
               :currentQuestion="currentQuestion"
-              :isAnswerValid="isValid"
             />
 
             <QuestionEditor
               v-if="currentQuestion.type==='editor'"
               :currentQuestion="currentQuestion"
-                            :isAnswerValid="isValid"
             />
 
             <QuestionList
               v-if="currentQuestion.type==='list' || currentQuestion.type==='rawlist'"
               :currentQuestion="currentQuestion"
-                            :isAnswerValid="isValid"
             />
 
             <QuestionConfirm
               v-if="currentQuestion.type==='confirm'"
               :currentQuestion="currentQuestion"
-                            :isAnswerValid="isValid"
             />
 
             <QuestionCheckbox
               v-if="currentQuestion.type==='checkbox'"
               :currentQuestion="currentQuestion"
-                            :isAnswerValid="isValid"
             />
 
             <QuestionExpand
               v-if="currentQuestion.type==='expand'"
               :currentQuestion="currentQuestion"
-                            :isAnswerValid="isValid"
-
             />
           </div>
         </div>
@@ -84,11 +77,6 @@ export default {
   methods: {
     onGeneratorSelected(generatorName) {
       this.$emit("generatorSelected", generatorName);
-    },
-    isValid(currentQuestion) {
-      return currentQuestion.isValid 
-        ? ""
-        : currentQuestion.validationMessage;
     }
   }
 };

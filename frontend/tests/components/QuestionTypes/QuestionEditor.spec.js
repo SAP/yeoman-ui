@@ -14,9 +14,6 @@ describe('QuestionEditor.vue', () => {
             wrapper = initComponent(QuestionEditor, {
                 currentQuestion: {
                     default: 'testDefault', answer: 'testAnswer'
-                },
-                isAnswerValid() {
-                    return '';
                 }
             })
             
@@ -29,9 +26,6 @@ describe('QuestionEditor.vue', () => {
             wrapper = initComponent(QuestionEditor, {
                 currentQuestion: {
                     default: 'testDefault', answer: 'testAnswer'
-                },
-                isAnswerValid() {
-                    return '';
                 }
             })
             

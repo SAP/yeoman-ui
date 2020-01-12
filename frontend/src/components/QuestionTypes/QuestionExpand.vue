@@ -22,8 +22,7 @@
 export default {
   name: "QuestionExpand",
   props: {
-    currentQuestion: Object,
-    isAnswerValid: Function
+    currentQuestion: Object
   },
   methods: {
     onClick(answer) {

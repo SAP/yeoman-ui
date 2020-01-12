@@ -2,8 +2,8 @@
   <div>
     <p class="question-label">{{currentQuestion.message}}</p>
       <div v-for="(option,index) in options" :key="options[index].text">
-        <v-checkbox 
-      :error-messages="isValid" :hide-details="index !== (options.length - 1)" dense :label="option.text || option" v-model="option.selected"></v-checkbox>
+        <v-checkbox  
+      :error-messages="currentQuestion.isValid ? '' : currentQuestion.validationMessage" :hide-details="index !== (options.length - 1)" dense :label="option.text || option" v-model="option.selected"></v-checkbox>
       </div>
   </div>
 </template>
@@ -26,14 +26,10 @@ export default {
       }
 
       return [];
-    },
-    isValid() {
-         return this.isAnswerValid(this.currentQuestion)
     }
   },
   props: {
-    currentQuestion: Object,
-    isAnswerValid: Function
+    currentQuestion: Object
   },
   data() {
     const selected = _.compact(
