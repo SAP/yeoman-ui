@@ -55,3 +55,15 @@ div.v-select-list div.v-list div.v-list-item:not(.v-list-item--active):not(.v-li
 div.v-input__slot input, div.v-input__slot textarea {
   color: var(--vscode-input-foreground, #cccccc) !important;
 }
+.v-input--has-state.error--text .v-label,
+.v-input--selection-controls__ripple .error--text{
+  color: #ffffff !important;
+}
+/* Override error state colors on input components  */
+div.v-messages__message {
+  color: #ff5252 !important;
+}
+div.v-application .error--text {
+  color: var(--vscode-input-foreground, #cccccc) !important;
+  caret-color: var(--vscode-input-foreground, #cccccc) !important;
+}

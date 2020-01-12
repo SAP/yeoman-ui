@@ -5,6 +5,7 @@
       <v-radio label="Yes" :value="true"></v-radio>
       <v-radio label="No" :value="false"></v-radio>
     </v-radio-group>
+    
   </div>
 </template>
 

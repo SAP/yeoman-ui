@@ -86,9 +86,7 @@ export default {
       this.$emit("generatorSelected", generatorName);
     },
     isValid(currentQuestion) {
-      return currentQuestion.isValid ||
-        currentQuestion.answer === undefined ||
-        currentQuestion.answer === ""
+      return currentQuestion.isValid 
         ? ""
         : currentQuestion.validationMessage;
     }

@@ -14,7 +14,7 @@
         <span class="hidden-sm-and-down">{{ choice.name }}</span>
       </v-btn>
     </v-btn-toggle>
-    <div v-if="!currentQuestion.isValid" class="error--text">{{currentQuestion.validationMessage}}</div>
+    <div v-if="!currentQuestion.isValid" class="error-validation-text">{{currentQuestion.validationMessage}}</div>
   </div>
 </template>
 
@@ -43,9 +43,10 @@ div.v-btn-toggle:not(.v-btn-toggle--group) .v-btn.v-btn:not(.v-item--active) {
 div.v-btn-toggle:not(.v-btn-toggle--group) .v-btn.v-btn.v-item--active {
   background-color: var(--vscode-button-background, #1976d2);
 }
-.error--text{
+.error-validation-text{
   font-size: 12px;
   padding-left: 12px;
+  color: #ff5252;
 }
 .v-btn-toggle {
   flex-direction: column;

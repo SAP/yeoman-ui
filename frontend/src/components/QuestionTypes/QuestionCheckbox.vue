@@ -3,7 +3,7 @@
     <p class="question-label">{{currentQuestion.message}}</p>
       <div v-for="(option,index) in options" :key="options[index].text">
         <v-checkbox 
-      :error-messages="isValid" dense :label="option.text || option" v-model="option.selected"></v-checkbox>
+      :error-messages="isValid" :hide-details="index !== (options.length - 1)" dense :label="option.text || option" v-model="option.selected"></v-checkbox>
       </div>
   </div>
 </template>
