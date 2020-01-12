@@ -6,7 +6,7 @@
           style="height: 100%;"
         >
     <v-col align-self="center" class="done-column" cols="10">
-    <p class="done-message"><v-icon  color="success" size="40">mdi-checkbox-marked-circle-outline</v-icon> {{doneMessage}}</p>
+    <p class="done-message"><v-icon  color="success" size="30">mdi-checkbox-marked-circle-outline</v-icon> {{doneMessage}}</p>
     </v-col>
       </v-row>
   </div>
@@ -29,7 +29,7 @@ export default {
 
 <style>
 .done-message{
-  font-size: 1.5rem;
+  font-size: 1.25rem;
 }
 .done-column{
     background-color: var(--vscode-editorWidget-background, #252526);

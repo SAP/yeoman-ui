@@ -57,7 +57,7 @@ div.v-input__slot input, div.v-input__slot textarea {
 }
 .v-input--has-state.error--text .v-label,
 .v-input--selection-controls__ripple .error--text{
-  color: #ffffff !important;
+  color: var(--vscode-input-foreground, #cccccc) !important;
 }
 /* Override error state colors on input components  */
 div.v-messages__message {
