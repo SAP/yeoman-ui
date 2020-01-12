@@ -5,6 +5,7 @@
              :height="64"
              :width="64"
              :color="isLoadingColor"
+             background-color="transparent"
              loader="spinner">
     </loading>
 
