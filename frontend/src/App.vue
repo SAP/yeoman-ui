@@ -124,18 +124,18 @@ export default {
   },
   watch: {
     "prompts": {
-      handler(promptsVal) {
-        this.setBusyIndicator(_.isEmpty(promptsVal))
+      handler() {
+        this.setBusyIndicator()
       }
     },
     "currentPrompt.status": {
-      handler(statusVal) {
-        this.setBusyIndicator(statusVal === PENDING && !this.isDone)
+      handler() {
+        this.setBusyIndicator()
       }
     },
     "isDone": {
-      handler(isDoneVal) {
-        this.setBusyIndicator(this.currentPrompt.status === PENDING && !isDoneVal)
+      handler() {
+        this.setBusyIndicator()
       }
     },
     "clonedAnswers": {
@@ -177,8 +177,8 @@ export default {
     }
   },
   methods: {
-    setBusyIndicator(showBusyIndicator) {
-      this.showBusyIndicator = showBusyIndicator
+    setBusyIndicator() {
+      this.showBusyIndicator = _.isEmpty(this.prompts) || (this.currentPrompt.status === PENDING && !this.isDone);
     },
     async updateQuestion(question, newAnswers) {
       if (question.when === FUNCTION) {

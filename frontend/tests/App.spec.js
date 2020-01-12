@@ -463,24 +463,31 @@ describe('App.vue', () => {
       expect(wrapper.vm.currentPrompt.name).toBe('Confirmation')
       expect(window.vscode.postMessage).toHaveBeenCalled()
     })
+  })
 
-    test('isDone is true - watch', () => {
+  describe('setBusyIndicator - method', () => {
+    it('prompts is empty', () => {
       wrapper = initComponent(App)
-      wrapper.vm.prompts = [{}, {}]
-      wrapper.vm.promptIndex = 1
-      wrapper.vm.isDone = true
-      wrapper.vm.currentPrompt.status = 'pending'
-      wrapper.vm.$options.watch["isDone"].handler.call(wrapper.vm)
+      wrapper.vm.prompts = []
+      wrapper.vm.setBusyIndicator()
       expect(wrapper.vm.showBusyIndicator).toBeTruthy()
     })
 
-    test('isDone is false - watch', () => {
+    it('isDone is false, status is pending, prompts is not empty', () => {
       wrapper = initComponent(App)
       wrapper.vm.prompts = [{}, {}]
-      wrapper.vm.promptIndex = 1
       wrapper.vm.isDone = false
-      wrapper.vm.currentPrompt.status = 'not pending'
-      wrapper.vm.$options.watch["isDone"].handler.call(wrapper.vm)
+      wrapper.vm.currentPrompt.status = 'pending'
+      wrapper.vm.setBusyIndicator()
+      expect(wrapper.vm.showBusyIndicator).toBeTruthy()
+    })
+
+    it('isDone is true, status is pending, prompts is not empty', () => {
+      wrapper = initComponent(App)
+      wrapper.vm.prompts = [{}, {}]
+      wrapper.vm.isDone = true
+      wrapper.vm.currentPrompt.status = 'pending'
+      wrapper.vm.setBusyIndicator()
       expect(wrapper.vm.showBusyIndicator).toBeFalsy()
     })
   })
@@ -493,6 +500,5 @@ describe('App.vue', () => {
       wrapper.vm.toggleConsole()
       expect(wrapper.vm.showConsole).toBeFalsy()
     })
-
   })
 })
