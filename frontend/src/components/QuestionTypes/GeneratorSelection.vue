@@ -8,6 +8,8 @@
             :key="itemIndex"
             cols="12"
             md="4"
+            sm="6"
+          
           >
             <v-item v-slot:default="{ active, toggle }">
               <v-card

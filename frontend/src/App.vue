@@ -21,7 +21,7 @@
       <v-col class="left-col ma-0 pa-0" cols="3">
         <Navigation v-if="prompts.length" :promptIndex="promptIndex" :prompts="prompts" />
       </v-col>
-      <v-col class="right-col">
+      <v-col cols="9" class="right-col">
         <v-col class="prompts-col" cols="12">
           <Done
             v-if="isDone"
