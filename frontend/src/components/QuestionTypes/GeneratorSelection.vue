@@ -22,7 +22,6 @@
                 hover
                 flat
                 dark
-               raised
               >
                 <v-card-title>{{item.prettyName}}</v-card-title>
                 <v-card-text>
