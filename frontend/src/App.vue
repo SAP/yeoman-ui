@@ -35,7 +35,7 @@
             :currentPrompt="currentPrompt"
             @generatorSelected="onGeneratorSelected"
             @stepvalidated="onStepValidated"
-            @changedQuestionIndex="onChangedQuestionIndex"
+            @changedQuestionIndex="updateQuestionsFromIndex"
           />
         </v-col>
           <v-col v-if="prompts.length > 0 && !isDone" class="bottom-right-col" style="height: 4rem;" offset-lg="9" lg="3">
@@ -109,15 +109,16 @@ export default {
       return this.messages.selected_generator + this.generatorName;
     },
     currentPrompt() {
-      return _.get(this.prompts, "[" + this.promptIndex +"]")
-    },
-    currentPromptAnswers() {
-      const answers = _.get(this.currentPrompt, "answers", {})
-      const questions = _.get(this.currentPrompt, "questions", [])
-      for(const question of questions) {
+      const prompt = _.get(this.prompts, "[" + this.promptIndex +"]")
+      
+      const answers = _.get(prompt, "answers", {})
+      const questions = _.get(prompt, "questions", [])
+      _.forEach(questions, question => {
         _.set(answers, [question.name], (question.isWhen === false ? undefined : question.answer))
-      }
-      return answers
+      })
+      _.set(prompt, "answers", answers)
+      
+      return prompt
     }
   },
   watch: {
@@ -138,9 +139,9 @@ export default {
     }
   },
   methods: {
-    async onChangedQuestionIndex(questionIndex) {
+    async updateQuestionsFromIndex(questionIndex) {
       const questions = _.get(this, "currentPrompt.questions", []);
-      const relevantQuestionsToUpdate = questions.slice(questionIndex)
+      const relevantQuestionsToUpdate = _.slice(questions, questionIndex)
       
       let showBusy = true
       const that = this
@@ -162,7 +163,7 @@ export default {
       this.showBusyIndicator = _.isEmpty(this.prompts) || (this.currentPrompt.status === PENDING && !this.isDone);
     },
     async updateQuestion(question) {
-      const newAnswers = this.currentPromptAnswers
+      const newAnswers = this.currentPrompt.answers
       if (question.when === FUNCTION) {
         question.isWhen = await this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "when"])
       }
@@ -193,7 +194,7 @@ export default {
     next() {
       if (this.resolve) {
         try {
-          this.resolve(this.currentPromptAnswers);
+          this.resolve(this.currentPrompt.answers);
         } catch (e) {
           this.reject(e);
           return;
@@ -236,13 +237,13 @@ export default {
             } else {
               if (currentPrompt) {
                 currentPrompt.questions = prompt.questions;
-                if (prompt.name && currentPrompt.name === this.messages.step_is_pending
-                ) {
+                if (prompt.name && currentPrompt.name === this.messages.step_is_pending) {
                   currentPrompt.name = prompt.name;
                 }
                 // if questions are provided, remote the pending status
                 if (prompt.questions.length > 0) {
                   delete currentPrompt.status;
+                  currentPrompt.status = ''
                 }
               } else {
                 // first prompt (Select Generator)
@@ -254,8 +255,8 @@ export default {
             // multiple prompts provided -- simply add them
             this.prompts.push(prompt)
           }
-        });
-        this.setBusyIndicator()
+        })
+        this.updateQuestionsFromIndex(0)
       }
     },
     setQuestionProps(prompt) {
@@ -270,13 +271,13 @@ export default {
           this.$set(question, "_message", FUNCTION);
         }
         if (question.choices === FUNCTION) {
-          question.choices = [LOADING];
-          this.$set(question, "_choices", FUNCTION);
+          question.choices = [LOADING]
+          this.$set(question, "_choices", FUNCTION)
         }
 
         let answer = question.default;
         if (question.default === undefined && question.type !== "confirm") {
-          answer = "";
+          answer = ""
         }
         this.$set(question, "answer", answer)
         this.$set(question, "isValid", true)
@@ -285,27 +286,25 @@ export default {
         this.$set(question, "isWhen", question.when !== FUNCTION)
       }
     },
-    showPrompt(questions, name) {
-      const prompt = this.createPrompt(questions, name);
+    async showPrompt(questions, name) {
+      const prompt = this.createPrompt(questions, name)
       // evaluate message property on server if it is a function
       this.setPrompts([prompt]);
-      const promise = new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
         this.resolve = resolve;
         this.reject = reject;
       });
-      return promise;
     },
     createPrompt(questions, name) {
-      name =
-        name === "select_generator" ? this.messages.select_generator : name;
+      name = (name === "select_generator" ? this.messages.select_generator : name)
       const prompt = Vue.observable({
         questions: questions,
         name: name,
         answers: {},
         active: true
-      });
-      this.setQuestionProps(prompt);
-      return prompt;
+      })
+      this.setQuestionProps(prompt)
+      return prompt
     },
     log(log) {
       this.logText += log;
