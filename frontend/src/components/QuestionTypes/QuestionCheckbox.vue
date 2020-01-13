@@ -3,6 +3,9 @@
     <p class="question-label">{{currentQuestion.message}}</p>
         <div v-for="(option,index) in options" :key="options[index].text">
           <v-checkbox
+          dense
+            :error-messages="currentQuestion.isValid ? '' : currentQuestion.validationMessage"
+            :hide-details="currentQuestion.isValid && index !== options.length - 1"
             v-model="selected"
             :value="option.value || option"
             :label="option.text || option"

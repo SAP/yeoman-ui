@@ -22,7 +22,7 @@
                 hover
                 flat
                 dark
-                raised
+               raised
               >
                 <v-card-title>{{item.prettyName}}</v-card-title>
                 <v-card-text>
@@ -93,7 +93,7 @@ export default {
   background-color: var(--vscode-list-hoverBackground,#2a2d2e) ;
 }
 .v-card__title {
-  color: var(--vscode-editor-foreground, #d4d4d4);
+  color: var(--vscode-foreground, #cccccc);
 }
 .v-card > div.v-card__text {
   color: var(--vscode-editorCodeLens-foreground, #999999);

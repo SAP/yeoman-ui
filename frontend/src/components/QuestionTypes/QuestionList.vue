@@ -8,6 +8,7 @@
       aria-describedby="validation-message"
       solo
       dense
+
     ></v-select>
   </div>
 </template>
@@ -75,6 +76,7 @@ export default {
   color: var(--vscode-input-foreground, #cccccc) !important;
   background-color: var(--vscode-input-background, #3c3c3c) !important;
   border-radius: unset;
+  box-shadow: 0px 0px 1px -2px rgba(0, 0, 0, 0.2), 0px 0px 2px 0px rgba(0, 0, 0, 0.14), 0px 0px 5px 0px rgba(0, 0, 0, 0.12);
 }
 
 </style>
