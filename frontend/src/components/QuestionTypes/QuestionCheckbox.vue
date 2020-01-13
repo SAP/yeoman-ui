@@ -3,9 +3,8 @@
     <p class="question-label">{{currentQuestion.message}}</p>
         <div v-for="(option,index) in options" :key="options[index].text">
           <v-checkbox
-            :key="options[index].text"
             v-model="selected"
-            :value="option.value"
+            :value="option.value || option"
             :label="option.text || option"
           ></v-checkbox>
         </div>
