@@ -286,14 +286,15 @@ export default {
         this.$set(question, "isWhen", question.when !== FUNCTION)
       }
     },
-    async showPrompt(questions, name) {
-      const prompt = this.createPrompt(questions, name)
+    showPrompt(questions, name) {
+      const prompt = this.createPrompt(questions, name);
       // evaluate message property on server if it is a function
       this.setPrompts([prompt]);
-      return new Promise((resolve, reject) => {
+      const promise =  new Promise((resolve, reject) => {
         this.resolve = resolve;
         this.reject = reject;
       });
+      return promise;
     },
     createPrompt(questions, name) {
       name = (name === "select_generator" ? this.messages.select_generator : name)
@@ -303,8 +304,8 @@ export default {
         answers: {},
         active: true
       })
-      this.setQuestionProps(prompt)
-      return prompt
+      this.setQuestionProps(prompt);
+      return prompt;
     },
     log(log) {
       this.logText += log;
@@ -337,7 +338,7 @@ export default {
         this.rpc = new RpcBrowser(window, window.vscode);
         this.initRpc();
       } else {
-        const ws = new WebSocket("ws://127.0.0.1:8081");
+        const ws = new WebSocket("ws://127.0.0.1:8081")
         ws.onopen = () => {
           this.rpc = new RpcBrowserWebSockets(ws);
           this.initRpc();
