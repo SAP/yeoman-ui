@@ -90,6 +90,7 @@ export default {
 }
 .v-card.selected {
   border: 1px solid var(--vscode-button-background, #0e639c);
+  background-color: var(--vscode-list-hoverBackground,#2a2d2e) ;
 }
 .v-card__title {
   color: var(--vscode-editor-foreground, #d4d4d4);

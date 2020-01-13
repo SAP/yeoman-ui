@@ -1,10 +1,14 @@
 <template>
   <div>
     <p class="question-label">{{currentQuestion.message}}</p>
-      <div v-for="(option,index) in options" :key="options[index].text">
-        <v-checkbox  
-      :error-messages="currentQuestion.isValid ? '' : currentQuestion.validationMessage" :hide-details="index !== (options.length - 1)" dense :label="option.text || option" v-model="option.selected"></v-checkbox>
-      </div>
+        <div v-for="(option,index) in options" :key="options[index].text">
+          <v-checkbox
+            :key="options[index].text"
+            v-model="selected"
+            :value="option.value"
+            :label="option.text || option"
+          ></v-checkbox>
+        </div>
   </div>
 </template>
 
@@ -57,10 +61,10 @@ export default {
 </script>
 
 <style scoped>
-div.v-input--checkbox{
+div.v-input--checkbox {
   margin-top: 0;
 }
-div.v-input--checkbox >>> div.v-input__slot{
+div.v-input--checkbox >>> div.v-input__slot {
   margin-bottom: 0;
   align-items: flex-start;
 }
