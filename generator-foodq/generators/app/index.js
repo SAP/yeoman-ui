@@ -2,6 +2,7 @@ var Generator = require('yeoman-generator');
 var chalkPipe = require('chalk-pipe');
 var Inquirer = require('inquirer');
 var path = require('path');
+var _ = require('lodash');
 
 module.exports = class extends Generator {
   constructor(args, opts) {
@@ -63,13 +64,14 @@ module.exports = class extends Generator {
       {
         when: async (response) => {
           this.log(response.hungry);
+          const that = this;
           const promise = new Promise((resolve, reject) => {
-            this.log(`Purposely delaying response for 2 seconds...`);
+            that.log(`Purposely delaying response for 2 seconds...`);
             setTimeout(() => {
               resolve(response.hungry);
             }, 2000);
           });
-          return promise;
+          return await promise;
         },
         type: "checkbox",
         name: "beers",
@@ -261,14 +263,12 @@ module.exports = class extends Generator {
 
   writing() {
     this.log('in writing');
-    this.destinationRoot(path.join(this.destinationRoot(), this.answers.food));
+    this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "answers.food", "")));
     this.log('destinationRoot: ' + this.destinationRoot());
-    this.fs.copyTpl(
-      this.templatePath('index.html'),
-      this.destinationPath('public/index.html'),
-      {
+    this.fs.copyTpl(this.templatePath('index.html'),
+    this.destinationPath('public/index.html'), {
         title: 'Templating with Yeoman',
-        food: this.answers.food,
+        food: _.get(this, "answers.food", ""),
         hungerLevel: this.answers.hungerLevel,
         fav_color: this.answers.fav_color
       }
