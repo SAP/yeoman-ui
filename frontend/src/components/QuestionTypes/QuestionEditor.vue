@@ -7,6 +7,7 @@
     :placeholder="currentQuestion.default"
     class="yeoman-form-control"
     aria-describedby="validation-message"
+      :error-messages="currentQuestion.isValid ? '' : currentQuestion.validationMessage"
         ></v-textarea>
 </div>
 </template>
@@ -36,11 +37,10 @@ export default {
 </script>
 <style scoped>
 #question-editor >>> div.v-input__slot {
-  color: var(--vscode-input-foreground, #cccccc) !important;
-  background-color: var(--vscode-input-background, #3c3c3c) !important;
-  border-radius: unset !important; 
+  background-color: var(--vscode-input-background, #3c3c3c);
+  border-radius: unset; 
 }
-#question-editor >>> div.v-input__slot input, div.v-input__slot textarea {
-  color: var(--vscode-input-foreground, #cccccc) !important;
+ .v-textarea.v-input:not(.v-input--is-disabled) >>> textarea{
+  color: var(--vscode-input-foreground, #cccccc);
 }
 </style>

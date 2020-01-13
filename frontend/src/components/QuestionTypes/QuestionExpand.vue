@@ -1,7 +1,11 @@
 <template>
   <div id="question-expand">
     <p class="question-label">{{currentQuestion.message}}</p>
-    <v-btn-toggle v-model="icon" tile color="deep-purple accent-3">
+    <v-btn-toggle
+      dense
+      tile
+      color="deep-purple accent-3"
+    >
       <v-btn
         v-for="(choice, index) in currentQuestion.choices"
         @click="onClick(choice.value)"
@@ -10,6 +14,7 @@
         <span class="hidden-sm-and-down">{{ choice.name }}</span>
       </v-btn>
     </v-btn-toggle>
+    <div v-if="!currentQuestion.isValid" class="error-validation-text">{{currentQuestion.validationMessage}}</div>
   </div>
 </template>
 
@@ -28,13 +33,21 @@ export default {
 </script>
 
 <style scoped>
-div#question-expand{
+div#question-expand {
   margin-bottom: 1.5rem;
 }
 div.v-btn-toggle:not(.v-btn-toggle--group) .v-btn.v-btn:not(.v-item--active) {
-  background-color: var(--vscode-input-background, #3c3c3c);
+  background-color: var(--theia-list-activeSelectionBackground, #094771);
 }
 div.v-btn-toggle:not(.v-btn-toggle--group) .v-btn.v-btn.v-item--active {
   background-color: var(--vscode-button-background, #1976d2);
+}
+.error-validation-text{
+  font-size: 12px;
+  padding-left: 12px;
+  color: #ff5252;
+}
+.v-btn-toggle {
+  flex-direction: column;
 }
 </style>

@@ -1,11 +1,14 @@
 <template>
   <div id="done-component">
-    <b-jumbotron class="jumbo">
-      <p>
-        <b-img class="imgDone" src="https://icons-for-free.com/iconfiles/png/128/success-1319971786207747160.png"></b-img>
-        {{doneMessage}}
-      </p>
-    </b-jumbotron>
+      <v-row
+          align="center"
+          justify="center"
+          style="height: 100%;"
+        >
+    <v-col align-self="center" class="done-column" cols="10">
+    <p class="done-message"><v-icon  color="success" size="30">mdi-checkbox-marked-circle-outline</v-icon> {{doneMessage}}</p>
+    </v-col>
+      </v-row>
   </div>
 </template>
 <script>
@@ -25,25 +28,11 @@ export default {
 </script>
 
 <style>
-.jumbotron.jumbo {
-  background-color: var(--vscode-editorWidget-background, #252526);
-  padding: 1rem 0.5rem;
+.done-message{
+  font-size: 1.25rem;
 }
-img.imgDone {
-  width: 1.5rem;
-  height: 1.5rem;
+.done-column{
+    background-color: var(--vscode-editorWidget-background, #252526);
 }
-.jumbo button {
-  background-color: var(--vscode-button-background, #0e639c) !important;
-  border-color: var(--vscode-button-background, #0e639c) !important;
-  color: #cccccc !important;
-  border-radius: 0px !important;
-  font-size: 0.8rem !important;
-  padding: 0.2rem 0.6rem !important;
-  height: 2rem !important; 
-}
-.jumbo button {
-  background-color: var(--vscode-button-hoverBackground, #1177bb) !important;
-  border-color: var(--vscode-button-hoverBackground, #1177bb) !important;
-}
+
 </style>

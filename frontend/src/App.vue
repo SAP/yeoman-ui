@@ -1,13 +1,14 @@
 <template>
   <v-app id="app" class="vld-parent">
-    <loading :active.sync="showBusyIndicator"
-             :is-full-page="true"
-             :height="64"
-             :width="64"
-             :color="isLoadingColor"
-             background-color="transparent"
-             loader="spinner">
-    </loading>
+    <loading
+      :active.sync="showBusyIndicator"
+      :is-full-page="true"
+      :height="64"
+      :width="64"
+      :color="isLoadingColor"
+      background-color="transparent"
+      loader="spinner"
+    ></loading>
 
     <Header
       v-if="prompts.length"
@@ -16,31 +17,46 @@
       :rpc="rpc"
       @parentShowConsole="toggleConsole"
     />
-    <v-row class="main-row m-0 p-0">
-      <v-col class="left-col m-0 p-0" lg="3" sm="auto">
+    <v-row class="main-row ma-0 pa-0">
+      <v-col class="left-col ma-0 pa-0" cols="3">
         <Navigation v-if="prompts.length" :promptIndex="promptIndex" :prompts="prompts" />
       </v-col>
-      <v-col class="right-col">
-        <!-- <v-row class="right-row"> -->
-        <v-col class="prompts-col" lg="12">
+      <v-col cols="9" class="right-col">
+        <v-col class="prompts-col" cols="12">
           <Done
             v-if="isDone"
             :doneMessage="doneMessage"
             :donePath="donePath"
             :isInVsCode="isInVsCode()"
           />
-          <Step
-            v-if="prompts.length"
-            ref="step"
-            :currentPrompt="currentPrompt"
-            @generatorSelected="onGeneratorSelected"
-            @stepvalidated="onStepValidated"
-          />
+          <v-slide-x-transition v-else-if="prompts.length">
+            <Step
+              :key="transitionToggle"
+              ref="step"
+              :currentPrompt="currentPrompt"
+              @generatorSelected="onGeneratorSelected"
+              @stepvalidated="onStepValidated"
+            />
+          </v-slide-x-transition>
         </v-col>
-          <v-col v-if="prompts.length > 0 && !isDone" class="bottom-right-col" style="height: 4rem;" offset-lg="9" lg="3">
-            <v-row  class="progress-buttons-row" align="center" justify="end">
-              <v-btn :disabled="!stepValidated" @click="next">Next ></v-btn>
-            </v-row>
+        <v-col
+          v-if="prompts.length > 0 && !isDone"
+          class="bottom-right-col"
+          style="height: 4rem;"
+          offset-xl="9"
+          offset-lg="9"
+          offset-md="9"
+          offset-sm="8"
+          offset-xs="8"
+          xl="3"
+          lg="3"
+          md="3"
+          sm="4"
+          xs="4"
+        >
+          <v-row class="progress-buttons-row" align="center" justify="end">
+            <v-btn :disabled="!stepValidated" @click="next">Next ></v-btn>
+          </v-row>
         </v-col>
       </v-col>
     </v-row>
@@ -58,19 +74,19 @@
 
 
 <script>
-import Vue from "vue"
-import Loading from 'vue-loading-overlay';
-import Header from "./components/Header.vue"
-import Navigation from "./components/Navigation.vue"
-import Step from "./components/Step.vue"
-import Done from "./components/Done.vue"
+import Vue from "vue";
+import Loading from "vue-loading-overlay";
+import Header from "./components/Header.vue";
+import Navigation from "./components/Navigation.vue";
+import Step from "./components/Step.vue";
+import Done from "./components/Done.vue";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import * as _ from "lodash";
 
-const FUNCTION = "__Function"
-const LOADING = "loading..."
-const PENDING = 'pending'
+const FUNCTION = "__Function";
+const LOADING = "loading...";
+const PENDING = "pending";
 
 export default {
   name: "app",
@@ -97,114 +113,156 @@ export default {
       logText: "",
       showConsole: false,
       messages: {},
-      showBusyIndicator: false
+      showBusyIndicator: false,
+      transitionToggle: false
     };
   },
   computed: {
     isLoadingColor() {
-      return getComputedStyle(document.documentElement).getPropertyValue("--vscode-progressBar-background") || "#0e70c0"
+      return (
+        getComputedStyle(document.documentElement).getPropertyValue(
+          "--vscode-progressBar-background"
+        ) || "#0e70c0"
+      );
     },
     selectedGeneratorHeader() {
       return this.messages.selected_generator + this.generatorName;
     },
     currentPrompt() {
-      return _.get(this.prompts, "[" + this.promptIndex +"]")
+      return _.get(this.prompts, "[" + this.promptIndex + "]");
     },
     currentPromptAnswers() {
-      const answers = _.get(this.currentPrompt, "answers", {})
-      const questions = _.get(this.currentPrompt, "questions", [])
-      for(const question of questions) {
-        _.set(answers, [question.name], (question.isWhen === false ? undefined : question.answer))
+      const answers = _.get(this.currentPrompt, "answers", {});
+      const questions = _.get(this.currentPrompt, "questions", []);
+      for (const question of questions) {
+        _.set(
+          answers,
+          [question.name],
+          question.isWhen === false ? undefined : question.answer
+        );
       }
-      return answers
+      return answers;
     },
     clonedAnswers() {
-      return _.cloneDeep(this.currentPromptAnswers)
+      return _.cloneDeep(this.currentPromptAnswers);
     }
   },
   watch: {
-    "prompts": {
+    prompts: {
       handler() {
-        this.setBusyIndicator()
+        this.setBusyIndicator();
       }
     },
     "currentPrompt.status": {
       handler() {
-        this.setBusyIndicator()
+        this.setBusyIndicator();
       }
     },
-    "isDone": {
+    isDone: {
       handler() {
-        this.setBusyIndicator()
+        this.setBusyIndicator();
       }
     },
-    "clonedAnswers": {
+    clonedAnswers: {
       deep: true,
       async handler(newAnswers, oldAnswers) {
         // TODO: consider using debounce (especially for questions of type 'input') to limit roundtrips
         if (!_.isEmpty(newAnswers)) {
           const questions = _.get(this, "currentPrompt.questions", []);
-          
-          const questionWithNewAnswer = _.find(questions, question => {
-            const oldAnswer = _.get(oldAnswers, [question.name])
-            const newAnswer = _.get(newAnswers, [question.name])
-            return !_.isEqual(newAnswer, oldAnswer)
-          })
 
-          let relevantQuestionsToUpdate = questions // go esover all questions for the first time
+          const questionWithNewAnswer = _.find(questions, question => {
+            const oldAnswer = _.get(oldAnswers, [question.name]);
+            const newAnswer = _.get(newAnswers, [question.name]);
+            return !_.isEqual(newAnswer, oldAnswer);
+          });
+
+          let relevantQuestionsToUpdate = questions; // go esover all questions for the first time
           if (questionWithNewAnswer) {
-            const indexOfQuestionWithNewAnswer = _.indexOf(questions, questionWithNewAnswer)
-            relevantQuestionsToUpdate = questions.slice(indexOfQuestionWithNewAnswer)
-          } 
-          
-          let showBusy = true
-          const that = this
+            const indexOfQuestionWithNewAnswer = _.indexOf(
+              questions,
+              questionWithNewAnswer
+            );
+            relevantQuestionsToUpdate = questions.slice(
+              indexOfQuestionWithNewAnswer
+            );
+          }
+
+          let showBusy = true;
+          const that = this;
           const finished = relevantQuestionsToUpdate.reduce((p, question) => {
-            return p.then(() => that.updateQuestion(question, newAnswers))
+            return p.then(() => that.updateQuestion(question, newAnswers));
           }, Promise.resolve()); // initial
 
           setTimeout(() => {
             if (showBusy) {
-              that.showBusyIndicator = true
+              that.showBusyIndicator = true;
             }
-          }, 1000)
+          }, 1000);
 
-          await finished
-          showBusy = false
-          this.showBusyIndicator = false
+          await finished;
+          showBusy = false;
+          this.showBusyIndicator = false;
         }
       }
     }
   },
   methods: {
     setBusyIndicator() {
-      this.showBusyIndicator = _.isEmpty(this.prompts) || (this.currentPrompt.status === PENDING && !this.isDone);
+      this.showBusyIndicator =
+        _.isEmpty(this.prompts) ||
+        (this.currentPrompt.status === PENDING && !this.isDone);
     },
     async updateQuestion(question, newAnswers) {
       if (question.when === FUNCTION) {
-        question.isWhen = await this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "when"])
+        question.isWhen = await this.rpc.invoke("evaluateMethod", [
+          [newAnswers],
+          question.name,
+          "when"
+        ]);
       }
 
       if (question.isWhen === true) {
         if (question.filter === FUNCTION) {
-          question.answer = await this.rpc.invoke("evaluateMethod", [[question.answer], question.name, "filter"])
+          question.answer = await this.rpc.invoke("evaluateMethod", [
+            [question.answer],
+            question.name,
+            "filter"
+          ]);
         }
         if (question._default === FUNCTION) {
-          question.default = await this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "default"])
+          question.default = await this.rpc.invoke("evaluateMethod", [
+            [newAnswers],
+            question.name,
+            "default"
+          ]);
           if (question.answer === undefined) {
-            question.answer = question.default
+            question.answer = question.default;
           }
         }
         if (question._message === FUNCTION) {
-          question.message = await this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "message"])
+          question.message = await this.rpc.invoke("evaluateMethod", [
+            [newAnswers],
+            question.name,
+            "message"
+          ]);
         }
         if (question._choices === FUNCTION) {
-          question.choices = await this.rpc.invoke("evaluateMethod", [[newAnswers], question.name, "choices"])
+          question.choices = await this.rpc.invoke("evaluateMethod", [
+            [newAnswers],
+            question.name,
+            "choices"
+          ]);
         }
         if (question.validate === FUNCTION) {
-          const response = await this.rpc.invoke("evaluateMethod", [[question.answer, newAnswers], question.name, "validate"])
-          question.isValid = (_.isString(response) ? false : response)
-          question.validationMessage = (_.isString(response) ? response : undefined)
+          const response = await this.rpc.invoke("evaluateMethod", [
+            [question.answer, newAnswers],
+            question.name,
+            "validate"
+          ]);
+          question.isValid = _.isString(response) ? false : response;
+          question.validationMessage = _.isString(response)
+            ? response
+            : undefined;
         }
       }
     },
@@ -228,6 +286,7 @@ export default {
       this.promptIndex++;
       this.prompts[this.promptIndex - 1].active = false;
       this.prompts[this.promptIndex].active = true;
+      this.transitionToggle = !this.transitionToggle;
     },
     onGeneratorSelected(generatorName) {
       this.generatorName = generatorName;
@@ -278,8 +337,8 @@ export default {
       }
     },
     setQuestionProps(prompt) {
-      const questions = _.get(prompt, "questions", [])
-      for(const question of questions) {
+      const questions = _.get(prompt, "questions", []);
+      for (const question of questions) {
         if (question.default === FUNCTION) {
           question.default = undefined;
           this.$set(question, "_default", FUNCTION);
@@ -297,11 +356,11 @@ export default {
         if (question.default === undefined && question.type !== "confirm") {
           answer = "";
         }
-        this.$set(question, "answer", answer)
-        this.$set(question, "isValid", true)
-        this.$set(question, "validationMessage", true)
+        this.$set(question, "answer", answer);
+        this.$set(question, "isValid", true);
+        this.$set(question, "validationMessage", true);
 
-        this.$set(question, "isWhen", question.when !== FUNCTION)
+        this.$set(question, "isWhen", question.when !== FUNCTION);
       }
     },
     showPrompt(questions, name) {
@@ -397,43 +456,8 @@ export default {
   }
 };
 </script>
-
-<style>
-@import './../node_modules/vue-loading-overlay/dist/vue-loading.css';
-#app {
-  height: 100%;
-  color: var(--vscode-foreground, #cccccc);
-  background-color: var(--vscode-editor-background, #1e1e1e);
-  font-family: var(--vscode-font-family);
-  font-weight: var(--vscode-font-weight);
-  font-size: var(--vscode-font-size);
-}
-.yeoman-ui *:focus {
-  outline-color: transparent;
-}
-div.v-application .primary {
-  background-color: var(--vscode-editorCodeLens-foreground, #898989) !important;
-}
-html,
-body {
-  height: 100%;
-  background-color: var(--vscode-editor-background, #1e1e1e);
-}
-v-container {
-  margin: 0px;
-  padding: 0px;
-}
-v-row {
-  margin: 0px;
-}
-.theme--light {
-  color: var(--vscode-foreground, #cccccc) !important;
-}
-.loading {
-  color: var(--vscode-foreground, white);
-  margin: 1.5rem;
-  font-size: 1.5rem;
-}
+<style scoped>
+@import "./../node_modules/vue-loading-overlay/dist/vue-loading.css";
 .consoleClassVisible {
   visibility: visible;
 }
@@ -450,11 +474,10 @@ div.consoleClassVisible .v-footer {
   white-space: pre-wrap;
 }
 .left-col {
-  background-color: var(--vscode-menu-background, #252426);
+  background-color: var(--vscode-editorWidget-background, #252426);
 }
 .prompts-col {
   overflow-y: scroll;
-  padding-right: 30px !important;
 }
 .main-row,
 .prompts-col {
@@ -486,25 +509,9 @@ div.consoleClassVisible .v-footer {
   transform: rotate(-60deg);
   transform-origin: bottom left;
 }
-
-div.bottom-right-col 
-  .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
-  background-color: var(--vscode-button-background, #0e639c);
-  border-color: var(--vscode-button-background, #0e639c);
-  color: #cccccc !important;
-  border-radius: 0px;
-  font-size: 0.8rem;
-  padding: 0.2rem 0.6rem;
-  width: 7rem;
-  height: 2rem;
-}
-div.bottom-right-col
-  .theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined):hover {
-  background-color: var(--vscode-button-hoverBackground, #1177bb);
-  border-color: var(--vscode-button-hoverBackground, #1177bb);
-}
-div.bottom-right-col .progress-buttons-row  {
-  padding-right: 15px;
-  padding-top:4px;
+div.bottom-right-col .progress-buttons-row {
+  padding-right: 24px;
+  padding-top: 4px;
 }
 </style>
+

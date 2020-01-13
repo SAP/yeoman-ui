@@ -1,6 +1,5 @@
 import {initComponent, destroy} from '../Utils'
 import Done from '../../src/components/Done.vue'
-import { BJumbotron} from 'bootstrap-vue'
 import _ from 'lodash'
 
 let wrapper
@@ -24,7 +23,7 @@ describe('Done.vue', () => {
 
     test('doneMessage set', () => {
         wrapper = initComponent(Done, { doneMessage: testDoneMessage })
-        expect(wrapper.find(BJumbotron).text()).toBe(testDoneMessage)
+        expect(wrapper.find('p').text()).toBe('mdi-checkbox-marked-circle-outline testDoneMessage')
     })
 
 })
