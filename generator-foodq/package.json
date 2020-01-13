@@ -22,7 +22,8 @@
   "dependencies": {
     "yeoman-generator": "^1.1.1",
     "chalk": "^2.0.0",
-    "inquirer": "^6.2.2"
+    "inquirer": "^6.2.2",
+    "lodash": "^4.17.15"
   },
   "generator-filter": {
     "type": "project"
