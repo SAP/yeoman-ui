@@ -12,7 +12,15 @@
 export default {
   name: "QuestionConfirm",
   props: {
-    currentQuestion: Object
+    currentQuestion: Object,
+    questionIndex: Number
+  },
+  watch: {
+    "currentQuestion.answer": {
+      handler() {
+        this.$emit('changedQuestionIndex', this.questionIndex)
+      }
+    }
   }
 };
 </script>

@@ -17,11 +17,13 @@
 export default {
   name: "QuestionExpand",
   props: {
-    currentQuestion: Object
+    currentQuestion: Object,
+    questionIndex: Number
   },
   methods: {
     onClick(answer) {
       this.currentQuestion.answer = answer;
+      this.$emit('changedQuestionIndex', this.questionIndex)
     }
   }
 };
