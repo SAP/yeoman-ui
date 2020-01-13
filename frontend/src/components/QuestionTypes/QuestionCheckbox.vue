@@ -53,6 +53,10 @@ export default {
     selected: {
       handler(val) {
         this.currentQuestion.answer = val;
+      }
+    },
+    "options": {
+      handler() {
         this.$emit('changedQuestionIndex', this.questionIndex)
       }
     }
