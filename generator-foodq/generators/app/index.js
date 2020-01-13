@@ -62,16 +62,15 @@ module.exports = class extends Generator {
         default: "Junk food"
       },
       {
-        when: async (response) => {
+        when: async response => {
           this.log(response.hungry);
           const that = this;
-          const promise = new Promise((resolve, reject) => {
+          return new Promise((resolve) => {
             that.log(`Purposely delaying response for 2 seconds...`);
             setTimeout(() => {
               resolve(response.hungry);
             }, 2000);
           });
-          return await promise;
         },
         type: "checkbox",
         name: "beers",
@@ -245,13 +244,10 @@ module.exports = class extends Generator {
       }
     ];
 
-
     const answers_login = await this.prompt(prompts);
     this.answers = Object.assign({}, this.answers, answers_login);
     this.log("Email", this.answers.email);
   }
-
-
 
   _requireLetterAndNumber(value) {
     if (/\w/.test(value) && /\d/.test(value)) {
@@ -268,7 +264,7 @@ module.exports = class extends Generator {
     this.fs.copyTpl(this.templatePath('index.html'),
     this.destinationPath('public/index.html'), {
         title: 'Templating with Yeoman',
-        food: _.get(this, "answers.food", ""),
+        food: this.answers.food,
         hungerLevel: this.answers.hungerLevel,
         fav_color: this.answers.fav_color
       }
