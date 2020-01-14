@@ -40,7 +40,8 @@ export default {
 <style scoped>
 #question-editor >>> div.v-input__slot {
   background-color: var(--vscode-input-background, #3c3c3c);
-  box-shadow: 0px 0px 1px -2px rgba(0, 0, 0, 0.2), 0px 0px 2px 0px rgba(0, 0, 0, 0.14), 0px 0px 5px 0px rgba(0, 0, 0, 0.12);
+  border: 1px solid  var(--vscode-editorWidget-background, #252426);
+  box-shadow: none;
   border-radius: unset; 
 }
  .v-textarea.v-input:not(.v-input--is-disabled) >>> textarea{
