@@ -146,6 +146,25 @@ describe('App.vue', () => {
       expect(wrapper.vm.prompts[0].questions[0].isValid).toBe(true)
       expect(wrapper.vm.prompts[0].questions[0].validationMessage ).toBeUndefined()
     })
+
+    test('invoke for question that throws error', async () => {
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockRejectedValue("test error")
+      }
+      wrapper.vm.prompts = [{ 
+        questions: [{
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
+        }],
+        answers: {}
+     }]
+      wrapper.vm.promptIndex = 0
+
+      expect(wrapper.vm.prompts[0].questions[0].doNotShow).toBeUndefined()
+
+      await wrapper.vm.updateQuestionsFromIndex(0)
+
+      expect(wrapper.vm.prompts[0].questions[0].doNotShow).toBe(true)
+    })
   })
 
   describe('setQuestionProps - method', () => {
