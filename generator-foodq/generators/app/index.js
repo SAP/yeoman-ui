@@ -39,7 +39,7 @@ module.exports = class extends Generator {
       },
       {
         type: "confirm",
-        name: "confirmConfirmHungry",
+        name: "confirmHungry",
         message: (answers) => {
           return `You said you are ${(answers.hungry ? '' : 'not ')}hungry. Is that right?`;
         },
@@ -123,7 +123,7 @@ module.exports = class extends Generator {
     prompts = [
       {
         when: (response) => {
-          return this.answers.confirmConfirmHungry;
+          return this.answers.confirmHungry;
         },
         type: "list",
         name: "hungerLevel",
@@ -263,11 +263,24 @@ module.exports = class extends Generator {
     this.log('destinationRoot: ' + this.destinationRoot());
     this.fs.copyTpl(this.templatePath('index.html'),
     this.destinationPath('public/index.html'), {
-        title: 'Templating with Yeoman',
-        food: this.answers.food,
-        hungerLevel: this.answers.hungerLevel,
-        fav_color: this.answers.fav_color
-      }
+      title: 'Templating with Yeoman',
+      hungry: this.answers.hungry,
+      confirmHungry: this.answers.confirmHungry,
+      food: this.answers.food,
+      beers: this.answers.beers,
+      fav_color: this.answers.fav_color,
+      number: this.answers.number,
+      
+      hungerLevel: this.answers.hungerLevel,
+      dessert: this.answers.dessert,
+      enjoy: this.answers.enjoy,
+      comments: this.answers.comments,
+      
+      repotype: this.answers.repotype,
+      repoperms: this.answers.repoperms,
+      email: this.answers.email,
+      password: this.answers.password
+    }
     );
     this.fs.copy(
       this.templatePath('README.md'),
