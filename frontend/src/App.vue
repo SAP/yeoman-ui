@@ -303,7 +303,7 @@ export default {
             }
           } else {
             // multiple prompts provided -- simply add them
-            this.prompts.push(prompt)
+            this.prompts.push(prompt);
           }
         })
         this.updateQuestionsFromIndex(0)
@@ -321,13 +321,13 @@ export default {
           this.$set(question, "_message", FUNCTION);
         }
         if (question.choices === FUNCTION) {
-          question.choices = [LOADING]
-          this.$set(question, "_choices", FUNCTION)
+          question.choices = [LOADING];
+          this.$set(question, "_choices", FUNCTION);
         }
 
         let answer = question.default;
         if (question.default === undefined && question.type !== "confirm") {
-          answer = ""
+          answer = "";
         }
         this.$set(question, "answer", answer);
         this.$set(question, "isValid", true);
@@ -353,7 +353,7 @@ export default {
         name: name,
         answers: {},
         active: true
-      })
+      });
       this.setQuestionProps(prompt);
       return prompt;
     },
@@ -388,7 +388,7 @@ export default {
         this.rpc = new RpcBrowser(window, window.vscode);
         this.initRpc();
       } else {
-        const ws = new WebSocket("ws://127.0.0.1:8081")
+        const ws = new WebSocket("ws://127.0.0.1:8081");
         ws.onopen = () => {
           this.rpc = new RpcBrowserWebSockets(ws);
           this.initRpc();
