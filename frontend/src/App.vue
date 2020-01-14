@@ -34,7 +34,7 @@
               :key="transitionToggle"
               ref="step"
               :currentPrompt="currentPrompt"
-              @generatorSelected="onGeneratorSelected"
+              :selectGenerator="selectGenerator"
               @stepvalidated="onStepValidated"
               :updateQuestionsFromIndex="updateQuestionsFromIndex"
             />
@@ -130,7 +130,6 @@ export default {
       return this.messages.selected_generator + this.generatorName;
     },
     currentPrompt() {
-
       const prompt = _.get(this.prompts, "[" + this.promptIndex +"]")
       
       const answers = _.get(prompt, "answers", {})
@@ -263,7 +262,7 @@ export default {
       this.prompts[this.promptIndex].active = true;
       this.transitionToggle = !this.transitionToggle;
     },
-    onGeneratorSelected(generatorName) {
+    selectGenerator(generatorName) {
       this.generatorName = generatorName;
     },
     onStepValidated(stepValidated) {

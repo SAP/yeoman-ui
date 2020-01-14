@@ -48,7 +48,8 @@ import _ from "lodash";
 export default {
   name: "GeneratorSelection",
   props: {
-    currentQuestion: Object
+    currentQuestion: Object,
+    selectGenerator: Function
   },
   data() {
     return {
@@ -74,7 +75,7 @@ export default {
     },
     emitSelection(generatorName) {
       this.currentQuestion.answer = generatorName;
-      this.$emit("generatorSelected", generatorName);
+      this.selectGenerator(generatorName);
     }
   }
 };

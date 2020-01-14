@@ -240,11 +240,11 @@ describe('App.vue', () => {
     expect(wrapper.vm.logText).toBe('test_test_log')
   })
 
-  test('onGeneratorSelected - method', () => {
+  test('selectGenerator - method', () => {
     wrapper = initComponent(App)
     wrapper.vm.generatorName = 'test_ge_name'
 
-    wrapper.vm.onGeneratorSelected('testGeneratorName');
+    wrapper.vm.selectGenerator('testGeneratorName');
     
     expect(wrapper.vm.generatorName).toBe('testGeneratorName')
   })

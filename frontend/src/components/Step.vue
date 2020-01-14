@@ -2,7 +2,7 @@
   <div id="step-component-div">
       <QuestionTypeSelector
         :questions="currentPrompt.questions"
-        @generatorSelected="onGeneratorSelected"
+        :selectGenerator="selectGenerator"
         :updateQuestionsFromIndex="updateQuestionsFromIndex"
       />
   </div>
@@ -18,12 +18,8 @@ export default {
   },
   props: {
     currentPrompt: Object,
-    updateQuestionsFromIndex: Function
-  },
-  methods: {
-    onGeneratorSelected(generatorName) {
-      this.$emit("generatorSelected", generatorName)
-    }
+    updateQuestionsFromIndex: Function,
+    selectGenerator: Function
   },
   watch: {
     "currentPrompt.questions": {

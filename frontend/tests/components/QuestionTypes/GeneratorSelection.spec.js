@@ -15,7 +15,8 @@ describe('GeneratorSelection.vue', () => {
             wrapper = initComponent(GeneratorSelection, {
                 currentQuestion: {
                     choices: [{imageUrl: 'testImageUrl', name: 'testName'}]
-                }
+                },
+                selectGenerator: jest.fn()
             }, true)
             expect(getImageUrlSpy).toHaveReturnedWith('testImageUrl')
         })
@@ -24,19 +25,21 @@ describe('GeneratorSelection.vue', () => {
             wrapper = initComponent(GeneratorSelection, {
                 currentQuestion: {
                     choices: [{name: 'testName'}]
-                }
+                },
+                selectGenerator: jest.fn()
             }, true)
             wrapper.setData({publicPath: 'testPublicPath-'})
             expect(wrapper.vm.getImageUrl({})).toBe("testPublicPath-generator.png")
         })
     })
 
-    describe('emitSelection - method', () => {
+    describe.skip('emitSelection - method', () => {
         beforeEach(() => {
             wrapper = initComponent(GeneratorSelection, {
                 currentQuestion: {
                     choices: [{imageUrl: 'testImageUrl', name: 'testName'}]
-                }
+                },
+                selectGenerator: jest.fn()
             }, true)
         })
 
@@ -56,15 +59,20 @@ describe('GeneratorSelection.vue', () => {
                         {imageUrl: 'testImageUrl1', name: 'testName1'}, 
                         {imageUrl: 'testImageUrl2', name: 'testName2'}
                     ]
-                }
+                },
+                selectGenerator: jest.fn()
             }, true)
         })
 
         test('on click event of vCard', async () => {
+            const selectGeneratorSpy = jest.spyOn(wrapper.vm, 'selectGenerator')
+
             wrapper.find('.v-card').trigger('click')
             await wrapper.vm.$nextTick()
-            expect(wrapper.emitted('generatorSelected')).toBeTruthy()
+            expect(selectGeneratorSpy).toHaveBeenCalled()
             expect(wrapper.vm.$options.propsData.currentQuestion.answer).toBe('testName1')
+
+            selectGeneratorSpy.mockRestore()
         })
 
         test('selected 2 generators', async () => {
