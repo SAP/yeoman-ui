@@ -1,12 +1,13 @@
 <template>
   <div>
     <p class="question-label">{{currentQuestion.message}}</p>
-      <div v-for="(option,index) in options" :key="options[index].text">
-        <v-checkbox dense :label="option.text || option" v-model="option.selected"></v-checkbox>
-      </div>
-    <!-- <div class="question-checkbox-container">
-      <b-form-checkbox-group v-model="selected" stacked :options="options"></b-form-checkbox-group>
-    </div> -->
+        <div v-for="(option,index) in options" :key="options[index].text">
+          <v-checkbox
+            v-model="selected"
+            :value="option.value || option"
+            :label="option.text || option"
+          ></v-checkbox>
+        </div>
   </div>
 </template>
 
@@ -65,10 +66,10 @@ export default {
 </script>
 
 <style scoped>
-div.v-input--checkbox{
+div.v-input--checkbox {
   margin-top: 0;
 }
-div.v-input--checkbox >>> div.v-input__slot{
+div.v-input--checkbox >>> div.v-input__slot {
   margin-bottom: 0;
   align-items: flex-start;
 }

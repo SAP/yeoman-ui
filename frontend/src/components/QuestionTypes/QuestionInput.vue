@@ -9,6 +9,7 @@
       aria-describedby="validation-message"
       solo
       dense
+      :error-messages="currentQuestion.isValid ? '' : currentQuestion.validationMessage"
     ></v-text-field>
   </div>
 </template>
@@ -22,6 +23,7 @@ export default {
     currentQuestion: Object,
     questionIndex: Number
   },
+
   data() {
     return {
       text: undefined
@@ -52,9 +54,12 @@ export default {
 #question-input >>> div.v-input__slot {
   color: var(--vscode-input-foreground, #cccccc) !important;
   background-color: var(--vscode-input-background, #3c3c3c) !important;
-  border-radius: unset !important; 
+  border-radius: unset !important;
 }
-#question-input >>> div.v-input__slot .v-select__selection{
+#question-input >>> div.v-input__slot .v-select__selection {
   color: var(--vscode-input-foreground, #cccccc) !important;
+}
+.theme--light.v-input:not(.v-input--is-disabled) >>> input{
+  color: var(--vscode-input-foreground, #cccccc);
 }
 </style>
