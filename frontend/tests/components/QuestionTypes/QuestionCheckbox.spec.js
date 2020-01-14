@@ -3,7 +3,6 @@ import { initComponent, destroy } from '../../Utils'
 
 let wrapper
 
-
 describe('QuestionCheckbox.vue', () => {
     afterEach(() => {
         destroy(wrapper)
