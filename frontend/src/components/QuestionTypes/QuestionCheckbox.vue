@@ -1,13 +1,14 @@
 <template>
   <div>
     <p class="question-label">{{currentQuestion.message}}</p>
-        <div v-for="(option,index) in options" :key="options[index].text">
-          <v-checkbox
-            v-model="selected"
-            :value="option.value || option"
-            :label="option.text || option"
-          ></v-checkbox>
-        </div>
+    <div v-for="(option,index) in options" :key="options[index].text">
+      <v-checkbox
+        v-model="selected"
+        :value="option.value || option"
+        :label="option.text || option"
+      ></v-checkbox>
+    </div>
+    <div v-if="!currentQuestion.isValid" class="error-validation-text">{{currentQuestion.validationMessage}}</div>
   </div>
 </template>
 
