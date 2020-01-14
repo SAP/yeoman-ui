@@ -18,7 +18,8 @@ describe('QuestionList.vue', () => {
                         { name: 'testName2' }
                     ],
                     default: 1
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
             
             expect(wrapper.vm.default).toBe('testName2')
@@ -32,7 +33,8 @@ describe('QuestionList.vue', () => {
                         { name: 'testName2' }
                     ],
                     default: 'testName1'
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
             
             expect(wrapper.vm.default).toBe('testName1')
@@ -46,7 +48,8 @@ describe('QuestionList.vue', () => {
                         { name: 'testName2' }
                     ],
                     default: true
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
             
             expect(wrapper.vm.default).toBeUndefined()
@@ -59,7 +62,8 @@ describe('QuestionList.vue', () => {
                         { name: 'testName1' },
                         { name: 'testName2' }
                     ]
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
             
             expect(wrapper.vm.default).toBe('testName1')
@@ -69,7 +73,8 @@ describe('QuestionList.vue', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: ['testName1', 'testName2']
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
             
             expect(wrapper.vm.default).toBe('testName1')
@@ -83,7 +88,8 @@ describe('QuestionList.vue', () => {
                         { name: 'testName2' }
                     ],
                     default: 1
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
             expect(wrapper.vm.default).toBe('testName2')
             wrapper.vm.$options.watch.default.handler.call(wrapper.vm, 'testName1')
@@ -99,7 +105,8 @@ describe('QuestionList.vue', () => {
                         { name: 'testName2', value: 't2' }
                     ],
                     default: 1
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
             
             expect(wrapper.vm.default).toBe('t2')
@@ -111,7 +118,8 @@ describe('QuestionList.vue', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     name: 'testName1', checked: true, text: 'testText1'
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
             
             const options = wrapper.find('v-select-stub').vm.items
@@ -127,7 +135,8 @@ describe('QuestionList.vue', () => {
                         { name: 'testName3', type: 'string' },
                         { name: 'testName4', type: 'separator', text: 'testText4', disabled: false },
                     ]
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
 
             const options = wrapper.find('v-select-stub').vm.items

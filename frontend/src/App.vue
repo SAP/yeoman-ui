@@ -36,7 +36,7 @@
               :currentPrompt="currentPrompt"
               @generatorSelected="onGeneratorSelected"
               @stepvalidated="onStepValidated"
-              @changedQuestionIndex="updateQuestionsFromIndex"
+              :updateQuestionsFromIndex="updateQuestionsFromIndex"
             />
           </v-slide-x-transition>
         </v-col>

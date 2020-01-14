@@ -1,7 +1,6 @@
 import {initComponent, destroy} from '../Utils'
 import Step from '../../src/components/Step.vue'
 import GeneratorSelection from "../../src/components/QuestionTypes/GeneratorSelection"
-import QuestionInput from "../../src/components/QuestionTypes/QuestionInput"
 
 let wrapper
 
@@ -10,17 +9,6 @@ describe('Step.vue', () => {
     afterEach(() => {
         destroy(wrapper)
     });
-
-    test('onChangedQuestionIndex event handler method', async () => {
-        wrapper = initComponent(Step, {
-            currentPrompt: {
-                questions: [{ isWhen: true, message: "testMessage", type: 'input', isValid: true }]
-            }
-        }, true)
-        wrapper.find(QuestionInput).vm.$emit('changedQuestionIndex', 123)
-        await wrapper.vm.$nextTick()
-        expect(wrapper.emitted('changedQuestionIndex')[0]).toEqual([123])
-    })
 
     test('onGeneratorSelected event handler method', async () => {
         wrapper = initComponent(Step, {

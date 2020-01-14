@@ -16,7 +16,8 @@ describe('QuestionCheckbox.vue', () => {
                         { value: 'testValue1', name: 'testName1', checked: false, text: 'testText1' },
                         { value: 'testValue2', name: 'testName2', checked: false, text: 'testText2' }
                     ]
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
 
             expect(wrapper.vm.selected).toHaveLength(0)
@@ -29,7 +30,8 @@ describe('QuestionCheckbox.vue', () => {
                         { value: 'testValue1', name: 'testName1', checked: false, text: 'testText1' },
                         { value: 'testValue2', name: 'testName2', checked: true, text: 'testText2' }
                     ]
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
 
             expect(wrapper.vm.selected).toHaveLength(1)
@@ -43,7 +45,8 @@ describe('QuestionCheckbox.vue', () => {
                     { value: 'testValue1', name: 'testName1', checked: true, text: 'testText1' },
                     { value: 'testValue2', name: 'testName2', checked: true, text: 'testText2' }
                 ]
-            }
+            },
+            updateQuestionsFromIndex: () => {}
         })
 
         expect(wrapper.vm.currentQuestion.answer).toHaveLength(2)
@@ -61,11 +64,16 @@ describe('QuestionCheckbox.vue', () => {
                     { value: 'testValue2', name: 'testName2', checked: true, text: 'testText2' }
                 ]
             },
-            questionIndex: 2
+            questionIndex: 3,
+            updateQuestionsFromIndex: jest.fn()
         })
 
-        wrapper.vm.$options.watch.options.handler.call(wrapper.vm)
-        expect(wrapper.emitted('changedQuestionIndex')[0]).toEqual([2])
+        let updateQuestionsFromIndexSpy = jest.spyOn(wrapper.vm, 'updateQuestionsFromIndex')
+
+        wrapper.vm.$options.watch.selected.handler.call(wrapper.vm)
+        expect(updateQuestionsFromIndexSpy).toHaveBeenCalledWith(3)
+
+        updateQuestionsFromIndexSpy.mockRestore()
     })
 
     describe('options - computed', () => {
@@ -73,7 +81,8 @@ describe('QuestionCheckbox.vue', () => {
             wrapper = initComponent(QuestionCheckbox, {
                 currentQuestion: {
                     choices: [{ value: 'testValue1', name: 'testName1', checked: true }]
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
 
             const bFormCheckboxGroup = wrapper.find('v-checkbox-stub')
@@ -84,7 +93,8 @@ describe('QuestionCheckbox.vue', () => {
             wrapper = initComponent(QuestionCheckbox, {
                 currentQuestion: {
                     choices: { value: 'testValue1', name: 'testName1', checked: true }
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
 
             const bFormCheckboxGroup = wrapper.find('v-checkbox-stub')

@@ -13,7 +13,8 @@ describe('QuestionExpand.vue', () => {
         wrapper = initComponent(QuestionExpand, {
             currentQuestion: {
                 choices: [{value: 'testValue', name: 'testName'}]
-            }
+            },
+            updateQuestionsFromIndex: () => {}
         }, true)
 
         expect(wrapper.vm.currentQuestion.answer).toBeUndefined()

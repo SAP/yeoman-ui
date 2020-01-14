@@ -14,7 +14,8 @@ describe('QuestionInput.vue', () => {
             wrapper = initComponent(QuestionInput, {
                 currentQuestion: {
                     type: 'time', default: 'testDefault', answer: 'testAnswer'
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
             
             const bFormInput = wrapper.find('v-text-field-stub')
@@ -25,7 +26,8 @@ describe('QuestionInput.vue', () => {
             wrapper = initComponent(QuestionInput, {
                 currentQuestion: {
                     type: 'input', default: 'testDefault', answer: 'testAnswer'
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
             
             const bFormInput = wrapper.find('v-text-field-stub')
@@ -38,7 +40,8 @@ describe('QuestionInput.vue', () => {
             wrapper = initComponent(QuestionInput, {
                 currentQuestion: {
                     type: 'time', default: 'testDefault', answer: 'testAnswer'
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
             
             wrapper.vm.$data.text = ''
@@ -50,7 +53,8 @@ describe('QuestionInput.vue', () => {
             wrapper = initComponent(QuestionInput, {
                 currentQuestion: {
                     type: 'time', default: 'testDefault', answer: 'testAnswer'
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
             
             wrapper.vm.$data.text = 'test_value'

@@ -61,13 +61,14 @@ export default {
       immediate: true,
       handler: function(selectedvalue) {
         this.currentQuestion.answer = selectedvalue
-        this.$emit('changedQuestionIndex', this.questionIndex)
+        this.updateQuestionsFromIndex(this.questionIndex)
       }
     }
   },
   props: {
     currentQuestion: Object,
-    questionIndex: Number
+    questionIndex: Number,
+    updateQuestionsFromIndex: Function
   }
 };
 </script>
