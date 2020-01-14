@@ -5,6 +5,7 @@
       :error-messages="currentQuestion.isValid ? '' : currentQuestion.validationMessage"
       v-model="currentQuestion.answer"
       row
+      dense
     >
       <v-radio label="Yes" :value="true" ></v-radio>
       <v-radio label="No" :value="false"></v-radio>

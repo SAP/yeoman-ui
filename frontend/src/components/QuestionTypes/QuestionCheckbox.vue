@@ -6,6 +6,7 @@
         v-model="selected"
         :value="option.value || option"
         :label="option.text || option"
+        dense
       ></v-checkbox>
     </div>
     <div v-if="!currentQuestion.isValid" class="error-validation-text">{{currentQuestion.validationMessage}}</div>
@@ -69,6 +70,5 @@ div.v-input--checkbox {
 }
 div.v-input--checkbox >>> div.v-input__slot {
   margin-bottom: 0;
-  align-items: flex-start;
 }
 </style>
