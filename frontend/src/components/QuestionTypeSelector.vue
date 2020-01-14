@@ -1,7 +1,7 @@
 <template>
   <div id="QuestionTypeSelector">
     <v-col v-if="questions[0] && questions[0].type==='generators'" cols="12">
-      <GeneratorSelection :currentQuestion="questions[0]" @generatorSelected="onGeneratorSelected" />
+      <GeneratorSelection :currentQuestion="questions[0]" :selectGenerator="selectGenerator" />
     </v-col>
     <v-col xl="6" lg="6" md="8" sm="11" xs="12">
       <v-form>
@@ -71,20 +71,8 @@ export default {
   },
   props: {
     questions: Array,
-    updateQuestionsFromIndex: Function
-  },
-  data() {
-    return {
-      selectedIndex: null,
-      correctIndex: null,
-      shuffledAnswers: [],
-      answered: false
-    };
-  },
-  methods: {
-    onGeneratorSelected(generatorName) {
-      this.$emit("generatorSelected", generatorName);
-    }
+    updateQuestionsFromIndex: Function,
+    selectGenerator: Function
   }
 };
 </script>

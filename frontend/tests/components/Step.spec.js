@@ -1,6 +1,5 @@
 import {initComponent, destroy} from '../Utils'
 import Step from '../../src/components/Step.vue'
-import GeneratorSelection from "../../src/components/QuestionTypes/GeneratorSelection"
 
 let wrapper
 
@@ -9,17 +8,6 @@ describe('Step.vue', () => {
     afterEach(() => {
         destroy(wrapper)
     });
-
-    test('onGeneratorSelected event handler method', async () => {
-        wrapper = initComponent(Step, {
-            currentPrompt: {
-                questions: [{isWhen: true, message: "testMessage", type: 'generators', choices: [{name:"testGenerator"}]}]
-            }
-        }, true)
-        wrapper.find(GeneratorSelection).vm.$emit('generatorSelected', "testGenerator")
-        await wrapper.vm.$nextTick()
-        expect(wrapper.emitted('generatorSelected')[0]).toEqual(['testGenerator'])
-    })
 
     test('watch currentPrompt.questions - step is invalid, no \'stepvalidated\' emitted', async () => {
         wrapper = initComponent(Step, {
