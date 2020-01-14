@@ -1,7 +1,7 @@
 <template>
   <div id="QuestionTypeSelector">
     <v-col v-if="questions[0] && questions[0].type==='generators'" cols="12">
-      <GeneratorSelection :currentQuestion="questions[0]"  @generatorSelected="onGeneratorSelected" />
+      <GeneratorSelection :currentQuestion="questions[0]" @generatorSelected="onGeneratorSelected" />
     </v-col>
     <v-col xl="6" lg="6" md="8" sm="11" xs="12">
       <v-form>
@@ -10,37 +10,37 @@
             <QuestionInput
               v-if="!currentQuestion.type || currentQuestion.type==='input' || currentQuestion.type==='password' || currentQuestion.type==='number'"
               :currentQuestion="currentQuestion" :questionIndex="index"
-              @changedQuestionIndex="onChangedQuestionIndex"
+              :updateQuestionsFromIndex="updateQuestionsFromIndex"
             />
 
             <QuestionEditor
               v-if="currentQuestion.type==='editor'"
               :currentQuestion="currentQuestion" :questionIndex="index"
-              @changedQuestionIndex="onChangedQuestionIndex"
+              :updateQuestionsFromIndex="updateQuestionsFromIndex"
             />
 
             <QuestionList
               v-if="currentQuestion.type==='list' || currentQuestion.type==='rawlist'"
               :currentQuestion="currentQuestion" :questionIndex="index"
-              @changedQuestionIndex="onChangedQuestionIndex"
+              :updateQuestionsFromIndex="updateQuestionsFromIndex"
             />
 
             <QuestionConfirm
               v-if="currentQuestion.type==='confirm'"
               :currentQuestion="currentQuestion" :questionIndex="index"
-              @changedQuestionIndex="onChangedQuestionIndex"
+              :updateQuestionsFromIndex="updateQuestionsFromIndex"
             />
 
             <QuestionCheckbox
               v-if="currentQuestion.type==='checkbox'"
               :currentQuestion="currentQuestion" :questionIndex="index"
-              @changedQuestionIndex="onChangedQuestionIndex"
+              :updateQuestionsFromIndex="updateQuestionsFromIndex"
             />
 
             <QuestionExpand
               v-if="currentQuestion.type==='expand'"
               :currentQuestion="currentQuestion" :questionIndex="index"
-              @changedQuestionIndex="onChangedQuestionIndex"
+              :updateQuestionsFromIndex="updateQuestionsFromIndex"
             />
           </div>
         </div>
@@ -70,7 +70,8 @@ export default {
     GeneratorSelection
   },
   props: {
-    questions: Array
+    questions: Array,
+    updateQuestionsFromIndex: Function
   },
   data() {
     return {
@@ -83,9 +84,6 @@ export default {
   methods: {
     onGeneratorSelected(generatorName) {
       this.$emit("generatorSelected", generatorName);
-    },
-    onChangedQuestionIndex(questionIndex) {
-      this.$emit("changedQuestionIndex", questionIndex)
     }
   }
 };

@@ -21,7 +21,8 @@ export default {
   name: "QuestionInput",
   props: {
     currentQuestion: Object,
-    questionIndex: Number
+    questionIndex: Number,
+    updateQuestionsFromIndex: Function
   },
 
   data() {
@@ -44,7 +45,7 @@ export default {
     text: {
       handler(val) {
         this.currentQuestion.answer = _.size(val) === 0 ? _.get(this.currentQuestion, "default") : val;
-        this.$emit('changedQuestionIndex', this.questionIndex);
+        this.updateQuestionsFromIndex(this.questionIndex);
       }
     }
   }

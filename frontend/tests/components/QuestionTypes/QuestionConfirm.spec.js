@@ -13,10 +13,15 @@ describe('QuestionConfirm.vue', () => {
             currentQuestion: {
                 answer: "testAnswer"
             },
-            questionIndex: 2
+            questionIndex: 4,
+            updateQuestionsFromIndex: jest.fn()
         })
 
+        let updateQuestionsFromIndexSpy = jest.spyOn(wrapper.vm, 'updateQuestionsFromIndex')
+
         wrapper.vm.$options.watch["currentQuestion.answer"].handler.call(wrapper.vm)
-        expect(wrapper.emitted('changedQuestionIndex')[0]).toEqual([2])
+        expect(updateQuestionsFromIndexSpy).toHaveBeenCalledWith(4)
+
+        updateQuestionsFromIndexSpy.mockRestore()
     })
 })

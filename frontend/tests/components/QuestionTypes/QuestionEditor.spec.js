@@ -14,7 +14,8 @@ describe('QuestionEditor.vue', () => {
             wrapper = initComponent(QuestionEditor, {
                 currentQuestion: {
                     default: 'testDefault', answer: 'testAnswer'
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
             
             wrapper.vm.$data.text = ''
@@ -26,7 +27,8 @@ describe('QuestionEditor.vue', () => {
             wrapper = initComponent(QuestionEditor, {
                 currentQuestion: {
                     default: 'testDefault', answer: 'testAnswer'
-                }
+                },
+                updateQuestionsFromIndex: () => {}
             })
             
             wrapper.vm.$data.text = 'test_value'
