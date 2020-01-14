@@ -6,7 +6,7 @@
     <v-col xl="6" lg="6" md="8" sm="11" xs="12">
       <v-form>
         <div v-for="(currentQuestion, index) in questions" :key="index">
-          <div v-if="currentQuestion.isWhen">
+          <div v-if="currentQuestion.isWhen && !currentQuestion.doNotShow">
             <QuestionInput
               v-if="!currentQuestion.type || currentQuestion.type==='input' || currentQuestion.type==='password' || currentQuestion.type==='number'"
               :currentQuestion="currentQuestion" :questionIndex="index"
