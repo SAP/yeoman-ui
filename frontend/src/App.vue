@@ -186,58 +186,63 @@ export default {
         (this.currentPrompt.status === PENDING && !this.isDone);
     },
     async updateQuestion(question) {
+      delete question.doNotShow
       const newAnswers = this.currentPrompt.answers
-      if (question.when === FUNCTION) {
-        question.isWhen = await this.rpc.invoke("evaluateMethod", [
-          [newAnswers],
-          question.name,
-          "when"
-        ]);
-      }
-
-      if (question.isWhen === true) {
-        if (question.filter === FUNCTION) {
-          question.answer = await this.rpc.invoke("evaluateMethod", [
-            [question.answer],
-            question.name,
-            "filter"
-          ]);
-        }
-        if (question._default === FUNCTION) {
-          question.default = await this.rpc.invoke("evaluateMethod", [
+      try {
+        if (question.when === FUNCTION) {
+          question.isWhen = await this.rpc.invoke("evaluateMethod", [
             [newAnswers],
             question.name,
-            "default"
+            "when"
           ]);
-          if (question.answer === undefined) {
-            question.answer = question.default;
+        }
+
+        if (question.isWhen === true) {
+          if (question.filter === FUNCTION) {
+            question.answer = await this.rpc.invoke("evaluateMethod", [
+              [question.answer],
+              question.name,
+              "filter"
+            ]);
+          }
+          if (question._default === FUNCTION) {
+            question.default = await this.rpc.invoke("evaluateMethod", [
+              [newAnswers],
+              question.name,
+              "default"
+            ]);
+            if (question.answer === undefined) {
+              question.answer = question.default;
+            }
+          }
+          if (question._message === FUNCTION) {
+            question.message = await this.rpc.invoke("evaluateMethod", [
+              [newAnswers],
+              question.name,
+              "message"
+            ]);
+          }
+          if (question._choices === FUNCTION) {
+            question.choices = await this.rpc.invoke("evaluateMethod", [
+              [newAnswers],
+              question.name,
+              "choices"
+            ]);
+          }
+          if (question.validate === FUNCTION) {
+            const response = await this.rpc.invoke("evaluateMethod", [
+              [question.answer, newAnswers],
+              question.name,
+              "validate"
+            ]);
+            question.isValid = _.isString(response) ? false : response;
+            question.validationMessage = _.isString(response)
+              ? response
+              : undefined;
           }
         }
-        if (question._message === FUNCTION) {
-          question.message = await this.rpc.invoke("evaluateMethod", [
-            [newAnswers],
-            question.name,
-            "message"
-          ]);
-        }
-        if (question._choices === FUNCTION) {
-          question.choices = await this.rpc.invoke("evaluateMethod", [
-            [newAnswers],
-            question.name,
-            "choices"
-          ]);
-        }
-        if (question.validate === FUNCTION) {
-          const response = await this.rpc.invoke("evaluateMethod", [
-            [question.answer, newAnswers],
-            question.name,
-            "validate"
-          ]);
-          question.isValid = _.isString(response) ? false : response;
-          question.validationMessage = _.isString(response)
-            ? response
-            : undefined;
-        }
+      } catch (error) {
+        question.doNotShow = true 
       }
     },
     next() {
@@ -485,4 +490,3 @@ div.bottom-right-col .progress-buttons-row {
   padding-top: 4px;
 }
 </style>
-
