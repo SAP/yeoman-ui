@@ -1,15 +1,14 @@
 <template>
 <div id="question-editor">
-    <p class="question-label">{{currentQuestion.message}}</p>
-    <v-textarea
-
-          solo
-              v-model="text"
+  <p class="question-label">{{currentQuestion.message}}</p>
+  <v-textarea
+    solo
+    v-model="text"
     :placeholder="currentQuestion.default"
     class="yeoman-form-control"
     aria-describedby="validation-message"
-      :error-messages="currentQuestion.isValid ? '' : currentQuestion.validationMessage"
-        ></v-textarea>
+    :error-messages="currentQuestion.isValid ? '' : currentQuestion.validationMessage"
+  ></v-textarea>
 </div>
 </template>
 

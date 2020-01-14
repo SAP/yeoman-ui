@@ -1,7 +1,11 @@
 <template>
   <div>
     <p class="question-label">{{currentQuestion.message}}</p>
-    <v-radio-group :error-messages="currentQuestion.isValid ? '' : currentQuestion.validationMessage" v-model="currentQuestion.answer" row>
+    <v-radio-group
+      :error-messages="currentQuestion.isValid ? '' : currentQuestion.validationMessage"
+      v-model="currentQuestion.answer"
+      row
+    >
       <v-radio label="Yes" :value="true" ></v-radio>
       <v-radio label="No" :value="false"></v-radio>
     </v-radio-group>

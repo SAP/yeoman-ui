@@ -42,11 +42,6 @@ div.v-btn-toggle:not(.v-btn-toggle--group) .v-btn.v-btn:not(.v-item--active) {
 div.v-btn-toggle:not(.v-btn-toggle--group) .v-btn.v-btn.v-item--active {
   background-color: var(--vscode-button-background, #1976d2);
 }
-.error-validation-text{
-  font-size: 12px;
-  padding-left: 12px;
-  color: #ff5252;
-}
 .v-btn-toggle {
   flex-direction: column;
 }

@@ -67,3 +67,9 @@ div.v-application .error--text {
   color: var(--vscode-input-foreground, #cccccc) !important;
   caret-color: var(--vscode-input-foreground, #cccccc) !important;
 }
+/* Error validation text div */
+.error-validation-text{
+  font-size: 12px;
+  padding-left: 12px;
+  color: #ff5252;
+}

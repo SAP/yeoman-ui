@@ -8,11 +8,9 @@
       aria-describedby="validation-message"
       solo
       dense
-
     ></v-select>
   </div>
 </template>
-
 
 <script>
 import _ from "lodash";
