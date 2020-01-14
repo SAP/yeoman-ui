@@ -175,7 +175,7 @@ export default {
         if (showBusy) {
           that.showBusyIndicator = true
         }
-      }, 1000)
+      }, 500)
 
       await finished
       showBusy = false
@@ -294,7 +294,6 @@ export default {
                 // if questions are provided, remote the pending status
                 if (prompt.questions.length > 0) {
                   delete currentPrompt.status;
-                  currentPrompt.status = ''
                 }
               } else {
                 // first prompt (Select Generator)

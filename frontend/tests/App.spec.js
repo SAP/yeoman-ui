@@ -4,7 +4,6 @@ import Vue from 'vue'
 import BootstrapVue from 'bootstrap-vue'
 import Vuetify from 'vuetify'
 import { WebSocket } from 'mock-socket'
-const flushPromises = require('flush-promises');
 
 Vue.use(BootstrapVue)
 Vue.use(Vuetify)
@@ -62,146 +61,44 @@ describe('App.vue', () => {
       }
     })
 
-    test('invoke - when is function', async () => {
+    test('invoke called on each question with Function method', async () => {
       wrapper.vm.prompts = [{ 
         questions: [{
           name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer', isWhen: true
-        }, {
-          name: 'whenQ', when: '__Function', answer: false
         }, {
           name: 'messageQ', _message: '__Function', answer: 'messageAnswer', isWhen: true
         }, {
           name: 'choicesQ', _choices: '__Function', answer: 'choicesAnswer', isWhen: true
         }, {
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
+        }, {
           name: 'filterQ', filter: '__Function', answer: 'filterAnswer', isWhen: true
         }, {
-          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
+          name: 'whenQ', when: '__Function', answer: "whenAnswer"
         }],
         answers: {}
      }]
       wrapper.vm.promptIndex = 0
-
+      
       const expectedAnswers = {
-        "choicesQ": "choicesAnswer",
         "defaultQ": "defaultAnswer",
-        "filterQ": "filterAnswer",
         "messageQ": "messageAnswer",
+        "choicesQ": "choicesAnswer",
         "validateQ": "validateAnswer",
-        "whenQ": true
+        "whenQ": "whenAnswer"
       }
+
       await wrapper.vm.updateQuestionsFromIndex(0)
       
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'defaultQ', 'default'])
-      // expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'whenQ', 'when'])
-      // expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'messageQ', 'message'])
-      // expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'choicesQ', 'choices'])
-      // expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [['filterAnswer'], 'filterQ', 'filter'])
-      // expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [['validateAnswer', expectedAnswers], 'validateQ', 'validate'])
-    })
-
-    test.skip('invoke - only 3 answers have been changed', async () => {
-      wrapper.vm.prompts = [{ 
-        questions: [{
-          name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer'
-        }, {
-          name: 'whenQ', when: '__Function', answer: true
-        }, {
-          name: 'messageQ', _message: '__Function', answer: 'messageAnswer', isWhen: true
-        }, {
-          name: 'choicesQ', _choices: '__Function', answer: 'choicesAnswer'
-        }, {
-          name: 'filterQ', filter: '__Function', answer: 'filterAnswer'
-        }, {
-          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
-        }],
-        answers: {}
-     }]
-      wrapper.vm.promptIndex = 0
-      const oldAnswers = {
-        "choicesQ": "choicesAnswer",
-        "defaultQ": "defaultAnswer",
-        "filterQ": "filterAnswer",
-        "messageQ": "old_messageAnswer",
-        "validateQ": "old_validateAnswer",
-        "whenQ": false
-      }
-
-      const expectedAnswers = {
-        "choicesQ": "choicesAnswer",
-        "defaultQ": "defaultAnswer",
-        "filterQ": "filterAnswer",
-        "messageQ": "messageAnswer",
-        "validateQ": "validateAnswer",
-        "whenQ": true
-      }
-      await wrapper.vm.$options.watch["clonedAnswers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
-      
-      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'whenQ', 'when'])
-      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'messageQ', 'message'])
-      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [['validateAnswer', expectedAnswers], 'validateQ', 'validate'])
-    })
-
-    test.skip('invoke - first answer have been changed, almost all invokes should be called', async () => {
-      wrapper.vm.prompts = [{ 
-        questions: [{
-          name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer', isWhen: true
-        }, {
-          name: 'whenQ', when: '__Function', answer: 'whenAnswer'
-        }, {
-          name: 'messageQ', _message: '__Function', answer: 'messageAnswer', isWhen: true
-        }, {
-          name: 'choicesQ', _choices: '__Function', answer: 'choicesAnswer', isWhen: true
-        }, {
-          name: 'filterQ', filter: '__Function', answer: 'filterAnswer', isWhen: true
-        }, {
-          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: false
-        }],
-        answers: {}
-     }]
-      wrapper.vm.promptIndex = 0
-      const oldAnswers = {
-        "choicesQ": "choicesAnswer",
-        "defaultQ": "old_defaultAnswer",
-        "filterQ": "filterAnswer",
-        "messageQ": "messageAnswer",
-        "validateQ": "_validateAnswer",
-        "whenQ": "false"
-      }
-
-      const expectedAnswers = {
-        "choicesQ": "choicesAnswer",
-        "defaultQ": "defaultAnswer",
-        "filterQ": "filterAnswer",
-        "messageQ": "messageAnswer",
-        "validateQ": "validateAnswer",
-        "whenQ": "true"
-      }
-      await wrapper.vm.$options.watch["clonedAnswers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
-      
-      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'defaultQ', 'default'])
-      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'whenQ', 'when'])
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'messageQ', 'message'])
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'choicesQ', 'choices'])
+      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [["validateAnswer", expectedAnswers], 'validateQ', 'validate'])
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [['filterAnswer'], 'filterQ', 'filter'])
+      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'whenQ', 'when'])
     })
 
-    test.skip('invoke for question default, answer is defined', async () => {
-      wrapper.vm.rpc = {
-        invoke: jest.fn().mockResolvedValue('defaultResponse')
-      }
-      wrapper.vm.prompts = [{ 
-        questions: [{
-          name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer', isWhen: true
-        }],
-        answers: {}
-     }]
-      wrapper.vm.promptIndex = 0
-      wrapper.vm.$options.watch["clonedAnswers"].handler.call(wrapper.vm)
-      await flushPromises()
-      expect(wrapper.vm.prompts[0].questions[0].default).toBe('defaultResponse')
-    })
-
-    test.skip('invoke for question default, answer is undefined', async () => {
+    test('invoke for question default, answer is undefined', async () => {
       wrapper.vm.rpc = {
         invoke: jest.fn().mockResolvedValue('defaultResponse')
       }
@@ -212,13 +109,13 @@ describe('App.vue', () => {
         answers: {}
      }]
       wrapper.vm.promptIndex = 0
-      wrapper.vm.$options.watch["clonedAnswers"].handler.call(wrapper.vm, {'defaultQ': 1}, {'defaultQ': 2})
-      await flushPromises()
+      await wrapper.vm.updateQuestionsFromIndex(0)
+      
       expect(wrapper.vm.prompts[0].questions[0].default).toBe('defaultResponse')
       expect(wrapper.vm.prompts[0].questions[0].answer).toBe('defaultResponse')
     })
 
-    test.skip('invoke for question validate , response is string', async () => {
+    test('invoke for question validate , response is string', async () => {
       wrapper.vm.rpc = {
         invoke: jest.fn().mockResolvedValue('validateResponse')
       }
@@ -229,13 +126,13 @@ describe('App.vue', () => {
         answers: {}
      }]
       wrapper.vm.promptIndex = 0
-      wrapper.vm.$options.watch["clonedAnswers"].handler.call(wrapper.vm)
-      await flushPromises()
+      await wrapper.vm.updateQuestionsFromIndex(0)
+
       expect(wrapper.vm.prompts[0].questions[0].isValid).toBe(false)
       expect(wrapper.vm.prompts[0].questions[0].validationMessage ).toBe('validateResponse')
     })
 
-    test.skip('invoke for question validate , response is boolean', async () => {
+    test('invoke for question validate , response is boolean', async () => {
       wrapper.vm.rpc = {
         invoke: jest.fn().mockResolvedValue(true)
       }
@@ -246,8 +143,8 @@ describe('App.vue', () => {
         answers: {}
      }]
       wrapper.vm.promptIndex = 0
-      wrapper.vm.$options.watch["clonedAnswers"].handler.call(wrapper.vm)
-      await flushPromises()
+      await wrapper.vm.updateQuestionsFromIndex(0)
+
       expect(wrapper.vm.prompts[0].questions[0].isValid).toBe(true)
       expect(wrapper.vm.prompts[0].questions[0].validationMessage ).toBeUndefined()
     })
