@@ -60,12 +60,14 @@ export default {
     selected: {
       immediate: true,
       handler: function(selectedvalue) {
-        this.currentQuestion.answer = selectedvalue;
+        this.currentQuestion.answer = selectedvalue
+        this.$emit('changedQuestionIndex', this.questionIndex)
       }
     }
   },
   props: {
-    currentQuestion: Object
+    currentQuestion: Object,
+    questionIndex: Number
   }
 };
 </script>

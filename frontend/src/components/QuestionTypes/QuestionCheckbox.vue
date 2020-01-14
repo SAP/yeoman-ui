@@ -33,7 +33,8 @@ export default {
     }
   },
   props: {
-    currentQuestion: Object
+    currentQuestion: Object,
+    questionIndex: Number
   },
   data() {
     const selected = _.compact(
@@ -54,6 +55,11 @@ export default {
     selected: {
       handler(val) {
         this.currentQuestion.answer = val;
+      }
+    },
+    "options": {
+      handler() {
+        this.$emit('changedQuestionIndex', this.questionIndex)
       }
     }
   }

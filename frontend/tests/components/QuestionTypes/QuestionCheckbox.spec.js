@@ -53,6 +53,21 @@ describe('QuestionCheckbox.vue', () => {
         expect(wrapper.vm.currentQuestion.answer[0]).toBe('testValue1')
     })
 
+    test('options - watcher', () => {
+        wrapper = initComponent(QuestionCheckbox, {
+            currentQuestion: {
+                choices: [
+                    { value: 'testValue1', name: 'testName1', checked: true, text: 'testText1' },
+                    { value: 'testValue2', name: 'testName2', checked: true, text: 'testText2' }
+                ]
+            },
+            questionIndex: 2
+        })
+
+        wrapper.vm.$options.watch.options.handler.call(wrapper.vm)
+        expect(wrapper.emitted('changedQuestionIndex')[0]).toEqual([2])
+    })
+
     describe('options - computed', () => {
         test('choice without text property', () => {
             wrapper = initComponent(QuestionCheckbox, {

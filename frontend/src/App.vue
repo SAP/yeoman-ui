@@ -36,6 +36,7 @@
               :currentPrompt="currentPrompt"
               @generatorSelected="onGeneratorSelected"
               @stepvalidated="onStepValidated"
+              @changedQuestionIndex="updateQuestionsFromIndex"
             />
           </v-slide-x-transition>
         </v-col>
@@ -129,22 +130,17 @@ export default {
       return this.messages.selected_generator + this.generatorName;
     },
     currentPrompt() {
-      return _.get(this.prompts, "[" + this.promptIndex + "]");
-    },
-    currentPromptAnswers() {
-      const answers = _.get(this.currentPrompt, "answers", {});
-      const questions = _.get(this.currentPrompt, "questions", []);
-      for (const question of questions) {
-        _.set(
-          answers,
-          [question.name],
-          question.isWhen === false ? undefined : question.answer
-        );
-      }
-      return answers;
-    },
-    clonedAnswers() {
-      return _.cloneDeep(this.currentPromptAnswers);
+
+      const prompt = _.get(this.prompts, "[" + this.promptIndex +"]")
+      
+      const answers = _.get(prompt, "answers", {})
+      const questions = _.get(prompt, "questions", [])
+      _.forEach(questions, question => {
+        _.set(answers, [question.name], (question.isWhen === false ? undefined : question.answer))
+      })
+      _.set(prompt, "answers", answers)
+      
+      return prompt
     }
   },
   watch: {
@@ -162,57 +158,36 @@ export default {
       handler() {
         this.setBusyIndicator();
       }
-    },
-    clonedAnswers: {
-      deep: true,
-      async handler(newAnswers, oldAnswers) {
-        // TODO: consider using debounce (especially for questions of type 'input') to limit roundtrips
-        if (!_.isEmpty(newAnswers)) {
-          const questions = _.get(this, "currentPrompt.questions", []);
-
-          const questionWithNewAnswer = _.find(questions, question => {
-            const oldAnswer = _.get(oldAnswers, [question.name]);
-            const newAnswer = _.get(newAnswers, [question.name]);
-            return !_.isEqual(newAnswer, oldAnswer);
-          });
-
-          let relevantQuestionsToUpdate = questions; // go esover all questions for the first time
-          if (questionWithNewAnswer) {
-            const indexOfQuestionWithNewAnswer = _.indexOf(
-              questions,
-              questionWithNewAnswer
-            );
-            relevantQuestionsToUpdate = questions.slice(
-              indexOfQuestionWithNewAnswer
-            );
-          }
-
-          let showBusy = true;
-          const that = this;
-          const finished = relevantQuestionsToUpdate.reduce((p, question) => {
-            return p.then(() => that.updateQuestion(question, newAnswers));
-          }, Promise.resolve()); // initial
-
-          setTimeout(() => {
-            if (showBusy) {
-              that.showBusyIndicator = true;
-            }
-          }, 1000);
-
-          await finished;
-          showBusy = false;
-          this.showBusyIndicator = false;
-        }
-      }
     }
   },
   methods: {
+    async updateQuestionsFromIndex(questionIndex) {
+      const questions = _.get(this, "currentPrompt.questions", []);
+      const relevantQuestionsToUpdate = _.slice(questions, questionIndex)
+      
+      let showBusy = true
+      const that = this
+      const finished = relevantQuestionsToUpdate.reduce((p, question) => {
+        return p.then(() => that.updateQuestion(question))
+      }, Promise.resolve()); 
+
+      setTimeout(() => {
+        if (showBusy) {
+          that.showBusyIndicator = true
+        }
+      }, 500)
+
+      await finished
+      showBusy = false
+      this.showBusyIndicator = false
+    },
     setBusyIndicator() {
       this.showBusyIndicator =
         _.isEmpty(this.prompts) ||
         (this.currentPrompt.status === PENDING && !this.isDone);
     },
-    async updateQuestion(question, newAnswers) {
+    async updateQuestion(question) {
+      const newAnswers = this.currentPrompt.answers
       if (question.when === FUNCTION) {
         question.isWhen = await this.rpc.invoke("evaluateMethod", [
           [newAnswers],
@@ -269,7 +244,7 @@ export default {
     next() {
       if (this.resolve) {
         try {
-          this.resolve(this.clonedAnswers);
+          this.resolve(this.currentPrompt.answers);
         } catch (e) {
           this.reject(e);
           return;
@@ -313,10 +288,7 @@ export default {
             } else {
               if (currentPrompt) {
                 currentPrompt.questions = prompt.questions;
-                if (
-                  prompt.name &&
-                  currentPrompt.name === this.messages.step_is_pending
-                ) {
+                if (prompt.name && currentPrompt.name === this.messages.step_is_pending) {
                   currentPrompt.name = prompt.name;
                 }
                 // if questions are provided, remote the pending status
@@ -333,7 +305,8 @@ export default {
             // multiple prompts provided -- simply add them
             this.prompts.push(prompt);
           }
-        });
+        })
+        this.updateQuestionsFromIndex(0)
       }
     },
     setQuestionProps(prompt) {
@@ -367,15 +340,14 @@ export default {
       const prompt = this.createPrompt(questions, name);
       // evaluate message property on server if it is a function
       this.setPrompts([prompt]);
-      const promise = new Promise((resolve, reject) => {
+      const promise =  new Promise((resolve, reject) => {
         this.resolve = resolve;
         this.reject = reject;
       });
       return promise;
     },
     createPrompt(questions, name) {
-      name =
-        name === "select_generator" ? this.messages.select_generator : name;
+      name = (name === "select_generator" ? this.messages.select_generator : name)
       const prompt = Vue.observable({
         questions: questions,
         name: name,

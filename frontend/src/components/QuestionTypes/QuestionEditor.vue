@@ -18,7 +18,8 @@ import _ from "lodash"
 export default {
   name: "QuestionEditor",
   props: {
-    currentQuestion: Object
+    currentQuestion: Object,
+    questionIndex: Number
   },
   data() {
     return {
@@ -28,8 +29,8 @@ export default {
   watch: {
     text: {
       handler(val) {
-        this.currentQuestion.answer =
-          _.size(val) === 0 ? _.get(this.currentQuestion, "default") : val
+        this.currentQuestion.answer = _.size(val) === 0 ? _.get(this.currentQuestion, "default") : val
+        this.$emit('changedQuestionIndex', this.questionIndex)
       }
     }
   }

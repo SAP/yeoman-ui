@@ -9,32 +9,38 @@
           <div v-if="currentQuestion.isWhen">
             <QuestionInput
               v-if="!currentQuestion.type || currentQuestion.type==='input' || currentQuestion.type==='password' || currentQuestion.type==='number'"
-              :currentQuestion="currentQuestion"
+              :currentQuestion="currentQuestion" :questionIndex="index"
+              @changedQuestionIndex="onChangedQuestionIndex"
             />
 
             <QuestionEditor
               v-if="currentQuestion.type==='editor'"
-              :currentQuestion="currentQuestion"
+              :currentQuestion="currentQuestion" :questionIndex="index"
+              @changedQuestionIndex="onChangedQuestionIndex"
             />
 
             <QuestionList
               v-if="currentQuestion.type==='list' || currentQuestion.type==='rawlist'"
-              :currentQuestion="currentQuestion"
+              :currentQuestion="currentQuestion" :questionIndex="index"
+              @changedQuestionIndex="onChangedQuestionIndex"
             />
 
             <QuestionConfirm
               v-if="currentQuestion.type==='confirm'"
-              :currentQuestion="currentQuestion"
+              :currentQuestion="currentQuestion" :questionIndex="index"
+              @changedQuestionIndex="onChangedQuestionIndex"
             />
 
             <QuestionCheckbox
               v-if="currentQuestion.type==='checkbox'"
-              :currentQuestion="currentQuestion"
+              :currentQuestion="currentQuestion" :questionIndex="index"
+              @changedQuestionIndex="onChangedQuestionIndex"
             />
 
             <QuestionExpand
               v-if="currentQuestion.type==='expand'"
-              :currentQuestion="currentQuestion"
+              :currentQuestion="currentQuestion" :questionIndex="index"
+              @changedQuestionIndex="onChangedQuestionIndex"
             />
           </div>
         </div>
@@ -77,6 +83,9 @@ export default {
   methods: {
     onGeneratorSelected(generatorName) {
       this.$emit("generatorSelected", generatorName);
+    },
+    onChangedQuestionIndex(questionIndex) {
+      this.$emit("changedQuestionIndex", questionIndex)
     }
   }
 };

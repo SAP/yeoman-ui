@@ -3,6 +3,7 @@
       <QuestionTypeSelector
         :questions="currentPrompt.questions"
         @generatorSelected="onGeneratorSelected"
+        @changedQuestionIndex="onChangedQuestionIndex"
       />
   </div>
 </template>
@@ -21,6 +22,9 @@ export default {
   methods: {
     onGeneratorSelected(generatorName) {
       this.$emit("generatorSelected", generatorName)
+    },
+    onChangedQuestionIndex(questionIndex) {
+      this.$emit("changedQuestionIndex", questionIndex)
     }
   },
   watch: {
