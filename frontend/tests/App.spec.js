@@ -1,11 +1,9 @@
 import {initComponent, destroy} from './Utils'
 import App from '../src/App.vue';
 import Vue from 'vue'
-import BootstrapVue from 'bootstrap-vue'
 import Vuetify from 'vuetify'
 import { WebSocket } from 'mock-socket'
 
-Vue.use(BootstrapVue)
 Vue.use(Vuetify)
 global.WebSocket = WebSocket
 
