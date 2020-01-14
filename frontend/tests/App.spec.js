@@ -153,13 +153,11 @@ describe('App.vue', () => {
       }
       wrapper.vm.prompts = [{ 
         questions: [{
-          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true, doNotShow: false
         }],
         answers: {}
      }]
       wrapper.vm.promptIndex = 0
-
-      expect(wrapper.vm.prompts[0].questions[0].doNotShow).toBeUndefined()
 
       await wrapper.vm.updateQuestionsFromIndex(0)
 

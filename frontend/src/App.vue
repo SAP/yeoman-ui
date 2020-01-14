@@ -186,7 +186,7 @@ export default {
         (this.currentPrompt.status === PENDING && !this.isDone);
     },
     async updateQuestion(question) {
-      delete question.doNotShow
+      question.doNotShow = false
       const newAnswers = this.currentPrompt.answers
       try {
         if (question.when === FUNCTION) {
@@ -335,6 +335,7 @@ export default {
         }
         this.$set(question, "answer", answer);
         this.$set(question, "isValid", true);
+        this.$set(question, "doNotShow", false);
         this.$set(question, "validationMessage", true);
 
         this.$set(question, "isWhen", question.when !== FUNCTION);
