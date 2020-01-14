@@ -55,7 +55,7 @@ export default {
     default: {
       immediate: true,
       handler: function(defaultValue) {
-        this.selected = defaultValue
+        this.selected = defaultValue;
       }
     },
     selected: {

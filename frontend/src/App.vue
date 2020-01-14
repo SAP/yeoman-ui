@@ -169,7 +169,7 @@ export default {
       const that = this
       const finished = relevantQuestionsToUpdate.reduce((p, question) => {
         return p.then(() => that.updateQuestion(question))
-      }, Promise.resolve()); // initial
+      }, Promise.resolve()); 
 
       setTimeout(() => {
         if (showBusy) {

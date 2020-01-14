@@ -43,8 +43,8 @@ export default {
   watch: {
     text: {
       handler(val) {
-        this.currentQuestion.answer = _.size(val) === 0 ? _.get(this.currentQuestion, "default") : val
-        this.$emit('changedQuestionIndex', this.questionIndex)
+        this.currentQuestion.answer = _.size(val) === 0 ? _.get(this.currentQuestion, "default") : val;
+        this.$emit('changedQuestionIndex', this.questionIndex);
       }
     }
   }
