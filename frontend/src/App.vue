@@ -248,7 +248,7 @@ export default {
           errorInfo = _.get(error, "message", _.get(error, "stack", errorInfo));
         }
         
-        const errorMessage = `ERROR: question '${question.name}' update of generator '${this.generatorName}' has failed: ${errorInfo}`;
+        const errorMessage = `Failure updating '${question.name}' question in generator '${this.generatorName}' ==> ${errorInfo}`;
         await this.rpc.invoke("logMessage", [errorMessage]);
         this.rpc.invoke("toggleLog", [{}]);
       }
