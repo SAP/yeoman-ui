@@ -32,24 +32,6 @@ describe('GeneratorSelection.vue', () => {
             expect(wrapper.vm.getImageUrl({})).toBe("testPublicPath-generator.png")
         })
     })
-
-    describe.skip('emitSelection - method', () => {
-        beforeEach(() => {
-            wrapper = initComponent(GeneratorSelection, {
-                currentQuestion: {
-                    choices: [{imageUrl: 'testImageUrl', name: 'testName'}]
-                },
-                selectGenerator: jest.fn()
-            }, true)
-        })
-
-        test('on click event of vCard', async () => {
-            wrapper.find('.v-card').trigger('click')
-            await wrapper.vm.$nextTick()
-            expect(wrapper.emitted('generatorSelected')).toBeTruthy()
-            expect(wrapper.vm.$options.propsData.currentQuestion.answer).toBe('testName')
-        })
-    })
     
     describe('select - method', () => {
         beforeEach(() => {

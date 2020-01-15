@@ -1,11 +1,9 @@
 import {initComponent, destroy} from './Utils'
 import App from '../src/App.vue';
 import Vue from 'vue'
-import BootstrapVue from 'bootstrap-vue'
 import Vuetify from 'vuetify'
 import { WebSocket } from 'mock-socket'
 
-Vue.use(BootstrapVue)
 Vue.use(Vuetify)
 global.WebSocket = WebSocket
 
@@ -147,6 +145,25 @@ describe('App.vue', () => {
 
       expect(wrapper.vm.prompts[0].questions[0].isValid).toBe(true)
       expect(wrapper.vm.prompts[0].questions[0].validationMessage ).toBeUndefined()
+    })
+
+    test('invoke for question that throws error', async () => {
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockRejectedValueOnce("test error").mockResolvedValue()
+      }
+      wrapper.vm.prompts = [{ 
+        questions: [{
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true, doNotShow: false
+        }],
+        answers: {}
+      }]
+      wrapper.vm.promptIndex = 0
+
+      const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
+      await wrapper.vm.updateQuestionsFromIndex(0)
+      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [["validateAnswer", {"validateQ": "validateAnswer"}], 'validateQ', 'validate'])
+      expect(invokeSpy).toHaveBeenCalledWith('logMessage', ["'validateQ' question update of generator  has failed: test error"])
+      expect(invokeSpy).toHaveBeenCalledWith('toggleLog', [{}])
     })
   })
 

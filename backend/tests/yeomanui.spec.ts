@@ -409,6 +409,13 @@ describe('yeomanui unit test', () => {
         expect(res).to.be.false;
     });
 
+    it("logMessage", () => {
+        const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
+        const res = yeomanUi.logMessage("message");
+        // tslint:disable-next-line: no-unused-expression
+        expect(res).to.be.undefined;
+    });
+
     describe("getEnv", () => {
         const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
         const testEnv = yeomanUi["getEnv"]();

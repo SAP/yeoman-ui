@@ -1,9 +1,7 @@
 import { mount, shallowMount } from '@vue/test-utils'
 import Vue from 'vue'
-import BootstrapVue from 'bootstrap-vue'
 import Vuetify from 'vuetify'
 Vue.use(Vuetify);
-Vue.use(BootstrapVue)
 
 import {
     createLocalVue

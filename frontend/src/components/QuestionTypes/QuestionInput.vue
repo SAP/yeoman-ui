@@ -32,11 +32,6 @@ export default {
   },
   computed: {
     type() {
-      // mapping between
-      //   https://www.npmjs.com/package/inquirer#question
-      // and
-      //   https://bootstrap-vue.js.org/docs/components/form-input/
-      // const questionType = _.get(this.currentQuestion, "type")
       const type = this.currentQuestion.type;
       return type === "input" ? "text" : type;
     }
