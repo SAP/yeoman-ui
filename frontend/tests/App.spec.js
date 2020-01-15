@@ -147,7 +147,7 @@ describe('App.vue', () => {
       expect(wrapper.vm.prompts[0].questions[0].validationMessage ).toBeUndefined()
     })
 
-    test('invoke for question that throws error', async () => {
+    test('invoke for question that throws error as string', async () => {
       wrapper.vm.rpc = {
         invoke: jest.fn().mockRejectedValueOnce("test error").mockResolvedValue()
       }
@@ -157,13 +157,38 @@ describe('App.vue', () => {
         }],
         answers: {}
       }]
+      wrapper.vm.generatorName = "testGen";
       wrapper.vm.promptIndex = 0
 
       const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
       await wrapper.vm.updateQuestionsFromIndex(0)
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [["validateAnswer", {"validateQ": "validateAnswer"}], 'validateQ', 'validate'])
-      expect(invokeSpy).toHaveBeenCalledWith('logMessage', ["'validateQ' question update of generator  has failed: test error"])
+      expect(invokeSpy).toHaveBeenCalledWith('logMessage', ["ERROR: question 'validateQ' update of generator 'testGen' has failed: test error"])
       expect(invokeSpy).toHaveBeenCalledWith('toggleLog', [{}])
+
+      invokeSpy.mockRestore();
+    })
+
+    test('invoke for question that throws error as error object', async () => {
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockRejectedValueOnce(new Error("test error")).mockResolvedValueOnce().mockResolvedValueOnce()
+      }
+      wrapper.vm.prompts = [{ 
+        questions: [{
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true, doNotShow: false
+        }],
+        answers: {}
+      }]
+      wrapper.vm.generatorName = "testGen";
+      wrapper.vm.promptIndex = 0
+
+      const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
+      await wrapper.vm.updateQuestionsFromIndex(0)
+      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [["validateAnswer", {"validateQ": "validateAnswer"}], 'validateQ', 'validate'])
+      // expect(invokeSpy).toHaveBeenCalledWith('logMessage', ["ERROR: question 'validateQ' update of generator 'testGen' has failed: Error: test error"])
+      expect(invokeSpy).toHaveBeenCalledWith('toggleLog', [{}])
+
+      invokeSpy.mockRestore();
     })
   })
 
