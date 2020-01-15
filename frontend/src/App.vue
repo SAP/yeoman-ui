@@ -186,7 +186,6 @@ export default {
         (this.currentPrompt.status === PENDING && !this.isDone);
     },
     async updateQuestion(question) {
-      question.doNotShow = false;
       const newAnswers = this.currentPrompt.answers
       try {
         if (question.when === FUNCTION) {
@@ -242,9 +241,9 @@ export default {
           }
         }
       } catch (error) {
-        question.doNotShow = true; 
         const message = `'${question.name}' question update of generator ${this.generatorName} has failed: ${_.get(error, "message", error)}`;
-        this.rpc.invoke("logMessage", [message]);
+        await this.rpc.invoke("logMessage", [message]);
+        this.rpc.invoke("toggleLog", [{}]);
       }
     },
     next() {
