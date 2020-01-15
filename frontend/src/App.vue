@@ -241,8 +241,15 @@ export default {
           }
         }
       } catch (error) {
-        const message = `'${question.name}' question update of generator ${this.generatorName} has failed: ${_.get(error, "message", error)}`;
-        await this.rpc.invoke("logMessage", [message]);
+        let errorInfo = "No failure info";
+        if (_.isString(error)) {
+          errorInfo = error;
+        } else {
+          errorInfo = _.get(error, "message", _.get(error, "stack", errorInfo));
+        }
+        
+        const errorMessage = `Failed to update '${question.name}' question in generator '${this.generatorName}'. Reason: ${errorInfo}`;
+        await this.rpc.invoke("logMessage", [errorMessage]);
         this.rpc.invoke("toggleLog", [{}]);
       }
     },
