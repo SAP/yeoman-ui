@@ -163,7 +163,7 @@ describe('App.vue', () => {
       const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
       await wrapper.vm.updateQuestionsFromIndex(0)
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [["validateAnswer", {"validateQ": "validateAnswer"}], 'validateQ', 'validate'])
-      expect(invokeSpy).toHaveBeenCalledWith('logMessage', [`Failure updating 'validateQ' question in generator 'testGen' ==> test error`])
+      expect(invokeSpy).toHaveBeenCalledWith('logMessage', [`Failed to update 'validateQ' question in generator 'testGen'. Reason: test error`])
       expect(invokeSpy).toHaveBeenCalledWith('toggleLog', [{}])
 
       invokeSpy.mockRestore();
@@ -185,7 +185,7 @@ describe('App.vue', () => {
       const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
       await wrapper.vm.updateQuestionsFromIndex(0)
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [["validateAnswer", {"validateQ": "validateAnswer"}], 'validateQ', 'validate'])
-      expect(invokeSpy).toHaveBeenCalledWith('logMessage', [`Failure updating 'validateQ' question in generator 'testGen' ==> test error`])
+      expect(invokeSpy).toHaveBeenCalledWith('logMessage', [`Failed to update 'validateQ' question in generator 'testGen'. Reason: test error`])
       expect(invokeSpy).toHaveBeenCalledWith('toggleLog', [{}])
 
       invokeSpy.mockRestore();

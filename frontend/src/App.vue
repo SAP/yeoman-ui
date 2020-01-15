@@ -241,14 +241,14 @@ export default {
           }
         }
       } catch (error) {
-        let errorInfo = "No error info";
+        let errorInfo = "No failure info";
         if (_.isString(error)) {
           errorInfo = error;
         } else {
           errorInfo = _.get(error, "message", _.get(error, "stack", errorInfo));
         }
         
-        const errorMessage = `Failure updating '${question.name}' question in generator '${this.generatorName}' ==> ${errorInfo}`;
+        const errorMessage = `Failed to update '${question.name}' question in generator '${this.generatorName}'. Reason: ${errorInfo}`;
         await this.rpc.invoke("logMessage", [errorMessage]);
         this.rpc.invoke("toggleLog", [{}]);
       }
