@@ -67,6 +67,7 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.runGenerator, thisArg: this });
     this.rpc.registerMethod({ func: this.evaluateMethod, thisArg: this });
     this.rpc.registerMethod({ func: this.toggleLog, thisArg: this });
+    this.rpc.registerMethod({ func: this.logMessage, thisArg: this });
     this.youiAdapter = new YouiAdapter(logger);
     this.youiAdapter.setYeomanUI(this);
     this.promptCount = 0;
@@ -207,6 +208,10 @@ export class YeomanUI {
 
   public toggleLog(): boolean {
     return this.logger.showLog();
+  }
+
+  public logMessage(message: string): void {
+    this.logger.log(message);
   }
 
   public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {

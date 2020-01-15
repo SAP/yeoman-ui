@@ -149,18 +149,17 @@ describe('App.vue', () => {
 
     test('invoke for question that throws error', async () => {
       wrapper.vm.rpc = {
-        invoke: jest.fn().mockRejectedValue("test error")
+        invoke: jest.fn().mockRejectedValueOnce("test error")
       }
       wrapper.vm.prompts = [{ 
         questions: [{
           name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true, doNotShow: false
         }],
         answers: {}
-     }]
+      }]
       wrapper.vm.promptIndex = 0
 
       await wrapper.vm.updateQuestionsFromIndex(0)
-
       expect(wrapper.vm.prompts[0].questions[0].doNotShow).toBe(true)
     })
   })
