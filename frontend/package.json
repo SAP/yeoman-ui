@@ -15,14 +15,14 @@
     "precommit": "lint-staged"
   },
   "dependencies": {
+    "@mdi/font": "^4.5.95",
     "core-js": "2.6.6",
     "jquery": "3.4.1",
-    "vue-loading-overlay": "^3.2.0",
     "lodash": "^4.17.15",
-    "vue": "^2.6.10",
-    "vuetify": "^2.2.1",
     "material-design-icons-iconfont": "^5.0.1",
-    "@mdi/font": "^4.5.95"
+    "vue": "^2.6.10",
+    "vue-loading-overlay": "^3.2.0",
+    "vuetify": "^2.2.1"
   },
   "devDependencies": {
     "@sap-devx/webview-rpc": "^0.2.0",

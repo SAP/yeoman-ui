@@ -241,8 +241,9 @@ export default {
           }
         }
       } catch (error) {
-        const message = `'${question.name}' question update of generator ${this.generatorName} has failed: ${_.get(error, "message", error)}`;
-        await this.rpc.invoke("logMessage", [message]);
+        const errorInfo = _.get(error, "message", _.get(error, "stack", "No error info"));
+        const errorMessage = `Error while calculating question '${question.name}' of generator '${this.generatorName}': ${errorInfo}`;
+        await this.rpc.invoke("logMessage", [errorMessage]);
         this.rpc.invoke("toggleLog", [{}]);
       }
     },
