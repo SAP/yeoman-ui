@@ -3,6 +3,7 @@
   <p class="question-label">{{currentQuestion.message}}</p>
   <v-textarea
     solo
+    rows=7
     v-model="text"
     :placeholder="currentQuestion.default"
     class="yeoman-form-control"
