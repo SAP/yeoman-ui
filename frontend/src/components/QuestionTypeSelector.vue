@@ -3,7 +3,7 @@
     <v-col v-if="questions[0] && questions[0].type==='generators'" cols="12">
       <GeneratorSelection :currentQuestion="questions[0]" :selectGenerator="selectGenerator" />
     </v-col>
-    <v-col xl="6" lg="6" md="8" sm="11" xs="12">
+    <v-col xl="8" lg="8" md="8" sm="11" xs="12">
       <v-form>
         <div v-for="(currentQuestion, index) in questions" :key="index">
           <div v-if="currentQuestion.isWhen">
