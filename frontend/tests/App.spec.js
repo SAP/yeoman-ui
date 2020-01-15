@@ -171,7 +171,7 @@ describe('App.vue', () => {
 
     test('invoke for question that throws error as error object', async () => {
       wrapper.vm.rpc = {
-        invoke: jest.fn().mockRejectedValueOnce(new Error("test error")).mockResolvedValueOnce().mockResolvedValueOnce()
+        invoke: jest.fn().mockRejectedValueOnce(new Error("test error")).mockResolvedValue()
       }
       wrapper.vm.prompts = [{ 
         questions: [{
@@ -185,7 +185,7 @@ describe('App.vue', () => {
       const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
       await wrapper.vm.updateQuestionsFromIndex(0)
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [["validateAnswer", {"validateQ": "validateAnswer"}], 'validateQ', 'validate'])
-      // expect(invokeSpy).toHaveBeenCalledWith('logMessage', ["ERROR: question 'validateQ' update of generator 'testGen' has failed: Error: test error"])
+      expect(invokeSpy).toHaveBeenCalledWith('logMessage', ["ERROR: question 'validateQ' update of generator 'testGen' has failed: test error"])
       expect(invokeSpy).toHaveBeenCalledWith('toggleLog', [{}])
 
       invokeSpy.mockRestore();

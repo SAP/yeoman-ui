@@ -245,7 +245,7 @@ export default {
         if (_.isString(error)) {
           errorInfo = error;
         } else {
-          errorInfo = _.get(error, "stack", errorInfo);
+          errorInfo = _.get(error, "message", _.get(error, "stack", errorInfo));
         }
         
         const errorMessage = `ERROR: question '${question.name}' update of generator '${this.generatorName}' has failed: ${errorInfo}`;
