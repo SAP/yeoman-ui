@@ -286,9 +286,10 @@ describe('App.vue', () => {
     wrapper = initComponent(App)
     wrapper.vm.generatorName = 'test_ge_name'
 
-    wrapper.vm.selectGenerator('testGeneratorName');
+    wrapper.vm.selectGenerator('testGeneratorName', 'Test Generator Name');
     
     expect(wrapper.vm.generatorName).toBe('testGeneratorName')
+    expect(wrapper.vm.generatorPrettyName).toBe('Test Generator Name')
   })
 
   test('onStepValidated - method', () => {
