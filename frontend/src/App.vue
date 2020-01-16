@@ -101,6 +101,7 @@ export default {
   data() {
     return {
       generatorName: "",
+      generatorPrettyName: "",
       stepValidated: false,
       prompts: [],
       promptIndex: 0,
@@ -127,7 +128,7 @@ export default {
       );
     },
     selectedGeneratorHeader() {
-      return this.messages.selected_generator + this.generatorName;
+      return this.generatorName ? this.messages.selected_generator + this.generatorPrettyName : "";
     },
     currentPrompt() {
       const prompt = _.get(this.prompts, "[" + this.promptIndex +"]")
@@ -275,8 +276,9 @@ export default {
       this.prompts[this.promptIndex].active = true;
       this.transitionToggle = !this.transitionToggle;
     },
-    selectGenerator(generatorName) {
+    selectGenerator(generatorName, generatorPrettyName) {
       this.generatorName = generatorName;
+      this.generatorPrettyName = generatorPrettyName;
     },
     onStepValidated(stepValidated) {
       this.stepValidated = stepValidated;
