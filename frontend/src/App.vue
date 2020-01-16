@@ -241,21 +241,24 @@ export default {
           }
         }
       } catch (error) {
-        let errorInfo;
-        if (_.isString(error)) {
-          errorInfo = error;
-        } else {
-          errorInfo = _.get(error, "message", _.get(error, "stack", ""));
-        }
-        
-        if (!_.isEmpty(errorInfo)) {
-          errorInfo = ` Reason: ${errorInfo}`;
-        } 
-        
-        const errorMessage = `Could not update the '${question.name}' question in generator '${this.generatorName}'.${errorInfo}`;
+        const errorMessage = this.getErrorMessageOnException(question, error);
         await this.rpc.invoke("logMessage", [errorMessage]);
         this.rpc.invoke("toggleLog", [{}]);
       }
+    },
+    getErrorMessageOnException(question, error) {
+      let errorInfo;
+      if (_.isString(error)) {
+        errorInfo = error;
+      } else {
+        errorInfo = _.get(error, "message", _.get(error, "stack", ""));
+      }
+      
+      if (!_.isEmpty(errorInfo)) {
+        errorInfo = ` Reason: ${errorInfo}`;
+      } 
+      
+      return `Could not update the '${question.name}' question in generator '${this.generatorName}'.${errorInfo}`;
     },
     next() {
       if (this.resolve) {
