@@ -28,7 +28,7 @@
                 <v-card-text>
                   {{item.message}}
                   <br />
-                  <a :href="item.homepage">Generator Documentation</a>
+                  <a :href="item.homepage">More Information</a>
                 </v-card-text>
                 <v-spacer></v-spacer>
                 <v-card-actions>
@@ -76,7 +76,9 @@ export default {
     },
     emitSelection(generatorName) {
       this.currentQuestion.answer = generatorName;
-      this.selectGenerator(generatorName);
+      const choice = _.find(this.currentQuestion.choices, choice => {return choice.name === generatorName});
+      const generatorPrettyName = _.get(choice, "prettyName", generatorName);
+      this.selectGenerator(generatorName, generatorPrettyName);
     }
   }
 };
