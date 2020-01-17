@@ -38,8 +38,11 @@ export default {
   },
   methods: {
     onChange() {
-      this.currentQuestion.answer = _.isEmpty(this.text) ? _.get(this.currentQuestion, "default") : this.text;
-      this.updateQuestionsFromIndex(this.questionIndex);
+      const currentValue = _.isEmpty(this.text) ? _.get(this.currentQuestion, "default") : this.text;
+      if (this.currentQuestion.answer !== currentValue) {
+        this.currentQuestion.answer = currentValue;
+        this.updateQuestionsFromIndex(this.questionIndex);
+      }
     }
   }
 };
