@@ -61,5 +61,20 @@ describe('QuestionInput.vue', () => {
             wrapper.vm.onChange()
             expect(wrapper.vm.currentQuestion.answer).toBe('test_value')
         })
+
+        test('text size is equal to previous answer', async () => {
+            wrapper = initComponent(QuestionInput, {
+                currentQuestion: {
+                    type: 'time', default: 'testDefault', answer: 'testAnswer'
+                },
+                updateQuestionsFromIndex: jest.fn()
+            })
+            
+            const spyUpdateQuestionsFromIndex = jest.spyOn(wrapper.vm, 'updateQuestionsFromIndex')
+            wrapper.vm.$data.text = 'testAnswer'
+            wrapper.vm.onChange()
+            expect(spyUpdateQuestionsFromIndex).not.toHaveBeenCalled()
+            spyUpdateQuestionsFromIndex.mockRestore()
+        })
     })
 })
