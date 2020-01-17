@@ -186,6 +186,30 @@ describe('App.vue', () => {
       await wrapper.vm.updateQuestionsFromIndex(0)
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [["validateAnswer", {"validateQ": "validateAnswer"}], 'validateQ', 'validate'])
       expect(invokeSpy).toHaveBeenCalledWith('logMessage', [`Could not update the 'validateQ' question in generator 'testGen'. Reason: test error`])
+
+      expect(invokeSpy).toHaveBeenCalledWith('toggleLog', [{}])
+
+      invokeSpy.mockRestore();
+    })
+
+    test('invoke for question that throws error as error object without message', async () => {
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockRejectedValueOnce(new Error()).mockResolvedValue()
+      }
+      wrapper.vm.prompts = [{ 
+        questions: [{
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true, doNotShow: false
+        }],
+        answers: {}
+      }]
+      wrapper.vm.generatorName = "testGen";
+      wrapper.vm.promptIndex = 0
+
+      const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
+      await wrapper.vm.updateQuestionsFromIndex(0)
+      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [["validateAnswer", {"validateQ": "validateAnswer"}], 'validateQ', 'validate'])
+      expect(invokeSpy).toHaveBeenCalledWith('logMessage', [`Could not update the 'validateQ' question in generator 'testGen'.`])
+
       expect(invokeSpy).toHaveBeenCalledWith('toggleLog', [{}])
 
       invokeSpy.mockRestore();
@@ -286,9 +310,10 @@ describe('App.vue', () => {
     wrapper = initComponent(App)
     wrapper.vm.generatorName = 'test_ge_name'
 
-    wrapper.vm.selectGenerator('testGeneratorName');
+    wrapper.vm.selectGenerator('testGeneratorName', 'Test Generator Name');
     
     expect(wrapper.vm.generatorName).toBe('testGeneratorName')
+    expect(wrapper.vm.generatorPrettyName).toBe('Test Generator Name')
   })
 
   test('onStepValidated - method', () => {
