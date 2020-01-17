@@ -101,6 +101,7 @@ export default {
   data() {
     return {
       generatorName: "",
+      generatorPrettyName: "",
       stepValidated: false,
       prompts: [],
       promptIndex: 0,
@@ -127,7 +128,7 @@ export default {
       );
     },
     selectedGeneratorHeader() {
-      return this.messages.selected_generator + this.generatorName;
+      return this.generatorName ? this.messages.selected_generator + this.generatorPrettyName : "";
     },
     currentPrompt() {
       const prompt = _.get(this.prompts, "[" + this.promptIndex +"]")
@@ -241,21 +242,24 @@ export default {
           }
         }
       } catch (error) {
-        let errorInfo;
-        if (_.isString(error)) {
-          errorInfo = error;
-        } else {
-          errorInfo = _.get(error, "message", _.get(error, "stack", ""));
-        }
-        
-        if (!_.isEmpty(errorInfo)) {
-          errorInfo = ` Reason: ${errorInfo}`;
-        } 
-        
-        const errorMessage = `Could not update the '${question.name}' question in generator '${this.generatorName}'.${errorInfo}`;
+        const errorMessage = this.getErrorMessageOnException(question, error);
         await this.rpc.invoke("logMessage", [errorMessage]);
         this.rpc.invoke("toggleLog", [{}]);
       }
+    },
+    getErrorMessageOnException(question, error) {
+      let errorInfo;
+      if (_.isString(error)) {
+        errorInfo = error;
+      } else {
+        errorInfo = _.get(error, "message", _.get(error, "stack", ""));
+      }
+      
+      if (!_.isEmpty(errorInfo)) {
+        errorInfo = ` Reason: ${errorInfo}`;
+      } 
+      
+      return `Could not update the '${question.name}' question in generator '${this.generatorName}'.${errorInfo}`;
     },
     next() {
       if (this.resolve) {
@@ -279,8 +283,9 @@ export default {
       this.prompts[this.promptIndex].active = true;
       this.transitionToggle = !this.transitionToggle;
     },
-    selectGenerator(generatorName) {
+    selectGenerator(generatorName, generatorPrettyName) {
       this.generatorName = generatorName;
+      this.generatorPrettyName = generatorPrettyName;
     },
     onStepValidated(stepValidated) {
       this.stepValidated = stepValidated;
