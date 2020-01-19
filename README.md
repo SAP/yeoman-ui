@@ -26,11 +26,8 @@ To test run the framework you only need to build & install the backend package, 
     ```
 * To install, compile and prepare the static resources run the following commands:
     ```bash
-    npm install
-    npm run compile
-    npm run frontend:install
-    npm run frontend:build
-    npm run frontend:copy
+    npm run backend
+    npm run frontend
     ```
 ### Usage & Development
 #### Run the dev mode
@@ -58,9 +55,8 @@ To develop and contribute you can build & install each package seperatly. Instru
 * [Build & install the yeoman example generator](generator-foodq/README.md)
 
 ## Known Issues
-* Not all inquirer.js types are supported.
 * inquirer.js plugins not supported.
-* backend evaluation mid-prompt of functions only support when and validations.
+* transformer function not supported.
 
 ## How to obtain support
 To get more help, support and information please open a github issue.
@@ -69,14 +65,9 @@ To get more help, support and information please open a github issue.
 Contributing information can be found in the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 ## TODO
-* CI 
-* Tests 90%
 * error handling
     * promise rejects while performing rpc calls
     * ensure callback of `Generator.run()` is called when user aborts during conflict resolution and when exceptions occur.
-* layout (align with mockup)
-    * move next button to flush with bottom of page
-    * navbar (replace?)
 * support 3 default themes (vscode-black, vscode-white, non-vscode) ( pending Theia 13 adoption)
 * provide yeoman generator best practice guide (also provide example)
 * use debounce when watching changes to input fields
@@ -95,7 +86,6 @@ Contributing information can be found in the [CONTRIBUTING.md](CONTRIBUTING.md) 
 * support extensible question type custom user interfaces for complex operations (e.g. choose odata source)
 * support inquirer plugins (e.g. date/time)
 
-* consume rpc from npm
 
 ## License
 Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved. This file is licensed under the Apache Software License, v. 2 except as noted otherwise in the [LICENSE]() file.
