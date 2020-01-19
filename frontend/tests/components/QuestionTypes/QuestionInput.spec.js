@@ -35,6 +35,34 @@ describe('QuestionInput.vue', () => {
         })
     })
 
+    describe('currentQuestion.answe - watch', () => {
+        test('current answer is undefined', () => {
+            wrapper = initComponent(QuestionInput, {
+                currentQuestion: {
+                    type: 'input', default: 'testDefault', answer: 'testAnswer'
+                },
+                updateQuestionsFromIndex: () => {}
+            })
+            
+            wrapper.vm.$data.text = ''
+            wrapper.vm.$options.watch["currentQuestion.answer"].handler.call(wrapper.vm, undefined)
+            expect(wrapper.vm.$data.text).toBeUndefined()
+        })
+
+        test('current answer is defined', () => {
+            wrapper = initComponent(QuestionInput, {
+                currentQuestion: {
+                    type: 'input', default: 'testDefault', answer: 'testAnswer'
+                },
+                updateQuestionsFromIndex: () => {}
+            })
+            
+            wrapper.vm.$data.text = ''
+            wrapper.vm.$options.watch["currentQuestion.answer"].handler.call(wrapper.vm, "test")
+            expect(wrapper.vm.$data.text).toBe("test")
+        })
+    })
+
     describe('text - method', () => {
         test('text size is 0', async () => {
             wrapper = initComponent(QuestionInput, {

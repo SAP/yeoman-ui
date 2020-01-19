@@ -36,6 +36,13 @@ export default {
       return type === "input" ? "text" : type;
     }
   },
+  watch: {
+    "currentQuestion.answer": {
+      handler(currentAnswer) {
+        this.text = currentAnswer;
+      }
+    }
+  },
   methods: {
     onChange() {
       const currentValue = _.isEmpty(this.text) ? _.get(this.currentQuestion, "default") : this.text;
