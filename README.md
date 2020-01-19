@@ -14,7 +14,7 @@ The repository contains three main packages:
 
 ## Requirements
 * [node.js](https://www.npmjs.com/package/node) version 10 or higher.
-* [VSCode](https://code.visualstudio.com/) 1.38 or higher or [Theia](https://www.theia-ide.org/) 0.12 or higher.
+* [VSCode](https://code.visualstudio.com/) 1.39.2 or higher or [Theia](https://www.theia-ide.org/) 0.12 or higher.
 
 ## Download and Installation
 To test run the framework you only need to build & install the backend package, which will automatically build & run the UI.
