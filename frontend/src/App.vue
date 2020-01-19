@@ -161,16 +161,16 @@ export default {
     }
   },
   methods: {
-    async updateQuestionsFromIndex(initialQuestionIndex) {
+    async updateQuestionsFromIndex(changedQuestionIndex) {
       const questions = _.get(this, "currentPrompt.questions", []);
-      const relevantQuestionsToUpdate = _.slice(questions, initialQuestionIndex)
+      const relevantQuestionsToUpdate = _.slice(questions, changedQuestionIndex)
       
       let showBusy = true
       const that = this
-      let questionIndex = initialQuestionIndex - 1;
+      let questionIndex = changedQuestionIndex - 1;
       const finished = relevantQuestionsToUpdate.reduce((p, question) => {
         questionIndex++;
-        return p.then(() => that.updateQuestion(question, questionIndex, initialQuestionIndex))
+        return p.then(() => that.updateQuestion(question, questionIndex, changedQuestionIndex))
       }, Promise.resolve()); 
 
       setTimeout(() => {
@@ -188,7 +188,7 @@ export default {
         _.isEmpty(this.prompts) ||
         (this.currentPrompt.status === PENDING && !this.isDone);
     },
-    async updateQuestion(question, questionIndex, initialQuestionIndex) {
+    async updateQuestion(question, questionIndex, changedQuestionIndex) {
       const newAnswers = this.currentPrompt.answers
       try {
         if (question.when === FUNCTION) {
@@ -217,7 +217,7 @@ export default {
               question.answer = question.default;
             }
           }
-          if (questionIndex !== initialQuestionIndex && question.type === "password") {
+          if (questionIndex !== changedQuestionIndex && question.type === "password") {
             question.answer = undefined;
           }
           if (question._message === FUNCTION) {
