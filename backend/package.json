@@ -7,7 +7,7 @@
 	"repository": "https://github.com/SAP/yeoman-ui",
 	"version": "0.0.26",
 	"engines": {
-		"vscode": "^1.38.0"
+		"vscode": "^1.39.2"
 	},
 	"categories": [
 		"Other"
