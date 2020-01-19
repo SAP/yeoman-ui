@@ -27,7 +27,7 @@ export default {
   },
   data() {
     return {
-      text: _.get(this.currentQuestion, "default")
+      text: undefined
     };
   },
   computed: {
