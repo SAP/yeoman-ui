@@ -177,7 +177,7 @@ export default {
         if (showBusy) {
           that.showBusyIndicator = true
         }
-      }, 500)
+      }, 1000)
 
       await finished
       showBusy = false
