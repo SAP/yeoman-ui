@@ -1,7 +1,8 @@
 <template>
   <div id="question-input">
     <p class="question-label">{{currentQuestion.message}}</p>
-    <v-text-field
+    <v-text-field @blur="onChange"
+      @keyup.enter="onChange"
       v-model="text"
       :type="type"
       :placeholder="currentQuestion.default"
@@ -24,7 +25,6 @@ export default {
     questionIndex: Number,
     updateQuestionsFromIndex: Function
   },
-
   data() {
     return {
       text: undefined
@@ -36,10 +36,11 @@ export default {
       return type === "input" ? "text" : type;
     }
   },
-  watch: {
-    text: {
-      handler(val) {
-        this.currentQuestion.answer = _.size(val) === 0 ? _.get(this.currentQuestion, "default") : val;
+  methods: {
+    onChange() {
+      const currentValue = _.isEmpty(this.text) ? _.get(this.currentQuestion, "default") : this.text;
+      if (this.currentQuestion.answer !== currentValue) {
+        this.currentQuestion.answer = currentValue;
         this.updateQuestionsFromIndex(this.questionIndex);
       }
     }
