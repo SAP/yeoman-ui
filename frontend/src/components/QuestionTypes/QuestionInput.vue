@@ -37,6 +37,11 @@ export default {
     }
   },
   watch: {
+    "currentQuestion.answer": {
+      handler(currentAnswer) {
+        this.text = currentAnswer;
+      }
+    },
     text: {
       handler(val) {
         this.currentQuestion.answer = _.size(val) === 0 ? _.get(this.currentQuestion, "default") : val;
