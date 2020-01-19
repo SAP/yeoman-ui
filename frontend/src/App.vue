@@ -217,7 +217,7 @@ export default {
               question.answer = question.default;
             }
           }
-          if (questionIndex !== changedQuestionIndex && question.type === "password") {
+          if (question.type === "password" && questionIndex !== changedQuestionIndex) {
             question.answer = undefined;
           }
           if (question._message === FUNCTION) {
