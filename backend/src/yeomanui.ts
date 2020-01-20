@@ -5,9 +5,9 @@ import * as fsextra from "fs-extra";
 import * as _ from "lodash";
 import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
+const datauri = require("datauri");
 const titleize = require('titleize');
 const humanizeString = require('humanize-string');
-const datauri = require("datauri");
 import * as defaultImage from "./defaultImage";
 import { YouiAdapter } from "./youi-adapter";
 import { YouiLog } from "./youi-log";
@@ -40,7 +40,7 @@ export class YeomanUI {
     return _.isFunction(value) ? "__Function" : value;
   }
 
-  private static defaultMessage = 
+  private static defaultMessage =
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
   private static YEOMAN_PNG = "yeoman.png";
   private static isWin32 = (process.platform === 'win32');
@@ -74,7 +74,7 @@ export class YeomanUI {
     this.genMeta = {};
     this.currentQuestions = {};
     this.setGenFilter(genFilter);
-    
+
   }
 
   public setGenFilter(genFilter: GeneratorFilter) {
@@ -96,7 +96,7 @@ export class YeomanUI {
   private getEnv(): Environment.Options {
     const env: Environment.Options = Environment.createEnv();
     const envGetNpmPaths: () => any = env.getNpmPaths;
-    env.getNpmPaths = function (localOnly:boolean = false) {
+    env.getNpmPaths = function (localOnly: boolean = false) {
       // Start with the local paths derived by cwd in vscode 
       // (as opposed to cwd of the plugin host process which is what is used by yeoman/environment)
       // Walk up the CWD and add `node_modules/` folder lookup on each level
@@ -107,8 +107,8 @@ export class YeomanUI {
 
       });
       const defaultPaths = envGetNpmPaths.call(this, localOnly);
-      
-      return  _.uniq(localPaths.concat(defaultPaths));
+
+      return _.uniq(localPaths.concat(defaultPaths));
     };
     return env;
   }
@@ -132,14 +132,10 @@ export class YeomanUI {
       env.register(meta.resolved);
       const getGenMetadataName = this.getGenMetaName(generatorName);
       const gen: any = env.create(getGenMetadataName, {});
-      // check if generator defined a helper function called getPrompts()
-      const genGetPrompts = _.get(gen, "getPrompts");
-      if (genGetPrompts) {
-        const promptNames: any[] = genGetPrompts();
-        const prompts: IPrompt[] = promptNames.map(value => {
-          return _.assign({ questions: [], name: "" }, value);
-        });
-        this.setPrompts(prompts);
+      // check if generator defined a helper function called setPromptsCallback()
+      const setPromptsCallback = _.get(gen, "setPromptsCallback");
+      if (setPromptsCallback) {
+        setPromptsCallback(this.setPromptList.bind(this));
       }
 
       const genGetImage = _.get(gen, "getImage");
@@ -181,6 +177,10 @@ export class YeomanUI {
 
   public doGeneratorDone(success: boolean, message: string, targetPath = ""): Promise<any> {
     return this.rpc.invoke("generatorDone", [true, message, targetPath]);
+  }
+
+  public setMessages(messages: any): Promise<void> {
+    return this.rpc ? this.rpc.invoke("setMessages", [messages]) : Promise.resolve();
   }
 
   /**
@@ -226,7 +226,16 @@ export class YeomanUI {
       const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
       return this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
   }
-  
+
+  private getPromptName(questions: Environment.Adapter.Questions<any>): string {
+    const firstQuestionName = _.get(questions, "[0].name");
+    if (firstQuestionName) {
+      return _.startCase(firstQuestionName);
+    } else {
+      return `Step ${this.promptCount}`;
+    }
+  }
+
   private async onEnvLookup(env: Environment.Options, resolve: any, filter?: GeneratorFilter) {
     this.genMeta = env.getGeneratorsMeta();
     const generatorNames: string[] = env.getGeneratorNames();
@@ -246,19 +255,19 @@ export class YeomanUI {
 
   private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<IGeneratorChoice | undefined> {
     let packageJson: any;
-    
+
     const genPackagePath = this.getGenMetaPackagePath(genName);
     try {
       packageJson = await this.getGenPackageJson(genPackagePath);
     } catch (error) {
       return Promise.resolve(undefined);
     }
-    
+
     const genFilter: GeneratorFilter = GeneratorFilter.create(_.get(packageJson, ["generator-filter"]));
     const typeEqual: boolean = (filter.type === GeneratorType.all || filter.type === genFilter.type);
     const categoriesHasIntersection: boolean = (_.isEmpty(filter.categories) || !_.isEmpty(_.intersection(filter.categories, genFilter.categories)));
     if (typeEqual && categoriesHasIntersection) {
-        return this.createGeneratorChoice(genName, genPackagePath, packageJson);
+      return this.createGeneratorChoice(genName, genPackagePath, packageJson);
     }
 
     return Promise.resolve(undefined);
@@ -316,7 +325,11 @@ export class YeomanUI {
     return JSON.parse(JSON.stringify(questions, YeomanUI.funcReplacer));
   }
 
-  private setPrompts(prompts: IPrompt[]): Promise<void> {
-    return this.rpc.invoke("setPrompts", [prompts]);
+  private setPromptList(prompts: IPrompt[]): Promise<void> {
+    const promptNames: IPrompt[] = prompts.map(value => {
+      return _.assign({ questions: [], name: "" }, value);
+    });
+
+    return this.rpc.invoke("setPromptList", [promptNames]);
   }
 }

@@ -73,7 +73,6 @@
   </v-app>
 </template>
 
-
 <script>
 import Vue from "vue";
 import Loading from "vue-loading-overlay";
@@ -131,16 +130,20 @@ export default {
       return this.generatorName ? this.messages.selected_generator + this.generatorPrettyName : "";
     },
     currentPrompt() {
-      const prompt = _.get(this.prompts, "[" + this.promptIndex +"]")
-      
-      const answers = _.get(prompt, "answers", {})
-      const questions = _.get(prompt, "questions", [])
+      const prompt = _.get(this.prompts, "[" + this.promptIndex + "]");
+
+      const answers = _.get(prompt, "answers", {});
+      const questions = _.get(prompt, "questions", []);
       _.forEach(questions, question => {
-        _.set(answers, [question.name], (question.isWhen === false ? undefined : question.answer))
-      })
-      _.set(prompt, "answers", answers)
-      
-      return prompt
+        _.set(
+          answers,
+          [question.name],
+          question.isWhen === false ? undefined : question.answer
+        );
+      });
+      _.set(prompt, "answers", answers);
+
+      return prompt;
     }
   },
   watch: {
@@ -298,41 +301,35 @@ export default {
     setMessages(messages) {
       this.messages = messages;
     },
+    setPromptList(prompts) {
+      // replace all existing prompts except 1st (generator selction)
+      //   and current prompt
+      this.prompts.splice(this.promptIndex + 1, this.prompts.length - this.promptIndex, ...prompts.splice(this.promptIndex, prompts.length));
+    },
     setPrompts(prompts) {
-      // TODO:
-      //   if prompt name is provided, find an existing prompt based on key or name:
-      //     if found then update it
-      //     if not found then create a prompt
-      //   if no prompt name is provided, assign incoming question to current prompt
       const currentPrompt = this.currentPrompt;
-      if (prompts) {
-        _.forEach(prompts, (prompt, index) => {
-          if (index === 0) {
-            if (prompt.status === PENDING) {
-              // new pending prompt
-              this.prompts.push(prompt);
-            } else {
-              if (currentPrompt) {
-                currentPrompt.questions = prompt.questions;
-                if (prompt.name && currentPrompt.name === this.messages.step_is_pending) {
-                  currentPrompt.name = prompt.name;
-                }
-                // if questions are provided, remote the pending status
-                if (prompt.questions.length > 0) {
-                  delete currentPrompt.status;
-                }
-              } else {
-                // first prompt (Select Generator)
-                prompt.active = true;
-                this.prompts.push(prompt);
-              }
-            }
+      const firstIncomingPrompt = _.get(prompts, "[0]");
+      if (firstIncomingPrompt) {
+        if (currentPrompt) {
+          if (firstIncomingPrompt.status === PENDING) {
+            // new pending prompt: when user presses next after last step
+            this.prompts.push(...prompts);
+          } else if (currentPrompt.status === PENDING) {
+            this.prompts.splice(this.promptIndex , prompts.length, ...prompts);
           } else {
-            // multiple prompts provided -- simply add them
-            this.prompts.push(prompt);
+            // new prompt with questions to replace placeholder prompt
+            const mappedPrompts = prompts.map((prompt, index) => {
+              // ignore name
+              prompt.name = this.prompts[this.promptIndex + index].name;
+              return prompt;
+            });
+            this.prompts.splice(this.promptIndex , prompts.length, ...mappedPrompts);
           }
-        })
-        this.updateQuestionsFromIndex(0)
+        } else {
+          // first prompt: typically, generator selection
+          this.prompts.push(...prompts);
+        }
+        this.updateQuestionsFromIndex(0);
       }
     },
     setQuestionProps(prompt) {
@@ -357,7 +354,6 @@ export default {
         }
         this.$set(question, "answer", answer);
         this.$set(question, "isValid", true);
-        this.$set(question, "doNotShow", false);
         this.$set(question, "validationMessage", true);
 
         this.$set(question, "isWhen", question.when !== FUNCTION);
@@ -426,6 +422,7 @@ export default {
       const functions = [
         "showPrompt",
         "setPrompts",
+        "setPromptList",
         "generatorDone",
         "log",
         "setMessages"

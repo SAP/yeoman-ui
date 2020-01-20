@@ -4,15 +4,41 @@ var Inquirer = require('inquirer');
 var path = require('path');
 var _ = require('lodash');
 
+// TODO: externalize this class to library
+class Prompts {
+  constructor(items) {
+    this.items = items;
+
+    this.splice = (start, deleteCount, items) => {
+      if (items) {
+        this.items.splice(start, deleteCount, items);
+      } else {
+        this.items.splice(start, deleteCount);
+      }
+      if (this.callback) {
+        this.callback(this.items);
+      }
+    }
+
+    this.setCallback = (callback) => {
+      this.callback = callback;
+      callback(this.items);
+    }
+  }
+}
+
 module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts);
 
-    this.getPrompts = function () {
-      console.log('in getPrompts()');
+    this.setPromptsCallback = (fn) => {
+      if (this.prompts) {
+        this.prompts.setCallback(fn);
+      }
+    };
 
-      return [{ name: "Prompt 1" }, { name: "Prompt 2" }, { name: "Registration" }];
-    }
+    var prompts = [{ name: "Basic info" }, { name: "Hunger" }, { name: "Registration" }, { name: "Take Away" }, { name: "Tip" }];
+    this.prompts = new Prompts(prompts);
 
     this.option('babel');
   }
@@ -25,8 +51,8 @@ module.exports = class extends Generator {
     // returns '~/projects/index.js'
   }
 
-  async default() {
-    this.composeWith(require.resolve("../app2"), this.projectEnvironment);
+  async initializing() {
+    this.composeWith(require.resolve("../app2"), { prompts: this.prompts });
   }
 
   async prompting() {
@@ -113,11 +139,12 @@ module.exports = class extends Generator {
     ];
 
     this.answers = await this.prompt(prompts);
+
     this.log("Food", this.answers.food);
 
     // currently not supported:
     const ui = new Inquirer.ui.BottomBar();
-    this.log("xx");
+
     ui.updateBottomBar("This is written to the bottom bar");
 
     prompts = [
@@ -191,8 +218,8 @@ module.exports = class extends Generator {
       }
     ];
 
-
     const answers = await this.prompt(prompts);
+
     this.answers = Object.assign({}, this.answers, answers);
     this.log("Hunger level", this.answers.hungerLevel);
 
