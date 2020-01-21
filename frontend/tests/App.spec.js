@@ -153,7 +153,7 @@ describe('App.vue', () => {
       }
       wrapper.vm.prompts = [{ 
         questions: [{
-          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true, doNotShow: false
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
         }],
         answers: {}
       }]
@@ -175,7 +175,7 @@ describe('App.vue', () => {
       }
       wrapper.vm.prompts = [{ 
         questions: [{
-          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true, doNotShow: false
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
         }],
         answers: {}
       }]
@@ -197,7 +197,7 @@ describe('App.vue', () => {
       }
       wrapper.vm.prompts = [{ 
         questions: [{
-          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true, doNotShow: false
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
         }],
         answers: {}
       }]
