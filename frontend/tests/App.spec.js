@@ -153,7 +153,7 @@ describe('App.vue', () => {
       }
       wrapper.vm.prompts = [{ 
         questions: [{
-          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true, doNotShow: false
         }],
         answers: {}
       }]
@@ -175,7 +175,7 @@ describe('App.vue', () => {
       }
       wrapper.vm.prompts = [{ 
         questions: [{
-          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true, doNotShow: false
         }],
         answers: {}
       }]
@@ -197,7 +197,7 @@ describe('App.vue', () => {
       }
       wrapper.vm.prompts = [{ 
         questions: [{
-          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true, doNotShow: false
         }],
         answers: {}
       }]
@@ -211,26 +211,6 @@ describe('App.vue', () => {
       expect(invokeSpy).toHaveBeenCalledWith('toggleLog', [{}])
 
       invokeSpy.mockRestore();
-    })
-
-    test('invoke for question that comes before question of type password', async () => {
-      wrapper.vm.rpc = {
-        invoke: jest.fn().mockResolvedValue()
-      }
-      wrapper.vm.prompts = [{ 
-        questions: [{
-          name: 'serviceQ', validate: '__Function', answer: 'serviceAnswer', isWhen: true
-        }, {
-          name: 'passwordQ', validate: '__Function', answer: "somePassword", isWhen: true, type: "password"
-        }],
-        answers: {}
-      }]
-      wrapper.vm.generatorName = "testGen";
-      wrapper.vm.promptIndex = 0;
-      
-      await wrapper.vm.updateQuestionsFromIndex(0)
-      
-      expect(wrapper.vm.prompts[0].questions[1].answer).toBeUndefined()
     })
   })
 
