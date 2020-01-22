@@ -164,16 +164,16 @@ export default {
     }
   },
   methods: {
-    async updateQuestionsFromIndex(changedQuestionIndex) {
+    async updateQuestionsFromIndex(questionIndex) {
       const questions = _.get(this, "currentPrompt.questions", []);
-      const relevantQuestionsToUpdate = _.slice(questions, changedQuestionIndex)
+      const relevantQuestionsToUpdate = _.slice(questions, questionIndex)
       
       let showBusy = true
       const that = this
-      let questionIndex = changedQuestionIndex - 1;
+    
       const finished = relevantQuestionsToUpdate.reduce((p, question) => {
         questionIndex++;
-        return p.then(() => that.updateQuestion(question, questionIndex, changedQuestionIndex))
+        return p.then(() => that.updateQuestion(question))
       }, Promise.resolve()); 
 
       setTimeout(() => {
@@ -191,7 +191,7 @@ export default {
         _.isEmpty(this.prompts) ||
         (this.currentPrompt.status === PENDING && !this.isDone);
     },
-    async updateQuestion(question, questionIndex, changedQuestionIndex) {
+    async updateQuestion(question) {
       const newAnswers = this.currentPrompt.answers
       try {
         if (question.when === FUNCTION) {
@@ -219,9 +219,6 @@ export default {
             if (question.answer === undefined) {
               question.answer = question.default;
             }
-          }
-          if (question.type === "password" && questionIndex !== changedQuestionIndex) {
-            question.answer = undefined;
           }
           if (question._message === FUNCTION) {
             question.message = await this.rpc.invoke("evaluateMethod", [
