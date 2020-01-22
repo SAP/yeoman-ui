@@ -218,22 +218,15 @@ export class YeomanUI {
     this.currentQuestions = questions;
     
       this.promptCount++;
-      const firstQuestionName = _.get(questions, "[0].name");
-      let promptName: string = `Step ${this.promptCount}`;
-      if (firstQuestionName) {
-        promptName = _.startCase(firstQuestionName);
-      }
+      
+      const promptName: string = this.getPromptName(questions);
       const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
       return this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
   }
 
   private getPromptName(questions: Environment.Adapter.Questions<any>): string {
     const firstQuestionName = _.get(questions, "[0].name");
-    if (firstQuestionName) {
-      return _.startCase(firstQuestionName);
-    } else {
-      return `Step ${this.promptCount}`;
-    }
+    return (firstQuestionName ? _.startCase(firstQuestionName) : `Step ${this.promptCount}`);
   }
 
   private async onEnvLookup(env: Environment.Options, resolve: any, filter?: GeneratorFilter) {
