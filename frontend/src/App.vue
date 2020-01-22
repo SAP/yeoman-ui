@@ -170,9 +170,7 @@ export default {
       
       let showBusy = true
       const that = this
-    
       const finished = relevantQuestionsToUpdate.reduce((p, question) => {
-        questionIndex++;
         return p.then(() => that.updateQuestion(question))
       }, Promise.resolve()); 
 
