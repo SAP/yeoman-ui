@@ -187,6 +187,8 @@ export default {
         (this.currentPrompt.status === PENDING && !this.isDone);
     },
     async updateQuestion(question) {
+      // eslint-disable-next-line no-console
+      console.error(question.name);
       const newAnswers = this.currentPrompt.answers
       try {
         if (question.when === FUNCTION) {
@@ -329,8 +331,7 @@ export default {
             // multiple prompts provided -- simply add them
             this.prompts.push(prompt);
           }
-        })
-        this.updateQuestionsFromIndex(0)
+        });
       }
     },
     setQuestionProps(prompt) {
@@ -359,7 +360,7 @@ export default {
         this.$set(question, "isWhen", question.when !== FUNCTION);
       }
     },
-    showPrompt(questions, name) {
+    async showPrompt(questions, name) {
       const prompt = this.createPrompt(questions, name);
       // evaluate message property on server if it is a function
       this.setPrompts([prompt]);
@@ -367,6 +368,7 @@ export default {
         this.resolve = resolve;
         this.reject = reject;
       });
+      await this.updateQuestionsFromIndex(0);
       return promise;
     },
     createPrompt(questions, name) {
