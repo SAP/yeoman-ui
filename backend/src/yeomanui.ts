@@ -183,6 +183,10 @@ export class YeomanUI {
     return this.rpc.invoke("generatorDone", [true, message, targetPath]);
   }
 
+  public setMessages(messages: any): Promise<void> {
+    return this.rpc ? this.rpc.invoke("setMessages", [messages]) : Promise.resolve();
+  }
+
   /**
    * 
    * @param answers - partial answers for the current prompt -- the input parameter to the method to be evaluated

@@ -252,14 +252,15 @@ export default {
       if (_.isString(error)) {
         errorInfo = error;
       } else {
-        errorInfo = _.get(error, "message", _.get(error, "stack", ""));
+        const name = _.get(error, "name", "");
+        const message = _.get(error, "message", "");
+        const stack = _.get(error, "stack", "");
+        const string = error.toString();
+
+        errorInfo = `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${string}\n`;
       }
       
-      if (!_.isEmpty(errorInfo)) {
-        errorInfo = ` Reason: ${errorInfo}`;
-      } 
-      
-      return `Could not update the '${question.name}' question in generator '${this.generatorName}'.${errorInfo}`;
+      return `Could not update the '${question.name}' question in generator '${this.generatorName}'.\nError info ---->\n ${errorInfo}`;
     },
     next() {
       if (this.resolve) {
@@ -352,9 +353,7 @@ export default {
         }
         this.$set(question, "answer", answer);
         this.$set(question, "isValid", true);
-        this.$set(question, "doNotShow", false);
         this.$set(question, "validationMessage", true);
-
         this.$set(question, "isWhen", question.when !== FUNCTION);
       }
     },
