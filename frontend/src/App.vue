@@ -329,8 +329,7 @@ export default {
             // multiple prompts provided -- simply add them
             this.prompts.push(prompt);
           }
-        })
-        this.updateQuestionsFromIndex(0)
+        });
       }
     },
     setQuestionProps(prompt) {
@@ -359,14 +358,16 @@ export default {
         this.$set(question, "isWhen", question.when !== FUNCTION);
       }
     },
-    showPrompt(questions, name) {
+    async showPrompt(questions, name) {
       const prompt = this.createPrompt(questions, name);
       // evaluate message property on server if it is a function
       this.setPrompts([prompt]);
+      await this.updateQuestionsFromIndex(0);
       const promise =  new Promise((resolve, reject) => {
         this.resolve = resolve;
         this.reject = reject;
       });
+      
       return promise;
     },
     createPrompt(questions, name) {
