@@ -187,8 +187,6 @@ export default {
         (this.currentPrompt.status === PENDING && !this.isDone);
     },
     async updateQuestion(question) {
-      // eslint-disable-next-line no-console
-      console.error(question.name);
       const newAnswers = this.currentPrompt.answers
       try {
         if (question.when === FUNCTION) {
