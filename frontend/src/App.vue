@@ -362,11 +362,12 @@ export default {
       const prompt = this.createPrompt(questions, name);
       // evaluate message property on server if it is a function
       this.setPrompts([prompt]);
+      await this.updateQuestionsFromIndex(0);
       const promise =  new Promise((resolve, reject) => {
         this.resolve = resolve;
         this.reject = reject;
       });
-      await this.updateQuestionsFromIndex(0);
+      
       return promise;
     },
     createPrompt(questions, name) {
