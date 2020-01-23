@@ -174,13 +174,32 @@ export class YeomanUI {
         console.log("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
         this.doGeneratorDone(true, message, destinationRoot);
       });
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      const errorMessage = this.getErrorInfo(error);
+      console.error(errorMessage);
+      this.logMessage(errorMessage);
+      this.toggleLog();
     }
+  }
+
+  getErrorInfo(error: any) {
+    if (_.isString(error)) {
+      return error;
+    } 
+      const name = _.get(error, "name", "");
+      const message = _.get(error, "message", "");
+      const stack = _.get(error, "stack", "");
+      const string = error.toString();
+
+      return `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${string}\n`;
   }
 
   public doGeneratorDone(success: boolean, message: string, targetPath = ""): Promise<any> {
     return this.rpc.invoke("generatorDone", [true, message, targetPath]);
+  }
+
+  public setMessages(messages: any): Promise<void> {
+    return this.rpc ? this.rpc.invoke("setMessages", [messages]) : Promise.resolve();
   }
 
   /**
