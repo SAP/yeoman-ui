@@ -194,8 +194,8 @@ export class YeomanUI {
       return `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${string}\n`;
   }
 
-  showMessageInOutput(errorMessage: string) {
-    this.logMessage(errorMessage);
+  async showMessageInOutput(errorMessage: string) {
+    await this.logMessage(errorMessage);
     this.toggleLog();
   }
 
