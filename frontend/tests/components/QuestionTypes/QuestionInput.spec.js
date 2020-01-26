@@ -35,7 +35,7 @@ describe('QuestionInput.vue', () => {
         })
     })
 
-    describe('text - method', () => {
+    describe('onChange - method', () => {
         test('text size is 0', async () => {
             wrapper = initComponent(QuestionInput, {
                 currentQuestion: {
