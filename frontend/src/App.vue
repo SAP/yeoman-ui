@@ -245,7 +245,7 @@ export default {
         const errorMessage = this.getErrorMessageOnException(question, error);
         // eslint-disable-next-line no-console
         console.error(errorMessage);
-        await this.rpc.invoke("handleError", [errorMessage]);
+        await this.rpc.invoke("logMessage", [errorMessage]);
         this.rpc.invoke("toggleLog", [{}]);
       }
     },
