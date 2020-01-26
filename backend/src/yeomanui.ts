@@ -68,6 +68,7 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.evaluateMethod, thisArg: this });
     this.rpc.registerMethod({ func: this.toggleLog, thisArg: this });
     this.rpc.registerMethod({ func: this.logMessage, thisArg: this });
+  
     this.youiAdapter = new YouiAdapter(logger);
     this.youiAdapter.setYeomanUI(this);
     this.promptCount = 0;
@@ -175,10 +176,7 @@ export class YeomanUI {
         this.doGeneratorDone(true, message, destinationRoot);
       });
     } catch (error) {
-      const errorMessage = this.getErrorInfo(error);
-      console.error(errorMessage);
-      this.logMessage(errorMessage);
-      this.toggleLog();
+      this.handleError(error);
     }
   }
 
@@ -192,6 +190,13 @@ export class YeomanUI {
       const string = error.toString();
 
       return `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${string}\n`;
+  }
+
+  handleError(error: any) {
+    const errorMessage = `Error info ---->\n ${this.getErrorInfo(error)}`;
+    console.error(errorMessage);
+    this.logMessage(errorMessage);
+    this.toggleLog();
   }
 
   public doGeneratorDone(success: boolean, message: string, targetPath = ""): Promise<any> {
@@ -208,14 +213,18 @@ export class YeomanUI {
    * @param method
    */
   public evaluateMethod(params: any[], questionName: string, methodName: string): any {
-    if (this.currentQuestions) {
-      const relevantQuestion: any = _.find(this.currentQuestions, question => {
-        return (_.get(question, "name") === questionName);
-      });
-      if (relevantQuestion) {
-        return relevantQuestion[methodName].apply(this.gen, params);
+    try {
+      if (this.currentQuestions) {
+        const relevantQuestion: any = _.find(this.currentQuestions, question => {
+          return (_.get(question, "name") === questionName);
+        });
+        if (relevantQuestion) {
+          return relevantQuestion[methodName].apply(this.gen, params);
+        }
       }
-    }
+    } catch (error) {
+      this.handleError(error);
+    } 
   }
 
   public async receiveIsWebviewReady() {

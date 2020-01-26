@@ -190,11 +190,12 @@ export default {
       const newAnswers = this.currentPrompt.answers
       try {
         if (question.when === FUNCTION) {
-          question.isWhen = await this.rpc.invoke("evaluateMethod", [
+          const whenRes = await this.rpc.invoke("evaluateMethod", [
             [newAnswers],
             question.name,
             "when"
           ]);
+          question.isWhen = whenRes;
         }
 
         if (question.isWhen === true) {
@@ -223,11 +224,12 @@ export default {
             ]);
           }
           if (question._choices === FUNCTION) {
-            question.choices = await this.rpc.invoke("evaluateMethod", [
+            const choicesRes = await this.rpc.invoke("evaluateMethod", [
               [newAnswers],
               question.name,
               "choices"
             ]);
+            question.choices = choicesRes;
           }
           if (question.validate === FUNCTION) {
             const response = await this.rpc.invoke("evaluateMethod", [
@@ -245,24 +247,12 @@ export default {
         const errorMessage = this.getErrorMessageOnException(question, error);
         // eslint-disable-next-line no-console
         console.error(errorMessage);
-        await this.rpc.invoke("logMessage", [errorMessage]);
+        await this.rpc.invoke("handleError", [errorMessage]);
         this.rpc.invoke("toggleLog", [{}]);
       }
     },
-    getErrorMessageOnException(question, error) {
-      let errorInfo;
-      if (_.isString(error)) {
-        errorInfo = error;
-      } else {
-        const name = _.get(error, "name", "");
-        const message = _.get(error, "message", "");
-        const stack = _.get(error, "stack", "");
-        const string = error.toString();
-
-        errorInfo = `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${string}\n`;
-      }
-      
-      return `Could not update the '${question.name}' question in generator '${this.generatorName}'.\nError info ---->\n ${errorInfo}`;
+    getErrorMessageOnException(question) {
+      return `Could not update the '${question.name}' question in generator '${this.generatorName}`;
     },
     next() {
       if (this.resolve) {
