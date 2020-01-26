@@ -176,7 +176,9 @@ export class YeomanUI {
         this.doGeneratorDone(true, message, destinationRoot);
       });
     } catch (error) {
-      this.handleError(error);
+      const errorMessage = `Error info ---->\n ${this.getErrorInfo(error)}`;
+      this.showMessageInOutput(errorMessage);
+      return Promise.reject(errorMessage);
     }
   }
 
@@ -192,9 +194,7 @@ export class YeomanUI {
       return `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${string}\n`;
   }
 
-  handleError(error: any) {
-    const errorMessage = `Error info ---->\n ${this.getErrorInfo(error)}`;
-    console.error(errorMessage);
+  showMessageInOutput(errorMessage: string) {
     this.logMessage(errorMessage);
     this.toggleLog();
   }
@@ -212,20 +212,23 @@ export class YeomanUI {
    * @param answers - partial answers for the current prompt -- the input parameter to the method to be evaluated
    * @param method
    */
-  public evaluateMethod(params: any[], questionName: string, methodName: string): any {
+  public async evaluateMethod(params: any[], questionName: string, methodName: string): Promise<any> {
     try {
       if (this.currentQuestions) {
         const relevantQuestion: any = _.find(this.currentQuestions, question => {
           return (_.get(question, "name") === questionName);
         });
         if (relevantQuestion) {
-          return relevantQuestion[methodName].apply(this.gen, params);
+          return await relevantQuestion[methodName].apply(this.gen, params);
         }
       }
     } catch (error) {
-      this.handleError(error);
+      const questionInfo = `Could not update method '${methodName}' in '${questionName}' question in generator '${this.gen.options.namespace}'`;
+      const errorMessage = `${questionInfo}\nError info ---->\n ${this.getErrorInfo(error)}`;
+      this.showMessageInOutput(errorMessage);
+      return Promise.reject(errorMessage);
     } 
-  }
+}
 
   public async receiveIsWebviewReady() {
     // TODO: loading generators takes a long time; consider prefetching list of generators

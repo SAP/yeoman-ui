@@ -242,11 +242,8 @@ export default {
           }
         }
       } catch (error) {
-        const errorMessage = this.getErrorMessageOnException(question, error);
         // eslint-disable-next-line no-console
-        console.error(errorMessage);
-        await this.rpc.invoke("logMessage", [errorMessage]);
-        this.rpc.invoke("toggleLog", [{}]);
+        console.error(error);
       }
     },
     getErrorMessageOnException(question) {
