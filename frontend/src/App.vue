@@ -249,20 +249,8 @@ export default {
         this.rpc.invoke("toggleLog", [{}]);
       }
     },
-    getErrorMessageOnException(question, error) {
-      let errorInfo;
-      if (_.isString(error)) {
-        errorInfo = error;
-      } else {
-        const name = _.get(error, "name", "");
-        const message = _.get(error, "message", "");
-        const stack = _.get(error, "stack", "");
-        const string = error.toString();
-
-        errorInfo = `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${string}\n`;
-      }
-      
-      return `Could not update the '${question.name}' question in generator '${this.generatorName}'.\nError info ---->\n ${errorInfo}`;
+    getErrorMessageOnException(question) {
+      return `Could not update the '${question.name}' question in generator '${this.generatorName}`;
     },
     next() {
       if (this.resolve) {
