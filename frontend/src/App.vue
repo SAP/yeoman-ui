@@ -188,7 +188,6 @@ export default {
     },
     async updateQuestion(question) {
       const newAnswers = this.currentPrompt.answers
-      try {
         if (question.when === FUNCTION) {
           question.isWhen = await this.rpc.invoke("evaluateMethod", [
             [newAnswers],
@@ -241,13 +240,6 @@ export default {
               : undefined;
           }
         }
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error(error);
-      }
-    },
-    getErrorMessageOnException(question) {
-      return `Could not update the '${question.name}' question in generator '${this.generatorName}`;
     },
     next() {
       if (this.resolve) {
