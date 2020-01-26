@@ -190,12 +190,11 @@ export default {
       const newAnswers = this.currentPrompt.answers
       try {
         if (question.when === FUNCTION) {
-          const whenRes = await this.rpc.invoke("evaluateMethod", [
+          question.isWhen = await this.rpc.invoke("evaluateMethod", [
             [newAnswers],
             question.name,
             "when"
           ]);
-          question.isWhen = whenRes;
         }
 
         if (question.isWhen === true) {
@@ -224,12 +223,11 @@ export default {
             ]);
           }
           if (question._choices === FUNCTION) {
-            const choicesRes = await this.rpc.invoke("evaluateMethod", [
+            question.choices = await this.rpc.invoke("evaluateMethod", [
               [newAnswers],
               question.name,
               "choices"
             ]);
-            question.choices = choicesRes;
           }
           if (question.validate === FUNCTION) {
             const response = await this.rpc.invoke("evaluateMethod", [
