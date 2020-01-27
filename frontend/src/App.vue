@@ -450,7 +450,7 @@ div.consoleClassVisible .v-footer {
   white-space: pre-wrap;
 }
 .left-col {
-  background-color: var(--vscode-editorWidget-background, #252426);
+  background-color: var(--vscode-editorWidget-background, #252526);
 }
 .prompts-col {
   overflow-y: scroll;
