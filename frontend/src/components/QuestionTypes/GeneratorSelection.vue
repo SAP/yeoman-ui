@@ -86,7 +86,7 @@ export default {
 
 <style scoped>
 .v-card {
-  background-color: var(--vscode-input-background, #3c3c3c);
+  background-color: var(--vscode-editorWidget-background, #252526);
 }
 .v-card:hover {
   background-color: var(--vscode-list-hoverBackground,#2a2d2e) !important;

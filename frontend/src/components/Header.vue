@@ -28,7 +28,8 @@ header.v-app-bar.v-toolbar, header.v-app-bar.v-toolbar .v-btn {
   color: var(--vscode-foreground, #cccccc);
 }
 header.v-app-bar.v-toolbar {
-  border-bottom: 1px solid  var(--vscode-editorWidget-background, #252426);
+  border-bottom: 1px solid  var(--vscode-editorWidget-background, #252526);
   box-shadow: none;
+  background-color: var(--vscode-editor-background, #1e1e1e) !important;
 }
 </style>

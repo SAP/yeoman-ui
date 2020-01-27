@@ -77,7 +77,7 @@ export default {
   color: var(--vscode-input-foreground, #cccccc) !important;
   background-color: var(--vscode-input-background, #3c3c3c) !important;
   border-radius: unset;
-  border: 1px solid  var(--vscode-editorWidget-background, #252426);
+  border: 1px solid  var(--vscode-editorWidget-background, #252526);
   box-shadow: none;
 }
 

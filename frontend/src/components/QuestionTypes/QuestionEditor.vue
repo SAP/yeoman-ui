@@ -44,7 +44,7 @@ export default {
 <style scoped>
 #question-editor >>> div.v-input__slot {
   background-color: var(--vscode-input-background, #3c3c3c);
-  border: 1px solid  var(--vscode-editorWidget-background, #252426);
+  border: 1px solid  var(--vscode-editorWidget-background, #252526);
   box-shadow: none;
   border-radius: unset; 
 }
