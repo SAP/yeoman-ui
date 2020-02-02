@@ -15,7 +15,7 @@
 
 export default {
   name: "Done",
-  props: ["doneMessage", "donePath", "isInVsCode"],
+  props: ["doneMessage", "donePath"],
   methods: {
     // ISSUE: workbench.action.addRootFolder doesn't get params.
     // openCurrentWorkspace(event) {

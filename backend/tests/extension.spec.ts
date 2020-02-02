@@ -50,8 +50,9 @@ describe('extension unit test', () => {
 
         it("commands registration", () => {
             extension.activate(testContext);
-            expect(_.size(_.keys(oRegisteredCommands))).to.be.equal(1);
+            expect(_.size(_.keys(oRegisteredCommands))).to.be.equal(2);
             expect(_.keys(oRegisteredCommands)[0]).to.be.equal("loadYeomanUI");
+            expect(_.hasIn(oRegisteredCommands, 'yeomanUI.toggleLog')).to.be.equal(true);
         });
 
         it("execution loadYeomanUI command", () => {
