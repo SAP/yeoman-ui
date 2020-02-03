@@ -2,6 +2,7 @@
   <div id="question-list">
     <p class="question-label">{{currentQuestion.message}}</p>
     <v-select
+      label="Select a Value -->"
       :error-messages="currentQuestion.isValid ? '' : currentQuestion.validationMessage"
       v-model="selected"
       :items="options"
@@ -40,7 +41,7 @@ export default {
       return [];
     },
     default() {
-      const defaultValue = _.get(this.currentQuestion, "default", 0);
+      const defaultValue = _.get(this.currentQuestion, "default");
       if (_.isNumber(defaultValue)) {
         const choice = _.get(this.options, "[" + defaultValue + "]");
         return _.get(choice, "value", _.get(choice, "name", choice));
