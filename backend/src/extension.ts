@@ -20,7 +20,10 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 	context.subscriptions.push(
 		vscode.commands.registerCommand('yeomanUI.toggleLog', () => {
-			YeomanUIPanel.currentPanel.yeomanui.toggleLog();
+			const yeomanUi = _.get(YeomanUIPanel, "currentPanel.yeomanui");
+			if (yeomanUi) {
+				yeomanUi.toggleLog();
+			}
 	}));
 
 
