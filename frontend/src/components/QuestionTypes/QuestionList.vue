@@ -15,14 +15,14 @@
 <script>
 import _ from "lodash";
 
-const emptyValue = "select a value --->";
+const selectAValue = "select a value --->";
 
 export default {
   name: "QuestionList",
   data() {
     return {
       selected: null,
-      afterFirstSelection: false
+      providedChoiceSelected: false
     };
   },
   computed: {
@@ -39,8 +39,8 @@ export default {
           return value;
         });
 
-        if (this.afterFirstSelection === false) {
-          choiceValues.unshift({name: emptyValue, text: emptyValue, disabled: true});
+        if (!this.providedChoiceSelected) {
+          return _.concat([{name: selectAValue, text: selectAValue, disabled: true}], values);
         }
 
         return choiceValues;
@@ -49,28 +49,34 @@ export default {
       return [];
     },
     default() {
-      const defaultValue = _.get(this.currentQuestion, "default", emptyValue);
-      if (_.isNumber(defaultValue) && defaultValue >= 0) {
-        const choice = _.get(this.options, "[" + defaultValue + "]");
-        return _.get(choice, "value", _.get(choice, "name", choice));
-      } 
-      
-      return _.isString(defaultValue) ? defaultValue : undefined;
+      const values = this.options;
+      const defaultValue = _.get(this.currentQuestion, "default");
+      if (defaultValue) {
+        if (_.isNumber(defaultValue) && defaultValue >= 0) {
+          const choice = _.get(values, "[" + defaultValue + "]");
+          return _.get(choice, "value", _.get(choice, "name", choice));
+        } else if (_.isString(defaultValue)) {
+          return defaultValue;
+        }
+      }
+
+      return undefined;
     }
   },
   watch: {
     default: {
       immediate: true,
       handler: function(defaultValue) {
-        this.selected = defaultValue;
+        this.selected = defaultValue || selectAValue;
       }
     },
     selected: {
-      handler: function(selectedvalue) {
-        if (selectedvalue && selectedvalue !== emptyValue) {
-          this.afterFirstSelection = true;
-          this.currentQuestion.answer = selectedvalue
-          this.updateQuestionsFromIndex(this.questionIndex)
+      immediate: true,
+      handler: function(selectedValue) {
+        if (selectedValue && selectedValue !== selectAValue) {
+          this.providedChoiceSelected = true;
+          this.currentQuestion.answer = selectedValue;
+          this.updateQuestionsFromIndex(this.questionIndex);
         }
       }
     }
