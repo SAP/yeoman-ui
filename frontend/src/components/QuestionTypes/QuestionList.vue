@@ -15,18 +15,21 @@
 <script>
 import _ from "lodash";
 
+const emptyValue = "select a value --->";
+
 export default {
   name: "QuestionList",
   data() {
     return {
-      selected: null
+      selected: null,
+      afterFirstSelection: false
     };
   },
   computed: {
     options() {
       const values = this.currentQuestion.choices;
       if (_.isArray(values)) {
-        return _.map(values, value => {
+        const choiceValues = _.map(values, value => {
           if (_.has(value, "name") && !_.has(value, "text")) {
             value.text = value.name;
           } else if (value.type === "separator") {
@@ -35,19 +38,24 @@ export default {
           }
           return value;
         });
+
+        if (this.afterFirstSelection === false) {
+          choiceValues.unshift({name: emptyValue, text: emptyValue, disabled: true});
+        }
+
+        return choiceValues;
       }
 
       return [];
     },
     default() {
-      const defaultValue = _.get(this.currentQuestion, "default", 0);
-      if (_.isNumber(defaultValue)) {
+      const defaultValue = _.get(this.currentQuestion, "default", emptyValue);
+      if (_.isNumber(defaultValue) && defaultValue >= 0) {
         const choice = _.get(this.options, "[" + defaultValue + "]");
         return _.get(choice, "value", _.get(choice, "name", choice));
-      } else if (_.isString(defaultValue)) {
-        return defaultValue;
-      }
-      return undefined;
+      } 
+      
+      return _.isString(defaultValue) ? defaultValue : undefined;
     }
   },
   watch: {
@@ -58,10 +66,12 @@ export default {
       }
     },
     selected: {
-      immediate: true,
       handler: function(selectedvalue) {
-        this.currentQuestion.answer = selectedvalue
-        this.updateQuestionsFromIndex(this.questionIndex)
+        if (selectedvalue && selectedvalue !== emptyValue) {
+          this.afterFirstSelection = true;
+          this.currentQuestion.answer = selectedvalue
+          this.updateQuestionsFromIndex(this.questionIndex)
+        }
       }
     }
   },
@@ -72,6 +82,7 @@ export default {
   }
 };
 </script>
+
 <style scoped>
 #question-list >>> div.v-input__slot {
   color: var(--vscode-input-foreground, #cccccc) !important;
@@ -80,5 +91,4 @@ export default {
   border: 1px solid  var(--vscode-editorWidget-background, #252526);
   box-shadow: none;
 }
-
 </style>
