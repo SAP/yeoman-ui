@@ -15,6 +15,7 @@
       :selectedGeneratorHeader="selectedGeneratorHeader"
       :stepName="prompts[promptIndex].name"
       :rpc="rpc"
+      :isInVsCode="isInVsCode()"
       @parentShowConsole="toggleConsole"
     />
     <v-row class="main-row ma-0 pa-0">
@@ -27,7 +28,6 @@
             v-if="isDone"
             :doneMessage="doneMessage"
             :donePath="donePath"
-            :isInVsCode="isInVsCode()"
           />
           <v-slide-x-transition v-else-if="prompts.length">
             <Step

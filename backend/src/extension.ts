@@ -18,6 +18,14 @@ export function activate(context: vscode.ExtensionContext) {
 			const messages = _.get(options, "messages");
 			YeomanUIPanel.createOrShow(context.extensionPath, GeneratorFilter.create(genFilter), messages);
 	}));
+	context.subscriptions.push(
+		vscode.commands.registerCommand('yeomanUI.toggleLog', () => {
+			const yeomanUi = _.get(YeomanUIPanel, "currentPanel.yeomanui");
+			if (yeomanUi) {
+				yeomanUi.toggleLog();
+			}
+	}));
+
 
 	if (vscode.window.registerWebviewPanelSerializer) {
 		// Make sure we register a serializer in activation event
@@ -97,6 +105,9 @@ export class YeomanUIPanel {
 		// Set the webview's initial html content
 		this._update();
 
+		// Set the context (yeoman-ui is focused)
+		vscode.commands.executeCommand('setContext', 'yeomanUI.Focused', this.panel.active);
+
 		// Listen for when the panel is disposed
 		// This happens when the user closes the panel or when the panel is closed programatically
 		this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
@@ -107,6 +118,7 @@ export class YeomanUIPanel {
 				if (this.panel.visible) {
 					this._update();
 				}
+				vscode.commands.executeCommand('setContext', 'yeomanUI.Focused', this.panel.active);
 			},
 			null,
 			this.disposables

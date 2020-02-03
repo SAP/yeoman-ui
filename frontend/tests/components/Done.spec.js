@@ -18,7 +18,7 @@ describe('Done.vue', () => {
 
     test('component props', () => {
         wrapper = initComponent(Done)
-        expect(_.keys(wrapper.props())).toHaveLength(3)
+        expect(_.keys(wrapper.props())).toHaveLength(2)
     })
 
     test('doneMessage set', () => {
