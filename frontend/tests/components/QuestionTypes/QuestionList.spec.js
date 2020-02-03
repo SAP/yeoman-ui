@@ -66,7 +66,7 @@ describe('QuestionList.vue', () => {
                 updateQuestionsFromIndex: () => {}
             })
             
-            expect(wrapper.vm.default).toBe('testName1')
+            expect(wrapper.vm.default).toBeUndefined()
         })
 
         test('default is undefined and choices are strings', () => {
@@ -77,10 +77,10 @@ describe('QuestionList.vue', () => {
                 updateQuestionsFromIndex: () => {}
             })
             
-            expect(wrapper.vm.default).toBe('testName1')
+            expect(wrapper.vm.default).toBeUndefined();
         })
 
-        test('change selected', async () => {
+        test('change selected', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
                     choices: [
@@ -93,7 +93,6 @@ describe('QuestionList.vue', () => {
             })
             expect(wrapper.vm.default).toBe('testName2')
             wrapper.vm.$options.watch.default.handler.call(wrapper.vm, 'testName1')
-            await wrapper.vm.$nextTick()
             expect(wrapper.vm.currentQuestion.answer).toBe('testName1')
         })
 
@@ -140,14 +139,16 @@ describe('QuestionList.vue', () => {
             })
 
             const options = wrapper.find('v-select-stub').vm.items
-            expect(options).toHaveLength(4)
-            expect(options[0].name).toBe('testName1')
-            expect(options[0].text).toBe('testText1')
-            expect(options[1].disabled).toBe(true)
-            expect(options[1].text).toBe('===')
-            expect(options[2].text).toBe('testName3')
-            expect(options[3].disabled).toBe(true)
-            expect(options[3].text).toBe('──────────────')
+            expect(options).toHaveLength(5)
+            expect(options[0].name).toBe('select a value --->')
+            expect(options[0].text).toBe('select a value --->')
+            expect(options[1].name).toBe('testName1')
+            expect(options[1].text).toBe('testText1')
+            expect(options[2].disabled).toBe(true)
+            expect(options[2].text).toBe('===')
+            expect(options[3].text).toBe('testName3')
+            expect(options[4].disabled).toBe(true)
+            expect(options[4].text).toBe('──────────────')
         })
     })
 })
