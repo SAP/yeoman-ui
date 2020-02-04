@@ -88,6 +88,7 @@ import * as _ from "lodash";
 const FUNCTION = "__Function";
 const LOADING = "loading...";
 const PENDING = "pending";
+const INSTALLING = "Installing dependencies...";
 
 export default {
   name: "app",
@@ -365,8 +366,16 @@ export default {
       this.logText += log;
       return true;
     },
+    generatorInstall() {
+      if (this.isInVsCode()) {
+        window.vscode.postMessage({
+          command: "showInfoMessage",
+          commandParams: [INSTALLING]
+        });
+      }
+    },
     generatorDone(success, message, targetPath) {
-      if (this.currentPrompt.status === "pending") {
+      if (this.currentPrompt.status === PENDING) {
         this.currentPrompt.name = "Summary";
       }
       this.doneMessage = message;
@@ -403,6 +412,7 @@ export default {
       const functions = [
         "showPrompt",
         "setPrompts",
+        "generatorInstall",
         "generatorDone",
         "log",
         "setMessages"

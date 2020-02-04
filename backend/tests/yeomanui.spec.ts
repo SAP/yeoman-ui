@@ -416,6 +416,35 @@ describe('yeomanui unit test', () => {
         expect(res).to.be.undefined;
     });
 
+    describe("setGenInstall", () => {
+        it("install method not exist", () => {
+            const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
+            let gen: any = {} as Generator;
+            yeomanUi["setGenInstall"](gen);
+            // tslint:disable-next-line: no-unused-expression
+            expect(gen.__proto__.install).to.be.undefined;
+        });
+
+        it("install method exists", () => {
+            const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
+            class GenTest {
+               public install(): any{
+                   return "original_install";
+               }
+            }
+            const gen: any = new GenTest();
+            // tslint:disable-next-line: no-unused-expression
+            expect(gen.__proto__.install).to.be.not.undefined;
+
+            const installSpy = sandbox.spy(rpc,"invoke");
+            yeomanUi["setGenInstall"](gen);
+            gen.install();
+            // tslint:disable-next-line: no-unused-expression
+            expect(installSpy.calledWith("generatorInstall")).to.be.true;
+        });
+
+    });
+
     describe("getEnv", () => {
         const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
         const testEnv = yeomanUi["getEnv"]();
