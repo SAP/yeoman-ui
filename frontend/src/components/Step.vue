@@ -26,9 +26,11 @@ export default {
       deep: true,
       handler() {
         const invalidQuestions = _.filter(this.currentPrompt.questions, question => {
-            return (question.isValid === false && question.isWhen === true)
-        })
-        this.$emit("stepvalidated", _.isEmpty(invalidQuestions))
+          return (question.isWhen === true) &&
+                 ((question.isValid === false) || 
+                  (_.includes(["list", "rawlist"], question.type) && _.isEmpty(question.answer)));
+        });
+        this.$emit("stepvalidated", _.isEmpty(invalidQuestions));
       }
     }
   }
