@@ -2,7 +2,7 @@
   <div id="question-list">
     <p class="question-label">{{currentQuestion.message}}</p>
     <v-select
-      label="Choose an option"
+      label="-- Click to display the list of options --"
       :error-messages="currentQuestion.isValid ? '' : currentQuestion.validationMessage"
       v-model="selected"
       :items="options"
