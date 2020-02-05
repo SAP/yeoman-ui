@@ -4,7 +4,7 @@ import { listenToLogSettingsChanges, logLoggerDetails } from "./settings-changes
 // import {resolve} from "path";
 import { getLoggingLevelSetting, getSourceLocationTrackingSetting} from "./settings";
   
-const PACKAGE_JSON = "package.json";
+// const PACKAGE_JSON = "package.json";
 const YEOMAN_UI_LOGGER_NAME = "yeomanui";
 
 /**

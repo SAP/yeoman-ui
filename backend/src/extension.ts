@@ -8,6 +8,8 @@ import { GeneratorFilter } from './filter';
 import backendMessages from "./messages";
 import { Theia } from './theia';
 import { createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
+import { getClassLogger } from "./logger/logger-wrapper";
+import { IChildLogger } from "@vscode-logging/logger";
 
 const ERROR_ACTIVATION_FAILED = 'Extension activation failed due to Logger configuration failure:';
 
@@ -52,6 +54,9 @@ export class YeomanUIPanel {
 	/**
 	 * Track the currently panel. Only allow a single panel to exist at a time.
 	 */
+
+	 // Logger
+    private readonly logger: IChildLogger = getClassLogger(YeomanUI.name);
 	public static readonly viewType = 'yeomanui';
 	public static currentPanel: YeomanUIPanel | undefined;
 	public static genFilter: GeneratorFilter;

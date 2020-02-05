@@ -13,8 +13,6 @@ import { YouiAdapter } from "./youi-adapter";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 import { GeneratorType, GeneratorFilter } from "./filter";
-import { getClassLogger } from "./logger/logger-wrapper";
-import { IChildLogger } from "@vscode-logging/logger";
 
 export interface IGeneratorChoice {
   name: string;
@@ -37,9 +35,6 @@ export interface IPrompt {
 }
 
 export class YeomanUI {
-  // Logger
-  private readonly logger: IChildLogger = getClassLogger(YeomanUI.name);
-
   private static funcReplacer(key: any, value: any) {
     return _.isFunction(value) ? "__Function" : value;
   }
