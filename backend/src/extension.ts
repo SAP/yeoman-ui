@@ -4,8 +4,6 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { YeomanUI } from "./yeomanui";
 import {RpcExtension} from '@sap-devx/webview-rpc/out.ext/rpc-extension';
-import { YouiLog } from "./youi-log";
-import { OutputChannelLog } from './output-channel-log';
 import { GeneratorFilter } from './filter';
 import backendMessages from "./messages";
 import { Theia } from './theia';
@@ -106,10 +104,9 @@ export class YeomanUIPanel {
 		this.panel = panel;
 		this.extensionPath = extensionPath;
 		this.rpc = new RpcExtension(this.panel.webview);
-		const logger: YouiLog = new OutputChannelLog();
 		this.theia = new Theia();
 		
-		this.yeomanui = new YeomanUI(this.rpc, logger, YeomanUIPanel.genFilter);
+		this.yeomanui = new YeomanUI(this.rpc, YeomanUIPanel.genFilter);
 
 		// Set the webview's initial html content
 		this._update();

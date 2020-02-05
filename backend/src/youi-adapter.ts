@@ -1,6 +1,5 @@
 import { Adapter } from "yeoman-environment";
 import { YeomanUI } from "./yeomanui";
-import { YouiLog } from "./youi-log";
 import * as _ from "lodash";
 const chalk = require('chalk');
 
@@ -9,32 +8,9 @@ const chalk = require('chalk');
  */
 export class YouiAdapter implements Adapter {
   private yeomanui: YeomanUI | undefined = undefined;
-  private youiLog: YouiLog;
-
-  constructor(logger: YouiLog) {
-    this.youiLog = logger;
-    this.log.writeln = logger.writeln.bind(this.youiLog);
-    this.log.conflict = logger.conflict.bind(this.youiLog);
-    this.log.create = logger.create.bind(this.youiLog);
-    this.log.force = logger.force.bind(this.youiLog);
-    this.log.identical = logger.identical.bind(this.youiLog);
-    this.log.skip = logger.skip.bind(this.youiLog);
-  }
 
   public setYeomanUI(yeomanui: YeomanUI) {
     this.yeomanui = yeomanui;
-  }
-
-  public log: {
-    (value: string): void,
-    writeln?: (str: string) => void,
-    conflict?: (str: string) => void,
-    create?: (str: string) => void,
-    force?: (str: string) => void,
-    identical?: (str: string) => void,
-    skip?: (str: string) => void
-  } = (value: string) => {
-    this.youiLog.log.call(this.youiLog, value);
   }
 
   get colorDiffAdded() {

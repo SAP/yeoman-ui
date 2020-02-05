@@ -7,7 +7,6 @@ import * as _ from "lodash";
 import * as path from "path";
 import {YeomanUI, IGeneratorQuestion} from "../src/yeomanui";
 import * as yeomanEnv from "yeoman-environment";
-import { YouiLog } from "../src/youi-log";
 import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorType, GeneratorFilter } from "../src/filter";
 
@@ -57,36 +56,9 @@ describe('yeomanui unit test', () => {
             return Promise.resolve();
         }
     }
-    class TestLog implements YouiLog {
-        public log(): void {
-            return;
-        }            
-        public writeln(): void {
-            return;
-        } 
-        public create(): void {
-            return;
-        }  
-        public force(): void {
-            return;
-        } 
-        public conflict(): void {
-            return;
-        }  
-        public identical(): void {
-            return;
-        }  
-        public skip(): void {
-            return;
-        } 
-        public showLog(): boolean {
-            return false;
-        }  
-    }
 
     const rpc = new TestRpc();
-    const logger = new TestLog();
-    const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
+    const yeomanUi: YeomanUI = new YeomanUI(rpc);
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -402,22 +374,15 @@ describe('yeomanui unit test', () => {
         });
     });
 
-    it("toggleLog", () => {
-        const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
-        const res = yeomanUi.toggleLog();
-        // tslint:disable-next-line: no-unused-expression
-        expect(res).to.be.false;
-    });
-
     it("logMessage", () => {
-        const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
+        const yeomanUi: YeomanUI = new YeomanUI(rpc);
         const res = yeomanUi.logMessage("message");
         // tslint:disable-next-line: no-unused-expression
         expect(res).to.be.undefined;
     });
 
     describe("getEnv", () => {
-        const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
+        const yeomanUi: YeomanUI = new YeomanUI(rpc);
         const testEnv = yeomanUi["getEnv"]();
         const nodemodules = YeomanUI["NODE_MODULES"];
         testEnv.getNpmPaths = (localOnly: boolean = false): string[] => {

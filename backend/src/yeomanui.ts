@@ -10,10 +10,11 @@ const humanizeString = require('humanize-string');
 const datauri = require("datauri");
 import * as defaultImage from "./defaultImage";
 import { YouiAdapter } from "./youi-adapter";
-import { YouiLog } from "./youi-log";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 import { GeneratorType, GeneratorFilter } from "./filter";
+import { getClassLogger } from "./logger/logger-wrapper";
+import { IChildLogger } from "@vscode-logging/logger";
 
 export interface IGeneratorChoice {
   name: string;
@@ -36,6 +37,9 @@ export interface IPrompt {
 }
 
 export class YeomanUI {
+  // Logger
+  private readonly vscodelogger: IChildLogger = getClassLogger(YeomanUI.name);
+
   private static funcReplacer(key: any, value: any) {
     return _.isFunction(value) ? "__Function" : value;
   }
@@ -48,7 +52,6 @@ export class YeomanUI {
   private static NODE_MODULES = 'node_modules';
 
   private rpc: IRpc;
-  private logger: YouiLog;
   private genMeta: { [namespace: string]: Environment.GeneratorMeta };
   private youiAdapter: YouiAdapter;
   private gen: Generator | undefined;
@@ -56,20 +59,18 @@ export class YeomanUI {
   private currentQuestions: Environment.Adapter.Questions<any>;
   private genFilter: GeneratorFilter;
 
-  constructor(rpc: IRpc, logger: YouiLog, genFilter?: GeneratorFilter) {
+  constructor(rpc: IRpc, genFilter?: GeneratorFilter) {
     this.rpc = rpc;
     if (!this.rpc) {
       throw new Error("rpc must be set");
     }
-    this.logger = logger;
     this.rpc.setResponseTimeout(3600000);
     this.rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
     this.rpc.registerMethod({ func: this.runGenerator, thisArg: this });
     this.rpc.registerMethod({ func: this.evaluateMethod, thisArg: this });
-    this.rpc.registerMethod({ func: this.toggleLog, thisArg: this });
     this.rpc.registerMethod({ func: this.logMessage, thisArg: this });
   
-    this.youiAdapter = new YouiAdapter(logger);
+    this.youiAdapter = new YouiAdapter();
     this.youiAdapter.setYeomanUI(this);
     this.promptCount = 0;
     this.genMeta = {};
@@ -196,7 +197,6 @@ export class YeomanUI {
 
   async showMessageInOutput(errorMessage: string) {
     await this.logMessage(errorMessage);
-    this.toggleLog();
   }
 
   public doGeneratorDone(success: boolean, message: string, targetPath = ""): Promise<any> {
@@ -237,12 +237,10 @@ export class YeomanUI {
     await this.runGenerator(response.name);
   }
 
-  public toggleLog(): boolean {
-    return this.logger.showLog();
-  }
 
   public logMessage(message: string): void {
-    this.logger.log(message);
+    // TODO: 
+    this.vscodelogger.log(message);
   }
 
   public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
