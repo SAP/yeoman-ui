@@ -155,7 +155,6 @@ module.exports = class extends Generator {
         type: "list",
         name: "hungerLevel",
         message: "How hungry are you?",
-        default: 1,
         choices: () => [
           { name: "Very hungry" },
           { name: "A bit hungry" },
@@ -191,7 +190,7 @@ module.exports = class extends Generator {
         name: 'enjoy',
         message: 'Did you enjoy your meal?',
         default: (answers) => {
-          return (answers.hungerLevel === "A bit hungry" ? "ok" : "michelin");
+          return (answers.hungerLevel.toString() === "A bit hungry" ? "ok" : "michelin");
         },
         choices: [
           { name: 'Not at all', value: 'no' },

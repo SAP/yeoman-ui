@@ -5,7 +5,7 @@
 	"license": "Apache 2.0",
 	"description": "Provide rich user experience for Yeoman generators using VSCode extension or the browser",
 	"repository": "https://github.com/SAP/yeoman-ui",
-	"version": "0.0.30",
+	"version": "0.0.35",
 	"engines": {
 		"vscode": "^1.39.2"
 	},
@@ -22,8 +22,31 @@
 			{
 				"command": "loadYeomanUI",
 				"title": "Yeoman UI Generators"
+			},
+			{
+				"command": "yeomanUI.toggleLog",
+				"title": "Toggle Log",
+				"icon": {
+					"light": "./resources/images/icons/console_light.svg",
+					"dark": "./resources/images/icons/console_dark.svg"
+				}
 			}
-		]
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "yeomanUI.toggleLog",
+					"when": "false"
+				}
+			],
+			"editor/title": [
+				{
+					"command": "yeomanUI.toggleLog",
+					"group": "navigation",
+					"when": "yeomanUI.Focused"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"backend": "npm install && npm run compile",

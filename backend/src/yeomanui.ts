@@ -68,6 +68,7 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.evaluateMethod, thisArg: this });
     this.rpc.registerMethod({ func: this.toggleLog, thisArg: this });
     this.rpc.registerMethod({ func: this.logMessage, thisArg: this });
+  
     this.youiAdapter = new YouiAdapter(logger);
     this.youiAdapter.setYeomanUI(this);
     this.promptCount = 0;
@@ -149,7 +150,9 @@ export class YeomanUI {
           console.log(`image contents: ${image}`);
         }
       }
-
+      
+      this.setGenInstall(gen);
+      
       this.promptCount = 0;
       this.gen = (gen as Generator);
       this.gen.destinationRoot(YeomanUI.CWD);
@@ -171,10 +174,21 @@ export class YeomanUI {
         this.doGeneratorDone(true, message, destinationRoot);
       });
     } catch (error) {
-      const errorMessage = this.getErrorInfo(error);
-      console.error(errorMessage);
-      this.logMessage(errorMessage);
-      this.toggleLog();
+      const errorMessage = `Error info ---->\n ${this.getErrorInfo(error)}`;
+      this.showMessageInOutput(errorMessage);
+      return Promise.reject(errorMessage);
+    }
+  }
+
+  private setGenInstall(gen: any) {
+    let originalPrototype = Object.getPrototypeOf(gen);
+    const originalGenInstall = _.get(originalPrototype, "install");
+    if (originalGenInstall) {
+      originalPrototype.install = () => {
+        this.doGeneratorInstall();
+        originalGenInstall.call(gen);
+      };
+      Object.setPrototypeOf(gen, originalPrototype);
     }
   }
 
@@ -190,6 +204,15 @@ export class YeomanUI {
       return `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${string}\n`;
   }
 
+  async showMessageInOutput(errorMessage: string) {
+    await this.logMessage(errorMessage);
+    this.toggleLog();
+  }
+
+  public doGeneratorInstall(): Promise<any> {
+    return this.rpc.invoke("generatorInstall");
+  }
+
   public doGeneratorDone(success: boolean, message: string, targetPath = ""): Promise<any> {
     return this.rpc.invoke("generatorDone", [true, message, targetPath]);
   }
@@ -203,16 +226,23 @@ export class YeomanUI {
    * @param answers - partial answers for the current prompt -- the input parameter to the method to be evaluated
    * @param method
    */
-  public evaluateMethod(params: any[], questionName: string, methodName: string): any {
-    if (this.currentQuestions) {
-      const relevantQuestion: any = _.find(this.currentQuestions, question => {
-        return (_.get(question, "name") === questionName);
-      });
-      if (relevantQuestion) {
-        return relevantQuestion[methodName].apply(this.gen, params);
+  public async evaluateMethod(params: any[], questionName: string, methodName: string): Promise<any> {
+    try {
+      if (this.currentQuestions) {
+        const relevantQuestion: any = _.find(this.currentQuestions, question => {
+          return (_.get(question, "name") === questionName);
+        });
+        if (relevantQuestion) {
+          return await relevantQuestion[methodName].apply(this.gen, params);
+        }
       }
-    }
-  }
+    } catch (error) {
+      const questionInfo = `Could not update method '${methodName}' in '${questionName}' question in generator '${this.gen.options.namespace}'`;
+      const errorMessage = `${questionInfo}\nError info ---->\n ${this.getErrorInfo(error)}`;
+      this.showMessageInOutput(errorMessage);
+      return Promise.reject(errorMessage);
+    } 
+}
 
   public async receiveIsWebviewReady() {
     // TODO: loading generators takes a long time; consider prefetching list of generators

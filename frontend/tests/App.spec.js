@@ -163,8 +163,6 @@ describe('App.vue', () => {
       const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
       await wrapper.vm.updateQuestionsFromIndex(0)
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [["validateAnswer", {"validateQ": "validateAnswer"}], 'validateQ', 'validate'])
-      expect(invokeSpy).toHaveBeenCalledWith('toggleLog', [{}])
-
       invokeSpy.mockRestore();
     })
 
@@ -184,7 +182,6 @@ describe('App.vue', () => {
       const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
       await wrapper.vm.updateQuestionsFromIndex(0)
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [["validateAnswer", {"validateQ": "validateAnswer"}], 'validateQ', 'validate'])
-      expect(invokeSpy).toHaveBeenCalledWith('toggleLog', [{}])
 
       invokeSpy.mockRestore();
     })
@@ -205,7 +202,6 @@ describe('App.vue', () => {
       const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
       await wrapper.vm.updateQuestionsFromIndex(0)
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [["validateAnswer", {"validateQ": "validateAnswer"}], 'validateQ', 'validate'])
-      expect(invokeSpy).toHaveBeenCalledWith('toggleLog', [{}])
 
       invokeSpy.mockRestore();
     })
@@ -261,6 +257,7 @@ describe('App.vue', () => {
     
     wrapper.vm.showPrompt = jest.fn()
     wrapper.vm.setPrompts = jest.fn()
+    wrapper.vm.generatorInstall = jest.fn()
     wrapper.vm.generatorDone = jest.fn()
     wrapper.vm.log = jest.fn()
 
@@ -270,6 +267,7 @@ describe('App.vue', () => {
     
     expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.showPrompt, thisArg: wrapper.vm, name: 'showPrompt'})
     expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.setPrompts, thisArg: wrapper.vm, name: 'setPrompts'})
+    expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.generatorInstall, thisArg: wrapper.vm, name: 'generatorInstall'})
     expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.generatorDone, thisArg: wrapper.vm, name: 'generatorDone'})
     expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.log, thisArg: wrapper.vm, name: 'log'})
     expect(invokeSpy).toHaveBeenCalledWith("receiveIsWebviewReady", [])
@@ -380,14 +378,58 @@ describe('App.vue', () => {
     })
   })
 
+  describe('generatorInstall - method', () => {
+    beforeEach(() => {
+      window.vscode = {
+        postMessage: jest.fn()
+      }
+    })
+      
+    test('status is pending', () => {
+      wrapper = initComponent(App)
+      
+      wrapper.vm.prompts = [{}, {}]
+      wrapper.vm.promptIndex = 1
+      wrapper.vm.currentPrompt.status = 'pending'
+
+      wrapper.vm.isInVsCode = jest.fn().mockReturnValue(true)
+      wrapper.vm.generatorInstall()
+
+      expect(wrapper.vm.isDone).toBeFalsy()
+      expect(window.vscode.postMessage).toHaveBeenCalledWith({
+        command: "showInfoMessage",
+        commandParams: ["Installing dependencies..."]
+      })
+    })
+
+    test('not is vscode', () => {
+      wrapper = initComponent(App)
+      
+      wrapper.vm.prompts = [{}, {}]
+      wrapper.vm.promptIndex = 1
+      wrapper.vm.currentPrompt.status = 'pending'
+
+      wrapper.vm.isInVsCode = jest.fn().mockReturnValue(false)
+      wrapper.vm.generatorInstall()
+
+      expect(window.vscode.postMessage).not.toHaveBeenCalledWith({
+        command: "showInfoMessage",
+        commandParams: ["Installing dependencies..."]
+      })
+    })
+
+  })
+
   describe('generatorDone - method', () => {
-    window.vscode = {
-      postMessage: jest.fn()
-    }
+    beforeEach(() => {
+      window.vscode = {
+        postMessage: jest.fn()
+      }
+    })
       
     test('status is not pending', () => {
       wrapper = initComponent(App, {donePath: 'testDonePath'})
-      wrapper.vm.isInVsCode = jest.fn().mockResolvedValue(true)
+      wrapper.vm.isInVsCode = jest.fn().mockReturnValue(true)
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.promptIndex = 1
 
@@ -401,7 +443,7 @@ describe('App.vue', () => {
 
     test('status is pending', () => {
       wrapper = initComponent(App, {donePath: 'testDonePath'})
-      wrapper.vm.isInVsCode = jest.fn().mockResolvedValue(true)
+      wrapper.vm.isInVsCode = jest.fn().mockReturnValue(true)
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.promptIndex = 1
       wrapper.vm.currentPrompt.status = 'pending'

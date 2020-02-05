@@ -50,13 +50,13 @@ div.v-stepper div.v-stepper__step {
   border-bottom: 1px solid var(--vscode-editor-background, #1e1e1e);
 }
  .v-stepper__step--complete.v-stepper__step {
-  background: var(--vscode-editorWidget-background,#252426);
+  background: var(--vscode-editorWidget-background,#252526);
 }
 .v-stepper__step--active.v-stepper__step {
   background: var(--vscode-editor-background, #1e1e1e);
 }
 .v-stepper__step--inactive.v-stepper__step {
-  background: var(--vscode-editorWidget-background,#252426);
+  background: var(--vscode-editorWidget-background,#252526);
 }
 
 span.v-stepper__step__step {

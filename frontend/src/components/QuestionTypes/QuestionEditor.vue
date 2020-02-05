@@ -5,6 +5,8 @@
     solo
     rows=7
     v-model="text"
+    @blur="onChange"
+    @keyup.enter="onChange"
     :placeholder="currentQuestion.default"
     class="yeoman-form-control"
     aria-describedby="validation-message"
@@ -28,11 +30,12 @@ export default {
       text: undefined
     }
   },
-  watch: {
-    text: {
-      handler(val) {
-        this.currentQuestion.answer = _.size(val) === 0 ? _.get(this.currentQuestion, "default") : val
-        this.updateQuestionsFromIndex(this.questionIndex)
+  methods: {
+    onChange() {
+      const currentValue = _.isEmpty(this.text) ? _.get(this.currentQuestion, "default") : this.text;
+      if (this.currentQuestion.answer !== currentValue) {
+        this.currentQuestion.answer = currentValue;
+        this.updateQuestionsFromIndex(this.questionIndex);
       }
     }
   }
@@ -41,7 +44,7 @@ export default {
 <style scoped>
 #question-editor >>> div.v-input__slot {
   background-color: var(--vscode-input-background, #3c3c3c);
-  border: 1px solid  var(--vscode-editorWidget-background, #252426);
+  border: 1px solid  var(--vscode-editorWidget-background, #252526);
   box-shadow: none;
   border-radius: unset; 
 }

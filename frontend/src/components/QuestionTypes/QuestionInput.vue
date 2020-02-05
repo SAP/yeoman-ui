@@ -52,7 +52,7 @@ export default {
   color: var(--vscode-input-foreground, #cccccc) !important;
   background-color: var(--vscode-input-background, #3c3c3c) !important;
   border-radius: unset !important;
-  border: 1px solid  var(--vscode-editorWidget-background, #252426);
+  border: 1px solid  var(--vscode-editorWidget-background, #252526);
   box-shadow: none;
 }
 #question-input >>> div.v-input__slot .v-select__selection {
@@ -60,5 +60,8 @@ export default {
 }
 .theme--light.v-input:not(.v-input--is-disabled) >>> input{
   color: var(--vscode-input-foreground, #cccccc);
+}
+.theme--light.v-input:not(.v-input--is-disabled) >>> input::placeholder{
+  color: var(--vscode-editorCodeLens-foreground, #999999);
 }
 </style>

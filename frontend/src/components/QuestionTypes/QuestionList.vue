@@ -2,7 +2,8 @@
   <div id="question-list">
     <p class="question-label">{{currentQuestion.message}}</p>
     <v-select
-      :error-messages="currentQuestion.isValid ? '' : currentQuestion.validationMessage"
+      :label="clickToDisplay"
+      :error-messages="errorMessages"
       v-model="selected"
       :items="options"
       aria-describedby="validation-message"
@@ -19,7 +20,8 @@ export default {
   name: "QuestionList",
   data() {
     return {
-      selected: null
+      selected: null,
+      clickToDisplay: "Click to display the list of options"
     };
   },
   computed: {
@@ -40,7 +42,7 @@ export default {
       return [];
     },
     default() {
-      const defaultValue = _.get(this.currentQuestion, "default", 0);
+      const defaultValue = _.get(this.currentQuestion, "default");
       if (_.isNumber(defaultValue)) {
         const choice = _.get(this.options, "[" + defaultValue + "]");
         return _.get(choice, "value", _.get(choice, "name", choice));
@@ -48,6 +50,13 @@ export default {
         return defaultValue;
       }
       return undefined;
+    },
+    errorMessages() {
+      if (_.isEmpty(this.selected)) {
+        return this.clickToDisplay;
+      }
+      
+      return this.currentQuestion.isValid ? '' : this.currentQuestion.validationMessage;
     }
   },
   watch: {
@@ -59,8 +68,9 @@ export default {
     },
     selected: {
       immediate: true,
-      handler: function(selectedvalue) {
-        this.currentQuestion.answer = selectedvalue
+      handler: function(selectedValue) {
+        this.currentQuestion.isValid = !_.isEmpty(selectedValue)
+        this.currentQuestion.answer = selectedValue
         this.updateQuestionsFromIndex(this.questionIndex)
       }
     }
@@ -77,7 +87,7 @@ export default {
   color: var(--vscode-input-foreground, #cccccc) !important;
   background-color: var(--vscode-input-background, #3c3c3c) !important;
   border-radius: unset;
-  border: 1px solid  var(--vscode-editorWidget-background, #252426);
+  border: 1px solid  var(--vscode-editorWidget-background, #252526);
   box-shadow: none;
 }
 
