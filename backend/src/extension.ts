@@ -9,9 +9,18 @@ import { OutputChannelLog } from './output-channel-log';
 import { GeneratorFilter } from './filter';
 import backendMessages from "./messages";
 import { Theia } from './theia';
+import { getLogger, createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
 
+const ERROR_ACTIVATION_FAILED = 'Extension activation failed due to Logger configuration failure:';
 
 export function activate(context: vscode.ExtensionContext) {
+	try {
+		createExtensionLoggerAndSubscribeToLogSettingsChanges(context);
+	} catch (error) {
+		console.error(ERROR_ACTIVATION_FAILED, error.message);
+		return;
+	}
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand('loadYeomanUI', (options?: any) => {
 			const genFilter = _.get(options, "filter"); 

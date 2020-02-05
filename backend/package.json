@@ -75,7 +75,8 @@
 		"titleize": "^1.0.1",
 		"humanize-string": "^1.0.2",
 		"fs-extra": "^8.1.0",
-		"chalk": "^3.0.0"
+		"chalk": "^3.0.0",
+		"@vscode-logging/logger": "^0.1.1"
 	},
 	"devDependencies": {
 		"@types/chai": "^4.2.5",
@@ -105,5 +106,32 @@
 		"vscode": "^1.1.28",
 		"webpack": "^4.41.2",
 		"webpack-cli": "^3.3.10"
+	},
+	"configuration": {
+		"type": "object",
+		"title": "Yeoman UI",
+		"properties": {
+			"Yeoman UI.loggingLevel": {
+				"type": "string",
+				"enum": [
+					"off",
+					"fatal",
+					"error",
+					"warn",
+					"info",
+					"debug",
+					"trace"
+				],
+				"default": "warn",
+				"description": "The verbosity of logging according to the following order: trace > debug > info > warn > error > fatal > off.",
+				"scope": "resource"
+			},
+			"Yeoman UI.sourceLocationTracking": {
+				"type": "boolean",
+				"default": false,
+				"description": "If chosen, the location of the source code is added to log entries. Warning – this action may slow your extension. We recommend you use it only for debugging.",
+				"scope": "resource"
+			}
+		}
 	}
 }
