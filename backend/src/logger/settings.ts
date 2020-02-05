@@ -10,14 +10,16 @@ export const SOURCE_TRACKING_CONFIG_PROP = "Yeoman UI.sourceLocationTracking";
  * @returns {LogLevel}
  */
 export function getLoggingLevelSetting(): string {
-  return vscode.workspace.getConfiguration().get(LOGGING_LEVEL_CONFIG_PROP);
+  const config = vscode.workspace.getConfiguration();
+  return config.get(LOGGING_LEVEL_CONFIG_PROP);
 }
 
 /**
  * @returns {boolean}
  */
 export function getSourceLocationTrackingSetting(): boolean {
-  return vscode.workspace.getConfiguration().get(SOURCE_TRACKING_CONFIG_PROP);
+  const config = vscode.workspace.getConfiguration();
+  return config.get(SOURCE_TRACKING_CONFIG_PROP);
 }
 
 module.exports = {

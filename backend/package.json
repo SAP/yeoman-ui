@@ -32,6 +32,33 @@
 				}
 			}
 		],
+		"configuration": {
+			"type": "object",
+			"title": "Yeoman UI",
+			"properties": {
+				"Yeoman UI.loggingLevel": {
+					"type": "string",
+					"enum": [
+						"off",
+						"fatal",
+						"error",
+						"warn",
+						"info",
+						"debug",
+						"trace"
+					],
+					"default": "warn",
+					"description": "The verbosity of logging according to the following order: trace > debug > info > warn > error > fatal > off.",
+					"scope": "resource"
+				},
+				"Yeoman UI.sourceLocationTracking": {
+					"type": "boolean",
+					"default": false,
+					"description": "If chosen, the location of the source code is added to log entries. Warning – this action may slow your extension. We recommend you use it only for debugging.",
+					"scope": "resource"
+				}
+			}
+		},
 		"menus": {
 			"commandPalette": [
 				{
@@ -76,7 +103,7 @@
 		"humanize-string": "^1.0.2",
 		"fs-extra": "^8.1.0",
 		"chalk": "^3.0.0",
-		"@vscode-logging/logger": "^0.1.1"
+		"@vscode-logging/logger": "~0.1.1"
 	},
 	"devDependencies": {
 		"@types/chai": "^4.2.5",
@@ -103,35 +130,9 @@
 		"typescript": "^3.7.3",
 		"utf-8-validate": "^5.0.2",
 		"vsce": "^1.68.0",
-		"vscode": "^1.1.28",
+		"vscode": "^1.1.36",
+		"@types/vscode": "^1.41.0",
 		"webpack": "^4.41.2",
 		"webpack-cli": "^3.3.10"
-	},
-	"configuration": {
-		"type": "object",
-		"title": "Yeoman UI",
-		"properties": {
-			"Yeoman UI.loggingLevel": {
-				"type": "string",
-				"enum": [
-					"off",
-					"fatal",
-					"error",
-					"warn",
-					"info",
-					"debug",
-					"trace"
-				],
-				"default": "warn",
-				"description": "The verbosity of logging according to the following order: trace > debug > info > warn > error > fatal > off.",
-				"scope": "resource"
-			},
-			"Yeoman UI.sourceLocationTracking": {
-				"type": "boolean",
-				"default": false,
-				"description": "If chosen, the location of the source code is added to log entries. Warning – this action may slow your extension. We recommend you use it only for debugging.",
-				"scope": "resource"
-			}
-		}
 	}
 }

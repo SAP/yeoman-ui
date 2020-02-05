@@ -1,7 +1,7 @@
 import * as vscode from "vscode"; // NOSONAR
 import { getExtensionLogger, getExtensionLoggerOpts, IChildLogger, IVSCodeExtLogger } from "@vscode-logging/logger";
 import { listenToLogSettingsChanges, logLoggerDetails } from "./settings-changes-handler";
-import { resolve } from "path";
+// import {resolve} from "path";
 import { getLoggingLevelSetting, getSourceLocationTrackingSetting} from "./settings";
   
 const PACKAGE_JSON = "package.json";
@@ -67,9 +67,9 @@ function createExtensionLogger(context: vscode.ExtensionContext) {
 	const logLevelSetting: string = getLoggingLevelSetting();
 	const sourceLocationTrackingSettings: boolean = getSourceLocationTrackingSetting();
 
-	const meta = require(resolve(context.extensionPath, PACKAGE_JSON));
+	//TODO:  const meta = require(resolve(context.extensionPath, PACKAGE_JSON));
 	const extensionLoggerOpts: getExtensionLoggerOpts = {
-		extName: meta.name,
+		extName: "yeoman-ui",
 		level: logLevelSetting,
 		logPath: contextLogPath,
 		sourceLocationTracking: sourceLocationTrackingSettings

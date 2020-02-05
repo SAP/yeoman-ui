@@ -38,7 +38,7 @@ export interface IPrompt {
 
 export class YeomanUI {
   // Logger
-  private readonly vscodelogger: IChildLogger = getClassLogger(YeomanUI.name);
+  // private readonly vscodelogger: IChildLogger = getClassLogger(YeomanUI.name);
 
   private static funcReplacer(key: any, value: any) {
     return _.isFunction(value) ? "__Function" : value;
@@ -240,7 +240,7 @@ export class YeomanUI {
 
   public logMessage(message: string): void {
     // TODO: 
-    this.vscodelogger.log(message);
+    //this.vscodelogger.log(message);
   }
 
   public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
