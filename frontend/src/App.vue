@@ -171,6 +171,7 @@ export default {
         return p.then(() => that.updateQuestion(question)).catch(error => {
           // eslint-disable-next-line no-console
           console.error(error);
+          // TODO: add information to log in case a question failed and there is a list/rawlist question without selected value
         })
       }, Promise.resolve()); 
 
@@ -238,9 +239,7 @@ export default {
             "validate"
           ]);
           question.isValid = _.isString(response) ? false : response;
-          question.validationMessage = _.isString(response)
-            ? response
-            : undefined;
+          question.validationMessage = _.isString(response) ? response : undefined;
         }
       }
     },

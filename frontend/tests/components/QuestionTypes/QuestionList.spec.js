@@ -66,7 +66,7 @@ describe('QuestionList.vue', () => {
                 updateQuestionsFromIndex: () => {}
             })
             
-            expect(wrapper.vm.default).toBe('testName1')
+            expect(wrapper.vm.default).toBeUndefined()
         })
 
         test('default is undefined and choices are strings', () => {
@@ -77,7 +77,7 @@ describe('QuestionList.vue', () => {
                 updateQuestionsFromIndex: () => {}
             })
             
-            expect(wrapper.vm.default).toBe('testName1')
+            expect(wrapper.vm.default).toBeUndefined()
         })
 
         test('change selected', async () => {
