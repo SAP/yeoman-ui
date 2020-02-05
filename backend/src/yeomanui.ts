@@ -38,7 +38,7 @@ export interface IPrompt {
 
 export class YeomanUI {
   // Logger
-  // private readonly vscodelogger: IChildLogger = getClassLogger(YeomanUI.name);
+  private readonly logger: IChildLogger = getClassLogger(YeomanUI.name);
 
   private static funcReplacer(key: any, value: any) {
     return _.isFunction(value) ? "__Function" : value;
