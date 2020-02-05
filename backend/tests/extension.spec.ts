@@ -14,6 +14,7 @@ const testVscode = {
 };
 mockVscode(testVscode, "src/extension.ts");
 import * as extension from "../src/extension";
+import * as loggerWrapper from "../src/logger/logger-wrapper";
 
 describe('extension unit test', () => {
     let sandbox: any;
@@ -21,6 +22,7 @@ describe('extension unit test', () => {
     let windowMock: any;
     let yeomanUiPanelMock: any;
     let yeomanUiMock: any;
+    let loggerWrapperMock: any;
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -36,6 +38,7 @@ describe('extension unit test', () => {
         yeomanUiPanelMock = sandbox.mock(extension.YeomanUIPanel);
         _.set(extension.YeomanUIPanel, "currentPanel.yeomanui", {toggleLog: () => {}});
         yeomanUiMock = sandbox.mock(extension.YeomanUIPanel.currentPanel.yeomanui);
+        loggerWrapperMock = sandbox.mock(loggerWrapper);
     });
 
     afterEach(() => {
@@ -43,12 +46,14 @@ describe('extension unit test', () => {
         windowMock.verify();
         yeomanUiPanelMock.verify();
         yeomanUiMock.verify();
+        loggerWrapperMock.verify();
     });
 
     describe('activate', () => {
         let testContext: any;
         beforeEach(() => {
-            testContext = { subscriptions: [], extensionPath: "testExtensionpath" };
+            testContext = { subscriptions: [], extensionPath: "testExtensionpath" };            
+            loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
         });
 
         it("commands registration", () => {

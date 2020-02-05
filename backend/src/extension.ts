@@ -7,7 +7,7 @@ import {RpcExtension} from '@sap-devx/webview-rpc/out.ext/rpc-extension';
 import { GeneratorFilter } from './filter';
 import backendMessages from "./messages";
 import { Theia } from './theia';
-import { getLogger, createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
+import { createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
 
 const ERROR_ACTIVATION_FAILED = 'Extension activation failed due to Logger configuration failure:';
 
