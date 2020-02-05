@@ -383,7 +383,7 @@ describe('yeomanui unit test', () => {
 
     describe("setGenInstall", () => {
         it("install method not exist", () => {
-            const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
+            const yeomanUi: YeomanUI = new YeomanUI(rpc);
             let gen: any = {} as Generator;
             yeomanUi["setGenInstall"](gen);
             // tslint:disable-next-line: no-unused-expression
@@ -391,7 +391,7 @@ describe('yeomanui unit test', () => {
         });
 
         it("install method exists", () => {
-            const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
+            const yeomanUi: YeomanUI = new YeomanUI(rpc);
             class GenTest {
                public install(): any{
                    return "original_install";
