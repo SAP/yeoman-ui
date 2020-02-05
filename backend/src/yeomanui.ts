@@ -155,7 +155,9 @@ export class YeomanUI {
           console.log(`image contents: ${image}`);
         }
       }
-
+      
+      this.setGenInstall(gen);
+      
       this.promptCount = 0;
       this.gen = (gen as Generator);
       this.gen.destinationRoot(YeomanUI.CWD);
@@ -183,6 +185,18 @@ export class YeomanUI {
     }
   }
 
+  private setGenInstall(gen: any) {
+    let originalPrototype = Object.getPrototypeOf(gen);
+    const originalGenInstall = _.get(originalPrototype, "install");
+    if (originalGenInstall) {
+      originalPrototype.install = () => {
+        this.doGeneratorInstall();
+        originalGenInstall.call(gen);
+      };
+      Object.setPrototypeOf(gen, originalPrototype);
+    }
+  }
+
   getErrorInfo(error: any) {
     if (_.isString(error)) {
       return error;
@@ -197,6 +211,10 @@ export class YeomanUI {
 
   async showMessageInOutput(errorMessage: string) {
     await this.logMessage(errorMessage);
+  }
+
+  public doGeneratorInstall(): Promise<any> {
+    return this.rpc.invoke("generatorInstall");
   }
 
   public doGeneratorDone(success: boolean, message: string, targetPath = ""): Promise<any> {

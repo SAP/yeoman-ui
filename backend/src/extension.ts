@@ -141,6 +141,10 @@ export class YeomanUIPanel {
 						const resolve = this.questionsResolutions.get(message.taskId);
 						resolve(message.data);
 						return;
+					case 'showInfoMessage':
+						let InfoMessage = _.get(message, "commandParams[0]");
+						vscode.window.showInformationMessage(InfoMessage);
+						return;
 					case 'showDoneMessage':
 						let Close = 'Close';
 						let OpenWorkspace = 'Open Workspace';
