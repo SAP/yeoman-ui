@@ -73,3 +73,6 @@ div.v-application .error--text {
   padding-left: 12px;
   color: #ff5252;
 }
+.v-input--has-state.error--text .v-label{
+  animation: none;
+}
