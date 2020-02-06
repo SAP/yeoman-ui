@@ -1,4 +1,5 @@
 export interface YouiLog {
+    error(str: string): void;
     log(str: string): void;
     writeln(str: string): void;
     create(str: string): void;

@@ -5,6 +5,10 @@ import { IChildLogger } from "@vscode-logging/logger";
 export class YouiLogImpl implements YouiLog {
     constructor(private logger: IChildLogger) {}
 
+    public error(value: string): void {
+        this.logger.error(stripAnsi(value));
+    }
+
     public log(value: string): void {
         this.logger.debug(stripAnsi(value));
     }

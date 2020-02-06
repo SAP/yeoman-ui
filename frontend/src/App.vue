@@ -16,7 +16,6 @@
       :stepName="prompts[promptIndex].name"
       :rpc="rpc"
       :isInVsCode="isInVsCode()"
-      @parentShowConsole="toggleConsole"
     />
     <v-row class="main-row ma-0 pa-0">
       <v-col class="left-col ma-0 pa-0" cols="3">
@@ -166,25 +165,25 @@ export default {
       const questions = _.get(this, "currentPrompt.questions", []);
       const relevantQuestionsToUpdate = _.slice(questions, questionIndex)
       
+      const that = this;
       let showBusy = true
-      const that = this
       const finished = relevantQuestionsToUpdate.reduce((p, question) => {
-        return p.then(() => that.updateQuestion(question)).catch(error => {
+        return p.then(() => this.updateQuestion(question)).catch(error => {
           // eslint-disable-next-line no-console
           console.error(error);
-          // TODO: add information to log in case a question failed and there is a list/rawlist question without selected value
-        })
+          return that.rpc.invoke("logError", [error]);
+        });
       }, Promise.resolve()); 
 
       setTimeout(() => {
         if (showBusy) {
-          that.showBusyIndicator = true
+          that.showBusyIndicator = true;
         }
       }, 1000)
 
       await finished
       showBusy = false
-      this.showBusyIndicator = false
+      this.showBusyIndicator = false;
     },
     setBusyIndicator() {
       this.showBusyIndicator =
@@ -425,9 +424,6 @@ export default {
       });
 
       this.rpc.invoke("receiveIsWebviewReady", []);
-    },
-    toggleConsole() {
-      this.showConsole = !this.showConsole;
     }
   },
   mounted() {

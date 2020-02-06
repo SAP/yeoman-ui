@@ -59,6 +59,9 @@ describe('yeomanui unit test', () => {
     }
 
     class TestLog implements YouiLog {
+        public error(): void {
+            return;
+        } 
         public log(): void {
             return;
         }            
@@ -407,7 +410,7 @@ describe('yeomanui unit test', () => {
         const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
         const res = yeomanUi.logError("message");
         // tslint:disable-next-line: no-unused-expression
-        expect(res).to.be.undefined;
+        expect(res).to.be.not.undefined;
     });
 
     describe("setGenInstall", () => {

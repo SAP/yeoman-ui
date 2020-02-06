@@ -60,7 +60,9 @@ export class YeomanUI {
   constructor(rpc: IRpc, logger: YouiLog, genFilter?: GeneratorFilter) {
     this.rpc = rpc;
     if (!this.rpc) {
-      throw new Error("rpc must be set");
+      const error = new Error("rpc must be set");
+      this.logError(error);
+      throw error;
     }
     this.logger = logger;
     this.rpc.setResponseTimeout(3600000);
@@ -75,7 +77,6 @@ export class YeomanUI {
     this.genMeta = {};
     this.currentQuestions = {};
     this.setGenFilter(genFilter);
-    
   }
 
   public setGenFilter(genFilter: GeneratorFilter) {
@@ -94,10 +95,14 @@ export class YeomanUI {
     return promise;
   }
 
-  public logError(error: any) {
-    const errorMessage = this.getErrorInfo(error);
+  public async logError(error: any, prefixMessage?: string) {
+    let errorMessage = this.getErrorInfo(error);
+    if (prefixMessage) {
+      errorMessage = `${prefixMessage}\n${errorMessage}`;
+    }
     console.error(errorMessage);
-    this.logger.log(errorMessage);
+    this.logger.error(errorMessage);
+    return errorMessage;
   }
 
   private getEnv(): Environment.Options {
@@ -184,9 +189,7 @@ export class YeomanUI {
         this.doGeneratorDone(true, message, destinationRoot);
       });
     } catch (error) {
-      const errorMessage = this.getErrorInfo(error);
-      this.logger.log(errorMessage);
-      return Promise.reject(errorMessage);
+      this.logError(error);
     }
   }
 
@@ -243,11 +246,10 @@ export class YeomanUI {
       }
     } catch (error) {
       const questionInfo = `Could not update method '${methodName}' in '${questionName}' question in generator '${this.gen.options.namespace}'`;
-      const errorMessage = `${questionInfo}\n${this.getErrorInfo(error)}`;
-      this.logger.log(errorMessage);
+      const errorMessage = this.logError(error, questionInfo);
       return Promise.reject(errorMessage);
     } 
-}
+  }
 
   public async receiveIsWebviewReady() {
     // TODO: loading generators takes a long time; consider prefetching list of generators
@@ -255,7 +257,7 @@ export class YeomanUI {
     const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
     await this.runGenerator(response.name);
   }
-
+ 
   public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
     this.currentQuestions = questions;
     
@@ -293,6 +295,7 @@ export class YeomanUI {
     try {
       packageJson = await this.getGenPackageJson(genPackagePath);
     } catch (error) {
+      this.logError(error);
       return Promise.resolve(undefined);
     }
     
@@ -313,6 +316,7 @@ export class YeomanUI {
       genImageUrl = await datauri.promise(path.join(genPackagePath, YeomanUI.YEOMAN_PNG));
     } catch (error) {
       genImageUrl = defaultImage.default;
+      this.logError(error);
     }
 
     const genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);

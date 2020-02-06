@@ -484,14 +484,4 @@ describe('App.vue', () => {
       expect(wrapper.vm.showBusyIndicator).toBeFalsy()
     })
   })
-
-  describe('toggleConsole - method', () => {
-    test('showConsole property updated from toggleConsole()', () => {
-      wrapper = initComponent(App)
-      wrapper.vm.toggleConsole()
-      expect(wrapper.vm.showConsole).toBeTruthy()
-      wrapper.vm.toggleConsole()
-      expect(wrapper.vm.showConsole).toBeFalsy()
-    })
-  })
 })
