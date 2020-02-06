@@ -6,11 +6,11 @@ export class YouiLogImpl implements YouiLog {
     constructor(private logger: IChildLogger) {}
 
     public error(value: string): void {
-        this.logger.error(stripAnsi(value));
+        this.logger.error(value);
     }
 
     public log(value: string): void {
-        this.logger.debug(stripAnsi(value));
+        this.logger.debug(value);
     }
 
     public writeln(value: string): void {

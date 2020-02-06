@@ -165,16 +165,15 @@ export default {
       const questions = _.get(this, "currentPrompt.questions", []);
       const relevantQuestionsToUpdate = _.slice(questions, questionIndex)
       
-      const that = this;
       let showBusy = true
       const finished = relevantQuestionsToUpdate.reduce((p, question) => {
         return p.then(() => this.updateQuestion(question)).catch(error => {
           // eslint-disable-next-line no-console
           console.error(error);
-          return that.rpc.invoke("logError", [error]);
         });
       }, Promise.resolve()); 
 
+      const that = this;
       setTimeout(() => {
         if (showBusy) {
           that.showBusyIndicator = true;

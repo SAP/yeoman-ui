@@ -102,7 +102,6 @@ export class YeomanUI {
     }
     console.error(errorMessage);
     this.logger.error(errorMessage);
-    return errorMessage;
   }
 
   private getEnv(): Environment.Options {
@@ -179,8 +178,8 @@ export class YeomanUI {
         let message: string;
         let destinationRoot = this.gen.destinationRoot();
         if (err) {
-          this.logError(err);
           message = `${generatorName} failed: ${err}.`;
+          this.logError(err, message);
           this.doGeneratorDone(false, message, destinationRoot);
         }
 
@@ -209,12 +208,13 @@ export class YeomanUI {
     if (_.isString(error)) {
       return error;
     } 
-      const name = _.get(error, "name", "");
-      const message = _.get(error, "message", "");
-      const stack = _.get(error, "stack", "");
-      const string = error.toString();
+    
+    const name = _.get(error, "name", "");
+    const message = _.get(error, "message", "");
+    const stack = _.get(error, "stack", "");
+    const string = error.toString();
 
-      return `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${string}\n`;
+    return `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${string}\n`;
   }
 
   public doGeneratorInstall(): Promise<any> {
@@ -246,8 +246,8 @@ export class YeomanUI {
       }
     } catch (error) {
       const questionInfo = `Could not update method '${methodName}' in '${questionName}' question in generator '${this.gen.options.namespace}'`;
-      const errorMessage = this.logError(error, questionInfo);
-      return Promise.reject(errorMessage);
+      this.logError(error, questionInfo);
+      return Promise.reject(error);
     } 
   }
 
@@ -316,7 +316,7 @@ export class YeomanUI {
       genImageUrl = await datauri.promise(path.join(genPackagePath, YeomanUI.YEOMAN_PNG));
     } catch (error) {
       genImageUrl = defaultImage.default;
-      this.logError(error);
+      this.logger.log(error);
     }
 
     const genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
