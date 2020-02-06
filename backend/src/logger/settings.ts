@@ -3,8 +3,8 @@ import * as vscode from "vscode"; // NOSONAR
 /**
  * Note that the values of these configuration properties must match those defined in the package.json
  */
-export const LOGGING_LEVEL_CONFIG_PROP = "Yeoman UI.loggingLevel";
-export const SOURCE_TRACKING_CONFIG_PROP = "Yeoman UI.sourceLocationTracking";
+export const LOGGING_LEVEL_CONFIG_PROP = "Yeoman UI.Logger.loggingLevel";
+export const SOURCE_TRACKING_CONFIG_PROP = "Yeoman UI.Logger.sourceLocationTracking";
 
 /**
  * @returns {LogLevel}

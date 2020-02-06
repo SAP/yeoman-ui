@@ -29,14 +29,6 @@ export function activate(context: vscode.ExtensionContext) {
 			const messages = _.get(options, "messages");
 			YeomanUIPanel.createOrShow(context.extensionPath, GeneratorFilter.create(genFilter), messages);
 	}));
-	context.subscriptions.push(
-		vscode.commands.registerCommand('yeomanUI.toggleLog', () => {
-			const yeomanUi = _.get(YeomanUIPanel, "currentPanel.yeomanui");
-			if (yeomanUi) {
-				yeomanUi.toggleLog();
-			}
-	}));
-
 
 	if (vscode.window.registerWebviewPanelSerializer) {
 		// Make sure we register a serializer in activation event

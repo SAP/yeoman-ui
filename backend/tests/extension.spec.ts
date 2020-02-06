@@ -58,11 +58,9 @@ describe('extension unit test', () => {
 
         it("commands registration", () => {
             extension.activate(testContext);
-            expect(_.size(_.keys(oRegisteredCommands))).to.be.equal(2);
+            expect(_.size(_.keys(oRegisteredCommands))).to.be.equal(1);
             // tslint:disable-next-line: no-unused-expression
             expect( _.get(oRegisteredCommands, "loadYeomanUI")).to.be.not.undefined;
-            // tslint:disable-next-line: no-unused-expression
-            expect(_.get(oRegisteredCommands, "yeomanUI.toggleLog")).to.be.not.undefined;
         });
 
         it("execution loadYeomanUI command", () => {
@@ -70,13 +68,6 @@ describe('extension unit test', () => {
             const loadYeomanUICommand = _.get(oRegisteredCommands, "loadYeomanUI");
             yeomanUiPanelMock.expects("createOrShow").withArgs(testContext.extensionPath);
             loadYeomanUICommand();
-        });
-
-        it("execution yeomanui.toggleLog command", () => {
-            extension.activate(testContext);
-            const yeomanUIToggleLogCommand = _.get(oRegisteredCommands, "yeomanUI.toggleLog");
-            yeomanUiMock.expects("toggleLog");
-            yeomanUIToggleLogCommand();
         });
     });
 });
