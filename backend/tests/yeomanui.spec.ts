@@ -7,6 +7,7 @@ import * as _ from "lodash";
 import * as path from "path";
 import {YeomanUI, IGeneratorQuestion} from "../src/yeomanui";
 import * as yeomanEnv from "yeoman-environment";
+import { YouiLog } from "../src/logger/youi-log";
 import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorType, GeneratorFilter } from "../src/filter";
 
@@ -57,8 +58,36 @@ describe('yeomanui unit test', () => {
         }
     }
 
+    class TestLog implements YouiLog {
+        public log(): void {
+            return;
+        }            
+        public writeln(): void {
+            return;
+        } 
+        public create(): void {
+            return;
+        }  
+        public force(): void {
+            return;
+        } 
+        public conflict(): void {
+            return;
+        }  
+        public identical(): void {
+            return;
+        }  
+        public skip(): void {
+            return;
+        } 
+        public showLog(): boolean {
+            return false;
+        }  
+    }
+
     const rpc = new TestRpc();
-    const yeomanUi: YeomanUI = new YeomanUI(rpc);
+    const logger = new TestLog();
+    const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -375,15 +404,15 @@ describe('yeomanui unit test', () => {
     });
 
     it("logMessage", () => {
-        const yeomanUi: YeomanUI = new YeomanUI(rpc);
-        const res = yeomanUi.logMessage("message");
+        const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
+        const res = yeomanUi.logError("message");
         // tslint:disable-next-line: no-unused-expression
         expect(res).to.be.undefined;
     });
 
     describe("setGenInstall", () => {
         it("install method not exist", () => {
-            const yeomanUi: YeomanUI = new YeomanUI(rpc);
+            const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
             let gen: any = {} as Generator;
             yeomanUi["setGenInstall"](gen);
             // tslint:disable-next-line: no-unused-expression
@@ -391,7 +420,7 @@ describe('yeomanui unit test', () => {
         });
 
         it("install method exists", () => {
-            const yeomanUi: YeomanUI = new YeomanUI(rpc);
+            const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
             class GenTest {
                public install(): any{
                    return "original_install";
@@ -411,7 +440,7 @@ describe('yeomanui unit test', () => {
     });
 
     describe("getEnv", () => {
-        const yeomanUi: YeomanUI = new YeomanUI(rpc);
+        const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
         const testEnv = yeomanUi["getEnv"]();
         const nodemodules = YeomanUI["NODE_MODULES"];
         testEnv.getNpmPaths = (localOnly: boolean = false): string[] => {

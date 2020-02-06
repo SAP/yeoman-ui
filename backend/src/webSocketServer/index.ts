@@ -1,6 +1,8 @@
 import * as WebSocket from 'ws';
 import { RpcExtensionWebSockets } from '@sap-devx/webview-rpc/out.ext/rpc-extension-ws';
 import { YeomanUI } from '../yeomanui';
+import { YouiLog } from "../logger/youi-log";
+import { ServerLog } from './server-log';
 import backendMessages from "../messages";
 
 class YeomanUIWebSocketServer {
@@ -24,8 +26,8 @@ class YeomanUIWebSocketServer {
       console.log('new ws connection');
 
       this.rpc = new RpcExtensionWebSockets(ws);
-      //TODO: Use RPC to send it to the browser log (as a collapsed pannel in Vue)
-      this.yeomanui = new YeomanUI(this.rpc);
+      const logger: YouiLog = new ServerLog(this.rpc);
+      this.yeomanui = new YeomanUI(this.rpc, logger);
       this.yeomanui.setMessages(backendMessages);
     });
   }

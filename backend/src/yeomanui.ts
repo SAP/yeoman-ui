@@ -10,9 +10,11 @@ const humanizeString = require('humanize-string');
 const datauri = require("datauri");
 import * as defaultImage from "./defaultImage";
 import { YouiAdapter } from "./youi-adapter";
+import { YouiLog } from "./logger/youi-log";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 import { GeneratorType, GeneratorFilter } from "./filter";
+
 
 export interface IGeneratorChoice {
   name: string;
@@ -47,6 +49,7 @@ export class YeomanUI {
   private static NODE_MODULES = 'node_modules';
 
   private rpc: IRpc;
+  private logger: YouiLog;
   private genMeta: { [namespace: string]: Environment.GeneratorMeta };
   private youiAdapter: YouiAdapter;
   private gen: Generator | undefined;
@@ -54,18 +57,19 @@ export class YeomanUI {
   private currentQuestions: Environment.Adapter.Questions<any>;
   private genFilter: GeneratorFilter;
 
-  constructor(rpc: IRpc, genFilter?: GeneratorFilter) {
+  constructor(rpc: IRpc, logger: YouiLog, genFilter?: GeneratorFilter) {
     this.rpc = rpc;
     if (!this.rpc) {
       throw new Error("rpc must be set");
     }
+    this.logger = logger;
     this.rpc.setResponseTimeout(3600000);
     this.rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
     this.rpc.registerMethod({ func: this.runGenerator, thisArg: this });
     this.rpc.registerMethod({ func: this.evaluateMethod, thisArg: this });
-    this.rpc.registerMethod({ func: this.logMessage, thisArg: this });
+    this.rpc.registerMethod({ func: this.logError, thisArg: this });
   
-    this.youiAdapter = new YouiAdapter();
+    this.youiAdapter = new YouiAdapter(logger);
     this.youiAdapter.setYeomanUI(this);
     this.promptCount = 0;
     this.genMeta = {};
@@ -88,6 +92,12 @@ export class YeomanUI {
     });
 
     return promise;
+  }
+
+  public logError(error: any) {
+    const errorMessage = this.getErrorInfo(error);
+    console.error(errorMessage);
+    this.logger.log(errorMessage);
   }
 
   private getEnv(): Environment.Options {
@@ -114,7 +124,7 @@ export class YeomanUI {
     // TODO: wait for dir to be created
     fs.mkdir(YeomanUI.CWD, { recursive: true }, (err) => {
       if (err) {
-        console.error(err);
+        this.logError(err);
       }
     });
 
@@ -144,10 +154,10 @@ export class YeomanUI {
         const image: any = genGetImage();
         if (image.then) {
           image.then((contents: string) => {
-            console.log(`image contents: ${contents}`);
+            this.logger.log(`image contents: ${contents}`);
           });
         } else if (image !== undefined) {
-          console.log(`image contents: ${image}`);
+          this.logger.log(`image contents: ${image}`);
         }
       }
       
@@ -164,18 +174,18 @@ export class YeomanUI {
         let message: string;
         let destinationRoot = this.gen.destinationRoot();
         if (err) {
-          console.error(err);
+          this.logError(err);
           message = `${generatorName} failed: ${err}.`;
           this.doGeneratorDone(false, message, destinationRoot);
         }
 
         message = `The '${generatorName}' project has been generated.`;
-        console.log("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
+        this.logger.log("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
         this.doGeneratorDone(true, message, destinationRoot);
       });
     } catch (error) {
-      const errorMessage = `Error info ---->\n ${this.getErrorInfo(error)}`;
-      this.showMessageInOutput(errorMessage);
+      const errorMessage = this.getErrorInfo(error);
+      this.logger.log(errorMessage);
       return Promise.reject(errorMessage);
     }
   }
@@ -202,10 +212,6 @@ export class YeomanUI {
       const string = error.toString();
 
       return `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${string}\n`;
-  }
-
-  async showMessageInOutput(errorMessage: string) {
-    await this.logMessage(errorMessage);
   }
 
   public doGeneratorInstall(): Promise<any> {
@@ -237,8 +243,8 @@ export class YeomanUI {
       }
     } catch (error) {
       const questionInfo = `Could not update method '${methodName}' in '${questionName}' question in generator '${this.gen.options.namespace}'`;
-      const errorMessage = `${questionInfo}\nError info ---->\n ${this.getErrorInfo(error)}`;
-      this.showMessageInOutput(errorMessage);
+      const errorMessage = `${questionInfo}\n${this.getErrorInfo(error)}`;
+      this.logger.log(errorMessage);
       return Promise.reject(errorMessage);
     } 
 }
@@ -248,12 +254,6 @@ export class YeomanUI {
     const generators: IPrompt = await this.getGenerators();
     const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
     await this.runGenerator(response.name);
-  }
-
-
-  public logMessage(message: string): void {
-    // TODO: 
-    //this.vscodelogger.log(message);
   }
 
   public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
