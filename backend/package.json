@@ -50,21 +50,6 @@
 					"scope": "resource"
 				}
 			}
-		},
-		"menus": {
-			"commandPalette": [
-				{
-					"command": "yeomanUI.toggleLog",
-					"when": "false"
-				}
-			],
-			"editor/title": [
-				{
-					"command": "yeomanUI.toggleLog",
-					"group": "navigation",
-					"when": "yeomanUI.Focused"
-				}
-			]
 		}
 	},
 	"scripts": {

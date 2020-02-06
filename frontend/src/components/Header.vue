@@ -3,7 +3,7 @@
     <v-app-bar class="elevation-0">
       <v-toolbar-title>{{selectedGeneratorHeader}}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn v-if="!isInVsCode" @click="collapseLog" icon>
+      <v-btn v-if="!isInVsCode" icon>
         <v-icon>mdi-console</v-icon>
       </v-btn>
     </v-app-bar>
@@ -13,13 +13,7 @@
 <script>
 export default {
   name: "Header",
-  props: ["selectedGeneratorHeader", "stepName", "isInVsCode", "rpc"],
-  methods: {
-    collapseLog() {
-      this.rpc.invoke("toggleLog", [{}]);
-      this.$emit("parentShowConsole");
-    }
-  }
+  props: ["selectedGeneratorHeader", "stepName", "isInVsCode", "rpc"]
 };
 </script>
 <style>
