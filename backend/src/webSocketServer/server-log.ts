@@ -11,6 +11,9 @@ export class ServerLog implements YouiLog {
     constructor(rpc : RpcCommon) {
         this.rpc = rpc;        
     }
+    public error(str: string): void {
+        this.rpc.invoke("log", [stripAnsi(str) + '\n']);
+    }
     public log(str: string): void {
         this.rpc.invoke("log", [stripAnsi(str) + '\n']);
     }
