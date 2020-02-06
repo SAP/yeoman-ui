@@ -100,8 +100,9 @@ export class YeomanUI {
     if (prefixMessage) {
       errorMessage = `${prefixMessage}\n${errorMessage}`;
     }
-    console.error(errorMessage);
+    
     this.logger.error(errorMessage);
+    return errorMessage;
   }
 
   private getEnv(): Environment.Options {
@@ -246,8 +247,8 @@ export class YeomanUI {
       }
     } catch (error) {
       const questionInfo = `Could not update method '${methodName}' in '${questionName}' question in generator '${this.gen.options.namespace}'`;
-      this.logError(error, questionInfo);
-      return Promise.reject(error);
+      const errorMessage = await this.logError(error, questionInfo);
+      return Promise.reject(errorMessage);
     } 
   }
 
