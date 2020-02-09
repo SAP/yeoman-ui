@@ -3,9 +3,10 @@
     <v-app-bar class="elevation-0">
       <v-toolbar-title>{{selectedGeneratorHeader}}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn v-if="!isInVsCode" @click="collapseOutput" icon>
+      <!-- TODO: open when output channel is available from the logger library-->
+      <!--v-btn v-if="!isInVsCode" @click="collapseOutput" icon>
         <v-icon>mdi-console</v-icon>
-      </v-btn>
+      </v-btn -->
     </v-app-bar>
   </div>
 </template>

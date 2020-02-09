@@ -41,10 +41,7 @@ export class YouiLogImpl implements YouiLog {
     }
 
     public showOutput(): boolean {
-        if (!this.channel) {
-            this.channel = vscode.window.createOutputChannel("yeoman-ui");
-        }
-        this.channel.show();
+        // TODO: get output channel instance from the logger library
         return true;
     }
 }
