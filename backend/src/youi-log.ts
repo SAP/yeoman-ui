@@ -6,5 +6,5 @@ export interface YouiLog {
   conflict(str: string): void;
   identical(str: string): void;
   skip(str: string): void;
-  showLog():boolean;
+  showOutput():boolean;
 }

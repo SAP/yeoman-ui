@@ -14,6 +14,7 @@ import { YouiLog } from "./youi-log";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 import { GeneratorType, GeneratorFilter } from "./filter";
+import { IChildLogger } from "@vscode-logging/logger";
 
 export interface IGeneratorChoice {
   name: string;
@@ -48,7 +49,8 @@ export class YeomanUI {
   private static NODE_MODULES = 'node_modules';
 
   private rpc: IRpc;
-  private logger: YouiLog;
+  private outputChannel: YouiLog;
+  private logger: IChildLogger;
   private genMeta: { [namespace: string]: Environment.GeneratorMeta };
   private youiAdapter: YouiAdapter;
   private gen: Generator | undefined;
@@ -56,20 +58,21 @@ export class YeomanUI {
   private currentQuestions: Environment.Adapter.Questions<any>;
   private genFilter: GeneratorFilter;
 
-  constructor(rpc: IRpc, logger: YouiLog, genFilter?: GeneratorFilter) {
+  constructor(rpc: IRpc, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter) {
     this.rpc = rpc;
     if (!this.rpc) {
       throw new Error("rpc must be set");
     }
+    this.outputChannel = outputChannel;
     this.logger = logger;
     this.rpc.setResponseTimeout(3600000);
     this.rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
     this.rpc.registerMethod({ func: this.runGenerator, thisArg: this });
     this.rpc.registerMethod({ func: this.evaluateMethod, thisArg: this });
-    this.rpc.registerMethod({ func: this.toggleLog, thisArg: this });
-    this.rpc.registerMethod({ func: this.logMessage, thisArg: this });
+    this.rpc.registerMethod({ func: this.toggleOutput, thisArg: this });
+    this.rpc.registerMethod({ func: this.logError, thisArg: this });
   
-    this.youiAdapter = new YouiAdapter(logger);
+    this.youiAdapter = new YouiAdapter(outputChannel);
     this.youiAdapter.setYeomanUI(this);
     this.promptCount = 0;
     this.genMeta = {};
@@ -80,6 +83,16 @@ export class YeomanUI {
 
   public setGenFilter(genFilter: GeneratorFilter) {
     this.genFilter = genFilter ? genFilter : GeneratorFilter.create();
+  }
+
+  public async logError(error: any, prefixMessage?: string) {
+    let errorMessage = this.getErrorInfo(error);
+    if (prefixMessage) {
+      errorMessage = `${prefixMessage}\n${errorMessage}`;
+    }
+
+    this.logger.error(errorMessage);
+    return errorMessage;
   }
 
   public async getGenerators(): Promise<IPrompt> {
@@ -118,7 +131,7 @@ export class YeomanUI {
     // TODO: wait for dir to be created
     fs.mkdir(YeomanUI.CWD, { recursive: true }, (err) => {
       if (err) {
-        console.error(err);
+        this.logError(err);
       }
     });
 
@@ -148,10 +161,10 @@ export class YeomanUI {
         const image: any = genGetImage();
         if (image.then) {
           image.then((contents: string) => {
-            console.log(`image contents: ${contents}`);
+            this.logger.debug(`image contents: ${contents}`);
           });
         } else if (image !== undefined) {
-          console.log(`image contents: ${image}`);
+          this.logger.debug(`image contents: ${image}`);
         }
       }
       
@@ -174,13 +187,11 @@ export class YeomanUI {
         }
 
         message = `The '${generatorName}' project has been generated.`;
-        console.log("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
+        this.logger.debug("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
         this.doGeneratorDone(true, message, destinationRoot);
       });
     } catch (error) {
-      const errorMessage = `Error info ---->\n ${this.getErrorInfo(error)}`;
-      this.showMessageInOutput(errorMessage);
-      return Promise.reject(errorMessage);
+      this.logError(error);
     }
   }
 
@@ -200,17 +211,18 @@ export class YeomanUI {
     if (_.isString(error)) {
       return error;
     } 
-      const name = _.get(error, "name", "");
-      const message = _.get(error, "message", "");
-      const stack = _.get(error, "stack", "");
-      const string = error.toString();
 
-      return `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${string}\n`;
+    const name = _.get(error, "name", "");
+    const message = _.get(error, "message", "");
+    const stack = _.get(error, "stack", "");
+    const string = error.toString();
+
+    return `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${string}\n`;
   }
 
   async showMessageInOutput(errorMessage: string) {
     await this.logMessage(errorMessage);
-    this.toggleLog();
+    this.toggleOutput();
   }
 
   public doGeneratorInstall(): Promise<any> {
@@ -242,8 +254,7 @@ export class YeomanUI {
       }
     } catch (error) {
       const questionInfo = `Could not update method '${methodName}' in '${questionName}' question in generator '${this.gen.options.namespace}'`;
-      const errorMessage = `${questionInfo}\nError info ---->\n ${this.getErrorInfo(error)}`;
-      this.showMessageInOutput(errorMessage);
+      const errorMessage = await this.logError(error, questionInfo);
       return Promise.reject(errorMessage);
     } 
 }
@@ -255,12 +266,12 @@ export class YeomanUI {
     await this.runGenerator(response.name);
   }
 
-  public toggleLog(): boolean {
-    return this.logger.showLog();
+  public toggleOutput(): boolean {
+    return this.outputChannel.showOutput();
   }
 
   public logMessage(message: string): void {
-    this.logger.log(message);
+    this.outputChannel.log(message);
   }
 
   public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
@@ -300,6 +311,7 @@ export class YeomanUI {
     try {
       packageJson = await this.getGenPackageJson(genPackagePath);
     } catch (error) {
+      this.logError(error);
       return Promise.resolve(undefined);
     }
     
@@ -320,6 +332,7 @@ export class YeomanUI {
       genImageUrl = await datauri.promise(path.join(genPackagePath, YeomanUI.YEOMAN_PNG));
     } catch (error) {
       genImageUrl = defaultImage.default;
+      this.logger.debug(error);
     }
 
     const genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);

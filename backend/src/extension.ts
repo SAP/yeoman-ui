@@ -9,9 +9,20 @@ import { OutputChannelLog } from './output-channel-log';
 import { GeneratorFilter } from './filter';
 import backendMessages from "./messages";
 import { Theia } from './theia';
+import { createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
+import { getClassLogger } from "./logger/logger-wrapper";
+import { IChildLogger } from "@vscode-logging/logger";
 
+const ERROR_ACTIVATION_FAILED = 'Extension activation failed due to Logger configuration failure:';
 
 export function activate(context: vscode.ExtensionContext) {
+	try {
+		createExtensionLoggerAndSubscribeToLogSettingsChanges(context);
+	} catch (error) {
+		console.error(ERROR_ACTIVATION_FAILED, error.message);
+		return;
+	}
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand('loadYeomanUI', (options?: any) => {
 			const genFilter = _.get(options, "filter"); 
@@ -19,10 +30,10 @@ export function activate(context: vscode.ExtensionContext) {
 			YeomanUIPanel.createOrShow(context.extensionPath, GeneratorFilter.create(genFilter), messages);
 	}));
 	context.subscriptions.push(
-		vscode.commands.registerCommand('yeomanUI.toggleLog', () => {
+		vscode.commands.registerCommand('yeomanUI.toggleOutput', () => {
 			const yeomanUi = _.get(YeomanUIPanel, "currentPanel.yeomanui");
 			if (yeomanUi) {
-				yeomanUi.toggleLog();
+				yeomanUi.toggleOutput();
 			}
 	}));
 
@@ -42,6 +53,7 @@ export function activate(context: vscode.ExtensionContext) {
  * Manages webview panels
  */
 export class YeomanUIPanel {
+	private readonly logger: IChildLogger = getClassLogger(YeomanUI.name);
 	/**
 	 * Track the currently panel. Only allow a single panel to exist at a time.
 	 */
@@ -97,10 +109,10 @@ export class YeomanUIPanel {
 		this.panel = panel;
 		this.extensionPath = extensionPath;
 		this.rpc = new RpcExtension(this.panel.webview);
-		const logger: YouiLog = new OutputChannelLog();
+		const outputChannel: YouiLog = new OutputChannelLog();
 		this.theia = new Theia();
 		
-		this.yeomanui = new YeomanUI(this.rpc, logger, YeomanUIPanel.genFilter);
+		this.yeomanui = new YeomanUI(this.rpc, outputChannel, YeomanUIPanel.genFilter);
 
 		// Set the webview's initial html content
 		this._update();
