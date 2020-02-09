@@ -1,6 +1,5 @@
 import * as os from "os";
 import * as path from "path";
-import * as fs from "fs";
 import * as fsextra from "fs-extra";
 import * as _ from "lodash";
 import * as Environment from "yeoman-environment";
@@ -78,7 +77,6 @@ export class YeomanUI {
     this.genMeta = {};
     this.currentQuestions = {};
     this.setGenFilter(genFilter);
-
   }
 
   public setGenFilter(genFilter: GeneratorFilter) {
@@ -128,19 +126,12 @@ export class YeomanUI {
   }
 
   public async runGenerator(generatorName: string) {
-    // TODO: wait for dir to be created
-    fs.mkdir(YeomanUI.CWD, { recursive: true }, (err) => {
-      if (err) {
-        this.logError(err);
-      }
-    });
-
     // TODO: should create and set target dir only after user has selected a generator;
     //  see issue: https://github.com/yeoman/environment/issues/55
     //  process.chdir() doesn't work after environment has been created
-
-    const env: Environment = Environment.createEnv(undefined, {}, this.youiAdapter);
     try {
+      await fsextra.mkdirs(YeomanUI.CWD);
+      const env: Environment = Environment.createEnv(undefined, {}, this.youiAdapter);
       const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
       // TODO: support sub-generators
       env.register(meta.resolved);
@@ -177,8 +168,8 @@ export class YeomanUI {
         let message: string;
         let destinationRoot = this.gen.destinationRoot();
         if (err) {
-          console.error(err);
           message = `${generatorName} failed: ${err}.`;
+          this.logError(err, message);
           this.doGeneratorDone(false, message, destinationRoot);
         }
 
