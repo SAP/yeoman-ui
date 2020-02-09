@@ -397,8 +397,7 @@ describe('App.vue', () => {
 
       expect(wrapper.vm.isDone).toBeFalsy()
       expect(window.vscode.postMessage).toHaveBeenCalledWith({
-        command: "showInfoMessage",
-        commandParams: ["Installing dependencies..."]
+        command: "showInstallMessage"
       })
     })
 
@@ -413,8 +412,7 @@ describe('App.vue', () => {
       wrapper.vm.generatorInstall()
 
       expect(window.vscode.postMessage).not.toHaveBeenCalledWith({
-        command: "showInfoMessage",
-        commandParams: ["Installing dependencies..."]
+        command: "showInstallMessage"
       })
     })
 

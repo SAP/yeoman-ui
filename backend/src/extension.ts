@@ -49,6 +49,7 @@ export class YeomanUIPanel {
 	public static currentPanel: YeomanUIPanel | undefined;
 	public static genFilter: GeneratorFilter;
 	public static messages: any;
+	public static installing: boolean;
 
 	public static createOrShow(extensionPath: string, genFilter?: GeneratorFilter, messages?: any) {
 		YeomanUIPanel.genFilter = genFilter;
@@ -135,34 +136,45 @@ export class YeomanUIPanel {
 						const resolve = this.questionsResolutions.get(message.taskId);
 						resolve(message.data);
 						return;
-					case 'showInfoMessage':
-						let InfoMessage = _.get(message, "commandParams[0]");
-						vscode.window.showInformationMessage(InfoMessage);
+					case 'showInstallMessage':
+						YeomanUIPanel.installing = true;
+						vscode.window.withProgress({
+							location: vscode.ProgressLocation.Notification,
+							title: "Installing dependencies..."
+						},
+						async (progress) => {
+							await new Promise(resolve => {
+								let intervalId = setInterval(() => {
+									if (!YeomanUIPanel.installing) {
+										clearInterval(intervalId);
+										resolve(undefined);
+									}
+								}, 3000);
+							});
+							return "installing_dependencies_completed";
+						});
 						return;
 					case 'showDoneMessage':
+						YeomanUIPanel.installing = false;
 						let Close = 'Close';
 						let OpenWorkspace = 'Open Workspace';
-						this.theia.isInTheia().then((value) => {
-							let commandName_Close = "workbench.action.closeActiveEditor";
-							let commandName_OpenWorkspace = "vscode.openFolder";
-							let commandParam = _.get(message, "commandParams[0]");
-							vscode.window.showInformationMessage('Where would you like to open the project?', Close , OpenWorkspace)
-								.then(selection => {
-									if (selection === Close) {
-										this.executeCommand(commandName_Close, undefined);
-									} else if (selection === OpenWorkspace) {
-										this.executeCommand(commandName_OpenWorkspace, commandParam);
-									}
-								});
-						});
+						let commandName_Close = "workbench.action.closeActiveEditor";
+						let commandName_OpenWorkspace = "vscode.openFolder";
+						let commandParam_OpenWorkspace = _.get(message, "commandParams[0]");
+						vscode.window.showInformationMessage('Where would you like to open the project?', Close , OpenWorkspace)
+							.then(selection => {
+								if (selection === Close) {
+									this.executeCommand(commandName_Close, undefined);
+								} else if (selection === OpenWorkspace) {
+									this.executeCommand(commandName_OpenWorkspace, commandParam_OpenWorkspace);
+								}
+							});
 						return;
 					case 'vscodecommand':
-						this.theia.isInTheia().then((value) => {
-							let commandName = _.get(message, "commandName");
-							let commandParam = _.get(message, "commandParams[0]");
-							this.executeCommand(commandName, commandParam);
-							return;
-						});
+						let commandName = _.get(message, "commandName");
+						let commandParam = _.get(message, "commandParams[0]");
+						this.executeCommand(commandName, commandParam);
+						return;
 				}
 			},
 			null,

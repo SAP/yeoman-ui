@@ -88,7 +88,6 @@ import * as _ from "lodash";
 const FUNCTION = "__Function";
 const LOADING = "loading...";
 const PENDING = "pending";
-const INSTALLING = "Installing dependencies...";
 
 export default {
   name: "app",
@@ -368,8 +367,7 @@ export default {
     generatorInstall() {
       if (this.isInVsCode()) {
         window.vscode.postMessage({
-          command: "showInfoMessage",
-          commandParams: [INSTALLING]
+          command: "showInstallMessage"
         });
       }
     },
