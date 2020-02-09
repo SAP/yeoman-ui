@@ -249,12 +249,3 @@ export class YeomanUIPanel {
 		this.panel.webview.html = indexHtml;
 	}
 }
-
-let channel: vscode.OutputChannel;
-export function getOutputChannel(): vscode.OutputChannel {
-	if (!channel) {
-		channel = vscode.window.createOutputChannel('Yeoman UI');
-	}
-	
-	return channel;
-}
