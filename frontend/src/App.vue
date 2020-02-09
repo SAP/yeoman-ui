@@ -248,8 +248,9 @@ export default {
       if (this.resolve) {
         try {
           this.resolve(this.currentPrompt.answers);
-        } catch (e) {
-          this.reject(e);
+        } catch (error) {
+          this.rpc.invoke("logError", [error]);
+          this.reject(error);
           return;
         }
       }
