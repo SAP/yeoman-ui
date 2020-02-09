@@ -24,8 +24,8 @@
 				"title": "Yeoman UI Generators"
 			},
 			{
-				"command": "yeomanUI.toggleLog",
-				"title": "Toggle Log",
+				"command": "yeomanUI.toggleOutput",
+				"title": "Toggle Output",
 				"icon": {
 					"light": "./resources/images/icons/console_light.svg",
 					"dark": "./resources/images/icons/console_dark.svg"
@@ -35,17 +35,44 @@
 		"menus": {
 			"commandPalette": [
 				{
-					"command": "yeomanUI.toggleLog",
+					"command": "yeomanUI.toggleOutput",
 					"when": "false"
 				}
 			],
 			"editor/title": [
 				{
-					"command": "yeomanUI.toggleLog",
+					"command": "yeomanUI.toggleOutput",
 					"group": "navigation",
 					"when": "yeomanUI.Focused"
 				}
 			]
+		},
+		"configuration": {
+			"type": "object",
+			"title": "Yeoman UI.Logger",
+			"properties": {
+				"Yeoman UI.Logger.loggingLevel": {
+					"type": "string",
+					"enum": [
+						"off",
+						"fatal",
+						"error",
+						"warn",
+						"info",
+						"debug",
+						"trace"
+					],
+					"default": "warn",
+					"description": "The verbosity of logging according to the following order: trace > debug > info > warn > error > fatal > off.",
+					"scope": "resource"
+				},
+				"Yeoman UI.Logger.sourceLocationTracking": {
+					"type": "boolean",
+					"default": false,
+					"description": "If chosen, the location of the source code is added to log entries. Warning – this action may slow your extension. We recommend you use it only for debugging.",
+					"scope": "resource"
+				}
+			}
 		}
 	},
 	"scripts": {
@@ -75,7 +102,8 @@
 		"titleize": "^1.0.1",
 		"humanize-string": "^1.0.2",
 		"fs-extra": "^8.1.0",
-		"chalk": "^3.0.0"
+		"chalk": "^3.0.0",
+		"@vscode-logging/logger": "^0.1.1"
 	},
 	"devDependencies": {
 		"@types/chai": "^4.2.5",
