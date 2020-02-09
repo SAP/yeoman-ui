@@ -32,7 +32,7 @@ export class ServerLog implements YouiLog {
     public skip(str: string): void {
         this.rpc.invoke("log", [stripAnsi(str) + '\n']);
     }
-    public showLog(): boolean {
+    public showOutput(): boolean {
         this.isOutputVisible = !this.isOutputVisible;
         return !this.isOutputVisible;
     }

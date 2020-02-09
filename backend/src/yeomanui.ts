@@ -257,7 +257,7 @@ export class YeomanUI {
       const errorMessage = await this.logError(error, questionInfo);
       return Promise.reject(errorMessage);
     } 
-}
+  }
 
   public async receiveIsWebviewReady() {
     // TODO: loading generators takes a long time; consider prefetching list of generators

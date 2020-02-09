@@ -112,7 +112,7 @@ export class YeomanUIPanel {
 		const outputChannel: YouiLog = new OutputChannelLog();
 		this.theia = new Theia();
 		
-		this.yeomanui = new YeomanUI(this.rpc, outputChannel, YeomanUIPanel.genFilter);
+		this.yeomanui = new YeomanUI(this.rpc, outputChannel, this.logger, YeomanUIPanel.genFilter);
 
 		// Set the webview's initial html content
 		this._update();
