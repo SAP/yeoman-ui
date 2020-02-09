@@ -69,6 +69,7 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
     this.rpc.registerMethod({ func: this.runGenerator, thisArg: this });
     this.rpc.registerMethod({ func: this.evaluateMethod, thisArg: this });
+    this.rpc.registerMethod({ func: this.toggleOutput, thisArg: this });
     this.rpc.registerMethod({ func: this.logError, thisArg: this });
   
     this.youiAdapter = new YouiAdapter(logger);
@@ -257,6 +258,10 @@ export class YeomanUI {
     const generators: IPrompt = await this.getGenerators();
     const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
     await this.runGenerator(response.name);
+  }
+
+  public toggleOutput(): boolean {
+    return this.logger.showOutput();
   }
  
   public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {

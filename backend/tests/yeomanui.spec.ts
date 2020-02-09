@@ -59,6 +59,9 @@ describe('yeomanui unit test', () => {
     }
 
     class TestLog implements YouiLog {
+        showOutput(): boolean {
+            return;
+        }
         public error(): void {
             return;
         } 
@@ -404,6 +407,13 @@ describe('yeomanui unit test', () => {
             expect(test2Choice.homepage).to.be.equal("https://myhomepage.com/ANY/generator-test2-module#readme");
             expect(test3Choice.homepage).to.be.equal("");
         });
+    });
+
+    it("toggleOutput", () => {
+        const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
+        const res = yeomanUi.toggleOutput();
+        // tslint:disable-next-line: no-unused-expression
+        expect(res).to.be.undefined;
     });
 
     it("logMessage", () => {

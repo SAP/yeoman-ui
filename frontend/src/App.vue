@@ -16,6 +16,7 @@
       :stepName="prompts[promptIndex].name"
       :rpc="rpc"
       :isInVsCode="isInVsCode()"
+      @parentShowConsole="toggleConsole"
     />
     <v-row class="main-row ma-0 pa-0">
       <v-col class="left-col ma-0 pa-0" cols="3">
@@ -423,6 +424,9 @@ export default {
       });
 
       this.rpc.invoke("receiveIsWebviewReady", []);
+    },
+    toggleConsole() {
+      this.showConsole = !this.showConsole;
     }
   },
   mounted() {

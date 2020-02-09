@@ -22,8 +22,30 @@
 			{
 				"command": "loadYeomanUI",
 				"title": "Yeoman UI Generators"
+			}, {
+				"command": "yeomanUI.toggleOutput",
+				"title": "Toggle Output",
+				"icon": {
+					"light": "./resources/images/icons/console_light.svg",
+					"dark": "./resources/images/icons/console_dark.svg"
+				}
 			}
 		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "yeomanUI.toggleOutput",
+					"when": "false"
+				}
+			],
+			"editor/title": [
+				{
+					"command": "yeomanUI.toggleOutput",
+					"group": "navigation",
+					"when": "yeomanUI.Focused"
+				}
+			]
+		},
 		"configuration": {
 			"type": "object",
 			"title": "Yeoman UI.Logger",
@@ -80,7 +102,7 @@
 		"humanize-string": "^1.0.2",
 		"fs-extra": "^8.1.0",
 		"chalk": "^3.0.0",
-		"@vscode-logging/logger": "~0.1.1"
+		"@vscode-logging/logger": "^0.1.1"
 	},
 	"devDependencies": {
 		"@types/chai": "^4.2.5",

@@ -1,8 +1,11 @@
+import * as vscode from "vscode"; // NOSONAR
 import { YouiLog } from "./youi-log";
 const stripAnsi = require("strip-ansi");
 import { IChildLogger } from "@vscode-logging/logger";
 
 export class YouiLogImpl implements YouiLog {
+    private channel: vscode.OutputChannel;
+
     constructor(private logger: IChildLogger) {}
 
     public error(value: string): void {
@@ -35,5 +38,13 @@ export class YouiLogImpl implements YouiLog {
     
     public skip(value: string): void {
         this.logger.debug(stripAnsi(value));
+    }
+
+    public showOutput(): boolean {
+        if (!this.channel) {
+            this.channel = vscode.window.createOutputChannel("yeoman-ui");
+        }
+        this.channel.show();
+        return true;
     }
 }
