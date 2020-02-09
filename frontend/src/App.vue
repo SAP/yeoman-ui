@@ -281,9 +281,10 @@ export default {
       this.messages = messages;
     },
     setPromptList(prompts) {
+      prompts = prompts || [];
       // replace all existing prompts except 1st (generator selction)
       //   and current prompt
-      this.prompts.splice(this.promptIndex + 1, this.prompts.length - this.promptIndex, ...prompts.splice(this.promptIndex, prompts.length));
+      this.prompts.splice(this.promptIndex + 1, _.size(this.prompts) - this.promptIndex, ...prompts.splice(this.promptIndex, _.size(prompts)));
     },
     setPrompts(prompts) {
       const currentPrompt = this.currentPrompt;

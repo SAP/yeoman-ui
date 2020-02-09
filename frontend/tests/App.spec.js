@@ -381,6 +381,32 @@ describe('App.vue', () => {
     })
   })
 
+  describe('setPromptList - method', () => {
+    test('prompts is empty array', () => {
+      wrapper = initComponent(App)
+      
+      wrapper.vm.prompts = [{}, {}]
+      wrapper.vm.promptIndex = 1
+      wrapper.vm.currentPrompt.status = 'pending'
+
+      wrapper.vm.setPromptList([])
+
+      expect(wrapper.vm.prompts).toHaveLength(2)
+    })
+
+    test('prompts is undefined', () => {
+      wrapper = initComponent(App)
+      
+      wrapper.vm.prompts = [{}, {}]
+      wrapper.vm.promptIndex = 1
+      wrapper.vm.currentPrompt.status = 'pending'
+
+      wrapper.vm.setPromptList()
+
+      expect(wrapper.vm.prompts).toHaveLength(2)
+    })
+  })
+
   describe('generatorInstall - method', () => {
     beforeEach(() => {
       window.vscode = {
