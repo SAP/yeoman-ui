@@ -16,10 +16,10 @@ export default {
   name: "Header",
   props: ["selectedGeneratorHeader", "stepName", "isInVsCode", "rpc"],
   methods: {
-    collapseOutput() {
-      this.rpc.invoke("toggleOutput", [{}]);
-      this.$emit("parentShowConsole");
-    }
+    // collapseOutput() {
+    //   this.rpc.invoke("toggleOutput", [{}]);
+    //   this.$emit("parentShowConsole");
+    // }
   }
 };
 </script>

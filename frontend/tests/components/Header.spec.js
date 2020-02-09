@@ -22,14 +22,14 @@ describe('Header.vue', () => {
         expect(_.keys(wrapper.props())).toHaveLength(4)
     })
 
-    test('generator brand', () => {
+    test.skip('generator brand', () => {
         const testGen = 'Selected Generator: testGenerator'
         wrapper = initComponent(Header, { selectedGeneratorHeader: testGen })
         expect(wrapper.find('v-toolbar-title-stub').text()).toBe(testGen)
         expect(wrapper.find('v-icon-stub').text()).toBe("mdi-console")
     })
 
-    test('click triggers collapseOutput method', async () => {
+    test.skip('click triggers collapseOutput method', async () => {
         const rpcInvokeMockFunction = jest.fn()
         wrapper = initComponent(Header, {
             rpc: {
