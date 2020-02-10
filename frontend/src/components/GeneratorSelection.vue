@@ -78,7 +78,7 @@ export default {
       this.currentQuestion.answer = generatorName;
       const choice = _.find(this.currentQuestion.choices, choice => {return choice.name === generatorName});
       const generatorPrettyName = _.get(choice, "prettyName", generatorName);
-      this.selectGenerator(generatorName, generatorPrettyName);
+      this.$emit('generatorSelected', generatorName, generatorPrettyName)
     }
   }
 };

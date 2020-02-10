@@ -5,6 +5,11 @@ import vuetify from "./plugins/vuetify";
 import "material-design-icons-iconfont/dist/material-design-icons.css";
 import "./assets/css/globalStyles.css";
 
+import Form from "@sap-devx/inquirer-gui";
+
+const options = { vuetify };
+Vue.use(Form, options);
+
 Vue.config.productionTip = false
 
 new Vue({
