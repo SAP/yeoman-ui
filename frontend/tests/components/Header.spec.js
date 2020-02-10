@@ -23,8 +23,8 @@ describe('Header.vue', () => {
     })
 
     test('generator brand', () => {
-        const testGen = 'Selected Generator: testGenerator'
-        wrapper = initComponent(Header, { selectedGeneratorHeader: testGen })
+        const testGen = 'Yeoman Generators'
+        wrapper = initComponent(Header, { headerTitle: testGen})
         expect(wrapper.find('v-toolbar-title-stub').text()).toBe(testGen)
         expect(wrapper.find('v-icon-stub').text()).toBe("mdi-console")
     })

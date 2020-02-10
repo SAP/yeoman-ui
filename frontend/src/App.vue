@@ -12,7 +12,7 @@
 
     <Header
       v-if="prompts.length"
-      :selectedGeneratorHeader="selectedGeneratorHeader"
+      :headerTitle="headerTitle"
       :stepName="prompts[promptIndex].name"
       :rpc="rpc"
       :isInVsCode="isInVsCode()"
@@ -128,8 +128,8 @@ export default {
         ) || "#0e70c0"
       );
     },
-    selectedGeneratorHeader() {
-      return this.generatorName ? this.messages.selected_generator + this.generatorPrettyName : "";
+    headerTitle() {
+      return this.messages.yeoman_ui_title;
     },
     currentPrompt() {
       const prompt = _.get(this.prompts, "[" + this.promptIndex +"]")
@@ -294,6 +294,7 @@ export default {
                 currentPrompt.questions = prompt.questions;
                 if (prompt.name && currentPrompt.name === this.messages.step_is_pending) {
                   currentPrompt.name = prompt.name;
+                  currentPrompt.description = prompt.description ? prompt.description : "";
                 }
                 // if questions are provided, remote the pending status
                 if (prompt.questions.length > 0) {
@@ -351,10 +352,12 @@ export default {
       return promise;
     },
     createPrompt(questions, name) {
-      name = (name === "select_generator" ? this.messages.select_generator : name)
+      const description = (name === "select_generator" ? this.messages.select_generator_description : "")
+      name = (name === "select_generator" ? this.messages.select_generator_name : name)
       const prompt = Vue.observable({
         questions: questions,
         name: name,
+        description: description,
         answers: {},
         active: true
       });
