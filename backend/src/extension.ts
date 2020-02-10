@@ -13,13 +13,21 @@ import { createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/
 import { getClassLogger } from "./logger/logger-wrapper";
 import { IChildLogger } from "@vscode-logging/logger";
 
+<<<<<<< HEAD
 const ERROR_ACTIVATION_FAILED = 'Extension activation failed due to Logger configuration failure:';
+=======
+const ERROR_ACTIVATION_FAILED_LOGGER_CONFIG = 'Extension activation failed due to Logger configuration failure:';
+>>>>>>> 0ddcbf20994f059441e819db7e3e1a9563689dd9
 
 export function activate(context: vscode.ExtensionContext) {
 	try {
 		createExtensionLoggerAndSubscribeToLogSettingsChanges(context);
 	} catch (error) {
+<<<<<<< HEAD
 		console.error(ERROR_ACTIVATION_FAILED, error.message);
+=======
+		console.error(ERROR_ACTIVATION_FAILED_LOGGER_CONFIG, error.message);
+>>>>>>> 0ddcbf20994f059441e819db7e3e1a9563689dd9
 		return;
 	}
 
