@@ -175,11 +175,11 @@ export class YeomanUI {
           message = `${generatorName} failed: ${err}.`;
           this.logError(err, message);
           this.doGeneratorDone(false, message, destinationRoot);
+        } else {
+          message = `The '${generatorName}' project has been generated.`;
+          this.logger.debug("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
+          this.doGeneratorDone(true, message, destinationRoot);
         }
-
-        message = `The '${generatorName}' project has been generated.`;
-        this.logger.debug("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
-        this.doGeneratorDone(true, message, destinationRoot);
       });
     } catch (error) {
       this.logError(error);
