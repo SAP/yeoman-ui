@@ -176,13 +176,6 @@ export class YeomanUI {
           this.logger.debug("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
           this.doGeneratorDone(true, message, destinationRoot);
         }
-<<<<<<< HEAD
-
-        message = `The '${generatorName}' project has been generated.`;
-        this.logger.debug("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
-        this.doGeneratorDone(true, message, destinationRoot);
-=======
->>>>>>> 0ddcbf20994f059441e819db7e3e1a9563689dd9
       });
     } catch (error) {
       this.logError(error);
