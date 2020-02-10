@@ -18,6 +18,14 @@ export function activate(context: vscode.ExtensionContext) {
 			const messages = _.get(options, "messages");
 			YeomanUIPanel.createOrShow(context.extensionPath, GeneratorFilter.create(genFilter), messages);
 	}));
+	context.subscriptions.push(
+		vscode.commands.registerCommand('yeomanUI.toggleLog', () => {
+			const yeomanUi = _.get(YeomanUIPanel, "currentPanel.yeomanui");
+			if (yeomanUi) {
+				yeomanUi.toggleLog();
+			}
+	}));
+
 
 	if (vscode.window.registerWebviewPanelSerializer) {
 		// Make sure we register a serializer in activation event
@@ -97,6 +105,9 @@ export class YeomanUIPanel {
 		// Set the webview's initial html content
 		this._update();
 
+		// Set the context (yeoman-ui is focused)
+		vscode.commands.executeCommand('setContext', 'yeomanUI.Focused', this.panel.active);
+
 		// Listen for when the panel is disposed
 		// This happens when the user closes the panel or when the panel is closed programatically
 		this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
@@ -107,6 +118,7 @@ export class YeomanUIPanel {
 				if (this.panel.visible) {
 					this._update();
 				}
+				vscode.commands.executeCommand('setContext', 'yeomanUI.Focused', this.panel.active);
 			},
 			null,
 			this.disposables
@@ -123,25 +135,32 @@ export class YeomanUIPanel {
 						const resolve = this.questionsResolutions.get(message.taskId);
 						resolve(message.data);
 						return;
+					case 'showInfoMessage':
+						let InfoMessage = _.get(message, "commandParams[0]");
+						vscode.window.showInformationMessage(InfoMessage);
+						return;
+					case 'showDoneMessage':
+						let Close = 'Close';
+						let OpenWorkspace = 'Open Workspace';
+						this.theia.isInTheia().then((value) => {
+							let commandName_Close = "workbench.action.closeActiveEditor";
+							let commandName_OpenWorkspace = "vscode.openFolder";
+							let commandParam = _.get(message, "commandParams[0]");
+							vscode.window.showInformationMessage('Where would you like to open the project?', Close , OpenWorkspace)
+								.then(selection => {
+									if (selection === Close) {
+										this.executeCommand(commandName_Close, undefined);
+									} else if (selection === OpenWorkspace) {
+										this.executeCommand(commandName_OpenWorkspace, commandParam);
+									}
+								});
+						});
+						return;
 					case 'vscodecommand':
 						this.theia.isInTheia().then((value) => {
 							let commandName = _.get(message, "commandName");
 							let commandParam = _.get(message, "commandParams[0]");
-							if (commandName === "vscode.open" || commandName === "vscode.openFolder") {
-								commandParam = vscode.Uri.file(commandParam);
-							}
-							if (value) {
-								const commandMappings: Map<string, string> = this.theia.getCommandMappings()
-								const theiaCommand = commandMappings.get(commandName);
-								if (theiaCommand !== undefined) {
-									commandName = theiaCommand;
-								}
-							}
-							vscode.commands.executeCommand(commandName, commandParam).then(success => {
-								console.debug(`Execution of command ${commandName} returned ${success}`);
-							}, failure => {
-								console.debug(`Execution of command ${commandName} returned ${failure}`);
-							});
+							this.executeCommand(commandName, commandParam);
 							return;
 						});
 				}
@@ -149,6 +168,26 @@ export class YeomanUIPanel {
 			null,
 			this.disposables
 		);
+	}
+
+	private executeCommand(commandName: string, commandParam: any): Promise<any> {
+		return this.theia.isInTheia().then((value) => {
+			if (commandName === "vscode.open" || commandName === "vscode.openFolder") {
+				commandParam = vscode.Uri.file(commandParam);
+			}
+			if (value) {
+				const commandMappings: Map<string, string> = this.theia.getCommandMappings();
+				const theiaCommand = commandMappings.get(commandName);
+				if (theiaCommand !== undefined) {
+					commandName = theiaCommand;
+				}
+			}
+			return vscode.commands.executeCommand(commandName, commandParam).then(success => {
+				console.debug(`Execution of command ${commandName} returned ${success}`);
+			}, failure => {
+				console.debug(`Execution of command ${commandName} returned ${failure}`);
+			});
+		});
 	}
 
 	public dispose() {

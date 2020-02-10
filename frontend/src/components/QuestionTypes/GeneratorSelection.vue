@@ -1,128 +1,107 @@
 <template>
   <div>
-    <b-card-group deck>
-      <b-container fluid>
-        <b-row v-for="(chunk, chunkIndex) in getChunks()" :key="chunkIndex" class="align-self-md-stretch">
-          <b-col v-for="(item, itemIndex) in chunk" :key="itemIndex" cols="4" col class="col-generator">
-            <b-card
-              @click="emitSelection(item.name)"
-              v-on:click="select"
-              class="generator h-100"
-              :title="item.prettyName"
-              img-alt="Image"
-              img-top
-              tag="article"
-            >
-              <b-card-text>{{item.message}}</b-card-text>
-              <b-card-text class="templateDocumentationClass"><b-link :href="item.homepage">Generator Documentation</b-link></b-card-text>
-              <b-card-img :src="getImageUrl(item)"></b-card-img>
-            </b-card>
-          </b-col>
-        </b-row>
-      </b-container>
-    </b-card-group>
+    <v-item-group mandatory>
+      <v-container class="pa-0">
+        <v-row>
+          <v-col
+            v-for="(item, itemIndex) in currentQuestion.choices"
+            :key="itemIndex"
+            cols="12"
+            md="4"
+            sm="6"
+          
+          >
+            <v-item v-slot:default="{ active, toggle }">
+              <v-card
+                width="400"
+                class="d-flex flex-column mx-auto"
+                @click="emitSelection(item.name)"
+                v-on:click="select"
+                height="380"
+                tile
+                hover
+                flat
+                dark
+                elevation=2
+              >
+                <v-card-title>{{item.prettyName}}</v-card-title>
+                <v-card-text>
+                  {{item.message}}
+                  <br />
+                  <a :href="item.homepage">More Information</a>
+                </v-card-text>
+                <v-spacer></v-spacer>
+                <v-card-actions>
+                  <v-img class :src="getImageUrl(item)" height="194"></v-img>
+                </v-card-actions>
+              </v-card>
+            </v-item>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-item-group>
   </div>
 </template>
 
 <script>
-import _ from "lodash"
+import _ from "lodash";
 
 export default {
   name: "GeneratorSelection",
   props: {
-    currentQuestion: Object
+    currentQuestion: Object,
+    selectGenerator: Function
   },
   data() {
     return {
       publicPath: process.env.BASE_URL,
       selectedItem: undefined,
-      nColumns: 3, // number of groups/columns
+      nColumns: 1, // number of groups/columns
       groupedItems: []
-    }
+    };
   },
   methods: {
     getImageUrl(choice) {
-      return _.get(choice, "imageUrl", `${this.publicPath}generator.png`)
+      return _.get(choice, "imageUrl", `${this.publicPath}generator.png`);
     },
     select(event) {
       if (this.selectedItem) {
         // deselect old selection
-        this.selectedItem.classList.toggle("selected")
-        this.selectedItem.setAttribute("border-style", "none")
+        this.selectedItem.classList.toggle("selected");
+        this.selectedItem.setAttribute("border-style", "none");
       }
-      this.selectedItem = event.currentTarget
-      this.selectedItem.setAttribute("border-style", "solid")
-      this.selectedItem.classList.toggle("selected")
+      this.selectedItem = event.currentTarget;
+      this.selectedItem.setAttribute("border-style", "solid");
+      this.selectedItem.classList.toggle("selected");
     },
     emitSelection(generatorName) {
-      this.currentQuestion.answer = generatorName
-      this.$emit("generatorSelected", generatorName)
-    },
-    chunk: function(arr, size) {
-      var newArr = [];
-      for (var i=0; i<arr.length; i+=size) {
-        newArr.push(arr.slice(i, i+size));
-      }
-      return newArr;
-    },
-    getChunks: function() {
-      // divide into n groups
-      return this.chunk(this.currentQuestion.choices, this.nColumns); 
+      this.currentQuestion.answer = generatorName;
+      const choice = _.find(this.currentQuestion.choices, choice => {return choice.name === generatorName});
+      const generatorPrettyName = _.get(choice, "prettyName", generatorName);
+      this.selectGenerator(generatorName, generatorPrettyName);
     }
-  },
-}
-
+  }
+};
 </script>
 
-<style>
-.col.col-generator {
-  padding: 11px;
+<style scoped>
+.v-card {
+  background-color: var(--vscode-editorWidget-background, #252526);
 }
-
-.card-body {
-  color: var(--vscode-editorWidget-foreground, #cccccc);
-  border: none;
+.v-card:hover {
+  background-color: var(--vscode-list-hoverBackground,#2a2d2e) !important;
 }
-
-.card-title {
-  font-size: 1rem;
-  font-weight: bold;
-  color: var(--vscode-editor-foreground, #d4d4d4);
+.v-card.selected {
+  border: 1px solid var(--vscode-button-background, #0e639c);
+  background-color: var(--vscode-list-hoverBackground,#2a2d2e) ;
 }
-
-.card-text {
-  font-size: 0.75rem;
+.v-card__title {
+  color: var(--vscode-foreground, #cccccc);
+}
+.v-card > div.v-card__text {
   color: var(--vscode-editorCodeLens-foreground, #999999);
-  margin: 0;
 }
-
-.card-text.templateDocumentationClass {
-  /* change this to vscode color for url */
-  color: var(--vscode-textLink-foreground, #3794ff);
-  margin-bottom: 1rem;
-}
-
-.card-deck {
-  margin: 0rem;
-}
-
-.card.generator {
-  width: 100%;
-  height: 100%;
-  border-style: none;
-  border-width: 1px;
-  border-radius: 0px;
-  border-color: var(--vscode-button-background, #0e639c);
-  background-color: var(--vscode-input-background, #3c3c3c);
-}
-
-.card.generator:hover:not(.selected) {
-  background-color: var(--vscode-list-hoverBackground, #2a2d2e);
-  cursor: pointer;
-}
-
-.card.generator.selected {
-  border-style: solid;
-  background-color: var(--vscode-menu-background, #3c3c3c);
+a {
+  font-size: 11px;
 }
 </style>

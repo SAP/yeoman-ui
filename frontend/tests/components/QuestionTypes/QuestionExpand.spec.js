@@ -1,5 +1,4 @@
 import QuestionExpand from '../../../src/components/QuestionTypes/QuestionExpand.vue'
-import {BButton} from 'bootstrap-vue'
 import {initComponent, destroy} from '../../Utils'
 
 let wrapper
@@ -14,12 +13,13 @@ describe('QuestionExpand.vue', () => {
         wrapper = initComponent(QuestionExpand, {
             currentQuestion: {
                 choices: [{value: 'testValue', name: 'testName'}]
-            }
+            },
+            updateQuestionsFromIndex: () => {}
         }, true)
 
         expect(wrapper.vm.currentQuestion.answer).toBeUndefined()
 
-        wrapper.find(BButton).trigger('click')
+        wrapper.find('button').trigger('click')
         await wrapper.vm.$nextTick()
 
         expect(wrapper.vm.currentQuestion.answer).toBe('testValue')

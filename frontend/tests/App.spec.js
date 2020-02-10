@@ -1,12 +1,9 @@
 import {initComponent, destroy} from './Utils'
 import App from '../src/App.vue';
 import Vue from 'vue'
-import BootstrapVue from 'bootstrap-vue'
 import Vuetify from 'vuetify'
 import { WebSocket } from 'mock-socket'
-const flushPromises = require('flush-promises');
 
-Vue.use(BootstrapVue)
 Vue.use(Vuetify)
 global.WebSocket = WebSocket
 
@@ -42,18 +39,16 @@ describe('App.vue', () => {
           questions: [{name: 'q12', isWhen: true, answer: 'a12'}, {name: 'q22', isWhen: false, answer: 'a22'}]
       }]
       wrapper.vm.promptIndex = 1
-      const testPrompt = wrapper.vm.currentPrompt
-      expect(testPrompt.answers.q12).toBe('a12')
-      expect(testPrompt.answers.q22).toBeUndefined()
+      expect(wrapper.vm.currentPrompt.answers.q22).toBeUndefined()
     })
   })
 
-  describe('currentPrompt.answers - watcher', () => {
+  describe('updateQuestionsFromIndex - method', () => {
     let invokeSpy
     beforeEach(() => {
       wrapper = initComponent(App)
       wrapper.vm.rpc = {
-        invoke: () => Promise.resolve()
+        invoke: () => new Promise(resolve => setTimeout(() => resolve(), 300))
       }
       invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
     })
@@ -64,151 +59,41 @@ describe('App.vue', () => {
       }
     })
 
-    test('invoke - when is function', async () => {
+    test('invoke called on each question with Function method', async () => {
       wrapper.vm.prompts = [{ 
         questions: [{
           name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer', isWhen: true
-        }, {
-          name: 'whenQ', when: '__Function', answer: false
         }, {
           name: 'messageQ', _message: '__Function', answer: 'messageAnswer', isWhen: true
         }, {
           name: 'choicesQ', _choices: '__Function', answer: 'choicesAnswer', isWhen: true
         }, {
-          name: 'filterQ', filter: '__Function', answer: 'filterAnswer', isWhen: true
-        }, {
           name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
-        }],
-        answers: {}
-     }]
-      wrapper.vm.promptIndex = 0
-      const oldAnswers = {
-        "choicesQ": "old_choicesAnswer",
-        "defaultQ": "old_defaultAnswer",
-        "filterQ": "old_filterAnswer",
-        "messageQ": "old_messageAnswer",
-        "validateQ": "old_validateAnswer",
-        "whenQ": false
-      }
-
-      const expectedAnswers = {
-        "choicesQ": "choicesAnswer",
-        "defaultQ": "defaultAnswer",
-        "filterQ": "filterAnswer",
-        "messageQ": "messageAnswer",
-        "validateQ": "validateAnswer",
-        "whenQ": true
-      }
-      await wrapper.vm.$options.watch["currentPrompt.answers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
-      
-      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'defaultQ', 'default'])
-      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'whenQ', 'when'])
-      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'messageQ', 'message'])
-      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'choicesQ', 'choices'])
-      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [['filterAnswer'], 'filterQ', 'filter'])
-      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [['validateAnswer', expectedAnswers], 'validateQ', 'validate'])
-    })
-
-    test('invoke - only 3 answers have been changed', async () => {
-      wrapper.vm.prompts = [{ 
-        questions: [{
-          name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer'
-        }, {
-          name: 'whenQ', when: '__Function', answer: true
-        }, {
-          name: 'messageQ', _message: '__Function', answer: 'messageAnswer', isWhen: true
-        }, {
-          name: 'choicesQ', _choices: '__Function', answer: 'choicesAnswer'
-        }, {
-          name: 'filterQ', filter: '__Function', answer: 'filterAnswer'
-        }, {
-          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
-        }],
-        answers: {}
-     }]
-      wrapper.vm.promptIndex = 0
-      const oldAnswers = {
-        "choicesQ": "choicesAnswer",
-        "defaultQ": "defaultAnswer",
-        "filterQ": "filterAnswer",
-        "messageQ": "old_messageAnswer",
-        "validateQ": "old_validateAnswer",
-        "whenQ": false
-      }
-
-      const expectedAnswers = {
-        "choicesQ": "choicesAnswer",
-        "defaultQ": "defaultAnswer",
-        "filterQ": "filterAnswer",
-        "messageQ": "messageAnswer",
-        "validateQ": "validateAnswer",
-        "whenQ": true
-      }
-      await wrapper.vm.$options.watch["currentPrompt.answers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
-      
-      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'whenQ', 'when'])
-      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'messageQ', 'message'])
-      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [['validateAnswer', expectedAnswers], 'validateQ', 'validate'])
-    })
-
-    test('invoke - first answer have been changed, almost all invokes should be called', async () => {
-      wrapper.vm.prompts = [{ 
-        questions: [{
-          name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer', isWhen: true
-        }, {
-          name: 'whenQ', when: '__Function', answer: 'whenAnswer'
-        }, {
-          name: 'messageQ', _message: '__Function', answer: 'messageAnswer', isWhen: true
-        }, {
-          name: 'choicesQ', _choices: '__Function', answer: 'choicesAnswer', isWhen: true
         }, {
           name: 'filterQ', filter: '__Function', answer: 'filterAnswer', isWhen: true
         }, {
-          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: false
+          name: 'whenQ', when: '__Function', answer: "whenAnswer"
         }],
         answers: {}
      }]
       wrapper.vm.promptIndex = 0
-      const oldAnswers = {
-        "choicesQ": "choicesAnswer",
-        "defaultQ": "old_defaultAnswer",
-        "filterQ": "filterAnswer",
+      
+      const expectedAnswers = {
+        "defaultQ": "defaultAnswer",
         "messageQ": "messageAnswer",
-        "validateQ": "_validateAnswer",
-        "whenQ": "false"
+        "choicesQ": "choicesAnswer",
+        "validateQ": "validateAnswer",
+        "whenQ": "whenAnswer"
       }
 
-      const expectedAnswers = {
-        "choicesQ": "choicesAnswer",
-        "defaultQ": "defaultAnswer",
-        "filterQ": "filterAnswer",
-        "messageQ": "messageAnswer",
-        "validateQ": "validateAnswer",
-        "whenQ": "true"
-      }
-      await wrapper.vm.$options.watch["currentPrompt.answers"].handler.call(wrapper.vm, expectedAnswers, oldAnswers)
+      await wrapper.vm.updateQuestionsFromIndex(0)
       
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'defaultQ', 'default'])
-      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'whenQ', 'when'])
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'messageQ', 'message'])
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'choicesQ', 'choices'])
+      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [["validateAnswer", expectedAnswers], 'validateQ', 'validate'])
       expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [['filterAnswer'], 'filterQ', 'filter'])
-    })
-
-    test('invoke for question default, answer is defined', async () => {
-      wrapper.vm.rpc = {
-        invoke: jest.fn().mockResolvedValue('defaultResponse')
-      }
-      wrapper.vm.prompts = [{ 
-        questions: [{
-          name: 'defaultQ', _default: '__Function', answer: 'defaultAnswer', isWhen: true
-        }],
-        answers: {}
-     }]
-      wrapper.vm.promptIndex = 0
-      wrapper.vm.$options.watch["currentPrompt.answers"].handler.call(wrapper.vm)
-      await flushPromises()
-      expect(wrapper.vm.prompts[0].questions[0].default).toBe('defaultResponse')
+      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [[expectedAnswers], 'whenQ', 'when'])
     })
 
     test('invoke for question default, answer is undefined', async () => {
@@ -222,8 +107,8 @@ describe('App.vue', () => {
         answers: {}
      }]
       wrapper.vm.promptIndex = 0
-      wrapper.vm.$options.watch["currentPrompt.answers"].handler.call(wrapper.vm, {'defaultQ': 1}, {'defaultQ': 2})
-      await flushPromises()
+      await wrapper.vm.updateQuestionsFromIndex(0)
+      
       expect(wrapper.vm.prompts[0].questions[0].default).toBe('defaultResponse')
       expect(wrapper.vm.prompts[0].questions[0].answer).toBe('defaultResponse')
     })
@@ -239,8 +124,8 @@ describe('App.vue', () => {
         answers: {}
      }]
       wrapper.vm.promptIndex = 0
-      wrapper.vm.$options.watch["currentPrompt.answers"].handler.call(wrapper.vm)
-      await flushPromises()
+      await wrapper.vm.updateQuestionsFromIndex(0)
+
       expect(wrapper.vm.prompts[0].questions[0].isValid).toBe(false)
       expect(wrapper.vm.prompts[0].questions[0].validationMessage ).toBe('validateResponse')
     })
@@ -256,10 +141,69 @@ describe('App.vue', () => {
         answers: {}
      }]
       wrapper.vm.promptIndex = 0
-      wrapper.vm.$options.watch["currentPrompt.answers"].handler.call(wrapper.vm)
-      await flushPromises()
+      await wrapper.vm.updateQuestionsFromIndex(0)
+
       expect(wrapper.vm.prompts[0].questions[0].isValid).toBe(true)
       expect(wrapper.vm.prompts[0].questions[0].validationMessage ).toBeUndefined()
+    })
+
+    test('invoke for question that throws error as string', async () => {
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockRejectedValueOnce("test error").mockResolvedValue()
+      }
+      wrapper.vm.prompts = [{ 
+        questions: [{
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
+        }],
+        answers: {}
+      }]
+      wrapper.vm.generatorName = "testGen";
+      wrapper.vm.promptIndex = 0
+
+      const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
+      await wrapper.vm.updateQuestionsFromIndex(0)
+      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [["validateAnswer", {"validateQ": "validateAnswer"}], 'validateQ', 'validate'])
+      invokeSpy.mockRestore();
+    })
+
+    test('invoke for question that throws error as error object', async () => {
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockRejectedValueOnce(new Error("test error")).mockResolvedValue()
+      }
+      wrapper.vm.prompts = [{ 
+        questions: [{
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
+        }],
+        answers: {}
+      }]
+      wrapper.vm.generatorName = "testGen";
+      wrapper.vm.promptIndex = 0
+
+      const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
+      await wrapper.vm.updateQuestionsFromIndex(0)
+      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [["validateAnswer", {"validateQ": "validateAnswer"}], 'validateQ', 'validate'])
+
+      invokeSpy.mockRestore();
+    })
+
+    test('invoke for question that throws error as error object without message', async () => {
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockRejectedValueOnce(new Error()).mockResolvedValue()
+      }
+      wrapper.vm.prompts = [{ 
+        questions: [{
+          name: 'validateQ', validate: '__Function', answer: 'validateAnswer', isWhen: true
+        }],
+        answers: {}
+      }]
+      wrapper.vm.generatorName = "testGen";
+      wrapper.vm.promptIndex = 0
+
+      const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
+      await wrapper.vm.updateQuestionsFromIndex(0)
+      expect(invokeSpy).toHaveBeenCalledWith('evaluateMethod', [["validateAnswer", {"validateQ": "validateAnswer"}], 'validateQ', 'validate'])
+
+      invokeSpy.mockRestore();
     })
   })
 
@@ -313,6 +257,7 @@ describe('App.vue', () => {
     
     wrapper.vm.showPrompt = jest.fn()
     wrapper.vm.setPrompts = jest.fn()
+    wrapper.vm.generatorInstall = jest.fn()
     wrapper.vm.generatorDone = jest.fn()
     wrapper.vm.log = jest.fn()
 
@@ -322,6 +267,7 @@ describe('App.vue', () => {
     
     expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.showPrompt, thisArg: wrapper.vm, name: 'showPrompt'})
     expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.setPrompts, thisArg: wrapper.vm, name: 'setPrompts'})
+    expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.generatorInstall, thisArg: wrapper.vm, name: 'generatorInstall'})
     expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.generatorDone, thisArg: wrapper.vm, name: 'generatorDone'})
     expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.log, thisArg: wrapper.vm, name: 'log'})
     expect(invokeSpy).toHaveBeenCalledWith("receiveIsWebviewReady", [])
@@ -353,13 +299,14 @@ describe('App.vue', () => {
     expect(wrapper.vm.logText).toBe('test_test_log')
   })
 
-  test('onGeneratorSelected - method', () => {
+  test('selectGenerator - method', () => {
     wrapper = initComponent(App)
     wrapper.vm.generatorName = 'test_ge_name'
 
-    wrapper.vm.onGeneratorSelected('testGeneratorName');
+    wrapper.vm.selectGenerator('testGeneratorName', 'Test Generator Name');
     
     expect(wrapper.vm.generatorName).toBe('testGeneratorName')
+    expect(wrapper.vm.generatorPrettyName).toBe('Test Generator Name')
   })
 
   test('onStepValidated - method', () => {
@@ -431,9 +378,58 @@ describe('App.vue', () => {
     })
   })
 
-  describe('generatorDone - method', () => {
-    test('status is not pending', () => {
+  describe('generatorInstall - method', () => {
+    beforeEach(() => {
+      window.vscode = {
+        postMessage: jest.fn()
+      }
+    })
+      
+    test('status is pending', () => {
       wrapper = initComponent(App)
+      
+      wrapper.vm.prompts = [{}, {}]
+      wrapper.vm.promptIndex = 1
+      wrapper.vm.currentPrompt.status = 'pending'
+
+      wrapper.vm.isInVsCode = jest.fn().mockReturnValue(true)
+      wrapper.vm.generatorInstall()
+
+      expect(wrapper.vm.isDone).toBeFalsy()
+      expect(window.vscode.postMessage).toHaveBeenCalledWith({
+        command: "showInfoMessage",
+        commandParams: ["Installing dependencies..."]
+      })
+    })
+
+    test('not is vscode', () => {
+      wrapper = initComponent(App)
+      
+      wrapper.vm.prompts = [{}, {}]
+      wrapper.vm.promptIndex = 1
+      wrapper.vm.currentPrompt.status = 'pending'
+
+      wrapper.vm.isInVsCode = jest.fn().mockReturnValue(false)
+      wrapper.vm.generatorInstall()
+
+      expect(window.vscode.postMessage).not.toHaveBeenCalledWith({
+        command: "showInfoMessage",
+        commandParams: ["Installing dependencies..."]
+      })
+    })
+
+  })
+
+  describe('generatorDone - method', () => {
+    beforeEach(() => {
+      window.vscode = {
+        postMessage: jest.fn()
+      }
+    })
+      
+    test('status is not pending', () => {
+      wrapper = initComponent(App, {donePath: 'testDonePath'})
+      wrapper.vm.isInVsCode = jest.fn().mockReturnValue(true)
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.promptIndex = 1
 
@@ -442,10 +438,12 @@ describe('App.vue', () => {
       expect(wrapper.vm.doneMessage).toBe('testMessage')
       expect(wrapper.vm.donePath).toBe('/test/path')
       expect(wrapper.vm.isDone).toBeTruthy()
+      expect(window.vscode.postMessage).toHaveBeenCalled()
     })
 
     test('status is pending', () => {
-      wrapper = initComponent(App)
+      wrapper = initComponent(App, {donePath: 'testDonePath'})
+      wrapper.vm.isInVsCode = jest.fn().mockReturnValue(true)
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.promptIndex = 1
       wrapper.vm.currentPrompt.status = 'pending'
@@ -455,7 +453,35 @@ describe('App.vue', () => {
       expect(wrapper.vm.doneMessage).toBe('testMessage')
       expect(wrapper.vm.donePath).toBe('/test/path')
       expect(wrapper.vm.isDone).toBeTruthy()
-      expect(wrapper.vm.currentPrompt.name).toBe('Confirmation')
+      expect(wrapper.vm.currentPrompt.name).toBe('Summary')
+      expect(window.vscode.postMessage).toHaveBeenCalled()
+    })
+  })
+
+  describe('setBusyIndicator - method', () => {
+    it('prompts is empty', () => {
+      wrapper = initComponent(App)
+      wrapper.vm.prompts = []
+      wrapper.vm.setBusyIndicator()
+      expect(wrapper.vm.showBusyIndicator).toBeTruthy()
+    })
+
+    it('isDone is false, status is pending, prompts is not empty', () => {
+      wrapper = initComponent(App)
+      wrapper.vm.prompts = [{}, {}]
+      wrapper.vm.isDone = false
+      wrapper.vm.currentPrompt.status = 'pending'
+      wrapper.vm.setBusyIndicator()
+      expect(wrapper.vm.showBusyIndicator).toBeTruthy()
+    })
+
+    it('isDone is true, status is pending, prompts is not empty', () => {
+      wrapper = initComponent(App)
+      wrapper.vm.prompts = [{}, {}]
+      wrapper.vm.isDone = true
+      wrapper.vm.currentPrompt.status = 'pending'
+      wrapper.vm.setBusyIndicator()
+      expect(wrapper.vm.showBusyIndicator).toBeFalsy()
     })
   })
 
@@ -467,6 +493,5 @@ describe('App.vue', () => {
       wrapper.vm.toggleConsole()
       expect(wrapper.vm.showConsole).toBeFalsy()
     })
-
   })
 })

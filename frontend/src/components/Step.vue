@@ -1,13 +1,10 @@
 <template>
-  <div>
-    <b-form>
+  <div id="step-component-div">
       <QuestionTypeSelector
-        v-for="(item, index) in currentPrompt.questions"
-        :key="index"
-        :currentQuestion="item"
-        @generatorSelected="onGeneratorSelected"
+        :questions="currentPrompt.questions"
+        :selectGenerator="selectGenerator"
+        :updateQuestionsFromIndex="updateQuestionsFromIndex"
       />
-    </b-form>
   </div>
 </template>
 
@@ -20,12 +17,9 @@ export default {
     QuestionTypeSelector
   },
   props: {
-    currentPrompt: Object
-  },
-  methods: {
-    onGeneratorSelected(generatorName) {
-      this.$emit("generatorSelected", generatorName)
-    }
+    currentPrompt: Object,
+    updateQuestionsFromIndex: Function,
+    selectGenerator: Function
   },
   watch: {
     "currentPrompt.questions": {

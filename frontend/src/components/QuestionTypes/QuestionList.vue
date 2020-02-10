@@ -1,85 +1,94 @@
 <template>
-  <b-form-select
-    v-model="selected"
-    :options="options"
-    class="custom-yeoman-select"
-    aria-describedby="validation-message"
-  ></b-form-select>
+  <div id="question-list">
+    <p class="question-label">{{currentQuestion.message}}</p>
+    <v-select
+      :label="clickToDisplay"
+      :error-messages="errorMessages"
+      v-model="selected"
+      :items="options"
+      aria-describedby="validation-message"
+      solo
+      dense
+    ></v-select>
+  </div>
 </template>
 
 <script>
-import _ from "lodash"
+import _ from "lodash";
 
 export default {
   name: "QuestionList",
   data() {
     return {
-      selected: null
-    }
+      selected: null,
+      clickToDisplay: "Click to display the list of options"
+    };
   },
   computed: {
     options() {
-      const values = this.currentQuestion.choices
+      const values = this.currentQuestion.choices;
       if (_.isArray(values)) {
         return _.map(values, value => {
           if (_.has(value, "name") && !_.has(value, "text")) {
-            value.text = value.name
+            value.text = value.name;
           } else if (value.type === "separator") {
-            value.text = _.has(value, "line") ? value.line : "──────────────"
-            value.disabled = true
+            value.text = _.has(value, "line") ? value.line : "──────────────";
+            value.disabled = true;
           }
-          return value
-        })
+          return value;
+        });
       }
 
-      return []
+      return [];
     },
     default() {
-      const defaultValue = _.get(this.currentQuestion, "default", 0)
+      const defaultValue = _.get(this.currentQuestion, "default");
       if (_.isNumber(defaultValue)) {
-        const choice = _.get(this.options, "[" + defaultValue + "]")
-        return _.get(choice, "value", _.get(choice, "name", choice))
+        const choice = _.get(this.options, "[" + defaultValue + "]");
+        return _.get(choice, "value", _.get(choice, "name", choice));
       } else if (_.isString(defaultValue)) {
-        return defaultValue
+        return defaultValue;
       }
-      return undefined
+      return undefined;
+    },
+    errorMessages() {
+      if (_.isEmpty(this.selected)) {
+        return this.clickToDisplay;
+      }
+      
+      return this.currentQuestion.isValid ? '' : this.currentQuestion.validationMessage;
     }
   },
   watch: {
-    'default': {
+    default: {
       immediate: true,
       handler: function(defaultValue) {
-        this.selected = defaultValue
+        this.selected = defaultValue;
       }
     },
-    'selected': {
+    selected: {
       immediate: true,
-      handler: function(selectedvalue) {
-        this.currentQuestion.answer = selectedvalue
+      handler: function(selectedValue) {
+        this.currentQuestion.isValid = !_.isEmpty(selectedValue)
+        this.currentQuestion.answer = selectedValue
+        this.updateQuestionsFromIndex(this.questionIndex)
       }
     }
   },
   props: {
-    currentQuestion: Object
+    currentQuestion: Object,
+    questionIndex: Number,
+    updateQuestionsFromIndex: Function
   }
-}
+};
 </script>
-
 <style scoped>
-.list-group {
-  margin-bottom: 15px;
-}
-.list-group-item:hover {
-  background: var(--vscode-list-hover-background);
-  cursor: pointer;
-}
-
-.selected {
-  background-color: var(--vscode-list-active-selection-background);
+#question-list >>> div.v-input__slot {
+  color: var(--vscode-input-foreground, #cccccc) !important;
+  background-color: var(--vscode-input-background, #3c3c3c) !important;
+  border-radius: unset;
+  border: 1px solid  var(--vscode-editorWidget-background, #252526);
+  box-shadow: none;
 }
 
-.custom-select.custom-yeoman-select {
-  color: var(--vscode-input-foreground, #cccccc);
-  background-color: var(--vscode-input-background, #3c3c3c);
-}
 </style>

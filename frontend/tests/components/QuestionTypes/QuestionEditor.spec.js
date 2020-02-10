@@ -9,29 +9,46 @@ describe('QuestionEditor.vue', () => {
         destroy(wrapper)
     })
 
-    describe('text - watcher', () => {
+    describe('onChange - method', () => {
         test('text size is 0', async () => {
             wrapper = initComponent(QuestionEditor, {
                 currentQuestion: {
-                    default: 'testDefault', answer: 'testAnswer'
-                }
+                    type: 'time', default: 'testDefault', answer: 'testAnswer'
+                },
+                updateQuestionsFromIndex: () => {}
             })
             
             wrapper.vm.$data.text = ''
-            await wrapper.vm.$nextTick()
+            wrapper.vm.onChange()
             expect(wrapper.vm.currentQuestion.answer).toBe('testDefault')
         })
 
         test('text size is not 0', async () => {
             wrapper = initComponent(QuestionEditor, {
                 currentQuestion: {
-                    default: 'testDefault', answer: 'testAnswer'
-                }
+                    type: 'time', default: 'testDefault', answer: 'testAnswer'
+                },
+                updateQuestionsFromIndex: () => {}
             })
             
             wrapper.vm.$data.text = 'test_value'
-            await wrapper.vm.$nextTick()
+            wrapper.vm.onChange()
             expect(wrapper.vm.currentQuestion.answer).toBe('test_value')
+        })
+
+        test('text size is equal to previous answer', async () => {
+            wrapper = initComponent(QuestionEditor, {
+                currentQuestion: {
+                    type: 'time', default: 'testDefault', answer: 'testAnswer'
+                },
+                updateQuestionsFromIndex: jest.fn()
+            })
+            
+            const spyUpdateQuestionsFromIndex = jest.spyOn(wrapper.vm, 'updateQuestionsFromIndex')
+            wrapper.vm.$data.text = 'testAnswer'
+            wrapper.vm.onChange()
+            expect(spyUpdateQuestionsFromIndex).not.toHaveBeenCalled()
+            spyUpdateQuestionsFromIndex.mockRestore()
         })
     })
 })

@@ -3,7 +3,7 @@
     <v-app-bar class="elevation-0">
       <v-toolbar-title>{{selectedGeneratorHeader}}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn @click="collapseLog" icon>
+      <v-btn v-if="!isInVsCode" @click="collapseLog" icon>
         <v-icon>mdi-console</v-icon>
       </v-btn>
     </v-app-bar>
@@ -13,11 +13,11 @@
 <script>
 export default {
   name: "Header",
-  props: ["selectedGeneratorHeader", "stepName", "rpc"],
+  props: ["selectedGeneratorHeader", "stepName", "isInVsCode", "rpc"],
   methods: {
     collapseLog() {
       this.rpc.invoke("toggleLog", [{}]);
-      this.$parent.showConsole = !this.$parent.showConsole; //TODO investigate why this.$emit is not working
+      this.$emit("parentShowConsole");
     }
   }
 };
@@ -28,7 +28,8 @@ header.v-app-bar.v-toolbar, header.v-app-bar.v-toolbar .v-btn {
   color: var(--vscode-foreground, #cccccc);
 }
 header.v-app-bar.v-toolbar {
-  border-bottom: 1px solid var(--vscode-terminal-ansiBlack, #000000);
+  border-bottom: 1px solid  var(--vscode-editorWidget-background, #252526);
   box-shadow: none;
+  background-color: var(--vscode-editor-background, #1e1e1e) !important;
 }
 </style>

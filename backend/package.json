@@ -5,9 +5,9 @@
 	"license": "Apache 2.0",
 	"description": "Provide rich user experience for Yeoman generators using VSCode extension or the browser",
 	"repository": "https://github.com/SAP/yeoman-ui",
-	"version": "0.0.19",
+	"version": "0.0.35",
 	"engines": {
-		"vscode": "^1.38.0"
+		"vscode": "^1.39.2"
 	},
 	"categories": [
 		"Other"
@@ -22,10 +22,34 @@
 			{
 				"command": "loadYeomanUI",
 				"title": "Yeoman UI Generators"
+			},
+			{
+				"command": "yeomanUI.toggleLog",
+				"title": "Toggle Log",
+				"icon": {
+					"light": "./resources/images/icons/console_light.svg",
+					"dark": "./resources/images/icons/console_dark.svg"
+				}
 			}
-		]
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "yeomanUI.toggleLog",
+					"when": "false"
+				}
+			],
+			"editor/title": [
+				{
+					"command": "yeomanUI.toggleLog",
+					"group": "navigation",
+					"when": "yeomanUI.Focused"
+				}
+			]
+		}
 	},
 	"scripts": {
+		"backend": "npm install && npm run compile",
 		"frontend": "npm run frontend:install && npm run frontend:build && npm run frontend:copy",
 		"frontend:install": "cd ../frontend && npm i",
 		"frontend:build": "cd ../frontend && npm run build",
@@ -50,11 +74,12 @@
 		"yeoman-environment": "^2.7.0",
 		"titleize": "^1.0.1",
 		"humanize-string": "^1.0.2",
-		"fs-extra": "^8.1.0"
+		"fs-extra": "^8.1.0",
+		"chalk": "^3.0.0"
 	},
 	"devDependencies": {
-		"@types/fs-extra": "^8.0.1",
 		"@types/chai": "^4.2.5",
+		"@types/fs-extra": "^8.0.1",
 		"@types/inquirer": "^6.5.0",
 		"@types/lodash": "^4.14.145",
 		"@types/mocha": "^5.2.7",
@@ -63,6 +88,7 @@
 		"@types/strip-ansi": "^5.2.1",
 		"@types/ws": "^6.0.3",
 		"@types/yeoman-environment": "^2.3.2",
+		"bufferutil": "^4.0.1",
 		"chai": "^4.2.0",
 		"copy-webpack-plugin": "^5.0.5",
 		"mocha": "^6.2.2",
@@ -74,11 +100,10 @@
 		"tslint-config-prettier": "^1.18.0",
 		"tslint-no-unused-expression-chai": "^0.1.4",
 		"typescript": "^3.7.3",
+		"utf-8-validate": "^5.0.2",
 		"vsce": "^1.68.0",
 		"vscode": "^1.1.28",
 		"webpack": "^4.41.2",
-		"webpack-cli": "^3.3.10",
-		"bufferutil": "^4.0.1",
-		"utf-8-validate": "^5.0.2"
+		"webpack-cli": "^3.3.10"
 	}
 }

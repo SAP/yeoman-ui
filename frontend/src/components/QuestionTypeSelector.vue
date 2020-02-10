@@ -1,39 +1,51 @@
 <template>
-  <div v-if="currentQuestion.isWhen">
-    
-    <GeneratorSelection
-      v-if="currentQuestion.type==='generators'"
-      :currentQuestion="currentQuestion"
-      @generatorSelected="onGeneratorSelected"
-    />
-    <b-form-group :label="currentQuestion.message">
-      <QuestionInput
-        v-if="!currentQuestion.type || currentQuestion.type==='input' || currentQuestion.type==='password' || currentQuestion.type==='number'"
-        :currentQuestion="currentQuestion"
-      />
+  <div id="QuestionTypeSelector">
+    <v-col v-if="questions[0] && questions[0].type==='generators'" cols="12">
+      <GeneratorSelection :currentQuestion="questions[0]" :selectGenerator="selectGenerator" />
+    </v-col>
+    <v-col xl="8" lg="8" md="8" sm="11" xs="12">
+      <v-form>
+        <div v-for="(currentQuestion, index) in questions" :key="index">
+          <div v-if="currentQuestion.isWhen">
+            <QuestionInput
+              v-if="!currentQuestion.type || currentQuestion.type==='input' || currentQuestion.type==='password' || currentQuestion.type==='number'"
+              :currentQuestion="currentQuestion" :questionIndex="index"
+              :updateQuestionsFromIndex="updateQuestionsFromIndex"
+            />
 
-      <QuestionEditor v-if="currentQuestion.type==='editor'" :currentQuestion="currentQuestion" />
+            <QuestionEditor
+              v-if="currentQuestion.type==='editor'"
+              :currentQuestion="currentQuestion" :questionIndex="index"
+              :updateQuestionsFromIndex="updateQuestionsFromIndex"
+            />
 
-      <QuestionList
-        v-if="currentQuestion.type==='list' || currentQuestion.type==='rawlist'"
-        :currentQuestion="currentQuestion"
-      />
+            <QuestionList
+              v-if="currentQuestion.type==='list' || currentQuestion.type==='rawlist'"
+              :currentQuestion="currentQuestion" :questionIndex="index"
+              :updateQuestionsFromIndex="updateQuestionsFromIndex"
+            />
 
-      <QuestionConfirm v-if="currentQuestion.type==='confirm'" :currentQuestion="currentQuestion" />
+            <QuestionConfirm
+              v-if="currentQuestion.type==='confirm'"
+              :currentQuestion="currentQuestion" :questionIndex="index"
+              :updateQuestionsFromIndex="updateQuestionsFromIndex"
+            />
 
-      <QuestionCheckbox
-        v-if="currentQuestion.type==='checkbox'"
-        :currentQuestion="currentQuestion"
-      />
+            <QuestionCheckbox
+              v-if="currentQuestion.type==='checkbox'"
+              :currentQuestion="currentQuestion" :questionIndex="index"
+              :updateQuestionsFromIndex="updateQuestionsFromIndex"
+            />
 
-      <QuestionExpand v-if="currentQuestion.type==='expand'" :currentQuestion="currentQuestion" />
-
-      <b-form-invalid-feedback
-        id="validation-message"
-        class="invalid-feedback"
-        :state="currentQuestion.isValid"
-      >{{currentQuestion.validationMessage}}</b-form-invalid-feedback>
-    </b-form-group>
+            <QuestionExpand
+              v-if="currentQuestion.type==='expand'"
+              :currentQuestion="currentQuestion" :questionIndex="index"
+              :updateQuestionsFromIndex="updateQuestionsFromIndex"
+            />
+          </div>
+        </div>
+      </v-form>
+    </v-col>
   </div>
 </template>
 
@@ -58,25 +70,9 @@ export default {
     GeneratorSelection
   },
   props: {
-    currentQuestion: Object
-  },
-  data() {
-    return {
-      selectedIndex: null,
-      correctIndex: null,
-      shuffledAnswers: [],
-      answered: false
-    };
-  },
-  methods: {
-    onGeneratorSelected(generatorName) {
-      this.$emit("generatorSelected", generatorName);
-    }
+    questions: Array,
+    updateQuestionsFromIndex: Function,
+    selectGenerator: Function
   }
 };
 </script>
-<style scoped>
-.btn {
-  margin: 0 5px;
-}
-</style>
