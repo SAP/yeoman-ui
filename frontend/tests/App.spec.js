@@ -381,6 +381,40 @@ describe('App.vue', () => {
     })
   })
 
+  describe('updateCurrentPrompt - method', () => {
+    test('currentPrompt status should be deleted', () => {
+      wrapper = initComponent(App)
+      
+      wrapper.vm.prompts = [{}, {status: "testStatus", name: "name2"}]
+      wrapper.vm.promptIndex = 1
+
+      wrapper.vm.currentPrompt.status = "status";
+      wrapper.vm.updateCurrentPrompt({questions: [{}, {}]})
+      expect(wrapper.vm.currentPrompt.status).toBeUndefined()
+    })
+
+    test('currentPrompt status should not be deleted', () => {
+      wrapper = initComponent(App)
+      
+      wrapper.vm.prompts = [{}, {status: "testStatus", name: "name2"}]
+      wrapper.vm.promptIndex = 1
+
+      wrapper.vm.currentPrompt.status = "status";
+      wrapper.vm.updateCurrentPrompt({questions: []})
+      expect(wrapper.vm.currentPrompt.status).not.toBeUndefined()
+    })
+
+    test('only currentPrompt questions are updated', () => {
+      wrapper = initComponent(App)
+      
+      wrapper.vm.prompts = [{}, {status: "testStatus", name: "name2"}]
+      wrapper.vm.promptIndex = 1
+
+      wrapper.vm.updateCurrentPrompt({questions: [{}, {}, {}, {}]})
+      expect(wrapper.vm.currentPrompt.questions).toHaveLength(4)
+    })
+  });
+
   describe('generatorInstall - method', () => {
     beforeEach(() => {
       window.vscode = {

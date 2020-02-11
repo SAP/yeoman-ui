@@ -56,4 +56,20 @@ describe('Step.vue', () => {
         await wrapper.vm.$nextTick() 
         expect(wrapper.emitted('stepvalidated')[0][0]).toBeTruthy()
     })
+
+    test('currentPrompt name,description', () => {
+        const testName = 'testName'
+        const testDescription = 'testDescription'
+        wrapper = initComponent(Step, {
+            currentPrompt: {
+                name: testName,
+                description: testDescription,
+                questions: [
+                    {isWhen: true, message: "testMessage", type: 'input', isValid: true}
+                ]
+            }
+        })
+        expect(wrapper.find('v-card-title-stub').text()).toBe(testName)
+        expect(wrapper.find('v-card-subtitle-stub').text()).toBe(testDescription)
+    })
 })
