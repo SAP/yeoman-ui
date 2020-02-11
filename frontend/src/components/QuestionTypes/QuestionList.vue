@@ -52,7 +52,7 @@ export default {
       return undefined;
     },
     errorMessages() {
-      if (_.isEmpty(this.selected)) {
+      if (_.isNil(this.selected)) {
         return this.clickToDisplay;
       }
       
@@ -63,13 +63,15 @@ export default {
     default: {
       immediate: true,
       handler: function(defaultValue) {
-        this.selected = defaultValue;
+        if (!_.isNil(defaultValue)) {
+          this.selected = defaultValue;
+        }
       }
     },
     selected: {
       immediate: true,
       handler: function(selectedValue) {
-        this.currentQuestion.isValid = !_.isEmpty(selectedValue)
+        this.currentQuestion.isValid = !_.isNil(selectedValue)
         this.currentQuestion.answer = selectedValue
         this.updateQuestionsFromIndex(this.questionIndex)
       }
