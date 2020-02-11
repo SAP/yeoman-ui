@@ -1,10 +1,14 @@
 <template>
   <div id="step-component-div">
-      <QuestionTypeSelector
-        :questions="currentPrompt.questions"
-        :selectGenerator="selectGenerator"
-        :updateQuestionsFromIndex="updateQuestionsFromIndex"
-      />
+    <div>
+      <v-card-title>{{currentPrompt.name}}</v-card-title>
+      <v-card-subtitle>{{currentPrompt.description}}</v-card-subtitle>
+    </div>
+    <QuestionTypeSelector
+      :questions="currentPrompt.questions"
+      :selectGenerator="selectGenerator"
+      :updateQuestionsFromIndex="updateQuestionsFromIndex"
+    />
   </div>
 </template>
 
@@ -34,3 +38,13 @@ export default {
   }
 }
 </script>
+<style scoped>
+.v-card__title {
+  color: var(--vscode-foreground, #cccccc);
+}
+.v-card__subtitle {
+  color: var(--vscode-editorCodeLens-foreground, #999999);
+  white-space:pre-wrap;
+}
+
+</style>

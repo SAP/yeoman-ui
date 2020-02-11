@@ -32,6 +32,7 @@ export interface IGeneratorQuestion {
 
 export interface IPrompt {
   name: string;
+  description: string;
   questions: any[];
 }
 
@@ -122,7 +123,7 @@ export class YeomanUI {
       if (genGetPrompts) {
         const promptNames: any[] = genGetPrompts();
         const prompts: IPrompt[] = promptNames.map(value => {
-          return _.assign({ questions: [], name: "" }, value);
+          return _.assign({ questions: [], name: "", description: "" }, value);
         });
         this.setPrompts(prompts);
       }
