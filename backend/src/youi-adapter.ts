@@ -74,7 +74,7 @@ export class YouiAdapter implements Adapter {
       });
     }
 
-    return Promise.resolve(({} as T2));
+    return Promise.resolve({} as T2);
   }
 
   /**

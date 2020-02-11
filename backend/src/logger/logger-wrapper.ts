@@ -69,7 +69,7 @@ function createExtensionLogger(context: vscode.ExtensionContext) {
 
 	//TODO:  const meta = require(resolve(context.extensionPath, PACKAGE_JSON));
 	const extensionLoggerOpts: getExtensionLoggerOpts = {
-		extName: "yeoman-ui.logger",
+		extName: "Yeoman UI.Logger",
 		level: logLevelSetting,
 		logPath: contextLogPath,
 		sourceLocationTracking: sourceLocationTrackingSettings
