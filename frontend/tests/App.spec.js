@@ -532,6 +532,29 @@ describe('App.vue', () => {
     })
   })
 
+  describe('init - method', () => {
+    test('isInVsCode = true', () => {
+      wrapper = initComponent(App)
+      
+      wrapper.vm.isInVsCode = jest.fn().mockReturnValue(true)
+      wrapper.vm.init()
+
+      expect(wrapper.vm.promptIndex).toBe(0)
+      expect(wrapper.vm.prompts).toStrictEqual([])
+      expect(wrapper.vm.consoleClass).toBe('consoleClassHidden')
+    })
+
+    test('isInVsCode = false', () => {
+      wrapper = initComponent(App)
+      
+      wrapper.vm.isInVsCode = jest.fn().mockReturnValue(false)
+      wrapper.vm.init()
+
+      expect(wrapper.vm.consoleClass).toBe('consoleClassVisible')
+    })
+
+  })
+
   test('reload - method', () => {
     wrapper = initComponent(App)
 
