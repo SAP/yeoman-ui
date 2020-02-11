@@ -356,6 +356,9 @@ describe('App.vue', () => {
       const rejectSpy = jest.spyOn(wrapper.vm, 'reject')
       wrapper.vm.promptIndex = 1 
       wrapper.vm.prompts = [{}, {}]
+      wrapper.vm.rpc = {
+        invoke: () => new Promise(resolve => setTimeout(() => resolve(), 300))
+      }
 
       wrapper.vm.next()
 
