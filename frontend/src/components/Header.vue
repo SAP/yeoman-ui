@@ -6,6 +6,9 @@
       <v-btn v-if="!isInVsCode" @click="collapseOutput" icon>
         <v-icon>mdi-console</v-icon>
       </v-btn>
+      <v-btn @click="reload" icon>
+        <v-icon>mdi-reload</v-icon>
+      </v-btn>
     </v-app-bar>
   </div>
 </template>
@@ -18,6 +21,9 @@ export default {
     collapseOutput() {
       this.rpc.invoke("toggleOutput", [{}]);
       this.$emit("parentShowConsole");
+    },
+    reload() {
+      this.$emit("parentReload");
     }
   }
 };

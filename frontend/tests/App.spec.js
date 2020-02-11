@@ -531,4 +531,24 @@ describe('App.vue', () => {
       expect(wrapper.vm.showConsole).toBeFalsy()
     })
   })
+
+  test('reload - method', () => {
+    wrapper = initComponent(App)
+
+    wrapper.vm.rpc = {
+      invoke: jest.fn(),
+      registerMethod: jest.fn()
+    }
+    const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
+    
+    wrapper.vm.init = jest.fn()
+    const initSpy = jest.spyOn(wrapper.vm, 'init')
+
+    wrapper.vm.reload();
+    
+    expect(initSpy).toHaveBeenCalled()
+    expect(invokeSpy).toHaveBeenCalledWith("receiveIsWebviewReady", [])
+
+    invokeSpy.mockRestore()
+  })
 })
