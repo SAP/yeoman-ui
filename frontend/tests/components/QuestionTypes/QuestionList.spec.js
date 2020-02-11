@@ -150,4 +150,42 @@ describe('QuestionList.vue', () => {
             expect(options[3].text).toBe('──────────────')
         })
     })
+
+    describe('errorMessages - computed', () => {
+        test('data.selected is empty', () => {
+            wrapper = initComponent(QuestionList, {
+                currentQuestion: {
+                    name: 'testName1', text: 'testText1'
+                },
+                updateQuestionsFromIndex: () => {}
+            })
+
+            expect(wrapper.vm.errorMessages).toBe("Click to display the list of options")
+        })
+
+        test('data.selected is not empty, currentQuestion.isValid = true', async () => {
+            wrapper = initComponent(QuestionList, {
+                currentQuestion: {
+                    name: 'testName1', isValid: true, text: 'testText1'
+                },
+                updateQuestionsFromIndex: () => {}
+            })
+
+            wrapper.vm.$data.selected = "test"
+            await wrapper.vm.$nextTick()
+            expect(wrapper.vm.errorMessages).toBe("")
+        })
+
+        test('data.selected is not empty, currentQuestion.isValid = false', () => {
+            wrapper = initComponent(QuestionList, {
+                currentQuestion: {
+                    name: 'testName1', isValid: false, validationMessage: 'validationMessageTest'
+                },
+                updateQuestionsFromIndex: () => {}
+            })
+
+            wrapper.vm.$data.selected = "test"
+            expect(wrapper.vm.errorMessages).toBe("validationMessageTest")
+        })
+    })
 })
