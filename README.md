@@ -65,22 +65,13 @@ To get more help, support and information please open a github issue.
 Contributing information can be found in the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 ## TODO
-* error handling
-    * promise rejects while performing rpc calls
-    * ensure callback of `Generator.run()` is called when user aborts during conflict resolution and when exceptions occur.
-* support 3 default themes (vscode-black, vscode-white, non-vscode) ( pending Theia 13 adoption)
 * provide yeoman generator best practice guide (also provide example)
 * use debounce when watching changes to input fields
-* cleanup code
-    * remove redundant css
 * implement ability for yeoman-ui to call methods in vscode extensions
     * support hook for executing commands after finish
-    * support open workspace in destination
     * support open readme.md file by default (with turn off setting)
 
 * support back
-* support start over
-* support async functions in generator
 * enable configuring destination root
 * support custom question rendering: generator set the ui renderer, example: tiles instead of dropdown, radio buttons instead of 
 * support extensible question type custom user interfaces for complex operations (e.g. choose odata source)
