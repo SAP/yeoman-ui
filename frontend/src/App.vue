@@ -17,6 +17,7 @@
       :rpc="rpc"
       :isInVsCode="isInVsCode()"
       @parentShowConsole="toggleConsole"
+      @parentReload="reload"
     />
     <v-row class="main-row ma-0 pa-0">
       <v-col class="left-col ma-0 pa-0" cols="3">
@@ -437,16 +438,24 @@ export default {
     },
     toggleConsole() {
       this.showConsole = !this.showConsole;
+    },
+    init() {
+      this.yeomanName = "<no generator selected>";
+      this.promptIndex = 0;
+      this.prompts = [];
+      this.isInVsCode()
+        ? (this.consoleClass = "consoleClassHidden")
+        : (this.consoleClass = "consoleClassVisible");
+    },
+    reload() {
+      this.rpc.invoke("receiveIsWebviewReady", []);
+      this.init();
     }
+
   },
   mounted() {
     this.setupRpc();
-    //todo: add validate support
-    this.yeomanName = "<no generator selected>";
-    this.prompts = [];
-    this.isInVsCode()
-      ? (this.consoleClass = "consoleClassHidden")
-      : (this.consoleClass = "consoleClassVisible");
+    this.init();
   }
 };
 </script>
