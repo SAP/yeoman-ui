@@ -7,7 +7,7 @@ body {
   height: 100%;
   color: var(--vscode-foreground, #cccccc); 
   background-color: var(--vscode-editor-background, #1e1e1e);
-  font-family: var(--vscode-font-family);
+  font-family: var(--vscode-font-family, Arial, Helvetica, sans-serif);
   font-weight: var(--vscode-font-weight);
   font-size: var(--vscode-font-size);
 }
@@ -51,6 +51,11 @@ div.v-select-list div.v-list div.v-list-item,
 div.v-select-list div.v-list div.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled)
 {
   color: var(--vscode-input-foreground, #cccccc) !important;
+}
+
+form.inquirer-gui div.theme--light.v-input input,
+form.inquirer-gui div.theme--light.v-input textarea {
+  color: var(--vscode-input-foreground, white);
 }
 
 .v-textarea.v-input:not(.v-input--is-disabled) input{

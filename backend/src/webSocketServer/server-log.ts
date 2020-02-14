@@ -4,7 +4,7 @@ const stripAnsi = require("strip-ansi");
 
 export class ServerLog implements YouiLog {
     private rpc: RpcCommon;
-    private isLogVisible: boolean = false;
+    private isOutputVisible: boolean = false;
     /**
      *
      */
@@ -32,8 +32,8 @@ export class ServerLog implements YouiLog {
     public skip(str: string): void {
         this.rpc.invoke("log", [stripAnsi(str) + '\n']);
     }
-    public showLog(): boolean {
-        this.isLogVisible = !this.isLogVisible;
-        return !this.isLogVisible;
+    public showOutput(): boolean {
+        this.isOutputVisible = !this.isOutputVisible;
+        return !this.isOutputVisible;
     }
 }

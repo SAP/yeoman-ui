@@ -14,6 +14,7 @@ const testVscode = {
 };
 mockVscode(testVscode, "src/extension.ts");
 import * as extension from "../src/extension";
+import * as loggerWrapper from "../src/logger/logger-wrapper";
 
 describe('extension unit test', () => {
     let sandbox: any;
@@ -21,6 +22,7 @@ describe('extension unit test', () => {
     let windowMock: any;
     let yeomanUiPanelMock: any;
     let yeomanUiMock: any;
+    let loggerWrapperMock: any;
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -34,8 +36,9 @@ describe('extension unit test', () => {
         commandsMock = sandbox.mock(testVscode.commands);
         windowMock = sandbox.mock(testVscode.window);
         yeomanUiPanelMock = sandbox.mock(extension.YeomanUIPanel);
-        _.set(extension.YeomanUIPanel, "currentPanel.yeomanui", {toggleLog: () => {}});
+        _.set(extension.YeomanUIPanel, "currentPanel.yeomanui", {toggleOutput: () => {}});
         yeomanUiMock = sandbox.mock(extension.YeomanUIPanel.currentPanel.yeomanui);
+        loggerWrapperMock = sandbox.mock(loggerWrapper);
     });
 
     afterEach(() => {
@@ -43,12 +46,14 @@ describe('extension unit test', () => {
         windowMock.verify();
         yeomanUiPanelMock.verify();
         yeomanUiMock.verify();
+        loggerWrapperMock.verify();
     });
 
     describe('activate', () => {
         let testContext: any;
         beforeEach(() => {
             testContext = { subscriptions: [], extensionPath: "testExtensionpath" };
+            loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
         });
 
         it("commands registration", () => {
@@ -57,7 +62,7 @@ describe('extension unit test', () => {
             // tslint:disable-next-line: no-unused-expression
             expect( _.get(oRegisteredCommands, "loadYeomanUI")).to.be.not.undefined;
             // tslint:disable-next-line: no-unused-expression
-            expect(_.get(oRegisteredCommands, "yeomanUI.toggleLog")).to.be.not.undefined;
+            expect(_.get(oRegisteredCommands, "yeomanUI.toggleOutput")).to.be.not.undefined;
         });
 
         it("execution loadYeomanUI command", () => {
@@ -67,11 +72,11 @@ describe('extension unit test', () => {
             loadYeomanUICommand();
         });
 
-        it("execution yeomanui.toggleLog command", () => {
+        it("execution yeomanui.toggleOutput command", () => {
             extension.activate(testContext);
-            const yeomanUIToggleLogCommand = _.get(oRegisteredCommands, "yeomanUI.toggleLog");
-            yeomanUiMock.expects("toggleLog");
-            yeomanUIToggleLogCommand();
+            const yeomanUIToggleOutputCommand = _.get(oRegisteredCommands, "yeomanUI.toggleOutput");
+            yeomanUiMock.expects("toggleOutput");
+            yeomanUIToggleOutputCommand();
         });
     });
 });

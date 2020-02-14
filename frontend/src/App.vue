@@ -33,8 +33,8 @@
           <v-slide-x-transition>
             <Form
               ref="form"
-              :questions="currentPrompt.questions"
-              v-if="currentPrompt"
+              :questions="currentPrompt ? currentPrompt.questions : []"
+              v-show="currentPrompt"
               @answered="onAnswered"
             />
           </v-slide-x-transition>
@@ -83,6 +83,7 @@ import Done from "./components/Done.vue";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import * as _ from "lodash";
+import RemoteFileBrowserPlugin from "@sap-devx/inquirer-gui-remote-file-browser-plugin";
 
 const FUNCTION = "__Function";
 const LOADING = "loading...";
@@ -167,32 +168,6 @@ export default {
     }
   },
   methods: {
-    // async updateQuestionsFromIndex(questionIndex) {
-    //   const questions = _.get(this, "currentPrompt.questions", []);
-    //   const relevantQuestionsToUpdate = _.slice(questions, questionIndex);
-
-    //   let showBusy = true;
-    //   const that = this;
-    //   const finished = relevantQuestionsToUpdate.reduce((p, question) => {
-    //     return p
-    //       .then(() => that.updateQuestion(question))
-    //       .catch(error => {
-    //         // eslint-disable-next-line no-console
-    //         console.error(error);
-    //         // TODO: add information to log in case a question failed and there is a list/rawlist question without selected value
-    //       });
-    //   }, Promise.resolve());
-
-    //   setTimeout(() => {
-    //     if (showBusy) {
-    //       that.showBusyIndicator = true;
-    //     }
-    //   }, 1000);
-
-    //   await finished;
-    //   showBusy = false;
-    //   this.showBusyIndicator = false;
-    // },
     setBusyIndicator() {
       this.showBusyIndicator =
         _.isEmpty(this.prompts) ||
@@ -202,8 +177,9 @@ export default {
       if (this.resolve) {
         try {
           this.resolve(this.currentPrompt.answers);
-        } catch (e) {
-          this.reject(e);
+        } catch (error) {
+          this.rpc.invoke("logError", [error]);
+          this.reject(error);
           return;
         }
       }
@@ -390,6 +366,11 @@ export default {
     }
   },
   mounted() {
+    // register custom inquirer-gui plugins
+    let options = {};
+    Vue.use(RemoteFileBrowserPlugin, options);
+    this.$refs.form.registerPlugin(options.plugin);
+
     this.setupRpc();
     //todo: add validate support
     this.yeomanName = "<no generator selected>";
@@ -401,10 +382,6 @@ export default {
 };
 </script>
 <style scoped>
-html body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @import "./../node_modules/vue-loading-overlay/dist/vue-loading.css";
 .consoleClassVisible {
   visibility: visible;
@@ -469,6 +446,5 @@ div.bottom-right-col .progress-buttons-row {
 form.inquirer-gui div.theme--light.v-input div.v-input__control{
   background-color: var(--vscode-input-background, darkgray);
 }
-
 
 </style>

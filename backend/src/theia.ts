@@ -1,5 +1,5 @@
 // TODO: remove this class when those vscode commands are implemented in theia.
-import * as vscode from "vscode";
+import * as vscode from "vscode"; // NOSONAR
 
 export class Theia {
     private isInTheiaCached: boolean;
