@@ -91,6 +91,28 @@ const LOADING = "loading...";
 const PENDING = "pending";
 const INSTALLING = "Installing dependencies...";
 
+function initialState (){
+  return {
+    generatorName: "",
+    generatorPrettyName: "",
+    stepValidated: false,
+    prompts: [],
+    promptIndex: 0,
+    index: 0,
+    rpc: Object,
+    resolve: Object,
+    reject: Object,
+    isDone: false,
+    doneMessage: Object,
+    consoleClass: "",
+    logText: "",
+    showConsole: false,
+    messages: {},
+    showBusyIndicator: false,
+    transitionToggle: false
+  };
+}
+
 export default {
   name: "app",
   components: {
@@ -101,25 +123,7 @@ export default {
     Loading
   },
   data() {
-    return {
-      generatorName: "",
-      generatorPrettyName: "",
-      stepValidated: false,
-      prompts: [],
-      promptIndex: 0,
-      index: 0,
-      rpc: Object,
-      resolve: Object,
-      reject: Object,
-      isDone: false,
-      doneMessage: Object,
-      consoleClass: "",
-      logText: "",
-      showConsole: false,
-      messages: {},
-      showBusyIndicator: false,
-      transitionToggle: false
-    };
+    return initialState();
   },
   computed: {
     isLoadingColor() {
@@ -440,18 +444,17 @@ export default {
       this.showConsole = !this.showConsole;
     },
     init() {
-      this.yeomanName = "<no generator selected>";
-      this.promptIndex = 0;
-      this.prompts = [];
       this.isInVsCode()
         ? (this.consoleClass = "consoleClassHidden")
         : (this.consoleClass = "consoleClassVisible");
     },
     reload() {
-      this.rpc.invoke("receiveIsWebviewReady", []);
+      const dataObj = initialState();
+      dataObj.rpc = this.rpc;
+      Object.assign(this.$data, dataObj);
       this.init();
+      this.rpc.invoke("receiveIsWebviewReady", []);
     }
-
   },
   mounted() {
     this.setupRpc();
