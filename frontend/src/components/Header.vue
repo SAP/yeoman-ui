@@ -8,7 +8,7 @@
           <v-icon left>mdi-console</v-icon>
         </v-card-text>
       </v-btn>
-      <v-tooltip left>
+      <v-tooltip bottom>
         <template v-slot:activator="{ on }">
             <v-btn class="ma-2" @click="reload" icon v-on="on">
               <v-card-text>
