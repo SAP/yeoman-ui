@@ -37,7 +37,13 @@ module.exports = class extends Generator {
       }
     };
 
-    var prompts = [{ name: "Basic info" }, { name: "Hunger" }, { name: "Registration" }, { name: "Take Away" }, { name: "Tip" }];
+    var prompts = [
+      { name: "Basic info", description: "Basic info Description" }, 
+      { name: "Hunger", description: "Hunger Description" }, 
+      { name: "Registration", description: "Registration Description" }, 
+      { name: "Take Away", description: "Take Away Description" }, 
+      { name: "Tip", description: "Tip Description" }
+    ];
     this.prompts = new Prompts(prompts);
 
     this.option('babel');

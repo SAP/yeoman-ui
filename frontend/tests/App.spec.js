@@ -523,4 +523,47 @@ describe('App.vue', () => {
       expect(wrapper.vm.showConsole).toBeFalsy()
     })
   })
+
+  describe('init - method', () => {
+    test('isInVsCode = true', () => {
+      wrapper = initComponent(App)
+      
+      wrapper.vm.isInVsCode = jest.fn().mockReturnValue(true)
+      wrapper.vm.init()
+
+      expect(wrapper.vm.promptIndex).toBe(0)
+      expect(wrapper.vm.prompts).toStrictEqual([])
+      expect(wrapper.vm.consoleClass).toBe('consoleClassHidden')
+    })
+
+    test('isInVsCode = false', () => {
+      wrapper = initComponent(App)
+      
+      wrapper.vm.isInVsCode = jest.fn().mockReturnValue(false)
+      wrapper.vm.init()
+
+      expect(wrapper.vm.consoleClass).toBe('consoleClassVisible')
+    })
+
+  })
+
+  test('reload - method', () => {
+    wrapper = initComponent(App)
+
+    wrapper.vm.rpc = {
+      invoke: jest.fn(),
+      registerMethod: jest.fn()
+    }
+    const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
+    
+    wrapper.vm.init = jest.fn()
+    const initSpy = jest.spyOn(wrapper.vm, 'init')
+
+    wrapper.vm.reload();
+    
+    expect(initSpy).toHaveBeenCalled()
+    expect(invokeSpy).toHaveBeenCalledWith("receiveIsWebviewReady", [])
+
+    invokeSpy.mockRestore()
+  })
 })

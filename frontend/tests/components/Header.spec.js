@@ -22,8 +22,8 @@ describe('Header.vue', () => {
     })
 
     test('generator brand', () => {
-        const testGen = 'Selected Generator: testGenerator'
-        wrapper = initComponent(Header, { selectedGeneratorHeader: testGen })
+        const testGen = 'Yeoman Generators'
+        wrapper = initComponent(Header, { headerTitle: testGen})
         expect(wrapper.find('v-toolbar-title-stub').text()).toBe(testGen)
         expect(wrapper.find('v-icon-stub').text()).toBe("mdi-console")
     })
@@ -37,6 +37,18 @@ describe('Header.vue', () => {
         }, true)
         
         wrapper.find("button").trigger('click')
-        expect(rpcInvokeMockFunction).toHaveBeenCalled()  
+        expect(rpcInvokeMockFunction).toHaveBeenCalled()
+    })
+
+    test('click triggers reload method', async () => {
+        const rpcInvokeMockFunction = jest.fn()
+        wrapper = initComponent(Header, {
+            rpc: {
+                invoke: rpcInvokeMockFunction
+            }
+        }, true)
+        
+        wrapper.find("button").trigger('reload')
+        expect(rpcInvokeMockFunction).not.toHaveBeenCalled()
     })
 })

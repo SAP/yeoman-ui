@@ -12,11 +12,12 @@
 
     <Header
       v-if="prompts.length"
-      :selectedGeneratorHeader="selectedGeneratorHeader"
+      :headerTitle="headerTitle"
       :stepName="prompts[promptIndex].name"
       :rpc="rpc"
       :isInVsCode="isInVsCode()"
       @parentShowConsole="toggleConsole"
+      @parentReload="reload"
     />
     <v-row class="main-row ma-0 pa-0">
       <v-col class="left-col ma-0 pa-0" cols="3">
@@ -89,6 +90,28 @@ const LOADING = "loading...";
 const PENDING = "pending";
 const INSTALLING = "Installing dependencies...";
 
+function initialState (){
+  return {
+    generatorName: "",
+    generatorPrettyName: "",
+    stepValidated: false,
+    prompts: [],
+    promptIndex: 0,
+    index: 0,
+    rpc: Object,
+    resolve: Object,
+    reject: Object,
+    isDone: false,
+    doneMessage: Object,
+    consoleClass: "",
+    logText: "",
+    showConsole: false,
+    messages: {},
+    showBusyIndicator: false,
+    transitionToggle: false
+  };
+}
+
 export default {
   name: "app",
   components: {
@@ -99,25 +122,7 @@ export default {
     Loading
   },
   data() {
-    return {
-      generatorName: "",
-      generatorPrettyName: "",
-      stepValidated: false,
-      prompts: [],
-      promptIndex: 0,
-      index: 0,
-      rpc: Object,
-      resolve: Object,
-      reject: Object,
-      isDone: false,
-      doneMessage: Object,
-      consoleClass: "",
-      logText: "",
-      showConsole: false,
-      messages: {},
-      showBusyIndicator: false,
-      transitionToggle: false
-    };
+    return initialState();
   },
   computed: {
     isLoadingColor() {
@@ -127,8 +132,8 @@ export default {
         ) || "#0e70c0"
       );
     },
-    selectedGeneratorHeader() {
-      return this.generatorName ? this.messages.selected_generator + this.generatorPrettyName : "";
+    headerTitle() {
+      return this.messages.yeoman_ui_title;
     },
     currentPrompt() {
       const prompt = _.get(this.prompts, "[" + this.promptIndex + "]");
@@ -350,10 +355,17 @@ export default {
       return promise;
     },
     createPrompt(questions, name) {
-      name = (name === "select_generator" ? this.messages.select_generator : name)
+      let promptDescription = "";
+      let promptName = name;
+      if (name === "select_generator") {
+        promptDescription = this.messages.select_generator_description;
+        promptName = this.messages.select_generator_name;
+      }
+      
       const prompt = Vue.observable({
         questions: questions,
-        name: name,
+        name: promptName,
+        description: promptDescription,
         answers: {},
         active: true
       });
@@ -428,16 +440,23 @@ export default {
     },
     toggleConsole() {
       this.showConsole = !this.showConsole;
+    },
+    init() {
+      this.isInVsCode()
+        ? (this.consoleClass = "consoleClassHidden")
+        : (this.consoleClass = "consoleClassVisible");
+    },
+    reload() {
+      const dataObj = initialState();
+      dataObj.rpc = this.rpc;
+      Object.assign(this.$data, dataObj);
+      this.init();
+      this.rpc.invoke("receiveIsWebviewReady", []);
     }
   },
   mounted() {
     this.setupRpc();
-    //todo: add validate support
-    this.yeomanName = "<no generator selected>";
-    this.prompts = [];
-    this.isInVsCode()
-      ? (this.consoleClass = "consoleClassHidden")
-      : (this.consoleClass = "consoleClassVisible");
+    this.init();
   }
 };
 </script>

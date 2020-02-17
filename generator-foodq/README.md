@@ -28,7 +28,19 @@ If you write your own generator and you want it to render well in Yeoman UI, fol
 
 ```js
 this.getPrompts = function() {
-    return [{name:"Prompt 1"},{name: "Prompt 2"},{name: "Registration"}];
+    return [
+            { name: "Prompt 1", description: "Prompt 1 Description" }, 
+            { name: "Prompt 2", description: "Prompt 2 Description" }, 
+            { name: "Registration", description: "Please enter user cresentials" }
+    ];
+}
+```
+
+  * Update the target folder (your project root path) in the 'writing()' method 
+
+```javascript
+writing() {
+    this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "answers.food", "")));
 }
 ```
 

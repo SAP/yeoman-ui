@@ -32,20 +32,21 @@ export interface IGeneratorQuestion {
 
 export interface IPrompt {
   name: string;
+  description: string;
   questions: any[];
 }
 
 export class YeomanUI {
-  private static funcReplacer(key: any, value: any) {
-    return _.isFunction(value) ? "__Function" : value;
-  }
-
-  private static defaultMessage =
+  private static defaultMessage = 
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
   private static YEOMAN_PNG = "yeoman.png";
   private static isWin32 = (process.platform === 'win32');
   private static CWD = path.join(os.homedir(), 'projects');
   private static NODE_MODULES = 'node_modules';
+
+  private static funcReplacer(key: any, value: any) {
+    return _.isFunction(value) ? "__Function" : value;
+  }
 
   private rpc: IRpc;
   private outputChannel: YouiLog;
@@ -166,7 +167,7 @@ export class YeomanUI {
            https://www.npmjs.com/package/@types/yeoman-generator */
       this.gen.run((err) => {
         let message: string;
-        let destinationRoot = this.gen.destinationRoot();
+        const destinationRoot = this.gen.destinationRoot();
         if (err) {
           message = `${generatorName} failed: ${err}.`;
           this.logError(err, message);
@@ -180,36 +181,6 @@ export class YeomanUI {
     } catch (error) {
       this.logError(error);
     }
-  }
-
-  private setGenInstall(gen: any) {
-    let originalPrototype = Object.getPrototypeOf(gen);
-    const originalGenInstall = _.get(originalPrototype, "install");
-    if (originalGenInstall) {
-      originalPrototype.install = () => {
-        this.doGeneratorInstall();
-        originalGenInstall.call(gen);
-      };
-      Object.setPrototypeOf(gen, originalPrototype);
-    }
-  }
-
-  getErrorInfo(error: any) {
-    if (_.isString(error)) {
-      return error;
-    } 
-
-    const name = _.get(error, "name", "");
-    const message = _.get(error, "message", "");
-    const stack = _.get(error, "stack", "");
-    const string = error.toString();
-
-    return `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${string}\n`;
-  }
-
-  async showMessageInOutput(errorMessage: string) {
-    await this.logMessage(errorMessage);
-    this.toggleOutput();
   }
 
   public doGeneratorInstall(): Promise<any> {
@@ -271,11 +242,36 @@ export class YeomanUI {
       return this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
   }
 
+
   private getPromptName(questions: Environment.Adapter.Questions<any>): string {
     const firstQuestionName = _.get(questions, "[0].name");
     return (firstQuestionName ? _.startCase(firstQuestionName) : `Step ${this.promptCount}`);
   }
 
+  private setGenInstall(gen: any) {
+    const originalPrototype = Object.getPrototypeOf(gen);
+    const originalGenInstall = _.get(originalPrototype, "install");
+    if (originalGenInstall) {
+      originalPrototype.install = () => {
+        this.doGeneratorInstall();
+        originalGenInstall.call(gen);
+      };
+      Object.setPrototypeOf(gen, originalPrototype);
+    }
+  }
+
+  private getErrorInfo(error: any) {
+    if (_.isString(error)) {
+      return error;
+    } 
+
+    const name = _.get(error, "name", "");
+    const message = _.get(error, "message", "");
+    const stack = _.get(error, "stack", "");
+
+    return `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${error.toString()}\n`;
+  }
+  
   private async onEnvLookup(env: Environment.Options, resolve: any, filter?: GeneratorFilter) {
     this.genMeta = env.getGeneratorsMeta();
     const generatorNames: string[] = env.getGeneratorNames();

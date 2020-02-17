@@ -159,7 +159,7 @@ describe('QuestionList.vue', () => {
                 },
                 updateQuestionsFromIndex: () => {}
             })
-            
+
             expect(wrapper.vm.errorMessages).toBe("Click to display the list of options")
         })
 
@@ -170,7 +170,7 @@ describe('QuestionList.vue', () => {
                 },
                 updateQuestionsFromIndex: () => {}
             })
-            
+
             wrapper.vm.$data.selected = "test"
             await wrapper.vm.$nextTick()
             expect(wrapper.vm.errorMessages).toBe("")
@@ -183,7 +183,7 @@ describe('QuestionList.vue', () => {
                 },
                 updateQuestionsFromIndex: () => {}
             })
-            
+
             wrapper.vm.$data.selected = "test"
             expect(wrapper.vm.errorMessages).toBe("validationMessageTest")
         })
