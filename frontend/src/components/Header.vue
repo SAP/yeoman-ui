@@ -5,15 +5,14 @@
       <v-spacer></v-spacer>
       <v-btn v-if="!isInVsCode" class="ma-2" @click="collapseOutput" icon>
         <v-card-text>
-          <v-icon left>mdi-console</v-icon>
+          <v-icon>mdi-console</v-icon>
         </v-card-text>
       </v-btn>
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
             <v-btn class="ma-2" @click="reload" icon v-on="on">
               <v-card-text>
-                <v-icon left>mdi-reload</v-icon>
-                Start Over
+                <v-icon>mdi-reload</v-icon>
               </v-card-text>
             </v-btn>
         </template>
