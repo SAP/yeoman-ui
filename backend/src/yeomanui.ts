@@ -365,7 +365,7 @@ export class YeomanUI {
 
   private setPromptList(prompts: IPrompt[]): Promise<void> {
     const promptNames: IPrompt[] = prompts.map(value => {
-      return _.assign({ questions: [], name: "" }, value);
+      return _.assign({ questions: [], name: "", description: "" }, value);
     });
 
     return this.rpc.invoke("setPromptList", [promptNames]);

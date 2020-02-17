@@ -306,6 +306,7 @@ export default {
             const mappedPrompts = prompts.map((prompt, index) => {
               // ignore name
               prompt.name = this.prompts[this.promptIndex + index].name;
+              prompt.description = this.prompts[this.promptIndex + index].description;
               return prompt;
             });
             this.prompts.splice(this.promptIndex , prompts.length, ...mappedPrompts);
