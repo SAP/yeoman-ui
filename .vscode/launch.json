@@ -13,6 +13,9 @@
       "outFiles": [
         "${workspaceFolder}/backend/out/**/*.js"
       ],
+      "env": {
+        "PORT": "8081"
+      },
       "preLaunchTask": "watch backend (tsc)"
     },
     {

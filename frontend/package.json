@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@mdi/font": "^4.5.95",
-    "@sap-devx/inquirer-gui": "0.0.6",
+    "@sap-devx/inquirer-gui": "0.0.8",
     "@sap-devx/inquirer-gui-remote-file-browser-plugin": "0.0.1",
     "core-js": "2.6.6",
     "jquery": "3.4.1",
@@ -27,6 +27,7 @@
     "vuetify": "^2.2.1"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.8.4",
     "@sap-devx/webview-rpc": "^0.2.0",
     "@vue/cli-plugin-babel": "^3.11.0",
     "@vue/cli-plugin-eslint": "^3.11.0",
@@ -40,18 +41,18 @@
     "eslint-plugin-vue": "^5.0.0",
     "fibers": "^4.0.2",
     "flush-promises": "^1.0.2",
+    "husky": "1.2.1",
     "jest": "^24.9.0",
     "jest-serializer-vue": "^2.0.2",
+    "lint-staged": "^8.1.5",
     "mock-socket": "^9.0.2",
     "sass": "^1.24.2",
     "sass-loader": "^8.0.0",
-    "lint-staged": "^8.1.5",
-    "husky": "1.2.1",
+    "vue-cli-plugin-vuetify": "^2.0.2",
     "vue-jest": "^3.0.5",
     "vue-template-compiler": "^2.6.10",
-    "webpack": "^4.41.2",
-    "vue-cli-plugin-vuetify": "^2.0.2",
-    "vuetify-loader": "^1.3.0"
+    "vuetify-loader": "^1.3.0",
+    "webpack": "^4.41.2"
   },
   "eslintConfig": {
     "root": true,

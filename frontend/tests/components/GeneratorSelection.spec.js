@@ -1,5 +1,5 @@
-import GeneratorSelection from '../../../src/components/QuestionTypes/GeneratorSelection.vue'
-import {initComponent, destroy} from '../../Utils'
+import GeneratorSelection from '../../src/components/GeneratorSelection.vue'
+import {initComponent, destroy} from '../Utils'
 
 let wrapper
 
@@ -51,8 +51,10 @@ describe('GeneratorSelection.vue', () => {
 
             wrapper.find('.v-card').trigger('click')
             await wrapper.vm.$nextTick()
-            expect(selectGeneratorSpy).toHaveBeenCalled()
-            expect(wrapper.vm.$options.propsData.currentQuestion.answer).toBe('testName1')
+            expect(wrapper.emitted().generatorSelected).toBeTruthy();
+            const generatorSelected = wrapper.emitted().generatorSelected[0];
+
+            expect(generatorSelected[0]).toBe('testName1')
 
             selectGeneratorSpy.mockRestore()
         })

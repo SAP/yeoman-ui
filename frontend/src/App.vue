@@ -55,7 +55,7 @@
           xs="4"
         >
           <v-row class="progress-buttons-row" align="center" justify="end">
-            <v-btn @click="next">Next ></v-btn>
+            <v-btn :disabled="!stepValidated" @click="next">Next ></v-btn>
           </v-row>
         </v-col>
       </v-col>
@@ -191,23 +191,26 @@ export default {
         };
         this.setPrompts([prompt]);
       }
+      this.stepValidated = false;
       this.promptIndex++;
       this.prompts[this.promptIndex - 1].active = false;
       this.prompts[this.promptIndex].active = true;
       this.transitionToggle = !this.transitionToggle;
     },
     selectGenerator(generatorName, generatorPrettyName) {
-      this.currentPrompt.answers.name = generatorName;
+      this.stepValidated = true;
+      const currentPrompt = this.currentPrompt;
+      if (currentPrompt) {
+        currentPrompt.answers.name = generatorName;
+      }
       this.generatorName = generatorName;
       this.generatorPrettyName = generatorPrettyName;
     },
-    onStepValidated(stepValidated) {
-      this.stepValidated = stepValidated;
-    },
-    onAnswered(answers, allValid) {
-      this.currentPrompt.answers = answers;
-      for (let answer in answers) {
-        console.log(`${answer}: ${answers[answer]}`);
+    onAnswered(answers, issues) {
+      this.stepValidated = (issues === undefined);
+      const currentPrompt = this.currentPrompt;
+      if (currentPrompt)  {
+        currentPrompt.answers = answers;
       }
     },
     setMessages(messages) {
@@ -256,7 +259,6 @@ export default {
       for (let question of questions) {
         for (let prop in question) {
           if (question[prop] === "__Function") {
-            console.debug(`${question.name}.${prop}() is a function`);
             var that = this;
             question[prop] = async (...args) => {
               const response = await that.rpc.invoke("evaluateMethod", [
@@ -274,9 +276,7 @@ export default {
     async showPrompt(questions, name) {
       this.prepQuestions(questions);
       const prompt = this.createPrompt(questions, name);
-      // evaluate message property on server if it is a function
       this.setPrompts([prompt]);
-      // await this.updateQuestionsFromIndex(0);
 
       const promise = new Promise((resolve, reject) => {
         this.resolve = resolve;
@@ -365,14 +365,17 @@ export default {
       this.showConsole = !this.showConsole;
     }
   },
+  created() {
+    this.setupRpc();
+  },
   mounted() {
     // register custom inquirer-gui plugins
     let options = {};
     Vue.use(RemoteFileBrowserPlugin, options);
-    this.$refs.form.registerPlugin(options.plugin);
+    if (options.plugin) {
+      this.$refs.form.registerPlugin(options.plugin);
+    }
 
-    this.setupRpc();
-    //todo: add validate support
     this.yeomanName = "<no generator selected>";
     this.prompts = [];
     this.isInVsCode()
