@@ -42,7 +42,12 @@ div.v-input__slot .v-select__selection,
 .v-input div label.v-label{
   color: var(--vscode-input-foreground, #cccccc) !important;
 }
+
 div.v-select-list div.v-list{
+  background-color: var(--vscode-input-background, #3c3c3c);
+}
+
+form.inquirer-gui div.v-list{
   background-color: var(--vscode-input-background, #3c3c3c);
 }
 

@@ -36,7 +36,7 @@ describe('extension unit test', () => {
         commandsMock = sandbox.mock(testVscode.commands);
         windowMock = sandbox.mock(testVscode.window);
         yeomanUiPanelMock = sandbox.mock(extension.YeomanUIPanel);
-        _.set(extension.YeomanUIPanel, "currentPanel.yeomanui", {toggleOutput: () => {}});
+        _.set(extension.YeomanUIPanel, "currentPanel.yeomanui", {toggleOutput: () => true});
         yeomanUiMock = sandbox.mock(extension.YeomanUIPanel.currentPanel.yeomanui);
         loggerWrapperMock = sandbox.mock(loggerWrapper);
     });

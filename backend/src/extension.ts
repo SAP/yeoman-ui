@@ -9,8 +9,7 @@ import { OutputChannelLog } from './output-channel-log';
 import { GeneratorFilter } from './filter';
 import backendMessages from "./messages";
 import { Theia } from './theia';
-import { createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
-import { getClassLogger } from "./logger/logger-wrapper";
+import { getClassLogger, createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
 import { IChildLogger } from "@vscode-logging/logger";
 
 const ERROR_ACTIVATION_FAILED_LOGGER_CONFIG = 'Extension activation failed due to Logger configuration failure:';
@@ -37,7 +36,6 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 	}));
 
-
 	if (vscode.window.registerWebviewPanelSerializer) {
 		// Make sure we register a serializer in activation event
 		vscode.window.registerWebviewPanelSerializer(YeomanUIPanel.viewType, {
@@ -53,7 +51,6 @@ export function activate(context: vscode.ExtensionContext) {
  * Manages webview panels
  */
 export class YeomanUIPanel {
-	private readonly logger: IChildLogger = getClassLogger(YeomanUI.name);
 	/**
 	 * Track the currently panel. Only allow a single panel to exist at a time.
 	 */
@@ -96,7 +93,12 @@ export class YeomanUIPanel {
 		YeomanUIPanel.currentPanel = new YeomanUIPanel(panel, extensionPath);
 	}
 
+	private static getMediaPath(extensionPath: string): string {
+		return path.join(extensionPath, 'dist', 'media');
+	}
+
 	public yeomanui: YeomanUI;
+	private readonly logger: IChildLogger = getClassLogger(YeomanUI.name);
 	private rpc: RpcExtension;
 	private readonly panel: vscode.WebviewPanel;
 	private readonly extensionPath: string;
@@ -148,30 +150,30 @@ export class YeomanUIPanel {
 						resolve(message.data);
 						return;
 					case 'showInfoMessage':
-						let InfoMessage = _.get(message, "commandParams[0]");
+						const InfoMessage = _.get(message, "commandParams[0]");
 						vscode.window.showInformationMessage(InfoMessage);
 						return;
 					case 'showDoneMessage':
-						let Close = 'Close';
-						let OpenWorkspace = 'Open Workspace';
-						this.theia.isInTheia().then((value) => {
-							let commandName_Close = "workbench.action.closeActiveEditor";
-							let commandName_OpenWorkspace = "vscode.openFolder";
-							let commandParam = _.get(message, "commandParams[0]");
+						const Close = 'Close';
+						const OpenWorkspace = 'Open Workspace';
+						this.theia.isInTheia().then(() => {
+							const commandNameClose = "workbench.action.closeActiveEditor";
+							const commandNameOpenWorkspace = "vscode.openFolder";
+							const commandParam = _.get(message, "commandParams[0]");
 							vscode.window.showInformationMessage('Where would you like to open the project?', Close , OpenWorkspace)
 								.then(selection => {
 									if (selection === Close) {
-										this.executeCommand(commandName_Close, undefined);
+										this.executeCommand(commandNameClose, undefined);
 									} else if (selection === OpenWorkspace) {
-										this.executeCommand(commandName_OpenWorkspace, commandParam);
+										this.executeCommand(commandNameOpenWorkspace, commandParam);
 									}
 								});
 						});
 						return;
 					case 'vscodecommand':
-						this.theia.isInTheia().then((value) => {
-							let commandName = _.get(message, "commandName");
-							let commandParam = _.get(message, "commandParams[0]");
+						this.theia.isInTheia().then(() => {
+							const commandName = _.get(message, "commandName");
+							const commandParam = _.get(message, "commandParams[0]");
 							this.executeCommand(commandName, commandParam);
 							return;
 						});
@@ -180,6 +182,20 @@ export class YeomanUIPanel {
 			null,
 			this.disposables
 		);
+	}
+	
+	public dispose() {
+		YeomanUIPanel.currentPanel = undefined;
+
+		// Clean up our resources
+		this.panel.dispose();
+
+		while (this.disposables.length) {
+			const x = this.disposables.pop();
+			if (x) {
+				x.dispose();
+			}
+		}
 	}
 
 	private executeCommand(commandName: string, commandParam: any): Promise<any> {
@@ -200,24 +216,6 @@ export class YeomanUIPanel {
 				console.debug(`Execution of command ${commandName} returned ${failure}`);
 			});
 		});
-	}
-
-	public dispose() {
-		YeomanUIPanel.currentPanel = undefined;
-
-		// Clean up our resources
-		this.panel.dispose();
-
-		while (this.disposables.length) {
-			const x = this.disposables.pop();
-			if (x) {
-				x.dispose();
-			}
-		}
-	}
-
-	private static getMediaPath(extensionPath: string): string {
-		return path.join(extensionPath, 'dist', 'media');
 	}
 
 	private setMessages(messages: any): Promise<void> {

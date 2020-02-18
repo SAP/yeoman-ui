@@ -1,11 +1,24 @@
 <template>
   <div>
     <v-app-bar class="elevation-0">
-      <v-toolbar-title>{{selectedGeneratorHeader}}</v-toolbar-title>
+      <v-toolbar-title>{{headerTitle}}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn v-if="!isInVsCode" @click="collapseOutput" icon>
-        <v-icon>mdi-console</v-icon>
+      <v-btn v-if="!isInVsCode" class="ma-2" @click="collapseOutput" icon>
+        <v-card-text>
+          <v-icon left>mdi-console</v-icon>
+        </v-card-text>
       </v-btn>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on }">
+            <v-btn class="ma-2" @click="reload" icon v-on="on">
+              <v-card-text>
+                <v-icon left>mdi-reload</v-icon>
+                Start Over
+              </v-card-text>
+            </v-btn>
+        </template>
+        <span>Starting over will clear all the values you have entered and start the process from scratch</span>
+      </v-tooltip>
     </v-app-bar>
   </div>
 </template>
@@ -13,11 +26,14 @@
 <script>
 export default {
   name: "Header",
-  props: ["selectedGeneratorHeader", "stepName", "isInVsCode", "rpc"],
+  props: ["headerTitle", "stepName", "isInVsCode", "rpc"],
   methods: {
     collapseOutput() {
       this.rpc.invoke("toggleOutput", [{}]);
       this.$emit("parentShowConsole");
+    },
+    reload() {
+      this.$emit("parentReload");
     }
   }
 };

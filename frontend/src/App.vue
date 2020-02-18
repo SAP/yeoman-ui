@@ -12,11 +12,12 @@
 
     <Header
       v-if="prompts.length"
-      :selectedGeneratorHeader="selectedGeneratorHeader"
+      :headerTitle="headerTitle"
       :stepName="prompts[promptIndex].name"
       :rpc="rpc"
       :isInVsCode="isInVsCode()"
       @parentShowConsole="toggleConsole"
+      @parentReload="reload"
     />
     <v-row class="main-row ma-0 pa-0">
       <v-col class="left-col ma-0 pa-0" cols="3">
@@ -26,7 +27,7 @@
         <v-col class="prompts-col" cols="12">
           <Done v-if="isDone" :doneMessage="doneMessage" :donePath="donePath" />
           <GeneratorSelection
-            v-if="currentPrompt && currentPrompt.name === 'Select generator'"
+            v-if="currentPrompt && currentPrompt.name === 'Select Generator'"
             @generatorSelected="selectGenerator"
             :currentQuestion="currentPrompt.questions[0]"
           />
@@ -90,6 +91,28 @@ const LOADING = "loading...";
 const PENDING = "pending";
 const INSTALLING = "Installing dependencies...";
 
+function initialState (){
+  return {
+    generatorName: "",
+    generatorPrettyName: "",
+    stepValidated: false,
+    prompts: [],
+    promptIndex: 0,
+    index: 0,
+    rpc: Object,
+    resolve: Object,
+    reject: Object,
+    isDone: false,
+    doneMessage: Object,
+    consoleClass: "",
+    logText: "",
+    showConsole: false,
+    messages: {},
+    showBusyIndicator: false,
+    transitionToggle: false
+  };
+}
+
 export default {
   name: "app",
   components: {
@@ -100,25 +123,7 @@ export default {
     Loading
   },
   data() {
-    return {
-      generatorName: "",
-      generatorPrettyName: "",
-      stepValidated: false,
-      prompts: [],
-      promptIndex: 0,
-      index: 0,
-      rpc: Object,
-      resolve: Object,
-      reject: Object,
-      isDone: false,
-      doneMessage: Object,
-      consoleClass: "",
-      logText: "",
-      showConsole: false,
-      messages: {},
-      showBusyIndicator: false,
-      transitionToggle: false
-    };
+    return initialState();
   },
   computed: {
     isLoadingColor() {
@@ -128,10 +133,8 @@ export default {
         ) || "#0e70c0"
       );
     },
-    selectedGeneratorHeader() {
-      return this.generatorName
-        ? this.messages.selected_generator + this.generatorPrettyName
-        : "";
+    headerTitle() {
+      return this.messages.yeoman_ui_title;
     },
     currentPrompt() {
       const prompt = _.get(this.prompts, "[" + this.promptIndex + "]");
@@ -222,37 +225,35 @@ export default {
       //     if found then update it
       //     if not found then create a prompt
       //   if no prompt name is provided, assign incoming question to current prompt
-      const currentPrompt = this.currentPrompt;
-      if (prompts) {
-        _.forEach(prompts, (prompt, index) => {
-          if (index === 0) {
-            if (prompt.status === PENDING) {
-              // new pending prompt
-              this.prompts.push(prompt);
-            } else {
-              if (currentPrompt) {
-                currentPrompt.questions = prompt.questions;
-                if (
-                  prompt.name &&
-                  currentPrompt.name === this.messages.step_is_pending
-                ) {
-                  currentPrompt.name = prompt.name;
-                }
-                // if questions are provided, remote the pending status
-                if (prompt.questions.length > 0) {
-                  delete currentPrompt.status;
-                }
-              } else {
-                // first prompt (Select Generator)
-                prompt.active = true;
-                this.prompts.push(prompt);
-              }
-            }
-          } else {
-            // multiple prompts provided -- simply add them
+      _.forEach(prompts, (prompt, index) => {
+        if (index === 0) {
+          if (prompt.status === PENDING) {
+            // new pending prompt
             this.prompts.push(prompt);
+          } else {
+            if (this.currentPrompt) {
+              this.updateCurrentPrompt(prompt);
+            } else {
+              // first prompt (Select Generator)
+              prompt.active = true;
+              this.prompts.push(prompt);
+            }
           }
-        });
+        } else {
+          // multiple prompts provided -- simply add them
+          this.prompts.push(prompt);
+        }
+      });
+    },
+    updateCurrentPrompt(prompt) {
+      this.currentPrompt.questions = prompt.questions;
+      if (prompt.name && this.currentPrompt.name === this.messages.step_is_pending) {
+        this.currentPrompt.name = prompt.name;
+        this.currentPrompt.description = _.get(prompt, "description", "");
+      }
+      // if questions are provided, remote the pending status
+      if (_.size(prompt.questions) > 0) {
+        delete this.currentPrompt.status;
       }
     },
     prepQuestions(questions) {
@@ -286,11 +287,17 @@ export default {
       return promise;
     },
     createPrompt(questions, name) {
-      name =
-        name === "select_generator" ? this.messages.select_generator : name;
+      let promptDescription = "";
+      let promptName = name;
+      if (name === "select_generator") {
+        promptDescription = this.messages.select_generator_description;
+        promptName = this.messages.select_generator_name;
+      }
+      
       const prompt = Vue.observable({
         questions: questions,
-        name: name,
+        name: promptName,
+        description: promptDescription,
         answers: {},
         active: true
       });
@@ -363,24 +370,32 @@ export default {
     },
     toggleConsole() {
       this.showConsole = !this.showConsole;
+    },
+    init() {
+      // register custom inquirer-gui plugins
+      let options = {};
+      Vue.use(RemoteFileBrowserPlugin, options);
+      if (options.plugin) {
+        this.$refs.form.registerPlugin(options.plugin);
+      }
+
+      this.isInVsCode()
+        ? (this.consoleClass = "consoleClassHidden")
+        : (this.consoleClass = "consoleClassVisible");
+    },
+    reload() {
+      const dataObj = initialState();
+      dataObj.rpc = this.rpc;
+      Object.assign(this.$data, dataObj);
+      this.init();
+      this.rpc.invoke("receiveIsWebviewReady", []);
     }
   },
   created() {
     this.setupRpc();
   },
   mounted() {
-    // register custom inquirer-gui plugins
-    let options = {};
-    Vue.use(RemoteFileBrowserPlugin, options);
-    if (options.plugin) {
-      this.$refs.form.registerPlugin(options.plugin);
-    }
-
-    this.yeomanName = "<no generator selected>";
-    this.prompts = [];
-    this.isInVsCode()
-      ? (this.consoleClass = "consoleClassHidden")
-      : (this.consoleClass = "consoleClassVisible");
+    this.init();
   }
 };
 </script>

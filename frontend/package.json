@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@mdi/font": "^4.5.95",
-    "@sap-devx/inquirer-gui": "0.0.11",
+    "@sap-devx/inquirer-gui": "0.0.12",
     "@sap-devx/inquirer-gui-remote-file-browser-plugin": "0.0.1",
     "core-js": "2.6.6",
     "jquery": "3.4.1",

@@ -11,7 +11,9 @@ module.exports = class extends Generator {
     this.getPrompts = function () {
       console.log('in getPrompts()');
 
-      return [{ name: "Prompt 1" }, { name: "Prompt 2" }, { name: "Registration" }];
+      return [{ name: "Prompt 1", description: "Prompt 1 Description\nWe are happy to welcome you to our family restaurant" },
+              { name: "Prompt 2", description: "Prompt 2 Description\nWe hope you enjoy our authentic food" },
+              { name: "Registration", description: "Thank you for your interest in our resturant.\nPlease enter credentials to register.\n(it shouldn't take you more then 1 minute)" }];
     }
 
     this.option('babel');

@@ -32,20 +32,21 @@ export interface IGeneratorQuestion {
 
 export interface IPrompt {
   name: string;
+  description: string;
   questions: any[];
 }
 
 export class YeomanUI {
-  private static funcReplacer(key: any, value: any) {
-    return _.isFunction(value) ? "__Function" : value;
-  }
-
   private static defaultMessage = 
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
   private static YEOMAN_PNG = "yeoman.png";
   private static isWin32 = (process.platform === 'win32');
   private static CWD = path.join(os.homedir(), 'projects');
   private static NODE_MODULES = 'node_modules';
+
+  private static funcReplacer(key: any, value: any) {
+    return _.isFunction(value) ? "__Function" : value;
+  }
 
   private rpc: IRpc;
   private outputChannel: YouiLog;
@@ -105,26 +106,6 @@ export class YeomanUI {
     return promise;
   }
 
-  private getEnv(): Environment.Options {
-    const env: Environment.Options = Environment.createEnv();
-    const envGetNpmPaths: () => any = env.getNpmPaths;
-    env.getNpmPaths = function (localOnly:boolean = false) {
-      // Start with the local paths derived by cwd in vscode 
-      // (as opposed to cwd of the plugin host process which is what is used by yeoman/environment)
-      // Walk up the CWD and add `node_modules/` folder lookup on each level
-      const parts: string[] = YeomanUI.CWD.split(path.sep);
-      const localPaths = _.map(parts, (part, index) => {
-        const resrpath = path.join(...parts.slice(0, index + 1), YeomanUI.NODE_MODULES);
-        return YeomanUI.isWin32 ? resrpath : path.join(path.sep, resrpath);
-
-      });
-      const defaultPaths = envGetNpmPaths.call(this, localOnly);
-      
-      return  _.uniq(localPaths.concat(defaultPaths));
-    };
-    return env;
-  }
-
   public async runGenerator(generatorName: string) {
     // TODO: should create and set target dir only after user has selected a generator;
     //  see issue: https://github.com/yeoman/environment/issues/55
@@ -142,7 +123,7 @@ export class YeomanUI {
       if (genGetPrompts) {
         const promptNames: any[] = genGetPrompts();
         const prompts: IPrompt[] = promptNames.map(value => {
-          return _.assign({ questions: [], name: "" }, value);
+          return _.assign({ questions: [], name: "", description: "" }, value);
         });
         this.setPrompts(prompts);
       }
@@ -170,7 +151,7 @@ export class YeomanUI {
            https://www.npmjs.com/package/@types/yeoman-generator */
       this.gen.run((err) => {
         let message: string;
-        let destinationRoot = this.gen.destinationRoot();
+        const destinationRoot = this.gen.destinationRoot();
         if (err) {
           message = `${generatorName} failed: ${err}.`;
           this.logError(err, message);
@@ -184,36 +165,6 @@ export class YeomanUI {
     } catch (error) {
       this.logError(error);
     }
-  }
-
-  private setGenInstall(gen: any) {
-    let originalPrototype = Object.getPrototypeOf(gen);
-    const originalGenInstall = _.get(originalPrototype, "install");
-    if (originalGenInstall) {
-      originalPrototype.install = () => {
-        this.doGeneratorInstall();
-        originalGenInstall.call(gen);
-      };
-      Object.setPrototypeOf(gen, originalPrototype);
-    }
-  }
-
-  getErrorInfo(error: any) {
-    if (_.isString(error)) {
-      return error;
-    } 
-
-    const name = _.get(error, "name", "");
-    const message = _.get(error, "message", "");
-    const stack = _.get(error, "stack", "");
-    const string = error.toString();
-
-    return `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${string}\n`;
-  }
-
-  async showMessageInOutput(errorMessage: string) {
-    await this.logMessage(errorMessage);
-    this.toggleOutput();
   }
 
   public doGeneratorInstall(): Promise<any> {
@@ -276,6 +227,50 @@ export class YeomanUI {
       }
       const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
       return this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
+  }
+
+  private getEnv(): Environment.Options {
+    const env: Environment.Options = Environment.createEnv();
+    const envGetNpmPaths: () => any = env.getNpmPaths;
+    env.getNpmPaths = function (localOnly:boolean = false) {
+      // Start with the local paths derived by cwd in vscode 
+      // (as opposed to cwd of the plugin host process which is what is used by yeoman/environment)
+      // Walk up the CWD and add `node_modules/` folder lookup on each level
+      const parts: string[] = YeomanUI.CWD.split(path.sep);
+      const localPaths = _.map(parts, (part, index) => {
+        const resrpath = path.join(...parts.slice(0, index + 1), YeomanUI.NODE_MODULES);
+        return YeomanUI.isWin32 ? resrpath : path.join(path.sep, resrpath);
+
+      });
+      const defaultPaths = envGetNpmPaths.call(this, localOnly);
+      
+      return  _.uniq(localPaths.concat(defaultPaths));
+    };
+    return env;
+  }
+
+  private setGenInstall(gen: any) {
+    const originalPrototype = Object.getPrototypeOf(gen);
+    const originalGenInstall = _.get(originalPrototype, "install");
+    if (originalGenInstall) {
+      originalPrototype.install = () => {
+        this.doGeneratorInstall();
+        originalGenInstall.call(gen);
+      };
+      Object.setPrototypeOf(gen, originalPrototype);
+    }
+  }
+
+  private getErrorInfo(error: any) {
+    if (_.isString(error)) {
+      return error;
+    } 
+
+    const name = _.get(error, "name", "");
+    const message = _.get(error, "message", "");
+    const stack = _.get(error, "stack", "");
+
+    return `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${error.toString()}\n`;
   }
   
   private async onEnvLookup(env: Environment.Options, resolve: any, filter?: GeneratorFilter) {
