@@ -26,6 +26,10 @@
       <v-col cols="9" class="right-col">
         <v-col class="prompts-col" cols="12">
           <Done v-if="isDone" :doneMessage="doneMessage" :donePath="donePath" />
+          <div v-if="currentPrompt">
+            <v-card-title>{{currentPrompt.name}}</v-card-title>
+            <v-card-subtitle>{{currentPrompt.description}}</v-card-subtitle>
+          </div>
           <GeneratorSelection
             v-if="currentPrompt && currentPrompt.name === 'Select Generator'"
             @generatorSelected="selectGenerator"
@@ -91,7 +95,7 @@ const LOADING = "loading...";
 const PENDING = "pending";
 const INSTALLING = "Installing dependencies...";
 
-function initialState (){
+function initialState() {
   return {
     generatorName: "",
     generatorPrettyName: "",
@@ -210,9 +214,9 @@ export default {
       this.generatorPrettyName = generatorPrettyName;
     },
     onAnswered(answers, issues) {
-      this.stepValidated = (issues === undefined);
+      this.stepValidated = issues === undefined;
       const currentPrompt = this.currentPrompt;
-      if (currentPrompt)  {
+      if (currentPrompt) {
         currentPrompt.answers = answers;
       }
     },
@@ -247,7 +251,10 @@ export default {
     },
     updateCurrentPrompt(prompt) {
       this.currentPrompt.questions = prompt.questions;
-      if (prompt.name && this.currentPrompt.name === this.messages.step_is_pending) {
+      if (
+        prompt.name &&
+        this.currentPrompt.name === this.messages.step_is_pending
+      ) {
         this.currentPrompt.name = prompt.name;
         this.currentPrompt.description = _.get(prompt, "description", "");
       }
@@ -293,7 +300,7 @@ export default {
         promptDescription = this.messages.select_generator_description;
         promptName = this.messages.select_generator_name;
       }
-      
+
       const prompt = Vue.observable({
         questions: questions,
         name: promptName,
@@ -386,6 +393,7 @@ export default {
     reload() {
       const dataObj = initialState();
       dataObj.rpc = this.rpc;
+      dataObj.messages = this.messages;
       Object.assign(this.$data, dataObj);
       this.init();
       this.rpc.invoke("receiveIsWebviewReady", []);
@@ -461,8 +469,7 @@ div.bottom-right-col .progress-buttons-row {
   border-radius: 0;
 }
 
-form.inquirer-gui div.theme--light.v-input div.v-input__control{
+form.inquirer-gui div.theme--light.v-input div.v-input__control {
   background-color: var(--vscode-input-background, darkgray);
 }
-
 </style>
