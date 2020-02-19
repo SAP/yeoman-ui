@@ -108,7 +108,8 @@ function initialState (){
     showConsole: false,
     messages: {},
     showBusyIndicator: false,
-    transitionToggle: false
+    transitionToggle: false,
+    promptsInfoToDisplay: []
   };
 }
 
@@ -287,9 +288,15 @@ export default {
     },
     setPromptList(prompts) {
       prompts = prompts || [];
+      this.promptsInfoToDisplay = _.cloneDeep(prompts);
       // replace all existing prompts except 1st (generator selction)
       //   and current prompt
-      this.prompts.splice(this.promptIndex + 1, _.size(this.prompts) - this.promptIndex, ...prompts.splice(this.promptIndex, _.size(prompts)));
+      const startIndex = this.promptIndex + 1;
+      const deleteCount = _.size(this.prompts) - this.promptIndex;
+      const itemsToInsert = prompts.splice(this.promptIndex, _.size(prompts));
+      this.prompts.splice(startIndex, deleteCount, ...itemsToInsert);
+      // eslint-disable-next-line no-console
+      console.error(this.prompts);
     },
     setPrompts(prompts) {
       const currentPrompt = this.currentPrompt;
@@ -361,6 +368,10 @@ export default {
       if (name === "select_generator") {
         promptDescription = this.messages.select_generator_description;
         promptName = this.messages.select_generator_name;
+      } else {
+        const promptToDisplay = _.get(this.promptsInfoToDisplay, "[" + (this.promptIndex - 1) +"]");
+        promptDescription = _.get(promptToDisplay, "description", "");
+        promptName = _.get(promptToDisplay, "name", name);
       }
       
       const prompt = Vue.observable({

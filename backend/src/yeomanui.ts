@@ -235,13 +235,12 @@ export class YeomanUI {
   public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
     this.currentQuestions = questions;
     
-      this.promptCount++;
-      
-      const promptName: string = this.getPromptName(questions);
-      const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
-      return this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
+    this.promptCount++;
+    
+    const promptName: string = this.getPromptName(questions);
+    const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
+    return this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
   }
-
 
   private getPromptName(questions: Environment.Adapter.Questions<any>): string {
     const firstQuestionName = _.get(questions, "[0].name");
@@ -364,10 +363,10 @@ export class YeomanUI {
   }
 
   private setPromptList(prompts: IPrompt[]): Promise<void> {
-    const promptNames: IPrompt[] = prompts.map(value => {
+    const promptsToDisplay: IPrompt[] = prompts.map(value => {
       return _.assign({ questions: [], name: "", description: "" }, value);
     });
 
-    return this.rpc.invoke("setPromptList", [promptNames]);
+    return this.rpc.invoke("setPromptList", [promptsToDisplay]);
   }
 }

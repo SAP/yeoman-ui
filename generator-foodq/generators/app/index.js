@@ -38,8 +38,8 @@ module.exports = class extends Generator {
     };
 
     var prompts = [
-      { name: "Basic info", description: "Basic info Description" }, 
-      { name: "Hunger", description: "Hunger Description" }, 
+      { name: "Hungry Info", description: "Hungry Info Description" }, 
+      { name: "Hunger Level", description: "Hunger Level Description" }, 
       { name: "Registration", description: "Registration Description" }, 
       { name: "Take Away", description: "Take Away Description" }, 
       { name: "Tip", description: "Tip Description" }

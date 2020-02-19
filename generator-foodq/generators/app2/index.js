@@ -33,7 +33,7 @@ module.exports = class extends Generator {
         if (answers.isTakeaway) {
           // add address prompt if doesn't exist
           if (indexOfAddress === -1) {
-            this.prompts.splice(4, 0, { name: "Address" });
+            this.prompts.splice(4, 0, { name: "Address", description: "Address Description" });
           }
         } else {
           // remove address prompt if exists
