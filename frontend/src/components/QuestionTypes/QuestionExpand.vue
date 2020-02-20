@@ -40,7 +40,7 @@ div#question-expand {
   margin-bottom: 1.5rem;
 }
 div.v-btn-toggle:not(.v-btn-toggle--group) .v-btn.v-btn:not(.v-item--active) {
-  background-color: var(--theia-list-activeSelectionBackground, #094771);
+  background-color: var(--vscode-list-activeSelectionBackground, #094771);
 }
 div.v-btn-toggle:not(.v-btn-toggle--group) .v-btn.v-btn.v-item--active {
   background-color: var(--vscode-button-background, #1976d2);
