@@ -97,7 +97,6 @@ function initialState (){
     stepValidated: false,
     prompts: [],
     promptIndex: 0,
-    index: 0,
     rpc: Object,
     resolve: Object,
     reject: Object,
@@ -289,22 +288,20 @@ export default {
     setPromptList(prompts) {
       prompts = prompts || [];
       this.promptsInfoToDisplay = _.cloneDeep(prompts);
-      // replace all existing prompts except 1st (generator selction)
-      //   and current prompt
+      // replace all existing prompts except 1st (generator selction) and current prompt
       const startIndex = this.promptIndex + 1;
       const deleteCount = _.size(this.prompts) - this.promptIndex;
       const itemsToInsert = prompts.splice(this.promptIndex, _.size(prompts));
       this.prompts.splice(startIndex, deleteCount, ...itemsToInsert);
     },
     setPrompts(prompts) {
-      const currentPrompt = this.currentPrompt;
       const firstIncomingPrompt = _.get(prompts, "[0]");
       if (firstIncomingPrompt) {
-        if (currentPrompt) {
+        if (this.currentPrompt) {
           if (firstIncomingPrompt.status === PENDING) {
             // new pending prompt: when user presses next after last step
             this.prompts.push(...prompts);
-          } else if (currentPrompt.status === PENDING) {
+          } else if (this.currentPrompt.status === PENDING) {
             this.prompts.splice(this.promptIndex , prompts.length, ...prompts);
           } else {
             // new prompt with questions to replace placeholder prompt
