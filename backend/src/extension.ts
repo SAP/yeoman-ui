@@ -8,7 +8,6 @@ import { YouiLog } from "./youi-log";
 import { OutputChannelLog } from './output-channel-log';
 import { GeneratorFilter } from './filter';
 import backendMessages from "./messages";
-import { Theia } from './theia';
 import { getClassLogger, createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
 import { IChildLogger } from "@vscode-logging/logger";
 
@@ -104,7 +103,6 @@ export class YeomanUIPanel {
 	private readonly extensionPath: string;
 	private disposables: vscode.Disposable[] = [];
 	private questionsResolutions: Map<number, any>;
-	private theia: Theia;
 
 	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
 		this.questionsResolutions = new Map();
@@ -112,7 +110,6 @@ export class YeomanUIPanel {
 		this.extensionPath = extensionPath;
 		this.rpc = new RpcExtension(this.panel.webview);
 		const outputChannel: YouiLog = new OutputChannelLog();
-		this.theia = new Theia();
 		
 		this.yeomanui = new YeomanUI(this.rpc, outputChannel, this.logger, YeomanUIPanel.genFilter);
 
@@ -156,28 +153,24 @@ export class YeomanUIPanel {
 					case 'showDoneMessage':
 						const Close = 'Close';
 						const OpenWorkspace = 'Open Workspace';
-						this.theia.isInTheia().then(() => {
-							const commandNameClose = "workbench.action.closeActiveEditor";
-							const commandNameOpenWorkspace = "vscode.openFolder";
-							const commandParam = _.get(message, "commandParams[0]");
-							vscode.window.showInformationMessage('Where would you like to open the project?', Close , OpenWorkspace)
-								.then(selection => {
-									if (selection === Close) {
-										this.executeCommand(commandNameClose, undefined);
-									} else if (selection === OpenWorkspace) {
-										this.executeCommand(commandNameOpenWorkspace, commandParam);
-									}
-								});
-						});
+						const commandName_Close = "workbench.action.closeActiveEditor";
+						const commandName_OpenWorkspace = "vscode.openFolder";
+						const commandParam_OpenWorkspace = _.get(message, "commandParams[0]");
+						vscode.window.showInformationMessage('Where would you like to open the project?', Close , OpenWorkspace)
+							.then(selection => {
+								if (selection === Close) {
+									this.executeCommand(commandName_Close, undefined);
+								} else if (selection === OpenWorkspace) {
+									this.executeCommand(commandName_OpenWorkspace, commandParam_OpenWorkspace);
+								}
+							});
 						return;
 					case 'vscodecommand':
-						this.theia.isInTheia().then(() => {
-							const commandName = _.get(message, "commandName");
-							const commandParam = _.get(message, "commandParams[0]");
-							this.executeCommand(commandName, commandParam);
-							return;
-						});
-				}
+						const commandName = _.get(message, "commandName");
+						const commandParam = _.get(message, "commandParams[0]");
+						this.executeCommand(commandName, commandParam);
+						return;
+			}
 			},
 			null,
 			this.disposables
@@ -198,23 +191,14 @@ export class YeomanUIPanel {
 		}
 	}
 
-	private executeCommand(commandName: string, commandParam: any): Promise<any> {
-		return this.theia.isInTheia().then((value) => {
-			if (commandName === "vscode.open" || commandName === "vscode.openFolder") {
-				commandParam = vscode.Uri.file(commandParam);
-			}
-			if (value) {
-				const commandMappings: Map<string, string> = this.theia.getCommandMappings();
-				const theiaCommand = commandMappings.get(commandName);
-				if (theiaCommand !== undefined) {
-					commandName = theiaCommand;
-				}
-			}
-			return vscode.commands.executeCommand(commandName, commandParam).then(success => {
-				console.debug(`Execution of command ${commandName} returned ${success}`);
-			}, failure => {
-				console.debug(`Execution of command ${commandName} returned ${failure}`);
-			});
+	private async executeCommand(commandName: string, commandParam: any): Promise<any> {
+		if (commandName === "vscode.open" || commandName === "vscode.openFolder") {
+			commandParam = vscode.Uri.file(commandParam);
+		}
+		return vscode.commands.executeCommand(commandName, commandParam).then(success => {
+			console.debug(`Execution of command ${commandName} returned ${success}`);
+		}, failure => {
+			console.debug(`Execution of command ${commandName} returned ${failure}`);
 		});
 	}
 
