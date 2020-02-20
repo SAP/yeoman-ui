@@ -299,8 +299,7 @@ export default {
       if (firstIncomingPrompt) {
         let startIndex = this.promptIndex;
         let deleteCount = prompts.length;
-        if (this.currentPrompt && firstIncomingPrompt.status === PENDING) { 
-          // like this.prompts.push(...prompts)
+        if (!this.currentPrompt || firstIncomingPrompt.status === PENDING) {
           startIndex = this.promptIndex + 1;
           deleteCount = 0;
         }
