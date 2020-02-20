@@ -297,26 +297,14 @@ export default {
     setPrompts(prompts) {
       const firstIncomingPrompt = _.get(prompts, "[0]");
       if (firstIncomingPrompt) {
-        if (this.currentPrompt) {
-          if (firstIncomingPrompt.status === PENDING) {
-            // new pending prompt: when user presses next after last step
-            this.prompts.push(...prompts);
-          } else if (this.currentPrompt.status === PENDING) {
-            this.prompts.splice(this.promptIndex , prompts.length, ...prompts);
-          } else {
-            // new prompt with questions to replace placeholder prompt
-            const mappedPrompts = prompts.map((prompt, index) => {
-              // ignore name
-              prompt.name = this.prompts[this.promptIndex + index].name;
-              prompt.description = this.prompts[this.promptIndex + index].description;
-              return prompt;
-            });
-            this.prompts.splice(this.promptIndex , prompts.length, ...mappedPrompts);
-          }
-        } else {
-          // first prompt: typically, generator selection
-          this.prompts.push(...prompts);
+        let startIndex = this.promptIndex;
+        let deleteCount = prompts.length;
+        if (this.currentPrompt && firstIncomingPrompt.status === PENDING) { 
+          // like this.prompts.push(...prompts)
+          startIndex = this.promptIndex + 1;
+          deleteCount = 0;
         }
+        this.prompts.splice(startIndex, deleteCount, ...prompts);
       }
     },
     setQuestionProps(prompt) {
