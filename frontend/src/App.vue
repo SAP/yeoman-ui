@@ -27,8 +27,8 @@
         <v-col class="prompts-col" cols="12">
           <Done v-if="isDone" :doneMessage="doneMessage" :donePath="donePath" />
           <div v-if="currentPrompt">
-            <v-card-title>{{currentPrompt.name}}</v-card-title>
-            <v-card-subtitle>{{currentPrompt.description}}</v-card-subtitle>
+            <v-card-title class="prompt-title">{{currentPrompt.name}}</v-card-title>
+            <v-card-subtitle class="prompt-title">{{currentPrompt.description}}</v-card-subtitle>
           </div>
           <GeneratorSelection
             v-if="currentPrompt && currentPrompt.name === 'Select Generator'"
@@ -60,7 +60,9 @@
           xs="4"
         >
           <v-row class="progress-buttons-row" align="center" justify="end">
-            <v-btn :disabled="!stepValidated" @click="next">Next ></v-btn>
+            <v-btn :disabled="!stepValidated" @click="next">
+              Next<v-icon right>mdi-chevron-right</v-icon>
+            </v-btn>
           </v-row>
         </v-col>
       </v-col>
@@ -465,11 +467,4 @@ div.bottom-right-col .progress-buttons-row {
   padding-top: 4px;
 }
 
-.inquirer-gui div.v-input__slot {
-  border-radius: 0;
-}
-
-form.inquirer-gui div.theme--light.v-input div.v-input__control {
-  background-color: var(--vscode-input-background, darkgray);
-}
 </style>
