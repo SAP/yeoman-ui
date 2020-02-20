@@ -295,8 +295,6 @@ export default {
       const deleteCount = _.size(this.prompts) - this.promptIndex;
       const itemsToInsert = prompts.splice(this.promptIndex, _.size(prompts));
       this.prompts.splice(startIndex, deleteCount, ...itemsToInsert);
-      // eslint-disable-next-line no-console
-      console.error(this.prompts);
     },
     setPrompts(prompts) {
       const currentPrompt = this.currentPrompt;

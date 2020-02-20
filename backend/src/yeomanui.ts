@@ -143,18 +143,6 @@ export class YeomanUI {
       if (setPromptsCallback) {
         setPromptsCallback(this.setPromptList.bind(this));
       }
-
-      const genGetImage = _.get(gen, "getImage");
-      if (genGetImage) {
-        const image: any = genGetImage();
-        if (image.then) {
-          image.then((contents: string) => {
-            this.logger.debug(`image contents: ${contents}`);
-          });
-        } else if (image !== undefined) {
-          this.logger.debug(`image contents: ${image}`);
-        }
-      }
       
       this.setGenInstall(gen);
       
