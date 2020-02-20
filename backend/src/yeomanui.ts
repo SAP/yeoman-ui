@@ -41,7 +41,7 @@ export class YeomanUI {
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
   private static YEOMAN_PNG = "yeoman.png";
   private static isWin32 = (process.platform === 'win32');
-  private static CWD = path.join(os.homedir(), 'projects');
+  private static CWD: string = path.join(os.homedir(), 'projects');
   private static NODE_MODULES = 'node_modules';
 
   private static funcReplacer(key: any, value: any) {
