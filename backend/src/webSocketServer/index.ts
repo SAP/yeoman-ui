@@ -29,8 +29,8 @@ class YeomanUIWebSocketServer {
       this.rpc = new RpcExtensionWebSockets(ws);
       //TODO: Use RPC to send it to the browser log (as a collapsed pannel in Vue)
       const logger: YouiLog = new ServerLog(this.rpc);
-      const childLogger = {} as IChildLogger;
-      this.yeomanui = new YeomanUI(this.rpc, logger, childLogger);
+      const childLogger = {debug: () => {}, error: () => {}, fatal: () => {}, warn: () => {}, info: () => {}, trace: () => {}, getChildLogger: () => {return {} as IChildLogger;}};
+      this.yeomanui = new YeomanUI(this.rpc, logger, childLogger as IChildLogger);
       this.yeomanui.setMessages(backendMessages);
     });
   }
