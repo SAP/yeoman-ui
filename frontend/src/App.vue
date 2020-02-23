@@ -26,7 +26,7 @@
       <v-col cols="9" class="right-col">
         <v-col class="prompts-col" cols="12">
           <Done v-if="isDone" :doneMessage="doneMessage" :donePath="donePath" />
-          <div v-if="currentPrompt">
+          <div v-if="currentPrompt && !isDone">
             <v-card-title class="prompt-title">{{currentPrompt.name}}</v-card-title>
             <v-card-subtitle class="prompt-title">{{currentPrompt.description}}</v-card-subtitle>
           </div>
@@ -271,11 +271,22 @@ export default {
           if (question[prop] === "__Function") {
             var that = this;
             question[prop] = async (...args) => {
+              let showBusy = true;
+              setTimeout(() => {
+                if (showBusy) {
+                  that.showBusyIndicator = true;
+                }
+              }, 1000);
+
               const response = await that.rpc.invoke("evaluateMethod", [
                 args,
                 question.name,
                 prop
               ]);
+
+              showBusy = false;
+              this.showBusyIndicator = false;
+
               return response;
             };
           }
