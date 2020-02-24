@@ -93,7 +93,6 @@ import * as _ from "lodash";
 import RemoteFileBrowserPlugin from "@sap-devx/inquirer-gui-remote-file-browser-plugin";
 
 const FUNCTION = "__Function";
-const LOADING = "loading...";
 const PENDING = "pending";
 const INSTALLING = "Installing dependencies...";
 
@@ -268,7 +267,7 @@ export default {
     prepQuestions(questions) {
       for (let question of questions) {
         for (let prop in question) {
-          if (question[prop] === "__Function") {
+          if (question[prop] === FUNCTION) {
             var that = this;
             question[prop] = async (...args) => {
               let showBusy = true;
@@ -283,9 +282,10 @@ export default {
                 question.name,
                 prop
               ]);
+              // TODO: turn off busy indicator in case of exception
 
               showBusy = false;
-              this.showBusyIndicator = false;
+              that.showBusyIndicator = false;
 
               return response;
             };
@@ -328,7 +328,9 @@ export default {
       return true;
     },
     generatorInstall() {
+      /* istanbul ignore if */
       if (this.isInVsCode()) {
+        // TODO: use rpc.invoke
         window.vscode.postMessage({
           command: "showInfoMessage",
           commandParams: [INSTALLING]
@@ -342,7 +344,9 @@ export default {
       this.doneMessage = message;
       this.donePath = targetPath;
       this.isDone = true;
+      /* istanbul ignore else */
       if (this.isInVsCode()) {
+        // TODO: use rpc.invoke
         window.vscode.postMessage({
           command: "showDoneMessage",
           commandParams: [this.donePath]
@@ -356,6 +360,7 @@ export default {
       return typeof acquireVsCodeApi !== "undefined";
     },
     setupRpc() {
+      /* istanbul ignore if */
       if (this.isInVsCode()) {
         // eslint-disable-next-line
         window.vscode = acquireVsCodeApi();
@@ -363,6 +368,7 @@ export default {
         this.initRpc();
       } else {
         const ws = new WebSocket("ws://127.0.0.1:8081");
+        /* istanbul ignore next */
         ws.onopen = () => {
           this.rpc = new RpcBrowserWebSockets(ws);
           this.initRpc();

@@ -1,6 +1,6 @@
 module.exports = {
   verbose: true,
-  testRegex: "(\/tests\/(.*)\.(test|spec))\.[jt]sx?$",
+  testRegex: "(/tests/(.*).(test|spec)).[jt]sx?$",
   collectCoverage: true,
   collectCoverageFrom: [
     "src/**/*.{js,vue}",

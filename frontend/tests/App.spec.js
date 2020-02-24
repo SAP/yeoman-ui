@@ -79,6 +79,33 @@ describe('App.vue', () => {
       response = await questions[5].validate()
       expect(response).toBe(questions[5].name)
     })
+
+    // the delay ensures we call the busy indicator
+    test('validate() with delay', async () => {
+      wrapper = initComponent(App, {}, true)
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async (...args) => {
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              resolve(args[1][1]);
+            },
+            1500);
+          });
+        })
+      }
+
+      wrapper.vm.prompts = [{}, {name: "Loading..."}]
+      wrapper.vm.promptIndex = 1
+
+      const questions = [
+        { name: 'validateQ', validate: '__Function' }
+      ]
+      wrapper.vm.showPrompt(questions, 'promptName')
+      await Vue.nextTick()
+
+      const response = await questions[0].validate()
+      expect(response).toBe(questions[0].name)
+    })
   })
 
   test('initRpc - method', () => {
@@ -247,6 +274,20 @@ describe('App.vue', () => {
       wrapper.vm.updateCurrentPrompt({questions: [{}, {}, {}, {}]})
       expect(wrapper.vm.currentPrompt.questions).toHaveLength(4)
     })
+
+    test('prompt name and description', () => {
+      wrapper = initComponent(App)
+      
+      wrapper.vm.prompts = [{}, {name: "Loading..."}]
+      wrapper.vm.promptIndex = 1
+
+      wrapper.vm.setMessages({step_is_pending: "Loading..."});
+      wrapper.vm.updateCurrentPrompt({name: "name2", description: "desc2", questions: [{}, {}, {}, {}]})
+      expect(wrapper.vm.currentPrompt.questions).toHaveLength(4)
+      expect(wrapper.vm.currentPrompt.name).toBe("name2");
+      expect(wrapper.vm.currentPrompt.description).toBe("desc2");
+    })
+
   });
 
   describe('generatorInstall - method', () => {
