@@ -162,6 +162,9 @@ export class YeomanUI {
           this.doGeneratorDone(true, message, destinationRoot);
         }
       });
+      this.gen.on('error', (error: any) => {
+        this.logError(error);
+      });
     } catch (error) {
       this.logError(error);
     }
@@ -202,10 +205,14 @@ export class YeomanUI {
   }
 
   public async receiveIsWebviewReady() {
-    // TODO: loading generators takes a long time; consider prefetching list of generators
-    const generators: IPrompt = await this.getGenerators();
-    const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
-    await this.runGenerator(response.name);
+    try {
+      // TODO: loading generators takes a long time; consider prefetching list of generators
+      const generators: IPrompt = await this.getGenerators();
+      const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
+      await this.runGenerator(response.name);
+    } catch (error) {
+      this.logError(error);
+    }
   }
 
   public toggleOutput(): boolean {
@@ -292,13 +299,15 @@ export class YeomanUI {
 
   private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<IGeneratorChoice | undefined> {
     let packageJson: any;
-    
-    const genPackagePath = this.getGenMetaPackagePath(genName);
+    let genPackagePath: string = this.getGenMetaPackagePath(genName);
+    if (_.isEmpty(genPackagePath)) {
+      return Promise.resolve(undefined);
+    }
     try {
       packageJson = await this.getGenPackageJson(genPackagePath);
     } catch (error) {
       this.logError(error);
-      return Promise.resolve(undefined);
+      return Promise.reject(error);
     }
     
     const genFilter: GeneratorFilter = GeneratorFilter.create(_.get(packageJson, ["generator-filter"]));
@@ -345,7 +354,12 @@ export class YeomanUI {
 
   private getGenMetadata(genName: string): Environment.GeneratorMeta {
     const metadataName: string = this.getGenMetaName(genName);
-    return _.get(this, ["genMeta", metadataName]);
+    const genMetadata = _.get(this, ["genMeta", metadataName]);
+    if (_.isNil(genMetadata)) {
+      const debugMessage = `${this.getGenMetaName(genName)} generator metadata was not found.`;
+      this.logger.debug(debugMessage);
+    }
+    return genMetadata;
   }
 
   private getGenMetaName(genName: string): string {
