@@ -89,7 +89,7 @@
 		"postinstall": "node ./node_modules/vscode/bin/install",
 		"package": "vsce package .",
 		"test": "nyc mocha -p tsconfig.json --opts ./mocha.opts",
-		"ws:run": "node ./out/webSocketServer/index.js",
+		"ws:run": "node ./out/src/webSocketServer/index.js",
 		"lint": "tslint '*/*.{ts,tsx}' -c ./tslint.yml"
 	},
 	"dependencies": {
