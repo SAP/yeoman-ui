@@ -24,8 +24,8 @@ div.v-application button.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--o
   color: var(--vscode-button-foreground, #ffffff);
 }
 
-div.v-application button.v-btn i.v-icon {
-  color: var(--vscode-button-foreground, #ffffff);
+div.v-application .theme--light.v-btn.v-btn--disabled .v-icon {
+  color: var(--vscode-button-foreground, #ffffff) !important;
 }
 
 .v-application button.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined):hover {
