@@ -1,5 +1,5 @@
 import * as vscode from "vscode"; // NOSONAR
-import { getExtensionLogger, getExtensionLoggerOpts, IChildLogger, IVSCodeExtLogger } from "@vscode-logging/logger";
+import { getExtensionLogger, getExtensionLoggerOpts, IChildLogger, IVSCodeExtLogger, LogLevel } from "@vscode-logging/logger";
 import { listenToLogSettingsChanges, logLoggerDetails } from "./settings-changes-handler";
 // import {resolve} from "path";
 import { getLoggingLevelSetting, getSourceLocationTrackingSetting} from "./settings";
@@ -64,7 +64,7 @@ function initLoggerWrapper(newLogger: any) {
 
 function createExtensionLogger(context: vscode.ExtensionContext) {
 	const contextLogPath = context.logPath;
-	const logLevelSetting: string = getLoggingLevelSetting();
+	const logLevelSetting: LogLevel = getLoggingLevelSetting();
 	const sourceLocationTrackingSettings: boolean = getSourceLocationTrackingSetting();
 
 	//TODO:  const meta = require(resolve(context.extensionPath, PACKAGE_JSON));
