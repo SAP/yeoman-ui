@@ -299,15 +299,13 @@ export class YeomanUI {
 
   private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<IGeneratorChoice | undefined> {
     let packageJson: any;
-    let genPackagePath: string = this.getGenMetaPackagePath(genName);
-    if (_.isEmpty(genPackagePath)) {
-      return Promise.resolve(undefined);
-    }
+    const genPackagePath: string = this.getGenMetaPackagePath(genName);
+  
     try {
       packageJson = await this.getGenPackageJson(genPackagePath);
     } catch (error) {
       this.logError(error);
-      return Promise.reject(error);
+      return Promise.resolve(undefined);
     }
     
     const genFilter: GeneratorFilter = GeneratorFilter.create(_.get(packageJson, ["generator-filter"]));
