@@ -276,17 +276,21 @@ export default {
                 }
               }, 1000);
 
-              const response = await that.rpc.invoke("evaluateMethod", [
-                args,
-                question.name,
-                prop
-              ]);
-              // TODO: turn off busy indicator in case of exception
+              try {
+                const response = await that.rpc.invoke("evaluateMethod", [
+                  args,
+                  question.name,
+                  prop
+                ]);
+                showBusy = false;
+                that.showBusyIndicator = false;
 
-              showBusy = false;
-              that.showBusyIndicator = false;
-
-              return response;
+                return response;
+              } catch(e) {
+                showBusy = false;
+                that.showBusyIndicator = false;
+                throw(e);
+              }
             };
           }
         }
