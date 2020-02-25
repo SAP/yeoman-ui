@@ -157,7 +157,7 @@ export class YeomanUI {
         let message: string;
         const destinationRoot = this.gen.destinationRoot();
         if (err) {
-          message = `${generatorName} failed: ${err}.`;
+          message = `${generatorName} generator failed.\n\n${this.getErrorInfo(err)}`;
           this.logError(err, message);
           this.doGeneratorDone(false, message, destinationRoot);
         } else {
@@ -165,6 +165,9 @@ export class YeomanUI {
           this.logger.debug("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
           this.doGeneratorDone(true, message, destinationRoot);
         }
+      });
+      this.gen.on('error', (error: any) => {
+        this.logError(error);
       });
     } catch (error) {
       this.logError(error);
@@ -175,8 +178,8 @@ export class YeomanUI {
     return this.rpc.invoke("generatorInstall");
   }
 
-  public doGeneratorDone(success: boolean, message: string, targetPath = ""): Promise<any> {
-    return this.rpc.invoke("generatorDone", [true, message, targetPath]);
+  public doGeneratorDone(suceeded: boolean, message: string, targetPath = ""): Promise<any> {
+    return this.rpc.invoke("generatorDone", [suceeded, message, targetPath]);
   }
 
   public setMessages(messages: any): Promise<void> {
@@ -206,10 +209,14 @@ export class YeomanUI {
   }
 
   public async receiveIsWebviewReady() {
-    // TODO: loading generators takes a long time; consider prefetching list of generators
-    const generators: IPrompt = await this.getGenerators();
-    const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
-    await this.runGenerator(response.name);
+    try {
+      // TODO: loading generators takes a long time; consider prefetching list of generators
+      const generators: IPrompt = await this.getGenerators();
+      const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
+      await this.runGenerator(response.name);
+    } catch (error) {
+      this.logError(error);
+    }
   }
 
   public toggleOutput(): boolean {
@@ -278,8 +285,8 @@ export class YeomanUI {
 
   private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<IGeneratorChoice | undefined> {
     let packageJson: any;
-
-    const genPackagePath = this.getGenMetaPackagePath(genName);
+    const genPackagePath: string = this.getGenMetaPackagePath(genName);
+  
     try {
       packageJson = await this.getGenPackageJson(genPackagePath);
     } catch (error) {
@@ -331,7 +338,12 @@ export class YeomanUI {
 
   private getGenMetadata(genName: string): Environment.GeneratorMeta {
     const metadataName: string = this.getGenMetaName(genName);
-    return _.get(this, ["genMeta", metadataName]);
+    const genMetadata = _.get(this, ["genMeta", metadataName]);
+    if (_.isNil(genMetadata)) {
+      const debugMessage = `${this.getGenMetaName(genName)} generator metadata was not found.`;
+      this.logger.debug(debugMessage);
+    }
+    return genMetadata;
   }
 
   private getGenMetaName(genName: string): string {
