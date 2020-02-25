@@ -6,7 +6,7 @@
           style="height: 100%;"
         >
     <v-col align-self="center" class="done-column" cols="10">
-    <p class="done-message"><v-icon  color="success" size="30">mdi-checkbox-marked-circle-outline</v-icon> {{doneMessage}}</p>
+    <p class="done-message"><v-icon :color="color" size="30">{{icon}}</v-icon> {{doneMessage}}</p>
     </v-col>
       </v-row>
   </div>
@@ -15,15 +15,15 @@
 
 export default {
   name: "Done",
-  props: ["doneMessage", "donePath"],
-  methods: {
-    // ISSUE: workbench.action.addRootFolder doesn't get params.
-    // openCurrentWorkspace(event) {
-    //   close(event);
-    //   event.currentTarget.dataset.commandName = "workbench.action.addRootFolder";
-    //   this.executeCommand(event);
-    // }
-  },
+  props: ["doneStatus", "doneMessage", "donePath"],
+  computed: {
+    color() {
+      return this.doneStatus ? "green" : "red";
+    },
+    icon() {
+      return this.doneStatus ? "mdi-checkbox-marked-circle-outline" : "mdi-close-circle-outline";
+    }
+  }
 }
 </script>
 

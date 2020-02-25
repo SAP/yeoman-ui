@@ -18,12 +18,16 @@ describe('Done.vue', () => {
 
     test('component props', () => {
         wrapper = initComponent(Done)
-        expect(_.keys(wrapper.props())).toHaveLength(2)
+        expect(_.keys(wrapper.props())).toHaveLength(3)
     })
 
-    test('doneMessage set', () => {
-        wrapper = initComponent(Done, { doneMessage: testDoneMessage })
+    test('doneMessage set, success', () => {
+        wrapper = initComponent(Done, { doneStatus: true, doneMessage: testDoneMessage })
         expect(wrapper.find('p').text()).toBe('mdi-checkbox-marked-circle-outline testDoneMessage')
     })
 
+    test('doneMessage set, failure', () => {
+        wrapper = initComponent(Done, { doneStatus: false, doneMessage: testDoneMessage })
+        expect(wrapper.find('p').text()).toBe('mdi-close-circle-outline testDoneMessage')
+    })
 })

@@ -27,6 +27,7 @@
         <v-col class="prompts-col" cols="12">
           <Done
             v-if="isDone"
+            :doneStatus="doneStatus"
             :doneMessage="doneMessage"
             :donePath="donePath"
           />
@@ -104,6 +105,7 @@ function initialState (){
     reject: Object,
     isDone: false,
     doneMessage: Object,
+    doneStatus: false,
     consoleClass: "",
     logText: "",
     showConsole: false,
@@ -387,12 +389,13 @@ export default {
         });
       }
     },
-    generatorDone(success, message, targetPath) {
+    generatorDone(suceeded, message, targetPath) {
       if (this.currentPrompt.status === PENDING) {
         this.currentPrompt.name = "Summary";
       }
       this.doneMessage = message;
       this.donePath = targetPath;
+      this.doneStatus = suceeded;
       this.isDone = true;
       if (this.isInVsCode()) {
         window.vscode.postMessage({
