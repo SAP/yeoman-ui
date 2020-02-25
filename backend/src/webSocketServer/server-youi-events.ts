@@ -8,8 +8,8 @@ export class ServerYouiEvents implements YouiEvents {
         this.rpc = rpc;        
     }
 
-    doGeneratorDone(success: boolean, message: string, targetPath = ""): void {
-        this.rpc.invoke("generatorDone", [true, message, targetPath]);
+    doGeneratorDone(suceeded: boolean, message: string, targetPath = ""): void {
+        this.rpc.invoke("generatorDone", [suceeded, message, targetPath]);
     }
 
     public doGeneratorInstall(): void {
