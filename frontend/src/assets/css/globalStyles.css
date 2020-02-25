@@ -94,8 +94,18 @@ form.inquirer-gui .v-text-field fieldset {
   background-color: var(--vscode-input-background, #3c3c3c);
 }
 
-form.inquirer-gui div.v-list{
+form.inquirer-gui div.v-list {
+  color: var(--vscode-input-foreground, white);
   background-color: var(--vscode-input-background, #3c3c3c);
+}
+
+form.inquirer-gui .theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {
+  color: var(--vscode-input-foreground, white) !important;
+}
+
+/* set checkbox and radio button icon color for inactive items */
+form.inquirer-gui .theme--light:not(.v-item--active) .v-icon {
+  color: var(--vscode-input-foreground, white);
 }
 
 form.inquirer-gui div.v-card{
