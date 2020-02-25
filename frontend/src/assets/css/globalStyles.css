@@ -74,11 +74,17 @@ div.v-application .error--text {
   caret-color: var(--vscode-input-foreground, #cccccc) !important;
 }
 /* Error validation text div */
-.error-validation-text{
+form.inquirer-gui .error-validation-text{
   font-size: 12px;
-  padding-left: 12px;
+  padding-left: 0px;
+  color: var(--vscode-foreground, #cccccc);
+}
+
+.error-validation-asterisk{
+  font-size: 14px;
   color: #ff5252;
 }
+
 .v-input--has-state.error--text .v-label{
   animation: none;
 }
