@@ -380,12 +380,12 @@ export default {
       return true;
     },
     generatorInstall() {
-      if (this.isInVsCode()) {
-        window.vscode.postMessage({
-          command: "showInfoMessage",
-          commandParams: [INSTALLING]
-        });
+      if (this.currentPrompt.status === PENDING) {
+        this.currentPrompt.name = "Installing";
       }
+      this.doneMessage = INSTALLING;
+      this.donePath = "";
+      this.isDone = true;
     },
     generatorDone(success, message, targetPath) {
       if (this.currentPrompt.status === PENDING) {

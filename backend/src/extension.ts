@@ -146,10 +146,6 @@ export class YeomanUIPanel {
 						const resolve = this.questionsResolutions.get(message.taskId);
 						resolve(message.data);
 						return;
-					case 'showInfoMessage':
-						const InfoMessage = _.get(message, "commandParams[0]");
-						vscode.window.showInformationMessage(InfoMessage);
-						return;
 				}
 			},
 			null,

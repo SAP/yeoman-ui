@@ -170,10 +170,6 @@ export class YeomanUI {
     }
   }
 
-  public doGeneratorInstall(): Promise<any> {
-    return this.rpc.invoke("generatorInstall");
-  }
-
   public setMessages(messages: any): Promise<void> {
     return this.rpc ? this.rpc.invoke("setMessages", [messages]) : Promise.resolve();
   }
@@ -253,7 +249,7 @@ export class YeomanUI {
     const originalGenInstall = _.get(originalPrototype, "install");
     if (originalGenInstall) {
       originalPrototype.install = () => {
-        this.doGeneratorInstall();
+        this.youiEvents.doGeneratorInstall();
         originalGenInstall.call(gen);
       };
       Object.setPrototypeOf(gen, originalPrototype);

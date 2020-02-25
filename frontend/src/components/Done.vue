@@ -1,14 +1,18 @@
 <template>
   <div id="done-component">
-      <v-row
-          align="center"
-          justify="center"
-          style="height: 100%;"
-        >
-    <v-col align-self="center" class="done-column" cols="10">
-    <p class="done-message"><v-icon  color="success" size="30">mdi-checkbox-marked-circle-outline</v-icon> {{doneMessage}}</p>
-    </v-col>
-      </v-row>
+    <v-row
+      align="center"
+      justify="center"
+      style="height: 100%;"
+    >
+      <v-col align-self="center" class="done-column" cols="10">
+        <p class="done-message">
+          <v-icon v-if="donePath" color="success" size="30">mdi-checkbox-marked-circle-outline</v-icon>
+          <v-icon v-if="!donePath" color="indigo" size="30">mdi-wrench-outline</v-icon>
+          {{doneMessage}}
+        </p>
+      </v-col>
+    </v-row>
   </div>
 </template>
 <script>

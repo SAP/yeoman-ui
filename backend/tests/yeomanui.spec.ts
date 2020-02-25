@@ -449,11 +449,11 @@ describe('yeomanui unit test', () => {
             // tslint:disable-next-line: no-unused-expression
             expect(gen.__proto__.install).to.be.not.undefined;
 
-            const installSpy = sandbox.spy(rpc,"invoke");
+            const installSpy = sandbox.spy(youiEvents,"doGeneratorInstall");
             yeomanUiInstance["setGenInstall"](gen);
             gen.install();
             // tslint:disable-next-line: no-unused-expression
-            expect(installSpy.calledWith("generatorInstall")).to.be.true;
+            expect(installSpy.called).to.be.true;
         });
     });
 

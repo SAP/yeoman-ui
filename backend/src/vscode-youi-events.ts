@@ -4,33 +4,59 @@ import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 
 export class VSCodeYouiEvents implements YouiEvents {
     private rpc: RpcCommon;
+    public static installing: boolean;
+    public static closed: boolean;
 
     constructor(rpc : RpcCommon) {
         this.rpc = rpc;        
     }
 
     public doGeneratorDone(success: boolean, message: string, targetPath = ""): void {
-        this.rpc.invoke("generatorDone", [true, message, targetPath]);
+        this.doClose();
         this.showDoneMessage(targetPath);
-
-
     }
 
     public doGeneratorInstall(): void {
-        throw new Error("Method not implemented.");
+        this.doClose();
+        this.showInstallMessage();
+    }
+
+    private doClose(): void {
+        if(!VSCodeYouiEvents.closed) {
+            VSCodeYouiEvents.closed = true;
+            this.executeCommand("workbench.action.closeActiveEditor", undefined);
+        }
+        return;
+    }
+
+    private showInstallMessage(): void {
+        VSCodeYouiEvents.installing = true;
+        vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: "Installing dependencies..."
+        },
+        async (progress) => {
+            await new Promise(resolve => {
+                let intervalId = setInterval(() => {
+                    if (!VSCodeYouiEvents.installing) {
+                        clearInterval(intervalId);
+                        resolve(undefined);
+                    }
+                }, 3000);
+            });
+            return "installing_dependencies_completed";
+        });
+        return;
     }
 
     private showDoneMessage(targetPath: string): void {
-        const Close = 'Close';
+        VSCodeYouiEvents.installing = false;
         const OpenWorkspace = 'Open Workspace';
-        const commandName_Close = "workbench.action.closeActiveEditor";
         const commandName_OpenWorkspace = "vscode.openFolder";
         const commandParam_OpenWorkspace = targetPath;
-        vscode.window.showInformationMessage('Where would you like to open the project?', Close , OpenWorkspace)
+        vscode.window.showInformationMessage('Where would you like to open the project?', OpenWorkspace)
             .then(selection => {
-                if (selection === Close) {
-                    this.executeCommand(commandName_Close, undefined);
-                } else if (selection === OpenWorkspace) {
+                if (selection === OpenWorkspace) {
                     this.executeCommand(commandName_OpenWorkspace, commandParam_OpenWorkspace);
                 }
             });

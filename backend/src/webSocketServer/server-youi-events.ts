@@ -13,6 +13,6 @@ export class ServerYouiEvents implements YouiEvents {
     }
 
     public doGeneratorInstall(): void {
-        throw new Error("Method not implemented.");
+        this.rpc.invoke("generatorInstall");
     }
 }
