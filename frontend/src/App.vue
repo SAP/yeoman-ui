@@ -389,13 +389,13 @@ export default {
         });
       }
     },
-    generatorDone(suceeded, message, targetPath) {
+    generatorDone(succeeded, message, targetPath) {
       if (this.currentPrompt.status === PENDING) {
         this.currentPrompt.name = "Summary";
       }
       this.doneMessage = message;
       this.donePath = targetPath;
-      this.doneStatus = suceeded;
+      this.doneStatus = succeeded;
       this.isDone = true;
       if (this.isInVsCode()) {
         window.vscode.postMessage({
