@@ -3,8 +3,10 @@ import { RpcExtensionWebSockets } from '@sap-devx/webview-rpc/out.ext/rpc-extens
 import { YeomanUI } from '../yeomanui';
 import { YouiLog } from "../youi-log";
 import { ServerLog } from './server-log';
+import { ServerYouiEvents } from './server-youi-events';
 import backendMessages from "../messages";
 import { IChildLogger } from "@vscode-logging/logger";
+import { YouiEvents } from '../youi-events';
 
 class YeomanUIWebSocketServer {
   private rpc: RpcExtensionWebSockets | undefined;
@@ -29,7 +31,8 @@ class YeomanUIWebSocketServer {
       this.rpc = new RpcExtensionWebSockets(ws);
       //TODO: Use RPC to send it to the browser log (as a collapsed pannel in Vue)
       const logger: YouiLog = new ServerLog(this.rpc);
-      this.yeomanui = new YeomanUI(this.rpc, logger, {debug: () => {}, error: () => {}} as IChildLogger);
+      const youiEvents: YouiEvents = new ServerYouiEvents(this.rpc);
+      this.yeomanui = new YeomanUI(this.rpc, youiEvents, logger, {debug: () => {}, error: () => {}} as IChildLogger);
       this.yeomanui.setMessages(backendMessages);
     });
   }

@@ -31,6 +31,9 @@ div.v-application button.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--o
 .v-btn {
   text-transform: none;
 }
+.v-btn--disabled {
+  opacity: 0.55;
+}
 .theme--light {
   color: var(--vscode-foreground, #cccccc) !important;
 }

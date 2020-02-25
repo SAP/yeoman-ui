@@ -394,12 +394,6 @@ export default {
       this.doneMessage = message;
       this.donePath = targetPath;
       this.isDone = true;
-      if (this.isInVsCode()) {
-        window.vscode.postMessage({
-          command: "showDoneMessage",
-          commandParams: [this.donePath]
-        });
-      }
     },
     runGenerator(generatorName) {
       this.rpc.invoke("runGenerator", [generatorName]);
