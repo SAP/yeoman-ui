@@ -5,7 +5,7 @@
 	"license": "Apache 2.0",
 	"description": "Provide rich user experience for Yeoman generators using VSCode extension or the browser",
 	"repository": "https://github.com/SAP/yeoman-ui",
-	"version": "0.0.41",
+	"version": "0.0.42",
 	"engines": {
 		"vscode": "^1.39.2"
 	},
@@ -62,7 +62,7 @@
 						"debug",
 						"trace"
 					],
-					"default": "warn",
+					"default": "debug",
 					"description": "The verbosity of logging according to the following order: trace > debug > info > warn > error > fatal > off.",
 					"scope": "resource"
 				},

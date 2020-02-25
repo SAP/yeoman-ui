@@ -153,7 +153,7 @@ export class YeomanUI {
         let message: string;
         const destinationRoot = this.gen.destinationRoot();
         if (err) {
-          message = `${generatorName} failed: ${err}.`;
+          message = `${generatorName} generator failed.\n\n${this.getErrorInfo(err)}`;
           this.logError(err, message);
           this.doGeneratorDone(false, message, destinationRoot);
         } else {
@@ -174,8 +174,8 @@ export class YeomanUI {
     return this.rpc.invoke("generatorInstall");
   }
 
-  public doGeneratorDone(success: boolean, message: string, targetPath = ""): Promise<any> {
-    return this.rpc.invoke("generatorDone", [true, message, targetPath]);
+  public doGeneratorDone(suceeded: boolean, message: string, targetPath = ""): Promise<any> {
+    return this.rpc.invoke("generatorDone", [suceeded, message, targetPath]);
   }
 
   public setMessages(messages: any): Promise<void> {
