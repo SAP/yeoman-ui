@@ -89,6 +89,7 @@ import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import * as _ from "lodash";
 import RemoteFileBrowserPlugin from "@sap-devx/inquirer-gui-remote-file-browser-plugin";
+import LoginPlugin from "@sap-devx/inquirer-gui-login-plugin";
 
 const FUNCTION = "__Function";
 const PENDING = "pending";
@@ -404,6 +405,12 @@ export default {
       // register custom inquirer-gui plugins
       let options = {};
       Vue.use(RemoteFileBrowserPlugin, options);
+      if (options.plugin) {
+        this.$refs.form.registerPlugin(options.plugin);
+      }
+
+      options = {};
+      Vue.use(LoginPlugin, options);
       if (options.plugin) {
         this.$refs.form.registerPlugin(options.plugin);
       }
