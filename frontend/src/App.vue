@@ -26,10 +26,7 @@
       <v-col cols="9" class="right-col">
         <v-col class="prompts-col" cols="12">
           <Done v-if="isDone" :doneMessage="doneMessage" :donePath="donePath" />
-          <div v-if="currentPrompt && !isDone">
-            <v-card-title class="prompt-title">{{currentPrompt.name}}</v-card-title>
-            <v-card-subtitle class="prompt-title">{{currentPrompt.description}}</v-card-subtitle>
-          </div>
+          <PromptInfo v-if="currentPrompt && !isDone" :currentPrompt="currentPrompt" />
           <GeneratorSelection
             v-if="currentPrompt && currentPrompt.name === 'Select Generator'"
             @generatorSelected="selectGenerator"
@@ -87,6 +84,7 @@ import Header from "./components/Header.vue";
 import Navigation from "./components/Navigation.vue";
 import GeneratorSelection from "./components/GeneratorSelection.vue";
 import Done from "./components/Done.vue";
+import PromptInfo from "./components/PromptInfo.vue";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import * as _ from "lodash";
@@ -125,6 +123,7 @@ export default {
     Navigation,
     GeneratorSelection,
     Done,
+    PromptInfo,
     Loading
   },
   data() {
