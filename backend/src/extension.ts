@@ -153,15 +153,15 @@ export class YeomanUIPanel {
 					case 'showDoneMessage':
 						const Close = 'Close';
 						const OpenWorkspace = 'Open Workspace';
-						const commandName_Close = "workbench.action.closeActiveEditor";
-						const commandName_OpenWorkspace = "vscode.openFolder";
-						const commandParam_OpenWorkspace = _.get(message, "commandParams[0]");
+						const commandNameClose = "workbench.action.closeActiveEditor";
+						const commandNameOpenWorkspace = "vscode.openFolder";
+						const commandParamOpenWorkspace = _.get(message, "commandParams[0]");
 						vscode.window.showInformationMessage('Where would you like to open the project?', Close , OpenWorkspace)
 							.then(selection => {
 								if (selection === Close) {
-									this.executeCommand(commandName_Close, undefined);
+									this.executeCommand(commandNameClose, undefined);
 								} else if (selection === OpenWorkspace) {
-									this.executeCommand(commandName_OpenWorkspace, commandParam_OpenWorkspace);
+									this.executeCommand(commandNameOpenWorkspace, commandParamOpenWorkspace);
 								}
 							});
 						return;

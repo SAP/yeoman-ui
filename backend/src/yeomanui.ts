@@ -153,7 +153,7 @@ export class YeomanUI {
         let message: string;
         const destinationRoot = this.gen.destinationRoot();
         if (err) {
-          message = `${generatorName} generator failed. ${this.getErrorInfo(err)}`;
+          message = `${generatorName} generator failed.\n\n${this.getErrorInfo(err)}`;
           this.logError(err, message);
           this.doGeneratorDone(false, message, destinationRoot);
         } else {

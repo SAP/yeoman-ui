@@ -85,7 +85,7 @@ describe('yeomanui unit test', () => {
         }  
     }
 
-    const testLogger = {debug: () => {}, error: () => {}, fatal: () => {}, warn: () => {}, info: () => {}, trace: () => {}, getChildLogger: () => {return {} as IChildLogger;}};
+    const testLogger = {debug: () => {}, error: () => {}, fatal: () => {}, warn: () => {}, info: () => {}, trace: () => {}, getChildLogger: () => ({} as IChildLogger)};
 
     const rpc = new TestRpc();
     const logger = new TestLog();

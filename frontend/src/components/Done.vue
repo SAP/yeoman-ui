@@ -30,9 +30,9 @@ export default {
 <style>
 .done-message{
   font-size: 1.25rem;
+  white-space:pre-wrap;
 }
 .done-column{
     background-color: var(--vscode-editorWidget-background, #252526);
 }
-
 </style>
