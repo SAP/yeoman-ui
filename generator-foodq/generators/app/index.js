@@ -238,6 +238,7 @@ module.exports = class extends Generator {
       },
       {
         type: "password",
+        guiType: "login",
         name: "password",
         message: "What's your GitHub password",
         mask: '*',

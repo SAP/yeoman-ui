@@ -405,6 +405,20 @@ describe('yeomanui unit test', () => {
         });
     });
 
+    describe("funcReplacer", () => {
+        it("with function", () => {
+            const res = YeomanUI["funcReplacer"]("key", function() {});
+            // tslint:disable-next-line: no-unused-expression
+            expect(res).to.be.equal("__Function");
+        });
+
+        it("without function", () => {
+            const res = YeomanUI["funcReplacer"]("key", "value");
+            // tslint:disable-next-line: no-unused-expression
+            expect(res).to.be.equal("value");
+        });
+    });
+
     it("toggleOutput", () => {
         const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, logger, testLogger);
         const res = yeomanUiInstance.toggleOutput();
