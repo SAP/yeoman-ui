@@ -33,7 +33,7 @@
           />
           <PromptInfo v-if="currentPrompt && !isDone" :currentPrompt="currentPrompt" />
           <GeneratorSelection
-            v-if="currentPrompt && currentPrompt.name === 'Select Generator'"
+            v-if="currentPrompt && currentPrompt.questions && currentPrompt.questions[0] && currentPrompt.questions[0].type==='generators'"
             @generatorSelected="selectGenerator"
             :currentQuestion="currentPrompt.questions[0]"
           />
