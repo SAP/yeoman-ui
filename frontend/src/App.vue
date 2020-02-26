@@ -387,6 +387,7 @@ export default {
       }
       this.doneMessage = INSTALLING;
       this.donePath = "";
+      this.doneStatus = true;
       this.isDone = true;
     },
     generatorDone(succeeded, message, targetPath) {

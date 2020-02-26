@@ -104,10 +104,8 @@ export class YeomanUIPanel {
 	private readonly panel: vscode.WebviewPanel;
 	private readonly extensionPath: string;
 	private disposables: vscode.Disposable[] = [];
-	private questionsResolutions: Map<number, any>;
 
 	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
-		this.questionsResolutions = new Map();
 		this.panel = panel;
 		this.extensionPath = extensionPath;
 		this.rpc = new RpcExtension(this.panel.webview);
@@ -133,20 +131,6 @@ export class YeomanUIPanel {
 					this._update();
 				}
 				vscode.commands.executeCommand('setContext', 'yeomanUI.Focused', this.panel.active);
-			},
-			null,
-			this.disposables
-		);
-
-		// Handle messages from the webview
-		this.panel.webview.onDidReceiveMessage(
-			message => {
-				switch (message.command) {
-					case 'answers':
-						const resolve = this.questionsResolutions.get(message.taskId);
-						resolve(message.data);
-						return;
-				}
 			},
 			null,
 			this.disposables

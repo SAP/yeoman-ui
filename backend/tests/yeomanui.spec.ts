@@ -429,7 +429,15 @@ describe('yeomanui unit test', () => {
         expect(res).to.be.undefined;
     });
 
-    describe("setGenInstall", () => {
+    it("getErrorInfo", () => {
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+        const errorInfo: string = "Error Info";
+        const res = yeomanUiInstance["getErrorInfo"](errorInfo);
+        // tslint:disable-next-line: no-unused-expression
+        expect(res).to.be.equal(errorInfo);
+    });
+
+describe("setGenInstall", () => {
         it("install method not exist", () => {
             const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
             const gen: any = {};
