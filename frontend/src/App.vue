@@ -222,7 +222,7 @@ export default {
             question.name,
             "default"
           ]);
-          if (question.answer === undefined) {
+          if (_.isEmpty(question.answer)) {
             question.answer = question.default;
           }
         }
