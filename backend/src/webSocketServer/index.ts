@@ -14,11 +14,12 @@ class YeomanUIWebSocketServer {
 
   init() {
     // web socket server
-    const wss = new WebSocket.Server({ port: 8081 }, () => {
-      console.log('websocket server is listening on port 8081');
+    const port = (process.env.PORT ? Number.parseInt(process.env.PORT) : 8081);
+    const wss = new WebSocket.Server({ port: port }, () => {
+      console.log('started websocket server');
     });
     wss.on('listening', () => {
-      console.log('listening to websocket on port 8081');
+      console.log(`listening to websocket on port ${port}`);
     });
 
     wss.on('error', (error) => {
