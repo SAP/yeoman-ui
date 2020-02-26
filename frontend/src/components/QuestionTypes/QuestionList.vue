@@ -52,11 +52,13 @@ export default {
       return undefined;
     },
     errorMessages() {
-      if (_.isNil(this.selected)) {
+      if (_.get(this.currentQuestion, "isValid") === false) {
+        return _.get(this.currentQuestion, "validationMessage");
+      } else if (_.isNil(this.selected)) {
         return this.clickToDisplay;
       }
       
-      return this.currentQuestion.isValid ? '' : this.currentQuestion.validationMessage;
+      return '';
     }
   },
   watch: {

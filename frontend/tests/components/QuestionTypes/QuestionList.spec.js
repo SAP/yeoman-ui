@@ -152,39 +152,46 @@ describe('QuestionList.vue', () => {
     })
 
     describe('errorMessages - computed', () => {
-        test('data.selected is empty', () => {
+        test('data.selected is empty, currentQuestion.isValid = true', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
-                    name: 'testName1', text: 'testText1'
+                    name: 'testName1', isValid: true, choices: [
+                        { name: 'testName1' },
+                        { name: 'testName2' }
+                    ],
+                    default: 1
                 },
                 updateQuestionsFromIndex: () => {}
             })
-
-            expect(wrapper.vm.errorMessages).toBe("Click to display the list of options")
+            wrapper.vm.$data.selected = null;
+            expect(wrapper.vm.errorMessages).toBe(wrapper.vm.$data.clickToDisplay)
         })
 
-        test('data.selected is not empty, currentQuestion.isValid = true', async () => {
+        test('data.selected is not empty, currentQuestion.isValid = true', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
-                    name: 'testName1', isValid: true, text: 'testText1'
+                    name: 'testName1', isValid: true, choices: [
+                        { name: 'testName1' },
+                        { name: 'testName2' }
+                    ],
+                    default: 1
                 },
                 updateQuestionsFromIndex: () => {}
             })
-
-            wrapper.vm.$data.selected = "test"
-            await wrapper.vm.$nextTick()
-            expect(wrapper.vm.errorMessages).toBe("")
+            
+            wrapper.vm.$data.selected = "testName1"
+            expect(wrapper.vm.errorMessages).toBe('')
         })
-
-        test('data.selected is not empty, currentQuestion.isValid = false', () => {
+        
+        test('currentQuestion.isValid = false', () => {
             wrapper = initComponent(QuestionList, {
                 currentQuestion: {
-                    name: 'testName1', isValid: false, validationMessage: 'validationMessageTest'
+                    isValid: false, validationMessage: 'validationMessageTest', choices: [
+                    ]
                 },
                 updateQuestionsFromIndex: () => {}
             })
 
-            wrapper.vm.$data.selected = "test"
             expect(wrapper.vm.errorMessages).toBe("validationMessageTest")
         })
     })

@@ -36,7 +36,8 @@ describe('Header.vue', () => {
             }
         }, true)
         
-        wrapper.find("button").trigger('click')
+        wrapper.findAll("button").wrappers[0].trigger('click')
+        await wrapper.vm.$nextTick();
         expect(rpcInvokeMockFunction).toHaveBeenCalled()
     })
 
@@ -48,7 +49,8 @@ describe('Header.vue', () => {
             }
         }, true)
         
-        wrapper.find("button").trigger('reload')
+        wrapper.findAll("button").wrappers[1].trigger('click')
+        await wrapper.vm.$nextTick();
         expect(rpcInvokeMockFunction).not.toHaveBeenCalled()
     })
 })
