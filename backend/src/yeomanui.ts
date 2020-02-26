@@ -10,6 +10,7 @@ const datauri = require("datauri");
 import * as defaultImage from "./defaultImage";
 import { YouiAdapter } from "./youi-adapter";
 import { YouiLog } from "./youi-log";
+import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 import { GeneratorType, GeneratorFilter } from "./filter";
@@ -49,6 +50,7 @@ export class YeomanUI {
   }
 
   private rpc: IRpc;
+  private youiEvents: YouiEvents;
   private outputChannel: YouiLog;
   private logger: IChildLogger;
   private genMeta: { [namespace: string]: Environment.GeneratorMeta };
@@ -58,11 +60,12 @@ export class YeomanUI {
   private currentQuestions: Environment.Adapter.Questions<any>;
   private genFilter: GeneratorFilter;
 
-  constructor(rpc: IRpc, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter) {
+  constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter) {
     this.rpc = rpc;
     if (!this.rpc) {
       throw new Error("rpc must be set");
     }
+    this.youiEvents = youiEvents;
     this.outputChannel = outputChannel;
     this.logger = logger;
     this.rpc.setResponseTimeout(3600000);
@@ -72,7 +75,7 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.toggleOutput, thisArg: this });
     this.rpc.registerMethod({ func: this.logError, thisArg: this });
   
-    this.youiAdapter = new YouiAdapter(outputChannel);
+    this.youiAdapter = new YouiAdapter(outputChannel, youiEvents);
     this.youiAdapter.setYeomanUI(this);
     this.promptCount = 0;
     this.genMeta = {};
@@ -155,11 +158,11 @@ export class YeomanUI {
         if (err) {
           message = `${generatorName} generator failed.\n\n${this.getErrorInfo(err)}`;
           this.logError(err, message);
-          this.doGeneratorDone(false, message, destinationRoot);
+          this.youiEvents.doGeneratorDone(false, message, destinationRoot);
         } else {
           message = `The '${generatorName}' project has been generated.`;
           this.logger.debug("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
-          this.doGeneratorDone(true, message, destinationRoot);
+          this.youiEvents.doGeneratorDone(true, message, destinationRoot);
         }
       });
       this.gen.on('error', (error: any) => {
@@ -168,14 +171,6 @@ export class YeomanUI {
     } catch (error) {
       this.logError(error);
     }
-  }
-
-  public doGeneratorInstall(): Promise<any> {
-    return this.rpc.invoke("generatorInstall");
-  }
-
-  public doGeneratorDone(suceeded: boolean, message: string, targetPath = ""): Promise<any> {
-    return this.rpc.invoke("generatorDone", [suceeded, message, targetPath]);
   }
 
   public setMessages(messages: any): Promise<void> {
@@ -261,7 +256,7 @@ export class YeomanUI {
     const originalGenInstall = _.get(originalPrototype, "install");
     if (originalGenInstall) {
       originalPrototype.install = () => {
-        this.doGeneratorInstall();
+        this.youiEvents.doGeneratorInstall();
         originalGenInstall.call(gen);
       };
       Object.setPrototypeOf(gen, originalPrototype);

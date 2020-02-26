@@ -291,12 +291,6 @@ describe('App.vue', () => {
   });
 
   describe('generatorInstall - method', () => {
-    beforeEach(() => {
-      window.vscode = {
-        postMessage: jest.fn()
-      }
-    })
-      
     test('status is pending', () => {
       wrapper = initComponent(App, {}, true)
       
@@ -304,58 +298,15 @@ describe('App.vue', () => {
       wrapper.vm.promptIndex = 1
       wrapper.vm.currentPrompt.status = 'pending'
 
-      wrapper.vm.isInVsCode = jest.fn().mockReturnValue(true)
       wrapper.vm.generatorInstall()
 
-      expect(wrapper.vm.isDone).toBeFalsy()
-      expect(window.vscode.postMessage).toHaveBeenCalledWith({
-        command: "showInfoMessage",
-        commandParams: ["Installing dependencies..."]
-      })
+      expect(wrapper.vm.isDone).toBeTruthy()
     })
-
-    test('not is vscode', () => {
-      wrapper = initComponent(App, {}, true)
-      
-      wrapper.vm.prompts = [{}, {}]
-      wrapper.vm.promptIndex = 1
-      wrapper.vm.currentPrompt.status = 'pending'
-
-      wrapper.vm.isInVsCode = jest.fn().mockReturnValue(false)
-      wrapper.vm.generatorInstall()
-
-      expect(window.vscode.postMessage).not.toHaveBeenCalledWith({
-        command: "showInfoMessage",
-        commandParams: ["Installing dependencies..."]
-      })
-    })
-
   })
 
   describe('generatorDone - method', () => {
-    beforeEach(() => {
-      window.vscode = {
-        postMessage: jest.fn()
-      }
-    })
-      
-    test('status is not pending', () => {
-      wrapper = initComponent(App, {donePath: 'testDonePath'}, true)
-      wrapper.vm.isInVsCode = jest.fn().mockReturnValue(true)
-      wrapper.vm.prompts = [{}, {}]
-      wrapper.vm.promptIndex = 1
-
-      wrapper.vm.generatorDone(true, 'testMessage', '/test/path')
-
-      expect(wrapper.vm.doneMessage).toBe('testMessage')
-      expect(wrapper.vm.donePath).toBe('/test/path')
-      expect(wrapper.vm.isDone).toBeTruthy()
-      expect(window.vscode.postMessage).toHaveBeenCalled()
-    })
-
     test('status is pending', () => {
       wrapper = initComponent(App, {donePath: 'testDonePath'}, true)
-      wrapper.vm.isInVsCode = jest.fn().mockReturnValue(true)
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.promptIndex = 1
       wrapper.vm.currentPrompt.status = 'pending'
@@ -366,7 +317,6 @@ describe('App.vue', () => {
       expect(wrapper.vm.donePath).toBe('/test/path')
       expect(wrapper.vm.isDone).toBeTruthy()
       expect(wrapper.vm.currentPrompt.name).toBe('Summary')
-      expect(window.vscode.postMessage).toHaveBeenCalled()
     })
   })
 

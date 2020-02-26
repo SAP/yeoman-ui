@@ -338,31 +338,18 @@ export default {
       return true;
     },
     generatorInstall() {
-      /* istanbul ignore if */
-      if (this.isInVsCode()) {
-        // TODO: use rpc.invoke
-        window.vscode.postMessage({
-          command: "showInfoMessage",
-          commandParams: [INSTALLING]
-        });
-      }
+      this.currentPrompt.name = "Installing";
+      this.doneMessage = INSTALLING;
+      this.donePath = "";
+      this.doneStatus = true;
+      this.isDone = true;
     },
     generatorDone(succeeded, message, targetPath) {
-      if (this.currentPrompt.status === PENDING) {
-        this.currentPrompt.name = "Summary";
-      }
+      this.currentPrompt.name = "Summary";
       this.doneMessage = message;
       this.donePath = targetPath;
       this.doneStatus = succeeded;
       this.isDone = true;
-      /* istanbul ignore else */
-      if (this.isInVsCode()) {
-        // TODO: use rpc.invoke
-        window.vscode.postMessage({
-          command: "showDoneMessage",
-          commandParams: [this.donePath]
-        });
-      }
     },
     runGenerator(generatorName) {
       this.rpc.invoke("runGenerator", [generatorName]);
