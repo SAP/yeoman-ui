@@ -47,16 +47,9 @@ describe('GeneratorSelection.vue', () => {
         })
 
         test('on click event of vCard', async () => {
-            const selectGeneratorSpy = jest.spyOn(wrapper.vm, 'selectGenerator')
-
             wrapper.find('.v-card').trigger('click')
             await wrapper.vm.$nextTick()
             expect(wrapper.emitted().generatorSelected).toBeTruthy();
-            const generatorSelected = wrapper.emitted().generatorSelected[0];
-
-            expect(generatorSelected[0]).toBe('testName1')
-
-            selectGeneratorSpy.mockRestore()
         })
 
         test('selected 2 generators', async () => {

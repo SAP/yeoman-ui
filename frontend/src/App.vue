@@ -25,7 +25,12 @@
       </v-col>
       <v-col cols="9" class="right-col">
         <v-col class="prompts-col" cols="12">
-          <Done v-if="isDone" :doneMessage="doneMessage" :donePath="donePath" />
+          <Done
+            v-if="isDone"
+            :doneStatus="doneStatus"
+            :doneMessage="doneMessage"
+            :donePath="donePath"
+          />
           <PromptInfo v-if="currentPrompt && !isDone" :currentPrompt="currentPrompt" />
           <GeneratorSelection
             v-if="currentPrompt && currentPrompt.name === 'Select Generator'"
@@ -108,6 +113,7 @@ function initialState() {
     reject: Object,
     isDone: false,
     doneMessage: Object,
+    doneStatus: false,
     consoleClass: "",
     logText: "",
     showConsole: false,
@@ -341,12 +347,13 @@ export default {
         });
       }
     },
-    generatorDone(success, message, targetPath) {
+    generatorDone(succeeded, message, targetPath) {
       if (this.currentPrompt.status === PENDING) {
         this.currentPrompt.name = "Summary";
       }
       this.doneMessage = message;
       this.donePath = targetPath;
+      this.doneStatus = succeeded;
       this.isDone = true;
       /* istanbul ignore else */
       if (this.isInVsCode()) {

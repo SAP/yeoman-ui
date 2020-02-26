@@ -85,7 +85,7 @@ describe('yeomanui unit test', () => {
         }  
     }
 
-    const testLogger = {debug: () => true, error: () => true};
+    const testLogger = {debug: () => {}, error: () => {}, fatal: () => {}, warn: () => {}, info: () => {}, trace: () => {}, getChildLogger: () => ({} as IChildLogger)};
 
     const rpc = new TestRpc();
     const logger = new TestLog();
@@ -402,6 +402,20 @@ describe('yeomanui unit test', () => {
             expect(test1Choice.homepage).to.be.equal("https://myhomepage.com/ANY/generator-test1-project#readme");
             expect(test2Choice.homepage).to.be.equal("https://myhomepage.com/ANY/generator-test2-module#readme");
             expect(test3Choice.homepage).to.be.equal("");
+        });
+    });
+
+    describe("funcReplacer", () => {
+        it("with function", () => {
+            const res = YeomanUI["funcReplacer"]("key", function() {});
+            // tslint:disable-next-line: no-unused-expression
+            expect(res).to.be.equal("__Function");
+        });
+
+        it("without function", () => {
+            const res = YeomanUI["funcReplacer"]("key", "value");
+            // tslint:disable-next-line: no-unused-expression
+            expect(res).to.be.equal("value");
         });
     });
 

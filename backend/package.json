@@ -5,7 +5,7 @@
 	"license": "Apache 2.0",
 	"description": "Provide rich user experience for Yeoman generators using VSCode extension or the browser",
 	"repository": "https://github.com/SAP/yeoman-ui",
-	"version": "0.0.40",
+	"version": "0.0.42",
 	"engines": {
 		"vscode": "^1.39.2"
 	},
@@ -62,7 +62,7 @@
 						"debug",
 						"trace"
 					],
-					"default": "warn",
+					"default": "debug",
 					"description": "The verbosity of logging according to the following order: trace > debug > info > warn > error > fatal > off.",
 					"scope": "resource"
 				},
@@ -89,7 +89,7 @@
 		"postinstall": "node ./node_modules/vscode/bin/install",
 		"package": "vsce package .",
 		"test": "nyc mocha -p tsconfig.json --opts ./mocha.opts",
-		"ws:run": "node ./out/webSocketServer/index.js",
+		"ws:run": "node ./out/src/webSocketServer/index.js",
 		"lint": "tslint '*/*.{ts,tsx}' -c ./tslint.yml"
 	},
 	"dependencies": {
@@ -103,7 +103,7 @@
 		"humanize-string": "^1.0.2",
 		"fs-extra": "^8.1.0",
 		"chalk": "^3.0.0",
-		"@vscode-logging/logger": "0.1.1"
+		"@vscode-logging/logger": "^0.1.2"
 	},
 	"devDependencies": {
 		"@types/chai": "^4.2.5",
@@ -127,7 +127,7 @@
 		"tslint": "^5.20.1",
 		"tslint-config-prettier": "^1.18.0",
 		"tslint-no-unused-expression-chai": "^0.1.4",
-		"typescript": "^3.7.3",
+		"typescript": "^3.8.2",
 		"utf-8-validate": "^5.0.2",
 		"vsce": "^1.68.0",
 		"vscode": "^1.1.28",

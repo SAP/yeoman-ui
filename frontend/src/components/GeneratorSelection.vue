@@ -49,8 +49,7 @@ import _ from "lodash";
 export default {
   name: "GeneratorSelection",
   props: {
-    currentQuestion: Object,
-    selectGenerator: Function
+    currentQuestion: Object
   },
   data() {
     return {

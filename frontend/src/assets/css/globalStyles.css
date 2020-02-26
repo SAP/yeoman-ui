@@ -36,9 +36,11 @@ div.v-application .theme--light.v-btn.v-btn--disabled .v-icon {
 .v-btn {
   text-transform: none;
 }
-/* .theme--light {
-  color: var(--vscode-foreground, #cccccc) !important;
-} */
+
+.v-btn--disabled {
+  opacity: 0.55;
+}
+
 p.question-label{
   margin-bottom: 0.25rem ;
 }
