@@ -103,11 +103,14 @@ form.inquirer-gui .v-text-field fieldset {
 }
 
 form.inquirer-gui div.v-list {
-  color: var(--vscode-input-foreground, white);
   background-color: var(--vscode-input-background, #3c3c3c);
 }
 
-form.inquirer-gui .theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {
+div[role="listbox"].theme--light.v-list {
+  background-color: var(--vscode-input-background, #3c3c3c);
+}
+
+div.theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {
   color: var(--vscode-input-foreground, white) !important;
 }
 
