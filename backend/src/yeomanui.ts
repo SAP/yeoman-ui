@@ -152,24 +152,17 @@ export class YeomanUI {
            https://yeoman.github.io/generator/Generator.html#run
          ... but .d.ts hasn't been updated for a while:
            https://www.npmjs.com/package/@types/yeoman-generator */
-      this.gen.run((err) => {
-        let message: string;
-        const destinationRoot = this.gen.destinationRoot();
-        if (err) {
-          message = `${generatorName} generator failed.\n\n${this.getErrorInfo(err)}`;
-          this.logError(err, message);
-          this.youiEvents.doGeneratorDone(false, message, destinationRoot);
-        } else {
-          message = `The '${generatorName}' project has been generated.`;
-          this.logger.debug("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
-          this.youiEvents.doGeneratorDone(true, message, destinationRoot);
-        }
+      const destinationRoot = this.gen.destinationRoot();
+        this.gen.run((err) => {
+        if (!err) {
+          this.onGeneratorSuccess(generatorName, destinationRoot);
+        } 
       });
       this.gen.on('error', (error: any) => {
-        this.logError(error);
+        this.onGeneratorFailure(generatorName, destinationRoot, error);
       });
     } catch (error) {
-      this.logError(error);
+      this.onGeneratorFailure(generatorName, this.gen.destinationRoot(), error);
     }
   }
 
@@ -229,6 +222,18 @@ export class YeomanUI {
       }
       const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
       return this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
+  }
+
+  private onGeneratorSuccess(generatorName: string, destinationRoot: string) {
+    const message = `The '${generatorName}' project has been generated.`;
+    this.logger.debug("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
+    this.youiEvents.doGeneratorDone(true, message, destinationRoot);
+  }
+
+  private onGeneratorFailure(generatorName: string, destinationRoot: string, error: any) {
+    const message = `${generatorName} generator failed.\n\n${this.getErrorInfo(error)}`;
+    this.logError(error, message);
+    this.youiEvents.doGeneratorDone(false, message, destinationRoot);
   }
 
   private getEnv(): Environment.Options {
