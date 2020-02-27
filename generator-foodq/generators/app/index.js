@@ -58,8 +58,8 @@ module.exports = class extends Generator {
         validate: (value, answers) => {
           return (value.length > 1 ? true : "Enter at least 2 characters");
         },
-        type: "input",
         name: "food",
+        type: "input",
         message: "What do you want to eat",
         default: "Junk food"
       },
@@ -231,10 +231,12 @@ module.exports = class extends Generator {
         },
       },
       {
-        type: "input",
         name: "email",
         message: "What's your GitHub username",
-        store: true
+        store: true,
+        validate: (value, answers) => {
+          return (value.length > 0 ? true : "This field is mandatory");
+        }
       },
       {
         type: "password",
