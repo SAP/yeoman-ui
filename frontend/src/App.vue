@@ -33,7 +33,7 @@
           />
           <PromptInfo v-if="currentPrompt && !isDone" :currentPrompt="currentPrompt" />
           <GeneratorSelection
-            v-if="currentPrompt && currentPrompt.questions && currentPrompt.questions[0] && currentPrompt.questions[0].type==='generators'"
+            v-if="shouldShowGeneratorSelection()"
             @generatorSelected="selectGenerator"
             :currentQuestion="currentPrompt.questions[0]"
           />
@@ -41,7 +41,7 @@
             <Form
               ref="form"
               :questions="currentPrompt ? currentPrompt.questions : []"
-              v-show="currentPrompt"
+              v-show="!shouldShowGeneratorSelection()"
               @answered="onAnswered"
             />
           </v-slide-x-transition>
@@ -182,6 +182,12 @@ export default {
     }
   },
   methods: {
+    shouldShowGeneratorSelection() {
+      return this.currentPrompt && 
+        this.currentPrompt.questions &&
+        this.currentPrompt.questions[0] &&
+        this.currentPrompt.questions[0].type==='generators';
+    },
     setBusyIndicator() {
       this.showBusyIndicator =
         _.isEmpty(this.prompts) ||
