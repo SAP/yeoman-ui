@@ -4,11 +4,12 @@ import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 
 export class VSCodeYouiEvents implements YouiEvents {
     private rpc: RpcCommon;
+    private webviewPanel: vscode.WebviewPanel;
     public static installing: boolean;
-    public static closed: boolean;
 
-    constructor(rpc : RpcCommon) {
-        this.rpc = rpc;        
+    constructor(rpc : RpcCommon, webviewPanel: vscode.WebviewPanel) {
+        this.rpc = rpc; 
+        this.webviewPanel = webviewPanel;       
     }
 
     public doGeneratorDone(success: boolean, message: string, targetPath = ""): void {
@@ -22,11 +23,10 @@ export class VSCodeYouiEvents implements YouiEvents {
     }
 
     private doClose(): void {
-        if(!VSCodeYouiEvents.closed) {
-            VSCodeYouiEvents.closed = true;
-            this.executeCommand("workbench.action.closeActiveEditor", undefined);
+        if (this.webviewPanel) {
+            this.webviewPanel.dispose();
+            this.webviewPanel = null;
         }
-        return;
     }
 
     private showInstallMessage(): void {
