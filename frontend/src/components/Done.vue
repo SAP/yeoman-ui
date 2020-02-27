@@ -1,70 +1,38 @@
 <template>
-  <div>
-    <b-jumbotron class="jumbo">
-      <p>
-        <b-img class="imgDone" src="https://icons-for-free.com/iconfiles/png/128/success-1319971786207747160.png"></b-img>
-        {{doneMessage}}
-      </p>
-
-      <hr class="my-4">
-
-      <b-container v-if="isInVsCode" class="bv-example-row">
-        <b-row>
-          <b-col>Where would you like to open the project?</b-col>
-          <b-col cols="12" md="auto">
-            <b-button class="btn" :data-command-params="donePath" @click="close">Close</b-button>
-          </b-col>
-          <b-col cols="12" md="auto">
-            <b-button class="btn" data-command-name="vscode.openFolder" :data-command-params="donePath" @click="executeCommand">New Workspace</b-button>
-          </b-col>
-        </b-row>
-      </b-container>
-    </b-jumbotron>
+  <div id="done-component">
+    <v-row
+      align="center"
+      justify="center"
+      style="height: 100%;"
+    >
+      <v-col align-self="center" class="done-column" cols="10">
+        <p class="done-message"><v-icon :color="color" size="30">{{icon}}</v-icon> {{doneMessage}}</p>
+      </v-col>
+    </v-row>
   </div>
 </template>
 <script>
 
-import _ from "lodash"
-
 export default {
   name: "Done",
-  props: ["doneMessage", "donePath", "isInVsCode"],
-  methods: {
-    executeCommand(event) {
-      const curTargetData = _.get(event, "currentTarget.dataset");
-      if (curTargetData) {
-        let cParams = _.get(curTargetData, "commandParams", []);
-        if (!_.isEmpty(cParams)) {
-          cParams = [cParams]
-        } 
-        window.vscode.postMessage({
-            command: 'vscodecommand',
-            commandName: curTargetData.commandName,
-            commandParams: cParams
-        });
-      }
+  props: ["doneStatus", "doneMessage", "donePath"],
+  computed: {
+    color() {
+      return this.doneStatus ? (this.donePath !== "" ? "success" : "indigo") : "red";
     },
-    close(event) {
-      _.set(event, "currentTarget.dataset.commandName", "workbench.action.closeActiveEditor");
-      this.executeCommand(event);
-    },
-    // ISSUE: workbench.action.addRootFolder doesn't get params.
-    // openCurrentWorkspace(event) {
-    //   close(event);
-    //   event.currentTarget.dataset.commandName = "workbench.action.addRootFolder";
-    //   this.executeCommand(event);
-    // }
-  },
+    icon() {
+      return this.doneStatus ? (this.donePath !== "" ? "mdi-checkbox-marked-circle-outline" : "mdi-wrench-outline") : "mdi-close-circle-outline";
+    }
+  }
 }
 </script>
 
 <style>
-.jumbotron.jumbo {
-  background-color: var(--vscode-editorWidget-background, #252526);
-  padding: 1rem 0.5rem;
+.done-message{
+  font-size: 1.25rem;
+  white-space:pre-wrap;
 }
-img.imgDone {
-  width: 1.5rem;
-  height: 1.5rem;
+.done-column{
+    background-color: var(--vscode-editorWidget-background, #252526);
 }
 </style>

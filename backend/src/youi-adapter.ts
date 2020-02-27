@@ -1,6 +1,7 @@
 import { Adapter } from "yeoman-environment";
 import { YeomanUI } from "./yeomanui";
 import { YouiLog } from "./youi-log";
+import { YouiEvents } from "./youi-events";
 import * as _ from "lodash";
 const chalk = require('chalk');
 
@@ -10,9 +11,11 @@ const chalk = require('chalk');
 export class YouiAdapter implements Adapter {
   private yeomanui: YeomanUI | undefined = undefined;
   private youiLog: YouiLog;
+  private youiEvents: YouiEvents;
 
-  constructor(logger: YouiLog) {
+  constructor(logger: YouiLog, youiEvents: YouiEvents) {
     this.youiLog = logger;
+    this.youiEvents = youiEvents;
     this.log.writeln = logger.writeln.bind(this.youiLog);
     this.log.conflict = logger.conflict.bind(this.youiLog);
     this.log.create = logger.create.bind(this.youiLog);
@@ -63,7 +66,7 @@ export class YouiAdapter implements Adapter {
           try {
             return await cb(result);
           } catch (err) {
-            this.yeomanui.doGeneratorDone(false, (_.get(err, "message", 'Yeoman UI detected an error')), "");
+            this.youiEvents.doGeneratorDone(false, (_.get(err, "message", 'Yeoman UI detected an error')), "");
             return;
           }
         } 
@@ -74,7 +77,7 @@ export class YouiAdapter implements Adapter {
       });
     }
 
-    return Promise.resolve(({} as T2));
+    return Promise.resolve({} as T2);
   }
 
   /**

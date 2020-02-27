@@ -30,13 +30,12 @@ function getType(filterObject?: any): GeneratorType {
 }
 
 export class GeneratorFilter {
-    constructor(public readonly  type: GeneratorType,
-                public readonly categories: string[]) {}
-
     public static create(filterObject?: any) {
         const categories: string[] = getCategories(filterObject); 
         const type: GeneratorType = getType(filterObject);
 
         return new GeneratorFilter(type, categories);
     }
+
+    constructor(public readonly  type: GeneratorType, public readonly categories: string[]) {}
 }

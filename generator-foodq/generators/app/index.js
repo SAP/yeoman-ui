@@ -2,6 +2,7 @@ var Generator = require('yeoman-generator');
 var chalkPipe = require('chalk-pipe');
 var Inquirer = require('inquirer');
 var path = require('path');
+var _ = require('lodash');
 
 module.exports = class extends Generator {
   constructor(args, opts) {
@@ -10,7 +11,9 @@ module.exports = class extends Generator {
     this.getPrompts = function () {
       console.log('in getPrompts()');
 
-      return [{ name: "Prompt 1" }, { name: "Prompt 2" }, { name: "Registration" }];
+      return [{ name: "Prompt 1", description: "Prompt 1 Description\nWe are happy to welcome you to our family restaurant" },
+              { name: "Prompt 2", description: "Prompt 2 Description\nWe hope you enjoy our authentic food" },
+              { name: "Registration", description: "Thank you for your interest in our resturant.\nPlease enter credentials to register.\n(it shouldn't take you more then 1 minute)" }];
     }
 
     this.option('babel');
@@ -38,7 +41,7 @@ module.exports = class extends Generator {
       },
       {
         type: "confirm",
-        name: "confirmConfirmHungry",
+        name: "confirmHungry",
         message: (answers) => {
           return `You said you are ${(answers.hungry ? '' : 'not ')}hungry. Is that right?`;
         },
@@ -61,15 +64,15 @@ module.exports = class extends Generator {
         default: "Junk food"
       },
       {
-        when: async (response) => {
+        when: async response => {
           this.log(response.hungry);
-          const promise = new Promise((resolve, reject) => {
-            this.log(`Purposely delaying response for 2 seconds...`);
+          const that = this;
+          return new Promise((resolve) => {
+            that.log(`Purposely delaying response for 2 seconds...`);
             setTimeout(() => {
               resolve(response.hungry);
             }, 2000);
           });
-          return promise;
         },
         type: "checkbox",
         name: "beers",
@@ -122,12 +125,11 @@ module.exports = class extends Generator {
     prompts = [
       {
         when: (response) => {
-          return this.answers.confirmConfirmHungry;
+          return this.answers.confirmHungry;
         },
         type: "list",
         name: "hungerLevel",
         message: "How hungry are you?",
-        default: 1,
         choices: () => [
           { name: "Very hungry" },
           { name: "A bit hungry" },
@@ -163,7 +165,7 @@ module.exports = class extends Generator {
         name: 'enjoy',
         message: 'Did you enjoy your meal?',
         default: (answers) => {
-          return (answers.hungerLevel === "A bit hungry" ? "ok" : "michelin");
+          return (answers.hungerLevel.toString() === "A bit hungry" ? "ok" : "michelin");
         },
         choices: [
           { name: 'Not at all', value: 'no' },
@@ -236,6 +238,7 @@ module.exports = class extends Generator {
       },
       {
         type: "password",
+        guiType: "login",
         name: "password",
         message: "What's your GitHub password",
         mask: '*',
@@ -243,13 +246,10 @@ module.exports = class extends Generator {
       }
     ];
 
-
     const answers_login = await this.prompt(prompts);
     this.answers = Object.assign({}, this.answers, answers_login);
     this.log("Email", this.answers.email);
   }
-
-
 
   _requireLetterAndNumber(value) {
     if (/\w/.test(value) && /\d/.test(value)) {
@@ -261,17 +261,28 @@ module.exports = class extends Generator {
 
   writing() {
     this.log('in writing');
-    this.destinationRoot(path.join(this.destinationRoot(), this.answers.food));
+    this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "answers.food", "")));
     this.log('destinationRoot: ' + this.destinationRoot());
-    this.fs.copyTpl(
-      this.templatePath('index.html'),
-      this.destinationPath('public/index.html'),
-      {
-        title: 'Templating with Yeoman',
-        food: this.answers.food,
-        hungerLevel: this.answers.hungerLevel,
-        fav_color: this.answers.fav_color
-      }
+    this.fs.copyTpl(this.templatePath('index.html'),
+    this.destinationPath('public/index.html'), {
+      title: 'Templating with Yeoman',
+      hungry: this.answers.hungry,
+      confirmHungry: this.answers.confirmHungry,
+      food: this.answers.food,
+      beers: this.answers.beers,
+      fav_color: this.answers.fav_color,
+      number: this.answers.number,
+      
+      hungerLevel: this.answers.hungerLevel,
+      dessert: this.answers.dessert,
+      enjoy: this.answers.enjoy,
+      comments: this.answers.comments,
+      
+      repotype: this.answers.repotype,
+      repoperms: this.answers.repoperms,
+      email: this.answers.email,
+      password: this.answers.password
+    }
     );
     this.fs.copy(
       this.templatePath('README.md'),

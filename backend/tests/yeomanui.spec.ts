@@ -8,8 +8,10 @@ import * as path from "path";
 import {YeomanUI, IGeneratorQuestion} from "../src/yeomanui";
 import * as yeomanEnv from "yeoman-environment";
 import { YouiLog } from "../src/youi-log";
+import { YouiEvents } from '../src/youi-events';
 import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorType, GeneratorFilter } from "../src/filter";
+import { IChildLogger } from "@vscode-logging/logger";
 
 describe('yeomanui unit test', () => {
     let sandbox: any;
@@ -22,6 +24,14 @@ describe('yeomanui unit test', () => {
 
     const choiceMessage = 
         "Some quick example text of the generator description. This is a long text so that the example will look good.";
+    class TestEvents implements YouiEvents {
+        public doGeneratorDone(success: boolean, message: string, targetPath?: string): void {
+            return;
+        }
+        public doGeneratorInstall(): void {
+            return;
+        }
+    }
     class TestRpc implements IRpc {
         public  timeout: number;
         public promiseCallbacks: Map<number, IPromiseCallbacks>;
@@ -79,14 +89,17 @@ describe('yeomanui unit test', () => {
         public skip(): void {
             return;
         } 
-        public showLog(): boolean {
+        public showOutput(): boolean {
             return false;
         }  
     }
 
+    const testLogger = {debug: () => {}, error: () => {}, fatal: () => {}, warn: () => {}, info: () => {}, trace: () => {}, getChildLogger: () => ({} as IChildLogger)};
+
     const rpc = new TestRpc();
     const logger = new TestLog();
-    const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
+    const youiEvents = new TestEvents();
+    const yeomanUi: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -402,16 +415,73 @@ describe('yeomanui unit test', () => {
         });
     });
 
-    it("toggleLog", () => {
-        const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
-        const res = yeomanUi.toggleLog();
+    describe("funcReplacer", () => {
+        it("with function", () => {
+            const res = YeomanUI["funcReplacer"]("key", function() {});
+            // tslint:disable-next-line: no-unused-expression
+            expect(res).to.be.equal("__Function");
+        });
+
+        it("without function", () => {
+            const res = YeomanUI["funcReplacer"]("key", "value");
+            // tslint:disable-next-line: no-unused-expression
+            expect(res).to.be.equal("value");
+        });
+    });
+
+    it("toggleOutput", () => {
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+        const res = yeomanUiInstance.toggleOutput();
         // tslint:disable-next-line: no-unused-expression
         expect(res).to.be.false;
     });
 
+    it("logMessage", () => {
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+        const res = yeomanUiInstance.logMessage("message");
+        // tslint:disable-next-line: no-unused-expression
+        expect(res).to.be.undefined;
+    });
+
+    it("getErrorInfo", () => {
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+        const errorInfo: string = "Error Info";
+        const res = yeomanUiInstance["getErrorInfo"](errorInfo);
+        // tslint:disable-next-line: no-unused-expression
+        expect(res).to.be.equal(errorInfo);
+    });
+
+describe("setGenInstall", () => {
+        it("install method not exist", () => {
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            const gen: any = {};
+            yeomanUiInstance["setGenInstall"](gen);
+            // tslint:disable-next-line: no-unused-expression
+            expect(gen.__proto__.install).to.be.undefined;
+        });
+
+        it("install method exists", () => {
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            class GenTest {
+               public install(): any{
+                   return "original_install";
+               }
+            }
+            const gen: any = new GenTest();
+            // tslint:disable-next-line: no-unused-expression
+            expect(gen.__proto__.install).to.be.not.undefined;
+
+            const installSpy = sandbox.spy(youiEvents,"doGeneratorInstall");
+            yeomanUiInstance["setGenInstall"](gen);
+            gen.install();
+            // tslint:disable-next-line: no-unused-expression
+            expect(installSpy.called).to.be.true;
+        });
+    });
+
     describe("getEnv", () => {
-        const yeomanUi: YeomanUI = new YeomanUI(rpc, logger);
-        const testEnv = yeomanUi["getEnv"]();
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+        const testEnv = yeomanUiInstance["getEnv"]();
         const nodemodules = YeomanUI["NODE_MODULES"];
         testEnv.getNpmPaths = (localOnly: boolean = false): string[] => {
             return localOnly ? 

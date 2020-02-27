@@ -1,0 +1,126 @@
+html,
+body {
+  height: 100%;
+  background-color: var(--vscode-editor-background, #1e1e1e);
+}
+#app {
+  height: 100%;
+  color: var(--vscode-foreground, #cccccc); 
+  background-color: var(--vscode-editor-background, #1e1e1e);
+  font-family: var(--vscode-font-family, Arial, Helvetica, sans-serif);
+  font-weight: var(--vscode-font-weight);
+  font-size: var(--vscode-font-size);
+}
+/* Align v-card image to fit card */
+.v-card .v-image__image--cover {
+    background-size: contain;
+}
+div.v-application button.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined){
+  background-color: var(--vscode-button-background, #0e639c);
+  border-color: var(--vscode-button-background, #0e639c);
+  border-radius: 0px;
+}
+div.v-application button.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) .v-btn__content{
+  color: var(--vscode-button-foreground, #ffffff);
+}
+
+div.v-application .theme--light.v-btn.v-btn--disabled .v-icon {
+  color: var(--vscode-button-foreground, #ffffff) !important;
+}
+
+.v-application button.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined):hover {
+  background-color: var(--vscode-button-hoverBackground, #1177bb);
+  border-color: var(--vscode-button-hoverBackground, #1177bb);
+}
+/* Do not accept uppercase from vuetify */
+.v-btn {
+  text-transform: none;
+}
+
+.v-btn--disabled {
+  opacity: 0.55;
+}
+
+p.question-label{
+  margin-bottom: 0.25rem ;
+}
+
+div.v-input__slot .v-select__selection,
+.v-input div label.v-label{
+  color: var(--vscode-input-foreground, #cccccc) !important;
+}
+
+div.v-select-list div.v-list{
+  background-color: var(--vscode-input-background, #3c3c3c);
+}
+
+/* Have to be important since vuetify itself define this color important */
+div.v-select-list div.v-list div.v-list-item,
+div.v-select-list div.v-list div.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled)
+{
+  color: var(--vscode-input-foreground, #cccccc) !important;
+}
+
+.v-textarea.v-input:not(.v-input--is-disabled) input{
+  color: var(--vscode-input-foreground, #cccccc);
+}
+
+/* Override error state colors on input components  */
+div.v-messages__message {
+  color: #ff5252;
+}
+/* Have to be important since vuetify itself define this color important */
+/* prevent controls from being red when thet're in error stare */
+div.v-application .error--text {
+  color: var(--vscode-input-foreground, #cccccc) !important;
+  caret-color: var(--vscode-input-foreground, #cccccc) !important;
+}
+/* Error validation text div */
+form.inquirer-gui .error-validation-text{
+  font-size: 12px;
+  padding-left: 0px;
+  color: var(--vscode-foreground, #cccccc);
+}
+
+.error-validation-asterisk{
+  font-size: 14px;
+  color: #ff5252;
+}
+
+.v-input--has-state.error--text .v-label{
+  animation: none;
+}
+
+div.prompt-title {
+  padding-left: 0px;
+  padding-top: 0px;
+}
+
+form.inquirer-gui .v-text-field fieldset {
+  border-radius: 0;
+  border-width: 0;
+  background-color: var(--vscode-input-background, #3c3c3c);
+}
+
+form.inquirer-gui div.v-list {
+  color: var(--vscode-input-foreground, white);
+  background-color: var(--vscode-input-background, #3c3c3c);
+}
+
+form.inquirer-gui .theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {
+  color: var(--vscode-input-foreground, white) !important;
+}
+
+/* set checkbox and radio button icon color for inactive items */
+form.inquirer-gui .theme--light:not(.v-item--active) .v-icon {
+  color: var(--vscode-input-foreground, white);
+}
+
+form.inquirer-gui div.v-card{
+  background-color: var(--vscode-input-background, #3c3c3c);
+}
+
+form.inquirer-gui div.theme--light.v-input input,
+form.inquirer-gui div.theme--light.v-input textarea {
+  color: var(--vscode-input-foreground, white);
+}

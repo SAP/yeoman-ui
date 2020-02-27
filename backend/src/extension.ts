@@ -6,17 +6,35 @@ import { YeomanUI } from "./yeomanui";
 import {RpcExtension} from '@sap-devx/webview-rpc/out.ext/rpc-extension';
 import { YouiLog } from "./youi-log";
 import { OutputChannelLog } from './output-channel-log';
+import { YouiEvents } from "./youi-events";
+import { VSCodeYouiEvents } from './vscode-youi-events';
 import { GeneratorFilter } from './filter';
 import backendMessages from "./messages";
-import { Theia } from './theia';
+import { getClassLogger, createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
+import { IChildLogger } from "@vscode-logging/logger";
 
+const ERROR_ACTIVATION_FAILED_LOGGER_CONFIG = 'Extension activation failed due to Logger configuration failure:';
 
 export function activate(context: vscode.ExtensionContext) {
+	try {
+		createExtensionLoggerAndSubscribeToLogSettingsChanges(context);
+	} catch (error) {
+		console.error(ERROR_ACTIVATION_FAILED_LOGGER_CONFIG, error.message);
+		return;
+	}
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand('loadYeomanUI', (options?: any) => {
 			const genFilter = _.get(options, "filter"); 
 			const messages = _.get(options, "messages");
 			YeomanUIPanel.createOrShow(context.extensionPath, GeneratorFilter.create(genFilter), messages);
+	}));
+	context.subscriptions.push(
+		vscode.commands.registerCommand('yeomanUI.toggleOutput', () => {
+			const yeomanUi = _.get(YeomanUIPanel, "currentPanel.yeomanui");
+			if (yeomanUi) {
+				yeomanUi.toggleOutput();
+			}
 	}));
 
 	if (vscode.window.registerWebviewPanelSerializer) {
@@ -76,26 +94,31 @@ export class YeomanUIPanel {
 		YeomanUIPanel.currentPanel = new YeomanUIPanel(panel, extensionPath);
 	}
 
+	private static getMediaPath(extensionPath: string): string {
+		return path.join(extensionPath, 'dist', 'media');
+	}
+
 	public yeomanui: YeomanUI;
+	private readonly logger: IChildLogger = getClassLogger(YeomanUI.name);
 	private rpc: RpcExtension;
 	private readonly panel: vscode.WebviewPanel;
 	private readonly extensionPath: string;
 	private disposables: vscode.Disposable[] = [];
-	private questionsResolutions: Map<number, any>;
-	private theia: Theia;
 
 	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
-		this.questionsResolutions = new Map();
 		this.panel = panel;
 		this.extensionPath = extensionPath;
 		this.rpc = new RpcExtension(this.panel.webview);
-		const logger: YouiLog = new OutputChannelLog();
-		this.theia = new Theia();
+		const outputChannel: YouiLog = new OutputChannelLog();
+		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc);
 		
-		this.yeomanui = new YeomanUI(this.rpc, logger, YeomanUIPanel.genFilter);
+		this.yeomanui = new YeomanUI(this.rpc, vscodeYouiEvents, outputChannel, this.logger, YeomanUIPanel.genFilter);
 
 		// Set the webview's initial html content
 		this._update();
+
+		// Set the context (yeoman-ui is focused)
+		vscode.commands.executeCommand('setContext', 'yeomanUI.Focused', this.panel.active);
 
 		// Listen for when the panel is disposed
 		// This happens when the user closes the panel or when the panel is closed programatically
@@ -107,50 +130,13 @@ export class YeomanUIPanel {
 				if (this.panel.visible) {
 					this._update();
 				}
-			},
-			null,
-			this.disposables
-		);
-
-		// Handle messages from the webview
-		this.panel.webview.onDidReceiveMessage(
-			message => {
-				switch (message.command) {
-					case 'alert':
-						vscode.window.showErrorMessage(message.text);
-						return;
-					case 'answers':
-						const resolve = this.questionsResolutions.get(message.taskId);
-						resolve(message.data);
-						return;
-					case 'vscodecommand':
-						this.theia.isInTheia().then((value) => {
-							let commandName = _.get(message, "commandName");
-							let commandParam = _.get(message, "commandParams[0]");
-							if (commandName === "vscode.open" || commandName === "vscode.openFolder") {
-								commandParam = vscode.Uri.file(commandParam);
-							}
-							if (value) {
-								const commandMappings: Map<string, string> = this.theia.getCommandMappings()
-								const theiaCommand = commandMappings.get(commandName);
-								if (theiaCommand !== undefined) {
-									commandName = theiaCommand;
-								}
-							}
-							vscode.commands.executeCommand(commandName, commandParam).then(success => {
-								console.debug(`Execution of command ${commandName} returned ${success}`);
-							}, failure => {
-								console.debug(`Execution of command ${commandName} returned ${failure}`);
-							});
-							return;
-						});
-				}
+				vscode.commands.executeCommand('setContext', 'yeomanUI.Focused', this.panel.active);
 			},
 			null,
 			this.disposables
 		);
 	}
-
+	
 	public dispose() {
 		YeomanUIPanel.currentPanel = undefined;
 
@@ -163,10 +149,6 @@ export class YeomanUIPanel {
 				x.dispose();
 			}
 		}
-	}
-
-	private static getMediaPath(extensionPath: string): string {
-		return path.join(extensionPath, 'dist', 'media');
 	}
 
 	private setMessages(messages: any): Promise<void> {
@@ -202,6 +184,5 @@ export function getOutputChannel(): vscode.OutputChannel {
 	if (!channel) {
 		channel = vscode.window.createOutputChannel('Yeoman UI');
 	}
-	
 	return channel;
 }

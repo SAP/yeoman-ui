@@ -30,7 +30,7 @@ export class OutputChannelLog implements YouiLog {
     public skip(value: string): void {
         getOutputChannel().appendLine(stripAnsi(value));
     }
-    public showLog():boolean {
+    public showOutput():boolean {
         getOutputChannel().show();
         return true;
     }

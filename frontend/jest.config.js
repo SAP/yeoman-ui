@@ -1,10 +1,12 @@
 module.exports = {
   verbose: true,
+  testRegex: "(/tests/(.*).(test|spec)).[jt]sx?$",
   collectCoverage: true,
   collectCoverageFrom: [
     "src/**/*.{js,vue}",
     "!**/node_modules/**",
-    "!<rootDir>/src/main.js"
+    "!<rootDir>/src/main.js",
+    "!<rootDir>/src/plugins/**"
   ],
   coverageReporters: [
     "html",
@@ -34,10 +36,10 @@ module.exports = {
   ],
   coverageThreshold: {
     "global": {
-      "branches": 86.87,
-      "functions": 98,
-      "lines": 94,
-      "statements": 94
+      "branches": 92.9,
+      "functions": 97.2,
+      "lines": 96,
+      "statements": 96
     }
   }
 }
