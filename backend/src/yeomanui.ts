@@ -152,14 +152,13 @@ export class YeomanUI {
            https://yeoman.github.io/generator/Generator.html#run
          ... but .d.ts hasn't been updated for a while:
            https://www.npmjs.com/package/@types/yeoman-generator */
-      const destinationRoot = this.gen.destinationRoot();
         this.gen.run((err) => {
         if (!err) {
-          this.onGeneratorSuccess(generatorName, destinationRoot);
+          this.onGeneratorSuccess(generatorName, this.gen.destinationRoot());
         } 
       });
       this.gen.on('error', (error: any) => {
-        this.onGeneratorFailure(generatorName, destinationRoot, error);
+        this.onGeneratorFailure(generatorName, this.gen.destinationRoot(), error);
       });
     } catch (error) {
       this.onGeneratorFailure(generatorName, this.gen.destinationRoot(), error);
@@ -263,8 +262,8 @@ export class YeomanUI {
       originalPrototype.install = () => {
         this.youiEvents.doGeneratorInstall();
         originalGenInstall.call(gen);
+        originalPrototype.install = originalGenInstall;
       };
-      Object.setPrototypeOf(gen, originalPrototype);
     }
   }
 
