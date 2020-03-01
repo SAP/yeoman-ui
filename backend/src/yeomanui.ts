@@ -57,12 +57,14 @@ export class YeomanUI {
   private promptCount: number;
   private currentQuestions: Environment.Adapter.Questions<any>;
   private genFilter: GeneratorFilter;
+  private cwd: string;
 
   constructor(rpc: IRpc, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter) {
     this.rpc = rpc;
     if (!this.rpc) {
       throw new Error("rpc must be set");
     }
+    this.cwd = YeomanUI.CWD;
     this.outputChannel = outputChannel;
     this.logger = logger;
     this.rpc.setResponseTimeout(3600000);
@@ -80,6 +82,14 @@ export class YeomanUI {
     this.setGenFilter(genFilter);
   }
 
+  public setCwd(cwd: string){
+    this.cwd = cwd;
+  }
+
+  public getCwd():string {
+    return this.cwd;
+  }
+  
   public setGenFilter(genFilter: GeneratorFilter) {
     this.genFilter = genFilter ? genFilter : GeneratorFilter.create();
   }
@@ -111,7 +121,7 @@ export class YeomanUI {
     //  see issue: https://github.com/yeoman/environment/issues/55
     //  process.chdir() doesn't work after environment has been created
     try {
-      await fsextra.mkdirs(YeomanUI.CWD);
+      await fsextra.mkdirs(this.cwd);
       const env: Environment = Environment.createEnv(undefined, {}, this.youiAdapter);
       const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
       // TODO: support sub-generators
@@ -144,7 +154,7 @@ export class YeomanUI {
       
       this.promptCount = 0;
       this.gen = (gen as Generator);
-      this.gen.destinationRoot(YeomanUI.CWD);
+      this.gen.destinationRoot(this.cwd);
       /* Generator.run() returns promise. Sending a callback is deprecated:
            https://yeoman.github.io/generator/Generator.html#run
          ... but .d.ts hasn't been updated for a while:
@@ -236,7 +246,7 @@ export class YeomanUI {
       // Start with the local paths derived by cwd in vscode 
       // (as opposed to cwd of the plugin host process which is what is used by yeoman/environment)
       // Walk up the CWD and add `node_modules/` folder lookup on each level
-      const parts: string[] = YeomanUI.CWD.split(path.sep);
+      const parts: string[] = this.cwd.split(path.sep);
       const localPaths = _.map(parts, (part, index) => {
         const resrpath = path.join(...parts.slice(0, index + 1), YeomanUI.NODE_MODULES);
         return YeomanUI.isWin32 ? resrpath : path.join(path.sep, resrpath);
