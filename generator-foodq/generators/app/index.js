@@ -244,7 +244,10 @@ module.exports = class extends Generator {
         name: "password",
         message: "What's your GitHub password",
         mask: '*',
-        validate: this._requireLetterAndNumber
+        validate: this._requireLetterAndNumber,
+        when: (response) => {
+          return response.email !== "root";
+        }
       }
     ];
 
