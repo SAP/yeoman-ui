@@ -284,15 +284,27 @@ module.exports = class extends Generator {
       repoperms: this.answers.repoperms,
       email: this.answers.email,
       password: this.answers.password
-    }
+      }
     );
     this.fs.copy(
       this.templatePath('README.md'),
       this.destinationPath('README.md')
     );
+
+    const pkgJson = {
+      devDependencies: {
+        eslint: '^3.15.0'
+      },
+      dependencies: {
+        react: '^16.2.0'
+      }
+    };
+    // Extend or create package.json file in destination path
+    this.fs.extendJSON(this.destinationPath('package.json'), pkgJson);
   }
 
   install() {
+    this.npmInstall(['lodash'], { 'save-dev': true });
   }
 
   end() {
