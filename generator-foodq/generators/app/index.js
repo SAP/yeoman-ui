@@ -292,6 +292,9 @@ module.exports = class extends Generator {
     );
   }
 
+  install() {
+  }
+
   end() {
     this.log('in end');
   }

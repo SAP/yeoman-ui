@@ -260,9 +260,14 @@ export class YeomanUI {
     const originalGenInstall = _.get(originalPrototype, "install");
     if (originalGenInstall) {
       originalPrototype.install = () => {
-        this.youiEvents.doGeneratorInstall();
-        originalGenInstall.call(gen);
-        originalPrototype.install = originalGenInstall;
+        try {
+          this.youiEvents.doGeneratorInstall();
+          originalGenInstall.call(gen);
+        } catch (error) {
+          this.logError(error);
+        } finally {
+          originalPrototype.install = originalGenInstall;
+        }
       };
     }
   }
