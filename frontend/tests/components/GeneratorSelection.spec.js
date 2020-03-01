@@ -1,5 +1,5 @@
-import GeneratorSelection from '../../../src/components/QuestionTypes/GeneratorSelection.vue'
-import {initComponent, destroy} from '../../Utils'
+import GeneratorSelection from '../../src/components/GeneratorSelection.vue'
+import {initComponent, destroy} from '../Utils'
 
 let wrapper
 
@@ -47,14 +47,9 @@ describe('GeneratorSelection.vue', () => {
         })
 
         test('on click event of vCard', async () => {
-            const selectGeneratorSpy = jest.spyOn(wrapper.vm, 'selectGenerator')
-
             wrapper.find('.v-card').trigger('click')
             await wrapper.vm.$nextTick()
-            expect(selectGeneratorSpy).toHaveBeenCalled()
-            expect(wrapper.vm.$options.propsData.currentQuestion.answer).toBe('testName1')
-
-            selectGeneratorSpy.mockRestore()
+            expect(wrapper.emitted().generatorSelected).toBeTruthy();
         })
 
         test('selected 2 generators', async () => {
