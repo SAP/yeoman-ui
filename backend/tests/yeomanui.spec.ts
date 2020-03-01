@@ -451,7 +451,7 @@ describe('yeomanui unit test', () => {
         expect(res).to.be.equal(errorInfo);
     });
 
-describe("setGenInstall", () => {
+    describe("setGenInstall", () => {
         it("install method not exist", () => {
             const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
             const gen: any = {};
@@ -476,6 +476,7 @@ describe("setGenInstall", () => {
             gen.install();
             // tslint:disable-next-line: no-unused-expression
             expect(installSpy.called).to.be.true;
+            installSpy.restore();
         });
     });
 
@@ -544,6 +545,30 @@ describe("setGenInstall", () => {
             expect(res).to.include(path.join(path.sep, "root", "project", "folder", nodemodules));
             expect(res).to.include(path.join("localPath1", nodemodules));
             expect(res).to.include(path.join("localPath2", nodemodules));
+        });
+    });
+
+    describe("onGeneratorSuccess - onGeneratorFailure", () => {
+        let doGeneratorDoneSpy: any;
+
+        beforeEach(() => {
+            doGeneratorDoneSpy = sandbox.spy(youiEvents, "doGeneratorDone");
+        });
+
+        afterEach(() => {
+            doGeneratorDoneSpy.restore();
+        });
+
+        it("onGeneratorSuccess", () => {
+            yeomanUi["onGeneratorSuccess"]("testGenName", "testDestinationRoot");
+            // tslint:disable-next-line: no-unused-expression
+            expect(doGeneratorDoneSpy.calledWith(true, "The 'testGenName' project has been generated.", "testDestinationRoot")).to.be.true;
+        });
+
+        it("onGeneratorFailure", () => {
+            yeomanUi["onGeneratorFailure"]("testGenName", "testDestinationRoot", "testError");
+            // tslint:disable-next-line: no-unused-expression
+            expect(doGeneratorDoneSpy.calledWith(false, `testGenName generator failed.\n\n${yeomanUi["getErrorInfo"]("testError")}`, "testDestinationRoot")).to.be.true;
         });
     });
 });

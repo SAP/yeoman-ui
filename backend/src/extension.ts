@@ -110,7 +110,7 @@ export class YeomanUIPanel {
 		this.extensionPath = extensionPath;
 		this.rpc = new RpcExtension(this.panel.webview);
 		const outputChannel: YouiLog = new OutputChannelLog();
-		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc);
+		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.panel);
 		
 		this.yeomanui = new YeomanUI(this.rpc, vscodeYouiEvents, outputChannel, this.logger, YeomanUIPanel.genFilter);
 
