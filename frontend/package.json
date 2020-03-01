@@ -18,7 +18,7 @@
     "@mdi/font": "^4.9.95",
     "@sap-devx/inquirer-gui": "0.0.23",
     "@sap-devx/inquirer-gui-login-plugin": "0.0.1",
-    "@sap-devx/inquirer-gui-remote-file-browser-plugin": "0.0.1",
+    "@sap-devx/inquirer-gui-remote-file-browser-plugin": "0.0.2",
     "core-js": "2.6.6",
     "jquery": "3.4.1",
     "lodash": "^4.17.15",
