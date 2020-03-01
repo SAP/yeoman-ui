@@ -354,7 +354,7 @@ export class YeomanUI {
   }
 
   private getGenMetadata(genName: string): Environment.GeneratorMeta {
-    const namespace = `${genName}:app`;
+    const namespace = this.getGenNamespace(genName);
     const genMetadata = _.get(this, ["genMeta", namespace]);
     if (_.isNil(genMetadata)) {
       const debugMessage = `${namespace} generator metadata was not found.`;
@@ -363,9 +363,9 @@ export class YeomanUI {
     return genMetadata;
   }
 
-  // private getGenMetaName(genName: string): string {
-  //   return `${genName}:app`;
-  // }
+  private getGenNamespace(genName: string): string {
+    return `${genName}:app`;
+  }
 
   /**
    * 
