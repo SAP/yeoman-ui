@@ -44,7 +44,7 @@ describe('vscode-youi-events unit test', () => {
     });
 
     it("install", () => {
-        const events = new VSCodeYouiEvents(undefined);
+        const events = new VSCodeYouiEvents(undefined, undefined);
         const showInstallMessageSpy = sandbox.spy(events,"showInstallMessage");
         events.doGeneratorInstall();
         // tslint:disable-next-line: no-unused-expression
