@@ -565,10 +565,10 @@ describe('yeomanui unit test', () => {
             expect(doGeneratorDoneSpy.calledWith(true, "The 'testGenName' project has been generated.", "testDestinationRoot")).to.be.true;
         });
 
-        it("onGeneratorFailure", () => {
-            yeomanUi["onGeneratorFailure"]("testGenName", "testDestinationRoot", "testError");
+        it("onGeneratorFailure", async () => {
+            await yeomanUi["onGeneratorFailure"]("testGenName", "testError");
             // tslint:disable-next-line: no-unused-expression
-            expect(doGeneratorDoneSpy.calledWith(false, `testGenName generator failed.\n\n${yeomanUi["getErrorInfo"]("testError")}`, "testDestinationRoot")).to.be.true;
+            expect(doGeneratorDoneSpy.calledWith(false, "testGenName generator failed.\ntestError")).to.be.true;
         });
     });
 });

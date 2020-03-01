@@ -14,7 +14,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 
     public doGeneratorDone(success: boolean, message: string, targetPath = ""): void {
         this.doClose();
-        this.showDoneMessage(targetPath);
+        this.showDoneMessage(success, message, targetPath);
     }
 
     public doGeneratorInstall(): void {
@@ -46,21 +46,22 @@ export class VSCodeYouiEvents implements YouiEvents {
             });
             return "installing_dependencies_completed";
         });
-        return;
     }
 
-    private showDoneMessage(targetPath: string): void {
+    private showDoneMessage(success: boolean, message: string, targetPath: string): void {
         VSCodeYouiEvents.installing = false;
         const OpenWorkspace = 'Open Workspace';
-        const commandName_OpenWorkspace = "vscode.openFolder";
-        const commandParam_OpenWorkspace = targetPath;
-        vscode.window.showInformationMessage('The project has been successfully generated.\nWould you like to open it?', OpenWorkspace)
-            .then(selection => {
+        const commandNameOpenWorkspace = "vscode.openFolder";
+        const commandParamOpenWorkspace = targetPath;
+        if (success) {
+            vscode.window.showInformationMessage('The project has been successfully generated.\nWould you like to open it?', OpenWorkspace).then(selection => {
                 if (selection === OpenWorkspace) {
-                    this.executeCommand(commandName_OpenWorkspace, commandParam_OpenWorkspace);
+                    this.executeCommand(commandNameOpenWorkspace, commandParamOpenWorkspace);
                 }
             });
-        return;
+        } else {
+            vscode.window.showErrorMessage(message);
+        }
     }
 
 	private async executeCommand(commandName: string, commandParam: any): Promise<any> {
