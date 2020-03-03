@@ -62,6 +62,9 @@
           xs="4"
         >
           <v-row class="progress-buttons-row" align="center" justify="end">
+            <v-btn @click="back">
+            <v-icon right>mdi-chevron-left</v-icon>&nbsp;&nbsp;Back
+            </v-btn>
             <v-btn :disabled="!stepValidated" @click="next">
               Next<v-icon right>mdi-chevron-right</v-icon>
             </v-btn>
@@ -192,6 +195,10 @@ export default {
       this.showBusyIndicator =
         _.isEmpty(this.prompts) ||
         (this.currentPrompt.status === PENDING && !this.isDone);
+    },
+    back() {
+      this.promptIndex--;
+      this.rpc.invoke("back", []);
     },
     next() {
       if (this.resolve) {

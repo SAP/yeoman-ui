@@ -59,12 +59,20 @@ export class YeomanUI {
   private promptCount: number;
   private currentQuestions: Environment.Adapter.Questions<any>;
   private genFilter: GeneratorFilter;
+  private isReplaying: boolean;
+  private answersStack: Array<Environment.Adapter.Answers>;
+  private answersReplayQueue: Array<Environment.Adapter.Answers>;
+  private generatorName: string;
 
   constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter) {
     this.rpc = rpc;
     if (!this.rpc) {
       throw new Error("rpc must be set");
     }
+    this.generatorName = "";
+    this.isReplaying = false;
+    this.answersStack = [];
+    this.answersReplayQueue = [];
     this.youiEvents = youiEvents;
     this.outputChannel = outputChannel;
     this.logger = logger;
@@ -74,7 +82,8 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.evaluateMethod, thisArg: this });
     this.rpc.registerMethod({ func: this.toggleOutput, thisArg: this });
     this.rpc.registerMethod({ func: this.logError, thisArg: this });
-  
+    this.rpc.registerMethod({ func: this.back, thisArg: this });
+
     this.youiAdapter = new YouiAdapter(outputChannel, youiEvents);
     this.youiAdapter.setYeomanUI(this);
     this.promptCount = 0;
@@ -110,6 +119,7 @@ export class YeomanUI {
   }
 
   public async runGenerator(generatorName: string) {
+    this.generatorName = generatorName;
     // TODO: should create and set target dir only after user has selected a generator;
     //  see issue: https://github.com/yeoman/environment/issues/55
     //  process.chdir() doesn't work after environment has been created
@@ -144,7 +154,6 @@ export class YeomanUI {
       }
       
       this.setGenInstall(gen);
-      
       this.promptCount = 0;
       this.gen = (gen as Generator);
       this.gen.destinationRoot(YeomanUI.CWD);
@@ -211,8 +220,14 @@ export class YeomanUI {
   }
 
   public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
-    this.currentQuestions = questions;
-    
+    if (this.isReplaying && this.answersReplayQueue.length > 0) {
+      const response = this.answersReplayQueue.shift();
+      if (this.answersReplayQueue.length === 0) {
+        this.isReplaying = false;
+      }
+      return response;
+    } else {
+      this.currentQuestions = questions;
       this.promptCount++;
       const firstQuestionName = _.get(questions, "[0].name");
       let promptName: string = `Step ${this.promptCount}`;
@@ -220,16 +235,30 @@ export class YeomanUI {
         promptName = _.startCase(firstQuestionName);
       }
       const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
-      return this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
+      const response = await this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
+      this.answersStack.push(response);
+      return response;
+    }
+  }
+
+  public back(): void {
+    // TODO: send previously answered questions to client
+    //   to populate controls
+    this.answersStack.pop();
+    this.answersReplayQueue = JSON.parse(JSON.stringify(this.answersStack));
+    this.isReplaying = true;
+    this.runGenerator(this.generatorName);
   }
 
   private onGeneratorSuccess(generatorName: string, destinationRoot: string) {
+    this.isReplaying = false;
     const message = `The '${generatorName}' project has been generated.`;
     this.logger.debug("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
     this.youiEvents.doGeneratorDone(true, message, destinationRoot);
   }
 
   private onGeneratorFailure(generatorName: string, destinationRoot: string, error: any) {
+    this.isReplaying = false;
     const message = `${generatorName} generator failed.\n\n${this.getErrorInfo(error)}`;
     this.logError(error, message);
     this.youiEvents.doGeneratorDone(false, message, destinationRoot);

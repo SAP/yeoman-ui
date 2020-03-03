@@ -242,6 +242,26 @@ describe('App.vue', () => {
     })
   })
 
+  describe('back - method', () => {
+    test('promptIndex is updated', () => {
+      wrapper = initComponent(App, {}, true);
+      wrapper.vm.rpc = {
+        invoke: jest.fn(),
+        registerMethod: jest.fn()
+      }  
+      const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke');
+
+      wrapper.vm.resolve = undefined;
+      wrapper.vm.promptIndex = 1;
+      wrapper.vm.prompts = [{}, {}];
+
+      wrapper.vm.back();
+
+      expect(wrapper.vm.promptIndex).toBe(0);
+      expect(invokeSpy).toHaveBeenCalledWith("back", []);
+    })
+  });
+
   describe('updateCurrentPrompt - method', () => {
     test('currentPrompt status should be deleted', () => {
       wrapper = initComponent(App)
