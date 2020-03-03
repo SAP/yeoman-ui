@@ -117,6 +117,9 @@ module.exports = class extends Generator {
     this.answers = await this.prompt(prompts);
     this.log("Food", this.answers.food);
 
+    // add prompt without questions
+    this.answers = await this.prompt([]);
+
     // currently not supported:
     const ui = new Inquirer.ui.BottomBar();
     this.log("xx");
@@ -124,7 +127,7 @@ module.exports = class extends Generator {
 
     prompts = [
       {
-        when: (response) => {
+        when: () => {
           return this.answers.confirmHungry;
         },
         type: "list",
@@ -244,7 +247,10 @@ module.exports = class extends Generator {
         name: "password",
         message: "What's your GitHub password",
         mask: '*',
-        validate: this._requireLetterAndNumber
+        validate: this._requireLetterAndNumber,
+        when: (response) => {
+          return response.email !== "root";
+        }
       }
     ];
 

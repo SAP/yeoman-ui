@@ -119,8 +119,7 @@ export class YeomanUI {
       const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
       // TODO: support sub-generators
       env.register(meta.resolved);
-      const getGenMetadataName = this.getGenMetaName(generatorName);
-      const gen: any = env.create(getGenMetadataName, {});
+      const gen: any = env.create(meta.namespace, {});
       // check if generator defined a helper function called getPrompts()
       const genGetPrompts = _.get(gen, "getPrompts");
       if (genGetPrompts) {
@@ -158,10 +157,10 @@ export class YeomanUI {
         } 
       });
       this.gen.on('error', (error: any) => {
-        this.onGeneratorFailure(generatorName, this.gen.destinationRoot(), error);
+        this.onGeneratorFailure(generatorName, error);
       });
     } catch (error) {
-      this.onGeneratorFailure(generatorName, this.gen.destinationRoot(), error);
+      this.onGeneratorFailure(generatorName, error);
     }
   }
 
@@ -220,6 +219,10 @@ export class YeomanUI {
         promptName = _.startCase(firstQuestionName);
       }
       const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
+      if (_.isEmpty(mappedQuestions)) {
+        return {};
+      }
+      
       return this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
   }
 
@@ -229,10 +232,10 @@ export class YeomanUI {
     this.youiEvents.doGeneratorDone(true, message, destinationRoot);
   }
 
-  private onGeneratorFailure(generatorName: string, destinationRoot: string, error: any) {
-    const message = `${generatorName} generator failed.\n\n${this.getErrorInfo(error)}`;
-    this.logError(error, message);
-    this.youiEvents.doGeneratorDone(false, message, destinationRoot);
+  private async onGeneratorFailure(generatorName: string, error: any) {
+    const messagePrefix = `${generatorName} generator failed.`;
+    const errorMessage: string = await this.logError(error, messagePrefix);
+    this.youiEvents.doGeneratorDone(false, errorMessage);
   }
 
   private getEnv(): Environment.Options {
@@ -355,16 +358,16 @@ export class YeomanUI {
   }
 
   private getGenMetadata(genName: string): Environment.GeneratorMeta {
-    const metadataName: string = this.getGenMetaName(genName);
-    const genMetadata = _.get(this, ["genMeta", metadataName]);
+    const namespace = this.getGenNamespace(genName);
+    const genMetadata = _.get(this, ["genMeta", namespace]);
     if (_.isNil(genMetadata)) {
-      const debugMessage = `${this.getGenMetaName(genName)} generator metadata was not found.`;
+      const debugMessage = `${namespace} generator metadata was not found.`;
       this.logger.debug(debugMessage);
     }
     return genMetadata;
   }
 
-  private getGenMetaName(genName: string): string {
+  private getGenNamespace(genName: string): string {
     return `${genName}:app`;
   }
 

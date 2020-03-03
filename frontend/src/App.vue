@@ -145,7 +145,8 @@ export default {
       );
     },
     headerTitle() {
-      return this.messages.yeoman_ui_title;
+      const titleSuffix = _.isEmpty(this.generatorPrettyName) ? "" : ` - ${this.generatorPrettyName}`;
+      return `${this.messages.yeoman_ui_title}${titleSuffix}`;
     },
     currentPrompt() {
       const prompt = _.get(this.prompts, "[" + this.promptIndex + "]");
