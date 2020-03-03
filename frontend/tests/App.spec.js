@@ -399,4 +399,24 @@ describe('App.vue', () => {
 
     invokeSpy.mockRestore()
   })
+
+  describe('headerTitle - computed', () => {
+    it('generatorPrettyName is empty', () => {
+      wrapper = initComponent(App, {}, true)
+      wrapper.vm.prompts = [{}, {}]
+      wrapper.vm.promptIndex = 1
+      wrapper.vm.$data.generatorPrettyName = null;
+      wrapper.vm.$data.messages = {yeoman_ui_title: "yeoman_ui_title"};
+      expect(wrapper.vm.headerTitle).toEqual("yeoman_ui_title")
+    })
+
+    it('generatorPrettyName is not empty', async () => {
+      wrapper = initComponent(App, {}, true)
+      wrapper.vm.prompts = [{}, {}]
+      wrapper.vm.promptIndex = 1
+      wrapper.vm.$data.generatorPrettyName = "testGeneratorPrettyName";
+      wrapper.vm.$data.messages = {yeoman_ui_title: "yeoman_ui_title"};
+      expect(wrapper.vm.headerTitle).toEqual("yeoman_ui_title - testGeneratorPrettyName")
+    })
+  })
 })
