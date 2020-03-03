@@ -35,7 +35,7 @@ export class VSCodeYouiEvents implements YouiEvents {
             location: vscode.ProgressLocation.Notification,
             title: "Installing dependencies..."
         },
-        async (progress) => {
+        async () => {
             await new Promise(resolve => {
                 let intervalId = setInterval(() => {
                     if (!VSCodeYouiEvents.installing) {
@@ -74,5 +74,4 @@ export class VSCodeYouiEvents implements YouiEvents {
 			console.debug(`Execution of command ${commandName} returned ${failure}`);
 		});
 	}
-
 }
