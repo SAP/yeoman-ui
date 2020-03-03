@@ -534,7 +534,6 @@ describe('yeomanui unit test', () => {
             questions = [{name: "q1"}];
             response = await yeomanUiInstance.showPrompt(questions);
             expect (response.firstName).to.equal(firstName);
-            expect(yeomanUiInstance["isReplaying"]).to.be.false;
         });
     });
 

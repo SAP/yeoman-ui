@@ -13,7 +13,7 @@
     <Header
       v-if="prompts.length"
       :headerTitle="headerTitle"
-      :stepName="prompts[promptIndex].name"
+      :stepName="(promptIndex < prompts.length ? prompts[promptIndex].name : '')"
       :rpc="rpc"
       :isInVsCode="isInVsCode()"
       @parentShowConsole="toggleConsole"
@@ -194,9 +194,10 @@ export default {
     setBusyIndicator() {
       this.showBusyIndicator =
         _.isEmpty(this.prompts) ||
-        (this.currentPrompt.status === PENDING && !this.isDone);
+        (this.currentPrompt && this.currentPrompt.status === PENDING && !this.isDone);
     },
     back() {
+      this.prompts = [this.prompts[0]];
       this.promptIndex--;
       this.rpc.invoke("back", []);
     },

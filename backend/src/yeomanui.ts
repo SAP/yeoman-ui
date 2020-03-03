@@ -219,32 +219,40 @@ export class YeomanUI {
     this.outputChannel.log(message);
   }
 
-  public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
-    if (this.isReplaying && this.answersReplayQueue.length > 0) {
-      const response = this.answersReplayQueue.shift();
-      if (this.answersReplayQueue.length === 0) {
-        this.isReplaying = false;
-      }
-      return response;
-    } else {
-      this.currentQuestions = questions;
-      this.promptCount++;
-      const firstQuestionName = _.get(questions, "[0].name");
-      let promptName: string = `Step ${this.promptCount}`;
-      if (firstQuestionName) {
-        promptName = _.startCase(firstQuestionName);
-      }
-      const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
-      const response = await this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
-      this.answersStack.push(response);
-      return response;
+  private setAnswers(questions: Environment.Adapter.Questions<any>, answers: Environment.Adapter.Answers): void {
+    for (const question of (questions as any[])) {
+      const name = question["name"];
+      const answer = answers[name];
+      question.default = answer;
     }
   }
 
+  public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
+    if (this.isReplaying) {
+      if (this.answersReplayQueue.length > 1) {
+        return this.answersReplayQueue.shift();
+      } else {
+        this.isReplaying = false;
+        this.answersReplayQueue = [];
+        const answers = this.answersStack.pop();
+        this.setAnswers(questions, answers);
+      }
+    }
+
+    this.currentQuestions = questions;
+    this.promptCount++;
+    const firstQuestionName = _.get(questions, "[0].name");
+    let promptName: string = `Step ${this.promptCount}`;
+    if (firstQuestionName) {
+      promptName = _.startCase(firstQuestionName);
+    }
+    const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
+    const response = await this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
+    this.answersStack.push(response);
+    return response;
+  }
+
   public back(): void {
-    // TODO: send previously answered questions to client
-    //   to populate controls
-    this.answersStack.pop();
     this.answersReplayQueue = JSON.parse(JSON.stringify(this.answersStack));
     this.isReplaying = true;
     this.runGenerator(this.generatorName);
