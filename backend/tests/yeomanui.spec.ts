@@ -20,7 +20,6 @@ describe('yeomanui unit test', () => {
     let datauriMock: any;
     const UTF8: string = "utf8";
     const PACKAGE_JSON: string = "package.json";
-    const YEOMAN_PNG = "yeoman.png";
 
     const choiceMessage = 
         "Some quick example text of the generator description. This is a long text so that the example will look good.";
@@ -119,6 +118,14 @@ describe('yeomanui unit test', () => {
         yeomanEnvMock.verify();
         fsExtraMock.verify();
         datauriMock.verify();
+    });
+
+    describe("showPrompt", () => {
+        it("prompt without questions", async () => {
+            const answers = await yeomanUi.showPrompt([]);
+            // tslint:disable-next-line: no-unused-expression
+            expect(answers).to.be.empty;
+        });
     });
 
     describe("getGenerators", () => {

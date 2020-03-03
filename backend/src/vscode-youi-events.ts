@@ -50,13 +50,11 @@ export class VSCodeYouiEvents implements YouiEvents {
 
     private showDoneMessage(success: boolean, message: string, targetPath: string): void {
         VSCodeYouiEvents.installing = false;
-        const OpenWorkspace = 'Open Workspace';
-        const commandNameOpenWorkspace = "vscode.openFolder";
-        const commandParamOpenWorkspace = targetPath;
         if (success) {
+            const OpenWorkspace = 'Open Workspace';
             vscode.window.showInformationMessage('The project has been successfully generated.\nWould you like to open it?', OpenWorkspace).then(selection => {
                 if (selection === OpenWorkspace) {
-                    this.executeCommand(commandNameOpenWorkspace, commandParamOpenWorkspace);
+                    this.executeCommand("vscode.openFolder", targetPath);
                 }
             });
         } else {

@@ -219,6 +219,10 @@ export class YeomanUI {
         promptName = _.startCase(firstQuestionName);
       }
       const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
+      if (_.isEmpty(mappedQuestions)) {
+        return {};
+      }
+      
       return this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
   }
 
