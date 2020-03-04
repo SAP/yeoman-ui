@@ -109,26 +109,6 @@ export class YeomanUI {
     return promise;
   }
 
-  private getEnv(): Environment.Options {
-    const env: Environment.Options = Environment.createEnv();
-    const envGetNpmPaths: () => any = env.getNpmPaths;
-    env.getNpmPaths = function (localOnly: boolean = false) {
-      // Start with the local paths derived by cwd in vscode 
-      // (as opposed to cwd of the plugin host process which is what is used by yeoman/environment)
-      // Walk up the CWD and add `node_modules/` folder lookup on each level
-      const parts: string[] = YeomanUI.CWD.split(path.sep);
-      const localPaths = _.map(parts, (part, index) => {
-        const resrpath = path.join(...parts.slice(0, index + 1), YeomanUI.NODE_MODULES);
-        return YeomanUI.isWin32 ? resrpath : path.join(path.sep, resrpath);
-
-      });
-      const defaultPaths = envGetNpmPaths.call(this, localOnly);
-
-      return _.uniq(localPaths.concat(defaultPaths));
-    };
-    return env;
-  }
-
   public async runGenerator(generatorName: string) {
     // TODO: should create and set target dir only after user has selected a generator;
     //  see issue: https://github.com/yeoman/environment/issues/55
@@ -140,8 +120,8 @@ export class YeomanUI {
       // TODO: support sub-generators
       env.register(meta.resolved);
 
-      const getGenMetadataName = this.getGenMetaName(generatorName);
-      const gen: any = env.create(getGenMetadataName, {});
+      const getGenMNamespace = this.getGenNamespace(generatorName);
+      const gen: any = env.create(getGenMNamespace, {});
       // check if generator defined a helper function called setPromptsCallback()
       const setPromptsCallback = _.get(gen, "setPromptsCallback");
       if (setPromptsCallback) {

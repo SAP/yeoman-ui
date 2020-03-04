@@ -4,10 +4,10 @@ import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { WebSocket } from 'mock-socket'
 
-Vue.use(Vuetify)
-global.WebSocket = WebSocket
+Vue.use(Vuetify);
+global.WebSocket = WebSocket;
 
-let wrapper
+let wrapper;
 
 describe('App.vue', () => {
   afterEach(() => {
@@ -23,15 +23,15 @@ describe('App.vue', () => {
   })
 
   describe('currentPrompt - computed', () => {
-    it.skip('questions are not defined', () => {
-      wrapper = initComponent(App, {}, true)
+    it('questions are not defined', () => {
+      wrapper = initComponent(App, {})
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.promptIndex = 1
       expect(wrapper.vm.currentPrompt.answers).toEqual({})
     })
 
     it('questions are defined', async () => {
-      wrapper = initComponent(App, {}, true)
+      wrapper = initComponent(App, {})
       await Vue.nextTick()
       wrapper.vm.prompts = [{
           questions: []
@@ -45,7 +45,7 @@ describe('App.vue', () => {
   })
 
   describe('setQuestionProps - method', () => {
-    test('set props', async () => {
+    it('set props', async () => {
       wrapper = initComponent(App, {}, true)
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation((...args) => { return args[1][1] })
@@ -81,7 +81,7 @@ describe('App.vue', () => {
     })
 
     // the delay ensures we call the busy indicator
-    test('validate() with delay', async () => {
+    it('validate() with delay', async () => {
       wrapper = initComponent(App, {}, true)
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation(async (...args) => {
@@ -108,7 +108,7 @@ describe('App.vue', () => {
     })
   })
 
-  test('initRpc - method', () => {
+  it('initRpc - method', () => {
     wrapper = initComponent(App, {}, true)
     wrapper.vm.rpc = {
       invoke: jest.fn(),
@@ -136,7 +136,7 @@ describe('App.vue', () => {
     registerMethodSpy.mockRestore()
   })
 
-  test('runGenerator - method', () => {
+  it('runGenerator - method', () => {
     wrapper = initComponent(App, {}, true)
     wrapper.vm.rpc = {
       invoke: jest.fn()
@@ -150,7 +150,7 @@ describe('App.vue', () => {
     invokeSpy.mockRestore()
   })
 
-  test('log - method', () => {
+  it('log - method', () => {
     wrapper = initComponent(App, {}, true)
     wrapper.vm.logText = 'test_'
 
@@ -159,29 +159,31 @@ describe('App.vue', () => {
     expect(wrapper.vm.logText).toBe('test_test_log')
   })
 
-  test('selectGenerator - method', async () => {
-    wrapper = initComponent(App, {}, true)
-    wrapper.vm.generatorName = 'test_ge_name'
+  describe('selectGenerator - method', () => {
+    it('currentPrompt is undefined', () => {
+      wrapper = initComponent(App)
+      wrapper.vm.generatorName = 'test_ge_name'
 
-    wrapper.vm.selectGenerator('testGeneratorName', 'Test Generator Name');
-    await Vue.nextTick();
-    
-    expect(wrapper.vm.generatorName).toBe('testGeneratorName')
-    expect(wrapper.vm.generatorPrettyName).toBe('Test Generator Name')
+      wrapper.vm.selectGenerator('testGeneratorName', 'Test Generator Name');
+      
+      expect(wrapper.vm.generatorName).toBe('testGeneratorName')
+      expect(wrapper.vm.generatorPrettyName).toBe('Test Generator Name')
+    })
+
+    it('currentPrompt is defined', () => {
+      wrapper = initComponent(App)
+      wrapper.vm.prompts = [{}, {}]
+      wrapper.vm.promptIndex = 1
+      wrapper.vm.generatorName = 'test_ge_name'
+      wrapper.vm.selectGenerator('testGeneratorName', 'Test Generator Name');
+      
+      expect(wrapper.vm.generatorName).toBe('testGeneratorName')
+      expect(wrapper.vm.generatorPrettyName).toBe('Test Generator Name')
+      expect(wrapper.vm.currentPrompt.answers.name).toBe('testGeneratorName')
+    })
   })
 
-  test.skip('onStepValidated - method', () => {
-    wrapper = initComponent(App, {}, true)
-    wrapper.vm.stepValidated = false
-
-    wrapper.vm.onStepValidated(false);
-    expect(wrapper.vm.stepValidated).toBeFalsy()
-
-    wrapper.vm.onStepValidated(true);
-    expect(wrapper.vm.stepValidated).toBeTruthy()
-  })
-
-  test('setMessages - method', () => {
+  it('setMessages - method', () => {
     wrapper = initComponent(App, {}, true)
     expect(wrapper.vm.messages).toEqual({})
 
@@ -190,8 +192,8 @@ describe('App.vue', () => {
   })
 
   describe('next - method', () => {
-    test('promptIndex is greater than prompt quantity, resolve is defined', () => {
-      wrapper = initComponent(App, {}, true)
+    it('promptIndex is greater than prompt quantity, resolve is defined', () => {
+      wrapper = initComponent(App, {})
       wrapper.vm.resolve = jest.fn()
       wrapper.vm.reject = jest.fn()
       wrapper.vm.promptIndex = 1 
@@ -207,8 +209,8 @@ describe('App.vue', () => {
       resolveSpy.mockRestore()
     })
 
-    test('resolve method throws an exception', () => {
-      wrapper = initComponent(App, {}, true)
+    it('resolve method throws an exception', () => {
+      wrapper = initComponent(App, {})
      
       wrapper.vm.resolve = () => {
         throw new Error('test_error')
@@ -227,8 +229,8 @@ describe('App.vue', () => {
       rejectSpy.mockRestore()
     })
 
-    test('resolve method does not exist', () => {
-      wrapper = initComponent(App, {}, true)
+    it('resolve method does not exist', () => {
+      wrapper = initComponent(App, {})
      
       wrapper.vm.resolve = undefined
       wrapper.vm.promptIndex = 1 
@@ -243,7 +245,7 @@ describe('App.vue', () => {
   })
 
   describe('setPromptList - method', () => {
-    test('prompts is empty array', () => {
+    it('prompts is empty array', () => {
       wrapper = initComponent(App)
       
       wrapper.vm.prompts = [{}, {}]
@@ -255,7 +257,7 @@ describe('App.vue', () => {
       expect(wrapper.vm.prompts).toHaveLength(2)
     })
 
-    test('prompts is undefined', () => {
+    it('prompts is undefined', () => {
       wrapper = initComponent(App)
       
       wrapper.vm.prompts = [{}, {}]
@@ -267,24 +269,10 @@ describe('App.vue', () => {
       expect(wrapper.vm.prompts).toHaveLength(2)
     })
   })
-  
-  test('prompt name and description', () => {
-      wrapper = initComponent(App)
-      
-      wrapper.vm.prompts = [{}, {name: "Loading..."}]
-      wrapper.vm.promptIndex = 1
-
-      wrapper.vm.setMessages({step_is_pending: "Loading..."});
-      wrapper.vm.updateCurrentPrompt({name: "name2", description: "desc2", questions: [{}, {}, {}, {}]})
-      expect(wrapper.vm.currentPrompt.questions).toHaveLength(4)
-      expect(wrapper.vm.currentPrompt.name).toBe("name2");
-      expect(wrapper.vm.currentPrompt.description).toBe("desc2");
-    })
-  });
 
   describe('generatorInstall - method', () => {
-    test('status is pending', () => {
-      wrapper = initComponent(App, {}, true)
+    it('status is pending', () => {
+      wrapper = initComponent(App, {})
       
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.promptIndex = 1
@@ -298,7 +286,7 @@ describe('App.vue', () => {
 
   describe('generatorDone - method', () => {
     test('status is pending', () => {
-      wrapper = initComponent(App, {donePath: 'testDonePath'}, true)
+      wrapper = initComponent(App, {donePath: 'testDonePath'})
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.promptIndex = 1
       wrapper.vm.currentPrompt.status = 'pending'
@@ -314,14 +302,14 @@ describe('App.vue', () => {
 
   describe('setBusyIndicator - method', () => {
     it('prompts is empty', () => {
-      wrapper = initComponent(App, {}, true)
+      wrapper = initComponent(App)
       wrapper.vm.prompts = []
       wrapper.vm.setBusyIndicator()
       expect(wrapper.vm.showBusyIndicator).toBeTruthy()
     })
 
     it('isDone is false, status is pending, prompts is not empty', () => {
-      wrapper = initComponent(App, {}, true)
+      wrapper = initComponent(App)
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.isDone = false
       wrapper.vm.currentPrompt.status = 'pending'
@@ -330,7 +318,7 @@ describe('App.vue', () => {
     })
 
     it('isDone is true, status is pending, prompts is not empty', () => {
-      wrapper = initComponent(App, {}, true)
+      wrapper = initComponent(App)
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.isDone = true
       wrapper.vm.currentPrompt.status = 'pending'
@@ -340,7 +328,7 @@ describe('App.vue', () => {
   })
 
   describe('toggleConsole - method', () => {
-    test('showConsole property updated from toggleConsole()', () => {
+    it('showConsole property updated from toggleConsole()', () => {
       wrapper = initComponent(App, {}, true)
       wrapper.vm.toggleConsole()
       expect(wrapper.vm.showConsole).toBeTruthy()
@@ -350,7 +338,7 @@ describe('App.vue', () => {
   })
 
   describe('init - method', () => {
-    test('isInVsCode = true', () => {
+    it('isInVsCode = true', () => {
       wrapper = initComponent(App)
       
       wrapper.vm.isInVsCode = jest.fn().mockReturnValue(true)
@@ -361,7 +349,7 @@ describe('App.vue', () => {
       expect(wrapper.vm.consoleClass).toBe('consoleClassHidden')
     })
 
-    test('isInVsCode = false', () => {
+    it('isInVsCode = false', () => {
       wrapper = initComponent(App)
       
       wrapper.vm.isInVsCode = jest.fn().mockReturnValue(false)
@@ -369,10 +357,9 @@ describe('App.vue', () => {
 
       expect(wrapper.vm.consoleClass).toBe('consoleClassVisible')
     })
-
   })
 
-  test('reload - method', () => {
+  it('reload - method', () => {
     wrapper = initComponent(App)
 
     wrapper.vm.rpc = {
@@ -394,7 +381,7 @@ describe('App.vue', () => {
 
   describe('headerTitle - computed', () => {
     it('generatorPrettyName is empty', () => {
-      wrapper = initComponent(App, {}, true)
+      wrapper = initComponent(App)
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.promptIndex = 1
       wrapper.vm.$data.generatorPrettyName = null;
@@ -402,8 +389,8 @@ describe('App.vue', () => {
       expect(wrapper.vm.headerTitle).toEqual("yeoman_ui_title")
     })
 
-    it('generatorPrettyName is not empty', async () => {
-      wrapper = initComponent(App, {}, true)
+    it('generatorPrettyName is not empty', () => {
+      wrapper = initComponent(App)
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.promptIndex = 1
       wrapper.vm.$data.generatorPrettyName = "testGeneratorPrettyName";

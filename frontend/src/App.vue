@@ -189,9 +189,7 @@ export default {
         this.currentPrompt.questions[0].type==='generators';
     },
     setBusyIndicator() {
-      this.showBusyIndicator =
-        _.isEmpty(this.prompts) ||
-        (this.currentPrompt.status === PENDING && !this.isDone);
+      this.showBusyIndicator = _.isEmpty(this.prompts) || (this.currentPrompt.status === PENDING && !this.isDone);
     },
     next() {
       if (this.resolve) {
@@ -219,9 +217,8 @@ export default {
     },
     selectGenerator(generatorName, generatorPrettyName) {
       this.stepValidated = true;
-      const currentPrompt = this.currentPrompt;
-      if (currentPrompt) {
-        currentPrompt.answers.name = generatorName;
+      if (this.currentPrompt) {
+        _.set(this.currentPrompt, "answers.name", generatorName);
       }
       this.generatorName = generatorName;
       this.generatorPrettyName = generatorPrettyName;
