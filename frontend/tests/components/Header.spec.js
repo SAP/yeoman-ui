@@ -36,7 +36,7 @@ describe('Header.vue', () => {
             }
         }, true)
         
-        wrapper.findAll("button").wrappers[0].trigger('click') // collapseOutput
+        wrapper.findAll("button").wrappers[0].trigger('click')
         expect(rpcInvokeMockFunction).toHaveBeenCalled()
     })
 
@@ -45,7 +45,7 @@ describe('Header.vue', () => {
         wrapper = initComponent(Header, {
         }, true)
         
-        wrapper.findAll("button").wrappers[1].trigger('click') // reload
+        wrapper.findAll("button").wrappers[1].trigger('click')
         expect(rpcInvokeMockFunction).not.toHaveBeenCalled()
     })
 })

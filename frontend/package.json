@@ -16,15 +16,19 @@
   },
   "dependencies": {
     "@mdi/font": "^4.9.95",
+    "@sap-devx/inquirer-gui": "0.0.23",
+    "@sap-devx/inquirer-gui-login-plugin": "0.0.1",
+    "@sap-devx/inquirer-gui-remote-file-browser-plugin": "0.0.1",
     "core-js": "2.6.6",
     "jquery": "3.4.1",
     "lodash": "^4.17.15",
     "material-design-icons-iconfont": "^5.0.1",
     "vue": "^2.6.10",
     "vue-loading-overlay": "^3.3.0",
-    "vuetify": "^2.2.14"
+    "vuetify": "^2.2.15"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.8.4",
     "@sap-devx/webview-rpc": "^0.2.0",
     "@vue/cli-plugin-babel": "^3.11.0",
     "@vue/cli-plugin-eslint": "^3.11.0",
