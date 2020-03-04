@@ -88,8 +88,8 @@ module.exports = class extends Generator {
         validate: (value, answers) => {
           return (value.length > 1 ? true : "Enter at least 2 characters");
         },
-        type: "input",
         name: "food",
+        type: "input",
         message: "What do you want to eat",
         default: "Junk food"
       },
@@ -148,6 +148,9 @@ module.exports = class extends Generator {
 
     this.log("Food", this.answers.food);
 
+    // add prompt without questions
+    this.answers = await this.prompt([]);
+
     // currently not supported:
     const ui = new Inquirer.ui.BottomBar();
 
@@ -155,7 +158,7 @@ module.exports = class extends Generator {
 
     prompts = [
       {
-        when: (response) => {
+        when: () => {
           return this.answers.confirmHungry;
         },
         type: "list",
@@ -262,17 +265,23 @@ module.exports = class extends Generator {
         },
       },
       {
-        type: "input",
         name: "email",
         message: "What's your GitHub username",
-        store: true
+        store: true,
+        validate: (value, answers) => {
+          return (value.length > 0 ? true : "This field is mandatory");
+        }
       },
       {
         type: "password",
+        guiType: "login",
         name: "password",
         message: "What's your GitHub password",
         mask: '*',
-        validate: this._requireLetterAndNumber
+        validate: this._requireLetterAndNumber,
+        when: (response) => {
+          return response.email !== "root";
+        }
       }
     ];
 
@@ -312,12 +321,27 @@ module.exports = class extends Generator {
       repoperms: this.answers.repoperms,
       email: this.answers.email,
       password: this.answers.password
-    }
+      }
     );
     this.fs.copy(
       this.templatePath('README.md'),
       this.destinationPath('README.md')
     );
+
+    const pkgJson = {
+      devDependencies: {
+        eslint: '^3.15.0'
+      },
+      dependencies: {
+        react: '^16.2.0'
+      }
+    };
+    // Extend or create package.json file in destination path
+    this.fs.extendJSON(this.destinationPath('package.json'), pkgJson);
+  }
+
+  install() {
+    this.npmInstall(['lodash'], { 'save-dev': true });
   }
 
   end() {
