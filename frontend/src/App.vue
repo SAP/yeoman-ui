@@ -258,7 +258,7 @@ export default {
       for (let question of questions) {
         for (let prop in question) {
           if (question[prop] === FUNCTION) {
-            var that = this;
+            const that = this;
             question[prop] = async (...args) => {
               let showBusy = true;
               setTimeout(() => {

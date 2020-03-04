@@ -11,6 +11,7 @@ class Prompts {
 
     this.splice = (start, deleteCount, items) => {
       if (items) {
+        items = _.isArray(items) ? items : [items];
         this.items.splice(start, deleteCount, ...items);
       } else {
         this.items.splice(start, deleteCount);

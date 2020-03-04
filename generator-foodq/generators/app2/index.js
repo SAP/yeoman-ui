@@ -1,4 +1,5 @@
 var Generator = require('yeoman-generator');
+var _ = require('lodash');
 
 module.exports = class extends Generator {
   constructor(args, opts) {
@@ -22,25 +23,26 @@ module.exports = class extends Generator {
           "Car",
           "Drone"
         ],
-      when: async (answers) => {
+        when: async (answers) => {
           let indexOfAddress = -1;
-        for await (let [i, prompt] of this.prompts.items.entries()) {
-          if (prompt && prompt.name === "Address") {
-            indexOfAddress = i;
+          for await (let [i, prompt] of this.prompts.items.entries()) {
+            if (prompt && prompt.name === "Address") {
+              indexOfAddress = i;
+            }
           }
-        }
 
-        if (answers.isTakeaway) {
-          // add address prompt if doesn't exist
-          if (indexOfAddress === -1) {
-            this.prompts.splice(4, 0, { name: "Address", description: "Address Description" });
+          const parentQuantity = _.size(this.prompts.items);
+          if (answers.isTakeaway) {
+            // add address prompt if doesn't exist
+            if (indexOfAddress === -1) {
+              this.prompts.splice(parentQuantity, 0, { name: "Address", description: "Address Description" });
+            }
+          } else {
+            // remove address prompt if exists
+            if (indexOfAddress > -1) {
+              this.prompts.splice(parentQuantity, 1);
+            }
           }
-        } else {
-          // remove address prompt if exists
-          if (indexOfAddress > -1) {
-            this.prompts.splice(4, 1);
-          }
-        }
 
           return true;
         }
