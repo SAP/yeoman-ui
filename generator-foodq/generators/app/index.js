@@ -117,9 +117,6 @@ module.exports = class extends Generator {
     this.answers = await this.prompt(prompts);
     this.log("Food", this.answers.food);
 
-    // add prompt without questions
-    this.answers = await this.prompt([]);
-
     // currently not supported:
     const ui = new Inquirer.ui.BottomBar();
     this.log("xx");
