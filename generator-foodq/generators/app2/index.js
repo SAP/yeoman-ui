@@ -35,12 +35,12 @@ module.exports = class extends Generator {
           if (answers.isTakeaway) {
             // add address prompt if doesn't exist
             if (indexOfAddress === -1) {
-              this.prompts.splice(parentQuantity, 0, { name: "Address", description: "Address Description" });
+              this.prompts.splice(parentQuantity - 1, 0, { name: "Address", description: "Address Description" });
             }
           } else {
             // remove address prompt if exists
             if (indexOfAddress > -1) {
-              this.prompts.splice(parentQuantity, 1);
+              this.prompts.splice(indexOfAddress, 1);
             }
           }
 
