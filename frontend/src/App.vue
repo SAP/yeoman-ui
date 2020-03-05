@@ -62,8 +62,12 @@
           xs="4"
         >
           <v-row class="progress-buttons-row" align="center" justify="end">
-            <v-btn @click="back">
-            <v-icon right>mdi-chevron-left</v-icon>&nbsp;&nbsp;Back
+            <v-btn
+              id="back"
+              @click="back"
+              :disabled="promptIndex<2"
+            >
+            <v-icon left>mdi-chevron-left</v-icon>Back
             </v-btn>
             <v-btn :disabled="!stepValidated" @click="next">
               Next<v-icon right>mdi-chevron-right</v-icon>
@@ -198,8 +202,10 @@ export default {
         (this.currentPrompt && this.currentPrompt.status === PENDING && !this.isDone);
     },
     back() {
-      this.prompts = [this.prompts[0]];
       this.promptIndex--;
+      if (this.promptIndex === this.prompts.length - 2) {
+        this.prompts.pop();
+      }
       this.rpc.invoke("back", []);
     },
     next() {

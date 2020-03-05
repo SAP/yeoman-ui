@@ -137,7 +137,9 @@ export class YeomanUI {
         const prompts: IPrompt[] = promptNames.map(value => {
           return _.assign({ questions: [], name: "", description: "" }, value);
         });
-        this.setPrompts(prompts);
+        if (!this.isReplaying) {
+          this.setPrompts(prompts);
+        }
       }
 
       const genGetImage = _.get(gen, "getImage");
@@ -229,6 +231,7 @@ export class YeomanUI {
   public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
     if (this.isReplaying) {
       if (this.answersReplayQueue.length > 1) {
+        this.promptCount++;
         return this.answersReplayQueue.shift();
       } else {
         this.isReplaying = false;
