@@ -98,6 +98,25 @@ export class YeomanUIPanel {
 		return path.join(extensionPath, 'dist', 'media');
 	}
 
+	public async showOpenDialog(currentPath: string): Promise<string> {
+		let uri;
+		try {
+			uri = vscode.Uri.file(currentPath);
+		} catch (e) {
+			uri = vscode.Uri.file('/');
+		}
+
+		try {
+			const filePath = await vscode.window.showOpenDialog({
+				canSelectFiles: true,
+				defaultUri: uri
+			});
+			return (filePath as vscode.Uri[])[0].fsPath;
+		} catch (e) {
+			return currentPath;
+		}
+	}
+
 	public yeomanui: YeomanUI;
 	private readonly logger: IChildLogger = getClassLogger(YeomanUI.name);
 	private rpc: RpcExtension;
@@ -111,8 +130,9 @@ export class YeomanUIPanel {
 		this.rpc = new RpcExtension(this.panel.webview);
 		const outputChannel: YouiLog = new OutputChannelLog();
 		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.panel);
-		
+
 		this.yeomanui = new YeomanUI(this.rpc, vscodeYouiEvents, outputChannel, this.logger, YeomanUIPanel.genFilter);
+		this.yeomanui.registerCustomQuestionEventHandler("remote-file-browser", "getFilePath", this.showOpenDialog);
 
 		// Set the webview's initial html content
 		this._update();
