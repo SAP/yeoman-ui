@@ -101,8 +101,17 @@ div.prompt-title {
 
 form.inquirer-gui .v-text-field fieldset {
   border-radius: 0;
-  border-width: 0;
+  border-width: medium;
+  border-style: solid;
   background-color: var(--vscode-input-background, #3c3c3c);
+}
+
+form.inquirer-gui :not(.v-input--is-focused).v-text-field fieldset {
+  border-color: var(--vscode-settings-textInputBorder, #cecece);
+}
+
+form.inquirer-gui .v-input--is-focused.v-text-field fieldset {
+  border-color: var(--vscode-focusBorder, rgba(0, 122, 204, 0.4));
 }
 
 form.inquirer-gui div.v-list {
