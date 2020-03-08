@@ -578,4 +578,47 @@ describe('yeomanui unit test', () => {
             expect(doGeneratorDoneSpy.calledWith(false, "testGenName generator failed.\ntestError")).to.be.true;
         });
     });
+
+    describe("evaluateMethod()", async () => {
+        it("custom question events", async () => {
+            const testEventFunction = () => {
+                return true;
+            };
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            yeomanUiInstance.registerCustomQuestionEventHandler("questionType", "testEvent", testEventFunction);
+            yeomanUiInstance["currentQuestions"] = [{name:"question1", guiType: "questionType"}];
+            const response = await yeomanUiInstance.evaluateMethod(null, "question1", "testEvent");
+            expect(response).to.be.true;
+        });
+
+        it("question method is called", async () => {
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            yeomanUiInstance["currentQuestions"] = [{name:"question1", method1:()=>{
+                return true;
+            }}];
+            const response = await yeomanUiInstance.evaluateMethod(null, "question1", "method1");
+            // tslint:disable-next-line: no-unused-expression
+            expect(response).to.be.true;
+        });
+
+        it("no questions", async () => {
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            const response = await yeomanUiInstance.evaluateMethod(null, "question1", "method1");
+            expect(response).to.be.undefined;
+        });
+
+        it("method throws exception", async () => {
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            yeomanUiInstance["gen"] = Object.create({});
+            yeomanUiInstance["gen"].options = {};
+            yeomanUiInstance["currentQuestions"] = [{name:"question1", method1:()=>{
+                throw new Error("Error");
+            }}];
+            try {
+                await yeomanUiInstance.evaluateMethod(null, "question1", "method1");
+            } catch(e) {
+                expect(e.toString()).to.contain("method1");
+            }
+        });
+    });
 });

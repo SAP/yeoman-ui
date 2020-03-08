@@ -161,6 +161,13 @@ module.exports = class extends Generator {
         }]
       },
       {
+        type: "input",
+        guiType: "remote-file-browser",
+        name: "uploadMenu",
+        message: "Upload menu",
+        default: "/"
+      },
+      {
         type: 'list',
         name: 'enjoy',
         message: 'Did you enjoy your meal?',
