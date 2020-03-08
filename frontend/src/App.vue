@@ -202,11 +202,11 @@ export default {
         (this.currentPrompt && this.currentPrompt.status === PENDING && !this.isDone);
     },
     back() {
+      const answers = this.currentPrompt.answers;
       this.promptIndex--;
-      if (this.promptIndex === this.prompts.length - 2) {
-        this.prompts.pop();
-      }
-      this.rpc.invoke("back", []);
+      // TODO: is 1st prompt always Generator Selection?
+      this.prompts = [this.prompts[0]];
+      this.rpc.invoke("back", [answers]);
     },
     next() {
       if (this.resolve) {

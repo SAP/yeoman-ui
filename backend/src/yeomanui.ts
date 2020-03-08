@@ -4,6 +4,8 @@ import * as fsextra from "fs-extra";
 import * as _ from "lodash";
 import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
+import { IPrompt } from "./iPrompt";
+import { AnswersUtils } from "./answersUtils";
 const titleize = require('titleize');
 const humanizeString = require('humanize-string');
 const datauri = require("datauri");
@@ -31,12 +33,6 @@ export interface IGeneratorQuestion {
   choices: IGeneratorChoice[];
 }
 
-export interface IPrompt {
-  name: string;
-  description: string;
-  questions: any[];
-}
-
 export class YeomanUI {
   private static defaultMessage = 
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
@@ -59,10 +55,8 @@ export class YeomanUI {
   private promptCount: number;
   private currentQuestions: Environment.Adapter.Questions<any>;
   private genFilter: GeneratorFilter;
-  private isReplaying: boolean;
-  private answersStack: Array<Environment.Adapter.Answers>;
-  private answersReplayQueue: Array<Environment.Adapter.Answers>;
   private generatorName: string;
+  private answersUtils: AnswersUtils;
 
   constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter) {
     this.rpc = rpc;
@@ -70,9 +64,7 @@ export class YeomanUI {
       throw new Error("rpc must be set");
     }
     this.generatorName = "";
-    this.isReplaying = false;
-    this.answersStack = [];
-    this.answersReplayQueue = [];
+    this.answersUtils = new AnswersUtils();
     this.youiEvents = youiEvents;
     this.outputChannel = outputChannel;
     this.logger = logger;
@@ -137,7 +129,9 @@ export class YeomanUI {
         const prompts: IPrompt[] = promptNames.map(value => {
           return _.assign({ questions: [], name: "", description: "" }, value);
         });
-        if (!this.isReplaying) {
+        if (this.answersUtils.isReplaying) {
+          this.answersUtils.replayedPrompts.push(...prompts);
+        } else {
           this.setPrompts(prompts);
         }
       }
@@ -206,6 +200,9 @@ export class YeomanUI {
       // TODO: loading generators takes a long time; consider prefetching list of generators
       const generators: IPrompt = await this.getGenerators();
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
+
+      this.answersUtils.reset();
+
       await this.runGenerator(response.name);
     } catch (error) {
       this.logError(error);
@@ -220,58 +217,62 @@ export class YeomanUI {
     this.outputChannel.log(message);
   }
 
-  private setAnswers(questions: Environment.Adapter.Questions<any>, answers: Environment.Adapter.Answers): void {
-    for (const question of (questions as any[])) {
-      const name = question["name"];
-      const answer = answers[name];
-      question.default = answer;
-    }
-  }
-
-  public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
-    if (this.isReplaying) {
-      if (this.answersReplayQueue.length > 1) {
-        this.promptCount++;
-        return this.answersReplayQueue.shift();
-      } else {
-        this.isReplaying = false;
-        this.answersReplayQueue = [];
-        const answers = this.answersStack.pop();
-        this.setAnswers(questions, answers);
-      }
-    }
-
-    this.currentQuestions = questions;
-    this.promptCount++;
+  private getPromptName(questions: Environment.Adapter.Questions<any>): string {
     const firstQuestionName = _.get(questions, "[0].name");
     let promptName: string = `Step ${this.promptCount}`;
     if (firstQuestionName) {
       promptName = _.startCase(firstQuestionName);
     }
+    return promptName;
+  }
+
+  public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
+    this.promptCount++;
+    const promptName = this.getPromptName(questions);
+
+    if (this.answersUtils.isReplaying) {
+      if (this.answersUtils.replayQueue.length > 1) {
+        const prompt: IPrompt = {
+          name: promptName, description: "", questions: []
+        };
+        this.answersUtils.replayedPrompts.push(prompt);
+        return this.answersUtils.replayQueue.shift();
+      } else {
+        this.setPrompts(this.answersUtils.replayedPrompts);
+        this.answersUtils.stopReplay();
+        const answers = this.answersUtils.replayStack.pop();
+        AnswersUtils.setDefaults(questions, answers);
+      }
+    }
+
+    this.currentQuestions = questions;
     const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
     if (_.isEmpty(mappedQuestions)) {
       return {};
     }
+    const previousAnswers = this.answersUtils.recallAnswers(questions);
+    if (previousAnswers !== undefined) {
+      AnswersUtils.setDefaults(mappedQuestions, previousAnswers);
+    }
     const response = await this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
-    this.answersStack.push(response);
+    this.answersUtils.replayStack.push(response);
+    this.answersUtils.rememberAnswers(questions, response);
     return response;
   }
 
-  public back(): void {
-    this.answersReplayQueue = JSON.parse(JSON.stringify(this.answersStack));
-    this.isReplaying = true;
+  public back(partialAnswers: Environment.Adapter.Answers): void {
+    this.answersUtils.rememberAnswers(this.currentQuestions, partialAnswers);
+    this.answersUtils.startReplay();
     this.runGenerator(this.generatorName);
   }
 
   private onGeneratorSuccess(generatorName: string, destinationRoot: string) {
-    this.isReplaying = false;
     const message = `The '${generatorName}' project has been generated.`;
     this.logger.debug("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
     this.youiEvents.doGeneratorDone(true, message, destinationRoot);
   }
 
   private async onGeneratorFailure(generatorName: string, error: any) {
-    this.isReplaying = false;
     const messagePrefix = `${generatorName} generator failed.`;
     const errorMessage: string = await this.logError(error, messagePrefix);
     this.youiEvents.doGeneratorDone(false, errorMessage);

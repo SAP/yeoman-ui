@@ -6,6 +6,7 @@ import { expect } from "chai";
 import * as _ from "lodash";
 import * as path from "path";
 import {YeomanUI, IGeneratorQuestion} from "../src/yeomanui";
+import {AnswersUtils} from "../src/answersUtils";
 import * as yeomanEnv from "yeoman-environment";
 import { YouiLog } from "../src/youi-log";
 import { YouiEvents } from '../src/youi-events';
@@ -458,6 +459,36 @@ describe('yeomanui unit test', () => {
         expect(res).to.be.equal(errorInfo);
     });
 
+    describe("answersUtils", () => {
+        it("setDefaults", () => {
+            const questions = [
+                {name: "q1", default: "a"},
+                {name: "q2", default: () => { return "b"}},
+                {name: "q3"}
+            ];
+            const answers = {
+                q1: "x",
+                q2: "y",
+                q3: "z"
+            }
+            AnswersUtils.setDefaults(questions, answers);
+            for (const index in questions) {
+                const question = questions[index];
+                switch (question.name) {
+                    case "a":
+                        expect((question as any)["answer"]).to.equal("x");
+                        break;
+                    case "b":
+                        expect((question as any)["answer"]).to.equal("y");
+                        break;
+                    case "c":
+                        expect((question as any)["answer"]).to.equal("z");
+                        break;
+                }
+            }
+        });
+    });
+
     describe("setGenInstall", () => {
         it("install method not exist", () => {
             const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
@@ -533,10 +564,10 @@ describe('yeomanui unit test', () => {
 
             response = await yeomanUiInstance.showPrompt(questions);        
             expect (response.country).to.equal(country);
-            expect(yeomanUiInstance["isReplaying"]).to.be.false;
+            expect(yeomanUiInstance["answersUtils"]["isReplaying"]).to.be.false;
 
-            yeomanUiInstance.back();
-            expect(yeomanUiInstance["isReplaying"]).to.be.true;
+            yeomanUiInstance.back(undefined);
+            expect(yeomanUiInstance["answersUtils"]["isReplaying"]).to.be.true;
 
             questions = [{name: "q1"}];
             response = await yeomanUiInstance.showPrompt(questions);
