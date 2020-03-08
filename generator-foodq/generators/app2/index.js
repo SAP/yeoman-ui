@@ -33,13 +33,10 @@ module.exports = class extends Generator {
           "Car",
           "Drone"
         ],
-        when: async (answers) => {
-          let indexOfAddress = -1;
-          for await (let [i, prompt] of this.prompts.items.entries()) {
-            if (prompt && prompt.name === "Address") {
-              indexOfAddress = i;
-            }
-          }
+        when: answers => {
+          const indexOfAddress = _.findIndex(this.prompts.items, prompt => {
+            return prompt.name === this.dynamicAddressPrompt.name;
+          });
 
           if (answers.isTakeaway) {
             // add address prompt if doesn't exist
