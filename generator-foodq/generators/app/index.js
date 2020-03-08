@@ -11,7 +11,7 @@ class Prompts {
 
     this.splice = (start, deleteCount, items) => {
       if (items) {
-        items = _.isArray(items) ? items : [items];
+        items = Array.isArray(items) ? items : [items];
         this.items.splice(start, deleteCount, ...items);
       } else {
         this.items.splice(start, deleteCount);
@@ -24,6 +24,10 @@ class Prompts {
     this.setCallback = (callback) => {
       this.callback = callback;
       callback(this.items);
+    }
+
+    this.size = () => {
+      return _.size(this.items);
     }
   }
 }
@@ -41,9 +45,7 @@ module.exports = class extends Generator {
     var prompts = [
       { name: "Hungry Info", description: "Hungry Info Description" }, 
       { name: "Hunger Level", description: "Hunger Level Description" }, 
-      { name: "Registration", description: "Registration Description" }, 
-      { name: "Take Away", description: "Take Away Description" }, 
-      { name: "Tip", description: "Tip Description" }
+      { name: "Registration", description: "Registration Description" }
     ];
     this.prompts = new Prompts(prompts);
 

@@ -5,6 +5,16 @@ module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts);
     this.prompts = opts.prompts;
+    this.parentQuantity = this.prompts.size();
+
+    this.dynamicAddressPrompt = { name: "Address", description: "Address Description" };
+
+    const prompts = [
+      { name: "Take Away", description: "Take Away Description" }, 
+      this.dynamicAddressPrompt,
+      { name: "Tip", description: "Tip Description" }];
+    
+      this.prompts.splice(this.parentQuantity, 0, prompts);
   }
 
   async prompting() {
@@ -31,11 +41,10 @@ module.exports = class extends Generator {
             }
           }
 
-          const parentQuantity = _.size(this.prompts.items);
           if (answers.isTakeaway) {
             // add address prompt if doesn't exist
             if (indexOfAddress === -1) {
-              this.prompts.splice(parentQuantity - 1, 0, { name: "Address", description: "Address Description" });
+              this.prompts.splice(this.parentQuantity + 1, 0, this.dynamicAddressPrompt);
             }
           } else {
             // remove address prompt if exists
