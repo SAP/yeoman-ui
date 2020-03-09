@@ -359,7 +359,8 @@ export class YeomanUI {
     }
 
     const genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
-    const genPrettyName = titleize(humanizeString(genName));
+    const genDisplayName = _.get(packageJson, "displayName", '');
+    const genPrettyName = _.isEmpty(genDisplayName) ? titleize(humanizeString(genName)) : genDisplayName;
     const genHomepage = _.get(packageJson, "homepage", '');
 
     return {
