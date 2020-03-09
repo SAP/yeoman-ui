@@ -377,7 +377,7 @@ describe('yeomanui unit test', () => {
 
             fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test3Description"}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test3Description", "displayName": "3rd - Test"}`);
 
             yeomanUi.setGenFilter(GeneratorFilter.create());
             const result = await yeomanUi.getGenerators();
@@ -388,7 +388,7 @@ describe('yeomanui unit test', () => {
             const test3Choice = result.questions[0].choices[2];
             expect(test1Choice.prettyName).to.be.equal("Test1 Project");
             expect(test2Choice.prettyName).to.be.equal("Test2 Module");
-            expect(test3Choice.prettyName).to.be.equal("Test3");
+            expect(test3Choice.prettyName).to.be.equal("3rd - Test");
         });
 
         it("get generators with homepage", async () => {
