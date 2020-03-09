@@ -162,7 +162,7 @@ module.exports = class extends Generator {
       },
       {
         type: "input",
-        guiType: "remote-file-browser",
+        guiType: "file-browser",
         name: "uploadMenu",
         message: "Upload menu",
         default: "/"
