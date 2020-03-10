@@ -137,8 +137,8 @@ export class YeomanUI {
       // TODO: support sub-generators
       env.register(meta.resolved);
 
-      const getGenNamespace = this.getGenNamespace(generatorName);
-      const gen: any = env.create(getGenNamespace, {});
+      const genNamespace = this.getGenNamespace(generatorName);
+      const gen: any = env.create(genNamespace, {});
       // check if generator defined a helper function called setPromptsCallback()
       const setPromptsCallback = _.get(gen, "setPromptsCallback");
       if (setPromptsCallback) {
@@ -369,10 +369,10 @@ export class YeomanUI {
   }
 
   private getGenMetadata(genName: string): Environment.GeneratorMeta {
-    const namespace = this.getGenNamespace(genName);
-    const genMetadata = _.get(this, ["genMeta", namespace]);
+    const genNamespace = this.getGenNamespace(genName);
+    const genMetadata = _.get(this, ["genMeta", genNamespace]);
     if (_.isNil(genMetadata)) {
-      const debugMessage = `${namespace} generator metadata was not found.`;
+      const debugMessage = `${genNamespace} generator metadata was not found.`;
       this.logger.debug(debugMessage);
     }
     return genMetadata;
