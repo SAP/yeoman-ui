@@ -38,11 +38,13 @@ module.exports = class extends Generator {
             return prompt.name === this.dynamicAddressPrompt.name;
           });
 
+          let bWhen = false;
           if (answers.isDelivery) {
             // add address prompt if doesn't exist
             if (indexOfAddress === -1) {
               this.prompts.splice(this.parentQuantity + 1, 0, this.dynamicAddressPrompt);
             }
+            bWhen = true;
           } else {
             // remove address prompt if exists
             if (indexOfAddress > -1) {
@@ -50,7 +52,7 @@ module.exports = class extends Generator {
             }
           }
 
-          return true;
+          return bWhen;
         }
       }
     ];
