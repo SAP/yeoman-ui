@@ -305,8 +305,7 @@ module.exports = class extends Generator {
 
   writing() {
     this.log('in writing');
-    this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "a
-                                                                 ", "")));
+    this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "a", "")));
     this.log('destinationRoot: ' + this.destinationRoot());
     this.fs.copyTpl(this.templatePath('index.html'),
     this.destinationPath('public/index.html'), {

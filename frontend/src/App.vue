@@ -364,7 +364,6 @@ export default {
     initRpc() {
       const functions = [
         "showPrompt",
-        "setPrompts",
         "setPromptList",
         "generatorInstall",
         "generatorDone",

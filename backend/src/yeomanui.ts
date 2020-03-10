@@ -405,18 +405,14 @@ export class YeomanUI {
   }
   
   private addCustomQuestionEventHandlers(questions: Environment.Adapter.Questions<any>): void {
-    for (const index in questions) {
+    for (let index in questions) {
       const question = (questions as any[])[Number.parseInt(index)];
-      const questionHandlers = this.customQuestionEventHandlers.get((question as any)["guiType"]);
+      const questionHandlers = this.customQuestionEventHandlers.get(question.guiType);
       if (questionHandlers) {
         questionHandlers.forEach((handler, methodName) => {
           (question as any)[methodName] = handler;
         });
       }
     }
-  }
-
-  private setPrompts(prompts: IPrompt[]): Promise<void> {
-    return this.rpc.invoke("setPrompts", [prompts]);
   }
 }
