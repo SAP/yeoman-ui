@@ -377,7 +377,7 @@ describe('yeomanui unit test', () => {
 
             fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test3Description"}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test3Description", "displayName": "3rd - Test"}`);
 
             yeomanUi.setGenFilter(GeneratorFilter.create());
             const result = await yeomanUi.getGenerators();
@@ -388,7 +388,7 @@ describe('yeomanui unit test', () => {
             const test3Choice = result.questions[0].choices[2];
             expect(test1Choice.prettyName).to.be.equal("Test1 Project");
             expect(test2Choice.prettyName).to.be.equal("Test2 Module");
-            expect(test3Choice.prettyName).to.be.equal("Test3");
+            expect(test3Choice.prettyName).to.be.equal("3rd - Test");
         });
 
         it("get generators with homepage", async () => {
@@ -576,6 +576,49 @@ describe('yeomanui unit test', () => {
             await yeomanUi["onGeneratorFailure"]("testGenName", "testError");
             // tslint:disable-next-line: no-unused-expression
             expect(doGeneratorDoneSpy.calledWith(false, "testGenName generator failed.\ntestError")).to.be.true;
+        });
+    });
+
+    describe("evaluateMethod()", async () => {
+        it("custom question events", async () => {
+            const testEventFunction = () => {
+                return true;
+            };
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            yeomanUiInstance.registerCustomQuestionEventHandler("questionType", "testEvent", testEventFunction);
+            yeomanUiInstance["currentQuestions"] = [{name:"question1", guiType: "questionType"}];
+            const response = await yeomanUiInstance.evaluateMethod(null, "question1", "testEvent");
+            expect(response).to.be.true;
+        });
+
+        it("question method is called", async () => {
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            yeomanUiInstance["currentQuestions"] = [{name:"question1", method1:()=>{
+                return true;
+            }}];
+            const response = await yeomanUiInstance.evaluateMethod(null, "question1", "method1");
+            // tslint:disable-next-line: no-unused-expression
+            expect(response).to.be.true;
+        });
+
+        it("no questions", async () => {
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            const response = await yeomanUiInstance.evaluateMethod(null, "question1", "method1");
+            expect(response).to.be.undefined;
+        });
+
+        it("method throws exception", async () => {
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            yeomanUiInstance["gen"] = Object.create({});
+            yeomanUiInstance["gen"].options = {};
+            yeomanUiInstance["currentQuestions"] = [{name:"question1", method1:()=>{
+                throw new Error("Error");
+            }}];
+            try {
+                await yeomanUiInstance.evaluateMethod(null, "question1", "method1");
+            } catch(e) {
+                expect(e.toString()).to.contain("method1");
+            }
         });
     });
 });

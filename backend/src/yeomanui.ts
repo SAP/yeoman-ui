@@ -59,6 +59,7 @@ export class YeomanUI {
   private promptCount: number;
   private currentQuestions: Environment.Adapter.Questions<any>;
   private genFilter: GeneratorFilter;
+  private customQuestionEventHandlers: Map<string, Map<string, Function>>;
 
   constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter) {
     this.rpc = rpc;
@@ -81,6 +82,23 @@ export class YeomanUI {
     this.genMeta = {};
     this.currentQuestions = {};
     this.setGenFilter(genFilter);
+    this.customQuestionEventHandlers = new Map();
+  }
+
+  public registerCustomQuestionEventHandler(questionType: string, methodName: string, handler: Function): void {
+    let entry: Map<string, Function> = this.customQuestionEventHandlers.get(questionType);
+    if (entry === undefined) {
+      this.customQuestionEventHandlers.set(questionType, new Map());
+      entry = this.customQuestionEventHandlers.get(questionType);
+    }
+    entry.set(methodName, handler);
+  }
+
+  private getCustomQuestionEventHandler(questionType: string, methodName: string): Function {
+    const entry: Map<string, Function> = this.customQuestionEventHandlers.get(questionType);
+    if (entry !== undefined) {
+      return entry.get(methodName);
+    }
   }
 
   public setGenFilter(genFilter: GeneratorFilter) {
@@ -166,7 +184,12 @@ export class YeomanUI {
           return (_.get(question, "name") === questionName);
         });
         if (relevantQuestion) {
-          return await relevantQuestion[methodName].apply(this.gen, params);
+          const customQuestionEventHandler: Function = this.getCustomQuestionEventHandler(relevantQuestion["guiType"], methodName);
+          if (customQuestionEventHandler !== undefined) {
+            return await customQuestionEventHandler.apply(this.gen, params);
+          } else {
+            return await relevantQuestion[methodName].apply(this.gen, params);
+          }
         }
       }
     } catch (error) {
@@ -324,7 +347,8 @@ export class YeomanUI {
     }
 
     const genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
-    const genPrettyName = titleize(humanizeString(genName));
+    const genDisplayName = _.get(packageJson, "displayName", '');
+    const genPrettyName = _.isEmpty(genDisplayName) ? titleize(humanizeString(genName)) : genDisplayName;
     const genHomepage = _.get(packageJson, "homepage", '');
 
     return {
@@ -368,6 +392,7 @@ export class YeomanUI {
    * Also functions cannot be evaluated on client)
    */
   private normalizeFunctions(questions: Environment.Adapter.Questions<any>): Environment.Adapter.Questions<any> {
+    this.addCustomQuestionEventHandlers(questions);
     return JSON.parse(JSON.stringify(questions, YeomanUI.funcReplacer));
   }
 
@@ -377,5 +402,21 @@ export class YeomanUI {
     });
 
     return this.rpc.invoke("setPromptList", [promptsToDisplay]);
+  }
+  
+  private addCustomQuestionEventHandlers(questions: Environment.Adapter.Questions<any>): void {
+    for (const index in questions) {
+      const question = (questions as any[])[Number.parseInt(index)];
+      const questionHandlers = this.customQuestionEventHandlers.get((question as any)["guiType"]);
+      if (questionHandlers) {
+        questionHandlers.forEach((handler, methodName) => {
+          (question as any)[methodName] = handler;
+        });
+      }
+    }
+  }
+
+  private setPrompts(prompts: IPrompt[]): Promise<void> {
+    return this.rpc.invoke("setPrompts", [prompts]);
   }
 }

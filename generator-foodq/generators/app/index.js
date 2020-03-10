@@ -149,8 +149,6 @@ module.exports = class extends Generator {
 
     this.answers = await this.prompt(prompts);
 
-    this.log("Food", this.answers.food);
-
     // currently not supported:
     const ui = new Inquirer.ui.BottomBar();
 
@@ -193,6 +191,13 @@ module.exports = class extends Generator {
           value: "includeModernizr",
           checked: true
         }]
+      },
+      {
+        type: "input",
+        guiType: "remote-file-browser",
+        name: "uploadMenu",
+        message: "Upload menu",
+        default: "/"
       },
       {
         type: 'list',
@@ -300,7 +305,8 @@ module.exports = class extends Generator {
 
   writing() {
     this.log('in writing');
-    this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "answers.food", "")));
+    this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "a
+                                                                 ", "")));
     this.log('destinationRoot: ' + this.destinationRoot());
     this.fs.copyTpl(this.templatePath('index.html'),
     this.destinationPath('public/index.html'), {
