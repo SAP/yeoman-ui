@@ -77,6 +77,5 @@ Contributing information can be found in the [CONTRIBUTING.md](CONTRIBUTING.md) 
 * support extensible question type custom user interfaces for complex operations (e.g. choose odata source)
 * support inquirer plugins (e.g. date/time)
 
-
 ## License
 Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved. This file is licensed under the Apache Software License, v. 2 except as noted otherwise in the [LICENSE]() file.
