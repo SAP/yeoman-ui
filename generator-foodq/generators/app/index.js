@@ -18,7 +18,7 @@ module.exports = class extends Generator {
     var prompts = [
       new types.Prompt({name: "Hungry Info", description: "Hungry Info Description"}),
       new types.Prompt({name: "Hunger Level", description: "Hunger Level Description"}),
-      new types.Prompt({name: "Registration", description: "Registration Description"})
+      new types.Prompt({name: "Registration", description: "Thank you for your interest in our resturant.\nPlease enter credentials to register.\n(it shouldn't take you more then 1 minute)"})
     ];
     this.prompts = new types.Prompts(prompts);
 
@@ -278,7 +278,7 @@ module.exports = class extends Generator {
 
   writing() {
     this.log('in writing');
-    this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "a", "")));
+    this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "answers.food", "")));
     this.log('destinationRoot: ' + this.destinationRoot());
     this.fs.copyTpl(this.templatePath('index.html'),
       this.destinationPath('public/index.html'), {

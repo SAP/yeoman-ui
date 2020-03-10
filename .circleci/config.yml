@@ -72,6 +72,23 @@ jobs: # a collection of steps
           working_directory: backend
           command: npm publish
 
+  deploy-types:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: compile for package
+          working_directory: types
+          command: npm run compile
+      - run:
+          name: Authenticate with registry
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+      - run:
+          name: Publish package
+          working_directory: types
+          command: npm publish
+
 workflows:
   version: 2
   test-deploy:
@@ -83,6 +100,12 @@ workflows:
       - deploy:
           requires:
             - build-and-test
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - deploy-types:
           filters:
             tags:
               only: /^v.*/
