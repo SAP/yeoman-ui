@@ -16,9 +16,9 @@ module.exports = class extends Generator {
     };
 
     var prompts = [
-      new types.Prompt({name: "Hungry Info", description: "Hungry Info Description"}),
-      new types.Prompt({name: "Hunger Level", description: "Hunger Level Description"}),
-      new types.Prompt({name: "Registration", description: "Thank you for your interest in our resturant.\nPlease enter credentials to register.\n(it shouldn't take you more then 1 minute)"})
+      {name: "Hunger Info", description: "Hunger Info Description"},
+      {name: "Hunger Level", description: "Hunger Level Description"},
+      {name: "Registration", description: "Thank you for your interest in our resturant.\nPlease enter credentials to register.\n(it shouldn't take you more then 1 minute)"}
     ];
     this.prompts = new types.Prompts(prompts);
 

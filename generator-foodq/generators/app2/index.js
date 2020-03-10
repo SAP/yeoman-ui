@@ -1,6 +1,5 @@
 var Generator = require('yeoman-generator');
 var _ = require('lodash');
-var types = require('../../../types');
 
 module.exports = class extends Generator {
   constructor(args, opts) {
@@ -8,23 +7,23 @@ module.exports = class extends Generator {
     this.prompts = opts.prompts;
     this.parentQuantity = this.prompts.size();
 
-    this.dynamicAddressPrompt = new types.Prompt({name: "Address", description: "Address Description"});
+    this.dynamicAddressPrompt = {name: "Address", description: "Address Description"};
 
     const prompts = [
-      new types.Prompt({name: "Take Away", description: "Take Away Description"}),
+      {name: "Delivery", description: "Delivery Description"},
       this.dynamicAddressPrompt,
-      new types.Prompt({name: "Tip", description: "Tip Description"})];
+      {name: "Tip", description: "Tip Description"}];
 
     this.prompts.splice(this.parentQuantity, 0, prompts);
   }
 
   async prompting() {
-    // isTakeaway question appears twice in CLI: https://github.com/yeoman/generator/issues/1100
+    // isDelivery question appears twice in CLI: https://github.com/yeoman/generator/issues/1100
     let prompts = [
       {
         type: "confirm",
-        name: "isTakeaway",
-        message: "Do you want to take away?"
+        name: "isDelivery",
+        message: "Do you want to get food near your home?"
       },
       {
         type: "list",
@@ -39,7 +38,7 @@ module.exports = class extends Generator {
             return prompt.name === this.dynamicAddressPrompt.name;
           });
 
-          if (answers.isTakeaway) {
+          if (answers.isDelivery) {
             // add address prompt if doesn't exist
             if (indexOfAddress === -1) {
               this.prompts.splice(this.parentQuantity + 1, 0, this.dynamicAddressPrompt);
@@ -58,7 +57,7 @@ module.exports = class extends Generator {
 
     this.answers = await this.prompt(prompts);
 
-    if (this.answers.isTakeaway) {
+    if (this.answers.isDelivery) {
       let addressQuestions = [
         {
           type: "input",
