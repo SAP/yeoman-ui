@@ -132,7 +132,7 @@ export class YeomanUIPanel {
 		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.panel);
 
 		this.yeomanui = new YeomanUI(this.rpc, vscodeYouiEvents, outputChannel, this.logger, YeomanUIPanel.genFilter);
-		this.yeomanui.registerCustomQuestionEventHandler("remote-file-browser", "getFilePath", this.showOpenDialog);
+		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenDialog);
 
 		// Set the webview's initial html content
 		this._update();
