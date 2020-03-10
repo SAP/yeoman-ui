@@ -2,6 +2,7 @@ html,
 body {
   height: 100%;
   background-color: var(--vscode-editor-background, #1e1e1e);
+  overflow: hidden !important;
 }
 #app {
   height: 100%;

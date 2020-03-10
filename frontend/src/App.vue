@@ -24,7 +24,8 @@
         <Navigation v-if="prompts.length" :promptIndex="promptIndex" :prompts="prompts" />
       </v-col>
       <v-col cols="9" class="right-col">
-        <v-col class="prompts-col" cols="12">
+        <v-row class="prompts-col">
+          <v-col>
           <Done
             v-if="isDone"
             :doneStatus="doneStatus"
@@ -45,23 +46,18 @@
               @answered="onAnswered"
             />
           </v-slide-x-transition>
-        </v-col>
-        <v-col
+          </v-col>
+        </v-row>
+        <v-row
           v-if="prompts.length > 0 && !isDone"
-          class="bottom-right-col"
-          style="height: 4rem;"
-          offset-xl="9"
-          offset-lg="9"
-          offset-md="9"
-          offset-sm="8"
-          offset-xs="8"
-          xl="3"
-          lg="3"
-          md="3"
-          sm="4"
-          xs="4"
+          style="height: 4rem"
+          sm="auto"
         >
-          <v-row class="progress-buttons-row" align="center" justify="end">
+          <div class="bottom-right-col" style="flex:1;">
+          </div>
+          <div class="diagonal">
+          </div>
+          <div style="display:flex;align-items: center;">
             <v-btn
               id="back"
               @click="back"
@@ -72,8 +68,8 @@
             <v-btn :disabled="!stepValidated" @click="next">
               Next<v-icon right>mdi-chevron-right</v-icon>
             </v-btn>
-          </v-row>
-        </v-col>
+          </div>
+        </v-row>
       </v-col>
     </v-row>
 
@@ -472,7 +468,8 @@ div.consoleClassVisible .v-footer {
   background-color: var(--vscode-editorWidget-background, #252526);
 }
 .prompts-col {
-  overflow-y: scroll;
+  overflow-y: auto;
+  margin: 0px;
 }
 .main-row,
 .prompts-col {
@@ -490,23 +487,14 @@ div.consoleClassVisible .v-footer {
 .right-col {
   padding: 0 !important;
 }
+.diagonal {
+  width: 80px;
+  background: linear-gradient(60deg, var(--vscode-editorWidget-background, #252526) 0%, var(--vscode-editorWidget-background, #252526) 50%, transparent 50%);
+  background-color: var(--vscode-editor-background, #1e1e1e);
+}
 .bottom-right-col {
   background: var(--vscode-editorWidget-background, #252526);
-  position: relative;
   overflow: hidden;
+  margin: 0px;
 }
-.bottom-right-col:before {
-  height: 100%;
-  width: 100%;
-  background-color: var(--vscode-editor-background, #1e1e1e);
-  position: absolute;
-  content: "";
-  transform: rotate(-60deg);
-  transform-origin: bottom left;
-}
-div.bottom-right-col .progress-buttons-row {
-  padding-right: 24px;
-  padding-top: 4px;
-}
-
 </style>
