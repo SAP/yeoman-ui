@@ -15,6 +15,7 @@ import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 import { GeneratorType, GeneratorFilter } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
+import {IPrompt} from "../../types";
 
 export interface IGeneratorChoice {
   name: string;
@@ -31,9 +32,7 @@ export interface IGeneratorQuestion {
   choices: IGeneratorChoice[];
 }
 
-export interface IPrompt {
-  name: string;
-  description: string;
+export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
 }
 
@@ -115,11 +114,11 @@ export class YeomanUI {
     return errorMessage;
   }
 
-  public async getGenerators(): Promise<IPrompt> {
+  public async getGenerators(): Promise<IQuestionsPrompt> {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
 
-    const promise: Promise<IPrompt> = new Promise(resolve => {
+    const promise: Promise<IQuestionsPrompt> = new Promise(resolve => {
       const env: Environment.Options = this.getEnv();
       env.lookup(async () => this.onEnvLookup(env, resolve, this.genFilter));
     });
@@ -202,7 +201,7 @@ export class YeomanUI {
   public async receiveIsWebviewReady() {
     try {
       // TODO: loading generators takes a long time; consider prefetching list of generators
-      const generators: IPrompt = await this.getGenerators();
+      const generators: IQuestionsPrompt = await this.getGenerators();
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
       await this.runGenerator(response.name);
     } catch (error) {
@@ -397,8 +396,8 @@ export class YeomanUI {
   }
 
   private setPromptList(prompts: IPrompt[]): Promise<void> {
-    const promptsToDisplay: IPrompt[] = prompts.map(value => {
-      return _.assign({ questions: [], name: "", description: "" }, value);
+    const promptsToDisplay: IPrompt[] = prompts.map((prompt: IPrompt) => {
+      return _.assign({ questions: [], name: "", description: ""}, prompt);
     });
 
     return this.rpc.invoke("setPromptList", [promptsToDisplay]);

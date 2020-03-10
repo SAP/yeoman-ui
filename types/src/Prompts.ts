@@ -4,9 +4,9 @@ import _ from "lodash";
 export class Prompts {
     private callback: any;
 
-    constructor(private items: Prompt[]) { }
+    constructor(private items: IPrompt[]) { }
 
-    public splice(start: number, deleteCount: number, items: Prompt[]) {
+    public splice(start: number, deleteCount: number, items: IPrompt[]) {
         if (items) {
             items = Array.isArray(items) ? items : [items];
             this.items.splice(start, deleteCount, ...items);
@@ -28,12 +28,7 @@ export class Prompts {
     }
 }
 
-export class Prompt {
-    public name: string;
-    public description: string;
-
-    constructor(prompt: any) { 
-        this.name = _.get(prompt, "name", "");
-        this.description = _.get(prompt, "description", "");
-    }
+export interface IPrompt {
+    name: string;
+    description: string;
 }
