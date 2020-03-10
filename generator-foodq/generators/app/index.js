@@ -3,34 +3,7 @@ var chalkPipe = require('chalk-pipe');
 var Inquirer = require('inquirer');
 var path = require('path');
 var _ = require('lodash');
-
-// TODO: externalize this class to library
-class Prompts {
-  constructor(items) {
-    this.items = items;
-
-    this.splice = (start, deleteCount, items) => {
-      if (items) {
-        items = Array.isArray(items) ? items : [items];
-        this.items.splice(start, deleteCount, ...items);
-      } else {
-        this.items.splice(start, deleteCount);
-      }
-      if (this.callback) {
-        this.callback(this.items);
-      }
-    }
-
-    this.setCallback = (callback) => {
-      this.callback = callback;
-      callback(this.items);
-    }
-
-    this.size = () => {
-      return _.size(this.items);
-    }
-  }
-}
+var types = require('../../../types');
 
 module.exports = class extends Generator {
   constructor(args, opts) {
@@ -43,11 +16,11 @@ module.exports = class extends Generator {
     };
 
     var prompts = [
-      { name: "Hungry Info", description: "Hungry Info Description" }, 
-      { name: "Hunger Level", description: "Hunger Level Description" }, 
-      { name: "Registration", description: "Registration Description" }
+      new types.Prompt({name: "Hungry Info", description: "Hungry Info Description"}),
+      new types.Prompt({name: "Hunger Level", description: "Hunger Level Description"}),
+      new types.Prompt({name: "Registration", description: "Registration Description"})
     ];
-    this.prompts = new Prompts(prompts);
+    this.prompts = new types.Prompts(prompts);
 
     this.option('babel');
   }
@@ -308,7 +281,7 @@ module.exports = class extends Generator {
     this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "a", "")));
     this.log('destinationRoot: ' + this.destinationRoot());
     this.fs.copyTpl(this.templatePath('index.html'),
-    this.destinationPath('public/index.html'), {
+      this.destinationPath('public/index.html'), {
       title: 'Templating with Yeoman',
       hungry: this.answers.hungry,
       confirmHungry: this.answers.confirmHungry,
@@ -316,17 +289,17 @@ module.exports = class extends Generator {
       beers: this.answers.beers,
       fav_color: this.answers.fav_color,
       number: this.answers.number,
-      
+
       hungerLevel: this.answers.hungerLevel,
       dessert: this.answers.dessert,
       enjoy: this.answers.enjoy,
       comments: this.answers.comments,
-      
+
       repotype: this.answers.repotype,
       repoperms: this.answers.repoperms,
       email: this.answers.email,
       password: this.answers.password
-      }
+    }
     );
     this.fs.copy(
       this.templatePath('README.md'),

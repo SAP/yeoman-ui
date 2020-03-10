@@ -1,5 +1,6 @@
 var Generator = require('yeoman-generator');
 var _ = require('lodash');
+var types = require('../../../types');
 
 module.exports = class extends Generator {
   constructor(args, opts) {
@@ -7,14 +8,14 @@ module.exports = class extends Generator {
     this.prompts = opts.prompts;
     this.parentQuantity = this.prompts.size();
 
-    this.dynamicAddressPrompt = { name: "Address", description: "Address Description" };
+    this.dynamicAddressPrompt = new types.Prompt({name: "Address", description: "Address Description"});
 
     const prompts = [
-      { name: "Take Away", description: "Take Away Description" }, 
+      new types.Prompt({name: "Take Away", description: "Take Away Description"}),
       this.dynamicAddressPrompt,
-      { name: "Tip", description: "Tip Description" }];
-    
-      this.prompts.splice(this.parentQuantity, 0, prompts);
+      new types.Prompt({name: "Tip", description: "Tip Description"})];
+
+    this.prompts.splice(this.parentQuantity, 0, prompts);
   }
 
   async prompting() {
