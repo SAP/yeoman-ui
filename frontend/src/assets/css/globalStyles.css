@@ -102,7 +102,7 @@ div.prompt-title {
 
 form.inquirer-gui .v-text-field fieldset {
   border-radius: 0;
-  border-width: medium;
+  border-width: thin;
   border-style: solid;
   background-color: var(--vscode-input-background, #3c3c3c);
 }

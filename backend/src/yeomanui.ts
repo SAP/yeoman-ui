@@ -5,7 +5,7 @@ import * as _ from "lodash";
 import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
 import { IPrompt } from "./iPrompt";
-import { AnswersUtils } from "./answersUtils";
+import { ReplayUtils, ReplayState } from "./replayUtils";
 const titleize = require('titleize');
 const humanizeString = require('humanize-string');
 const datauri = require("datauri");
@@ -56,7 +56,7 @@ export class YeomanUI {
   private currentQuestions: Environment.Adapter.Questions<any>;
   private genFilter: GeneratorFilter;
   private generatorName: string;
-  private answersUtils: AnswersUtils;
+  private replayUtils: ReplayUtils;
   private customQuestionEventHandlers: Map<string, Map<string, Function>>;
 
   constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter) {
@@ -65,7 +65,7 @@ export class YeomanUI {
       throw new Error("rpc must be set");
     }
     this.generatorName = "";
-    this.answersUtils = new AnswersUtils();
+    this.replayUtils = new ReplayUtils();
     this.youiEvents = youiEvents;
     this.outputChannel = outputChannel;
     this.logger = logger;
@@ -147,8 +147,8 @@ export class YeomanUI {
         const prompts: IPrompt[] = promptNames.map(value => {
           return _.assign({ questions: [], name: "", description: "" }, value);
         });
-        if (this.answersUtils.isReplaying) {
-          this.answersUtils.replayedPrompts.push(...prompts);
+        if (this.replayUtils.isReplaying) {
+          this.replayUtils.setPrompts(prompts);
         } else {
           this.setPrompts(prompts);
         }
@@ -224,8 +224,7 @@ export class YeomanUI {
       const generators: IPrompt = await this.getGenerators();
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 
-      this.answersUtils.reset();
-
+      this.replayUtils.clear();
       await this.runGenerator(response.name);
     } catch (error) {
       this.logError(error);
@@ -253,39 +252,28 @@ export class YeomanUI {
     this.promptCount++;
     const promptName = this.getPromptName(questions);
 
-    if (this.answersUtils.isReplaying) {
-      if (this.answersUtils.replayQueue.length > 1) {
-        const prompt: IPrompt = {
-          name: promptName, description: "", questions: []
-        };
-        this.answersUtils.replayedPrompts.push(prompt);
-        return this.answersUtils.replayQueue.shift();
-      } else {
-        this.setPrompts(this.answersUtils.replayedPrompts);
-        this.answersUtils.stopReplay();
-        const answers = this.answersUtils.replayStack.pop();
-        AnswersUtils.setDefaults(questions, answers);
-      }
+    if (this.replayUtils.getReplayState() === ReplayState.Replaying) {
+      return this.replayUtils.advanceReplay(promptName);
+    } else if (this.replayUtils.getReplayState() === ReplayState.EndingReplay) {
+      const prompts: IPrompt[] = this.replayUtils.stopReplay(questions);
+      this.setPrompts(prompts);
     }
+
+    this.replayUtils.recallAnswers(questions);
 
     this.currentQuestions = questions;
     const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
     if (_.isEmpty(mappedQuestions)) {
       return {};
     }
-    const previousAnswers = this.answersUtils.recallAnswers(questions);
-    if (previousAnswers !== undefined) {
-      AnswersUtils.setDefaults(mappedQuestions, previousAnswers);
-    }
-    const response = await this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
-    this.answersUtils.replayStack.push(response);
-    this.answersUtils.rememberAnswers(questions, response);
-    return response;
+
+    const answers = await this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
+    this.replayUtils.rememberAnswers(questions, answers);
+    return answers;
   }
 
   public back(partialAnswers: Environment.Adapter.Answers): void {
-    this.answersUtils.rememberAnswers(this.currentQuestions, partialAnswers);
-    this.answersUtils.startReplay();
+    this.replayUtils.startReplay(this.currentQuestions, partialAnswers);
     this.runGenerator(this.generatorName);
   }
 
@@ -399,7 +387,8 @@ export class YeomanUI {
     }
 
     const genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
-    const genPrettyName = titleize(humanizeString(genName));
+    const genDisplayName = _.get(packageJson, "displayName", '');
+    const genPrettyName = _.isEmpty(genDisplayName) ? titleize(humanizeString(genName)) : genDisplayName;
     const genHomepage = _.get(packageJson, "homepage", '');
 
     return {

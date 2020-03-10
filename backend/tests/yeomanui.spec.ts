@@ -6,7 +6,7 @@ import { expect } from "chai";
 import * as _ from "lodash";
 import * as path from "path";
 import {YeomanUI, IGeneratorQuestion} from "../src/yeomanui";
-import {AnswersUtils} from "../src/answersUtils";
+import {ReplayUtils} from "../src/replayUtils";
 import * as yeomanEnv from "yeoman-environment";
 import { YouiLog } from "../src/youi-log";
 import { YouiEvents } from '../src/youi-events';
@@ -378,7 +378,7 @@ describe('yeomanui unit test', () => {
 
             fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test3Description"}`);
+            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test3Description", "displayName": "3rd - Test"}`);
 
             yeomanUi.setGenFilter(GeneratorFilter.create());
             const result = await yeomanUi.getGenerators();
@@ -389,7 +389,7 @@ describe('yeomanui unit test', () => {
             const test3Choice = result.questions[0].choices[2];
             expect(test1Choice.prettyName).to.be.equal("Test1 Project");
             expect(test2Choice.prettyName).to.be.equal("Test2 Module");
-            expect(test3Choice.prettyName).to.be.equal("Test3");
+            expect(test3Choice.prettyName).to.be.equal("3rd - Test");
         });
 
         it("get generators with homepage", async () => {
@@ -471,7 +471,7 @@ describe('yeomanui unit test', () => {
                 q2: "y",
                 q3: "z"
             }
-            AnswersUtils.setDefaults(questions, answers);
+            ReplayUtils.setDefaults(questions, answers);
             for (const index in questions) {
                 const question = questions[index];
                 switch (question.name) {
@@ -562,10 +562,10 @@ describe('yeomanui unit test', () => {
 
             response = await yeomanUiInstance.showPrompt(questions);        
             expect (response.country).to.equal(country);
-            expect(yeomanUiInstance["answersUtils"]["isReplaying"]).to.be.false;
+            expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.false;
 
             yeomanUiInstance.back(undefined);
-            expect(yeomanUiInstance["answersUtils"]["isReplaying"]).to.be.true;
+            expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.true;
 
             questions = [{name: "q1"}];
             response = await yeomanUiInstance.showPrompt(questions);
