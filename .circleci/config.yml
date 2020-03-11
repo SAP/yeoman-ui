@@ -6,20 +6,34 @@ defaults: &defaults
     - image: circleci/node:10.17.0
 
 jobs: # a collection of steps
+  build-types:
+    <<: *defaults  
+    steps:
+      - checkout
+      - restore_cache:
+          keys: dependency-cache-{{ checksum "types/package.json" }}
+       - run:
+          name: install types
+          working_directory: types
+          command: npm install
+      - run:
+          name: compile types
+          working_directory: types
+          command: npm run compile
+      - save_cache:
+          paths:
+            - types/node_modules
+          key: dependency-cache-{{ checksum "types/package.json" }}
+      - persist_to_workspace:
+          root: ~/repo
+          paths: .
+
   build-and-test:
     <<: *defaults  
     steps:
       - checkout
       - restore_cache:
-          key: dependency-cache-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}-{{ checksum "types/package.json" }}
-      - run:
-          name: install types
-          working_directory: types
-          command: npm install
-      - run:
-          name: build types
-          working_directory: types
-          command: npm run compile
+          key: dependency-cache-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}
       - run:
           name: install frontend
           working_directory: frontend
@@ -48,7 +62,7 @@ jobs: # a collection of steps
           paths:
             - backend/node_modules
             - frontend/node_modules
-          key: dependency-cache-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}-{{ checksum "types/package.json" }}
+          key: dependency-cache-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}
       - persist_to_workspace:
           root: ~/repo
           paths: .
@@ -58,6 +72,19 @@ jobs: # a collection of steps
           prefix: tests
       - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: test-results.xml
+
+  deploy-types:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Authenticate with registry
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+      - run:
+          name: Publish package
+          working_directory: types
+          command: npm publish
 
   deploy:
     <<: *defaults
@@ -80,36 +107,30 @@ jobs: # a collection of steps
           working_directory: backend
           command: npm publish
 
-  deploy-types:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/repo
-      - run:
-          name: Authenticate with registry
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
-      - run:
-          name: Publish package
-          working_directory: types
-          command: npm publish
-
 workflows:
   version: 2
   test-deploy:
     jobs:
+      - build-types:
+          filters:
+            tags:
+              only: /.*/
+
       - build-and-test:
           filters:
             tags:
               only: /.*/
-      - deploy:
-          requires:
-            - build-and-test
+      
+      - deploy-types:
           filters:
             tags:
               only: /^v.*/
             branches:
               ignore: /.*/
-      - deploy-types:
+
+      - deploy:
+          requires:
+            - build-and-test
           filters:
             tags:
               only: /^v.*/
