@@ -43,9 +43,6 @@ describe('Header.vue', () => {
     test('click triggers reload method', async () => {
         const rpcInvokeMockFunction = jest.fn()
         wrapper = initComponent(Header, {
-            rpc: {
-                invoke: rpcInvokeMockFunction
-            }
         }, true)
         
         wrapper.findAll("button").wrappers[1].trigger('click')
