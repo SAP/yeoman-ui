@@ -192,9 +192,9 @@ export class YeomanUIPanel {
 		}
 		const uiMessages = _.assign({}, backendMessages, _.get(YeomanUIPanel, "messages", {}));
 		this.panel.title = _.get(uiMessages, "panel_title");
-		
+
 		this.setMessages(uiMessages);
-		
+
 		this.panel.webview.html = indexHtml;
 	}
 }

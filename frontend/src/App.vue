@@ -81,7 +81,6 @@
   </v-app>
 </template>
 
-
 <script>
 import Vue from "vue";
 import Loading from "vue-loading-overlay";
@@ -107,7 +106,6 @@ function initialState() {
     stepValidated: false,
     prompts: [],
     promptIndex: 0,
-    index: 0,
     rpc: Object,
     resolve: Object,
     reject: Object,
@@ -119,7 +117,8 @@ function initialState() {
     showConsole: false,
     messages: {},
     showBusyIndicator: false,
-    transitionToggle: false
+    transitionToggle: false,
+    promptsInfoToDisplay: []
   };
 }
 
@@ -190,9 +189,7 @@ export default {
         this.currentPrompt.questions[0].type==='generators';
     },
     setBusyIndicator() {
-      this.showBusyIndicator =
-        _.isEmpty(this.prompts) ||
-        (this.currentPrompt.status === PENDING && !this.isDone);
+      this.showBusyIndicator = _.isEmpty(this.prompts) || (this.currentPrompt.status === PENDING && !this.isDone);
     },
     next() {
       if (this.resolve) {
@@ -220,9 +217,8 @@ export default {
     },
     selectGenerator(generatorName, generatorPrettyName) {
       this.stepValidated = true;
-      const currentPrompt = this.currentPrompt;
-      if (currentPrompt) {
-        currentPrompt.answers.name = generatorName;
+      if (this.currentPrompt) {
+        _.set(this.currentPrompt, "answers.name", generatorName);
       }
       this.generatorName = generatorName;
       this.generatorPrettyName = generatorPrettyName;
@@ -237,51 +233,32 @@ export default {
     setMessages(messages) {
       this.messages = messages;
     },
-    setPrompts(prompts) {
-      // TODO:
-      //   if prompt name is provided, find an existing prompt based on key or name:
-      //     if found then update it
-      //     if not found then create a prompt
-      //   if no prompt name is provided, assign incoming question to current prompt
-      _.forEach(prompts, (prompt, index) => {
-        if (index === 0) {
-          if (prompt.status === PENDING) {
-            // new pending prompt
-            this.prompts.push(prompt);
-          } else {
-            if (this.currentPrompt) {
-              this.updateCurrentPrompt(prompt);
-            } else {
-              // first prompt (Select Generator)
-              prompt.active = true;
-              this.prompts.push(prompt);
-            }
-          }
-        } else {
-          // multiple prompts provided -- simply add them
-          this.prompts.push(prompt);
-        }
-      });
+    setPromptList(prompts) {
+      prompts = prompts || [];
+      this.promptsInfoToDisplay = _.cloneDeep(prompts);
+      // replace all existing prompts except 1st (generator selction) and current prompt
+      const startIndex = this.promptIndex + 1;
+      const deleteCount = _.size(this.prompts) - this.promptIndex;
+      const itemsToInsert = prompts.splice(this.promptIndex, _.size(prompts));
+      this.prompts.splice(startIndex, deleteCount, ...itemsToInsert);
     },
-    updateCurrentPrompt(prompt) {
-      this.currentPrompt.questions = prompt.questions;
-      if (
-        prompt.name &&
-        this.currentPrompt.name === this.messages.step_is_pending
-      ) {
-        this.currentPrompt.name = prompt.name;
-        this.currentPrompt.description = _.get(prompt, "description", "");
-      }
-      // if questions are provided, remote the pending status
-      if (_.size(prompt.questions) > 0) {
-        delete this.currentPrompt.status;
+    setPrompts(prompts) {
+      const firstIncomingPrompt = _.get(prompts, "[0]");
+      if (firstIncomingPrompt) {
+        let startIndex = this.promptIndex;
+        let deleteCount = prompts.length;
+        if (!this.currentPrompt || firstIncomingPrompt.status === PENDING) {
+          startIndex = this.promptIndex + 1;
+          deleteCount = 0;
+        }
+        this.prompts.splice(startIndex, deleteCount, ...prompts);
       }
     },
     prepQuestions(questions) {
       for (let question of questions) {
         for (let prop in question) {
           if (question[prop] === FUNCTION) {
-            var that = this;
+            const that = this;
             question[prop] = async (...args) => {
               let showBusy = true;
               setTimeout(() => {
@@ -329,6 +306,10 @@ export default {
       if (name === "select_generator") {
         promptDescription = this.messages.select_generator_description;
         promptName = this.messages.select_generator_name;
+      } else {
+        const promptToDisplay = _.get(this.promptsInfoToDisplay, "[" + (this.promptIndex - 1) +"]");
+        promptDescription = _.get(promptToDisplay, "description", "");
+        promptName = _.get(promptToDisplay, "name", name);
       }
 
       const prompt = Vue.observable({
@@ -383,7 +364,7 @@ export default {
     initRpc() {
       const functions = [
         "showPrompt",
-        "setPrompts",
+        "setPromptList",
         "generatorInstall",
         "generatorDone",
         "log",
