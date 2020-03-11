@@ -24,7 +24,7 @@
     "chalk": "^2.0.0",
     "inquirer": "^6.2.2",
     "lodash": "^4.17.15",
-    "@sap-devx/yeoman-ui-types": "file:../types"
+    "@sap-devx/yeoman-ui-types": "0.0.1"
   },
   "generator-filter": {
     "type": "project"

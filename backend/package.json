@@ -105,7 +105,7 @@
 		"titleize": "^1.0.1",
 		"ws": "^7.2.0",
 		"yeoman-environment": "^2.8.0",
-		"@sap-devx/yeoman-ui-types": "file:../types"
+		"@sap-devx/yeoman-ui-types": "0.0.1"
 	},
 	"devDependencies": {
 		"@types/chai": "^4.2.9",
