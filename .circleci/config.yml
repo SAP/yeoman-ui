@@ -48,6 +48,7 @@ jobs: # a collection of steps
       - persist_to_workspace:
           root: ~/repo
           paths: 
+            - .*
            # https://golang.org/pkg/path/filepath/#Match
             - yeoman-ui-*
       - store_artifacts: # special step to save test results as as artifact
