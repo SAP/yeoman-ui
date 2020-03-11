@@ -253,7 +253,7 @@ export class YeomanUI {
     const promptName = this.getPromptName(questions);
 
     if (this.replayUtils.getReplayState() === ReplayState.Replaying) {
-      return this.replayUtils.advanceReplay(promptName);
+      return this.replayUtils.advanceReplay(this.promptCount, promptName);
     } else if (this.replayUtils.getReplayState() === ReplayState.EndingReplay) {
       const prompts: IPrompt[] = this.replayUtils.stopReplay(questions);
       this.setPrompts(prompts);

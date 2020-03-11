@@ -42,11 +42,14 @@ export class ReplayUtils {
         return prompts;
     }
 
-    advanceReplay(promptName: string): Environment.Adapter.Answers {
-      const prompt: IPrompt = {
-        name: promptName, description: "", questions: []
-      };
-      this.replayedPrompts.push(prompt);
+    advanceReplay(promptCount: number, promptName: string): Environment.Adapter.Answers {
+      if (promptCount > this.replayedPrompts.length) {
+        const prompt: IPrompt = {
+          name: promptName, description: "", questions: []
+        };
+        this.replayedPrompts.push(prompt);
+      }
+        
       return this.replayQueue.shift();
     }
 
