@@ -11,7 +11,7 @@ jobs: # a collection of steps
     steps:
       - checkout
       - restore_cache:
-          keys: dependency-cache-{{ checksum "types/package.json" }}
+          key: dependency-cache-{{ checksum "types/package.json" }}
        - run:
           name: install types
           working_directory: types
