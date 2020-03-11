@@ -13,6 +13,14 @@ jobs: # a collection of steps
       - restore_cache:
           key: dependency-cache-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}
       - run:
+          name: install types
+          working_directory: types
+          command: npm install
+      - run:
+          name: build types
+          working_directory: types
+          command: npm run compile
+      - run:
           name: install frontend
           working_directory: frontend
           command: npm install
@@ -77,10 +85,6 @@ jobs: # a collection of steps
     steps:
       - attach_workspace:
           at: ~/repo
-      - run:
-          name: compile for package
-          working_directory: types
-          command: npm run compile
       - run:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
