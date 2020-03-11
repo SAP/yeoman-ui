@@ -1,5 +1,5 @@
 {
-  "name": "yeoman-ui-types",
+  "name": "@sap-devx/yeoman-ui-types",
   "displayName": "yeoman-ui-types",
   "description": "Yeoman-UI prompt types",
   "version": "0.0.1",

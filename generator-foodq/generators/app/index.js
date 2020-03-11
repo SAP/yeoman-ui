@@ -3,7 +3,7 @@ var chalkPipe = require('chalk-pipe');
 var Inquirer = require('inquirer');
 var path = require('path');
 var _ = require('lodash');
-var types = require('../../../types');
+var types = require('@sap-devx/yeoman-ui-types');
 
 module.exports = class extends Generator {
   constructor(args, opts) {

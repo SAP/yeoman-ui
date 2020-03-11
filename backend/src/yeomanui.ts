@@ -15,7 +15,7 @@ import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 import { GeneratorType, GeneratorFilter } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
-import {IPrompt} from "../../types";
+import {IPrompt} from "@sap-devx/yeoman-ui-types";
 
 export interface IGeneratorChoice {
   name: string;
