@@ -33,6 +33,10 @@ jobs: # a collection of steps
           working_directory: backend
           command: npm run webpack-prod
       - run:
+          name: create .vsix
+          working_directory: backend
+          command: npx vsce package .
+      - run:
           name: test backend 
           working_directory: backend
           command: npm run test
@@ -43,34 +47,29 @@ jobs: # a collection of steps
           key: dependency-cache-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}
       - persist_to_workspace:
           root: ~/repo
-          paths: .
+          paths: 
+            - .
+           # https://golang.org/pkg/path/filepath/#Match
+            - yeoman-ui-*
       - store_artifacts: # special step to save test results as as artifact
           # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
           path: test-results.xml
           prefix: tests
       - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: test-results.xml
-
+  
   deploy:
-    <<: *defaults
+    docker:
+      - image: circleci/golang:1.13
     steps:
       - attach_workspace:
-          at: ~/repo
+          at: ./dist
       - run:
-          name: compile for package
-          working_directory: backend
-          command: npm run webpack-prod
-      - run:
-          name: create .vsix
-          working_directory: backend
-          command: npx vsce package .
-      - run:
-          name: Authenticate with registry
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
-      - run:
-          name: Publish package
-          working_directory: backend
-          command: npm publish
+          name: "Publish Release on GitHub"
+          command: |
+            go get github.com/tcnksm/ghr
+            VERSION=${CIRCLE_TAG}
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./dist/
 
 workflows:
   version: 2
@@ -85,6 +84,6 @@ workflows:
             - build-and-test
           filters:
             tags:
-              only: /^v.*/
+              only: /^v[0-9]+(\.[0-9]+)*/
             branches:
-              ignore: /.*/
+              only: /.*/
