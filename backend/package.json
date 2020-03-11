@@ -76,7 +76,7 @@
 		}
 	},
 	"scripts": {
-		"backend": "npm install && npm run compile",
+		"backend": "npm i && npm run compile",
 		"types": "cd ../types && npm i && npm run compile",
 		"frontend": "npm run frontend:install && npm run frontend:build && npm run frontend:copy",
 		"frontend:install": "cd ../frontend && npm i",

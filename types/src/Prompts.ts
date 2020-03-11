@@ -1,10 +1,7 @@
-import _ from "lodash";
-
-// TODO: externalize this class to library
 export class Prompts {
     private callback: any;
 
-    constructor(private items: IPrompt[]) { }
+    constructor(private items: IPrompt[] = []) { }
 
     public splice(start: number, deleteCount: number, items: IPrompt[]) {
         if (items) {
@@ -24,7 +21,7 @@ export class Prompts {
     }
 
     public size() {
-        return _.size(this.items);
+        return this.items.length;
     }
 }
 
