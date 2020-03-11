@@ -9,7 +9,7 @@ module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts);
 
-    this.setPromptsCallback = (fn) => {
+    this.setPromptsCallback = fn => {
       if (this.prompts) {
         this.prompts.setCallback(fn);
       }

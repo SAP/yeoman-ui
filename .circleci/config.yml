@@ -11,7 +11,7 @@ jobs: # a collection of steps
     steps:
       - checkout
       - restore_cache:
-          key: dependency-cache-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}
+          key: dependency-cache-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}-{{ checksum "types/package.json" }}
       - run:
           name: install types
           working_directory: types
@@ -48,7 +48,7 @@ jobs: # a collection of steps
           paths:
             - backend/node_modules
             - frontend/node_modules
-          key: dependency-cache-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}
+          key: dependency-cache-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}-{{ checksum "types/package.json" }}
       - persist_to_workspace:
           root: ~/repo
           paths: .

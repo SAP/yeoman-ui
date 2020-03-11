@@ -19,7 +19,7 @@ module.exports = class extends Generator {
 
   async prompting() {
     // isDelivery question appears twice in CLI: https://github.com/yeoman/generator/issues/1100
-    let prompts = [
+    const prompts = [
       {
         type: "confirm",
         name: "isDelivery",
@@ -59,18 +59,19 @@ module.exports = class extends Generator {
 
     this.answers = await this.prompt(prompts);
 
-    if (this.answers.isDelivery) {
-      let addressQuestions = [
-        {
-          type: "input",
-          name: "address",
-          message: "Your Address"
+    const addressPrompt = [
+      {
+        type: "input",
+        name: "address",
+        message: "Your Address",
+        when: answers => {
+          return answers.isDelivery;
         }
-      ];
-      this.answers = await this.prompt(addressQuestions);
-    }
+      }
+    ];
+    this.answers = await this.prompt(addressPrompt);
 
-    let prompts2 = [
+    const tipPrompt = [
       {
         type: "number",
         name: "tip",
@@ -79,6 +80,6 @@ module.exports = class extends Generator {
       }
     ];
 
-    this.answers = await this.prompt(prompts2);
+    this.answers = await this.prompt(tipPrompt);
   }
 };
