@@ -128,7 +128,10 @@ form.inquirer-gui .theme--light:not(.v-item--active) .v-icon {
   color: var(--vscode-input-foreground, white);
 }
 
-form.inquirer-gui div.v-card{
+form.inquirer-gui div.theme--light.v-card.v-card--outlined {
+  border-width: thin;
+  border-style: solid;
+  border-color: var(--vscode-settings-textInputBorder, #cecece);
   background-color: var(--vscode-input-background, #3c3c3c);
 }
 
