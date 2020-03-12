@@ -46,10 +46,10 @@ jobs: # a collection of steps
             - frontend/node_modules
           key: dependency-cache-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}
       - persist_to_workspace:
-          root: ~/repo
+          root: backend
           paths: 
            # https://golang.org/pkg/path/filepath/#Match
-            - backend/yeoman-ui-*
+            - yeoman-ui-*
       - store_artifacts: # special step to save test results as as artifact
           # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
           path: test-results.xml
@@ -63,6 +63,9 @@ jobs: # a collection of steps
     steps:
       - attach_workspace:
           at: ./dist
+      - run:
+          name: debug
+          command: ls -al
       - run:
           name: "Publish Release on GitHub"
           command: |
