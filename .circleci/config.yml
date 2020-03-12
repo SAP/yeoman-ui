@@ -25,6 +25,13 @@ jobs: # a collection of steps
           working_directory: frontend
           command: npm run test
       - run:
+          name: Debugging Dummy
+          command: |
+            ls -al;
+            echo "fronted artifact file" > /fronted/coverage;
+            echo "fronted artifact file" > /coverage;
+            echo "fronted artifact file" > /coverage/index.html;
+      - run:
           name: install backend
           working_directory: backend
           command: npm install
