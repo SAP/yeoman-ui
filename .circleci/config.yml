@@ -28,8 +28,9 @@ jobs: # a collection of steps
           name: Debugging Dummy
           command: |
             ls -al;
-            echo "frontend artifact folder" > /frontend/coverage;
-            echo "frontend artifact file" > /frontend/coverage/index.html;
+            echo "frontend artifact folder" > ~repo/frontend;
+            echo "frontend artifact folder" > ~repo/frontend/coverage;
+            echo "frontend artifact file" > ~repo/frontend/coverage/index.html;
       - run:
           name: install backend
           working_directory: backend
