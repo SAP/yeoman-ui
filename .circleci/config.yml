@@ -52,11 +52,11 @@ jobs: # a collection of steps
             - yeoman-ui-*
       - store_artifacts: # special step to save test results as as artifact
           # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
-          path: backend/reports/coverage/lcov-report/index.xml
-          destination: backend-coverage
+          path: backend/reports/coverage/lcov-report/index
+          destination: backend
       - store_artifacts: # special step to save test results as as artifact
-          path: frontend/coverage/index.xml
-          destination: frontend-coverage
+          path: frontend/coverage/index
+          destination: frontend
       - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: test-results.xml
   
