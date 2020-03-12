@@ -25,16 +25,8 @@ jobs: # a collection of steps
           working_directory: frontend
           command: npm run test
       - store_artifacts: # special step to save test results as as artifact
-          path: frontend/coverage/index.html
-          destination: frontend
-      - run:
-          name: Debugging Dummy
-          command: |
-            ls -al;
-            sudo chmod 0777 frontend
-            echo "frontend artifact folder" > /frontend;
-            echo "frontend artifact folder" > /frontend/coverage;
-            echo "frontend artifact file" > /frontend/coverage/index.html;
+          path: frontend/coverage
+          destination: frontend-coverage
       - run:
           name: install backend
           working_directory: backend
@@ -53,8 +45,8 @@ jobs: # a collection of steps
           command: npm run test
       - store_artifacts: # special step to save test results as as artifact
           # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
-          path: backend/reports/coverage/lcov-report/index
-          destination: backend
+          path: backend/reports/coverage/lcov-report
+          destination: backend-coverage
       - save_cache:
           paths:
             - backend/node_modules
