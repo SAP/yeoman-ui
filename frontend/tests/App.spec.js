@@ -258,8 +258,9 @@ describe('App.vue', () => {
 
       wrapper.vm.back();
 
-      expect(wrapper.vm.promptIndex).toBe(0);
-      expect(wrapper.vm.prompts.length).toBe(1);
+      expect(wrapper.vm.promptIndex).toBe(1);
+      expect(wrapper.vm.prompts.length).toBe(2);
+      expect(wrapper.vm.isReplaying).toBe(true);
       expect(invokeSpy).toHaveBeenCalledWith("back", [{}]);
     });
 
@@ -306,6 +307,21 @@ describe('App.vue', () => {
       wrapper.vm.setPromptList()
 
       expect(wrapper.vm.prompts).toHaveLength(2)
+    })
+
+    it('while replaying', () => {
+      wrapper = initComponent(App);
+
+      wrapper.vm.prompts = [{}, {}];
+      wrapper.vm.promptIndex = 1;
+      wrapper.vm.isReplaying = true;
+      wrapper.vm.currentPrompt.status = 'pending';
+
+      const prompts = [{}, {}, {}];
+      wrapper.vm.setPromptList(prompts);
+
+      expect(wrapper.vm.prompts).toHaveLength(4);
+      expect(wrapper.vm.isReplaying).toBe(false);
     })
   })
 

@@ -121,7 +121,8 @@ function initialState() {
     messages: {},
     showBusyIndicator: false,
     transitionToggle: false,
-    promptsInfoToDisplay: []
+    promptsInfoToDisplay: [],
+    isReplaying: false
   };
 }
 
@@ -197,10 +198,8 @@ export default {
         (this.currentPrompt && this.currentPrompt.status === PENDING && !this.isDone);
     },
     back() {
+      this.isReplaying = true;
       const answers = this.currentPrompt.answers;
-      this.promptIndex--;
-      // TODO: is 1st prompt always Generator Selection?
-      this.prompts = [this.prompts[0]];
       this.rpc.invoke("back", [answers]);
     },
     next() {
@@ -246,13 +245,23 @@ export default {
       this.messages = messages;
     },
     setPromptList(prompts) {
+      let promptIndex = this.promptIndex;
+      if (this.isReplaying) {
+        // TODO: is 1st prompt always Generator Selection?
+        this.prompts = [this.prompts[0]];
+        promptIndex = 0;
+      }
       prompts = prompts || [];
       this.promptsInfoToDisplay = _.cloneDeep(prompts);
       // replace all existing prompts except 1st (generator selction) and current prompt
-      const startIndex = this.promptIndex + 1;
-      const deleteCount = _.size(this.prompts) - this.promptIndex;
-      const itemsToInsert = prompts.splice(this.promptIndex, _.size(prompts));
+      const startIndex = promptIndex + 1;
+      const deleteCount = _.size(this.prompts) - promptIndex;
+      const itemsToInsert = prompts.splice(promptIndex, _.size(prompts));
       this.prompts.splice(startIndex, deleteCount, ...itemsToInsert);
+      if (this.isReplaying) {
+        this.promptIndex--;
+        this.isReplaying = false;
+      }
     },
     setPrompts(prompts) {
       const firstIncomingPrompt = _.get(prompts, "[0]");
