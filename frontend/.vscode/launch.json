@@ -13,7 +13,8 @@
       "breakOnLoad": true,
       "sourceMapPathOverrides": {
         "webpack:///src/*": "${webRoot}/*"
-      }
+      },
+      "preLaunchTask": "serve"
     }
   ]
 }

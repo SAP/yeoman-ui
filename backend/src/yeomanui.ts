@@ -4,11 +4,10 @@ import * as fsextra from "fs-extra";
 import * as _ from "lodash";
 import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
-import { IPrompt } from "./iPrompt";
 import { ReplayUtils, ReplayState } from "./replayUtils";
+const datauri = require("datauri");
 const titleize = require('titleize');
 const humanizeString = require('humanize-string');
-const datauri = require("datauri");
 import * as defaultImage from "./defaultImage";
 import { YouiAdapter } from "./youi-adapter";
 import { YouiLog } from "./youi-log";
@@ -17,6 +16,7 @@ import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 import { GeneratorType, GeneratorFilter } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
+import {IPrompt} from "@sap-devx/yeoman-ui-types";
 
 export interface IGeneratorChoice {
   name: string;
@@ -33,12 +33,16 @@ export interface IGeneratorQuestion {
   choices: IGeneratorChoice[];
 }
 
+export interface IQuestionsPrompt extends IPrompt{
+  questions: any[];
+}
+
 export class YeomanUI {
   private static defaultMessage = 
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
   private static YEOMAN_PNG = "yeoman.png";
   private static isWin32 = (process.platform === 'win32');
-  private static CWD = path.join(os.homedir(), 'projects');
+  private static CWD: string = path.join(os.homedir(), 'projects');
   private static NODE_MODULES = 'node_modules';
 
   private static funcReplacer(key: any, value: any) {
@@ -116,11 +120,11 @@ export class YeomanUI {
     return errorMessage;
   }
 
-  public async getGenerators(): Promise<IPrompt> {
+  public async getGenerators(): Promise<IQuestionsPrompt> {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
 
-    const promise: Promise<IPrompt> = new Promise(resolve => {
+    const promise: Promise<IQuestionsPrompt> = new Promise(resolve => {
       const env: Environment.Options = this.getEnv();
       env.lookup(async () => this.onEnvLookup(env, resolve, this.genFilter));
     });
@@ -139,31 +143,13 @@ export class YeomanUI {
       const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
       // TODO: support sub-generators
       env.register(meta.resolved);
-      const gen: any = env.create(meta.namespace, {});
-      // check if generator defined a helper function called getPrompts()
-      const genGetPrompts = _.get(gen, "getPrompts");
-      if (genGetPrompts) {
-        const promptNames: any[] = genGetPrompts();
-        const prompts: IPrompt[] = promptNames.map(value => {
-          return _.assign({ questions: [], name: "", description: "" }, value);
-        });
-        if (this.replayUtils.isReplaying) {
-          this.replayUtils.setPrompts(prompts);
-        } else {
-          this.setPrompts(prompts);
-        }
-      }
 
-      const genGetImage = _.get(gen, "getImage");
-      if (genGetImage) {
-        const image: any = genGetImage();
-        if (image.then) {
-          image.then((contents: string) => {
-            this.logger.debug(`image contents: ${contents}`);
-          });
-        } else if (image !== undefined) {
-          this.logger.debug(`image contents: ${image}`);
-        }
+      const genNamespace = this.getGenNamespace(generatorName);
+      const gen: any = env.create(genNamespace, {});
+      // check if generator defined a helper function called setPromptsCallback()
+      const setPromptsCallback = _.get(gen, "setPromptsCallback");
+      if (setPromptsCallback) {
+        setPromptsCallback(this.setPromptList.bind(this));
       }
 
       this.setGenInstall(gen);
@@ -221,7 +207,7 @@ export class YeomanUI {
   public async receiveIsWebviewReady() {
     try {
       // TODO: loading generators takes a long time; consider prefetching list of generators
-      const generators: IPrompt = await this.getGenerators();
+      const generators: IQuestionsPrompt = await this.getGenerators();
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 
       this.replayUtils.clear();
@@ -239,15 +225,6 @@ export class YeomanUI {
     this.outputChannel.log(message);
   }
 
-  private getPromptName(questions: Environment.Adapter.Questions<any>): string {
-    const firstQuestionName = _.get(questions, "[0].name");
-    let promptName: string = `Step ${this.promptCount}`;
-    if (firstQuestionName) {
-      promptName = _.startCase(firstQuestionName);
-    }
-    return promptName;
-  }
-
   public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
     this.promptCount++;
     const promptName = this.getPromptName(questions);
@@ -256,7 +233,7 @@ export class YeomanUI {
       return this.replayUtils.advanceReplay(this.promptCount, promptName);
     } else if (this.replayUtils.getReplayState() === ReplayState.EndingReplay) {
       const prompts: IPrompt[] = this.replayUtils.stopReplay(questions);
-      this.setPrompts(prompts);
+      this.setPromptList(prompts);
     }
 
     this.replayUtils.recallAnswers(questions);
@@ -275,6 +252,11 @@ export class YeomanUI {
   public back(partialAnswers: Environment.Adapter.Answers): void {
     this.replayUtils.startReplay(this.currentQuestions, partialAnswers);
     this.runGenerator(this.generatorName);
+  }
+
+  private getPromptName(questions: Environment.Adapter.Questions<any>): string {
+    const firstQuestionName = _.get(questions, "[0].name");
+    return (firstQuestionName ? _.startCase(firstQuestionName) : `Step ${this.promptCount}`);
   }
 
   private onGeneratorSuccess(generatorName: string, destinationRoot: string) {
@@ -365,12 +347,12 @@ export class YeomanUI {
       this.logError(error);
       return Promise.resolve(undefined);
     }
-    
+
     const genFilter: GeneratorFilter = GeneratorFilter.create(_.get(packageJson, ["generator-filter"]));
     const typeEqual: boolean = (filter.type === GeneratorType.all || filter.type === genFilter.type);
     const categoriesHasIntersection: boolean = (_.isEmpty(filter.categories) || !_.isEmpty(_.intersection(filter.categories, genFilter.categories)));
     if (typeEqual && categoriesHasIntersection) {
-        return this.createGeneratorChoice(genName, genPackagePath, packageJson);
+      return this.createGeneratorChoice(genName, genPackagePath, packageJson);
     }
 
     return Promise.resolve(undefined);
@@ -410,10 +392,10 @@ export class YeomanUI {
   }
 
   private getGenMetadata(genName: string): Environment.GeneratorMeta {
-    const namespace = this.getGenNamespace(genName);
-    const genMetadata = _.get(this, ["genMeta", namespace]);
+    const genNamespace = this.getGenNamespace(genName);
+    const genMetadata = _.get(this, ["genMeta", genNamespace]);
     if (_.isNil(genMetadata)) {
-      const debugMessage = `${namespace} generator metadata was not found.`;
+      const debugMessage = `${genNamespace} generator metadata was not found.`;
       this.logger.debug(debugMessage);
     }
     return genMetadata;
@@ -436,6 +418,18 @@ export class YeomanUI {
     return JSON.parse(JSON.stringify(questions, YeomanUI.funcReplacer));
   }
 
+  private setPromptList(prompts: IPrompt[]): Promise<void> {
+    const promptsToDisplay: IPrompt[] = prompts.map((prompt: IPrompt) => {
+      return _.assign({ questions: [], name: "", description: ""}, prompt);
+    });
+
+    if (this.replayUtils.isReplaying) {
+      this.replayUtils.setPrompts(promptsToDisplay);
+    } else {
+      return this.rpc.invoke("setPromptList", [promptsToDisplay]);
+    }
+  }
+  
   private addCustomQuestionEventHandlers(questions: Environment.Adapter.Questions<any>): void {
     for (const question of (questions as any[])) {
       const questionHandlers = this.customQuestionEventHandlers.get(question["guiType"]);
@@ -445,9 +439,5 @@ export class YeomanUI {
         });
       }
     }
-  }
-
-  private setPrompts(prompts: IPrompt[]): Promise<void> {
-    return this.rpc.invoke("setPrompts", [prompts]);
   }
 }

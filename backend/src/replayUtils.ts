@@ -1,5 +1,5 @@
 import * as Environment from "yeoman-environment";
-import { IPrompt } from "./iPrompt";
+import {IPrompt} from "@sap-devx/yeoman-ui-types";
 
 export enum ReplayState {
   Replaying,
@@ -45,16 +45,16 @@ export class ReplayUtils {
     advanceReplay(promptCount: number, promptName: string): Environment.Adapter.Answers {
       if (promptCount > this.replayedPrompts.length) {
         const prompt: IPrompt = {
-          name: promptName, description: "", questions: []
+          name: promptName, description: ""
         };
         this.replayedPrompts.push(prompt);
       }
-        
+
       return this.replayQueue.shift();
     }
 
     setPrompts(prompts: IPrompt[]): void {
-      this.replayedPrompts.push(...prompts);
+      this.replayedPrompts = prompts;
     }
 
     rememberAnswers(questions: Environment.Adapter.Questions<any>, answers: Environment.Adapter.Answers): void {
