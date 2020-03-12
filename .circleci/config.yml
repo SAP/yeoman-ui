@@ -24,10 +24,14 @@ jobs: # a collection of steps
           name: test frontend
           working_directory: frontend
           command: npm run test
+      - store_artifacts: # special step to save test results as as artifact
+          path: frontend/coverage/index.html
+          destination: frontend
       - run:
           name: Debugging Dummy
           command: |
             ls -al;
+            sudo chmod 0777 frontend
             echo "frontend artifact folder" > /frontend;
             echo "frontend artifact folder" > /frontend/coverage;
             echo "frontend artifact file" > /frontend/coverage/index.html;
@@ -47,6 +51,10 @@ jobs: # a collection of steps
           name: test backend 
           working_directory: backend
           command: npm run test
+      - store_artifacts: # special step to save test results as as artifact
+          # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
+          path: backend/reports/coverage/lcov-report/index
+          destination: backend
       - save_cache:
           paths:
             - backend/node_modules
@@ -57,13 +65,6 @@ jobs: # a collection of steps
           paths: 
            # https://golang.org/pkg/path/filepath/#Match
             - yeoman-ui-*
-      - store_artifacts: # special step to save test results as as artifact
-          # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
-          path: backend/reports/coverage/lcov-report/index
-          destination: backend
-      - store_artifacts: # special step to save test results as as artifact
-          path: frontend/coverage/index
-          destination: frontend
       - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: test-results.xml
   
