@@ -49,7 +49,7 @@ jobs: # a collection of steps
           root: ~/repo
           paths: 
            # https://golang.org/pkg/path/filepath/#Match
-            - ./backend/yeoman-ui-*
+            - backend/yeoman-ui-*
       - store_artifacts: # special step to save test results as as artifact
           # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
           path: test-results.xml
