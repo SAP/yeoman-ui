@@ -49,7 +49,7 @@ div.v-stepper div.v-stepper__step {
   padding: 24px;
   border-bottom: 1px solid var(--vscode-editor-background, #1e1e1e);
 }
- .v-stepper__step--complete.v-stepper__step {
+.v-stepper__step--complete.v-stepper__step {
   background: var(--vscode-editorWidget-background,#252526);
 }
 .v-stepper__step--active.v-stepper__step {
@@ -60,8 +60,7 @@ div.v-stepper div.v-stepper__step {
 }
 
 span.v-stepper__step__step {
-  font-size: 0;
-  /* margin-right: 1rem; */
+  font-size: 0px;
   height: 14px;
   min-width: 14px;
   width: 14px;
@@ -93,6 +92,7 @@ div.v-stepper
   color: var(--vscode-editorCodeLens-foreground, #999999);
 }
 div.v-application div.v-stepper.v-stepper--vertical .v-stepper__content:not(:last-child) {
+  transition: none;
   margin-left: 29px;
   margin-top: -22px;
   margin-bottom: -18px;

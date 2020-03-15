@@ -61,7 +61,7 @@
             <v-btn
               id="back"
               @click="back"
-              :disabled="promptIndex<2"
+              :disabled="promptIndex<2 || isReplaying"
             >
             <v-icon left>mdi-chevron-left</v-icon>Back
             </v-btn>
@@ -258,10 +258,6 @@ export default {
       const deleteCount = _.size(this.prompts) - promptIndex;
       const itemsToInsert = prompts.splice(promptIndex, _.size(prompts));
       this.prompts.splice(startIndex, deleteCount, ...itemsToInsert);
-      if (this.isReplaying) {
-        this.promptIndex--;
-        this.isReplaying = false;
-      }
     },
     setPrompts(prompts) {
       const firstIncomingPrompt = _.get(prompts, "[0]");
@@ -312,6 +308,10 @@ export default {
     async showPrompt(questions, name) {
       this.prepQuestions(questions);
       const prompt = this.createPrompt(questions, name);
+      if (this.isReplaying) {
+        this.promptIndex--;
+        this.isReplaying = false;
+      }
       this.setPrompts([prompt]);
 
       const promise = new Promise((resolve, reject) => {

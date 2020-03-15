@@ -556,9 +556,7 @@ describe('yeomanui unit test', () => {
             let response = await yeomanUiInstance.showPrompt(questions);
             expect (response.firstName).to.equal(firstName);
 
-            questions = [{
-                name: "q2"
-            }];
+            questions = [{name: "q2"}];
 
             response = await yeomanUiInstance.showPrompt(questions);        
             expect (response.country).to.equal(country);

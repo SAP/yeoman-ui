@@ -230,13 +230,13 @@ export class YeomanUI {
     const promptName = this.getPromptName(questions);
 
     if (this.replayUtils.getReplayState() === ReplayState.Replaying) {
-      return this.replayUtils.advanceReplay(this.promptCount, promptName);
+      return this.replayUtils.next(this.promptCount, promptName);
     } else if (this.replayUtils.getReplayState() === ReplayState.EndingReplay) {
-      const prompts: IPrompt[] = this.replayUtils.stopReplay(questions);
+      const prompts: IPrompt[] = this.replayUtils.stop(questions);
       this.setPromptList(prompts);
     }
 
-    this.replayUtils.recallAnswers(questions);
+    this.replayUtils.recall(questions);
 
     this.currentQuestions = questions;
     const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
@@ -245,12 +245,12 @@ export class YeomanUI {
     }
 
     const answers = await this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
-    this.replayUtils.rememberAnswers(questions, answers);
+    this.replayUtils.remember(questions, answers);
     return answers;
   }
 
   public back(partialAnswers: Environment.Adapter.Answers): void {
-    this.replayUtils.startReplay(this.currentQuestions, partialAnswers);
+    this.replayUtils.start(this.currentQuestions, partialAnswers);
     this.runGenerator(this.generatorName);
   }
 

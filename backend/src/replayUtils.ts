@@ -6,108 +6,108 @@ export enum ReplayState {
   EndingReplay,
   NotReplaying
 }
+
 export class ReplayUtils {
-    private answersCache: Map<string, Environment.Adapter.Answers>;
-    private replayStack: Array<Environment.Adapter.Answers>;
-    private replayQueue: Array<Environment.Adapter.Answers>;
-    private replayedPrompts: Array<IPrompt>;
-    public isReplaying: boolean;
+  private answersCache: Map<string, Environment.Adapter.Answers>;
+  private replayStack: Array<Environment.Adapter.Answers>;
+  private replayQueue: Array<Environment.Adapter.Answers>;
+  private prompts: Array<IPrompt>;
+  public isReplaying: boolean;
 
-    constructor() {
-      this.answersCache = new Map();
-      this.clear();
-    }
+  constructor() {
+    this.answersCache = new Map();
+    this.clear();
+  }
 
-    clear(): void {
-      this.isReplaying = false;
-      this.replayQueue = [];
-      this.replayStack = [];
-      this.replayedPrompts = [];
-      this.answersCache.clear();
-    }
+  clear(): void {
+    this.isReplaying = false;
+    this.replayQueue = [];
+    this.replayStack = [];
+    this.prompts = [];
+    this.answersCache.clear();
+  }
 
-    startReplay(questions: Environment.Adapter.Questions<any>, answers: Environment.Adapter.Answers): void {
-        this._rememberAnswers(questions, answers);
-        this.replayQueue = JSON.parse(JSON.stringify(this.replayStack));
-        this.isReplaying = true;
-    }
-
-    stopReplay(questions: Environment.Adapter.Questions<any>): IPrompt[] {
-        const prompts = this.replayedPrompts;
-        this.isReplaying = false;
-        this.replayedPrompts = [];
-        this.replayQueue = [];
-        const answers: Environment.Adapter.Answers = this.replayStack.pop();
-        ReplayUtils.setDefaults(questions, answers);
-        return prompts;
-    }
-
-    advanceReplay(promptCount: number, promptName: string): Environment.Adapter.Answers {
-      if (promptCount > this.replayedPrompts.length) {
-        const prompt: IPrompt = {
-          name: promptName, description: ""
-        };
-        this.replayedPrompts.push(prompt);
-      }
-
-      return this.replayQueue.shift();
-    }
-
-    setPrompts(prompts: IPrompt[]): void {
-      this.replayedPrompts = prompts;
-    }
-
-    rememberAnswers(questions: Environment.Adapter.Questions<any>, answers: Environment.Adapter.Answers): void {
+  start(questions: Environment.Adapter.Questions<any>, answers: Environment.Adapter.Answers): void {
       this._rememberAnswers(questions, answers);
-      this.replayStack.push(answers);
+      this.replayQueue = JSON.parse(JSON.stringify(this.replayStack));
+      this.isReplaying = true;
+  }
+
+  stop(questions: Environment.Adapter.Questions<any>): IPrompt[] {
+      const prompts = this.prompts;
+      this.isReplaying = false;
+      this.prompts = [];
+      this.replayQueue = [];
+      const answers: Environment.Adapter.Answers = this.replayStack.pop();
+      ReplayUtils.setDefaults(questions, answers);
+      return prompts;
+  }
+
+  next(promptCount: number, promptName: string): Environment.Adapter.Answers {
+    if (promptCount > this.prompts.length) {
+      const prompt: IPrompt = {
+        name: promptName, description: ""
+      };
+      this.prompts.push(prompt);
     }
 
-    getReplayState(): ReplayState{
-      if (this.isReplaying) {
-        if (this.replayQueue.length > 1) {
-          return ReplayState.Replaying;
-        } else {
-          return ReplayState.EndingReplay;
-        }
-      } else {
-        return ReplayState.NotReplaying;
-      }
-    }
+    return this.replayQueue.shift();
+  }
 
-    recallAnswers(questions: Environment.Adapter.Questions<any>): void {
-      const key: string = ReplayUtils.getQuestionsHash(questions);
-      const previousAnswers: Environment.Adapter.Answers = this.answersCache.get(key);
-      if (previousAnswers !== undefined) {
-        ReplayUtils.setDefaults(questions, previousAnswers);
-      }
-    }
+  setPrompts(prompts: IPrompt[]): void {
+    this.prompts = prompts;
+  }
 
-    // assuming order of questions remains consistent
-    private static getQuestionsHash(questions: Environment.Adapter.Questions<any>): string {
-      let hash: string = "";
-      for (const question of (questions as any[])) {
-        hash = `${hash}-${question.name}`;
-      }
-      return hash;
-    }
+  remember(questions: Environment.Adapter.Questions<any>, answers: Environment.Adapter.Answers): void {
+    this._rememberAnswers(questions, answers);
+    this.replayStack.push(answers);
+  }
 
-    private _rememberAnswers(questions: Environment.Adapter.Questions<any>, answers: Environment.Adapter.Answers): void {
-      const key: string = ReplayUtils.getQuestionsHash(questions);
-      this.answersCache.set(key, answers);
-    }
-
-    static setDefaults(questions: Environment.Adapter.Questions<any>, answers: Environment.Adapter.Answers): void {
-      for (const question of (questions as any[])) {
-        const name = question["name"];
-        const answer = answers[name];
-
-        // __ForceDefault is required to let the frontend know to ignore all forms
-        //   of default values defined on the question, e.g. the checked property of
-        //   the choices array for questions of type checkbox
-        question.__ForceDefault = true;
-        question.default = answer;
-      }
+  recall(questions: Environment.Adapter.Questions<any>): void {
+    const key: string = ReplayUtils.getQuestionsHash(questions);
+    const previousAnswers: Environment.Adapter.Answers = this.answersCache.get(key);
+    if (previousAnswers !== undefined) {
+      ReplayUtils.setDefaults(questions, previousAnswers);
     }
   }
-  
-  
+
+  getReplayState(): ReplayState{
+    if (this.isReplaying) {
+      if (this.replayQueue.length > 1) {
+        return ReplayState.Replaying;
+      } else {
+        return ReplayState.EndingReplay;
+      }
+    } else {
+      return ReplayState.NotReplaying;
+    }
+  }
+
+  // assuming question names uniquely identifies a prompt
+  // also assuming that order of questions is consistent
+  private static getQuestionsHash(questions: Environment.Adapter.Questions<any>): string {
+    let questionNames: string[] = [];
+    for (const question of (questions as any[])) {
+      questionNames.push(question.name);
+    }
+    return questionNames.join('-');
+  }
+
+  private _rememberAnswers(questions: Environment.Adapter.Questions<any>, answers: Environment.Adapter.Answers): void {
+    const key: string = ReplayUtils.getQuestionsHash(questions);
+    this.answersCache.set(key, answers);
+  }
+
+  static setDefaults(questions: Environment.Adapter.Questions<any>, answers: Environment.Adapter.Answers): void {
+    for (const question of (questions as any[])) {
+      const name = question["name"];
+      const answer = answers[name];
+
+      // __ForceDefault is required to let the frontend know to ignore all forms
+      //   of default values defined on the question, e.g. the checked property of
+      //   the choices array for questions of type checkbox
+      question.__ForceDefault = true;
+      question.default = answer;
+    }
+  }
+}
