@@ -1,5 +1,6 @@
 import * as Environment from "yeoman-environment";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
+import * as hash from "object-hash";
 
 export enum ReplayState {
   Replaying,
@@ -86,11 +87,15 @@ export class ReplayUtils {
   // assuming question names uniquely identifies a prompt
   // also assuming that order of questions is consistent
   private static getQuestionsHash(questions: Environment.Adapter.Questions<any>): string {
-    let questionNames: string[] = [];
-    for (const question of (questions as any[])) {
-      questionNames.push(question.name);
-    }
-    return questionNames.join('-');
+    // exclude members that we manipulate in setDefault() below
+    const excludeKeys = (key: string) => {
+      if (key === "__ForceDefault" || key === "default") {
+        return true;
+      }
+      return false;
+    };
+
+    return hash(questions, {excludeKeys});
   }
 
   private _rememberAnswers(questions: Environment.Adapter.Questions<any>, answers: Environment.Adapter.Answers): void {

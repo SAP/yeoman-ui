@@ -307,11 +307,11 @@ export default {
 
     async showPrompt(questions, name) {
       this.prepQuestions(questions);
-      const prompt = this.createPrompt(questions, name);
       if (this.isReplaying) {
         this.promptIndex--;
         this.isReplaying = false;
       }
+      const prompt = this.createPrompt(questions, name);
       this.setPrompts([prompt]);
 
       const promise = new Promise((resolve, reject) => {
