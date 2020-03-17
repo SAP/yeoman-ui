@@ -173,6 +173,13 @@ module.exports = class extends Generator {
         default: "/"
       },
       {
+        type: "input",
+        guiType: "folder-browser",
+        name: "dump",
+        message: "Choose dump folder",
+        default: "/"
+      },
+      {
         type: 'list',
         name: 'enjoy',
         message: 'Did you enjoy your meal?',

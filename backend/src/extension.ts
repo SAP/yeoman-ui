@@ -104,7 +104,19 @@ export class YeomanUIPanel {
 		return path.join(extensionPath, 'dist', 'media');
 	}
 
-	public async showOpenDialog(currentPath: string): Promise<string> {
+	public async showOpenFileDialog(currentPath: string): Promise<string> {
+		return await this.showOpenDialog(currentPath, true);
+	}
+
+	public async showOpenFolderDialog(currentPath: string): Promise<string> {
+		return await this.showOpenDialog(currentPath, false);
+	}
+
+	private async showOpenDialog(currentPath: string, canSelectFiles: boolean): Promise<string> {
+		let canSelectFolders: boolean = false;
+		if (!canSelectFiles) {
+			canSelectFolders = true;
+		}
 		let uri;
 		try {
 			uri = vscode.Uri.file(currentPath);
@@ -114,7 +126,8 @@ export class YeomanUIPanel {
 
 		try {
 			const filePath = await vscode.window.showOpenDialog({
-				canSelectFiles: true,
+				canSelectFiles,
+				canSelectFolders,
 				defaultUri: uri
 			});
 			return (filePath as vscode.Uri[])[0].fsPath;
@@ -136,7 +149,8 @@ export class YeomanUIPanel {
 		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.panel);
 
 		this.yeomanui = new YeomanUI(this.rpc, vscodeYouiEvents, outputChannel, this.logger, YeomanUIPanel.genFilter);
-		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenDialog);
+		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
+		this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
 
 		// Set the webview's initial html content
 		this._update();

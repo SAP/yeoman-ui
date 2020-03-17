@@ -579,6 +579,29 @@ describe('yeomanui unit test', () => {
         });
     });
 
+    describe("Custom Question Event Handlers", async () => {
+        it("addCustomQuestionEventHandlers()", async () => {
+            const testEventFunction = () => {
+                return true;
+            };
+            const questions = [
+                {
+                    name:"q1",
+                    guiType: "questionType"
+                }
+            ];
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+
+            yeomanUiInstance["addCustomQuestionEventHandlers"](questions);
+            expect(questions[0]).to.not.have.property("testEvent");
+
+            yeomanUiInstance.registerCustomQuestionEventHandler("questionType", "testEvent", testEventFunction);
+            yeomanUiInstance["addCustomQuestionEventHandlers"](questions);
+            expect(questions[0]).to.have.property("testEvent");
+            expect((questions[0] as any)["testEvent"]).to.equal(testEventFunction);
+        });
+    });
+
     describe("evaluateMethod()", async () => {
         it("custom question events", async () => {
             const testEventFunction = () => {
