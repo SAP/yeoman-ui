@@ -96,6 +96,8 @@ export default {
 }
 .v-card__title {
   color: var(--vscode-foreground, #cccccc);
+  word-wrap: break-word;
+  word-break: normal;
 }
 .v-card > div.v-card__text {
   color: var(--vscode-editorCodeLens-foreground, #999999);
