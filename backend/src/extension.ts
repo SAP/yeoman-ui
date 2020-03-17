@@ -27,6 +27,12 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('loadYeomanUI', (options?: any) => {
 			const genFilter = _.get(options, "filter"); 
 			const messages = _.get(options, "messages");
+			
+			const displayedPanel = _.get(YeomanUIPanel, "currentPanel.panel");
+			if (displayedPanel) {
+				displayedPanel.dispose();
+			}
+			
 			YeomanUIPanel.createOrShow(context.extensionPath, GeneratorFilter.create(genFilter), messages);
 	}));
 	context.subscriptions.push(
@@ -120,12 +126,10 @@ export class YeomanUIPanel {
 	public yeomanui: YeomanUI;
 	private readonly logger: IChildLogger = getClassLogger(YeomanUI.name);
 	private rpc: RpcExtension;
-	private readonly panel: vscode.WebviewPanel;
 	private readonly extensionPath: string;
 	private disposables: vscode.Disposable[] = [];
 
-	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
-		this.panel = panel;
+	private constructor(public readonly panel: vscode.WebviewPanel, extensionPath: string) {
 		this.extensionPath = extensionPath;
 		this.rpc = new RpcExtension(this.panel.webview);
 		const outputChannel: YouiLog = new OutputChannelLog();
