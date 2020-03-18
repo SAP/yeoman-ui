@@ -84,15 +84,18 @@ export class ReplayUtils {
     }
   }
 
-  // assuming question names uniquely identifies a prompt
-  // also assuming that order of questions is consistent
+  // assuming that order of questions is consistent
   private static getQuestionsHash(questions: Environment.Adapter.Questions<any>): string {
-    // exclude members that we manipulate in setDefault() below
+    // we need exclude members that we manipulate in setDefault() below
+    // we also need to exclude members set by custom event handlers
+    // instead of blacklisting member, we whitelist them based on inquirer.js docs:
+    const whietlistedKeys: string[] = ["type", "name", "message", "choices", "validate", "filter", "transformer", "when"];
+
     const excludeKeys = (key: string) => {
-      if (key === "__ForceDefault" || key === "default") {
-        return true;
-      }
-      return false;
+      const keyIndex = whietlistedKeys.findIndex((value) => {
+        return value === key;
+      });
+      return (keyIndex < 0);
     };
 
     return hash(questions, {excludeKeys});
