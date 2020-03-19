@@ -3,18 +3,24 @@ var chalkPipe = require('chalk-pipe');
 var Inquirer = require('inquirer');
 var path = require('path');
 var _ = require('lodash');
+var types = require('@sap-devx/yeoman-ui-types');
 
 module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts);
 
-    this.getPrompts = function () {
-      console.log('in getPrompts()');
+    this.setPromptsCallback = fn => {
+      if (this.prompts) {
+        this.prompts.setCallback(fn);
+      }
+    };
 
-      return [{ name: "Prompt 1", description: "Prompt 1 Description\nWe are happy to welcome you to our family restaurant" },
-              { name: "Prompt 2", description: "Prompt 2 Description\nWe hope you enjoy our authentic food" },
-              { name: "Registration", description: "Thank you for your interest in our resturant.\nPlease enter credentials to register.\n(it shouldn't take you more then 1 minute)" }];
-    }
+    var prompts = [
+      {name: "Hunger Info", description: "Hunger Info Description"},
+      {name: "Hunger Level", description: "Hunger Level Description"},
+      {name: "Registration", description: "Thank you for your interest in our resturant.\nPlease enter credentials to register.\n(it shouldn't take you more then 1 minute)"}
+    ];
+    this.prompts = new types.Prompts(prompts);
 
     this.option('babel');
   }
@@ -27,8 +33,8 @@ module.exports = class extends Generator {
     // returns '~/projects/index.js'
   }
 
-  async default() {
-    this.composeWith(require.resolve("../app2"), this.projectEnvironment);
+  async initializing() {
+    this.composeWith(require.resolve("../app2"), { prompts: this.prompts });
   }
 
   async prompting() {
@@ -58,8 +64,8 @@ module.exports = class extends Generator {
         validate: (value, answers) => {
           return (value.length > 1 ? true : "Enter at least 2 characters");
         },
-        type: "input",
         name: "food",
+        type: "input",
         message: "What do you want to eat",
         default: "Junk food"
       },
@@ -115,16 +121,15 @@ module.exports = class extends Generator {
     ];
 
     this.answers = await this.prompt(prompts);
-    this.log("Food", this.answers.food);
 
     // currently not supported:
     const ui = new Inquirer.ui.BottomBar();
-    this.log("xx");
+
     ui.updateBottomBar("This is written to the bottom bar");
 
     prompts = [
       {
-        when: (response) => {
+        when: () => {
           return this.answers.confirmHungry;
         },
         type: "list",
@@ -161,6 +166,20 @@ module.exports = class extends Generator {
         }]
       },
       {
+        type: "input",
+        guiType: "file-browser",
+        name: "uploadMenu",
+        message: "Upload menu",
+        default: "/"
+      },
+      {
+        type: "input",
+        guiType: "folder-browser",
+        name: "dump",
+        message: "Choose dump folder",
+        default: "/"
+      },
+      {
         type: 'list',
         name: 'enjoy',
         message: 'Did you enjoy your meal?',
@@ -192,8 +211,8 @@ module.exports = class extends Generator {
       }
     ];
 
-
     const answers = await this.prompt(prompts);
+
     this.answers = Object.assign({}, this.answers, answers);
     this.log("Hunger level", this.answers.hungerLevel);
 
@@ -231,17 +250,23 @@ module.exports = class extends Generator {
         },
       },
       {
-        type: "input",
         name: "email",
         message: "What's your GitHub username",
-        store: true
+        store: true,
+        validate: (value, answers) => {
+          return (value.length > 0 ? true : "This field is mandatory");
+        }
       },
       {
         type: "password",
+        guiType: "login",
         name: "password",
         message: "What's your GitHub password",
         mask: '*',
-        validate: this._requireLetterAndNumber
+        validate: this._requireLetterAndNumber,
+        when: (response) => {
+          return response.email !== "root";
+        }
       }
     ];
 
@@ -263,7 +288,7 @@ module.exports = class extends Generator {
     this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "answers.food", "")));
     this.log('destinationRoot: ' + this.destinationRoot());
     this.fs.copyTpl(this.templatePath('index.html'),
-    this.destinationPath('public/index.html'), {
+      this.destinationPath('public/index.html'), {
       title: 'Templating with Yeoman',
       hungry: this.answers.hungry,
       confirmHungry: this.answers.confirmHungry,
@@ -271,12 +296,12 @@ module.exports = class extends Generator {
       beers: this.answers.beers,
       fav_color: this.answers.fav_color,
       number: this.answers.number,
-      
+
       hungerLevel: this.answers.hungerLevel,
       dessert: this.answers.dessert,
       enjoy: this.answers.enjoy,
       comments: this.answers.comments,
-      
+
       repotype: this.answers.repotype,
       repoperms: this.answers.repoperms,
       email: this.answers.email,
@@ -287,6 +312,21 @@ module.exports = class extends Generator {
       this.templatePath('README.md'),
       this.destinationPath('README.md')
     );
+
+    const pkgJson = {
+      devDependencies: {
+        eslint: '^3.15.0'
+      },
+      dependencies: {
+        react: '^16.2.0'
+      }
+    };
+    // Extend or create package.json file in destination path
+    this.fs.extendJSON(this.destinationPath('package.json'), pkgJson);
+  }
+
+  install() {
+    this.npmInstall(['lodash'], { 'save-dev': true });
   }
 
   end() {

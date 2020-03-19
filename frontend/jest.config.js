@@ -1,5 +1,6 @@
 module.exports = {
   verbose: true,
+  testRegex: "(/tests/(.*).(test|spec)).[jt]sx?$",
   collectCoverage: true,
   collectCoverageFrom: [
     "src/**/*.{js,vue}",
@@ -35,10 +36,10 @@ module.exports = {
   ],
   coverageThreshold: {
     "global": {
-      "branches": 91.7,
-      "functions": 97.14,
-      "lines": 95.97,
-      "statements": 95.98
+      "branches": 95.8,
+      "functions": 100,
+      "lines": 98.1,
+      "statements": 98.1
     }
   }
 }

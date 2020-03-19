@@ -49,8 +49,7 @@ import _ from "lodash";
 export default {
   name: "GeneratorSelection",
   props: {
-    currentQuestion: Object,
-    selectGenerator: Function
+    currentQuestion: Object
   },
   data() {
     return {
@@ -78,7 +77,7 @@ export default {
       this.currentQuestion.answer = generatorName;
       const choice = _.find(this.currentQuestion.choices, choice => {return choice.name === generatorName});
       const generatorPrettyName = _.get(choice, "prettyName", generatorName);
-      this.selectGenerator(generatorName, generatorPrettyName);
+      this.$emit('generatorSelected', generatorName, generatorPrettyName)
     }
   }
 };
@@ -97,6 +96,8 @@ export default {
 }
 .v-card__title {
   color: var(--vscode-foreground, #cccccc);
+  word-wrap: break-word;
+  word-break: normal;
 }
 .v-card > div.v-card__text {
   color: var(--vscode-editorCodeLens-foreground, #999999);

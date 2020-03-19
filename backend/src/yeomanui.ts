@@ -4,16 +4,18 @@ import * as fsextra from "fs-extra";
 import * as _ from "lodash";
 import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
+const datauri = require("datauri");
 const titleize = require('titleize');
 const humanizeString = require('humanize-string');
-const datauri = require("datauri");
 import * as defaultImage from "./defaultImage";
 import { YouiAdapter } from "./youi-adapter";
 import { YouiLog } from "./youi-log";
+import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 import { GeneratorType, GeneratorFilter } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
+import {IPrompt} from "@sap-devx/yeoman-ui-types";
 
 export interface IGeneratorChoice {
   name: string;
@@ -30,9 +32,7 @@ export interface IGeneratorQuestion {
   choices: IGeneratorChoice[];
 }
 
-export interface IPrompt {
-  name: string;
-  description: string;
+export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
 }
 
@@ -41,7 +41,7 @@ export class YeomanUI {
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
   private static YEOMAN_PNG = "yeoman.png";
   private static isWin32 = (process.platform === 'win32');
-  private static CWD = path.join(os.homedir(), 'projects');
+  private static CWD: string = path.join(os.homedir(), 'projects');
   private static NODE_MODULES = 'node_modules';
 
   private static funcReplacer(key: any, value: any) {
@@ -49,6 +49,7 @@ export class YeomanUI {
   }
 
   private rpc: IRpc;
+  private youiEvents: YouiEvents;
   private outputChannel: YouiLog;
   private logger: IChildLogger;
   private genMeta: { [namespace: string]: Environment.GeneratorMeta };
@@ -57,12 +58,14 @@ export class YeomanUI {
   private promptCount: number;
   private currentQuestions: Environment.Adapter.Questions<any>;
   private genFilter: GeneratorFilter;
+  private customQuestionEventHandlers: Map<string, Map<string, Function>>;
 
-  constructor(rpc: IRpc, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter) {
+  constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter) {
     this.rpc = rpc;
     if (!this.rpc) {
       throw new Error("rpc must be set");
     }
+    this.youiEvents = youiEvents;
     this.outputChannel = outputChannel;
     this.logger = logger;
     this.rpc.setResponseTimeout(3600000);
@@ -72,12 +75,29 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.toggleOutput, thisArg: this });
     this.rpc.registerMethod({ func: this.logError, thisArg: this });
   
-    this.youiAdapter = new YouiAdapter(outputChannel);
+    this.youiAdapter = new YouiAdapter(outputChannel, youiEvents);
     this.youiAdapter.setYeomanUI(this);
     this.promptCount = 0;
     this.genMeta = {};
     this.currentQuestions = {};
     this.setGenFilter(genFilter);
+    this.customQuestionEventHandlers = new Map();
+  }
+
+  public registerCustomQuestionEventHandler(questionType: string, methodName: string, handler: Function): void {
+    let entry: Map<string, Function> = this.customQuestionEventHandlers.get(questionType);
+    if (entry === undefined) {
+      this.customQuestionEventHandlers.set(questionType, new Map());
+      entry = this.customQuestionEventHandlers.get(questionType);
+    }
+    entry.set(methodName, handler);
+  }
+
+  private getCustomQuestionEventHandler(questionType: string, methodName: string): Function {
+    const entry: Map<string, Function> = this.customQuestionEventHandlers.get(questionType);
+    if (entry !== undefined) {
+      return entry.get(methodName);
+    }
   }
 
   public setGenFilter(genFilter: GeneratorFilter) {
@@ -94,11 +114,11 @@ export class YeomanUI {
     return errorMessage;
   }
 
-  public async getGenerators(): Promise<IPrompt> {
+  public async getGenerators(): Promise<IQuestionsPrompt> {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
 
-    const promise: Promise<IPrompt> = new Promise(resolve => {
+    const promise: Promise<IQuestionsPrompt> = new Promise(resolve => {
       const env: Environment.Options = this.getEnv();
       env.lookup(async () => this.onEnvLookup(env, resolve, this.genFilter));
     });
@@ -116,28 +136,13 @@ export class YeomanUI {
       const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
       // TODO: support sub-generators
       env.register(meta.resolved);
-      const getGenMetadataName = this.getGenMetaName(generatorName);
-      const gen: any = env.create(getGenMetadataName, {});
-      // check if generator defined a helper function called getPrompts()
-      const genGetPrompts = _.get(gen, "getPrompts");
-      if (genGetPrompts) {
-        const promptNames: any[] = genGetPrompts();
-        const prompts: IPrompt[] = promptNames.map(value => {
-          return _.assign({ questions: [], name: "", description: "" }, value);
-        });
-        this.setPrompts(prompts);
-      }
 
-      const genGetImage = _.get(gen, "getImage");
-      if (genGetImage) {
-        const image: any = genGetImage();
-        if (image.then) {
-          image.then((contents: string) => {
-            this.logger.debug(`image contents: ${contents}`);
-          });
-        } else if (image !== undefined) {
-          this.logger.debug(`image contents: ${image}`);
-        }
+      const genNamespace = this.getGenNamespace(generatorName);
+      const gen: any = env.create(genNamespace, {});
+      // check if generator defined a helper function called setPromptsCallback()
+      const setPromptsCallback = _.get(gen, "setPromptsCallback");
+      if (setPromptsCallback) {
+        setPromptsCallback(this.setPromptList.bind(this));
       }
       
       this.setGenInstall(gen);
@@ -149,30 +154,17 @@ export class YeomanUI {
            https://yeoman.github.io/generator/Generator.html#run
          ... but .d.ts hasn't been updated for a while:
            https://www.npmjs.com/package/@types/yeoman-generator */
-      this.gen.run((err) => {
-        let message: string;
-        const destinationRoot = this.gen.destinationRoot();
-        if (err) {
-          message = `${generatorName} failed: ${err}.`;
-          this.logError(err, message);
-          this.doGeneratorDone(false, message, destinationRoot);
-        } else {
-          message = `The '${generatorName}' project has been generated.`;
-          this.logger.debug("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
-          this.doGeneratorDone(true, message, destinationRoot);
-        }
+        this.gen.run((err) => {
+        if (!err) {
+          this.onGeneratorSuccess(generatorName, this.gen.destinationRoot());
+        } 
+      });
+      this.gen.on('error', (error: any) => {
+        this.onGeneratorFailure(generatorName, error);
       });
     } catch (error) {
-      this.logError(error);
+      this.onGeneratorFailure(generatorName, error);
     }
-  }
-
-  public doGeneratorInstall(): Promise<any> {
-    return this.rpc.invoke("generatorInstall");
-  }
-
-  public doGeneratorDone(success: boolean, message: string, targetPath = ""): Promise<any> {
-    return this.rpc.invoke("generatorDone", [true, message, targetPath]);
   }
 
   public setMessages(messages: any): Promise<void> {
@@ -191,7 +183,12 @@ export class YeomanUI {
           return (_.get(question, "name") === questionName);
         });
         if (relevantQuestion) {
-          return await relevantQuestion[methodName].apply(this.gen, params);
+          const customQuestionEventHandler: Function = this.getCustomQuestionEventHandler(relevantQuestion["guiType"], methodName);
+          if (customQuestionEventHandler !== undefined) {
+            return await customQuestionEventHandler.apply(this.gen, params);
+          } else {
+            return await relevantQuestion[methodName].apply(this.gen, params);
+          }
         }
       }
     } catch (error) {
@@ -202,10 +199,14 @@ export class YeomanUI {
   }
 
   public async receiveIsWebviewReady() {
-    // TODO: loading generators takes a long time; consider prefetching list of generators
-    const generators: IPrompt = await this.getGenerators();
-    const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
-    await this.runGenerator(response.name);
+    try {
+      // TODO: loading generators takes a long time; consider prefetching list of generators
+      const generators: IQuestionsPrompt = await this.getGenerators();
+      const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
+      await this.runGenerator(response.name);
+    } catch (error) {
+      this.logError(error);
+    }
   }
 
   public toggleOutput(): boolean {
@@ -219,14 +220,32 @@ export class YeomanUI {
   public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
     this.currentQuestions = questions;
     
-      this.promptCount++;
-      const firstQuestionName = _.get(questions, "[0].name");
-      let promptName: string = `Step ${this.promptCount}`;
-      if (firstQuestionName) {
-        promptName = _.startCase(firstQuestionName);
-      }
-      const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
-      return this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
+    this.promptCount++;
+    
+    const promptName: string = this.getPromptName(questions);
+    const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
+    if (_.isEmpty(mappedQuestions)) {
+      return {};
+    }
+    
+    return this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
+  }
+
+  private getPromptName(questions: Environment.Adapter.Questions<any>): string {
+    const firstQuestionName = _.get(questions, "[0].name");
+    return (firstQuestionName ? _.startCase(firstQuestionName) : `Step ${this.promptCount}`);
+  }
+
+  private onGeneratorSuccess(generatorName: string, destinationRoot: string) {
+    const message = `The '${generatorName}' project has been generated.`;
+    this.logger.debug("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
+    this.youiEvents.doGeneratorDone(true, message, destinationRoot);
+  }
+
+  private async onGeneratorFailure(generatorName: string, error: any) {
+    const messagePrefix = `${generatorName} generator failed.`;
+    const errorMessage: string = await this.logError(error, messagePrefix);
+    this.youiEvents.doGeneratorDone(false, errorMessage);
   }
 
   private getEnv(): Environment.Options {
@@ -254,10 +273,15 @@ export class YeomanUI {
     const originalGenInstall = _.get(originalPrototype, "install");
     if (originalGenInstall) {
       originalPrototype.install = () => {
-        this.doGeneratorInstall();
-        originalGenInstall.call(gen);
+        try {
+          this.youiEvents.doGeneratorInstall();
+          originalGenInstall.call(gen);
+        } catch (error) {
+          this.logError(error);
+        } finally {
+          originalPrototype.install = originalGenInstall;
+        }
       };
-      Object.setPrototypeOf(gen, originalPrototype);
     }
   }
 
@@ -292,20 +316,20 @@ export class YeomanUI {
 
   private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<IGeneratorChoice | undefined> {
     let packageJson: any;
-    
-    const genPackagePath = this.getGenMetaPackagePath(genName);
+    const genPackagePath: string = this.getGenMetaPackagePath(genName);
+  
     try {
       packageJson = await this.getGenPackageJson(genPackagePath);
     } catch (error) {
       this.logError(error);
       return Promise.resolve(undefined);
     }
-    
+
     const genFilter: GeneratorFilter = GeneratorFilter.create(_.get(packageJson, ["generator-filter"]));
     const typeEqual: boolean = (filter.type === GeneratorType.all || filter.type === genFilter.type);
     const categoriesHasIntersection: boolean = (_.isEmpty(filter.categories) || !_.isEmpty(_.intersection(filter.categories, genFilter.categories)));
     if (typeEqual && categoriesHasIntersection) {
-        return this.createGeneratorChoice(genName, genPackagePath, packageJson);
+      return this.createGeneratorChoice(genName, genPackagePath, packageJson);
     }
 
     return Promise.resolve(undefined);
@@ -322,7 +346,8 @@ export class YeomanUI {
     }
 
     const genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
-    const genPrettyName = titleize(humanizeString(genName));
+    const genDisplayName = _.get(packageJson, "displayName", '');
+    const genPrettyName = _.isEmpty(genDisplayName) ? titleize(humanizeString(genName)) : genDisplayName;
     const genHomepage = _.get(packageJson, "homepage", '');
 
     return {
@@ -344,11 +369,16 @@ export class YeomanUI {
   }
 
   private getGenMetadata(genName: string): Environment.GeneratorMeta {
-    const metadataName: string = this.getGenMetaName(genName);
-    return _.get(this, ["genMeta", metadataName]);
+    const genNamespace = this.getGenNamespace(genName);
+    const genMetadata = _.get(this, ["genMeta", genNamespace]);
+    if (_.isNil(genMetadata)) {
+      const debugMessage = `${genNamespace} generator metadata was not found.`;
+      this.logger.debug(debugMessage);
+    }
+    return genMetadata;
   }
 
-  private getGenMetaName(genName: string): string {
+  private getGenNamespace(genName: string): string {
     return `${genName}:app`;
   }
 
@@ -361,10 +391,27 @@ export class YeomanUI {
    * Also functions cannot be evaluated on client)
    */
   private normalizeFunctions(questions: Environment.Adapter.Questions<any>): Environment.Adapter.Questions<any> {
+    this.addCustomQuestionEventHandlers(questions);
     return JSON.parse(JSON.stringify(questions, YeomanUI.funcReplacer));
   }
 
-  private setPrompts(prompts: IPrompt[]): Promise<void> {
-    return this.rpc.invoke("setPrompts", [prompts]);
+  private setPromptList(prompts: IPrompt[]): Promise<void> {
+    const promptsToDisplay: IPrompt[] = prompts.map((prompt: IPrompt) => {
+      return _.assign({ questions: [], name: "", description: ""}, prompt);
+    });
+
+    return this.rpc.invoke("setPromptList", [promptsToDisplay]);
+  }
+  
+  private addCustomQuestionEventHandlers(questions: Environment.Adapter.Questions<any>): void {
+    for (let index in questions) {
+      const question = (questions as any[])[Number.parseInt(index)];
+      const questionHandlers = this.customQuestionEventHandlers.get(question.guiType);
+      if (questionHandlers) {
+        questionHandlers.forEach((handler, methodName) => {
+          (question as any)[methodName] = handler;
+        });
+      }
+    }
   }
 }

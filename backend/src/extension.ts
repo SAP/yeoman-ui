@@ -6,6 +6,8 @@ import { YeomanUI } from "./yeomanui";
 import {RpcExtension} from '@sap-devx/webview-rpc/out.ext/rpc-extension';
 import { YouiLog } from "./youi-log";
 import { OutputChannelLog } from './output-channel-log';
+import { YouiEvents } from "./youi-events";
+import { VSCodeYouiEvents } from './vscode-youi-events';
 import { GeneratorFilter } from './filter';
 import backendMessages from "./messages";
 import { getClassLogger, createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
@@ -25,6 +27,12 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('loadYeomanUI', (options?: any) => {
 			const genFilter = _.get(options, "filter"); 
 			const messages = _.get(options, "messages");
+			
+			const displayedPanel = _.get(YeomanUIPanel, "currentPanel.panel");
+			if (displayedPanel) {
+				displayedPanel.dispose();
+			}
+			
 			YeomanUIPanel.createOrShow(context.extensionPath, GeneratorFilter.create(genFilter), messages);
 	}));
 	context.subscriptions.push(
@@ -96,22 +104,53 @@ export class YeomanUIPanel {
 		return path.join(extensionPath, 'dist', 'media');
 	}
 
+	public async showOpenFileDialog(currentPath: string): Promise<string> {
+		return await this.showOpenDialog(currentPath, true);
+	}
+
+	public async showOpenFolderDialog(currentPath: string): Promise<string> {
+		return await this.showOpenDialog(currentPath, false);
+	}
+
+	private async showOpenDialog(currentPath: string, canSelectFiles: boolean): Promise<string> {
+		let canSelectFolders: boolean = false;
+		if (!canSelectFiles) {
+			canSelectFolders = true;
+		}
+		let uri;
+		try {
+			uri = vscode.Uri.file(currentPath);
+		} catch (e) {
+			uri = vscode.Uri.file('/');
+		}
+
+		try {
+			const filePath = await vscode.window.showOpenDialog({
+				canSelectFiles,
+				canSelectFolders,
+				defaultUri: uri
+			});
+			return (filePath as vscode.Uri[])[0].fsPath;
+		} catch (e) {
+			return currentPath;
+		}
+	}
+
 	public yeomanui: YeomanUI;
 	private readonly logger: IChildLogger = getClassLogger(YeomanUI.name);
 	private rpc: RpcExtension;
-	private readonly panel: vscode.WebviewPanel;
 	private readonly extensionPath: string;
 	private disposables: vscode.Disposable[] = [];
-	private questionsResolutions: Map<number, any>;
 
-	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
-		this.questionsResolutions = new Map();
-		this.panel = panel;
+	private constructor(public readonly panel: vscode.WebviewPanel, extensionPath: string) {
 		this.extensionPath = extensionPath;
 		this.rpc = new RpcExtension(this.panel.webview);
 		const outputChannel: YouiLog = new OutputChannelLog();
-		
-		this.yeomanui = new YeomanUI(this.rpc, outputChannel, this.logger, YeomanUIPanel.genFilter);
+		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.panel);
+
+		this.yeomanui = new YeomanUI(this.rpc, vscodeYouiEvents, outputChannel, this.logger, YeomanUIPanel.genFilter);
+		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
+		this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
 
 		// Set the webview's initial html content
 		this._update();
@@ -134,47 +173,6 @@ export class YeomanUIPanel {
 			null,
 			this.disposables
 		);
-
-		// Handle messages from the webview
-		this.panel.webview.onDidReceiveMessage(
-			message => {
-				switch (message.command) {
-					case 'alert':
-						vscode.window.showErrorMessage(message.text);
-						return;
-					case 'answers':
-						const resolve = this.questionsResolutions.get(message.taskId);
-						resolve(message.data);
-						return;
-					case 'showInfoMessage':
-						const InfoMessage = _.get(message, "commandParams[0]");
-						vscode.window.showInformationMessage(InfoMessage);
-						return;
-					case 'showDoneMessage':
-						const Close = 'Close';
-						const OpenWorkspace = 'Open Workspace';
-						const commandName_Close = "workbench.action.closeActiveEditor";
-						const commandName_OpenWorkspace = "vscode.openFolder";
-						const commandParam_OpenWorkspace = _.get(message, "commandParams[0]");
-						vscode.window.showInformationMessage('Where would you like to open the project?', Close , OpenWorkspace)
-							.then(selection => {
-								if (selection === Close) {
-									this.executeCommand(commandName_Close, undefined);
-								} else if (selection === OpenWorkspace) {
-									this.executeCommand(commandName_OpenWorkspace, commandParam_OpenWorkspace);
-								}
-							});
-						return;
-					case 'vscodecommand':
-						const commandName = _.get(message, "commandName");
-						const commandParam = _.get(message, "commandParams[0]");
-						this.executeCommand(commandName, commandParam);
-						return;
-			}
-			},
-			null,
-			this.disposables
-		);
 	}
 	
 	public dispose() {
@@ -189,17 +187,6 @@ export class YeomanUIPanel {
 				x.dispose();
 			}
 		}
-	}
-
-	private async executeCommand(commandName: string, commandParam: any): Promise<any> {
-		if (commandName === "vscode.open" || commandName === "vscode.openFolder") {
-			commandParam = vscode.Uri.file(commandParam);
-		}
-		return vscode.commands.executeCommand(commandName, commandParam).then(success => {
-			console.debug(`Execution of command ${commandName} returned ${success}`);
-		}, failure => {
-			console.debug(`Execution of command ${commandName} returned ${failure}`);
-		});
 	}
 
 	private setMessages(messages: any): Promise<void> {
@@ -223,9 +210,9 @@ export class YeomanUIPanel {
 		}
 		const uiMessages = _.assign({}, backendMessages, _.get(YeomanUIPanel, "messages", {}));
 		this.panel.title = _.get(uiMessages, "panel_title");
-		
+
 		this.setMessages(uiMessages);
-		
+
 		this.panel.webview.html = indexHtml;
 	}
 }
@@ -235,6 +222,5 @@ export function getOutputChannel(): vscode.OutputChannel {
 	if (!channel) {
 		channel = vscode.window.createOutputChannel('Yeoman UI');
 	}
-	
 	return channel;
 }

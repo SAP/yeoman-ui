@@ -27,17 +27,22 @@
         <v-col class="prompts-col" cols="12">
           <Done
             v-if="isDone"
+            :doneStatus="doneStatus"
             :doneMessage="doneMessage"
             :donePath="donePath"
           />
-          <v-slide-x-transition v-else-if="prompts.length">
-            <Step
-              :key="transitionToggle"
-              ref="step"
-              :currentPrompt="currentPrompt"
-              :selectGenerator="selectGenerator"
-              @stepvalidated="onStepValidated"
-              :updateQuestionsFromIndex="updateQuestionsFromIndex"
+          <PromptInfo v-if="currentPrompt && !isDone" :currentPrompt="currentPrompt" />
+          <GeneratorSelection
+            v-if="shouldShowGeneratorSelection()"
+            @generatorSelected="selectGenerator"
+            :currentQuestion="currentPrompt.questions[0]"
+          />
+          <v-slide-x-transition>
+            <Form
+              ref="form"
+              :questions="currentPrompt ? currentPrompt.questions : []"
+              v-show="!shouldShowGeneratorSelection()"
+              @answered="onAnswered"
             />
           </v-slide-x-transition>
         </v-col>
@@ -57,7 +62,9 @@
           xs="4"
         >
           <v-row class="progress-buttons-row" align="center" justify="end">
-            <v-btn :disabled="!stepValidated" @click="next">Next ></v-btn>
+            <v-btn :disabled="!stepValidated" @click="next">
+              Next<v-icon right>mdi-chevron-right</v-icon>
+            </v-btn>
           </v-row>
         </v-col>
       </v-col>
@@ -74,42 +81,45 @@
   </v-app>
 </template>
 
-
 <script>
 import Vue from "vue";
 import Loading from "vue-loading-overlay";
 import Header from "./components/Header.vue";
 import Navigation from "./components/Navigation.vue";
-import Step from "./components/Step.vue";
+import GeneratorSelection from "./components/GeneratorSelection.vue";
 import Done from "./components/Done.vue";
+import PromptInfo from "./components/PromptInfo.vue";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import * as _ from "lodash";
+import FileBrowserPlugin from "@sap-devx/inquirer-gui-file-browser-plugin";
+import FolderBrowserPlugin from "@sap-devx/inquirer-gui-folder-browser-plugin";
+import LoginPlugin from "@sap-devx/inquirer-gui-login-plugin";
 
 const FUNCTION = "__Function";
-const LOADING = "loading...";
 const PENDING = "pending";
 const INSTALLING = "Installing dependencies...";
 
-function initialState (){
+function initialState() {
   return {
     generatorName: "",
     generatorPrettyName: "",
     stepValidated: false,
     prompts: [],
     promptIndex: 0,
-    index: 0,
     rpc: Object,
     resolve: Object,
     reject: Object,
     isDone: false,
     doneMessage: Object,
+    doneStatus: false,
     consoleClass: "",
     logText: "",
     showConsole: false,
     messages: {},
     showBusyIndicator: false,
-    transitionToggle: false
+    transitionToggle: false,
+    promptsInfoToDisplay: []
   };
 }
 
@@ -118,8 +128,9 @@ export default {
   components: {
     Header,
     Navigation,
-    Step,
+    GeneratorSelection,
     Done,
+    PromptInfo,
     Loading
   },
   data() {
@@ -134,19 +145,24 @@ export default {
       );
     },
     headerTitle() {
-      return this.messages.yeoman_ui_title;
+      const titleSuffix = _.isEmpty(this.generatorPrettyName) ? "" : ` - ${this.generatorPrettyName}`;
+      return `${this.messages.yeoman_ui_title}${titleSuffix}`;
     },
     currentPrompt() {
-      const prompt = _.get(this.prompts, "[" + this.promptIndex +"]")
-      
-      const answers = _.get(prompt, "answers", {})
-      const questions = _.get(prompt, "questions", [])
+      const prompt = _.get(this.prompts, "[" + this.promptIndex + "]");
+
+      const answers = _.get(prompt, "answers", {});
+      const questions = _.get(prompt, "questions", []);
       _.forEach(questions, question => {
-        _.set(answers, [question.name], (question.isWhen === false ? undefined : question.answer))
-      })
-      _.set(prompt, "answers", answers)
-      
-      return prompt
+        _.set(
+          answers,
+          [question.name],
+          question.isWhen === false ? undefined : question.answer
+        );
+      });
+      _.set(prompt, "answers", answers);
+
+      return prompt;
     }
   },
   watch: {
@@ -167,87 +183,14 @@ export default {
     }
   },
   methods: {
-    async updateQuestionsFromIndex(questionIndex) {
-      const questions = _.get(this, "currentPrompt.questions", []);
-      const relevantQuestionsToUpdate = _.slice(questions, questionIndex)
-      
-      let showBusy = true
-      
-      const finished = relevantQuestionsToUpdate.reduce((p, question) => {
-        return p.then(() => this.updateQuestion(question)).catch(error => {
-          // eslint-disable-next-line no-console
-          console.error(error);
-        })
-      }, Promise.resolve()); 
-
-      const that = this
-      setTimeout(() => {
-        if (showBusy) {
-          that.showBusyIndicator = true
-        }
-      }, 1000)
-
-      await finished
-      showBusy = false
-      this.showBusyIndicator = false
+    shouldShowGeneratorSelection() {
+      return this.currentPrompt && 
+        this.currentPrompt.questions &&
+        this.currentPrompt.questions[0] &&
+        this.currentPrompt.questions[0].type==='generators';
     },
     setBusyIndicator() {
-      this.showBusyIndicator =
-        _.isEmpty(this.prompts) ||
-        (this.currentPrompt.status === PENDING && !this.isDone);
-    },
-    async updateQuestion(question) {
-      const newAnswers = this.currentPrompt.answers
-      if (question.when === FUNCTION) {
-        question.isWhen = await this.rpc.invoke("evaluateMethod", [
-          [newAnswers],
-          question.name,
-          "when"
-        ]);
-      }
-
-      if (question.isWhen === true) {
-        if (question.filter === FUNCTION) {
-          question.answer = await this.rpc.invoke("evaluateMethod", [
-            [question.answer],
-            question.name,
-            "filter"
-          ]);
-        }
-        if (question._default === FUNCTION) {
-          question.default = await this.rpc.invoke("evaluateMethod", [
-            [newAnswers],
-            question.name,
-            "default"
-          ]);
-          if (question.answer === undefined) {
-            question.answer = question.default;
-          }
-        }
-        if (question._message === FUNCTION) {
-          question.message = await this.rpc.invoke("evaluateMethod", [
-            [newAnswers],
-            question.name,
-            "message"
-          ]);
-        }
-        if (question._choices === FUNCTION) {
-          question.choices = await this.rpc.invoke("evaluateMethod", [
-            [newAnswers],
-            question.name,
-            "choices"
-          ]);
-        }
-        if (question.validate === FUNCTION) {
-          const response = await this.rpc.invoke("evaluateMethod", [
-            [question.answer, newAnswers],
-            question.name,
-            "validate"
-          ]);
-          question.isValid = _.isString(response) ? false : response;
-          question.validationMessage = _.isString(response) ? response : undefined;
-        }
-      }
+      this.showBusyIndicator = _.isEmpty(this.prompts) || (this.currentPrompt.status === PENDING && !this.isDone);
     },
     next() {
       if (this.resolve) {
@@ -267,94 +210,95 @@ export default {
         };
         this.setPrompts([prompt]);
       }
+      this.stepValidated = false;
       this.promptIndex++;
       this.prompts[this.promptIndex - 1].active = false;
       this.prompts[this.promptIndex].active = true;
       this.transitionToggle = !this.transitionToggle;
     },
     selectGenerator(generatorName, generatorPrettyName) {
+      this.stepValidated = true;
+      if (this.currentPrompt) {
+        _.set(this.currentPrompt, "answers.name", generatorName);
+      }
       this.generatorName = generatorName;
       this.generatorPrettyName = generatorPrettyName;
     },
-    onStepValidated(stepValidated) {
-      this.stepValidated = stepValidated;
+    onAnswered(answers, issues) {
+      this.stepValidated = issues === undefined;
+      const currentPrompt = this.currentPrompt;
+      if (currentPrompt) {
+        currentPrompt.answers = answers;
+      }
     },
     setMessages(messages) {
       this.messages = messages;
     },
+    setPromptList(prompts) {
+      prompts = prompts || [];
+      this.promptsInfoToDisplay = _.cloneDeep(prompts);
+      // replace all existing prompts except 1st (generator selction) and current prompt
+      const startIndex = this.promptIndex + 1;
+      const deleteCount = _.size(this.prompts) - this.promptIndex;
+      const itemsToInsert = prompts.splice(this.promptIndex, _.size(prompts));
+      this.prompts.splice(startIndex, deleteCount, ...itemsToInsert);
+    },
     setPrompts(prompts) {
-      // TODO:
-      //   if prompt name is provided, find an existing prompt based on key or name:
-      //     if found then update it
-      //     if not found then create a prompt
-      //   if no prompt name is provided, assign incoming question to current prompt
-      _.forEach(prompts, (prompt, index) => {
-        if (index === 0) {
-          if (prompt.status === PENDING) {
-            // new pending prompt
-            this.prompts.push(prompt);
-          } else {
-            if (this.currentPrompt) {
-              this.updateCurrentPrompt(prompt);
-            } else {
-              // first prompt (Select Generator)
-              prompt.active = true;
-              this.prompts.push(prompt);
-            }
-          }
-        } else {
-          // multiple prompts provided -- simply add them
-          this.prompts.push(prompt);
+      const firstIncomingPrompt = _.get(prompts, "[0]");
+      if (firstIncomingPrompt) {
+        let startIndex = this.promptIndex;
+        let deleteCount = prompts.length;
+        if (!this.currentPrompt || firstIncomingPrompt.status === PENDING) {
+          startIndex = this.promptIndex + 1;
+          deleteCount = 0;
         }
-      });
-    },
-    updateCurrentPrompt(prompt) {
-      this.currentPrompt.questions = prompt.questions;
-      if (prompt.name && this.currentPrompt.name === this.messages.step_is_pending) {
-        this.currentPrompt.name = prompt.name;
-        this.currentPrompt.description = _.get(prompt, "description", "");
-      }
-      // if questions are provided, remote the pending status
-      if (_.size(prompt.questions) > 0) {
-        delete this.currentPrompt.status;
+        this.prompts.splice(startIndex, deleteCount, ...prompts);
       }
     },
-    setQuestionProps(prompt) {
-      const questions = _.get(prompt, "questions", []);
-      for (const question of questions) {
-        if (question.default === FUNCTION) {
-          question.default = undefined;
-          this.$set(question, "_default", FUNCTION);
-        }
-        if (question.message === FUNCTION) {
-          question.message = LOADING;
-          this.$set(question, "_message", FUNCTION);
-        }
-        if (question.choices === FUNCTION) {
-          question.choices = [LOADING];
-          this.$set(question, "_choices", FUNCTION);
-        }
+    prepQuestions(questions) {
+      for (let question of questions) {
+        for (let prop in question) {
+          if (question[prop] === FUNCTION) {
+            const that = this;
+            question[prop] = async (...args) => {
+              let showBusy = true;
+              setTimeout(() => {
+                if (showBusy) {
+                  that.showBusyIndicator = true;
+                }
+              }, 1000);
 
-        let answer = question.default;
-        if (question.default === undefined && question.type !== "confirm") {
-          answer = "";
+              try {
+                const response = await that.rpc.invoke("evaluateMethod", [
+                  args,
+                  question.name,
+                  prop
+                ]);
+                showBusy = false;
+                that.showBusyIndicator = false;
+
+                return response;
+              } catch(e) {
+                showBusy = false;
+                that.showBusyIndicator = false;
+                throw(e);
+              }
+            };
+          }
         }
-        this.$set(question, "answer", answer);
-        this.$set(question, "isValid", true);
-        this.$set(question, "validationMessage", true);
-        this.$set(question, "isWhen", question.when !== FUNCTION);
       }
     },
+
     async showPrompt(questions, name) {
+      this.prepQuestions(questions);
       const prompt = this.createPrompt(questions, name);
-      // evaluate message property on server if it is a function
       this.setPrompts([prompt]);
-      await this.updateQuestionsFromIndex(0);
-      const promise =  new Promise((resolve, reject) => {
+
+      const promise = new Promise((resolve, reject) => {
         this.resolve = resolve;
         this.reject = reject;
       });
-      
+
       return promise;
     },
     createPrompt(questions, name) {
@@ -363,8 +307,12 @@ export default {
       if (name === "select_generator") {
         promptDescription = this.messages.select_generator_description;
         promptName = this.messages.select_generator_name;
+      } else {
+        const promptToDisplay = _.get(this.promptsInfoToDisplay, "[" + (this.promptIndex - 1) +"]");
+        promptDescription = _.get(promptToDisplay, "description", "");
+        promptName = _.get(promptToDisplay, "name", name);
       }
-      
+
       const prompt = Vue.observable({
         questions: questions,
         name: promptName,
@@ -372,7 +320,6 @@ export default {
         answers: {},
         active: true
       });
-      this.setQuestionProps(prompt);
       return prompt;
     },
     log(log) {
@@ -380,26 +327,18 @@ export default {
       return true;
     },
     generatorInstall() {
-      if (this.isInVsCode()) {
-        window.vscode.postMessage({
-          command: "showInfoMessage",
-          commandParams: [INSTALLING]
-        });
-      }
+      this.currentPrompt.name = "Installing";
+      this.doneMessage = INSTALLING;
+      this.donePath = "";
+      this.doneStatus = true;
+      this.isDone = true;
     },
-    generatorDone(success, message, targetPath) {
-      if (this.currentPrompt.status === PENDING) {
-        this.currentPrompt.name = "Summary";
-      }
+    generatorDone(succeeded, message, targetPath) {
+      this.currentPrompt.name = "Summary";
       this.doneMessage = message;
       this.donePath = targetPath;
+      this.doneStatus = succeeded;
       this.isDone = true;
-      if (this.isInVsCode()) {
-        window.vscode.postMessage({
-          command: "showDoneMessage",
-          commandParams: [this.donePath]
-        });
-      }
     },
     runGenerator(generatorName) {
       this.rpc.invoke("runGenerator", [generatorName]);
@@ -408,6 +347,7 @@ export default {
       return typeof acquireVsCodeApi !== "undefined";
     },
     setupRpc() {
+      /* istanbul ignore if */
       if (this.isInVsCode()) {
         // eslint-disable-next-line
         window.vscode = acquireVsCodeApi();
@@ -415,6 +355,7 @@ export default {
         this.initRpc();
       } else {
         const ws = new WebSocket("ws://127.0.0.1:8081");
+        /* istanbul ignore next */
         ws.onopen = () => {
           this.rpc = new RpcBrowserWebSockets(ws);
           this.initRpc();
@@ -424,7 +365,7 @@ export default {
     initRpc() {
       const functions = [
         "showPrompt",
-        "setPrompts",
+        "setPromptList",
         "generatorInstall",
         "generatorDone",
         "log",
@@ -444,6 +385,25 @@ export default {
       this.showConsole = !this.showConsole;
     },
     init() {
+      // register custom inquirer-gui plugins
+      let options = {};
+      Vue.use(FileBrowserPlugin, options);
+      if (options.plugin) {
+        this.$refs.form.registerPlugin(options.plugin);
+      }
+
+      options = {};
+      Vue.use(FolderBrowserPlugin, options);
+      if (options.plugin) {
+        this.$refs.form.registerPlugin(options.plugin);
+      }
+
+      options = {};
+      Vue.use(LoginPlugin, options);
+      if (options.plugin) {
+        this.$refs.form.registerPlugin(options.plugin);
+      }
+
       this.isInVsCode()
         ? (this.consoleClass = "consoleClassHidden")
         : (this.consoleClass = "consoleClassVisible");
@@ -451,13 +411,16 @@ export default {
     reload() {
       const dataObj = initialState();
       dataObj.rpc = this.rpc;
+      dataObj.messages = this.messages;
       Object.assign(this.$data, dataObj);
       this.init();
       this.rpc.invoke("receiveIsWebviewReady", []);
     }
   },
-  mounted() {
+  created() {
     this.setupRpc();
+  },
+  mounted() {
     this.init();
   }
 };
@@ -519,4 +482,5 @@ div.bottom-right-col .progress-buttons-row {
   padding-right: 24px;
   padding-top: 4px;
 }
+
 </style>
