@@ -10,11 +10,11 @@ const datauri = require("datauri");
 import * as defaultImage from "./defaultImage";
 import { YouiAdapter } from "./youi-adapter";
 import { YouiLog } from "./youi-log";
-import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 import { GeneratorType, GeneratorFilter } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
+import * as vscode from 'vscode';
 
 export interface IGeneratorChoice {
   name: string;
@@ -42,7 +42,7 @@ export class YeomanUI {
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
   private static YEOMAN_PNG = "yeoman.png";
   private static isWin32 = (process.platform === 'win32');
-  private static CWD = path.join(os.homedir(), 'projects');
+  private static cwd = path.join(os.homedir(), 'projects');
   private static NODE_MODULES = 'node_modules';
 
   private static funcReplacer(key: any, value: any) {
@@ -50,7 +50,6 @@ export class YeomanUI {
   }
 
   private rpc: IRpc;
-  private youiEvents: YouiEvents;
   private outputChannel: YouiLog;
   private logger: IChildLogger;
   private genMeta: { [namespace: string]: Environment.GeneratorMeta };
@@ -59,15 +58,15 @@ export class YeomanUI {
   private promptCount: number;
   private currentQuestions: Environment.Adapter.Questions<any>;
   private genFilter: GeneratorFilter;
-  private cwd: string;
-
-  constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter) {
+  
+  constructor(rpc: IRpc, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter) {
     this.rpc = rpc;
     if (!this.rpc) {
       throw new Error("rpc must be set");
     }
-    this.cwd = YeomanUI.CWD;
-    this.youiEvents = youiEvents;
+    if (vscode.workspace && vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
+      YeomanUI.cwd = vscode.workspace.workspaceFolders[0].uri.path;
+    }
     this.outputChannel = outputChannel;
     this.logger = logger;
     this.rpc.setResponseTimeout(3600000);
@@ -77,7 +76,7 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.toggleOutput, thisArg: this });
     this.rpc.registerMethod({ func: this.logError, thisArg: this });
   
-    this.youiAdapter = new YouiAdapter(outputChannel, youiEvents);
+    this.youiAdapter = new YouiAdapter(outputChannel);
     this.youiAdapter.setYeomanUI(this);
     this.promptCount = 0;
     this.genMeta = {};
@@ -86,11 +85,11 @@ export class YeomanUI {
   }
 
   public setCwd(cwd: string){
-    this.cwd = cwd;
+    YeomanUI.cwd = cwd;
   }
 
   public getCwd():string {
-    return this.cwd;
+    return YeomanUI.cwd;
   }
   
   public setGenFilter(genFilter: GeneratorFilter) {
@@ -124,7 +123,7 @@ export class YeomanUI {
     //  see issue: https://github.com/yeoman/environment/issues/55
     //  process.chdir() doesn't work after environment has been created
     try {
-      await fsextra.mkdirs(this.cwd);
+      await fsextra.mkdirs(YeomanUI.cwd);
       const env: Environment = Environment.createEnv(undefined, {}, this.youiAdapter);
       const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
       // TODO: support sub-generators
@@ -157,22 +156,35 @@ export class YeomanUI {
       
       this.promptCount = 0;
       this.gen = (gen as Generator);
-      this.gen.destinationRoot(this.cwd);
+      this.gen.destinationRoot(YeomanUI.cwd);
       /* Generator.run() returns promise. Sending a callback is deprecated:
            https://yeoman.github.io/generator/Generator.html#run
          ... but .d.ts hasn't been updated for a while:
            https://www.npmjs.com/package/@types/yeoman-generator */
-        this.gen.run((err) => {
-        if (!err) {
-          this.onGeneratorSuccess(generatorName, this.gen.destinationRoot());
-        } 
-      });
-      this.gen.on('error', (error: any) => {
-        this.onGeneratorFailure(generatorName, this.gen.destinationRoot(), error);
+      this.gen.run((err) => {
+        let message: string;
+        const destinationRoot = this.gen.destinationRoot();
+        if (err) {
+          message = `${generatorName} failed: ${err}.`;
+          this.logError(err, message);
+          this.doGeneratorDone(false, message, destinationRoot);
+        } else {
+          message = `The '${generatorName}' project has been generated.`;
+          this.logger.debug("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
+          this.doGeneratorDone(true, message, destinationRoot);
+        }
       });
     } catch (error) {
-      this.onGeneratorFailure(generatorName, this.gen.destinationRoot(), error);
+      this.logError(error);
     }
+  }
+
+  public doGeneratorInstall(): Promise<any> {
+    return this.rpc.invoke("generatorInstall");
+  }
+
+  public doGeneratorDone(success: boolean, message: string, targetPath = ""): Promise<any> {
+    return this.rpc.invoke("generatorDone", [true, message, targetPath]);
   }
 
   public setMessages(messages: any): Promise<void> {
@@ -202,14 +214,10 @@ export class YeomanUI {
   }
 
   public async receiveIsWebviewReady() {
-    try {
-      // TODO: loading generators takes a long time; consider prefetching list of generators
-      const generators: IPrompt = await this.getGenerators();
-      const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
-      await this.runGenerator(response.name);
-    } catch (error) {
-      this.logError(error);
-    }
+    // TODO: loading generators takes a long time; consider prefetching list of generators
+    const generators: IPrompt = await this.getGenerators();
+    const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
+    await this.runGenerator(response.name);
   }
 
   public toggleOutput(): boolean {
@@ -233,18 +241,6 @@ export class YeomanUI {
       return this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
   }
 
-  private onGeneratorSuccess(generatorName: string, destinationRoot: string) {
-    const message = `The '${generatorName}' project has been generated.`;
-    this.logger.debug("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
-    this.youiEvents.doGeneratorDone(true, message, destinationRoot);
-  }
-
-  private onGeneratorFailure(generatorName: string, destinationRoot: string, error: any) {
-    const message = `${generatorName} generator failed.\n\n${this.getErrorInfo(error)}`;
-    this.logError(error, message);
-    this.youiEvents.doGeneratorDone(false, message, destinationRoot);
-  }
-
   private getEnv(): Environment.Options {
     const env: Environment.Options = Environment.createEnv();
     const envGetNpmPaths: () => any = env.getNpmPaths;
@@ -252,7 +248,7 @@ export class YeomanUI {
       // Start with the local paths derived by cwd in vscode 
       // (as opposed to cwd of the plugin host process which is what is used by yeoman/environment)
       // Walk up the CWD and add `node_modules/` folder lookup on each level
-      const parts: string[] = this.cwd.split(path.sep);
+      const parts: string[] = YeomanUI.cwd.split(path.sep);
       const localPaths = _.map(parts, (part, index) => {
         const resrpath = path.join(...parts.slice(0, index + 1), YeomanUI.NODE_MODULES);
         return YeomanUI.isWin32 ? resrpath : path.join(path.sep, resrpath);
@@ -270,15 +266,10 @@ export class YeomanUI {
     const originalGenInstall = _.get(originalPrototype, "install");
     if (originalGenInstall) {
       originalPrototype.install = () => {
-        try {
-          this.youiEvents.doGeneratorInstall();
-          originalGenInstall.call(gen);
-        } catch (error) {
-          this.logError(error);
-        } finally {
-          originalPrototype.install = originalGenInstall;
-        }
+        this.doGeneratorInstall();
+        originalGenInstall.call(gen);
       };
+      Object.setPrototypeOf(gen, originalPrototype);
     }
   }
 
@@ -313,8 +304,8 @@ export class YeomanUI {
 
   private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<IGeneratorChoice | undefined> {
     let packageJson: any;
-    const genPackagePath: string = this.getGenMetaPackagePath(genName);
-  
+    
+    const genPackagePath = this.getGenMetaPackagePath(genName);
     try {
       packageJson = await this.getGenPackageJson(genPackagePath);
     } catch (error) {
@@ -366,12 +357,7 @@ export class YeomanUI {
 
   private getGenMetadata(genName: string): Environment.GeneratorMeta {
     const metadataName: string = this.getGenMetaName(genName);
-    const genMetadata = _.get(this, ["genMeta", metadataName]);
-    if (_.isNil(genMetadata)) {
-      const debugMessage = `${this.getGenMetaName(genName)} generator metadata was not found.`;
-      this.logger.debug(debugMessage);
-    }
-    return genMetadata;
+    return _.get(this, ["genMeta", metadataName]);
   }
 
   private getGenMetaName(genName: string): string {
