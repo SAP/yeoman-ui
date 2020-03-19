@@ -450,6 +450,14 @@ describe('yeomanui unit test', () => {
         expect(res).to.be.undefined;
     });
 
+    it("setCwd", () => {
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+        const res = yeomanUiInstance.setCwd("testpath");
+        // tslint:disable-next-line: no-unused-expression
+        expect(res).to.be.undefined;
+        expect(yeomanUiInstance.getCwd()).equal("testpath");
+    });
+
     it("getErrorInfo", () => {
         const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
         const errorInfo: string = "Error Info";
@@ -498,7 +506,7 @@ describe('yeomanui unit test', () => {
         };
 
         beforeEach(() => {
-            YeomanUI["CWD"] = path.join("root/project/folder");
+            YeomanUI["cwd"] = path.join("root/project/folder");
             yeomanEnvMock.expects("createEnv").returns(testEnv);
         });
 
