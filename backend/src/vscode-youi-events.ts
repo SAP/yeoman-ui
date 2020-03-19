@@ -52,9 +52,12 @@ export class VSCodeYouiEvents implements YouiEvents {
         VSCodeYouiEvents.installing = false;
         if (success) {
             const OpenWorkspace = 'Open Workspace';
-            vscode.window.showInformationMessage('The project has been successfully generated.\nWould you like to open it?', OpenWorkspace).then(selection => {
+            const AddToWorkspace = 'Add To Workspace';
+            vscode.window.showInformationMessage('The project has been successfully generated.\nWould you like to open it?', AddToWorkspace, OpenWorkspace).then(selection => {
                 if (selection === OpenWorkspace) {
                     this.executeCommand("vscode.openFolder", targetPath);
+                } else if (selection === AddToWorkspace) {
+                    vscode.workspace.updateWorkspaceFolders(vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders.length : 0, null, { uri: vscode.Uri.file(targetPath)});
                 }
             });
         } else {
