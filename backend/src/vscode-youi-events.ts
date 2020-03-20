@@ -52,7 +52,7 @@ export class VSCodeYouiEvents implements YouiEvents {
         VSCodeYouiEvents.installing = false;
         if (success) {
             const OpenWorkspace = 'Open in New Workspace';
-            const AddToWorkspace = 'Add To Workspace';
+            const AddToWorkspace = 'Add to Workspace';
             vscode.window.showInformationMessage('The project has been successfully generated.\nWhat would you like to do with it?', AddToWorkspace, OpenWorkspace).then(selection => {
                 if (selection === OpenWorkspace) {
                     this.executeCommand("vscode.openFolder", targetPath);
