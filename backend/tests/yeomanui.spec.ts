@@ -504,7 +504,7 @@ describe('yeomanui unit test', () => {
     });
 
     describe("getEnv", () => {
-        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, null, path.join("root/project/folder"));
         const testEnv = yeomanUiInstance["getEnv"]();
         const nodemodules = YeomanUI["NODE_MODULES"];
         testEnv.getNpmPaths = (localOnly: boolean = false): string[] => {
@@ -514,13 +514,12 @@ describe('yeomanui unit test', () => {
         };
 
         beforeEach(() => {
-            YeomanUI["cwd"] = path.join("root/project/folder");
             yeomanEnvMock.expects("createEnv").returns(testEnv);
         });
 
         it("env.getNpmPaths - localOnly is false, isWin32 is true", () => {
             YeomanUI["isWin32"] = true;
-            const env = yeomanUi["getEnv"]();
+            const env = yeomanUiInstance["getEnv"]();
             const res = env.getNpmPaths();
             expect(res).to.have.lengthOf(7);
             expect(res).to.include(path.join("root", nodemodules));
@@ -534,7 +533,7 @@ describe('yeomanui unit test', () => {
 
         it("env.getNpmPaths - localOnly is true, isWin32 is true", () => {
             YeomanUI["isWin32"] = true;
-            const env = yeomanUi["getEnv"]();
+            const env = yeomanUiInstance["getEnv"]();
             const res = env.getNpmPaths(true);
             expect(res).to.have.lengthOf(5);
             expect(res).to.include(path.join("root", nodemodules));
@@ -546,7 +545,7 @@ describe('yeomanui unit test', () => {
 
         it("env.getNpmPaths - localOnly is false, isWin32 is false", () => {
             YeomanUI["isWin32"] = false;
-            const env = yeomanUi["getEnv"]();
+            const env = yeomanUiInstance["getEnv"]();
             const res = env.getNpmPaths();
             expect(res).to.have.lengthOf(7);
             expect(res).to.include(path.join(path.sep, "root", nodemodules));
@@ -560,7 +559,7 @@ describe('yeomanui unit test', () => {
 
         it("env.getNpmPaths - localOnly is true, isWin32 is false", () => {
             YeomanUI["isWin32"] = false;
-            const env = yeomanUi["getEnv"]();
+            const env = yeomanUiInstance["getEnv"]();
             const res = env.getNpmPaths(true);
             expect(res).to.have.lengthOf(5);
             expect(res).to.include(path.join(path.sep, "root", nodemodules));
@@ -627,6 +626,7 @@ describe('yeomanui unit test', () => {
             yeomanUiInstance.registerCustomQuestionEventHandler("questionType", "testEvent", testEventFunction);
             yeomanUiInstance["currentQuestions"] = [{name:"question1", guiType: "questionType"}];
             const response = await yeomanUiInstance.evaluateMethod(null, "question1", "testEvent");
+            // tslint:disable-next-line: no-unused-expression
             expect(response).to.be.true;
         });
 
@@ -643,6 +643,7 @@ describe('yeomanui unit test', () => {
         it("no questions", async () => {
             const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
             const response = await yeomanUiInstance.evaluateMethod(null, "question1", "method1");
+            // tslint:disable-next-line: no-unused-expression
             expect(response).to.be.undefined;
         });
 
