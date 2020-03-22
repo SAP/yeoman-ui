@@ -50,22 +50,18 @@
         </v-row>
         <v-row
           v-if="prompts.length > 0 && !isDone"
-          style="height: 4rem"
+          style="height: 4rem; margin: 0;"
           sm="auto"
         >
           <div class="bottom-right-col" style="flex:1;">
           </div>
           <div class="diagonal">
           </div>
-          <div style="display:flex;align-items: center;">
-            <v-btn
-              id="back"
-              @click="back"
-              :disabled="promptIndex<2 || isReplaying"
-            >
-            <v-icon left>mdi-chevron-left</v-icon>Back
+          <div class="bottom-buttons-col" style="display:flex;align-items: center;">
+            <v-btn id="back" :disabled="promptIndex<2 || isReplaying" @click="back">
+              <v-icon left>mdi-chevron-left</v-icon>Back
             </v-btn>
-            <v-btn :disabled="!stepValidated" @click="next">
+            <v-btn id="next" :disabled="!stepValidated" @click="next">
               Next<v-icon right>mdi-chevron-right</v-icon>
             </v-btn>
           </div>
@@ -488,12 +484,16 @@ div.consoleClassVisible .v-footer {
 }
 .diagonal {
   width: 80px;
-  background: linear-gradient(60deg, var(--vscode-editorWidget-background, #252526) 0%, var(--vscode-editorWidget-background, #252526) 50%, transparent 50%);
-  background-color: var(--vscode-editor-background, #1e1e1e);
+  background: linear-gradient(120deg, var(--vscode-editor-background, #1e1e1e) 0%, var(--vscode-editor-background, #1e1e1e) 50%, transparent 50%);
+  background-color: var(--vscode-editorWidget-background, #252526);
 }
 .bottom-right-col {
-  background: var(--vscode-editorWidget-background, #252526);
+  background: var(--vscode-editor-background, #1e1e1e);
   overflow: hidden;
   margin: 0px;
+}
+.bottom-buttons-col {
+  background-color: var(--vscode-editorWidget-background, #252526);
+  padding-right: 25px;
 }
 </style>
