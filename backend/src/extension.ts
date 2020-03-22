@@ -193,10 +193,10 @@ export class YeomanUIPanel {
 		return this.rpc ? this.rpc.invoke("setMessages", [messages]) : Promise.resolve();
 	}
 
-	private _update() {
+    private async _update() {
 		
 		// TODO: don't use sync
-		let indexHtml: string = fsextra.readFileSync(path.join(YeomanUIPanel.getMediaPath(this.extensionPath), 'index.html'), "utf8");
+		let indexHtml: string = await fsextra.readFile(path.join(YeomanUIPanel.getMediaPath(this.extensionPath), 'index.html'), "utf8");
 		if (indexHtml) {
 			// Local path to main script run in the webview
 			const scriptPathOnDisk = vscode.Uri.file(path.join(YeomanUIPanel.getMediaPath(this.extensionPath), path.sep));
@@ -211,9 +211,9 @@ export class YeomanUIPanel {
 		const uiMessages = _.assign({}, backendMessages, _.get(YeomanUIPanel, "messages", {}));
 		this.panel.title = _.get(uiMessages, "panel_title");
 
-		this.setMessages(uiMessages);
-
 		this.panel.webview.html = indexHtml;
+
+		this.setMessages(uiMessages);
 	}
 }
 
