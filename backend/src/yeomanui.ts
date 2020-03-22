@@ -418,7 +418,12 @@ export class YeomanUI {
   }
 
   public setCwd(cwd: string){
-    cwd? YeomanUI.cwd=cwd: YeomanUI.cwd=path.join(os.homedir(), 'projects'); 
+    if(cwd){
+      YeomanUI.cwd=cwd;
+    }
+    else{
+      YeomanUI.cwd=path.join(os.homedir(), 'projects');
+    }
   }
 
   public getCwd():string {
