@@ -16,7 +16,6 @@ import Generator = require("yeoman-generator");
 import { GeneratorType, GeneratorFilter } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
-import * as vscode from 'vscode';
 
 
 export interface IGeneratorChoice {
@@ -62,7 +61,7 @@ export class YeomanUI {
   private genFilter: GeneratorFilter;
   private customQuestionEventHandlers: Map<string, Map<string, Function>>;
 
-  constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter) {
+  constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter, outputPath?: string) {
     this.rpc = rpc;
     if (!this.rpc) {
       throw new Error("rpc must be set");
@@ -84,9 +83,7 @@ export class YeomanUI {
     this.currentQuestions = {};
     this.setGenFilter(genFilter);
     this.customQuestionEventHandlers = new Map();
-    if (vscode.workspace && vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
-      YeomanUI.cwd = vscode.workspace.workspaceFolders[0].uri.path;
-    }
+    this.setCwd(outputPath);
   }
 
   public registerCustomQuestionEventHandler(questionType: string, methodName: string, handler: Function): void {
@@ -421,7 +418,7 @@ export class YeomanUI {
   }
 
   public setCwd(cwd: string){
-    YeomanUI.cwd = cwd;
+    cwd? YeomanUI.cwd=cwd: YeomanUI.cwd=path.join(os.homedir(), 'projects'); 
   }
 
   public getCwd():string {
