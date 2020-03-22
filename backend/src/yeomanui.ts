@@ -17,6 +17,7 @@ import { GeneratorType, GeneratorFilter } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
 
+
 export interface IGeneratorChoice {
   name: string;
   prettyName: string;
@@ -41,7 +42,7 @@ export class YeomanUI {
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
   private static YEOMAN_PNG = "yeoman.png";
   private static isWin32 = (process.platform === 'win32');
-  private static CWD: string = path.join(os.homedir(), 'projects');
+  private static cwd: string = path.join(os.homedir(), 'projects');
   private static NODE_MODULES = 'node_modules';
 
   private static funcReplacer(key: any, value: any) {
@@ -60,7 +61,7 @@ export class YeomanUI {
   private genFilter: GeneratorFilter;
   private customQuestionEventHandlers: Map<string, Map<string, Function>>;
 
-  constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter) {
+  constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter, outputPath?: string) {
     this.rpc = rpc;
     if (!this.rpc) {
       throw new Error("rpc must be set");
@@ -82,6 +83,7 @@ export class YeomanUI {
     this.currentQuestions = {};
     this.setGenFilter(genFilter);
     this.customQuestionEventHandlers = new Map();
+    this.setCwd(outputPath);
   }
 
   public registerCustomQuestionEventHandler(questionType: string, methodName: string, handler: Function): void {
@@ -131,7 +133,7 @@ export class YeomanUI {
     //  see issue: https://github.com/yeoman/environment/issues/55
     //  process.chdir() doesn't work after environment has been created
     try {
-      await fsextra.mkdirs(YeomanUI.CWD);
+      await fsextra.mkdirs(YeomanUI.cwd);
       const env: Environment = Environment.createEnv(undefined, {}, this.youiAdapter);
       const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
       // TODO: support sub-generators
@@ -149,7 +151,7 @@ export class YeomanUI {
       
       this.promptCount = 0;
       this.gen = (gen as Generator);
-      this.gen.destinationRoot(YeomanUI.CWD);
+      this.gen.destinationRoot(YeomanUI.cwd);
       /* Generator.run() returns promise. Sending a callback is deprecated:
            https://yeoman.github.io/generator/Generator.html#run
          ... but .d.ts hasn't been updated for a while:
@@ -255,7 +257,7 @@ export class YeomanUI {
       // Start with the local paths derived by cwd in vscode 
       // (as opposed to cwd of the plugin host process which is what is used by yeoman/environment)
       // Walk up the CWD and add `node_modules/` folder lookup on each level
-      const parts: string[] = YeomanUI.CWD.split(path.sep);
+      const parts: string[] = YeomanUI.cwd.split(path.sep);
       const localPaths = _.map(parts, (part, index) => {
         const resrpath = path.join(...parts.slice(0, index + 1), YeomanUI.NODE_MODULES);
         return YeomanUI.isWin32 ? resrpath : path.join(path.sep, resrpath);
@@ -413,5 +415,18 @@ export class YeomanUI {
         });
       }
     }
+  }
+
+  public setCwd(cwd: string){
+    if(cwd){
+      YeomanUI.cwd=cwd;
+    }
+    else{
+      YeomanUI.cwd=path.join(os.homedir(), 'projects');
+    }
+  }
+
+  public getCwd():string {
+    return YeomanUI.cwd;
   }
 }

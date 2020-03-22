@@ -12,6 +12,7 @@ import { YouiEvents } from '../src/youi-events';
 import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorType, GeneratorFilter } from "../src/filter";
 import { IChildLogger } from "@vscode-logging/logger";
+import * as os from "os";
 
 describe('yeomanui unit test', () => {
     let sandbox: any;
@@ -450,6 +451,21 @@ describe('yeomanui unit test', () => {
         expect(res).to.be.undefined;
     });
 
+    it("setCwd", () => {
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, undefined,  "testpathbefore");
+        expect(yeomanUiInstance.getCwd()).equal("testpathbefore");
+        const res = yeomanUiInstance.setCwd("testpathafter");
+        // tslint:disable-next-line: no-unused-expression
+        expect(res).to.be.undefined;
+        expect(yeomanUiInstance.getCwd()).equal("testpathafter");
+    });
+
+    it("defaultOutputPath", () => {
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+        const projectsPath = path.join(os.homedir(), 'projects');
+        expect(yeomanUiInstance.getCwd()).equal(projectsPath);
+    });
+
     it("getErrorInfo", () => {
         const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
         const errorInfo: string = "Error Info";
@@ -498,7 +514,7 @@ describe('yeomanui unit test', () => {
         };
 
         beforeEach(() => {
-            YeomanUI["CWD"] = path.join("root/project/folder");
+            YeomanUI["cwd"] = path.join("root/project/folder");
             yeomanEnvMock.expects("createEnv").returns(testEnv);
         });
 
