@@ -44,7 +44,7 @@ describe('vscode-youi-events unit test', () => {
         it("on success", () => {
             eventsMock.expects("doClose");
             _.set(vscode, "window.showInformationMessage", () => {return Promise.resolve("");});
-            windowMock.expects("showInformationMessage").withExactArgs('The project has been successfully generated.\nWould you like to open it?', 'Add To Workspace', 'Open Workspace').resolves();
+            windowMock.expects("showInformationMessage").withExactArgs('The project has been successfully generated.\nWhat would you like to do with it?', 'Add to Workspace', 'Open in New Workspace').resolves();
             events.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
 
