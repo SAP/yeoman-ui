@@ -36,10 +36,10 @@ this.getPrompts = function() {
 }
 ```
 
-  * Update the target folder (your project root path) in the 'writing()' method 
+  * Update the target folder (your project root path) in the 'configuring()' method 
 
 ```javascript
-writing() {
+configuring() {
     this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "answers.food", "")));
 }
 ```
