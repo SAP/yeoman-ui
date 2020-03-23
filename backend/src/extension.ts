@@ -147,32 +147,31 @@ export class YeomanUIPanel {
 		this.rpc = new RpcExtension(this.panel.webview);
 		const outputChannel: YouiLog = new OutputChannelLog();
 		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.panel);
-
-		this.yeomanui = new YeomanUI(this.rpc, vscodeYouiEvents, outputChannel, this.logger, YeomanUIPanel.genFilter);
+		const outputFolder = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
+		this.yeomanui = new YeomanUI(this.rpc, vscodeYouiEvents, outputChannel, this.logger, YeomanUIPanel.genFilter, outputFolder);
 		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
 		this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
 
 		// Set the webview's initial html content
-		this._update();
+		this._update().then(() => {
+			// Set the context (yeoman-ui is focused)
+			vscode.commands.executeCommand('setContext', 'yeomanUI.Focused', this.panel.active);
 
-		// Set the context (yeoman-ui is focused)
-		vscode.commands.executeCommand('setContext', 'yeomanUI.Focused', this.panel.active);
-
-		// Listen for when the panel is disposed
-		// This happens when the user closes the panel or when the panel is closed programatically
-		this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
-
-		// Update the content based on view changes
-		this.panel.onDidChangeViewState(
-			e => {
-				if (this.panel.visible) {
-					this._update();
-				}
-				vscode.commands.executeCommand('setContext', 'yeomanUI.Focused', this.panel.active);
-			},
-			null,
-			this.disposables
-		);
+			// Listen for when the panel is disposed
+			// This happens when the user closes the panel or when the panel is closed programatically
+			this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
+			const that = this;
+			// Update the content based on view changes
+			this.panel.onDidChangeViewState(async () => {
+					if (that.panel.visible) {
+						await that._update();
+					}
+					vscode.commands.executeCommand('setContext', 'yeomanUI.Focused', that.panel.active);
+				},
+				null,
+				this.disposables
+			);
+		});
 	}
 	
 	public dispose() {
@@ -193,10 +192,8 @@ export class YeomanUIPanel {
 		return this.rpc ? this.rpc.invoke("setMessages", [messages]) : Promise.resolve();
 	}
 
-	private _update() {
-		
-		// TODO: don't use sync
-		let indexHtml: string = fsextra.readFileSync(path.join(YeomanUIPanel.getMediaPath(this.extensionPath), 'index.html'), "utf8");
+    private async _update() {
+		let indexHtml: string = await fsextra.readFile(path.join(YeomanUIPanel.getMediaPath(this.extensionPath), 'index.html'), "utf8");
 		if (indexHtml) {
 			// Local path to main script run in the webview
 			const scriptPathOnDisk = vscode.Uri.file(path.join(YeomanUIPanel.getMediaPath(this.extensionPath), path.sep));
@@ -211,9 +208,9 @@ export class YeomanUIPanel {
 		const uiMessages = _.assign({}, backendMessages, _.get(YeomanUIPanel, "messages", {}));
 		this.panel.title = _.get(uiMessages, "panel_title");
 
-		this.setMessages(uiMessages);
-
 		this.panel.webview.html = indexHtml;
+
+		await this.setMessages(uiMessages);
 	}
 }
 
