@@ -114,8 +114,10 @@ export class ReplayUtils {
       // __ForceDefault is required to let the frontend know to ignore all forms
       //   of default values defined on the question, e.g. the checked property of
       //   the choices array for questions of type checkbox
-      question.__ForceDefault = true;
-      question.default = answer;
+      if (answer !== undefined) {
+        question.__ForceDefault = true;
+        question.default = answer;
+      }
     }
   }
 }
