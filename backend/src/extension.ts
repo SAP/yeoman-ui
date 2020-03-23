@@ -33,7 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
 				displayedPanel.dispose();
 			}
 			
-			YeomanUIPanel.createOrShow(context.extensionPath, GeneratorFilter.create(genFilter), messages);
+			YeomanUIPanel.create(context.extensionPath, GeneratorFilter.create(genFilter), messages);
 	}));
 	context.subscriptions.push(
 		vscode.commands.registerCommand('yeomanUI.toggleOutput', () => {
@@ -66,28 +66,19 @@ export class YeomanUIPanel {
 	public static genFilter: GeneratorFilter;
 	public static messages: any;
 
-	public static createOrShow(extensionPath: string, genFilter?: GeneratorFilter, messages?: any) {
+	public static create(extensionPath: string, genFilter?: GeneratorFilter, messages?: any) {
 		YeomanUIPanel.genFilter = genFilter;
 		YeomanUIPanel.messages = messages;
-		
-		const column = _.get(vscode.window, "activeTextEditor.viewColumn");
-
-		// If we already have a panel, show it.
-		if (YeomanUIPanel.currentPanel) {
-			YeomanUIPanel.currentPanel.yeomanui.setGenFilter(YeomanUIPanel.genFilter);
-			YeomanUIPanel.currentPanel.panel.reveal(column);
-			return;
-		}
 
 		// Otherwise, create a new panel.
 		const panel = vscode.window.createWebviewPanel(
 			YeomanUIPanel.viewType,
 			'Yeoman UI',
-			column || vscode.ViewColumn.One,
+			vscode.ViewColumn.One,
 			{
 				// Enable javascript in the webview
 				enableScripts: true,
-
+				retainContextWhenHidden : true,
 				// And restrict the webview to only loading content from our extension's `media` directory.
 				localResourceRoots: [vscode.Uri.file(YeomanUIPanel.getMediaPath(extensionPath))]
 			}
@@ -153,25 +144,9 @@ export class YeomanUIPanel {
 		this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
 
 		// Set the webview's initial html content
-		this._update().then(() => {
-			// Set the context (yeoman-ui is focused)
-			vscode.commands.executeCommand('setContext', 'yeomanUI.Focused', this.panel.active);
+		this._update();
 
-			// Listen for when the panel is disposed
-			// This happens when the user closes the panel or when the panel is closed programatically
-			this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
-			const that = this;
-			// Update the content based on view changes
-			this.panel.onDidChangeViewState(async () => {
-					if (that.panel.visible) {
-						await that._update();
-					}
-					vscode.commands.executeCommand('setContext', 'yeomanUI.Focused', that.panel.active);
-				},
-				null,
-				this.disposables
-			);
-		});
+		this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
 	}
 	
 	public dispose() {
