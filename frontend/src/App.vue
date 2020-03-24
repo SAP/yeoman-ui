@@ -149,20 +149,7 @@ export default {
       return `${this.messages.yeoman_ui_title}${titleSuffix}`;
     },
     currentPrompt() {
-      const prompt = _.get(this.prompts, "[" + this.promptIndex + "]");
-
-      const answers = _.get(prompt, "answers", {});
-      const questions = _.get(prompt, "questions", []);
-      _.forEach(questions, question => {
-        _.set(
-          answers,
-          [question.name],
-          question.isWhen === false ? undefined : question.answer
-        );
-      });
-      _.set(prompt, "answers", answers);
-
-      return prompt;
+      return _.get(this.prompts, "[" + this.promptIndex + "]");
     }
   },
   watch: {

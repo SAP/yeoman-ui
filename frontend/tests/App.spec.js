@@ -27,20 +27,7 @@ describe('App.vue', () => {
       wrapper = initComponent(App, {})
       wrapper.vm.prompts = [{}, {}]
       wrapper.vm.promptIndex = 1
-      expect(wrapper.vm.currentPrompt.answers).toEqual({})
-    })
-
-    it('questions are defined', async () => {
-      wrapper = initComponent(App, {})
-      await Vue.nextTick()
-      wrapper.vm.prompts = [{
-          questions: []
-        }, {
-          questions: [{name: 'q12', isWhen: true, answer: 'a12'}, {name: 'q22', isWhen: false, answer: 'a22'}]
-      }]
-      await Vue.nextTick()
-      wrapper.vm.promptIndex = 1
-      expect(wrapper.vm.currentPrompt.answers.q22).toBeUndefined()
+      expect(wrapper.vm.currentPrompt.answers).toBeUndefined()
     })
   })
 
@@ -78,6 +65,21 @@ describe('App.vue', () => {
 
       response = await questions[5].validate()
       expect(response).toBe(questions[5].name)
+    })
+
+    it('method that doesn\'t exist', async () => {
+      wrapper = initComponent(App, {}, true)
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          throw "error";
+        })
+      }
+
+      const questions = [
+        { name: 'validateQ', validate: '__Function' }
+      ]
+      wrapper.vm.prepQuestions(questions, 'promptName');
+      await expect(questions[0].validate()).rejects.toEqual("error");
     })
 
     // the delay ensures we call the busy indicator
@@ -203,8 +205,27 @@ describe('App.vue', () => {
 
       expect(resolveSpy).toHaveBeenCalled()
       expect(wrapper.vm.promptIndex).toBe(2)
+      expect(wrapper.vm.prompts).toHaveLength(3);
       expect(wrapper.vm.prompts[0].active).toBeFalsy()
       expect(wrapper.vm.prompts[2].active).toBeTruthy()
+      resolveSpy.mockRestore()
+    })
+
+    it('promptIndex is less than prompt length', () => {
+      wrapper = initComponent(App, {})
+      wrapper.vm.resolve = jest.fn()
+      wrapper.vm.reject = jest.fn()
+      wrapper.vm.promptIndex = 0
+      wrapper.vm.prompts = [{}, {}]
+      const resolveSpy = jest.spyOn(wrapper.vm, 'resolve')
+
+      wrapper.vm.next()
+
+      expect(resolveSpy).toHaveBeenCalled()
+      expect(wrapper.vm.promptIndex).toBe(1)
+      expect(wrapper.vm.prompts).toHaveLength(2);
+      expect(wrapper.vm.prompts[0].active).toBeFalsy()
+      expect(wrapper.vm.prompts[1].active).toBeTruthy()
       resolveSpy.mockRestore()
     })
 
