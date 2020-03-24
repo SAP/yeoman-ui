@@ -2,7 +2,7 @@
   <div>
     <v-item-group mandatory>
       <v-container class="pa-0">
-        <v-row>
+        <v-row class="generators">
           <v-col
             v-for="(item, itemIndex) in currentQuestion.choices"
             :key="itemIndex"
@@ -104,5 +104,8 @@ export default {
 }
 a {
   font-size: 11px;
+}
+.generators {
+  margin: 0px;
 }
 </style>

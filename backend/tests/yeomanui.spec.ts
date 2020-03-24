@@ -6,6 +6,7 @@ import { expect } from "chai";
 import * as _ from "lodash";
 import * as path from "path";
 import {YeomanUI, IGeneratorQuestion} from "../src/yeomanui";
+import {ReplayUtils} from "../src/replayUtils";
 import * as yeomanEnv from "yeoman-environment";
 import { YouiLog } from "../src/youi-log";
 import { YouiEvents } from '../src/youi-events';
@@ -425,7 +426,7 @@ describe('yeomanui unit test', () => {
 
     describe("funcReplacer", () => {
         it("with function", () => {
-            const res = YeomanUI["funcReplacer"]("key", function() {});
+            const res = YeomanUI["funcReplacer"]("key", () => { return });
             // tslint:disable-next-line: no-unused-expression
             expect(res).to.be.equal("__Function");
         });
@@ -474,6 +475,36 @@ describe('yeomanui unit test', () => {
         expect(res).to.be.equal(errorInfo);
     });
 
+    describe("answersUtils", () => {
+        it("setDefaults", () => {
+            const questions = [
+                {name: "q1", default: "a"},
+                {name: "q2", default: () => { return "b"}},
+                {name: "q3"}
+            ];
+            const answers = {
+                q1: "x",
+                q2: "y",
+                q3: "z"
+            }
+            ReplayUtils.setDefaults(questions, answers);
+            for (const index in questions) {
+                const question = questions[index];
+                switch (question.name) {
+                    case "a":
+                        expect((question as any)["answer"]).to.equal("x");
+                        break;
+                    case "b":
+                        expect((question as any)["answer"]).to.equal("y");
+                        break;
+                    case "c":
+                        expect((question as any)["answer"]).to.equal("z");
+                        break;
+                }
+            }
+        });
+    });
+
     describe("setGenInstall", () => {
         it("install method not exist", () => {
             const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
@@ -500,6 +531,59 @@ describe('yeomanui unit test', () => {
             // tslint:disable-next-line: no-unused-expression
             expect(installSpy.called).to.be.true;
             installSpy.restore();
+        });
+    });
+
+    describe("showPrompt", async () => {
+        it("returns answers", async () => {
+            const firstName = "john";
+            rpc.invoke = async () => {
+                return {
+                    firstName,
+                    lastName: "doe"
+                }
+            };
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            const questions = [{name: "q1"}];
+            const response = await yeomanUiInstance.showPrompt(questions);
+            expect (response.firstName).to.equal(firstName);
+        });
+
+        it("with back", async () => {
+            const firstName = "john";
+            const country = "denmark";
+
+            (rpc.invoke as (methodName: string, params: any[]) => Promise<any>) = async (methodName: string, params: any[]) => {
+                const questionName: string = params[0][0].name;
+                if (questionName === "q1") {
+                    return {
+                        firstName,
+                        lastName: "doe"
+                    }
+                } else if (questionName === "q2") {
+                    return {
+                        country
+                    }
+                }
+            };
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            yeomanUiInstance.runGenerator = async (): Promise<any> => { return };
+            let questions = [{name: "q1"}];
+            let response = await yeomanUiInstance.showPrompt(questions);
+            expect (response.firstName).to.equal(firstName);
+
+            questions = [{name: "q2"}];
+
+            response = await yeomanUiInstance.showPrompt(questions);        
+            expect (response.country).to.equal(country);
+            expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.false;
+
+            yeomanUiInstance.back(undefined);
+            expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.true;
+
+            questions = [{name: "q1"}];
+            response = await yeomanUiInstance.showPrompt(questions);
+            expect (response.firstName).to.equal(firstName);
         });
     });
 

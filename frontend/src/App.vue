@@ -13,7 +13,7 @@
     <Header
       v-if="prompts.length"
       :headerTitle="headerTitle"
-      :stepName="prompts[promptIndex].name"
+      :stepName="(promptIndex < prompts.length ? prompts[promptIndex].name : '')"
       :rpc="rpc"
       :isInVsCode="isInVsCode()"
       @parentShowConsole="toggleConsole"
@@ -24,7 +24,8 @@
         <Navigation v-if="prompts.length" :promptIndex="promptIndex" :prompts="prompts" />
       </v-col>
       <v-col cols="9" class="right-col">
-        <v-col class="prompts-col" cols="12">
+        <v-row class="prompts-col">
+          <v-col>
           <Done
             v-if="isDone"
             :doneStatus="doneStatus"
@@ -45,28 +46,26 @@
               @answered="onAnswered"
             />
           </v-slide-x-transition>
-        </v-col>
-        <v-col
+          </v-col>
+        </v-row>
+        <v-row
           v-if="prompts.length > 0 && !isDone"
-          class="bottom-right-col"
-          style="height: 4rem;"
-          offset-xl="9"
-          offset-lg="9"
-          offset-md="9"
-          offset-sm="8"
-          offset-xs="8"
-          xl="3"
-          lg="3"
-          md="3"
-          sm="4"
-          xs="4"
+          style="height: 4rem; margin: 0;"
+          sm="auto"
         >
-          <v-row class="progress-buttons-row" align="center" justify="end">
-            <v-btn :disabled="!stepValidated" @click="next">
+          <div class="bottom-right-col" style="flex:1;">
+          </div>
+          <div class="diagonal">
+          </div>
+          <div class="bottom-buttons-col" style="display:flex;align-items: center;">
+            <v-btn id="back" :disabled="promptIndex<1 || isReplaying" @click="back" v-show="!shouldShowGeneratorSelection()">
+              <v-icon left>mdi-chevron-left</v-icon>Back
+            </v-btn>
+            <v-btn id="next" :disabled="!stepValidated" @click="next">
               Next<v-icon right>mdi-chevron-right</v-icon>
             </v-btn>
-          </v-row>
-        </v-col>
+          </div>
+        </v-row>
       </v-col>
     </v-row>
 
@@ -119,7 +118,8 @@ function initialState() {
     messages: {},
     showBusyIndicator: false,
     transitionToggle: false,
-    promptsInfoToDisplay: []
+    promptsInfoToDisplay: [],
+    isReplaying: false
   };
 }
 
@@ -177,7 +177,18 @@ export default {
         this.currentPrompt.questions[0].type==='generators';
     },
     setBusyIndicator() {
-      this.showBusyIndicator = _.isEmpty(this.prompts) || (this.currentPrompt.status === PENDING && !this.isDone);
+      this.showBusyIndicator =
+        _.isEmpty(this.prompts) ||
+        (this.currentPrompt && this.currentPrompt.status === PENDING && !this.isDone);
+    },
+    back() {
+      this.isReplaying = true;
+      const answers = this.currentPrompt.answers;
+      if (this.promptIndex > 1) {
+        this.rpc.invoke("back", [answers]);
+      } else {
+        this.reload();
+      }
     },
     next() {
       if (this.resolve) {
@@ -222,12 +233,18 @@ export default {
       this.messages = messages;
     },
     setPromptList(prompts) {
+      let promptIndex = this.promptIndex;
+      if (this.isReplaying) {
+        // TODO: is 1st prompt always Generator Selection?
+        this.prompts = [this.prompts[0]];
+        promptIndex = 0;
+      }
       prompts = prompts || [];
       this.promptsInfoToDisplay = _.cloneDeep(prompts);
       // replace all existing prompts except 1st (generator selction) and current prompt
-      const startIndex = this.promptIndex + 1;
-      const deleteCount = _.size(this.prompts) - this.promptIndex;
-      const itemsToInsert = prompts.splice(this.promptIndex, _.size(prompts));
+      const startIndex = promptIndex + 1;
+      const deleteCount = _.size(this.prompts) - promptIndex;
+      const itemsToInsert = prompts.splice(promptIndex, _.size(prompts));
       this.prompts.splice(startIndex, deleteCount, ...itemsToInsert);
     },
     setPrompts(prompts) {
@@ -278,6 +295,10 @@ export default {
 
     async showPrompt(questions, name) {
       this.prepQuestions(questions);
+      if (this.isReplaying) {
+        this.promptIndex--;
+        this.isReplaying = false;
+      }
       const prompt = this.createPrompt(questions, name);
       this.setPrompts([prompt]);
 
@@ -433,7 +454,8 @@ div.consoleClassVisible .v-footer {
   background-color: var(--vscode-editorWidget-background, #252526);
 }
 .prompts-col {
-  overflow-y: scroll;
+  overflow-y: auto;
+  margin: 0px;
 }
 .main-row,
 .prompts-col {
@@ -451,23 +473,18 @@ div.consoleClassVisible .v-footer {
 .right-col {
   padding: 0 !important;
 }
+.diagonal {
+  width: 80px;
+  background: linear-gradient(120deg, var(--vscode-editor-background, #1e1e1e) 0%, var(--vscode-editor-background, #1e1e1e) 50%, transparent 50%);
+  background-color: var(--vscode-editorWidget-background, #252526);
+}
 .bottom-right-col {
-  background: var(--vscode-editorWidget-background, #252526);
-  position: relative;
+  background: var(--vscode-editor-background, #1e1e1e);
   overflow: hidden;
+  margin: 0px;
 }
-.bottom-right-col:before {
-  height: 100%;
-  width: 100%;
-  background-color: var(--vscode-editor-background, #1e1e1e);
-  position: absolute;
-  content: "";
-  transform: rotate(-60deg);
-  transform-origin: bottom left;
+.bottom-buttons-col {
+  background-color: var(--vscode-editorWidget-background, #252526);
+  padding-right: 25px;
 }
-div.bottom-right-col .progress-buttons-row {
-  padding-right: 24px;
-  padding-top: 4px;
-}
-
 </style>

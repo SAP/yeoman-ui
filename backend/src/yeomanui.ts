@@ -4,6 +4,7 @@ import * as fsextra from "fs-extra";
 import * as _ from "lodash";
 import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
+import { ReplayUtils, ReplayState } from "./replayUtils";
 const datauri = require("datauri");
 const titleize = require('titleize');
 const humanizeString = require('humanize-string');
@@ -60,6 +61,8 @@ export class YeomanUI {
   private promptCount: number;
   private currentQuestions: Environment.Adapter.Questions<any>;
   private genFilter: GeneratorFilter;
+  private generatorName: string;
+  private replayUtils: ReplayUtils;
   private customQuestionEventHandlers: Map<string, Map<string, Function>>;
 
   constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter, outputPath: string = YeomanUI.PROJECTS) {
@@ -67,6 +70,8 @@ export class YeomanUI {
     if (!this.rpc) {
       throw new Error("rpc must be set");
     }
+    this.generatorName = "";
+    this.replayUtils = new ReplayUtils();
     this.youiEvents = youiEvents;
     this.outputChannel = outputChannel;
     this.logger = logger;
@@ -76,7 +81,8 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.evaluateMethod, thisArg: this });
     this.rpc.registerMethod({ func: this.toggleOutput, thisArg: this });
     this.rpc.registerMethod({ func: this.logError, thisArg: this });
-  
+    this.rpc.registerMethod({ func: this.back, thisArg: this });
+
     this.youiAdapter = new YouiAdapter(outputChannel, youiEvents);
     this.youiAdapter.setYeomanUI(this);
     this.promptCount = 0;
@@ -130,6 +136,7 @@ export class YeomanUI {
   }
 
   public async runGenerator(generatorName: string) {
+    this.generatorName = generatorName;
     // TODO: should create and set target dir only after user has selected a generator;
     //  see issue: https://github.com/yeoman/environment/issues/55
     //  process.chdir() doesn't work after environment has been created
@@ -147,9 +154,8 @@ export class YeomanUI {
       if (setPromptsCallback) {
         setPromptsCallback(this.setPromptList.bind(this));
       }
-      
+
       this.setGenInstall(gen);
-      
       this.promptCount = 0;
       this.gen = (gen as Generator);
       this.gen.destinationRoot(this.getCwd());
@@ -206,6 +212,8 @@ export class YeomanUI {
       // TODO: loading generators takes a long time; consider prefetching list of generators
       const generators: IQuestionsPrompt = await this.getGenerators();
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
+
+      this.replayUtils.clear();
       await this.runGenerator(response.name);
     } catch (error) {
       this.logError(error);
@@ -229,17 +237,32 @@ export class YeomanUI {
   }
 
   public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
-    this.currentQuestions = questions;
-    
     this.promptCount++;
-    
-    const promptName: string = this.getPromptName(questions);
+    const promptName = this.getPromptName(questions);
+
+    if (this.replayUtils.getReplayState() === ReplayState.Replaying) {
+      return this.replayUtils.next(this.promptCount, promptName);
+    } else if (this.replayUtils.getReplayState() === ReplayState.EndingReplay) {
+      const prompts: IPrompt[] = this.replayUtils.stop(questions);
+      this.setPromptList(prompts);
+    }
+
+    this.replayUtils.recall(questions);
+
+    this.currentQuestions = questions;
     const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
     if (_.isEmpty(mappedQuestions)) {
       return {};
     }
-    
-    return this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
+
+    const answers = await this.rpc.invoke("showPrompt", [mappedQuestions, promptName]);
+    this.replayUtils.remember(questions, answers);
+    return answers;
+  }
+
+  public back(partialAnswers: Environment.Adapter.Answers): void {
+    this.replayUtils.start(this.currentQuestions, partialAnswers);
+    this.runGenerator(this.generatorName);
   }
 
   private getPromptName(questions: Environment.Adapter.Questions<any>): string {
@@ -411,13 +434,16 @@ export class YeomanUI {
       return _.assign({ questions: [], name: "", description: ""}, prompt);
     });
 
-    return this.rpc.invoke("setPromptList", [promptsToDisplay]);
+    if (this.replayUtils.isReplaying) {
+      this.replayUtils.setPrompts(promptsToDisplay);
+    } else {
+      return this.rpc.invoke("setPromptList", [promptsToDisplay]);
+    }
   }
   
   private addCustomQuestionEventHandlers(questions: Environment.Adapter.Questions<any>): void {
-    for (let index in questions) {
-      const question = (questions as any[])[Number.parseInt(index)];
-      const questionHandlers = this.customQuestionEventHandlers.get(question.guiType);
+    for (const question of (questions as any[])) {
+      const questionHandlers = this.customQuestionEventHandlers.get(question["guiType"]);
       if (questionHandlers) {
         questionHandlers.forEach((handler, methodName) => {
           (question as any)[methodName] = handler;

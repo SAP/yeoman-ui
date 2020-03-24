@@ -2,6 +2,7 @@ html,
 body {
   height: 100%;
   background-color: var(--vscode-editor-background, #1e1e1e);
+  overflow: hidden !important;
 }
 #app {
   height: 100%;
@@ -24,6 +25,9 @@ div.v-application button.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--o
   color: var(--vscode-button-foreground, #ffffff);
 }
 
+button#back {
+  margin-right: 6px;
+}
 div.v-application .theme--light.v-btn.v-btn--disabled .v-icon {
   color: var(--vscode-button-foreground, #ffffff) !important;
 }
