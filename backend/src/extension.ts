@@ -33,7 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
 				displayedPanel.dispose();
 			}
 			
-			YeomanUIPanel.createOrShow(context.extensionPath, GeneratorFilter.create(genFilter), messages);
+			YeomanUIPanel.create(context.extensionPath, GeneratorFilter.create(genFilter), messages);
 	}));
 	context.subscriptions.push(
 		vscode.commands.registerCommand('yeomanUI.toggleOutput', () => {
@@ -66,28 +66,19 @@ export class YeomanUIPanel {
 	public static genFilter: GeneratorFilter;
 	public static messages: any;
 
-	public static createOrShow(extensionPath: string, genFilter?: GeneratorFilter, messages?: any) {
+	public static create(extensionPath: string, genFilter?: GeneratorFilter, messages?: any) {
 		YeomanUIPanel.genFilter = genFilter;
 		YeomanUIPanel.messages = messages;
-		
-		const column = _.get(vscode.window, "activeTextEditor.viewColumn");
-
-		// If we already have a panel, show it.
-		if (YeomanUIPanel.currentPanel) {
-			YeomanUIPanel.currentPanel.yeomanui.setGenFilter(YeomanUIPanel.genFilter);
-			YeomanUIPanel.currentPanel.panel.reveal(column);
-			return;
-		}
 
 		// Otherwise, create a new panel.
 		const panel = vscode.window.createWebviewPanel(
 			YeomanUIPanel.viewType,
 			'Yeoman UI',
-			column || vscode.ViewColumn.One,
+			vscode.ViewColumn.One,
 			{
 				// Enable javascript in the webview
 				enableScripts: true,
-
+				retainContextWhenHidden : true,
 				// And restrict the webview to only loading content from our extension's `media` directory.
 				localResourceRoots: [vscode.Uri.file(YeomanUIPanel.getMediaPath(extensionPath))]
 			}
@@ -104,7 +95,19 @@ export class YeomanUIPanel {
 		return path.join(extensionPath, 'dist', 'media');
 	}
 
-	public async showOpenDialog(currentPath: string): Promise<string> {
+	public async showOpenFileDialog(currentPath: string): Promise<string> {
+		return await this.showOpenDialog(currentPath, true);
+	}
+
+	public async showOpenFolderDialog(currentPath: string): Promise<string> {
+		return await this.showOpenDialog(currentPath, false);
+	}
+
+	private async showOpenDialog(currentPath: string, canSelectFiles: boolean): Promise<string> {
+		let canSelectFolders: boolean = false;
+		if (!canSelectFiles) {
+			canSelectFolders = true;
+		}
 		let uri;
 		try {
 			uri = vscode.Uri.file(currentPath);
@@ -114,7 +117,8 @@ export class YeomanUIPanel {
 
 		try {
 			const filePath = await vscode.window.showOpenDialog({
-				canSelectFiles: true,
+				canSelectFiles,
+				canSelectFolders,
 				defaultUri: uri
 			});
 			return (filePath as vscode.Uri[])[0].fsPath;
@@ -134,31 +138,15 @@ export class YeomanUIPanel {
 		this.rpc = new RpcExtension(this.panel.webview);
 		const outputChannel: YouiLog = new OutputChannelLog();
 		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.panel);
-
-		this.yeomanui = new YeomanUI(this.rpc, vscodeYouiEvents, outputChannel, this.logger, YeomanUIPanel.genFilter);
-		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenDialog);
+		const outputFolder = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
+		this.yeomanui = new YeomanUI(this.rpc, vscodeYouiEvents, outputChannel, this.logger, YeomanUIPanel.genFilter, outputFolder);
+		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
+		this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
 
 		// Set the webview's initial html content
 		this._update();
 
-		// Set the context (yeoman-ui is focused)
-		vscode.commands.executeCommand('setContext', 'yeomanUI.Focused', this.panel.active);
-
-		// Listen for when the panel is disposed
-		// This happens when the user closes the panel or when the panel is closed programatically
 		this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
-
-		// Update the content based on view changes
-		this.panel.onDidChangeViewState(
-			e => {
-				if (this.panel.visible) {
-					this._update();
-				}
-				vscode.commands.executeCommand('setContext', 'yeomanUI.Focused', this.panel.active);
-			},
-			null,
-			this.disposables
-		);
 	}
 	
 	public dispose() {
@@ -179,10 +167,8 @@ export class YeomanUIPanel {
 		return this.rpc ? this.rpc.invoke("setMessages", [messages]) : Promise.resolve();
 	}
 
-	private _update() {
-		
-		// TODO: don't use sync
-		let indexHtml: string = fsextra.readFileSync(path.join(YeomanUIPanel.getMediaPath(this.extensionPath), 'index.html'), "utf8");
+    private async _update() {
+		let indexHtml: string = await fsextra.readFile(path.join(YeomanUIPanel.getMediaPath(this.extensionPath), 'index.html'), "utf8");
 		if (indexHtml) {
 			// Local path to main script run in the webview
 			const scriptPathOnDisk = vscode.Uri.file(path.join(YeomanUIPanel.getMediaPath(this.extensionPath), path.sep));
@@ -197,9 +183,9 @@ export class YeomanUIPanel {
 		const uiMessages = _.assign({}, backendMessages, _.get(YeomanUIPanel, "messages", {}));
 		this.panel.title = _.get(uiMessages, "panel_title");
 
-		this.setMessages(uiMessages);
-
 		this.panel.webview.html = indexHtml;
+
+		await this.setMessages(uiMessages);
 	}
 }
 

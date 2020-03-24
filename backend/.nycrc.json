@@ -1,15 +1,15 @@
 {
     "require": ["ts-node/register/transpile-only"],
     "include": ["src/**/*.ts"],
-    "exclude": ["src/logger/*.ts"],
+    "exclude": ["src/logger/*.ts", "src/webSocketServer/*.ts"],
     "reporter": ["lcov", "text"],
     "extension": [".ts"],
     "all": true,
     "temp-dir": "./reports/.nyc_output",
     "report-dir": "./reports/coverage",
     "check-coverage": true,
-    "branches": 51.5,
-    "lines": 56.2,
-    "functions": 43.3,
-    "statements": 56.1
+    "branches": 57.5,
+    "lines": 65.5,
+    "functions": 56.5,
+    "statements": 65.4
   }

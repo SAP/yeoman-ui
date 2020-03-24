@@ -5,12 +5,15 @@ import * as _ from "lodash";
 import { mockVscode } from "./mockUtil";
 
 const oRegisteredCommands = {};
+const oOutputChannel = {};
 const testVscode = {
     commands: {
         registerCommand: (id: string, cmd: any) => { _.set(oRegisteredCommands, id, cmd); return Promise.resolve(oRegisteredCommands); },
         executeCommand: () => Promise.reject()
     },
-    window: {}
+    window: {
+        createOutputChannel: (name: string) => { _.set(oOutputChannel, 'name', name); return oOutputChannel;}
+    },
 };
 mockVscode(testVscode, "src/extension.ts");
 import * as extension from "../src/extension";
@@ -68,7 +71,7 @@ describe('extension unit test', () => {
         it("execution loadYeomanUI command", () => {
             extension.activate(testContext);
             const loadYeomanUICommand = _.get(oRegisteredCommands, "loadYeomanUI");
-            yeomanUiPanelMock.expects("createOrShow").withArgs(testContext.extensionPath);
+            yeomanUiPanelMock.expects("create").withArgs(testContext.extensionPath);
             loadYeomanUICommand();
         });
 
@@ -79,4 +82,13 @@ describe('extension unit test', () => {
             yeomanUIToggleOutputCommand();
         });
     });
+
+    describe('getOutputChannel', () => {
+        it("channel not exist", () => {
+            const chanel = extension.getOutputChannel();
+            expect(chanel).to.be.equal(oOutputChannel);
+        });
+
+    });
+
 });

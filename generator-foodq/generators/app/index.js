@@ -173,6 +173,13 @@ module.exports = class extends Generator {
         default: "/"
       },
       {
+        type: "input",
+        guiType: "folder-browser",
+        name: "dump",
+        message: "Choose dump folder",
+        default: "/"
+      },
+      {
         type: 'list',
         name: 'enjoy',
         message: 'Did you enjoy your meal?',
@@ -276,10 +283,14 @@ module.exports = class extends Generator {
     return 'Password need to have at least a letter and a number';
   }
 
-  writing() {
-    this.log('in writing');
+  configuring() {
+    this.log('in configuring');
     this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "answers.food", "")));
     this.log('destinationRoot: ' + this.destinationRoot());
+  }
+
+  writing() {
+    this.log('in writing');
     this.fs.copyTpl(this.templatePath('index.html'),
       this.destinationPath('public/index.html'), {
       title: 'Templating with Yeoman',
