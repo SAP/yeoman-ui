@@ -58,7 +58,7 @@
           <div class="diagonal">
           </div>
           <div class="bottom-buttons-col" style="display:flex;align-items: center;">
-            <v-btn id="back" :disabled="promptIndex<2 || isReplaying" @click="back">
+            <v-btn id="back" :disabled="promptIndex<1 || isReplaying" @click="back" v-show="!shouldShowGeneratorSelection()">
               <v-icon left>mdi-chevron-left</v-icon>Back
             </v-btn>
             <v-btn id="next" :disabled="!stepValidated" @click="next">
@@ -197,7 +197,11 @@ export default {
     back() {
       this.isReplaying = true;
       const answers = this.currentPrompt.answers;
-      this.rpc.invoke("back", [answers]);
+      if (this.promptIndex > 1) {
+        this.rpc.invoke("back", [answers]);
+      } else {
+        this.reload();
+      }
     },
     next() {
       if (this.resolve) {

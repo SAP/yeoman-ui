@@ -244,7 +244,7 @@ describe('App.vue', () => {
   })
 
   describe('back - method', () => {
-    test('promptIndex is updated', () => {
+    test('promptIndex is 0 (Select Generator)', () => {
       wrapper = initComponent(App, {}, true);
       wrapper.vm.rpc = {
         invoke: jest.fn(),
@@ -258,8 +258,28 @@ describe('App.vue', () => {
 
       wrapper.vm.back();
 
-      expect(wrapper.vm.promptIndex).toBe(1);
-      expect(wrapper.vm.prompts.length).toBe(2);
+      expect(wrapper.vm.promptIndex).toBe(0);
+      expect(wrapper.vm.prompts.length).toBe(0);
+      expect(wrapper.vm.isReplaying).toBe(false);
+      expect(invokeSpy).toHaveBeenCalledWith("receiveIsWebviewReady", []);
+    });
+
+    test('promptIndex is updated', () => {
+      wrapper = initComponent(App, {}, true);
+      wrapper.vm.rpc = {
+        invoke: jest.fn(),
+        registerMethod: jest.fn()
+      }  
+      const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke');
+
+      wrapper.vm.resolve = undefined;
+      wrapper.vm.promptIndex = 2;
+      wrapper.vm.prompts = [{}, {}, {}];
+
+      wrapper.vm.back();
+
+      expect(wrapper.vm.promptIndex).toBe(2);
+      expect(wrapper.vm.prompts.length).toBe(3);
       expect(wrapper.vm.isReplaying).toBe(true);
       expect(invokeSpy).toHaveBeenCalledWith("back", [{}]);
     });
