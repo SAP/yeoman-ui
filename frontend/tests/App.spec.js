@@ -243,6 +243,61 @@ describe('App.vue', () => {
     })
   })
 
+  describe('back - method', () => {
+    test('promptIndex is 0 (Select Generator)', () => {
+      wrapper = initComponent(App, {}, true);
+      wrapper.vm.rpc = {
+        invoke: jest.fn(),
+        registerMethod: jest.fn()
+      }  
+      const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke');
+
+      wrapper.vm.resolve = undefined;
+      wrapper.vm.promptIndex = 1;
+      wrapper.vm.prompts = [{}, {}];
+
+      wrapper.vm.back();
+
+      expect(wrapper.vm.promptIndex).toBe(0);
+      expect(wrapper.vm.prompts.length).toBe(0);
+      expect(wrapper.vm.isReplaying).toBe(false);
+      expect(invokeSpy).toHaveBeenCalledWith("receiveIsWebviewReady", []);
+    });
+
+    test('promptIndex is updated', () => {
+      wrapper = initComponent(App, {}, true);
+      wrapper.vm.rpc = {
+        invoke: jest.fn(),
+        registerMethod: jest.fn()
+      }  
+      const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke');
+
+      wrapper.vm.resolve = undefined;
+      wrapper.vm.promptIndex = 2;
+      wrapper.vm.prompts = [{}, {}, {}];
+
+      wrapper.vm.back();
+
+      expect(wrapper.vm.promptIndex).toBe(2);
+      expect(wrapper.vm.prompts.length).toBe(3);
+      expect(wrapper.vm.isReplaying).toBe(true);
+      expect(invokeSpy).toHaveBeenCalledWith("back", [{}]);
+    });
+
+    test('set props', async () => {
+      wrapper = initComponent(App, {}, true)
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation((...args) => { return args[1][1] })
+      }
+      const questions = [{},{}];
+      wrapper.vm.promptIndex = 1;
+      wrapper.vm.isReplaying = true;
+      wrapper.vm.showPrompt(questions, 'promptName');
+      await Vue.nextTick()
+      expect(wrapper.vm.promptIndex).toBe(0);
+    });
+  });
+
   describe('setPromptList - method', () => {
     it('prompts is empty array', () => {
       wrapper = initComponent(App)
@@ -266,6 +321,21 @@ describe('App.vue', () => {
       wrapper.vm.setPromptList()
 
       expect(wrapper.vm.prompts).toHaveLength(2)
+    })
+
+    it('while replaying', () => {
+      wrapper = initComponent(App);
+
+      wrapper.vm.prompts = [{}, {}];
+      wrapper.vm.promptIndex = 1;
+      wrapper.vm.isReplaying = true;
+      wrapper.vm.currentPrompt.status = 'pending';
+
+      const prompts = [{}, {}, {}];
+      wrapper.vm.setPromptList(prompts);
+
+      expect(wrapper.vm.prompts).toHaveLength(4);
+      expect(wrapper.vm.isReplaying).toBe(true);
     })
   })
 

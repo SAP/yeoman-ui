@@ -7,7 +7,17 @@
             "label": "serve",
             "type": "npm",
             "script": "serve",
-            "problemMatcher": []
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*)$",
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^(.*)$",
+                    "endsPattern": "^(.*)DONE(.*)$"
+                }
+            }
         }
     ]
 }

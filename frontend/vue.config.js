@@ -1,5 +1,8 @@
 module.exports = {
     runtimeCompiler: true,
     publicPath: "./",
-    transpileDependencies: ["vuetify"]
-  };
+    transpileDependencies: ["vuetify"],
+    configureWebpack: (config) => {
+      config.devtool = 'source-map'
+  },
+};
