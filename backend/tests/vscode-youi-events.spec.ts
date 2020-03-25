@@ -41,10 +41,19 @@ describe('vscode-youi-events unit test', () => {
     });
 
     describe("doGeneratorDone", () => {
-        it("on success", () => {
+        it("on success workspace is open", () => {
             eventsMock.expects("doClose");
             _.set(vscode, "window.showInformationMessage", () => {return Promise.resolve("");});
+            _.set(vscode, "workspace.workspaceFolders", []);
             windowMock.expects("showInformationMessage").withExactArgs('The project has been successfully generated.\nWhat would you like to do with it?', 'Add to Workspace', 'Open in New Workspace').resolves();
+            events.doGeneratorDone(true, "success message", "testDestinationRoot");
+        });
+
+        it("on success workspace is closed", () => {
+            eventsMock.expects("doClose");
+            _.set(vscode, "window.showInformationMessage", () => {return Promise.resolve("");});
+            _.set(vscode, "workspace.workspaceFolders", undefined);
+            windowMock.expects("showInformationMessage").withExactArgs('The project has been successfully generated.\nWhat would you like to do with it?', undefined, 'Open in New Workspace').resolves();
             events.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
 
