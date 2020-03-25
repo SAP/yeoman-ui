@@ -182,12 +182,17 @@ export default {
         (this.currentPrompt && this.currentPrompt.status === PENDING && !this.isDone);
     },
     back() {
-      this.isReplaying = true;
-      const answers = this.currentPrompt.answers;
-      if (this.promptIndex > 1) {
-        this.rpc.invoke("back", [answers]);
-      } else {
-        this.reload();
+      try {
+        this.isReplaying = true;
+        const answers = this.currentPrompt.answers;
+        if (this.promptIndex > 1) {
+          this.rpc.invoke("back", [answers]);
+        } else {
+          this.reload();
+        }
+      } catch (error) {
+        this.rpc.invoke("logError", [error]);
+        this.reject(error);
       }
     },
     next() {
