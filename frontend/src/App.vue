@@ -58,7 +58,7 @@
           <div class="diagonal">
           </div>
           <div class="bottom-buttons-col" style="display:flex;align-items: center;">
-            <v-btn id="back" :disabled="promptIndex<1 || isReplaying" @click="back" v-show="!shouldShowGeneratorSelection()">
+            <v-btn id="back" :disabled="promptIndex<1 || isReplaying" @click="back" v-show="false && !shouldShowGeneratorSelection()">
               <v-icon left>mdi-chevron-left</v-icon>Back
             </v-btn>
             <v-btn id="next" :disabled="!stepValidated" @click="next">
