@@ -45,6 +45,7 @@ describe('vscode-youi-events unit test', () => {
             eventsMock.expects("doClose");
             _.set(vscode, "window.showInformationMessage", () => {return Promise.resolve("");});
             _.set(vscode, "workspace.workspaceFolders", []);
+            _.set(vscode, "workspace.workspaceFolders.length", 1);
             windowMock.expects("showInformationMessage").withExactArgs('The project has been successfully generated.\nWhat would you like to do with it?', 'Add to Workspace', 'Open in New Workspace').resolves();
             events.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
@@ -53,6 +54,7 @@ describe('vscode-youi-events unit test', () => {
             eventsMock.expects("doClose");
             _.set(vscode, "window.showInformationMessage", () => {return Promise.resolve("");});
             _.set(vscode, "workspace.workspaceFolders", undefined);
+            _.set(vscode, "workspace.workspaceFolders.length", 0);
             windowMock.expects("showInformationMessage").withExactArgs('The project has been successfully generated.\nWhat would you like to do with it?', undefined, 'Open in New Workspace').resolves();
             events.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
