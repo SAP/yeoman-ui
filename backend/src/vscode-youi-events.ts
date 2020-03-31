@@ -14,9 +14,9 @@ export class VSCodeYouiEvents implements YouiEvents {
         this.webviewPanel = webviewPanel;       
     }
 
-    public doGeneratorDone(success: boolean, errorMessage: string, targetPath = ""): void {
+    public doGeneratorDone(generationSucceeded: boolean, message: string, targetPath: string = ""): void {
         this.doClose();
-        this.showDoneMessage(success, errorMessage, targetPath);
+        this.showDoneMessage(generationSucceeded, message, targetPath);
     }
 
     public doGeneratorInstall(): void {
