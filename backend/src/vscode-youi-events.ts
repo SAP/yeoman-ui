@@ -1,20 +1,22 @@
 import * as vscode from 'vscode';
+import * as _ from 'lodash';
 import { YouiEvents } from "./youi-events";
 import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
+import { GeneratorFilter, GeneratorType } from './filter';
 
 export class VSCodeYouiEvents implements YouiEvents {
     private rpc: RpcCommon;
     private webviewPanel: vscode.WebviewPanel;
     public static installing: boolean;
 
-    constructor(rpc : RpcCommon, webviewPanel: vscode.WebviewPanel) {
+    constructor(rpc : RpcCommon, webviewPanel: vscode.WebviewPanel, private genFilter: GeneratorFilter) {
         this.rpc = rpc; 
         this.webviewPanel = webviewPanel;       
     }
 
-    public doGeneratorDone(success: boolean, message: string, targetPath = ""): void {
+    public doGeneratorDone(success: boolean, errorMessage: string, targetPath = ""): void {
         this.doClose();
-        this.showDoneMessage(success, message, targetPath);
+        this.showDoneMessage(success, errorMessage, targetPath);
     }
 
     public doGeneratorInstall(): void {
@@ -48,20 +50,36 @@ export class VSCodeYouiEvents implements YouiEvents {
         });
     }
 
-    private showDoneMessage(success: boolean, message: string, targetPath: string): void {
+    private showDoneMessage(success: boolean, errorMmessage: string, targetPath: string): void {
         VSCodeYouiEvents.installing = false;
+        
         if (success) {
-            const OpenWorkspace = 'Open in New Workspace';
-            const AddToWorkspace = (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length) ? 'Add to Workspace' : undefined;
-            vscode.window.showInformationMessage('The project has been successfully generated.\nWhat would you like to do with it?', AddToWorkspace, OpenWorkspace).then(selection => {
-                if (selection === OpenWorkspace) {
+            let addToWorkspaceButton: any;
+            let openInNewWorkspaceButton: any;
+            let infoMessage = "The project has been successfully generated.";
+            const uriTargetFolder = vscode.Uri.file(targetPath);
+
+            if (this.genFilter.type !== GeneratorType.module) {
+                const targetFolderInWorkspace: vscode.WorkspaceFolder = vscode.workspace.getWorkspaceFolder(uriTargetFolder);
+                addToWorkspaceButton = targetFolderInWorkspace ? undefined: 'Add to Workspace';
+                const wsFolderPath = _.get(targetFolderInWorkspace, "uri.fsPath");
+                openInNewWorkspaceButton = (wsFolderPath === uriTargetFolder.fsPath) ? undefined: 'Open in New Workspace';
+
+                if (addToWorkspaceButton || openInNewWorkspaceButton) {
+                    infoMessage = infoMessage.concat("\nWhat would you like to do with it?");
+                } 
+            }
+                
+            vscode.window.showInformationMessage(infoMessage, addToWorkspaceButton, openInNewWorkspaceButton).then(selection => {
+                if (selection === openInNewWorkspaceButton) {
                     this.executeCommand("vscode.openFolder", targetPath);
-                } else if (selection === AddToWorkspace) {
-                    vscode.workspace.updateWorkspaceFolders(vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders.length : 0, null, { uri: vscode.Uri.file(targetPath)});
+                } else if (selection === addToWorkspaceButton) {
+                    const wsFoldersQuantity = _.size(vscode.workspace.workspaceFolders);
+                    vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, { uri: uriTargetFolder});
                 }
             });
         } else {
-            vscode.window.showErrorMessage(message);
+            vscode.window.showErrorMessage(errorMmessage);
         }
     }
 

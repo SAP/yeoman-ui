@@ -67,7 +67,7 @@ export class YeomanUIPanel {
 	public static messages: any;
 
 	public static create(extensionPath: string, genFilter?: GeneratorFilter, messages?: any) {
-		YeomanUIPanel.genFilter = genFilter;
+		YeomanUIPanel.genFilter = (genFilter ? genFilter : GeneratorFilter.create());
 		YeomanUIPanel.messages = messages;
 
 		// Otherwise, create a new panel.
@@ -104,10 +104,8 @@ export class YeomanUIPanel {
 	}
 
 	private async showOpenDialog(currentPath: string, canSelectFiles: boolean): Promise<string> {
-		let canSelectFolders: boolean = false;
-		if (!canSelectFiles) {
-			canSelectFolders = true;
-		}
+		const canSelectFolders: boolean = !canSelectFiles;
+		
 		let uri;
 		try {
 			uri = vscode.Uri.file(currentPath);
@@ -121,8 +119,8 @@ export class YeomanUIPanel {
 				canSelectFolders,
 				defaultUri: uri
 			});
-			return (filePath as vscode.Uri[])[0].fsPath;
-		} catch (e) {
+			return _.get(filePath, "[0].fsPath");
+		} catch (error) {
 			return currentPath;
 		}
 	}
@@ -137,9 +135,9 @@ export class YeomanUIPanel {
 		this.extensionPath = extensionPath;
 		this.rpc = new RpcExtension(this.panel.webview);
 		const outputChannel: YouiLog = new OutputChannelLog();
-		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.panel);
-		const outputFolder = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
-		this.yeomanui = new YeomanUI(this.rpc, vscodeYouiEvents, outputChannel, this.logger, YeomanUIPanel.genFilter, outputFolder);
+		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.panel, YeomanUIPanel.genFilter);
+		//const outputFolder = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
+		this.yeomanui = new YeomanUI(this.rpc, vscodeYouiEvents, outputChannel, this.logger, YeomanUIPanel.genFilter);
 		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
 		this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
 

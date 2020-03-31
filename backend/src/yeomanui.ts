@@ -82,6 +82,7 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.toggleOutput, thisArg: this });
     this.rpc.registerMethod({ func: this.logError, thisArg: this });
     this.rpc.registerMethod({ func: this.back, thisArg: this });
+    this.rpc.registerMethod({ func: this.selectTargetFolder, thisArg: this });
 
     this.youiAdapter = new YouiAdapter(outputChannel, youiEvents);
     this.youiAdapter.setYeomanUI(this);
@@ -102,7 +103,7 @@ export class YeomanUI {
     entry.set(methodName, handler);
   }
 
-  private getCustomQuestionEventHandler(questionType: string, methodName: string): Function {
+  public getCustomQuestionEventHandler(questionType: string, methodName: string): Function {
     const entry: Map<string, Function> = this.customQuestionEventHandlers.get(questionType);
     if (entry !== undefined) {
       return entry.get(methodName);
@@ -189,15 +190,13 @@ export class YeomanUI {
     try {
       if (this.currentQuestions) {
         const relevantQuestion: any = _.find(this.currentQuestions, question => {
-          return (_.get(question, "name") === questionName);
+          return _.get(question, "name") === questionName;
         });
         if (relevantQuestion) {
           const customQuestionEventHandler: Function = this.getCustomQuestionEventHandler(relevantQuestion["guiType"], methodName);
-          if (customQuestionEventHandler !== undefined) {
-            return await customQuestionEventHandler.apply(this.gen, params);
-          } else {
-            return await relevantQuestion[methodName].apply(this.gen, params);
-          }
+          return _.isUndefined(customQuestionEventHandler) ? 
+            await relevantQuestion[methodName].apply(this.gen, params) : 
+            await customQuestionEventHandler.apply(this.gen, params);
         }
       }
     } catch (error) {
@@ -226,6 +225,14 @@ export class YeomanUI {
 
   public logMessage(message: string): void {
     this.outputChannel.log(message);
+  }
+
+  public async selectTargetFolder() {
+    try {
+      return await this.getCustomQuestionEventHandler("folder-browser", "getPath")();
+    } catch (error) {
+      return YeomanUI.PROJECTS;
+    }
   }
 
   public setCwd(cwd: string) {
