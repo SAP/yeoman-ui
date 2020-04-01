@@ -492,4 +492,7 @@ div.consoleClassVisible .v-footer {
   background-color: var(--vscode-editorWidget-background, #252526);
   padding-right: 25px;
 }
+.bottom-buttons-col > .v-btn:not(:last-child) {
+    margin-right: 10px !important;
+}
 </style>
