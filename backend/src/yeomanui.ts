@@ -312,7 +312,8 @@ export class YeomanUI {
   private setGenInstall(gen: any) {
     const originalPrototype = Object.getPrototypeOf(gen);
     const originalGenInstall = _.get(originalPrototype, "install");
-    if (originalGenInstall) {
+    if (originalGenInstall && !originalPrototype._genInstall) {
+      originalPrototype._genInstall = true;
       originalPrototype.install = () => {
         try {
           this.youiEvents.doGeneratorInstall();
@@ -321,6 +322,7 @@ export class YeomanUI {
           this.logError(error);
         } finally {
           originalPrototype.install = originalGenInstall;
+          delete originalPrototype._genInstall;
         }
       };
     }
