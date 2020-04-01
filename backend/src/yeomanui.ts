@@ -103,7 +103,7 @@ export class YeomanUI {
     entry.set(methodName, handler);
   }
 
-  public getCustomQuestionEventHandler(questionType: string, methodName: string): Function {
+  private getCustomQuestionEventHandler(questionType: string, methodName: string): Function {
     const entry: Map<string, Function> = this.customQuestionEventHandlers.get(questionType);
     if (entry !== undefined) {
       return entry.get(methodName);

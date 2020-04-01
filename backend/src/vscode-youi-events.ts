@@ -8,10 +8,12 @@ export class VSCodeYouiEvents implements YouiEvents {
     private rpc: RpcCommon;
     private webviewPanel: vscode.WebviewPanel;
     public static installing: boolean;
+    private genFilter: GeneratorFilter;
 
-    constructor(rpc : RpcCommon, webviewPanel: vscode.WebviewPanel, private genFilter: GeneratorFilter) {
+    constructor(rpc : RpcCommon, webviewPanel: vscode.WebviewPanel, genFilter: GeneratorFilter) {
         this.rpc = rpc; 
-        this.webviewPanel = webviewPanel;       
+        this.webviewPanel = webviewPanel;   
+        this.genFilter = genFilter;    
     }
 
     public doGeneratorDone(generationSucceeded: boolean, message: string, targetPath: string = ""): void {
@@ -60,9 +62,9 @@ export class VSCodeYouiEvents implements YouiEvents {
             const uriTargetFolder = vscode.Uri.file(targetPath);
 
             if (this.genFilter.type !== GeneratorType.module) {
-                const targetFolderInWorkspace: vscode.WorkspaceFolder = vscode.workspace.getWorkspaceFolder(uriTargetFolder);
-                addToWorkspaceButton = targetFolderInWorkspace ? undefined: 'Add to Workspace';
-                const wsFolderPath = _.get(targetFolderInWorkspace, "uri.fsPath");
+                const targetWorkspaceFolder: vscode.WorkspaceFolder = vscode.workspace.getWorkspaceFolder(uriTargetFolder);
+                addToWorkspaceButton = targetWorkspaceFolder ? undefined: 'Add to Workspace';
+                const wsFolderPath = _.get(targetWorkspaceFolder, "uri.fsPath");
                 openInNewWorkspaceButton = (wsFolderPath === uriTargetFolder.fsPath) ? undefined: 'Open in New Workspace';
 
                 if (addToWorkspaceButton || openInNewWorkspaceButton) {
