@@ -149,7 +149,7 @@ export class YeomanUI {
       env.register(meta.resolved);
 
       const genNamespace = this.getGenNamespace(generatorName);
-      const gen: any = env.create(genNamespace, {});
+      const gen: any = env.create(genNamespace, {options: {logger: this.logger}});
       // check if generator defined a helper function called setPromptsCallback()
       const setPromptsCallback = _.get(gen, "setPromptsCallback");
       if (setPromptsCallback) {
