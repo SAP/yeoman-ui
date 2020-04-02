@@ -100,7 +100,7 @@ describe('yeomanui unit test', () => {
     const rpc = new TestRpc();
     const logger = new TestLog();
     const youiEvents = new TestEvents();
-    const yeomanUi: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+    const yeomanUi: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, GeneratorFilter.create());
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -426,7 +426,7 @@ describe('yeomanui unit test', () => {
 
     describe("funcReplacer", () => {
         it("with function", () => {
-            const res = YeomanUI["funcReplacer"]("key", () => { return });
+            const res = YeomanUI["funcReplacer"]("key", () => { return; });
             // tslint:disable-next-line: no-unused-expression
             expect(res).to.be.equal("__Function");
         });
@@ -479,14 +479,14 @@ describe('yeomanui unit test', () => {
         it("setDefaults", () => {
             const questions = [
                 {name: "q1", default: "a"},
-                {name: "q2", default: () => { return "b"}},
+                {name: "q2", default: () => { return "b";}},
                 {name: "q3"}
             ];
             const answers = {
                 q1: "x",
                 q2: "y",
                 q3: "z"
-            }
+            };
             ReplayUtils.setDefaults(questions, answers);
             for (const index in questions) {
                 const question = questions[index];
@@ -541,7 +541,7 @@ describe('yeomanui unit test', () => {
                 return {
                     firstName,
                     lastName: "doe"
-                }
+                };
             };
             const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
             const questions = [{name: "q1"}];
@@ -559,15 +559,15 @@ describe('yeomanui unit test', () => {
                     return {
                         firstName,
                         lastName: "doe"
-                    }
+                    };
                 } else if (questionName === "q2") {
                     return {
                         country
-                    }
+                    };
                 }
             };
             const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
-            yeomanUiInstance.runGenerator = async (): Promise<any> => { return };
+            yeomanUiInstance.runGenerator = async (): Promise<any> => { return; };
             let questions = [{name: "q1"}];
             let response = await yeomanUiInstance.showPrompt(questions);
             expect (response.firstName).to.equal(firstName);
@@ -576,9 +576,11 @@ describe('yeomanui unit test', () => {
 
             response = await yeomanUiInstance.showPrompt(questions);        
             expect (response.country).to.equal(country);
+            // tslint:disable-next-line: no-unused-expression
             expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.false;
 
             yeomanUiInstance.back(undefined);
+            // tslint:disable-next-line: no-unused-expression
             expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.true;
 
             questions = [{name: "q1"}];

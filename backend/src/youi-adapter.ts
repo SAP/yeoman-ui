@@ -66,7 +66,7 @@ export class YouiAdapter implements Adapter {
           try {
             return await cb(result);
           } catch (err) {
-            this.youiEvents.doGeneratorDone(false, (_.get(err, "message", 'Yeoman UI detected an error')), "");
+            this.youiEvents.doGeneratorDone(false, (_.get(err, "message", 'Yeoman UI detected an error')));
             return;
           }
         } 

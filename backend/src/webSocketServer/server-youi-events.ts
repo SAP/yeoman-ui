@@ -7,8 +7,12 @@ export class ServerYouiEvents implements YouiEvents {
     constructor(rpc : RpcCommon) {
         this.rpc = rpc;        
     }
+    
+    selectFolder(): void {
+        this.rpc.invoke("selectOutputFolder");
+    }
 
-    doGeneratorDone(suceeded: boolean, message: string, targetPath = ""): void {
+    doGeneratorDone(suceeded: boolean, message: string, targetPath: string = ""): void {
         this.rpc.invoke("generatorDone", [suceeded, message, targetPath]);
     }
 

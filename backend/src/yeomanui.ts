@@ -148,7 +148,7 @@ export class YeomanUI {
       env.register(meta.resolved);
 
       const genNamespace = this.getGenNamespace(generatorName);
-      const gen: any = env.create(genNamespace, {});
+      const gen: any = env.create(genNamespace, {options: {logger: this.logger.getChildLogger({label: generatorName})}});
       // check if generator defined a helper function called setPromptsCallback()
       const setPromptsCallback = _.get(gen, "setPromptsCallback");
       if (setPromptsCallback) {
@@ -189,15 +189,13 @@ export class YeomanUI {
     try {
       if (this.currentQuestions) {
         const relevantQuestion: any = _.find(this.currentQuestions, question => {
-          return (_.get(question, "name") === questionName);
+          return _.get(question, "name") === questionName;
         });
         if (relevantQuestion) {
           const customQuestionEventHandler: Function = this.getCustomQuestionEventHandler(relevantQuestion["guiType"], methodName);
-          if (customQuestionEventHandler !== undefined) {
-            return await customQuestionEventHandler.apply(this.gen, params);
-          } else {
-            return await relevantQuestion[methodName].apply(this.gen, params);
-          }
+          return _.isUndefined(customQuestionEventHandler) ? 
+            await relevantQuestion[methodName].apply(this.gen, params) : 
+            await customQuestionEventHandler.apply(this.gen, params);
         }
       }
     } catch (error) {
@@ -305,7 +303,8 @@ export class YeomanUI {
   private setGenInstall(gen: any) {
     const originalPrototype = Object.getPrototypeOf(gen);
     const originalGenInstall = _.get(originalPrototype, "install");
-    if (originalGenInstall) {
+    if (originalGenInstall && !originalPrototype._uiInstall) {
+      originalPrototype._uiInstall = true;
       originalPrototype.install = () => {
         try {
           this.youiEvents.doGeneratorInstall();
@@ -314,6 +313,7 @@ export class YeomanUI {
           this.logError(error);
         } finally {
           originalPrototype.install = originalGenInstall;
+          delete originalPrototype._uiInstall;
         }
       };
     }

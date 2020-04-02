@@ -32,6 +32,7 @@
             :doneMessage="doneMessage"
             :donePath="donePath"
           />
+         
           <PromptInfo v-if="currentPrompt && !isDone" :currentPrompt="currentPrompt" />
           <GeneratorSelection
             v-if="shouldShowGeneratorSelection()"
@@ -171,10 +172,8 @@ export default {
   },
   methods: {
     shouldShowGeneratorSelection() {
-      return this.currentPrompt && 
-        this.currentPrompt.questions &&
-        this.currentPrompt.questions[0] &&
-        this.currentPrompt.questions[0].type==='generators';
+      const currentQuestionType = _.get(this, "currentPrompt.questions[0].type"); 
+      return currentQuestionType === 'generators';
     },
     setBusyIndicator() {
       this.showBusyIndicator =
