@@ -64,10 +64,13 @@ export class VSCodeYouiEvents implements YouiEvents {
 
             if (this.genFilter.type !== GeneratorType.module) {
                 const targetWorkspaceFolder: vscode.WorkspaceFolder = vscode.workspace.getWorkspaceFolder(uriTargetFolder);
+                // 1. target workspace folder should not already contain target generator folder
+                // 2. Theia bug: vscode.workspace.workspaceFolders should not be undefined
                 if (!targetWorkspaceFolder && !_.isUndefined(vscode.workspace.workspaceFolders)) {
                     items.push(addToWorkspace);
                 }
 
+                // target workspace path should not be equal to target generator folder path
                 if (_.get(targetWorkspaceFolder, "uri.fsPath") !== _.get(uriTargetFolder, "fsPath")) {
                     items.push(openInNewWorkspace);
                 }
@@ -80,10 +83,10 @@ export class VSCodeYouiEvents implements YouiEvents {
 
             return vscode.window.showInformationMessage(`${successInfoMessage}\nWhat would you like to do with it?`, ...items).then(selection => {
                 if (selection === openInNewWorkspace) {
-                    vscode.commands.executeCommand("vscode.openFolder", uriTargetFolder);
+                    return vscode.commands.executeCommand("vscode.openFolder", uriTargetFolder);
                 } else if (selection === addToWorkspace) {
                     const wsFoldersQuantity = _.size(vscode.workspace.workspaceFolders);
-                    vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, { uri: uriTargetFolder});
+                    return vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, { uri: uriTargetFolder});
                 }
             });
         }
