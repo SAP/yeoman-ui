@@ -66,7 +66,7 @@ export class VSCodeYouiEvents implements YouiEvents {
                 const targetWorkspaceFolder: vscode.WorkspaceFolder = vscode.workspace.getWorkspaceFolder(uriTargetFolder);
                 // 1. target workspace folder should not already contain target generator folder
                 // 2. Theia bug: vscode.workspace.workspaceFolders should not be undefined
-                if (!targetWorkspaceFolder && !_.isUndefined(vscode.workspace.workspaceFolders)) {
+                if (!targetWorkspaceFolder && (_.size(vscode.workspace.workspaceFolders) > 0)) {
                     items.push(addToWorkspace);
                 }
 

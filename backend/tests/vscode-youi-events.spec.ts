@@ -58,9 +58,10 @@ describe('vscode-youi-events unit test', () => {
         it("on success, add to workspace button is visible", () => {
             eventsMock.expects("doClose");
             const actionName = 'Add to Workspace';
+            _.set(vscode, "workspace.workspaceFolders", [{}]);
             windowMock.expects("showInformationMessage").
                 withExactArgs('The project has been successfully generated.\nWhat would you like to do with it?', actionName).resolves(actionName);
-            workspaceMock.expects("updateWorkspaceFolders").withArgs(0, null).resolves();
+            workspaceMock.expects("updateWorkspaceFolders").withArgs(1, null).resolves();
             return events.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
 
