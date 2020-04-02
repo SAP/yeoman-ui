@@ -52,14 +52,14 @@ export class VSCodeYouiEvents implements YouiEvents {
         });
     }
 
-    private showDoneMessage(success: boolean, errorMmessage: string, targetPath: string): void {
+    private showDoneMessage(success: boolean, errorMmessage: string, targetPath: string): Thenable<any> {
         VSCodeYouiEvents.installing = false;
         
         if (success) {
             const addToWorkspace: string = "Add to Workspace";
             const openInNewWorkspace: any = "Open in New Workspace";
             const items: string[] = [];
-            const successInfoMessage = "The project has been successfully generated.";
+            
             const uriTargetFolder = vscode.Uri.file(targetPath);
 
             if (this.genFilter.type !== GeneratorType.module) {
@@ -73,8 +73,12 @@ export class VSCodeYouiEvents implements YouiEvents {
                 }
             }
 
-            const infoMessage = _.isEmpty(items) ? successInfoMessage : `${successInfoMessage}\nWhat would you like to do with it?`;
-            vscode.window.showInformationMessage(infoMessage, ...items).then(selection => {
+            const successInfoMessage = "The project has been successfully generated.";
+            if (_.isEmpty(items)) {
+                return vscode.window.showInformationMessage(successInfoMessage);
+            } 
+
+            return vscode.window.showInformationMessage(`${successInfoMessage}\nWhat would you like to do with it?`, ...items).then(selection => {
                 if (selection === openInNewWorkspace) {
                     vscode.commands.executeCommand("vscode.openFolder", uriTargetFolder);
                 } else if (selection === addToWorkspace) {
@@ -82,8 +86,8 @@ export class VSCodeYouiEvents implements YouiEvents {
                     vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, { uri: uriTargetFolder});
                 }
             });
-        } else {
-            vscode.window.showErrorMessage(errorMmessage);
         }
+
+        return vscode.window.showErrorMessage(errorMmessage);
     }
 }
