@@ -16,9 +16,9 @@ export class VSCodeYouiEvents implements YouiEvents {
         this.genFilter = genFilter;    
     }
 
-    public doGeneratorDone(generationSucceeded: boolean, message: string, targetPath: string = ""): void {
+    public doGeneratorDone(success: boolean, message: string, targetPath: string = ""): void {
         this.doClose();
-        this.showDoneMessage(generationSucceeded, message, targetPath);
+        this.showDoneMessage(success, message, targetPath);
     }
 
     public doGeneratorInstall(): void {
