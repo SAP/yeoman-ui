@@ -82,7 +82,6 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.toggleOutput, thisArg: this });
     this.rpc.registerMethod({ func: this.logError, thisArg: this });
     this.rpc.registerMethod({ func: this.back, thisArg: this });
-    // this.rpc.registerMethod({ func: this.selectTargetFolder, thisArg: this });
 
     this.youiAdapter = new YouiAdapter(outputChannel, youiEvents);
     this.youiAdapter.setYeomanUI(this);
@@ -226,14 +225,6 @@ export class YeomanUI {
   public logMessage(message: string): void {
     this.outputChannel.log(message);
   }
-
-  // public async selectTargetFolder() {
-  //   try {
-  //     return await this.getCustomQuestionEventHandler("folder-browser", "getPath")();
-  //   } catch (error) {
-  //     return YeomanUI.PROJECTS;
-  //   }
-  // }
 
   public setCwd(cwd: string) {
     this.cwd = (cwd || YeomanUI.PROJECTS);

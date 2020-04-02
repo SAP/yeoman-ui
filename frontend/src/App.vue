@@ -32,7 +32,7 @@
             :doneMessage="doneMessage"
             :donePath="donePath"
           />
-          <!--v-btn v-if="shouldShowGeneratorSelection()" @click="selectTargetFolder" >SELECT TARGET FOLDER</v-btn-->
+         
           <PromptInfo v-if="currentPrompt && !isDone" :currentPrompt="currentPrompt" />
           <GeneratorSelection
             v-if="shouldShowGeneratorSelection()"
@@ -171,11 +171,6 @@ export default {
     }
   },
   methods: {
-    // selectTargetFolder() {
-    //   this.rpc.invoke("selectTargetFolder", []).then(result => {
-    //     this.rpc.invoke("logError", [result]);
-    //   });
-    // },
     shouldShowGeneratorSelection() {
       const currentQuestionType = _.get(this, "currentPrompt.questions[0].type"); 
       return currentQuestionType === 'generators';
@@ -385,7 +380,6 @@ export default {
         "setPromptList",
         "generatorInstall",
         "generatorDone",
-        // "selectTargetFolder",
         "log",
         "setMessages"
       ];

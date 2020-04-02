@@ -16,7 +16,7 @@ describe('vscode-youi-events unit test', () => {
     before(() => {
         sandbox = sinon.createSandbox();
         _.set(vscode, "ProgressLocation.Notification", 15);
-        _.set(vscode, "Uri.file", (path: string) => path);
+        _.set(vscode, "Uri.file", (): any => undefined);
         _.set(vscode, "window.showInformationMessage", () => {return Promise.resolve("");});
         _.set(vscode, "window.showErrorMessage", () => {return Promise.resolve("");});
         _.set(vscode, "workspace.workspaceFolders", []);
@@ -49,7 +49,16 @@ describe('vscode-youi-events unit test', () => {
     describe("doGeneratorDone", () => {
         it("on success, add to workspace button is visible", () => {
             eventsMock.expects("doClose");
-            windowMock.expects("showInformationMessage").withExactArgs('The project has been successfully generated.\nWhat would you like to do with it?', 'Add to Workspace', undefined).resolves();
+            windowMock.expects("showInformationMessage").withExactArgs('The project has been successfully generated.\nWhat would you like to do with it?', 'Add to Workspace').resolves();
+            events.doGeneratorDone(true, "success message", "testDestinationRoot");
+        });
+
+        it("on success, open in new workspace button is visible", () => {
+            eventsMock.expects("doClose");
+            _.set(vscode, "workspace.workspaceFolders", undefined);
+            _.set(vscode, "Uri.file", (path: string) => {return {uri: path};});
+            _.set(vscode, "workspace.getWorkspaceFolder", (): any => {return {uri: {fsPath: "testDestinationRoot"}};});
+            windowMock.expects("showInformationMessage").withExactArgs('The project has been successfully generated.\nWhat would you like to do with it?', 'Open in New Workspace').resolves();
             events.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
 
