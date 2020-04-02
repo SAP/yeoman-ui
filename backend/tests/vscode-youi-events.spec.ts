@@ -67,5 +67,14 @@ describe('vscode-youi-events unit test', () => {
             windowMock.expects("showErrorMessage").withExactArgs("error message");
             events.doGeneratorDone(false, "error message");
         });
+
+        it("generator filter type is module", () => {
+            const genFilter = GeneratorFilter.create({type: GeneratorType.module});
+            const events = new VSCodeYouiEvents(undefined, undefined, genFilter);
+            eventsMock = sandbox.mock(events);
+            eventsMock.expects("doClose");
+            windowMock.expects("showInformationMessage").withExactArgs('The project has been successfully generated.').resolves();
+            events.doGeneratorDone(true, "success message", "testDestinationRoot");
+        });
     });
 });

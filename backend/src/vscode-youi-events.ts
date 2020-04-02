@@ -59,7 +59,7 @@ export class VSCodeYouiEvents implements YouiEvents {
             const addToWorkspace: string = "Add to Workspace";
             const openInNewWorkspace: any = "Open in New Workspace";
             const items: string[] = [];
-            let infoMessage = "The project has been successfully generated.";
+            const successInfoMessage = "The project has been successfully generated.";
             const uriTargetFolder = vscode.Uri.file(targetPath);
 
             if (this.genFilter.type !== GeneratorType.module) {
@@ -71,12 +71,9 @@ export class VSCodeYouiEvents implements YouiEvents {
                 if (_.get(targetWorkspaceFolder, "uri.fsPath") !== _.get(uriTargetFolder, "fsPath")) {
                     items.push(openInNewWorkspace);
                 }
-
-                if (!_.isEmpty(items)) {
-                    infoMessage = infoMessage.concat("\nWhat would you like to do with it?");
-                } 
             }
-                
+
+            const infoMessage = _.isEmpty(items) ? successInfoMessage : `${successInfoMessage}\nWhat would you like to do with it?`;
             vscode.window.showInformationMessage(infoMessage, ...items).then(selection => {
                 if (selection === openInNewWorkspace) {
                     vscode.commands.executeCommand("vscode.openFolder", uriTargetFolder);
