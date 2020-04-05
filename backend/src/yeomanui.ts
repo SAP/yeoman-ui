@@ -99,7 +99,7 @@ export class YeomanUI {
       const path: string = await this.getCustomQuestionEventHandler("folder-browser", "getPath")();
       this.setCwd(path);
     } catch (error) {
-      return YeomanUI.PROJECTS;
+      this.logError(error);
     }
   }
 
