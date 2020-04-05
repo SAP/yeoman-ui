@@ -4,6 +4,8 @@ var Inquirer = require('inquirer');
 var path = require('path');
 var _ = require('lodash');
 var types = require('@sap-devx/yeoman-ui-types');
+const datauri = require("datauri");
+const DEFAULT_IMAGE = require("./images/defaultImage");
 
 module.exports = class extends Generator {
   constructor(args, opts) {
@@ -17,6 +19,7 @@ module.exports = class extends Generator {
 
     var prompts = [
       {name: "Hunger Info", description: "Hunger Info Description"},
+      {name: "Main Dishes", description: "Please select a main dish from list"},
       {name: "Hunger Level", description: "Hunger Level Description"},
       {name: "Registration", description: "Thank you for your interest in our resturant.\nPlease enter credentials to register.\n(it shouldn't take you more then 1 minute)"}
     ];
@@ -57,6 +60,9 @@ module.exports = class extends Generator {
         },
       },
       {
+        type: 'input',
+        name: 'fav_color',
+        message: "What's your favorite napkin color",
         when: (response) => {
           this.log(response.hungry);
           return response.hungry;
@@ -64,10 +70,24 @@ module.exports = class extends Generator {
         validate: (value, answers) => {
           return (value.length > 1 ? true : "Enter at least 2 characters");
         },
-        name: "food",
-        type: "input",
-        message: "What do you want to eat",
-        default: "Junk food"
+        transformer: function (color, answers, flags) {
+          const text = chalkPipe(color)(color);
+          if (flags.isFinal) {
+            return text + '!';
+          }
+          return text;
+        }
+      },
+      {
+        default: (answers) => {
+          return (answers.fav_color === "green" ? "11" : "5");
+        },
+        validate: (value, answers) => {
+          return (value > 10 ? true : "Enter a number > 10");
+        },
+        type: "number",
+        name: "number",
+        message: "How many times you have been in this resturant"
       },
       {
         when: async response => {
@@ -93,34 +113,28 @@ module.exports = class extends Generator {
           "HOUBLON CHOUFFE DOBBELEN IPA TRIPEL",
           "Augustiner Hell"
         ]
-      },
-      {
-        type: 'input',
-        name: 'fav_color',
-        message: "What's your favorite napkin color",
-        transformer: function (color, answers, flags) {
-          const text = chalkPipe(color)(color);
-          if (flags.isFinal) {
-            return text + '!';
-          }
-
-          return text;
-        }
-      },
-      {
-        default: (answers) => {
-          return (answers.food === "Pizza" ? "11" : "5");
-        },
-        validate: (value, answers) => {
-          return (value > 10 ? true : "Enter a number > 10");
-        },
-        type: "number",
-        name: "number",
-        message: "How many times you have been in this resturant"
       }
     ];
 
     this.answers = await this.prompt(prompts);
+
+    prompts = [
+      {
+        name: "food",
+        type: "list",
+        message: "What do you want to eat",
+        guiType: "tiles",
+        choices: [
+          { value: "junk-food", name: "Junk Food", description: "Over the long term, this can lead to an increased risk of heart attack.", homepage: "https://www.betterhealthsolutions.org/junk-food-ruining-body/", image: this._getImage(path.join(this.sourceRoot(), "../images/junk-food.jpg")) },
+          { value: "jerk-chicken", name: "Pulled Jerk Chicken", description: "A slow cooked pulled chicken.", image: this._getImage(path.join(this.sourceRoot(), "../images/jerk-chicken.jpeg"))},
+          { value: "lasagna", name: "Lasagna", description: "made with layers of creamy ricotta and spinach filling, tomato sauce, Parmesan cheese and mozzarella cheese.", image: this._getImage(path.join(this.sourceRoot(), "../images/lasagna.jpeg"))},
+          { value: "steak", name: "Ribeye Steak", description: "super traditional big ribeye with baked potato.", image: this._getImage(path.join(this.sourceRoot(), "../images/steak.jpg"))},
+          { value: "spaghetti", name: "Spaghetti Carbonara", description: "classic spaghetti alla carbonara, made with pancetta, an Italian-style bacon.", homepage: "https://www.allrecipes.com/recipe/11973/spaghetti-carbonara-ii/", image: DEFAULT_IMAGE },
+        ]
+          },
+    ];
+
+    this.answers_main_dish = await this.prompt(prompts);
 
     // currently not supported:
     const ui = new Inquirer.ui.BottomBar();
@@ -283,9 +297,20 @@ module.exports = class extends Generator {
     return 'Password need to have at least a letter and a number';
   }
 
+  _getImage(imagePath) {
+    let image;
+    try {
+      image = datauri.sync(imagePath);
+    } catch (error) {
+      image = DEFAULT_IMAGE;
+      this.log("Error", error);
+    }
+    return image;
+  }
+
   configuring() {
     this.log('in configuring');
-    this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "answers.food", "")));
+    this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "answers_main_dish.food", "")));
     this.log('destinationRoot: ' + this.destinationRoot());
   }
 
@@ -296,7 +321,7 @@ module.exports = class extends Generator {
       title: 'Templating with Yeoman',
       hungry: this.answers.hungry,
       confirmHungry: this.answers.confirmHungry,
-      food: this.answers.food,
+      food: this.answers_main_dish.food,
       beers: this.answers.beers,
       fav_color: this.answers.fav_color,
       number: this.answers.number,
