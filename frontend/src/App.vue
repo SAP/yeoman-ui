@@ -33,6 +33,7 @@
             :donePath="donePath"
           />
          
+         <v-btn v-if="shouldShowGeneratorSelection()" @click="selectTargetFolder" >SELECT TARGET FOLDER</v-btn>
           <PromptInfo v-if="currentPrompt && !isDone" :currentPrompt="currentPrompt" />
           <GeneratorSelection
             v-if="shouldShowGeneratorSelection()"
@@ -266,6 +267,9 @@ export default {
         this.prompts.splice(startIndex, deleteCount, ...prompts);
       }
     },
+    selectTargetFolder() {
+      this.rpc.invoke("selectTargetFolder", []);
+    },
     prepQuestions(questions) {
       for (let question of questions) {
         for (let prop in question) {
@@ -384,7 +388,8 @@ export default {
         "generatorInstall",
         "generatorDone",
         "log",
-        "setState"
+        "setState",
+        "selectTargetFolder"
       ];
       _.forEach(functions, funcName => {
         this.rpc.registerMethod({
