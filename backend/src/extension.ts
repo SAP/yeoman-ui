@@ -25,7 +25,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('loadYeomanUI', (options?: any) => {
-			const genFilter = _.get(options, "filter"); 
+			const filter = GeneratorFilter.create(_.get(options, "filter")); 
 			const messages = _.get(options, "messages");
 			
 			const displayedPanel = _.get(YeomanUIPanel, "currentPanel.panel");
@@ -33,7 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
 				displayedPanel.dispose();
 			}
 			
-			YeomanUIPanel.create(context.extensionPath, GeneratorFilter.create(genFilter), messages);
+			YeomanUIPanel.create(context.extensionPath, filter, messages);
 	}));
 	context.subscriptions.push(
 		vscode.commands.registerCommand('yeomanUI.toggleOutput', () => {
@@ -44,10 +44,11 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	if (vscode.window.registerWebviewPanelSerializer) {
-		// Make sure we register a serializer in activation event
 		vscode.window.registerWebviewPanelSerializer(YeomanUIPanel.viewType, {
 			async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
 				console.log(`Got state: ${state}`);
+				YeomanUIPanel.genFilter = GeneratorFilter.create(_.get(state, "filter")); 
+				YeomanUIPanel.messages = _.assign({}, backendMessages, _.get(state, "messages", {}));
 				YeomanUIPanel.revive(webviewPanel, context.extensionPath);
 			}
 		});
@@ -66,9 +67,9 @@ export class YeomanUIPanel {
 	public static genFilter: GeneratorFilter;
 	public static messages: any;
 
-	public static create(extensionPath: string, genFilter?: GeneratorFilter, messages?: any) {
-		YeomanUIPanel.genFilter = (genFilter ? genFilter : GeneratorFilter.create());
-		YeomanUIPanel.messages = messages;
+	public static create(extensionPath: string, filter?: GeneratorFilter, messages: any = {}) {
+		YeomanUIPanel.genFilter = GeneratorFilter.create(filter);
+		YeomanUIPanel.messages = _.assign({}, backendMessages, messages);
 
 		// Otherwise, create a new panel.
 		const panel = vscode.window.createWebviewPanel(
@@ -160,8 +161,8 @@ export class YeomanUIPanel {
 		}
 	}
 
-	private setMessages(messages: any): Promise<void> {
-		return this.rpc ? this.rpc.invoke("setMessages", [messages]) : Promise.resolve();
+	private setState(options: any): Promise<void> {
+		return this.rpc ? this.rpc.invoke("setState", [options]) : Promise.resolve();
 	}
 
     private async _update() {
@@ -177,12 +178,13 @@ export class YeomanUIPanel {
 			indexHtml = indexHtml.replace(/<script src=/g, `<script src=${scriptUri.toString()}`);
 			indexHtml = indexHtml.replace(/<img src=/g, `<img src=${scriptUri.toString()}`);
 		}
-		const uiMessages = _.assign({}, backendMessages, _.get(YeomanUIPanel, "messages", {}));
-		this.panel.title = _.get(uiMessages, "panel_title");
+		const messages = YeomanUIPanel.messages;
+		const filter = YeomanUIPanel.genFilter;
+		this.panel.title = _.get(messages, "panel_title");
 
 		this.panel.webview.html = indexHtml;
 
-		await this.setMessages(uiMessages);
+		await this.setState({messages, filter});
 	}
 }
 
