@@ -184,11 +184,11 @@ describe('App.vue', () => {
     })
   })
 
-  it('setMessages - method', () => {
+  it('setState - method', () => {
     wrapper = initComponent(App, {}, true)
     expect(wrapper.vm.messages).toEqual({})
 
-    wrapper.vm.setMessages({test: "test1"});
+    wrapper.vm.setState({messages: {test: "test1"}});
     expect(wrapper.vm.messages).toEqual({test: "test1"})
   })
 

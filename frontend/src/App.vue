@@ -233,8 +233,11 @@ export default {
         currentPrompt.answers = answers;
       }
     },
-    setMessages(messages) {
-      this.messages = messages;
+    setState(state) {
+      this.messages = state.messages;
+      if (this.isInVsCode()) {
+        window.vscode.setState(state);
+      }
     },
     setPromptList(prompts) {
       let promptIndex = this.promptIndex;
@@ -381,7 +384,8 @@ export default {
         "generatorInstall",
         "generatorDone",
         "log",
-        "setMessages"
+        "setState",
+        "setVscodeApi"
       ];
       _.forEach(functions, funcName => {
         this.rpc.registerMethod({

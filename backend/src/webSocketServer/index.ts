@@ -35,7 +35,7 @@ class YeomanUIWebSocketServer {
       const childLogger = {debug: () => {}, error: () => {}, fatal: () => {}, warn: () => {}, info: () => {}, trace: () => {}, getChildLogger: () => {return {} as IChildLogger;}};
       const youiEvents: YouiEvents = new ServerYouiEvents(this.rpc);
       this.yeomanui = new YeomanUI(this.rpc, youiEvents, logger, childLogger as IChildLogger);
-      this.yeomanui.setMessages(backendMessages);
+      // this.yeomanui.setMessages(backendMessages);
     });
   }
 }
