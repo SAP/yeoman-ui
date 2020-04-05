@@ -384,8 +384,7 @@ export default {
         "generatorInstall",
         "generatorDone",
         "log",
-        "setState",
-        "setVscodeApi"
+        "setState"
       ];
       _.forEach(functions, funcName => {
         this.rpc.registerMethod({

@@ -138,8 +138,8 @@ export class YeomanUI {
   public async runGenerator(generatorName: string) {
     this.generatorName = generatorName;
     // TODO: should create and set target dir only after user has selected a generator;
-    //  see issue: https://github.com/yeoman/environment/issues/55
-    //  process.chdir() doesn't work after environment has been created
+    // see issue: https://github.com/yeoman/environment/issues/55
+    // process.chdir() doesn't work after environment has been created
     try {
       await fsextra.mkdirs(this.getCwd());
       const env: Environment = Environment.createEnv(undefined, {}, this.youiAdapter);
@@ -174,6 +174,10 @@ export class YeomanUI {
     } catch (error) {
       this.onGeneratorFailure(generatorName, error);
     }
+  }
+
+  public setState(messages: any): Promise<void> {
+    return this.rpc ? this.rpc.invoke("setState", [messages]) : Promise.resolve();
   }
 
   /**
