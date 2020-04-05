@@ -48,7 +48,7 @@ export function activate(context: vscode.ExtensionContext) {
 			async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
 				console.log(`Got state: ${state}`);
 				YeomanUIPanel.genFilter = GeneratorFilter.create(_.get(state, "filter")); 
-				YeomanUIPanel.messages = _.assign({}, backendMessages, _.get(state, "messages") || {});
+				YeomanUIPanel.messages = _.assign({}, backendMessages, _.get(state, "messages", {}));
 				YeomanUIPanel.revive(webviewPanel, context.extensionPath);
 			}
 		});
@@ -67,9 +67,9 @@ export class YeomanUIPanel {
 	public static genFilter: GeneratorFilter;
 	public static messages: any;
 
-	public static create(extensionPath: string, filter?: GeneratorFilter, messages?: any) {
+	public static create(extensionPath: string, filter?: GeneratorFilter, messages: any = {}) {
 		YeomanUIPanel.genFilter = GeneratorFilter.create(filter);
-		YeomanUIPanel.messages = _.assign({}, backendMessages, messages || {});
+		YeomanUIPanel.messages = _.assign({}, backendMessages, messages);
 
 		// Otherwise, create a new panel.
 		const panel = vscode.window.createWebviewPanel(
