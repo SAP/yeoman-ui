@@ -76,7 +76,7 @@ export class VSCodeYouiEvents implements YouiEvents {
                 }
             }
 
-            const successInfoMessage = "The project has been successfully generated.";
+            const successInfoMessage = "The project has been generated.";
             if (_.isEmpty(items)) {
                 return vscode.window.showInformationMessage(successInfoMessage);
             } 
