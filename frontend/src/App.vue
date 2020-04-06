@@ -103,6 +103,7 @@ import * as _ from "lodash";
 import FileBrowserPlugin from "@sap-devx/inquirer-gui-file-browser-plugin";
 import FolderBrowserPlugin from "@sap-devx/inquirer-gui-folder-browser-plugin";
 import LoginPlugin from "@sap-devx/inquirer-gui-login-plugin";
+import TilesPlugin from "@sap-devx/inquirer-gui-tiles-plugin";
 
 const FUNCTION = "__Function";
 const PENDING = "pending";
@@ -431,6 +432,12 @@ export default {
 
       options = {};
       Vue.use(LoginPlugin, options);
+      if (options.plugin) {
+        this.$refs.form.registerPlugin(options.plugin);
+      }
+
+      options = {};
+      Vue.use(TilesPlugin, options);
       if (options.plugin) {
         this.$refs.form.registerPlugin(options.plugin);
       }
