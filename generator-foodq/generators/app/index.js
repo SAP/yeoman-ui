@@ -122,7 +122,7 @@ module.exports = class extends Generator {
       {
         name: "food",
         type: "list",
-        message: "What do you want to eat",
+        message: "",
         guiType: "tiles",
         choices: [
           { value: "junk-food", name: "Junk Food", description: "Over the long term, this can lead to an increased risk of heart attack.", homepage: "https://www.betterhealthsolutions.org/junk-food-ruining-body/", image: this._getImage(path.join(this.sourceRoot(), "../images/junk-food.jpg")) },
@@ -131,7 +131,7 @@ module.exports = class extends Generator {
           { value: "steak", name: "Ribeye Steak", description: "super traditional big ribeye with baked potato.", image: this._getImage(path.join(this.sourceRoot(), "../images/steak.jpg"))},
           { value: "spaghetti", name: "Spaghetti Carbonara", description: "classic spaghetti alla carbonara, made with pancetta, an Italian-style bacon.", homepage: "https://www.allrecipes.com/recipe/11973/spaghetti-carbonara-ii/", image: DEFAULT_IMAGE },
         ]
-          },
+      }
     ];
 
     this.answers_main_dish = await this.prompt(prompts);
