@@ -11,6 +11,9 @@ import { YouiEvents } from '../youi-events';
 class YeomanUIWebSocketServer {
   private rpc: RpcExtensionWebSockets | undefined;
   private yeomanui: YeomanUI | undefined;
+  private async mockFolderDialog() {
+    return "mock path";
+  }
 
   init() {
     // web socket server
@@ -35,6 +38,7 @@ class YeomanUIWebSocketServer {
       const childLogger = {debug: () => {}, error: () => {}, fatal: () => {}, warn: () => {}, info: () => {}, trace: () => {}, getChildLogger: () => {return {} as IChildLogger;}};
       const youiEvents: YouiEvents = new ServerYouiEvents(this.rpc);
       this.yeomanui = new YeomanUI(this.rpc, youiEvents, logger, childLogger as IChildLogger);
+      this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.mockFolderDialog.bind(this));
       this.yeomanui.setState({messages: backendMessages});
     });
   }

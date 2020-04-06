@@ -366,9 +366,12 @@ export class YeomanUI {
       message: "",
       choices: _.compact(generatorChoices)
     };
-    
+
+    const questions = [targetFolderQuestion, generatorQuestion];
+    this.currentQuestions = questions;
+    const normalizedQuestions = this.normalizeFunctions(questions);
     // resolve({ name: "Select Generator", questions: [targetFolderQuestion, generatorQuestion] });
-    resolve({ name: "Select Generator", questions: [targetFolderQuestion] });
+    resolve({ name: "Select Generator", questions: normalizedQuestions });
   }
 
   private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<IGeneratorChoice | undefined> {
