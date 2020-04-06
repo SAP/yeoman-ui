@@ -82,7 +82,7 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.toggleOutput, thisArg: this });
     this.rpc.registerMethod({ func: this.logError, thisArg: this });
     this.rpc.registerMethod({ func: this.back, thisArg: this });
-    this.rpc.registerMethod({ func: this.selectTargetFolder, thisArg: this });
+    this.rpc.registerMethod({ func: this.setCwd, thisArg: this });
 
     this.youiAdapter = new YouiAdapter(outputChannel, youiEvents);
     this.youiAdapter.setYeomanUI(this);
@@ -94,15 +94,6 @@ export class YeomanUI {
     this.setCwd(outputPath);
   }
 
-  public async selectTargetFolder() {
-    try {
-      const path: string = await this.getCustomQuestionEventHandler("folder-browser", "getPath")();
-      this.setCwd(path);
-    } catch (error) {
-      this.logError(error);
-    }
-  }
-
   public registerCustomQuestionEventHandler(questionType: string, methodName: string, handler: Function): void {
     let entry: Map<string, Function> = this.customQuestionEventHandlers.get(questionType);
     if (entry === undefined) {
@@ -110,13 +101,6 @@ export class YeomanUI {
       entry = this.customQuestionEventHandlers.get(questionType);
     }
     entry.set(methodName, handler);
-  }
-
-  private getCustomQuestionEventHandler(questionType: string, methodName: string): Function {
-    const entry: Map<string, Function> = this.customQuestionEventHandlers.get(questionType);
-    if (entry !== undefined) {
-      return entry.get(methodName);
-    }
   }
 
   public setGenFilter(genFilter: GeneratorFilter) {
@@ -151,7 +135,8 @@ export class YeomanUI {
     // see issue: https://github.com/yeoman/environment/issues/55
     // process.chdir() doesn't work after environment has been created
     try {
-      await fsextra.mkdirs(this.getCwd());
+      const targetFolder = this.getCwd();
+      await fsextra.mkdirs(targetFolder);
       const env: Environment = Environment.createEnv(undefined, {}, this.youiAdapter);
       const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
       // TODO: support sub-generators
@@ -168,7 +153,7 @@ export class YeomanUI {
       this.setGenInstall(gen);
       this.promptCount = 0;
       this.gen = (gen as Generator);
-      this.gen.destinationRoot(this.getCwd());
+      this.gen.destinationRoot(targetFolder);
       /* Generator.run() returns promise. Sending a callback is deprecated:
            https://yeoman.github.io/generator/Generator.html#run
          ... but .d.ts hasn't been updated for a while:
@@ -273,6 +258,13 @@ export class YeomanUI {
     this.runGenerator(this.generatorName);
   }
 
+  private getCustomQuestionEventHandler(questionType: string, methodName: string): Function {
+    const entry: Map<string, Function> = this.customQuestionEventHandlers.get(questionType);
+    if (entry !== undefined) {
+      return entry.get(methodName);
+    }
+  }
+
   private getPromptName(questions: Environment.Adapter.Questions<any>): string {
     const firstQuestionName = _.get(questions, "[0].name");
     return (firstQuestionName ? _.startCase(firstQuestionName) : `Step ${this.promptCount}`);
@@ -348,15 +340,14 @@ export class YeomanUI {
       return this.getGeneratorChoice(genName, filter);
     });
 
+    const defaultPath = this.getCwd();
     const targetFolderQuestion: any = {
       type: "input",
       guiType: "folder-browser",
       name: "generators.target.folder",
-      message: "Choose target folder",
-      default: this.getCwd(),
-      getPath: async () => {
-        console.error(arguments);
-      }
+      message: "Specify a target folder path",
+      default: defaultPath,
+      getPath: async (path: string) => path
     };
 
     const generatorChoices = await Promise.all(generatorChoicePromises);
@@ -370,7 +361,7 @@ export class YeomanUI {
     const questions = [targetFolderQuestion, generatorQuestion];
     this.currentQuestions = questions;
     const normalizedQuestions = this.normalizeFunctions(questions);
-    // resolve({ name: "Select Generator", questions: [targetFolderQuestion, generatorQuestion] });
+    
     resolve({ name: "Select Generator", questions: normalizedQuestions });
   }
 

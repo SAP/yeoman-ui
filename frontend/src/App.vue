@@ -34,12 +34,15 @@
           />
          
           <PromptInfo v-if="currentPrompt && !isDone" :currentPrompt="currentPrompt" />
-          <Form
+          <div style="width:50%;">
+            <Form
               ref="folderForm"
-              :questions="currentPrompt ? [currentPrompt.questions[0]] : []"
-              v-show="showTargetFolder && shouldShowGeneratorSelection()"
-              @answerChanged="selectTargetFolder"
+              :questions="folderBrowserQuestions"
+              v-show="shouldShowGeneratorSelection()"
+              @answered="setTargetFolder"
             />
+          </div>
+
           <GeneratorSelection
             v-if="shouldShowGeneratorSelection()"
             @generatorSelected="selectGenerator"
@@ -158,6 +161,9 @@ export default {
     },
     currentPrompt() {
       return _.get(this.prompts, "[" + this.promptIndex + "]");
+    },
+    folderBrowserQuestions() {
+      return [_.get(this, "currentPrompt.questions[0]", [])];
     }
   },
   watch: {
@@ -178,6 +184,12 @@ export default {
     }
   },
   methods: {
+    setTargetFolder(answers) {
+      const targetFolder = _.get(answers, "generators.target.folder");
+      if (targetFolder) {
+        return this.rpc.invoke("setCwd", [targetFolder]);
+      }
+    },
     shouldShowGeneratorSelection() {
       const currentQuestionType = _.get(this, "currentPrompt.questions[1].type"); 
       return currentQuestionType === 'generators';
@@ -272,11 +284,6 @@ export default {
         }
         this.prompts.splice(startIndex, deleteCount, ...prompts);
       }
-    },
-    selectTargetFolder() {
-      //this.rpc.invoke("selectTargetFolder", []);
-      // eslint-disable-next-line no-debugger
-      debugger;
     },
     prepQuestions(questions) {
       for (let question of questions) {
