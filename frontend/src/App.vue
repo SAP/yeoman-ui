@@ -32,14 +32,16 @@
             :doneMessage="doneMessage"
             :donePath="donePath"
           />
-         
+
           <PromptInfo v-if="currentPrompt && !isDone" :currentPrompt="currentPrompt" />
-          <Form
+          <div style="width:50%;">
+            <Form
               ref="folderForm"
-              :questions="currentPrompt ? [currentPrompt.questions[0]] : []"
+              :questions="currentPrompt && currentPrompt.questions[0] ? [currentPrompt.questions[0]] : []"
               v-show="showTargetFolder && shouldShowGeneratorSelection()"
               @answerChanged="selectTargetFolder"
             />
+          </div>
           <GeneratorSelection
             v-if="shouldShowGeneratorSelection()"
             @generatorSelected="selectGenerator"
