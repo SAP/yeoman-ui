@@ -33,13 +33,19 @@
             :donePath="donePath"
           />
          
-         <v-btn v-if="shouldShowGeneratorSelection()" @click="selectTargetFolder" >SELECT TARGET FOLDER</v-btn>
           <PromptInfo v-if="currentPrompt && !isDone" :currentPrompt="currentPrompt" />
-          <GeneratorSelection
+          <Form
+              ref="form"
+              :questions="currentPrompt ? currentPrompt.questions : []"
+              v-show="shouldShowGeneratorSelection()"
+              @answerChanged="selectTargetFolder"
+              @click="selectTargetFolder"
+            />
+          <!-- <GeneratorSelection
             v-if="shouldShowGeneratorSelection()"
             @generatorSelected="selectGenerator"
-            :currentQuestion="currentPrompt.questions[0]"
-          />
+            :currentQuestion="currentPrompt.questions[1]"
+          /> -->
           <v-slide-x-transition>
             <Form
               ref="form"
@@ -87,7 +93,7 @@ import Vue from "vue";
 import Loading from "vue-loading-overlay";
 import Header from "./components/Header.vue";
 import Navigation from "./components/Navigation.vue";
-import GeneratorSelection from "./components/GeneratorSelection.vue";
+// import GeneratorSelection from "./components/GeneratorSelection.vue";
 import Done from "./components/Done.vue";
 import PromptInfo from "./components/PromptInfo.vue";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
@@ -130,7 +136,7 @@ export default {
   components: {
     Header,
     Navigation,
-    GeneratorSelection,
+    // GeneratorSelection,
     Done,
     PromptInfo,
     Loading
@@ -173,7 +179,7 @@ export default {
   },
   methods: {
     shouldShowGeneratorSelection() {
-      const currentQuestionType = _.get(this, "currentPrompt.questions[0].type"); 
+      const currentQuestionType = _.get(this, "currentPrompt.questions[1].type"); 
       return currentQuestionType === 'generators';
     },
     setBusyIndicator() {
@@ -268,7 +274,9 @@ export default {
       }
     },
     selectTargetFolder() {
-      this.rpc.invoke("selectTargetFolder", []);
+      //this.rpc.invoke("selectTargetFolder", []);
+      // eslint-disable-next-line no-debugger
+      debugger;
     },
     prepQuestions(questions) {
       for (let question of questions) {
@@ -388,8 +396,7 @@ export default {
         "generatorInstall",
         "generatorDone",
         "log",
-        "setState",
-        "selectTargetFolder"
+        "setState"
       ];
       _.forEach(functions, funcName => {
         this.rpc.registerMethod({

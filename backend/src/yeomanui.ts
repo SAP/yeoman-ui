@@ -348,6 +348,17 @@ export class YeomanUI {
       return this.getGeneratorChoice(genName, filter);
     });
 
+    const targetFolderQuestion: any = {
+      type: "input",
+      guiType: "folder-browser",
+      name: "generators.target.folder",
+      message: "Choose target folder",
+      default: this.getCwd(),
+      getPath: async () => {
+        console.error(arguments);
+      }
+    };
+
     const generatorChoices = await Promise.all(generatorChoicePromises);
     const generatorQuestion: IGeneratorQuestion = {
       type: "generators",
@@ -355,7 +366,9 @@ export class YeomanUI {
       message: "",
       choices: _.compact(generatorChoices)
     };
-    resolve({ name: "Select Generator", questions: [generatorQuestion] });
+    
+    // resolve({ name: "Select Generator", questions: [targetFolderQuestion, generatorQuestion] });
+    resolve({ name: "Select Generator", questions: [targetFolderQuestion] });
   }
 
   private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<IGeneratorChoice | undefined> {
