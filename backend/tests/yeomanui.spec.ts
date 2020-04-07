@@ -463,10 +463,21 @@ describe('yeomanui unit test', () => {
     it("setCwd", () => {
         const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, undefined,  "testpathbefore");
         expect(yeomanUiInstance.getCwd()).equal("testpathbefore");
-        const res = yeomanUiInstance.setCwd("testpathafter");
-        // tslint:disable-next-line: no-unused-expression
-        expect(res).to.be.undefined;
+        yeomanUiInstance.setCwd("testpathafter");
         expect(yeomanUiInstance.getCwd()).equal("testpathafter");
+
+        yeomanUiInstance.setCwd(undefined);
+        expect(yeomanUiInstance.getCwd()).equal(YeomanUI["PROJECTS"]);
+    });
+
+    it("setState", async () => {
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, undefined,  "testpathbefore");
+        // tslint:disable-next-line: no-unused-expression
+        expect(await yeomanUiInstance.setState(null)).to.be.undefined;
+        
+        rpc.invoke = async () => {};
+        const messages = {key: "value"};
+        await yeomanUiInstance.setState(messages);
     });
 
     it("defaultOutputPath", () => {
