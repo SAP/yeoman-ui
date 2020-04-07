@@ -156,13 +156,21 @@ describe('yeomanui unit test', () => {
 
         it("there are no generators", async () => {
             const result = await yeomanUi.getGenerators();
+            const targetFolderQuestion: any = {
+                type: "input",
+                guiType: "folder-browser",
+                name: "generators.target.folder",
+                message: "Specify a target folder path",
+                default: yeomanUi.getCwd(),
+                getPath: "__Function"
+            };
             const generatorQuestion: IGeneratorQuestion = {
                 type: "generators",
                 name: "name",
                 message: "",
                 choices: []
-              };
-            expect(result).to.be.deep.equal({ name: "Select Generator", questions: [generatorQuestion] });
+            };
+            expect(result).to.be.deep.equal({ name: "Select Generator", questions: [targetFolderQuestion, generatorQuestion] });
         });
 
         it("get generators with type project", async () => {
@@ -195,9 +203,9 @@ describe('yeomanui unit test', () => {
             yeomanUi.setGenFilter(genFilter);
             const result = await yeomanUi.getGenerators();
 
-            expect(result.questions[0].choices).to.have.lengthOf(2);
-            const test1Choice = result.questions[0].choices[0];
-            const test2Choice = result.questions[0].choices[1];
+            expect(result.questions[1].choices).to.have.lengthOf(2);
+            const test1Choice = result.questions[1].choices[0];
+            const test2Choice = result.questions[1].choices[1];
             expect(test1Choice.name).to.be.equal("test1");
             expect(test1Choice.message).to.be.equal("test1Description");
             expect(test2Choice.name).to.be.equal("test4");
@@ -234,8 +242,8 @@ describe('yeomanui unit test', () => {
             yeomanUi.setGenFilter(genFilter);
             const result = await yeomanUi.getGenerators();
 
-            expect(result.questions[0].choices).to.have.lengthOf(1);
-            const test1Choice = result.questions[0].choices[0];
+            expect(result.questions[1].choices).to.have.lengthOf(1);
+            const test1Choice = result.questions[1].choices[0];
             expect(test1Choice.name).to.be.equal("test3");
             expect(test1Choice.message).to.be.equal(choiceMessage);
         });
@@ -273,7 +281,7 @@ describe('yeomanui unit test', () => {
             yeomanUi.setGenFilter(GeneratorFilter.create());
             const result = await yeomanUi.getGenerators();
 
-            expect(result.questions[0].choices).to.have.lengthOf(6);
+            expect(result.questions[1].choices).to.have.lengthOf(6);
         });
 
         it("get generators with accessible package.json", async () => {
@@ -304,7 +312,7 @@ describe('yeomanui unit test', () => {
 
             const result = await yeomanUi.getGenerators();
 
-            expect(result.questions[0].choices).to.have.lengthOf(3);
+            expect(result.questions[1].choices).to.have.lengthOf(3);
         });
 
         it("wrong generators filter type is provided", async () => {
@@ -321,7 +329,7 @@ describe('yeomanui unit test', () => {
             const result = await yeomanUi.getGenerators();
 
             // tslint:disable-next-line: no-unused-expression
-            expect(result.questions[0].choices).to.be.empty;
+            expect(result.questions[1].choices).to.be.empty;
         });
 
         it("get generators with type project and categories cat1 and cat2", async () => {
@@ -354,10 +362,10 @@ describe('yeomanui unit test', () => {
             yeomanUi.setGenFilter(genFilter);
             const result = await yeomanUi.getGenerators();
 
-            expect(result.questions[0].choices).to.have.lengthOf(3);
-            const test1Choice = result.questions[0].choices[0];
-            const test2Choice = result.questions[0].choices[1];
-            const test3Choice = result.questions[0].choices[2];
+            expect(result.questions[1].choices).to.have.lengthOf(3);
+            const test1Choice = result.questions[1].choices[0];
+            const test2Choice = result.questions[1].choices[1];
+            const test3Choice = result.questions[1].choices[2];
             expect(test1Choice.name).to.be.equal("test1");
             expect(test2Choice.name).to.be.equal("test2");
             expect(test3Choice.name).to.be.equal("test4");
@@ -384,10 +392,10 @@ describe('yeomanui unit test', () => {
             yeomanUi.setGenFilter(GeneratorFilter.create());
             const result = await yeomanUi.getGenerators();
 
-            expect(result.questions[0].choices).to.have.lengthOf(3);
-            const test1Choice = result.questions[0].choices[0];
-            const test2Choice = result.questions[0].choices[1];
-            const test3Choice = result.questions[0].choices[2];
+            expect(result.questions[1].choices).to.have.lengthOf(3);
+            const test1Choice = result.questions[1].choices[0];
+            const test2Choice = result.questions[1].choices[1];
+            const test3Choice = result.questions[1].choices[2];
             expect(test1Choice.prettyName).to.be.equal("Test1 Project");
             expect(test2Choice.prettyName).to.be.equal("Test2 Module");
             expect(test3Choice.prettyName).to.be.equal("3rd - Test");
@@ -414,10 +422,10 @@ describe('yeomanui unit test', () => {
             yeomanUi.setGenFilter(GeneratorFilter.create());
             const result = await yeomanUi.getGenerators();
 
-            expect(result.questions[0].choices).to.have.lengthOf(3);
-            const test1Choice = result.questions[0].choices[0];
-            const test2Choice = result.questions[0].choices[1];
-            const test3Choice = result.questions[0].choices[2];
+            expect(result.questions[1].choices).to.have.lengthOf(3);
+            const test1Choice = result.questions[1].choices[0];
+            const test2Choice = result.questions[1].choices[1];
+            const test3Choice = result.questions[1].choices[2];
             expect(test1Choice.homepage).to.be.equal("https://myhomepage.com/ANY/generator-test1-project#readme");
             expect(test2Choice.homepage).to.be.equal("https://myhomepage.com/ANY/generator-test2-module#readme");
             expect(test3Choice.homepage).to.be.equal("");
