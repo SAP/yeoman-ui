@@ -60,18 +60,21 @@ export class VSCodeYouiEvents implements YouiEvents {
             const openInNewWorkspace: any = "Open in New Workspace";
             const items: string[] = [];
             
-            const uriTargetFolder = vscode.Uri.file(targetPath);
+            const targetFolderUri: vscode.Uri = vscode.Uri.file(targetPath);
 
             if (this.genFilter.type !== GeneratorType.module) {
-                const targetWorkspaceFolder: vscode.WorkspaceFolder = vscode.workspace.getWorkspaceFolder(uriTargetFolder);
+                const workspacePath = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
                 // 1. target workspace folder should not already contain target generator folder
-                // 2. Theia bug: vscode.workspace.workspaceFolders should not be undefined
-                if (!targetWorkspaceFolder && (_.size(vscode.workspace.workspaceFolders) > 0)) {
+                const foundInWorkspace = _.find(vscode.workspace.workspaceFolders, (wsFolder: vscode.WorkspaceFolder) => {
+                    return targetFolderUri.fsPath === wsFolder.uri.fsPath;
+                });
+                // 2. Theia bug: vscode.workspace.workspaceFolders should not be undefined or empty
+                if (!foundInWorkspace && workspacePath) {
                     items.push(addToWorkspace);
                 }
 
                 // target workspace path should not be equal to target generator folder path
-                if (_.get(targetWorkspaceFolder, "uri.fsPath") !== _.get(uriTargetFolder, "fsPath")) {
+                if (workspacePath !== targetFolderUri.fsPath) {
                     items.push(openInNewWorkspace);
                 }
             }
@@ -83,10 +86,10 @@ export class VSCodeYouiEvents implements YouiEvents {
 
             return vscode.window.showInformationMessage(`${successInfoMessage}\nWhat would you like to do with it?`, ...items).then(selection => {
                 if (selection === openInNewWorkspace) {
-                    return vscode.commands.executeCommand("vscode.openFolder", uriTargetFolder);
+                    return vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
                 } else if (selection === addToWorkspace) {
                     const wsFoldersQuantity = _.size(vscode.workspace.workspaceFolders);
-                    return vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, { uri: uriTargetFolder});
+                    return vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, { uri: targetFolderUri});
                 }
             });
         }
