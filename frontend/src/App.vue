@@ -19,6 +19,7 @@
       @parentShowConsole="toggleConsole"
       @parentReload="reload"
     />
+
     <v-row class="main-row ma-0 pa-0">
       <v-col class="left-col ma-0 pa-0" cols="3">
         <Navigation v-if="prompts.length" :promptIndex="promptIndex" :prompts="prompts" />
@@ -34,6 +35,7 @@
           />
 
           <PromptInfo v-if="currentPrompt && !isDone" :currentPrompt="currentPrompt" />
+
           <div style="width:50%;">
             <Form
               ref="folderForm"
@@ -42,7 +44,7 @@
               @answered="setTargetFolder"
             />
           </div>
-
+          
           <GeneratorSelection
             v-if="shouldShowGeneratorSelection()"
             @generatorSelected="selectGenerator"

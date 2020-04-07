@@ -374,6 +374,38 @@ describe('App.vue', () => {
     })
   })
 
+  describe('setTargetFolder - method', () => {
+    it('answers is empty', () => {
+      wrapper = initComponent(App, {})
+
+      wrapper.vm.prompts = [{}, {}]
+      wrapper.vm.promptIndex = 1
+      wrapper.vm.currentPrompt.status = 'pending'
+
+      const result = wrapper.vm.setTargetFolder()
+
+      expect(result).toBeUndefined();
+    })
+
+    it('answers has "generators.target.folder"', () => {
+      wrapper = initComponent(App, {})
+      
+      wrapper.vm.rpc = {
+        invoke: jest.fn()
+      };
+
+      const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke');
+
+      wrapper.vm.prompts = [{}, {}]
+      wrapper.vm.promptIndex = 1
+      wrapper.vm.currentPrompt.status = 'pending'
+
+      wrapper.vm.setTargetFolder({"generators.target.folder": "testPath"})
+
+      expect(invokeSpy).toHaveBeenCalledWith("setCwd", ["testPath"])
+    })
+  })
+
   describe('generatorDone - method', () => {
     test('status is pending', () => {
       wrapper = initComponent(App, {donePath: 'testDonePath'})
