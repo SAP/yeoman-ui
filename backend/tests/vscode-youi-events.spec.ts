@@ -60,7 +60,7 @@ describe('vscode-youi-events unit test', () => {
             const actionName = 'Add to Workspace';
             _.set(vscode, "workspace.workspaceFolders", [{}]);
             windowMock.expects("showInformationMessage").
-                withExactArgs('The project has been successfully generated.\nWhat would you like to do with it?', actionName).resolves(actionName);
+                withExactArgs('The project has been generated.\nWhat would you like to do with it?', actionName).resolves(actionName);
             workspaceMock.expects("updateWorkspaceFolders").withArgs(1, null).resolves();
             return events.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
@@ -72,7 +72,7 @@ describe('vscode-youi-events unit test', () => {
             _.set(vscode, "workspace.getWorkspaceFolder", (): any => {return {uri: {fsPath: "testDestinationRoot"}};});
             const actionName = 'Open in New Workspace';
             windowMock.expects("showInformationMessage").
-                withExactArgs('The project has been successfully generated.\nWhat would you like to do with it?', actionName).resolves(actionName);
+                withExactArgs('The project has been generated.\nWhat would you like to do with it?', actionName).resolves(actionName);
             commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
             return events.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
@@ -88,7 +88,7 @@ describe('vscode-youi-events unit test', () => {
             const events = new VSCodeYouiEvents(undefined, undefined, genFilter);
             eventsMock = sandbox.mock(events);
             eventsMock.expects("doClose");
-            windowMock.expects("showInformationMessage").withExactArgs('The project has been successfully generated.').resolves();
+            windowMock.expects("showInformationMessage").withExactArgs('The project has been generated.').resolves();
             return events.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
     });
