@@ -60,7 +60,7 @@ export class VSCodeYouiEvents implements YouiEvents {
             const openInNewWorkspace: any = "Open in New Workspace";
             const items: string[] = [];
             
-            const targetFolderUri = vscode.Uri.file(targetPath);
+            const targetFolderUri: vscode.Uri = vscode.Uri.file(targetPath);
 
             if (this.genFilter.type !== GeneratorType.module) {
                 const workspacePath = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
