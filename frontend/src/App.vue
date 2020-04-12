@@ -35,26 +35,10 @@
           />
 
           <PromptInfo v-if="currentPrompt && !isDone" :currentPrompt="currentPrompt" />
-
-          <div style="width:50%;">
-            <Form
-              ref="folderForm"
-              :questions="folderBrowserQuestions"
-              v-show="shouldShowGeneratorSelection()"
-              @answered="setTargetFolder"
-            />
-          </div>
-          
-          <GeneratorSelection
-            v-if="shouldShowGeneratorSelection()"
-            @generatorSelected="selectGenerator"
-            :currentQuestion="currentPrompt.questions[1]"
-          />
           <v-slide-x-transition>
             <Form
               ref="form"
               :questions="currentPrompt ? currentPrompt.questions : []"
-              v-show="!shouldShowGeneratorSelection()"
               @answered="onAnswered"
             />
           </v-slide-x-transition>
@@ -70,7 +54,7 @@
           <div class="diagonal">
           </div>
           <div class="bottom-buttons-col" style="display:flex;align-items: center;">
-            <v-btn id="back" :disabled="promptIndex<1 || isReplaying" @click="back" v-show="false && !shouldShowGeneratorSelection()">
+            <v-btn id="back" :disabled="promptIndex<1 || isReplaying" @click="back" v-show="false">
               <v-icon left>mdi-chevron-left</v-icon>Back
             </v-btn>
             <v-btn id="next" :disabled="!stepValidated" @click="next">
@@ -97,7 +81,6 @@ import Vue from "vue";
 import Loading from "vue-loading-overlay";
 import Header from "./components/Header.vue";
 import Navigation from "./components/Navigation.vue";
-import GeneratorSelection from "./components/GeneratorSelection.vue";
 import Done from "./components/Done.vue";
 import PromptInfo from "./components/PromptInfo.vue";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
@@ -132,8 +115,7 @@ function initialState() {
     showBusyIndicator: false,
     transitionToggle: false,
     promptsInfoToDisplay: [],
-    isReplaying: false,
-    showTargetFolder: false
+    isReplaying: false
   };
 }
 
@@ -142,7 +124,6 @@ export default {
   components: {
     Header,
     Navigation,
-    GeneratorSelection,
     Done,
     PromptInfo,
     Loading
@@ -164,9 +145,6 @@ export default {
     },
     currentPrompt() {
       return _.get(this.prompts, "[" + this.promptIndex + "]");
-    },
-    folderBrowserQuestions() {
-      return [_.get(this, "currentPrompt.questions[0]", [])];
     }
   },
   watch: {
@@ -187,16 +165,6 @@ export default {
     }
   },
   methods: {
-    setTargetFolder(answers) {
-      const targetFolder = _.get(answers, "generators.target.folder");
-      if (targetFolder) {
-        return this.rpc.invoke("setCwd", [targetFolder]);
-      }
-    },
-    shouldShowGeneratorSelection() {
-      const currentQuestionType = _.get(this, "currentPrompt.questions[1].type"); 
-      return currentQuestionType === 'generators';
-    },
     setBusyIndicator() {
       this.showBusyIndicator =
         _.isEmpty(this.prompts) ||
@@ -239,14 +207,6 @@ export default {
       this.prompts[this.promptIndex - 1].active = false;
       this.prompts[this.promptIndex].active = true;
       this.transitionToggle = !this.transitionToggle;
-    },
-    selectGenerator(generatorName, generatorPrettyName) {
-      this.stepValidated = true;
-      if (this.currentPrompt) {
-        _.set(this.currentPrompt, "answers.name", generatorName);
-      }
-      this.generatorName = generatorName;
-      this.generatorPrettyName = generatorPrettyName;
     },
     onAnswered(answers, issues) {
       this.stepValidated = issues === undefined;
@@ -433,8 +393,6 @@ export default {
       Vue.use(FolderBrowserPlugin, options);
       if (options.plugin) {
         this.$refs.form.registerPlugin(options.plugin);
-        this.$refs.folderForm.registerPlugin(options.plugin);
-        this.showTargetFolder = true;
       }
 
       options = {};

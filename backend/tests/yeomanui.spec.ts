@@ -159,15 +159,17 @@ describe('yeomanui unit test', () => {
             const targetFolderQuestion: any = {
                 type: "input",
                 guiType: "folder-browser",
-                name: "generators.target.folder",
+                name: "generator.target.folder",
                 message: "Specify a target folder path",
                 default: yeomanUi.getCwd(),
-                getPath: "__Function"
+                getPath: "__Function",
+                validate: "__Function"
             };
             const generatorQuestion: any = {
-                type: "generators",
-                name: "name",
-                message: "",
+                type: "list",
+                guiType: "tiles",
+                name: "generator",
+                message: "Select Generator",
                 choices: []
             };
             expect(result).to.be.deep.equal({ name: "Select Generator", questions: [targetFolderQuestion, generatorQuestion] });
@@ -206,10 +208,10 @@ describe('yeomanui unit test', () => {
             expect(result.questions[1].choices).to.have.lengthOf(2);
             const test1Choice = result.questions[1].choices[0];
             const test2Choice = result.questions[1].choices[1];
-            expect(test1Choice.name).to.be.equal("test1");
-            expect(test1Choice.message).to.be.equal("test1Description");
-            expect(test2Choice.name).to.be.equal("test4");
-            expect(test2Choice.message).to.be.equal("test4Description");
+            expect(test1Choice.name).to.be.equal("Test1");
+            expect(test1Choice.description).to.be.equal("test1Description");
+            expect(test2Choice.name).to.be.equal("Test4");
+            expect(test2Choice.description).to.be.equal("test4Description");
         });
 
         it("get generators with type module", async () => {
@@ -244,8 +246,8 @@ describe('yeomanui unit test', () => {
 
             expect(result.questions[1].choices).to.have.lengthOf(1);
             const test1Choice = result.questions[1].choices[0];
-            expect(test1Choice.name).to.be.equal("test3");
-            expect(test1Choice.message).to.be.equal(choiceMessage);
+            expect(test1Choice.name).to.be.equal("Test3");
+            expect(test1Choice.description).to.be.equal(choiceMessage);
         });
 
         it("get generators all generators", async () => {
@@ -366,9 +368,9 @@ describe('yeomanui unit test', () => {
             const test1Choice = result.questions[1].choices[0];
             const test2Choice = result.questions[1].choices[1];
             const test3Choice = result.questions[1].choices[2];
-            expect(test1Choice.name).to.be.equal("test1");
-            expect(test2Choice.name).to.be.equal("test2");
-            expect(test3Choice.name).to.be.equal("test4");
+            expect(test1Choice.name).to.be.equal("Test1");
+            expect(test2Choice.name).to.be.equal("Test2");
+            expect(test3Choice.name).to.be.equal("Test4");
         });
 
         it("get generators with displayName", async () => {
@@ -396,9 +398,9 @@ describe('yeomanui unit test', () => {
             const test1Choice = result.questions[1].choices[0];
             const test2Choice = result.questions[1].choices[1];
             const test3Choice = result.questions[1].choices[2];
-            expect(test1Choice.prettyName).to.be.equal("Test1 Project");
-            expect(test2Choice.prettyName).to.be.equal("Test2 Module");
-            expect(test3Choice.prettyName).to.be.equal("3rd - Test");
+            expect(test1Choice.name).to.be.equal("Test1 Project");
+            expect(test2Choice.name).to.be.equal("Test2 Module");
+            expect(test3Choice.name).to.be.equal("3rd - Test");
         });
 
         it("get generators with homepage", async () => {

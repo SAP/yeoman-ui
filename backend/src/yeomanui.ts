@@ -335,6 +335,7 @@ export class YeomanUI {
       default: defaultPath,
       getPath: async (path: string) => path,
       validate: async (path: string) => {
+        // TODO: check accss permissions
         this.setCwd(path);
         return true;
       }

@@ -160,30 +160,6 @@ describe('App.vue', () => {
     expect(wrapper.vm.logText).toBe('test_test_log')
   })
 
-  describe('selectGenerator - method', () => {
-    it('currentPrompt is undefined', () => {
-      wrapper = initComponent(App)
-      wrapper.vm.generatorName = 'test_ge_name'
-
-      wrapper.vm.selectGenerator('testGeneratorName', 'Test Generator Name');
-      
-      expect(wrapper.vm.generatorName).toBe('testGeneratorName')
-      expect(wrapper.vm.generatorPrettyName).toBe('Test Generator Name')
-    })
-
-    it('currentPrompt is defined', () => {
-      wrapper = initComponent(App)
-      wrapper.vm.prompts = [{}, {}]
-      wrapper.vm.promptIndex = 1
-      wrapper.vm.generatorName = 'test_ge_name'
-      wrapper.vm.selectGenerator('testGeneratorName', 'Test Generator Name');
-      
-      expect(wrapper.vm.generatorName).toBe('testGeneratorName')
-      expect(wrapper.vm.generatorPrettyName).toBe('Test Generator Name')
-      expect(wrapper.vm.currentPrompt.answers.name).toBe('testGeneratorName')
-    })
-  })
-
   it('setState - method', () => {
     wrapper = initComponent(App, {}, true)
     expect(wrapper.vm.messages).toEqual({})
@@ -371,38 +347,6 @@ describe('App.vue', () => {
       wrapper.vm.generatorInstall()
 
       expect(wrapper.vm.isDone).toBeTruthy()
-    })
-  })
-
-  describe('setTargetFolder - method', () => {
-    it('answers is empty', () => {
-      wrapper = initComponent(App, {})
-
-      wrapper.vm.prompts = [{}, {}]
-      wrapper.vm.promptIndex = 1
-      wrapper.vm.currentPrompt.status = 'pending'
-
-      const result = wrapper.vm.setTargetFolder()
-
-      expect(result).toBeUndefined();
-    })
-
-    it('answers has "generators.target.folder"', () => {
-      wrapper = initComponent(App, {})
-      
-      wrapper.vm.rpc = {
-        invoke: jest.fn()
-      };
-
-      const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke');
-
-      wrapper.vm.prompts = [{}, {}]
-      wrapper.vm.promptIndex = 1
-      wrapper.vm.currentPrompt.status = 'pending'
-
-      wrapper.vm.setTargetFolder({"generators.target.folder": "testPath"})
-
-      expect(invokeSpy).toHaveBeenCalledWith("setCwd", ["testPath"])
     })
   })
 
