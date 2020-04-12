@@ -130,7 +130,8 @@ module.exports = class extends Generator {
           { value: "lasagna", name: "Lasagna", description: "made with layers of creamy ricotta and spinach filling, tomato sauce, Parmesan cheese and mozzarella cheese.", image: this._getImage(path.join(this.sourceRoot(), "../images/lasagna.jpeg"))},
           { value: "steak", name: "Ribeye Steak", description: "super traditional big ribeye with baked potato.", image: this._getImage(path.join(this.sourceRoot(), "../images/steak.jpg"))},
           { value: "spaghetti", name: "Spaghetti Carbonara", description: "classic spaghetti alla carbonara, made with pancetta, an Italian-style bacon.", homepage: "https://www.allrecipes.com/recipe/11973/spaghetti-carbonara-ii/", image: DEFAULT_IMAGE },
-        ]
+        ],
+        default: "junk-food"
       }
     ];
 
