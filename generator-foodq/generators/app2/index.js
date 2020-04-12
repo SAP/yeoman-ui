@@ -27,6 +27,7 @@ module.exports = class extends Generator {
       },
       {
         type: "list",
+        guiType: "tiles",
         name: "deliveryMethod",
         message: "Delivery method",
         choices: [
