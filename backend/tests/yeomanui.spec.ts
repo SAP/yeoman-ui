@@ -5,7 +5,7 @@ import * as fsextra from "fs-extra";
 import { expect } from "chai";
 import * as _ from "lodash";
 import * as path from "path";
-import {YeomanUI, IGeneratorQuestion} from "../src/yeomanui";
+import {YeomanUI} from "../src/yeomanui";
 import {ReplayUtils} from "../src/replayUtils";
 import * as yeomanEnv from "yeoman-environment";
 import { YouiLog } from "../src/youi-log";
@@ -164,7 +164,7 @@ describe('yeomanui unit test', () => {
                 default: yeomanUi.getCwd(),
                 getPath: "__Function"
             };
-            const generatorQuestion: IGeneratorQuestion = {
+            const generatorQuestion: any = {
                 type: "generators",
                 name: "name",
                 message: "",

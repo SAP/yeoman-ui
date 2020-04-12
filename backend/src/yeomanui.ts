@@ -19,21 +19,6 @@ import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
 
 
-export interface IGeneratorChoice {
-  name: string;
-  prettyName: string;
-  message: string;
-  homepage: string;
-  imageUrl?: string;
-}
-
-export interface IGeneratorQuestion {
-  type: string;
-  name: string;
-  message: string;
-  choices: IGeneratorChoice[];
-}
-
 export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
 }
@@ -208,7 +193,7 @@ export class YeomanUI {
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 
       this.replayUtils.clear();
-      await this.runGenerator(response.name);
+      await this.runGenerator(response.generator);
     } catch (error) {
       this.logError(error);
     }
@@ -345,17 +330,22 @@ export class YeomanUI {
     const targetFolderQuestion: any = {
       type: "input",
       guiType: "folder-browser",
-      name: "generators.target.folder",
+      name: "generator.target.folder",
       message: "Specify a target folder path",
       default: defaultPath,
-      getPath: async (path: string) => path
+      getPath: async (path: string) => path,
+      validate: async (path: string) => {
+        this.setCwd(path);
+        return true;
+      }
     };
 
     const generatorChoices = await Promise.all(generatorChoicePromises);
-    const generatorQuestion: IGeneratorQuestion = {
-      type: "generators",
-      name: "name",
-      message: "",
+    const generatorQuestion: any = {
+      type: "list",
+      guiType: "tiles",
+      name: "generator",
+      message: "Select Generator",
       choices: _.compact(generatorChoices)
     };
 
@@ -366,7 +356,7 @@ export class YeomanUI {
     resolve({ name: "Select Generator", questions: normalizedQuestions });
   }
 
-  private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<IGeneratorChoice | undefined> {
+  private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<any> {
     let packageJson: any;
     const genPackagePath: string = this.getGenMetaPackagePath(genName);
   
@@ -387,7 +377,7 @@ export class YeomanUI {
     return Promise.resolve(undefined);
   }
 
-  private async createGeneratorChoice(genName: string, genPackagePath: string, packageJson: any): Promise<IGeneratorChoice> {
+  private async createGeneratorChoice(genName: string, genPackagePath: string, packageJson: any): Promise<any> {
     let genImageUrl;
 
     try {
@@ -403,11 +393,11 @@ export class YeomanUI {
     const genHomepage = _.get(packageJson, "homepage", '');
 
     return {
-      name: genName,
-      prettyName: genPrettyName,
-      message: genMessage,
+      value: genName,
+      name: genPrettyName,
+      description: genMessage,
       homepage: genHomepage,
-      imageUrl: genImageUrl
+      image: genImageUrl
     };
   }
 
