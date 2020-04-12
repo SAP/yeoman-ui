@@ -140,7 +140,8 @@ export class YeomanUI {
       const env: Environment = Environment.createEnv(undefined, {}, this.youiAdapter);
       const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
       // TODO: support sub-generators
-      env.register(meta.resolved);
+      // @ts-ignore
+      env.register(meta.resolved, meta.namespace, meta.packagePath);
 
       const genNamespace = this.getGenNamespace(generatorName);
       const gen: any = env.create(genNamespace, {options: {logger: this.logger.getChildLogger({label: generatorName})}});
