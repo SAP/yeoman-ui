@@ -50,7 +50,7 @@ export class YeomanUI {
   private replayUtils: ReplayUtils;
   private customQuestionEventHandlers: Map<string, Map<string, Function>>;
 
-  constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter, outputPath: string = YeomanUI.PROJECTS) {
+  constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, genFilter: GeneratorFilter, outputPath: string = YeomanUI.PROJECTS) {
     this.rpc = rpc;
     if (!this.rpc) {
       throw new Error("rpc must be set");
@@ -319,28 +319,33 @@ export class YeomanUI {
     return `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${error.toString()}\n`;
   }
   
-  private async onEnvLookup(env: Environment.Options, resolve: any, filter?: GeneratorFilter) {
+  private async onEnvLookup(env: Environment.Options, resolve: any, filter: GeneratorFilter) {
     this.genMeta = env.getGeneratorsMeta();
     const generatorNames: string[] = env.getGeneratorNames();
     const generatorChoicePromises = _.map(generatorNames, genName => {
       return this.getGeneratorChoice(genName, filter);
     });
 
-    const defaultPath = this.getCwd();
-    const targetFolderQuestion: any = {
-      type: "input",
-      guiType: "folder-browser",
-      name: "generator.target.folder",
-      message: "Specify a target folder path",
-      default: defaultPath,
-      getPath: async (path: string) => path,
-      validate: async (path: string) => {
-        // TODO: check accss permissions
-        this.setCwd(path);
-        return true;
-      }
-    };
+    const questions: any[] = [];
 
+    if (filter.type !== GeneratorType.module) {
+      const defaultPath = this.getCwd();
+      const targetFolderQuestion: any = {
+        type: "input",
+        guiType: "folder-browser",
+        name: "generator.target.folder",
+        message: "Specify a target folder path",
+        default: defaultPath,
+        getPath: async (path: string) => path,
+        validate: async (path: string) => {
+          // TODO: check access permissions
+          this.setCwd(path);
+          return true;
+        }
+      };
+      questions.push(targetFolderQuestion);
+    }
+    
     const generatorChoices = await Promise.all(generatorChoicePromises);
     const generatorQuestion: any = {
       type: "list",
@@ -349,8 +354,8 @@ export class YeomanUI {
       message: "Select Generator",
       choices: _.compact(generatorChoices)
     };
+    questions.push(generatorQuestion);
 
-    const questions = [targetFolderQuestion, generatorQuestion];
     this.currentQuestions = questions;
     const normalizedQuestions = this.normalizeFunctions(questions);
     
