@@ -244,8 +244,8 @@ describe('yeomanui unit test', () => {
             yeomanUi.setGenFilter(genFilter);
             const result = await yeomanUi.getGenerators();
 
-            expect(result.questions[1].choices).to.have.lengthOf(1);
-            const test1Choice = result.questions[1].choices[0];
+            expect(result.questions[0].choices).to.have.lengthOf(1);
+            const test1Choice = result.questions[0].choices[0];
             expect(test1Choice.name).to.be.equal("Test3");
             expect(test1Choice.description).to.be.equal(choiceMessage);
         });
@@ -449,14 +449,14 @@ describe('yeomanui unit test', () => {
     });
 
     it("toggleOutput", () => {
-        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, GeneratorFilter.create());
         const res = yeomanUiInstance.toggleOutput();
         // tslint:disable-next-line: no-unused-expression
         expect(res).to.be.false;
     });
 
     it("logMessage", () => {
-        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, GeneratorFilter.create());
         const res = yeomanUiInstance.logMessage("message");
         // tslint:disable-next-line: no-unused-expression
         expect(res).to.be.undefined;
@@ -483,13 +483,13 @@ describe('yeomanui unit test', () => {
     });
 
     it("defaultOutputPath", () => {
-        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, GeneratorFilter.create());
         const projectsPath = path.join(os.homedir(), 'projects');
         expect(yeomanUiInstance.getCwd()).equal(projectsPath);
     });
 
     it("getErrorInfo", () => {
-        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, GeneratorFilter.create());
         const errorInfo: string = "Error Info";
         const res = yeomanUiInstance["getErrorInfo"](errorInfo);
         // tslint:disable-next-line: no-unused-expression
@@ -528,7 +528,7 @@ describe('yeomanui unit test', () => {
 
     describe("setGenInstall", () => {
         it("install method not exist", () => {
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, GeneratorFilter.create());
             const gen: any = {};
             yeomanUiInstance["setGenInstall"](gen);
             // tslint:disable-next-line: no-unused-expression
@@ -536,7 +536,7 @@ describe('yeomanui unit test', () => {
         });
 
         it("install method exists", () => {
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, GeneratorFilter.create());
             class GenTest {
                public install(): any{
                    return "original_install";
@@ -564,7 +564,7 @@ describe('yeomanui unit test', () => {
                     lastName: "doe"
                 };
             };
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, GeneratorFilter.create());
             const questions = [{name: "q1"}];
             const response = await yeomanUiInstance.showPrompt(questions);
             expect (response.firstName).to.equal(firstName);
@@ -587,7 +587,7 @@ describe('yeomanui unit test', () => {
                     };
                 }
             };
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, GeneratorFilter.create());
             yeomanUiInstance.runGenerator = async (): Promise<any> => { return; };
             let questions = [{name: "q1"}];
             let response = await yeomanUiInstance.showPrompt(questions);
@@ -712,7 +712,7 @@ describe('yeomanui unit test', () => {
                     guiType: "questionType"
                 }
             ];
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, GeneratorFilter.create());
 
             yeomanUiInstance["addCustomQuestionEventHandlers"](questions);
             expect(questions[0]).to.not.have.property("testEvent");
@@ -729,7 +729,7 @@ describe('yeomanui unit test', () => {
             const testEventFunction = () => {
                 return true;
             };
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, GeneratorFilter.create());
             yeomanUiInstance.registerCustomQuestionEventHandler("questionType", "testEvent", testEventFunction);
             yeomanUiInstance["currentQuestions"] = [{name:"question1", guiType: "questionType"}];
             const response = await yeomanUiInstance.evaluateMethod(null, "question1", "testEvent");
@@ -738,7 +738,7 @@ describe('yeomanui unit test', () => {
         });
 
         it("question method is called", async () => {
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, GeneratorFilter.create());
             yeomanUiInstance["currentQuestions"] = [{name:"question1", method1:()=>{
                 return true;
             }}];
@@ -748,14 +748,14 @@ describe('yeomanui unit test', () => {
         });
 
         it("no questions", async () => {
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, GeneratorFilter.create());
             const response = await yeomanUiInstance.evaluateMethod(null, "question1", "method1");
             // tslint:disable-next-line: no-unused-expression
             expect(response).to.be.undefined;
         });
 
         it("method throws exception", async () => {
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger);
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, GeneratorFilter.create());
             yeomanUiInstance["gen"] = Object.create({});
             yeomanUiInstance["gen"].options = {};
             yeomanUiInstance["currentQuestions"] = [{name:"question1", method1:()=>{
