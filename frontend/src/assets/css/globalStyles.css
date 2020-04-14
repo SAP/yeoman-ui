@@ -100,6 +100,10 @@ div.prompt-title {
   padding-top: 0px;
 }
 
+form.inquirer-gui > *:not(.tiles) {
+  max-width: 66%;
+}
+
 form.inquirer-gui .v-text-field fieldset {
   border-radius: 0;
   border-width: thin;
