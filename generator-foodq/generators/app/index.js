@@ -241,6 +241,7 @@ module.exports = class extends Generator {
           'GitLab',
           new Inquirer.Separator(),
           'Bitbucket',
+          new Inquirer.Separator("-*-*-*-*-*-*-*"),
           'Gitea'
         ]
       },

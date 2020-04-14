@@ -16,11 +16,11 @@
   },
   "dependencies": {
     "@mdi/font": "^4.9.95",
-    "@sap-devx/inquirer-gui": "0.1.5",
+    "@sap-devx/inquirer-gui": "0.1.6",
     "@sap-devx/inquirer-gui-file-browser-plugin": "0.0.3",
     "@sap-devx/inquirer-gui-folder-browser-plugin": "0.0.1",
     "@sap-devx/inquirer-gui-login-plugin": "0.0.2",
-    "@sap-devx/inquirer-gui-tiles-plugin": "0.0.2",
+    "@sap-devx/inquirer-gui-tiles-plugin": "0.0.3",
     "core-js": "2.6.6",
     "jquery": "3.4.1",
     "lodash": "^4.17.15",
