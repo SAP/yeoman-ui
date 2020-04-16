@@ -38,8 +38,12 @@ export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
 }
 
+interface ILookupOptions {
+	npmPaths?: string;
+}
+
 export class YeomanUI {
-  private static defaultMessage = 
+  private static defaultMessage =
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
   private static YEOMAN_PNG = "yeoman.png";
   private static isWin32 = (process.platform === 'win32');
@@ -54,7 +58,8 @@ export class YeomanUI {
   private rpc: IRpc;
   private youiEvents: YouiEvents;
   private outputChannel: YouiLog;
-  private logger: IChildLogger;
+	private logger: IChildLogger;
+	private lookupPath: string;
   private genMeta: { [namespace: string]: Environment.GeneratorMeta };
   private youiAdapter: YouiAdapter;
   private gen: Generator | undefined;
@@ -65,7 +70,15 @@ export class YeomanUI {
   private replayUtils: ReplayUtils;
   private customQuestionEventHandlers: Map<string, Map<string, Function>>;
 
-  constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter, outputPath: string = YeomanUI.PROJECTS) {
+  constructor(
+		rpc: IRpc,
+		youiEvents: YouiEvents,
+		outputChannel: YouiLog,
+		logger: IChildLogger,
+		genFilter?: GeneratorFilter,
+		outputPath: string = YeomanUI.PROJECTS,
+		lookupPath: string = '') {
+
     this.rpc = rpc;
     if (!this.rpc) {
       throw new Error("rpc must be set");
@@ -74,7 +87,9 @@ export class YeomanUI {
     this.replayUtils = new ReplayUtils();
     this.youiEvents = youiEvents;
     this.outputChannel = outputChannel;
-    this.logger = logger;
+		this.logger = logger;
+		this.lookupPath = lookupPath;
+
     this.rpc.setResponseTimeout(3600000);
     this.rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
     this.rpc.registerMethod({ func: this.runGenerator, thisArg: this });
@@ -128,8 +143,12 @@ export class YeomanUI {
     // on the other hand, we never look for newly installed generators...
 
     const promise: Promise<IQuestionsPrompt> = new Promise(resolve => {
-      const env: Environment.Options = this.getEnv();
-      env.lookup(async () => this.onEnvLookup(env, resolve, this.genFilter));
+			const env: Environment.Options = this.getEnv();
+			const options:ILookupOptions = {};
+			if (this.lookupPath) {
+				options.npmPaths = this.lookupPath;
+			}
+			env.lookup(options, async () => this.onEnvLookup(env, resolve, this.genFilter));
     });
 
     return promise;
@@ -167,7 +186,7 @@ export class YeomanUI {
         this.gen.run((err) => {
         if (!err) {
           this.onGeneratorSuccess(generatorName, this.gen.destinationRoot());
-        } 
+        }
       });
       this.gen.on('error', (error: any) => {
         this.onGeneratorFailure(generatorName, error);
@@ -182,7 +201,7 @@ export class YeomanUI {
   }
 
   /**
-   * 
+   *
    * @param answers - partial answers for the current prompt -- the input parameter to the method to be evaluated
    * @param method
    */
@@ -194,8 +213,8 @@ export class YeomanUI {
         });
         if (relevantQuestion) {
           const customQuestionEventHandler: Function = this.getCustomQuestionEventHandler(relevantQuestion["guiType"], methodName);
-          return _.isUndefined(customQuestionEventHandler) ? 
-            await relevantQuestion[methodName].apply(this.gen, params) : 
+          return _.isUndefined(customQuestionEventHandler) ?
+            await relevantQuestion[methodName].apply(this.gen, params) :
             await customQuestionEventHandler.apply(this.gen, params);
         }
       }
@@ -203,7 +222,7 @@ export class YeomanUI {
       const questionInfo = `Could not update method '${methodName}' in '${questionName}' question in generator '${this.gen.options.namespace}'`;
       const errorMessage = await this.logError(error, questionInfo);
       return Promise.reject(errorMessage);
-    } 
+    }
   }
 
   public async receiveIsWebviewReady() {
@@ -286,7 +305,7 @@ export class YeomanUI {
     const envGetNpmPaths: () => any = env.getNpmPaths;
     const that = this;
     env.getNpmPaths = function (localOnly:boolean = false) {
-      // Start with the local paths derived by cwd in vscode 
+      // Start with the local paths derived by cwd in vscode
       // (as opposed to cwd of the plugin host process which is what is used by yeoman/environment)
       // Walk up the CWD and add `node_modules/` folder lookup on each level
       const parts: string[] = that.getCwd().split(path.sep);
@@ -295,7 +314,7 @@ export class YeomanUI {
         return YeomanUI.isWin32 ? resrpath : path.join(path.sep, resrpath);
       });
       const defaultPaths = envGetNpmPaths.call(this, localOnly);
-      
+
       return  _.uniq(localPaths.concat(defaultPaths));
     };
     return env;
@@ -323,7 +342,7 @@ export class YeomanUI {
   private getErrorInfo(error: any) {
     if (_.isString(error)) {
       return error;
-    } 
+    }
 
     const name = _.get(error, "name", "");
     const message = _.get(error, "message", "");
@@ -331,7 +350,7 @@ export class YeomanUI {
 
     return `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${error.toString()}\n`;
   }
-  
+
   private async onEnvLookup(env: Environment.Options, resolve: any, filter?: GeneratorFilter) {
     this.genMeta = env.getGeneratorsMeta();
     const generatorNames: string[] = env.getGeneratorNames();
@@ -352,7 +371,7 @@ export class YeomanUI {
   private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<IGeneratorChoice | undefined> {
     let packageJson: any;
     const genPackagePath: string = this.getGenMetaPackagePath(genName);
-  
+
     try {
       packageJson = await this.getGenPackageJson(genPackagePath);
     } catch (error) {
@@ -418,10 +437,10 @@ export class YeomanUI {
   }
 
   /**
-   * 
-   * @param quesions 
+   *
+   * @param quesions
    * returns a deep copy of the original questions, but replaces Function properties with a placeholder
-   * 
+   *
    * Functions are lost when being passed to client (using JSON.Stringify)
    * Also functions cannot be evaluated on client)
    */
@@ -441,7 +460,7 @@ export class YeomanUI {
       return this.rpc.invoke("setPromptList", [promptsToDisplay]);
     }
   }
-  
+
   private addCustomQuestionEventHandlers(questions: Environment.Adapter.Questions<any>): void {
     for (const question of (questions as any[])) {
       const questionHandlers = this.customQuestionEventHandlers.get(question["guiType"]);
