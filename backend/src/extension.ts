@@ -120,8 +120,11 @@ export class YeomanUIPanel {
 				canSelectFolders,
 				defaultUri: uri
 			});
-			return _.get(filePath, "[0].fsPath", currentPath);
+			const resultPath = _.get(filePath, "[0].fsPath", currentPath);
+			await fsextra.access(resultPath, fsextra.constants.W_OK);
+			return resultPath;
 		} catch (error) {
+			this.logger.error(error);
 			return currentPath;
 		}
 	}
