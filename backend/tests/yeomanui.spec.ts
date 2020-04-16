@@ -23,7 +23,7 @@ describe('yeomanui unit test', () => {
     const UTF8: string = "utf8";
     const PACKAGE_JSON: string = "package.json";
 
-    const choiceMessage = 
+    const choiceMessage =
         "Some quick example text of the generator description. This is a long text so that the example will look good.";
     class TestEvents implements YouiEvents {
         public doGeneratorDone(success: boolean, message: string, targetPath?: string): void {
@@ -39,25 +39,25 @@ describe('yeomanui unit test', () => {
         public methods: Map<string, IMethod>;
         public sendRequest(): void {
             return;
-        }            
+        }
         public sendResponse(): void {
             return;
-        } 
+        }
         public setResponseTimeout(): void {
             return;
         }
         public registerMethod(): void {
             return;
-        } 
+        }
         public unregisterMethod(): void {
             return;
-        } 
+        }
         public listLocalMethods(): string[] {
             return [];
         }
         public handleResponse(): void {
             return;
-        } 
+        }
         public listRemoteMethods(): Promise<string[]> {
             return Promise.resolve([]);
         }
@@ -71,28 +71,28 @@ describe('yeomanui unit test', () => {
     class TestLog implements YouiLog {
         public log(): void {
             return;
-        }            
+        }
         public writeln(): void {
             return;
-        } 
+        }
         public create(): void {
             return;
-        }  
+        }
         public force(): void {
             return;
-        } 
+        }
         public conflict(): void {
             return;
-        }  
+        }
         public identical(): void {
             return;
-        }  
+        }
         public skip(): void {
             return;
-        } 
+        }
         public showOutput(): boolean {
             return false;
-        }  
+        }
     }
 
     const testLogger = {debug: () => {}, error: () => {}, fatal: () => {}, warn: () => {}, info: () => {}, trace: () => {}, getChildLogger: () => ({} as IChildLogger)};
@@ -134,7 +134,7 @@ describe('yeomanui unit test', () => {
         let envMock: any;
 
         const environment = {
-            lookup: async (cb: any) => {
+            lookup: async ({}, cb: any) => {
                 return cb.call();
             },
             getGeneratorsMeta: (): any => {
@@ -574,7 +574,7 @@ describe('yeomanui unit test', () => {
 
             questions = [{name: "q2"}];
 
-            response = await yeomanUiInstance.showPrompt(questions);        
+            response = await yeomanUiInstance.showPrompt(questions);
             expect (response.country).to.equal(country);
             // tslint:disable-next-line: no-unused-expression
             expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.false;
@@ -594,8 +594,8 @@ describe('yeomanui unit test', () => {
         const testEnv = yeomanUiInstance["getEnv"]();
         const nodemodules = YeomanUI["NODE_MODULES"];
         testEnv.getNpmPaths = (localOnly: boolean = false): string[] => {
-            return localOnly ? 
-                [path.join("localPath1", nodemodules), path.join("localPath2", nodemodules)] : 
+            return localOnly ?
+                [path.join("localPath1", nodemodules), path.join("localPath2", nodemodules)] :
                 [path.join("path1", nodemodules), path.join("path2", nodemodules), path.join("localPath1", nodemodules), path.join("localPath2", nodemodules)];
         };
 
