@@ -14,6 +14,7 @@ import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/
 import { GeneratorType, GeneratorFilter } from "../src/filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import * as os from "os";
+import { lookup } from "dns";
 
 describe('yeomanui unit test', () => {
     let sandbox: any;
@@ -95,7 +96,7 @@ describe('yeomanui unit test', () => {
         }
     }
 
-    const testLogger = {debug: () => {}, error: () => {}, fatal: () => {}, warn: () => {}, info: () => {}, trace: () => {}, getChildLogger: () => ({} as IChildLogger)};
+	const testLogger = {debug: () => {}, error: () => {}, fatal: () => {}, warn: () => {}, info: () => {}, trace: () => {}, getChildLogger: () => ({} as IChildLogger)};
 
     const rpc = new TestRpc();
     const logger = new TestLog();
@@ -473,6 +474,15 @@ describe('yeomanui unit test', () => {
         const res = yeomanUiInstance["getErrorInfo"](errorInfo);
         // tslint:disable-next-line: no-unused-expression
         expect(res).to.be.equal(errorInfo);
+	});
+
+    it("acceptsLookupPath", async () => {
+		// look for generators in the root of the repo
+		const lookupPath = path.join(__dirname, '..', '..');
+		const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, logger, testLogger, undefined, undefined, lookupPath);
+		const res = await yeomanUiInstance.getGenerators();
+		const foundGenerators = _.get(res, 'questions[0].choices.length', 0);
+		expect(foundGenerators).to.be.greaterThan(0);
     });
 
     describe("answersUtils", () => {
