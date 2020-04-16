@@ -322,13 +322,23 @@ export class YeomanUI {
   private async onEnvLookup(env: Environment.Options, resolve: any, filter: GeneratorFilter) {
     this.genMeta = env.getGeneratorsMeta();
     const generatorNames: string[] = env.getGeneratorNames();
+
+    const questions: any[] = await this.createGeneratorPromptQuestions(generatorNames, filter);
+
+    this.currentQuestions = questions;
+    const normalizedQuestions = this.normalizeFunctions(questions);
+    
+    resolve({ name: "Select Generator", questions: normalizedQuestions });
+  }
+
+  private async createGeneratorPromptQuestions(generatorNames: string[], genFilter: GeneratorFilter): Promise<any[]> {
     const generatorChoicePromises = _.map(generatorNames, genName => {
-      return this.getGeneratorChoice(genName, filter);
+      return this.getGeneratorChoice(genName, genFilter);
     });
 
     const questions: any[] = [];
 
-    if (filter.type !== GeneratorType.module) {
+    if (genFilter.type !== GeneratorType.module) {
       const defaultPath = this.getCwd();
       const targetFolderQuestion: any = {
         type: "input",
@@ -344,7 +354,7 @@ export class YeomanUI {
             return true;
           } catch (error) {
             this.logError(error);
-            return "selected target folder is not accessible";
+            return "the selected target folder is not writable";
           }
         }
       };
@@ -361,10 +371,7 @@ export class YeomanUI {
     };
     questions.push(generatorQuestion);
 
-    this.currentQuestions = questions;
-    const normalizedQuestions = this.normalizeFunctions(questions);
-    
-    resolve({ name: "Select Generator", questions: normalizedQuestions });
+    return questions;
   }
 
   private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<any> {
