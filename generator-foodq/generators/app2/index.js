@@ -1,5 +1,8 @@
 var Generator = require('yeoman-generator');
 var _ = require('lodash');
+var path = require('path');
+const datauri = require("datauri");
+const DEFAULT_IMAGE = require("./images/defaultImage");
 
 module.exports = class extends Generator {
   constructor(args, opts) {
@@ -27,11 +30,12 @@ module.exports = class extends Generator {
       },
       {
         type: "list",
+        guiType: "tiles",
         name: "deliveryMethod",
         message: "Delivery method",
         choices: [
-          "Car",
-          "Drone"
+          { value: "car", name: "Car", image: this._getImage(path.join(this.sourceRoot(), "../images/car.png")) },
+          { value: "drone", name: "Drone", image: this._getImage(path.join(this.sourceRoot(), "../images/drone.png")) }
         ],
         when: answers => {
           const indexOfAddress = _.findIndex(this.prompts.items, prompt => {
@@ -81,4 +85,16 @@ module.exports = class extends Generator {
 
     this.answers = await this.prompt(tipPrompt);
   }
+
+  _getImage(imagePath) {
+    let image;
+    try {
+      image = datauri.sync(imagePath);
+    } catch (error) {
+      image = DEFAULT_IMAGE;
+      this.log("Error", error);
+    }
+    return image;
+  }
+
 };
