@@ -338,9 +338,14 @@ export class YeomanUI {
         default: defaultPath,
         getPath: async (path: string) => path,
         validate: async (path: string) => {
-          // TODO: check access permissions
-          this.setCwd(path);
-          return true;
+          try {
+            await fsextra.access(path, fsextra.constants.W_OK);
+            this.setCwd(path);
+            return true;
+          } catch (error) {
+            this.logError(error);
+            return "selected target folder is not accessible";
+          }
         }
       };
       questions.push(targetFolderQuestion);
