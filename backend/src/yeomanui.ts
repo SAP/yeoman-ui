@@ -354,7 +354,7 @@ export class YeomanUI {
             return true;
           } catch (error) {
             this.logError(error);
-            return "the selected target folder is not writable";
+            return "The selected target folder is not writable";
           }
         }
       };
