@@ -19,21 +19,6 @@ import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
 
 
-export interface IGeneratorChoice {
-  name: string;
-  prettyName: string;
-  message: string;
-  homepage: string;
-  imageUrl?: string;
-}
-
-export interface IGeneratorQuestion {
-  type: string;
-  name: string;
-  message: string;
-  choices: IGeneratorChoice[];
-}
-
 export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
 }
@@ -65,7 +50,7 @@ export class YeomanUI {
   private replayUtils: ReplayUtils;
   private customQuestionEventHandlers: Map<string, Map<string, Function>>;
 
-  constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, genFilter?: GeneratorFilter, outputPath: string = YeomanUI.PROJECTS) {
+  constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, genFilter: GeneratorFilter, outputPath: string = YeomanUI.PROJECTS) {
     this.rpc = rpc;
     if (!this.rpc) {
       throw new Error("rpc must be set");
@@ -82,6 +67,7 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.toggleOutput, thisArg: this });
     this.rpc.registerMethod({ func: this.logError, thisArg: this });
     this.rpc.registerMethod({ func: this.back, thisArg: this });
+    this.rpc.registerMethod({ func: this.setCwd, thisArg: this });
 
     this.youiAdapter = new YouiAdapter(outputChannel, youiEvents);
     this.youiAdapter.setYeomanUI(this);
@@ -100,13 +86,6 @@ export class YeomanUI {
       entry = this.customQuestionEventHandlers.get(questionType);
     }
     entry.set(methodName, handler);
-  }
-
-  private getCustomQuestionEventHandler(questionType: string, methodName: string): Function {
-    const entry: Map<string, Function> = this.customQuestionEventHandlers.get(questionType);
-    if (entry !== undefined) {
-      return entry.get(methodName);
-    }
   }
 
   public setGenFilter(genFilter: GeneratorFilter) {
@@ -141,7 +120,8 @@ export class YeomanUI {
     // see issue: https://github.com/yeoman/environment/issues/55
     // process.chdir() doesn't work after environment has been created
     try {
-      await fsextra.mkdirs(this.getCwd());
+      const targetFolder = this.getCwd();
+      await fsextra.mkdirs(targetFolder);
       const env: Environment = Environment.createEnv(undefined, {}, this.youiAdapter);
       const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
       // TODO: support sub-generators
@@ -159,7 +139,7 @@ export class YeomanUI {
       this.setGenInstall(gen);
       this.promptCount = 0;
       this.gen = (gen as Generator);
-      this.gen.destinationRoot(this.getCwd());
+      this.gen.destinationRoot(targetFolder);
       /* Generator.run() returns promise. Sending a callback is deprecated:
            https://yeoman.github.io/generator/Generator.html#run
          ... but .d.ts hasn't been updated for a while:
@@ -213,7 +193,7 @@ export class YeomanUI {
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 
       this.replayUtils.clear();
-      await this.runGenerator(response.name);
+      await this.runGenerator(response.generator);
     } catch (error) {
       this.logError(error);
     }
@@ -262,6 +242,13 @@ export class YeomanUI {
   public back(partialAnswers: Environment.Adapter.Answers): void {
     this.replayUtils.start(this.currentQuestions, partialAnswers);
     this.runGenerator(this.generatorName);
+  }
+
+  private getCustomQuestionEventHandler(questionType: string, methodName: string): Function {
+    const entry: Map<string, Function> = this.customQuestionEventHandlers.get(questionType);
+    if (entry !== undefined) {
+      return entry.get(methodName);
+    }
   }
 
   private getPromptName(questions: Environment.Adapter.Questions<any>): string {
@@ -332,24 +319,62 @@ export class YeomanUI {
     return `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${error.toString()}\n`;
   }
   
-  private async onEnvLookup(env: Environment.Options, resolve: any, filter?: GeneratorFilter) {
+  private async onEnvLookup(env: Environment.Options, resolve: any, filter: GeneratorFilter) {
     this.genMeta = env.getGeneratorsMeta();
     const generatorNames: string[] = env.getGeneratorNames();
-    const generatorChoicePromises = _.map(generatorNames, genName => {
-      return this.getGeneratorChoice(genName, filter);
-    });
 
-    const generatorChoices = await Promise.all(generatorChoicePromises);
-    const generatorQuestion: IGeneratorQuestion = {
-      type: "generators",
-      name: "name",
-      message: "",
-      choices: _.compact(generatorChoices)
-    };
-    resolve({ name: "Select Generator", questions: [generatorQuestion] });
+    const questions: any[] = await this.createGeneratorPromptQuestions(generatorNames, filter);
+
+    this.currentQuestions = questions;
+    const normalizedQuestions = this.normalizeFunctions(questions);
+    
+    resolve({ name: "Select Generator", questions: normalizedQuestions });
   }
 
-  private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<IGeneratorChoice | undefined> {
+  private async createGeneratorPromptQuestions(generatorNames: string[], genFilter: GeneratorFilter): Promise<any[]> {
+    const generatorChoicePromises = _.map(generatorNames, genName => {
+      return this.getGeneratorChoice(genName, genFilter);
+    });
+
+    const questions: any[] = [];
+
+    if (genFilter.type !== GeneratorType.module) {
+      const defaultPath = this.getCwd();
+      const targetFolderQuestion: any = {
+        type: "input",
+        guiType: "folder-browser",
+        name: "generator.target.folder",
+        message: "Specify a target folder path",
+        default: defaultPath,
+        getPath: async (path: string) => path,
+        validate: async (path: string) => {
+          try {
+            await fsextra.access(path, fsextra.constants.W_OK);
+            this.setCwd(path);
+            return true;
+          } catch (error) {
+            this.logError(error);
+            return "The selected target folder is not writable";
+          }
+        }
+      };
+      questions.push(targetFolderQuestion);
+    }
+    
+    const generatorChoices = await Promise.all(generatorChoicePromises);
+    const generatorQuestion: any = {
+      type: "list",
+      guiType: "tiles",
+      name: "generator",
+      message: "Select Generator",
+      choices: _.compact(generatorChoices)
+    };
+    questions.push(generatorQuestion);
+
+    return questions;
+  }
+
+  private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<any> {
     let packageJson: any;
     const genPackagePath: string = this.getGenMetaPackagePath(genName);
   
@@ -370,7 +395,7 @@ export class YeomanUI {
     return Promise.resolve(undefined);
   }
 
-  private async createGeneratorChoice(genName: string, genPackagePath: string, packageJson: any): Promise<IGeneratorChoice> {
+  private async createGeneratorChoice(genName: string, genPackagePath: string, packageJson: any): Promise<any> {
     let genImageUrl;
 
     try {
@@ -386,11 +411,11 @@ export class YeomanUI {
     const genHomepage = _.get(packageJson, "homepage", '');
 
     return {
-      name: genName,
-      prettyName: genPrettyName,
-      message: genMessage,
+      value: genName,
+      name: genPrettyName,
+      description: genMessage,
       homepage: genHomepage,
-      imageUrl: genImageUrl
+      image: genImageUrl
     };
   }
 

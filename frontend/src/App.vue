@@ -19,6 +19,7 @@
       @parentShowConsole="toggleConsole"
       @parentReload="reload"
     />
+
     <v-row class="main-row ma-0 pa-0">
       <v-col class="left-col ma-0 pa-0" cols="3">
         <Navigation v-if="prompts.length" :promptIndex="promptIndex" :prompts="prompts" />
@@ -32,18 +33,12 @@
             :doneMessage="doneMessage"
             :donePath="donePath"
           />
-         
+
           <PromptInfo v-if="currentPrompt && !isDone" :currentPrompt="currentPrompt" />
-          <GeneratorSelection
-            v-if="shouldShowGeneratorSelection()"
-            @generatorSelected="selectGenerator"
-            :currentQuestion="currentPrompt.questions[0]"
-          />
           <v-slide-x-transition>
             <Form
               ref="form"
               :questions="currentPrompt ? currentPrompt.questions : []"
-              v-show="!shouldShowGeneratorSelection()"
               @answered="onAnswered"
             />
           </v-slide-x-transition>
@@ -59,7 +54,7 @@
           <div class="diagonal">
           </div>
           <div class="bottom-buttons-col" style="display:flex;align-items: center;">
-            <v-btn id="back" :disabled="promptIndex<1 || isReplaying" @click="back" v-show="false && !shouldShowGeneratorSelection()">
+            <v-btn id="back" :disabled="promptIndex<1 || isReplaying" @click="back" v-show="false && promptIndex > 0">
               <v-icon left>mdi-chevron-left</v-icon>Back
             </v-btn>
             <v-btn id="next" :disabled="!stepValidated" @click="next">
@@ -86,7 +81,6 @@ import Vue from "vue";
 import Loading from "vue-loading-overlay";
 import Header from "./components/Header.vue";
 import Navigation from "./components/Navigation.vue";
-import GeneratorSelection from "./components/GeneratorSelection.vue";
 import Done from "./components/Done.vue";
 import PromptInfo from "./components/PromptInfo.vue";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
@@ -130,7 +124,6 @@ export default {
   components: {
     Header,
     Navigation,
-    GeneratorSelection,
     Done,
     PromptInfo,
     Loading
@@ -172,10 +165,6 @@ export default {
     }
   },
   methods: {
-    shouldShowGeneratorSelection() {
-      const currentQuestionType = _.get(this, "currentPrompt.questions[0].type"); 
-      return currentQuestionType === 'generators';
-    },
     setBusyIndicator() {
       this.showBusyIndicator =
         _.isEmpty(this.prompts) ||
@@ -218,14 +207,6 @@ export default {
       this.prompts[this.promptIndex - 1].active = false;
       this.prompts[this.promptIndex].active = true;
       this.transitionToggle = !this.transitionToggle;
-    },
-    selectGenerator(generatorName, generatorPrettyName) {
-      this.stepValidated = true;
-      if (this.currentPrompt) {
-        _.set(this.currentPrompt, "answers.name", generatorName);
-      }
-      this.generatorName = generatorName;
-      this.generatorPrettyName = generatorPrettyName;
     },
     onAnswered(answers, issues) {
       this.stepValidated = issues === undefined;
