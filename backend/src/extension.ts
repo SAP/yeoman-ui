@@ -119,7 +119,7 @@ export class YeomanUIPanel {
 				canSelectFolders,
 				defaultUri: uri
 			});
-			return _.get(filePath, "[0].fsPath");
+			return _.get(filePath, "[0].fsPath", currentPath);
 		} catch (error) {
 			return currentPath;
 		}
