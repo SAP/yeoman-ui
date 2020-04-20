@@ -6,6 +6,7 @@ import { getLoggingLevelSetting, getSourceLocationTrackingSetting} from "./setti
 
 // const PACKAGE_JSON = "package.json";
 const YEOMAN_UI_LOGGER_NAME = "yeomanui";
+const YEOMAN_UI = "Yeoman UI";
 
 /**
  * A Simple Wrapper to hold the state of our "singleton" (per extension) IVSCodeExtLogger
@@ -66,12 +67,14 @@ function createExtensionLogger(context: vscode.ExtensionContext) {
 	const contextLogPath = context.logPath;
 	const logLevelSetting: LogLevel = getLoggingLevelSetting();
 	const sourceLocationTrackingSettings: boolean = getSourceLocationTrackingSetting();
+	const logOutputChannel =  vscode.window.createOutputChannel(YEOMAN_UI);
 
 	//TODO:  const meta = require(resolve(context.extensionPath, PACKAGE_JSON));
 	const extensionLoggerOpts: getExtensionLoggerOpts = {
-		extName: "Yeoman UI.Logger",
+		extName: YEOMAN_UI,
 		level: logLevelSetting,
 		logPath: contextLogPath,
+		logOutputChannel: logOutputChannel,
 		sourceLocationTracking: sourceLocationTrackingSettings
 	};
 
