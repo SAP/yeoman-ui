@@ -51,7 +51,7 @@
 			"type": "object",
 			"title": "Yeoman UI",
 			"properties": {
-				"Yeoman UI.logger.loggingLevel": {
+				"Yeoman UI.loggingLevel": {
 					"type": "string",
 					"enum": [
 						"off",
@@ -66,7 +66,7 @@
 					"description": "The verbosity of logging according to the following order: trace > debug > info > warn > error > fatal > off.",
 					"scope": "resource"
 				},
-				"Yeoman UI.logger.sourceLocationTracking": {
+				"Yeoman UI.sourceLocationTracking": {
 					"type": "boolean",
 					"default": false,
 					"description": "If chosen, the location of the source code is added to log entries. Warning – this action may slow your extension. We recommend you use it only for debugging.",
