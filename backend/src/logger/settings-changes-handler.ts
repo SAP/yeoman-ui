@@ -5,7 +5,7 @@ import { LogLevel } from "@vscode-logging/logger";
 
 export function logLoggerDetails(context: vscode.ExtensionContext, configLogLevel: string): void {
   getLogger().info(`Start Logging in Log Level: <${configLogLevel}>`);
-  getLogger().info(`Full Logs can be found in the <${context.logPath}> folder.`);  
+  getLogger().info(`Full Logs can be found in the <${context.logPath}> folder.`); 
 }
 
 /**
