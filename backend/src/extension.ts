@@ -36,7 +36,6 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 }
 
-
 /**
  * Manages webview panels
  */
