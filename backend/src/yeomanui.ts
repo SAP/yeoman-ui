@@ -102,7 +102,7 @@ export class YeomanUI {
     return errorMessage;
   }
 
-  public async getGenerators(): Promise<IQuestionsPrompt> {
+  public async getGeneratorsPrompt(): Promise<IQuestionsPrompt> {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
 
@@ -189,7 +189,7 @@ export class YeomanUI {
   public async receiveIsWebviewReady() {
     try {
       // TODO: loading generators takes a long time; consider prefetching list of generators
-      const generators: IQuestionsPrompt = await this.getGenerators();
+      const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 
       this.replayUtils.clear();
