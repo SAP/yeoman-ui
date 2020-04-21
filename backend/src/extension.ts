@@ -53,9 +53,9 @@ function loadYeomanUI(options?: any) {
 		displayedPanel.dispose();
 	}
 
-	const filter = GeneratorFilter.create(_.get(options, "filter")); 
-	const messages = getUIMessages(options);
-	YeomanUIPanel.create(_context.extensionPath, filter, messages);
+	YeomanUIPanel.genFilter = GeneratorFilter.create(_.get(options, "filter")); 
+	YeomanUIPanel.messages = getUIMessages(options);
+	YeomanUIPanel.create(_context.extensionPath);
 }
 
 function getUIMessages(options?: any) {
@@ -74,10 +74,7 @@ export class YeomanUIPanel {
 	public static genFilter: GeneratorFilter;
 	public static messages: any;
 
-	public static create(extensionPath: string, filter?: GeneratorFilter, messages: any = {}) {
-		YeomanUIPanel.genFilter = GeneratorFilter.create(filter);
-		YeomanUIPanel.messages = _.assign({}, backendMessages, messages);
-
+	public static create(extensionPath: string) {
 		// Otherwise, create a new panel.
 		const panel = vscode.window.createWebviewPanel(
 			YeomanUIPanel.viewType,
@@ -91,7 +88,6 @@ export class YeomanUIPanel {
 				localResourceRoots: [vscode.Uri.file(YeomanUIPanel.getMediaPath(extensionPath))]
 			}
 		);
-		
 		YeomanUIPanel.currentPanel = new YeomanUIPanel(panel, extensionPath);
 	}
 
@@ -185,13 +181,11 @@ export class YeomanUIPanel {
 			indexHtml = indexHtml.replace(/<script src=/g, `<script src=${scriptUri.toString()}`);
 			indexHtml = indexHtml.replace(/<img src=/g, `<img src=${scriptUri.toString()}`);
 		}
-		const messages = YeomanUIPanel.messages;
-		const filter = YeomanUIPanel.genFilter;
-		this.panel.title = _.get(messages, "panel_title");
-
+		
+		this.panel.title = _.get(YeomanUIPanel.messages, "panel_title");
 		this.panel.webview.html = indexHtml;
 
-		await this.setState({messages, filter});
+		await this.setState({messages: YeomanUIPanel.messages, filter: YeomanUIPanel.genFilter});
 	}
 }
 
