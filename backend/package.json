@@ -14,7 +14,8 @@
 	],
 	"activationEvents": [
 		"*",
-		"onCommand:loadYeomanUI"
+		"onCommand:loadYeomanUI",
+		"onWebviewPanel:yeomanui"
 	],
 	"main": "./dist/extension",
 	"contributes": {

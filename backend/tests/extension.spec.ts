@@ -12,8 +12,9 @@ const testVscode = {
         executeCommand: () => Promise.reject()
     },
     window: {
-        createOutputChannel: (name: string) => { _.set(oOutputChannel, 'name', name); return oOutputChannel;}
-    },
+        createOutputChannel: (name: string) => { _.set(oOutputChannel, 'name', name); return oOutputChannel;},
+        registerWebviewPanelSerializer: () => Promise.resolve()
+    }
 };
 mockVscode(testVscode, "src/extension.ts");
 import * as extension from "../src/extension";
@@ -72,7 +73,8 @@ describe('extension unit test', () => {
             loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
             extension.activate(testContext);
             const loadYeomanUICommand = _.get(oRegisteredCommands, "loadYeomanUI");
-            yeomanUiPanelMock.expects("create").withArgs(testContext.extensionPath);
+            yeomanUiPanelMock.expects("create");
+            // yeomanUiPanelMock.expects("create").withArgs(testContext.extensionPath);
             loadYeomanUICommand();
         });
 

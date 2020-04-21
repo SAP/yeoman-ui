@@ -26,41 +26,16 @@ export function activate(context: vscode.ExtensionContext) {
 		return;
 	}
 
-	context.subscriptions.push(vscode.commands.registerCommand('loadYeomanUI', loadYeomanUI));
-	context.subscriptions.push(vscode.commands.registerCommand('yeomanUI.toggleOutput', toggleOutput));
+	context.subscriptions.push(vscode.commands.registerCommand("loadYeomanUI", YeomanUIPanel.loadYeomanUI));
+	context.subscriptions.push(vscode.commands.registerCommand("yeomanUI.toggleOutput", YeomanUIPanel.toggleOutput));
 
-	if (vscode.window.registerWebviewPanelSerializer) {
-		vscode.window.registerWebviewPanelSerializer(YeomanUIPanel.viewType, {
-			async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
-				YeomanUIPanel.genFilter = GeneratorFilter.create(_.get(state, "filter")); 
-				YeomanUIPanel.messages = getUIMessages(state);
-				YeomanUIPanel.revive(webviewPanel, _context.extensionPath);
-			}
-		});
-	}
+	vscode.window.registerWebviewPanelSerializer(YeomanUIPanel.viewType, {
+		async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
+			YeomanUIPanel.revive(webviewPanel, context.extensionPath, state);
+		}
+	});
 }
 
-function toggleOutput() {
-	const yeomanUi = _.get(YeomanUIPanel, "currentPanel.yeomanui");
-	if (yeomanUi) {
-		yeomanUi.toggleOutput();
-	}
-}
-
-function loadYeomanUI(options?: any) {
-	const displayedPanel = _.get(YeomanUIPanel, "currentPanel.panel");
-	if (displayedPanel) {
-		displayedPanel.dispose();
-	}
-
-	YeomanUIPanel.genFilter = GeneratorFilter.create(_.get(options, "filter")); 
-	YeomanUIPanel.messages = getUIMessages(options);
-	YeomanUIPanel.create(_context.extensionPath);
-}
-
-function getUIMessages(options?: any) {
-	return _.assign({}, backendMessages, _.get(options, "messages", {}));
-}
 
 /**
  * Manages webview panels
@@ -70,12 +45,33 @@ export class YeomanUIPanel {
 	 * Track the currently panel. Only allow a single panel to exist at a time.
 	 */
 	public static readonly viewType = 'yeomanui';
-	public static currentPanel: YeomanUIPanel | undefined;
-	public static genFilter: GeneratorFilter;
-	public static messages: any;
+	private static currentPanel: YeomanUIPanel;
+	private static genFilter: GeneratorFilter;
+	private static messages: any;
 
-	public static create(extensionPath: string) {
-		// Otherwise, create a new panel.
+	public static revive(panel: vscode.WebviewPanel, extensionPath: string, state: any) {
+		YeomanUIPanel.setUIOptions(state); 
+		YeomanUIPanel.currentPanel = new YeomanUIPanel(panel, extensionPath);
+	}
+
+	public static loadYeomanUI(options?: any) {
+		const displayedPanel = _.get(YeomanUIPanel, "currentPanel.panel");
+		if (displayedPanel) {
+			displayedPanel.dispose();
+		}
+	
+		YeomanUIPanel.setUIOptions(options); 
+		YeomanUIPanel.create(_context.extensionPath);
+	}
+
+	public static toggleOutput() {
+		const yeomanUi = _.get(YeomanUIPanel, "currentPanel.yeomanui");
+		if (yeomanUi) {
+			yeomanUi.toggleOutput();
+		}
+	}
+
+	private static create(extensionPath: string) {
 		const panel = vscode.window.createWebviewPanel(
 			YeomanUIPanel.viewType,
 			YEOMAN_UI,
@@ -91,20 +87,21 @@ export class YeomanUIPanel {
 		YeomanUIPanel.currentPanel = new YeomanUIPanel(panel, extensionPath);
 	}
 
-	public static revive(panel: vscode.WebviewPanel, extensionPath: string) {
-		YeomanUIPanel.currentPanel = new YeomanUIPanel(panel, extensionPath);
+	private async showOpenFileDialog(currentPath: string): Promise<string> {
+		return await this.showOpenDialog(currentPath, true);
+	}
+
+	private async showOpenFolderDialog(currentPath: string): Promise<string> {
+		return await this.showOpenDialog(currentPath, false);
+	}
+
+	private static setUIOptions(options?: any) {
+		YeomanUIPanel.genFilter = GeneratorFilter.create(_.get(options, "filter")); 
+		YeomanUIPanel.messages = YeomanUIPanel.getUIMessages(options);
 	}
 
 	private static getMediaPath(extensionPath: string): string {
 		return path.join(extensionPath, 'dist', 'media');
-	}
-
-	public async showOpenFileDialog(currentPath: string): Promise<string> {
-		return await this.showOpenDialog(currentPath, true);
-	}
-
-	public async showOpenFolderDialog(currentPath: string): Promise<string> {
-		return await this.showOpenDialog(currentPath, false);
 	}
 
 	private async showOpenDialog(currentPath: string, canSelectFiles: boolean): Promise<string> {
@@ -129,13 +126,19 @@ export class YeomanUIPanel {
 		}
 	}
 
-	public yeomanui: YeomanUI;
+	private static getUIMessages(options?: any) {
+		return _.assign({}, backendMessages, _.get(options, "messages", {}));
+	}
+
+	private readonly panel: vscode.WebviewPanel;
+	private yeomanui: YeomanUI;
 	private readonly logger: IChildLogger = getClassLogger(YeomanUI.name);
 	private rpc: RpcExtension;
 	private readonly extensionPath: string;
 	private disposables: vscode.Disposable[] = [];
 
-	private constructor(public readonly panel: vscode.WebviewPanel, extensionPath: string) {
+	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
+		this.panel = panel;
 		this.extensionPath = extensionPath;
 		this.rpc = new RpcExtension(this.panel.webview);
 		const outputChannel: YouiLog = new OutputChannelLog();
@@ -150,7 +153,7 @@ export class YeomanUIPanel {
 		this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
 	}
 	
-	public dispose() {
+	private dispose() {
 		YeomanUIPanel.currentPanel = undefined;
 
 		// Clean up our resources
