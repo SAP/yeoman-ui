@@ -4,34 +4,38 @@ const stripAnsi = require("strip-ansi");
 
 export class OutputChannelLog implements YouiLog {
     public log(value: string): void {
-        getOutputChannel().appendLine(stripAnsi(value));
+        this.appendLine(value);
     }
 
     public writeln(value: string): void {
-        getOutputChannel().appendLine(stripAnsi(value));
+        this.appendLine(value);
     }
 
     public create(value: string): void {
-        getOutputChannel().appendLine(stripAnsi(value));
+        this.appendLine(value);
     }
 
     public force(value: string): void {
-        getOutputChannel().appendLine(stripAnsi(value));
+        this.appendLine(value);
     }
 
     public conflict(value: string): void {
-        getOutputChannel().appendLine(stripAnsi(value));
+        this.appendLine(value);
     }
 
     public identical(value: string): void {
-        getOutputChannel().appendLine(stripAnsi(value));
+        this.appendLine(value);
     }
     
     public skip(value: string): void {
-        getOutputChannel().appendLine(stripAnsi(value));
+        this.appendLine(value);
     }
     public showOutput():boolean {
         getOutputChannel().show();
         return true;
+    }
+
+    private appendLine(value: string) {
+        getOutputChannel().appendLine(stripAnsi(value));
     }
 }

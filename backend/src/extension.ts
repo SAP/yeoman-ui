@@ -13,9 +13,12 @@ import backendMessages from "./messages";
 import { getClassLogger, createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
 import { IChildLogger } from "@vscode-logging/logger";
 
+const YEOMAN_UI = "Yeoman UI";
 const ERROR_ACTIVATION_FAILED_LOGGER_CONFIG = 'Extension activation failed due to Logger configuration failure:';
+let _context: vscode.ExtensionContext;
 
 export function activate(context: vscode.ExtensionContext) {
+	_context = context;
 	try {
 		createExtensionLoggerAndSubscribeToLogSettingsChanges(context);
 	} catch (error) {
@@ -23,36 +26,40 @@ export function activate(context: vscode.ExtensionContext) {
 		return;
 	}
 
-	context.subscriptions.push(
-		vscode.commands.registerCommand('loadYeomanUI', (options?: any) => {
-			const filter = GeneratorFilter.create(_.get(options, "filter")); 
-			const messages = _.get(options, "messages");
-			
-			const displayedPanel = _.get(YeomanUIPanel, "currentPanel.panel");
-			if (displayedPanel) {
-				displayedPanel.dispose();
-			}
-			
-			YeomanUIPanel.create(context.extensionPath, filter, messages);
-	}));
-	context.subscriptions.push(
-		vscode.commands.registerCommand('yeomanUI.toggleOutput', () => {
-			const yeomanUi = _.get(YeomanUIPanel, "currentPanel.yeomanui");
-			if (yeomanUi) {
-				yeomanUi.toggleOutput();
-			}
-	}));
+	context.subscriptions.push(vscode.commands.registerCommand('loadYeomanUI', loadYeomanUI));
+	context.subscriptions.push(vscode.commands.registerCommand('yeomanUI.toggleOutput', toggleOutput));
 
 	if (vscode.window.registerWebviewPanelSerializer) {
 		vscode.window.registerWebviewPanelSerializer(YeomanUIPanel.viewType, {
 			async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
-				console.log(`Got state: ${state}`);
 				YeomanUIPanel.genFilter = GeneratorFilter.create(_.get(state, "filter")); 
-				YeomanUIPanel.messages = _.assign({}, backendMessages, _.get(state, "messages", {}));
-				YeomanUIPanel.revive(webviewPanel, context.extensionPath);
+				YeomanUIPanel.messages = getUIMessages(state);
+				YeomanUIPanel.revive(webviewPanel, _context.extensionPath);
 			}
 		});
 	}
+}
+
+function toggleOutput() {
+	const yeomanUi = _.get(YeomanUIPanel, "currentPanel.yeomanui");
+	if (yeomanUi) {
+		yeomanUi.toggleOutput();
+	}
+}
+
+function loadYeomanUI(options?: any) {
+	const displayedPanel = _.get(YeomanUIPanel, "currentPanel.panel");
+	if (displayedPanel) {
+		displayedPanel.dispose();
+	}
+
+	YeomanUIPanel.genFilter = GeneratorFilter.create(_.get(options, "filter")); 
+	YeomanUIPanel.messages = getUIMessages(options);
+	YeomanUIPanel.create(_context.extensionPath);
+}
+
+function getUIMessages(options?: any) {
+	return _.assign({}, backendMessages, _.get(options, "messages", {}));
 }
 
 /**
@@ -67,14 +74,11 @@ export class YeomanUIPanel {
 	public static genFilter: GeneratorFilter;
 	public static messages: any;
 
-	public static create(extensionPath: string, filter?: GeneratorFilter, messages: any = {}) {
-		YeomanUIPanel.genFilter = GeneratorFilter.create(filter);
-		YeomanUIPanel.messages = _.assign({}, backendMessages, messages);
-
+	public static create(extensionPath: string) {
 		// Otherwise, create a new panel.
 		const panel = vscode.window.createWebviewPanel(
 			YeomanUIPanel.viewType,
-			'Yeoman UI',
+			YEOMAN_UI,
 			vscode.ViewColumn.One,
 			{
 				// Enable javascript in the webview
@@ -84,7 +88,6 @@ export class YeomanUIPanel {
 				localResourceRoots: [vscode.Uri.file(YeomanUIPanel.getMediaPath(extensionPath))]
 			}
 		);
-		
 		YeomanUIPanel.currentPanel = new YeomanUIPanel(panel, extensionPath);
 	}
 
@@ -178,20 +181,18 @@ export class YeomanUIPanel {
 			indexHtml = indexHtml.replace(/<script src=/g, `<script src=${scriptUri.toString()}`);
 			indexHtml = indexHtml.replace(/<img src=/g, `<img src=${scriptUri.toString()}`);
 		}
-		const messages = YeomanUIPanel.messages;
-		const filter = YeomanUIPanel.genFilter;
-		this.panel.title = _.get(messages, "panel_title");
-
+		
+		this.panel.title = _.get(YeomanUIPanel.messages, "panel_title");
 		this.panel.webview.html = indexHtml;
 
-		await this.setState({messages, filter});
+		await this.setState({messages: YeomanUIPanel.messages, filter: YeomanUIPanel.genFilter});
 	}
 }
 
 let channel: vscode.OutputChannel;
 export function getOutputChannel(): vscode.OutputChannel {
 	if (!channel) {
-		channel = vscode.window.createOutputChannel('Yeoman UI');
+		channel = vscode.window.createOutputChannel(`${YEOMAN_UI}.Generators`);
 	}
 	return channel;
 }

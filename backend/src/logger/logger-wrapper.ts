@@ -67,7 +67,7 @@ function createExtensionLogger(context: vscode.ExtensionContext) {
 	const contextLogPath = context.logPath;
 	const logLevelSetting: LogLevel = getLoggingLevelSetting();
 	const sourceLocationTrackingSettings: boolean = getSourceLocationTrackingSetting();
-	const logOutputChannel =  vscode.window.createOutputChannel(YEOMAN_UI);
+	const logOutputChannel = vscode.window.createOutputChannel(YEOMAN_UI);
 
 	//TODO:  const meta = require(resolve(context.extensionPath, PACKAGE_JSON));
 	const extensionLoggerOpts: getExtensionLoggerOpts = {

@@ -56,10 +56,10 @@ describe('extension unit test', () => {
         let testContext: any;
         beforeEach(() => {
             testContext = { subscriptions: [], extensionPath: "testExtensionpath" };
-            loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
         });
 
         it("commands registration", () => {
+            loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
             extension.activate(testContext);
             expect(_.size(_.keys(oRegisteredCommands))).to.be.equal(2);
             // tslint:disable-next-line: no-unused-expression
@@ -69,6 +69,7 @@ describe('extension unit test', () => {
         });
 
         it("execution loadYeomanUI command", () => {
+            loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
             extension.activate(testContext);
             const loadYeomanUICommand = _.get(oRegisteredCommands, "loadYeomanUI");
             yeomanUiPanelMock.expects("create").withArgs(testContext.extensionPath);
@@ -76,10 +77,18 @@ describe('extension unit test', () => {
         });
 
         it("execution yeomanui.toggleOutput command", () => {
+            loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
             extension.activate(testContext);
             const yeomanUIToggleOutputCommand = _.get(oRegisteredCommands, "yeomanUI.toggleOutput");
             yeomanUiMock.expects("toggleOutput");
             yeomanUIToggleOutputCommand();
+        });
+
+        it("logger failure on extenion activation", () => {
+            const consoleMock = sandbox.mock(console);
+            loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges").throws(new Error("activation error"));
+            consoleMock.expects("error").withExactArgs('Extension activation failed due to Logger configuration failure:', "activation error");
+            extension.activate(testContext);
         });
     });
 
