@@ -23,6 +23,17 @@ Run the *Foodq* launch configuration.
 
 ## Best practices
 If you write your own generator and you want it to render well in the wizard, follow these guidelines:
+* Ipdate these properties in generator package.json:
+
+```javascript
+{
+    "name": "generator-demo",
+    "displayName": "DEMO Project",
+    "description": "Creates a new DEMO project.",
+    "homepage": "https://demo.cloud.sap/",
+}
+```
+
 * Group several questions into a single prompt – all questions in the same prompt will render as a single wizard step.
 * You can guide the user by showing the prompts in advance. To do so, follow these guidelines:
 

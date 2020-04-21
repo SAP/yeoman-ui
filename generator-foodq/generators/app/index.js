@@ -18,10 +18,10 @@ module.exports = class extends Generator {
     };
 
     var prompts = [
-      {name: "Hunger Info", description: "Hunger Info Description"},
-      {name: "Main Dishes", description: "Please select a main dish from list"},
-      {name: "Hunger Level", description: "Hunger Level Description"},
-      {name: "Registration", description: "Thank you for your interest in our resturant.\nPlease enter credentials to register.\n(it shouldn't take you more then 1 minute)"}
+      {name: "Basic Information", description: "Provide basic information to receive personalized service."},
+      {name: "Main Dishes", description: "Select a main dish from the list."},
+      {name: "Desserts", description: "How would you like to end your meal?"},
+      {name: "Registration", description: "Thank you for your interest in our resturant.\nPlease enter credentials to register.\n(It should not take you more than 1 minute.)"}
     ];
     this.prompts = new types.Prompts(prompts);
 
@@ -52,17 +52,17 @@ module.exports = class extends Generator {
         type: "confirm",
         name: "confirmHungry",
         message: (answers) => {
-          return `You said you are ${(answers.hungry ? '' : 'not ')}hungry. Is that right?`;
+          return `You said you are ${(answers.hungry ? '' : 'not ')}hungry. Is this correct?`;
         },
         store: true,
         validate: (value, answers) => {
-          return (value === true ? true : "It must be right");
+          return (value === true ? true : "You must be hungry");
         },
       },
       {
         type: 'input',
         name: 'fav_color',
-        message: "What's your favorite napkin color",
+        message: "What's your favorite napkin color?",
         when: (response) => {
           this.log(response.hungry);
           return response.hungry;
@@ -87,7 +87,7 @@ module.exports = class extends Generator {
         },
         type: "number",
         name: "number",
-        message: "How many times you have been in this resturant"
+        message: "How many times have you been in this resturant?"
       },
       {
         when: async response => {
@@ -102,15 +102,15 @@ module.exports = class extends Generator {
         },
         type: "checkbox",
         name: "beers",
-        message: "What beer would you like?",
+        message: "Which beer would you like?",
         choices: [
           "Chimay Trappist Ales",
           "Paulaner Salvator Doppel Bock",
           "Weihenstephaner Korbinian",
           "Hoegaarden Belguim White",
           "Allagash White Ale",
-          "ST. FEUILLIEN BLONDE",
-          "HOUBLON CHOUFFE DOBBELEN IPA TRIPEL",
+          "St. Feuillien Blonde",
+          "Houblon Chouffe Dobbelen IPA Tripel",
           "Augustiner Hell"
         ]
       }
@@ -125,11 +125,11 @@ module.exports = class extends Generator {
         message: "",
         guiType: "tiles",
         choices: [
-          { value: "junk-food", name: "Junk Food", description: "Over the long term, this can lead to an increased risk of heart attack.", homepage: "https://www.betterhealthsolutions.org/junk-food-ruining-body/", image: this._getImage(path.join(this.sourceRoot(), "../images/junk-food.jpg")) },
+          { value: "junk-food", name: "Junk Food", description: "It is the best food, but long term, junk food can increase the risk of a heart attack.", homepage: "https://www.betterhealthsolutions.org/junk-food-ruining-body/", image: this._getImage(path.join(this.sourceRoot(), "../images/junk-food.jpg")) },
           { value: "jerk-chicken", name: "Pulled Jerk Chicken", description: "A slow cooked pulled chicken.", image: this._getImage(path.join(this.sourceRoot(), "../images/jerk-chicken.jpeg"))},
-          { value: "lasagna", name: "Lasagna", description: "made with layers of creamy ricotta and spinach filling, tomato sauce, Parmesan cheese and mozzarella cheese.", image: this._getImage(path.join(this.sourceRoot(), "../images/lasagna.jpeg"))},
-          { value: "steak", name: "Ribeye Steak", description: "super traditional big ribeye with baked potato.", image: this._getImage(path.join(this.sourceRoot(), "../images/steak.jpg"))},
-          { value: "spaghetti", name: "Spaghetti Carbonara", description: "classic spaghetti alla carbonara, made with pancetta, an Italian-style bacon.", homepage: "https://www.allrecipes.com/recipe/11973/spaghetti-carbonara-ii/", image: DEFAULT_IMAGE },
+          { value: "lasagna", name: "Lasagna", description: "Layers of creamy ricotta, spinach, and tomato sauce, topped with Parmesan and mozzarella cheese. ", image: this._getImage(path.join(this.sourceRoot(), "../images/lasagna.jpeg"))},
+          { value: "steak", name: "Rib Eye Steak", description: "Super traditional big rib eye with baked potatos.", image: this._getImage(path.join(this.sourceRoot(), "../images/steak.jpg"))},
+          { value: "spaghetti", name: "Spaghetti Carbonara", description: "Classic spaghetti alla carbonara, made with pancetta and Italian-style bacon.", homepage: "https://www.allrecipes.com/recipe/11973/spaghetti-carbonara-ii/", image: DEFAULT_IMAGE },
         ],
         default: "junk-food"
       }
@@ -159,7 +159,7 @@ module.exports = class extends Generator {
       {
         type: "checkbox",
         name: "dessert",
-        message: "What desserts would you like?",
+        message: "Which desserts would you like?",
         validate: (answer) => {
           if (answer.length < 1) {
             return 'You must choose at least one dessert.'
@@ -216,7 +216,7 @@ module.exports = class extends Generator {
       {
         type: 'editor',
         name: 'comments',
-        message: 'Comments.',
+        message: 'Comments',
         validate: function (text) {
           if (!text || text.split('\n').length < 2) {
             return 'Must be at least 2 lines.';
@@ -235,7 +235,7 @@ module.exports = class extends Generator {
       {
         type: 'rawlist',
         name: 'repotype',
-        message: 'Git repo type',
+        message: 'Git repository type',
         choices: [
           'Github',
           'GitLab',
@@ -248,7 +248,7 @@ module.exports = class extends Generator {
       {
         type: 'expand',
         name: 'repoperms',
-        message: 'Git repo permission',
+        message: 'Git repository permissions',
         choices: [
           {
             key: 'u',
@@ -267,17 +267,17 @@ module.exports = class extends Generator {
       },
       {
         name: "email",
-        message: "What's your GitHub username",
+        message: "GitHub username",
         store: true,
         validate: (value, answers) => {
-          return (value.length > 0 ? true : "This field is mandatory");
+          return (value.length > 0 ? true : "Mandatory field");
         }
       },
       {
         type: "password",
         guiType: "login",
         name: "password",
-        message: "What's your GitHub password",
+        message: "GitHub password",
         mask: '*',
         validate: this._requireLetterAndNumber,
         when: (response) => {
@@ -296,7 +296,7 @@ module.exports = class extends Generator {
       return true;
     }
 
-    return 'Password need to have at least a letter and a number';
+    return 'The password must contain at least a letter and a number';
   }
 
   _getImage(imagePath) {
