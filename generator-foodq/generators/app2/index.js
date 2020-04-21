@@ -10,12 +10,12 @@ module.exports = class extends Generator {
     this.prompts = opts.prompts;
     this.parentPromptsQuantity = this.prompts.size();
 
-    this.dynamicAddressPrompt = {name: "Address", description: "Address Description"};
+    this.dynamicAddressPrompt = {name: "Address", description: "Provide the address for delivery."};
 
     const prompts = [
-      {name: "Delivery", description: "Delivery Description"},
+      {name: "Delivery", description: "Select your prefered delivery method."},
       this.dynamicAddressPrompt,
-      {name: "Tip", description: "Tip Description"}];
+      {name: "Tip", description: "You can include a tip for the delivery person."}];
 
     this.prompts.splice(this.parentPromptsQuantity, 0, prompts);
   }
@@ -26,7 +26,7 @@ module.exports = class extends Generator {
       {
         type: "confirm",
         name: "isDelivery",
-        message: "Do you want to get food near your home?"
+        message: "Do you want the food delivered to your home?"
       },
       {
         type: "list",
@@ -68,7 +68,7 @@ module.exports = class extends Generator {
         {
           type: "input",
           name: "address",
-          message: "Your Address"
+          message: "Home address"
         }
       ];
       this.answers = await this.prompt(addressPrompt);
@@ -78,7 +78,7 @@ module.exports = class extends Generator {
       {
         type: "number",
         name: "tip",
-        message: "Do you want to give a tip?",
+        message: "how much would you like to tip?",
         default: "10"
       }
     ];
