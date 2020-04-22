@@ -61,20 +61,17 @@ export class YouiAdapter implements Adapter {
     cb?: (res: T1) => T2
   ): Promise<T2> {
     if (this.yeomanui && questions) {
-      return (<Promise<T2>>this.yeomanui.showPrompt(questions)).then(async (result: any) => {
-        if (cb) {
-          try {
-            return await cb(result);
-          } catch (err) {
-            this.youiEvents.doGeneratorDone(false, (_.get(err, "message", 'Yeoman UI detected an error')));
-            return;
-          }
-        } 
+      const result: any = await (<Promise<T2>>this.yeomanui.showPrompt(questions));
+      if (cb) {
+        try {
+          return await cb(result);
+        } catch (err) {
+          this.youiEvents.doGeneratorDone(false, (_.get(err, "message", 'Yeoman UI detected an error')));
+          return;
+        }
+      }
 
-        return result;
-      }).catch((reason) => {
-        throw reason;
-      });
+      return result;
     }
 
     return Promise.resolve({} as T2);

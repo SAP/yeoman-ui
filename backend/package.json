@@ -13,7 +13,6 @@
 		"Other"
 	],
 	"activationEvents": [
-		"*",
 		"onCommand:loadYeomanUI",
 		"onWebviewPanel:yeomanui"
 	],
