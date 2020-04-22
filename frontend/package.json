@@ -18,7 +18,7 @@
     "@mdi/font": "^5.1.45",
     "@sap-devx/inquirer-gui": "0.1.7",
     "@sap-devx/inquirer-gui-file-browser-plugin": "0.0.5",
-    "@sap-devx/inquirer-gui-folder-browser-plugin": "0.0.2",
+    "@sap-devx/inquirer-gui-folder-browser-plugin": "0.0.3",
     "@sap-devx/inquirer-gui-login-plugin": "0.0.3",
     "@sap-devx/inquirer-gui-tiles-plugin": "0.0.8",
     "core-js": "2.6.6",
