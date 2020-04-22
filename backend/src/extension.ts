@@ -1,6 +1,7 @@
 import * as fsextra from 'fs-extra';
 import * as _ from 'lodash';
 import * as path from 'path';
+import * as os from "os";
 import * as vscode from 'vscode';
 import { YeomanUI } from "./yeomanui";
 import {RpcExtension} from '@sap-devx/webview-rpc/out.ext/rpc-extension';
@@ -51,8 +52,8 @@ export class YeomanUIPanel {
 	 * Track the currently panel. Only allow a single panel to exist at a time.
 	 */
 	public static readonly viewType = 'yeomanui';
-	public static currentPanel: YeomanUIPanel;
 	public static extensionPath: string;
+	public static currentPanel: YeomanUIPanel;
 	private static mediaPath: string;
 
 	public static setPaths(extensionPath: string) {
@@ -143,7 +144,7 @@ export class YeomanUIPanel {
 		try {
 			uri = vscode.Uri.file(currentPath);
 		} catch (e) {
-			uri = vscode.Uri.file('/');
+			uri = vscode.Uri.file(path.join(os.homedir()));
 		}
 
 		try {
