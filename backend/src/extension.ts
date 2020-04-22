@@ -14,10 +14,8 @@ import { getClassLogger, createExtensionLoggerAndSubscribeToLogSettingsChanges }
 import { IChildLogger } from "@vscode-logging/logger";
 
 const YEOMAN_UI = "Yeoman UI";
-let _context: vscode.ExtensionContext;
 
 export function activate(context: vscode.ExtensionContext) {
-	_context = context;
 	try {
 		createExtensionLoggerAndSubscribeToLogSettingsChanges(context);
 	} catch (error) {
@@ -25,12 +23,13 @@ export function activate(context: vscode.ExtensionContext) {
 		return;
 	}
 
+	YeomanUIPanel.setPaths(context.extensionPath);
 	context.subscriptions.push(vscode.commands.registerCommand("loadYeomanUI", YeomanUIPanel.loadYeomanUI));
 	context.subscriptions.push(vscode.commands.registerCommand("yeomanUI.toggleOutput", YeomanUIPanel.toggleOutput));
 
 	vscode.window.registerWebviewPanelSerializer(YeomanUIPanel.viewType, {
 		async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
-			YeomanUIPanel.currentPanel = new YeomanUIPanel(webviewPanel, context.extensionPath, state);
+			YeomanUIPanel.setCurrentPanel(webviewPanel, state);
 		}
 	});
 }
@@ -53,6 +52,13 @@ export class YeomanUIPanel {
 	 */
 	public static readonly viewType = 'yeomanui';
 	public static currentPanel: YeomanUIPanel;
+	public static extensionPath: string;
+	private static mediaPath: string;
+
+	public static setPaths(extensionPath: string) {
+		YeomanUIPanel.extensionPath = extensionPath;
+		YeomanUIPanel.mediaPath = path.join(extensionPath, 'dist', 'media');
+	}
 
 	public static loadYeomanUI(uiOptions?: any) {
 		const displayedPanel = _.get(YeomanUIPanel, "currentPanel.panel");
@@ -60,7 +66,7 @@ export class YeomanUIPanel {
 			displayedPanel.dispose();
 		}
 	
-		YeomanUIPanel.create(_context.extensionPath, uiOptions);
+		YeomanUIPanel.create(uiOptions);
 	}
 
 	public static toggleOutput() {
@@ -70,12 +76,17 @@ export class YeomanUIPanel {
 		}
 	}
 
-	private static getMediaPath(extensionPath: string): string {
-		return path.join(extensionPath, 'dist', 'media');
+	public static setCurrentPanel(webviewPanel: vscode.WebviewPanel, uiOptions?: any) {
+		const rpc = YeomanUIPanel.createRpc(webviewPanel);
+		YeomanUIPanel.currentPanel = new YeomanUIPanel(webviewPanel, rpc, uiOptions);
 	}
 
-	private static create(extensionPath: string, uiOptions?: any) {
-		const panel = vscode.window.createWebviewPanel(
+	public static createRpc(webviewPanel: vscode.WebviewPanel) {
+		return new RpcExtension(webviewPanel.webview);
+	}
+
+	private static create(uiOptions?: any) {
+		const webviewPanel = vscode.window.createWebviewPanel(
 			YeomanUIPanel.viewType,
 			YEOMAN_UI,
 			vscode.ViewColumn.One,
@@ -84,11 +95,11 @@ export class YeomanUIPanel {
 				enableScripts: true,
 				retainContextWhenHidden : true,
 				// And restrict the webview to only loading content from our extension's `media` directory.
-				localResourceRoots: [vscode.Uri.file(YeomanUIPanel.getMediaPath(extensionPath))]
+				localResourceRoots: [vscode.Uri.file(YeomanUIPanel.mediaPath)]
 			}
 		);
 		
-		YeomanUIPanel.currentPanel = new YeomanUIPanel(panel, extensionPath, uiOptions);
+		YeomanUIPanel.setCurrentPanel(webviewPanel, uiOptions);
 	}
 
 
@@ -96,17 +107,15 @@ export class YeomanUIPanel {
 	private readonly panel: vscode.WebviewPanel;
 	private readonly logger: IChildLogger = getClassLogger(YeomanUI.name);
 	private rpc: RpcExtension;
-	private readonly extensionPath: string;
 	private disposables: vscode.Disposable[] = [];
 	private genFilter: any;
 	private messages: any;
 
-	public constructor(panel: vscode.WebviewPanel, extensionPath: string, uiOptions: any) {
+	public constructor(panel: vscode.WebviewPanel, rpc: RpcExtension, uiOptions: any) {
 		this.panel = panel;
-		this.extensionPath = extensionPath;
 		this.genFilter = GeneratorFilter.create(_.get(uiOptions, "filter")); 
 		this.messages = _.assign({}, backendMessages, _.get(uiOptions, "messages", {})); 
-		this.rpc = new RpcExtension(this.panel.webview);
+		this.rpc = rpc;
 		const outputChannel: YouiLog = new OutputChannelLog();
 		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.panel, this.genFilter);
 		this.yeomanui = new YeomanUI(this.rpc, vscodeYouiEvents, outputChannel, this.logger, this.genFilter);
@@ -164,10 +173,10 @@ export class YeomanUIPanel {
 	}
 
     private async _update() {
-		let indexHtml: string = await fsextra.readFile(path.join(YeomanUIPanel.getMediaPath(this.extensionPath), 'index.html'), "utf8");
+		let indexHtml: string = await fsextra.readFile(path.join(YeomanUIPanel.mediaPath, 'index.html'), "utf8");
 		if (indexHtml) {
 			// Local path to main script run in the webview
-			const scriptPathOnDisk = vscode.Uri.file(path.join(YeomanUIPanel.getMediaPath(this.extensionPath), path.sep));
+			const scriptPathOnDisk = vscode.Uri.file(path.join(YeomanUIPanel.mediaPath, path.sep));
 			const scriptUri = this.panel.webview.asWebviewUri(scriptPathOnDisk);
 
 			// TODO: very fragile: assuming double quotes and src is first attribute

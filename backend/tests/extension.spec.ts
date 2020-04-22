@@ -2,6 +2,8 @@ import * as mocha from "mocha";
 import { expect } from "chai";
 import * as sinon from "sinon";
 import * as _ from "lodash";
+import * as fsextra from 'fs-extra';
+// import * as wvrpc from "@sap-devx/webview-rpc";
 import { mockVscode } from "./mockUtil";
 
 const oRegisteredCommands = {};
@@ -12,12 +14,37 @@ const testVscode = {
     },
     window: {
         createOutputChannel: () => {},
-        registerWebviewPanelSerializer: () => Promise.resolve()
+        registerWebviewPanelSerializer: () => Promise.resolve(),
+        createWebviewPanel: () => {
+            return {
+                onDidDispose: () => Promise.resolve(),
+                webview: {
+                    onDidReceiveMessage: () => Promise.resolve(),
+                    postMessage: () => Promise.resolve(),
+                    asWebviewUri: () => {
+                        return {
+                            toString: () => {}
+                        };
+                    }
+                }
+            };
+        }
+    },
+    ViewColumn: {
+        One: 1
+    },
+    Uri: {
+        file: () => {}
+    },
+    Webview: {
+        onDidReceiveMessage: () => Promise.resolve(),
+        postMessage: () => Promise.resolve()
     }
 };
 mockVscode(testVscode, "src/extension.ts");
 import * as extension from "../src/extension";
 import * as loggerWrapper from "../src/logger/logger-wrapper";
+import { window } from "vscode";
 
 describe('extension unit test', () => {
     let sandbox: any;
@@ -26,6 +53,7 @@ describe('extension unit test', () => {
     let yeomanUiPanelMock: any;
     let yeomanUiMock: any;
     let loggerWrapperMock: any;
+    let fsextraMock: any;
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -42,6 +70,7 @@ describe('extension unit test', () => {
         _.set(extension.YeomanUIPanel, "currentPanel.yeomanui", {toggleOutput: () => true});
         yeomanUiMock = sandbox.mock(extension.YeomanUIPanel.currentPanel.yeomanui);
         loggerWrapperMock = sandbox.mock(loggerWrapper);
+        fsextraMock = sandbox.mock(fsextra);
     });
 
     afterEach(() => {
@@ -50,13 +79,11 @@ describe('extension unit test', () => {
         yeomanUiPanelMock.verify();
         yeomanUiMock.verify();
         loggerWrapperMock.verify();
+        fsextraMock.verify();
     });
 
     describe('activate', () => {
-        let testContext: any;
-        beforeEach(() => {
-            testContext = { subscriptions: [], extensionPath: "testExtensionpath" };
-        });
+        const testContext: any = { subscriptions: [], extensionPath: "testExtensionpath" };
 
         it("commands registration", () => {
             loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
@@ -68,19 +95,11 @@ describe('extension unit test', () => {
             expect(_.get(oRegisteredCommands, "yeomanUI.toggleOutput")).to.be.not.undefined;
         });
 
-        it("execution loadYeomanUI command", () => {
-            loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
-            extension.activate(testContext);
-            const loadYeomanUICommand = _.get(oRegisteredCommands, "loadYeomanUI");
-            yeomanUiPanelMock.expects("create");
-            loadYeomanUICommand();
-        });
-
         it("logger failure on extenion activation", () => {
             const consoleMock = sandbox.mock(console);
             loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges").throws(new Error("activation error"));
             consoleMock.expects("error").withExactArgs('Extension activation failed due to Logger configuration failure:', "activation error");
-            extension.activate(testContext);
+            extension.activate(null);
         });
     });
 
@@ -92,7 +111,7 @@ describe('extension unit test', () => {
     });
 
     describe("YeomanUIPanel.toggleOutput", () => {
-        it("YeomanUIPanel.currentPanel.yeomanui does not exist", () => {
+        it("YeomanUIPanel.currentPanel.yeomanui not exist", () => {
             _.set(extension.YeomanUIPanel, "currentPanel.yeomanui", undefined);
             yeomanUiMock.expects("toggleOutput").never();
             extension.YeomanUIPanel.toggleOutput();
@@ -101,6 +120,25 @@ describe('extension unit test', () => {
         it("YeomanUIPanel.currentPanel.yeomanui exists", () => {
             yeomanUiMock.expects("toggleOutput");
             extension.YeomanUIPanel.toggleOutput();
+        });
+    });
+
+    describe("YeomanUIPanel.loadYeomanUI", () => {
+        beforeEach(() => {
+            extension.YeomanUIPanel.setPaths("testExtensionPath");
+            loggerWrapperMock.expects("getClassLogger").returns({});
+            fsextraMock.expects("readFile").resolves("test file content");
+            yeomanUiPanelMock.expects("createRpc").returns({invoke: () => Promise.resolve(), setResponseTimeout: () => Promise.resolve(), registerMethod: () => Promise.resolve()});
+        });
+
+        it("YeomanUIPanel.currentPanel.panel not exists", () => {
+            _.set(extension.YeomanUIPanel, "currentPanel.panel", undefined);
+            extension.YeomanUIPanel.loadYeomanUI();
+        });
+
+        it("YeomanUIPanel.currentPanel.yeomanui exists", () => {
+            _.set(extension.YeomanUIPanel, "currentPanel.panel", {dispose: () => {}});
+            extension.YeomanUIPanel.loadYeomanUI();
         });
     });
 });
