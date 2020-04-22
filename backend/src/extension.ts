@@ -30,7 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.window.registerWebviewPanelSerializer(YeomanUIPanel.viewType, {
 		async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
-			YeomanUIPanel.revive(webviewPanel, context.extensionPath, state);
+			YeomanUIPanel.currentPanel = new YeomanUIPanel(webviewPanel, context.extensionPath, state);
 		}
 	});
 }
@@ -40,7 +40,7 @@ export function getOutputChannel(): vscode.OutputChannel {
 	if (!channel) {
 		channel = vscode.window.createOutputChannel(`${YEOMAN_UI}.Generators`);
 	}
-	
+
 	return channel;
 }
 
@@ -53,22 +53,14 @@ export class YeomanUIPanel {
 	 */
 	public static readonly viewType = 'yeomanui';
 	public static currentPanel: YeomanUIPanel;
-	private static genFilter: GeneratorFilter;
-	private static messages: any;
 
-	public static revive(panel: vscode.WebviewPanel, extensionPath: string, state: any) {
-		YeomanUIPanel.setUIOptions(state); 
-		YeomanUIPanel.currentPanel = new YeomanUIPanel(panel, extensionPath);
-	}
-
-	public static loadYeomanUI(options?: any) {
+	public static loadYeomanUI(uiOptions?: any) {
 		const displayedPanel = _.get(YeomanUIPanel, "currentPanel.panel");
 		if (displayedPanel) {
 			displayedPanel.dispose();
 		}
 	
-		YeomanUIPanel.setUIOptions(options); 
-		YeomanUIPanel.create(_context.extensionPath);
+		YeomanUIPanel.create(_context.extensionPath, uiOptions);
 	}
 
 	public static toggleOutput() {
@@ -78,16 +70,11 @@ export class YeomanUIPanel {
 		}
 	}
 
-	private static setUIOptions(options?: any) {
-		YeomanUIPanel.genFilter = GeneratorFilter.create(_.get(options, "filter")); 
-		YeomanUIPanel.messages = YeomanUIPanel.getUIMessages(options);
-	}
-
 	private static getMediaPath(extensionPath: string): string {
 		return path.join(extensionPath, 'dist', 'media');
 	}
 
-	private static create(extensionPath: string) {
+	private static create(extensionPath: string, uiOptions?: any) {
 		const panel = vscode.window.createWebviewPanel(
 			YeomanUIPanel.viewType,
 			YEOMAN_UI,
@@ -100,11 +87,8 @@ export class YeomanUIPanel {
 				localResourceRoots: [vscode.Uri.file(YeomanUIPanel.getMediaPath(extensionPath))]
 			}
 		);
-		YeomanUIPanel.currentPanel = new YeomanUIPanel(panel, extensionPath);
-	}
-
-	private static getUIMessages(options?: any) {
-		return _.assign({}, backendMessages, _.get(options, "messages", {}));
+		
+		YeomanUIPanel.currentPanel = new YeomanUIPanel(panel, extensionPath, uiOptions);
 	}
 
 
@@ -114,14 +98,18 @@ export class YeomanUIPanel {
 	private rpc: RpcExtension;
 	private readonly extensionPath: string;
 	private disposables: vscode.Disposable[] = [];
+	private genFilter: any;
+	private messages: any;
 
-	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
+	public constructor(panel: vscode.WebviewPanel, extensionPath: string, uiOptions: any) {
 		this.panel = panel;
 		this.extensionPath = extensionPath;
+		this.genFilter = GeneratorFilter.create(_.get(uiOptions, "filter")); 
+		this.messages = _.assign({}, backendMessages, _.get(uiOptions, "messages", {})); 
 		this.rpc = new RpcExtension(this.panel.webview);
 		const outputChannel: YouiLog = new OutputChannelLog();
-		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.panel, YeomanUIPanel.genFilter);
-		this.yeomanui = new YeomanUI(this.rpc, vscodeYouiEvents, outputChannel, this.logger, YeomanUIPanel.genFilter);
+		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.panel, this.genFilter);
+		this.yeomanui = new YeomanUI(this.rpc, vscodeYouiEvents, outputChannel, this.logger, this.genFilter);
 		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
 		this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
 
@@ -175,10 +163,6 @@ export class YeomanUIPanel {
 		}
 	}
 
-	private setState(options: any): Promise<void> {
-		return this.rpc ? this.rpc.invoke("setState", [options]) : Promise.resolve();
-	}
-
     private async _update() {
 		let indexHtml: string = await fsextra.readFile(path.join(YeomanUIPanel.getMediaPath(this.extensionPath), 'index.html'), "utf8");
 		if (indexHtml) {
@@ -193,9 +177,9 @@ export class YeomanUIPanel {
 			indexHtml = indexHtml.replace(/<img src=/g, `<img src=${scriptUri.toString()}`);
 		}
 		
-		this.panel.title = _.get(YeomanUIPanel.messages, "panel_title");
+		this.panel.title = this.messages.panel_title;
 		this.panel.webview.html = indexHtml;
 
-		await this.setState({messages: YeomanUIPanel.messages, filter: YeomanUIPanel.genFilter});
+		await this.rpc.invoke("setState", [{messages: this.messages, filter: this.genFilter}]);
 	}
 }

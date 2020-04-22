@@ -5,14 +5,13 @@ import * as _ from "lodash";
 import { mockVscode } from "./mockUtil";
 
 const oRegisteredCommands = {};
-const oOutputChannel = {};
 const testVscode = {
     commands: {
         registerCommand: (id: string, cmd: any) => { _.set(oRegisteredCommands, id, cmd); return Promise.resolve(oRegisteredCommands); },
         executeCommand: () => Promise.reject()
     },
     window: {
-        createOutputChannel: (name: string) => { _.set(oOutputChannel, 'name', name); return oOutputChannel;},
+        createOutputChannel: () => {},
         registerWebviewPanelSerializer: () => Promise.resolve()
     }
 };
@@ -74,16 +73,7 @@ describe('extension unit test', () => {
             extension.activate(testContext);
             const loadYeomanUICommand = _.get(oRegisteredCommands, "loadYeomanUI");
             yeomanUiPanelMock.expects("create");
-            // yeomanUiPanelMock.expects("create").withArgs(testContext.extensionPath);
             loadYeomanUICommand();
-        });
-
-        it("execution yeomanui.toggleOutput command", () => {
-            loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
-            extension.activate(testContext);
-            const yeomanUIToggleOutputCommand = _.get(oRegisteredCommands, "yeomanUI.toggleOutput");
-            yeomanUiMock.expects("toggleOutput");
-            yeomanUIToggleOutputCommand();
         });
 
         it("logger failure on extenion activation", () => {
@@ -94,12 +84,23 @@ describe('extension unit test', () => {
         });
     });
 
-    describe('getOutputChannel', () => {
-        it("channel not exist", () => {
-            const chanel = extension.getOutputChannel();
-            expect(chanel).to.be.equal(oOutputChannel);
-        });
-
+    it("getOutputChannel", () => {
+        const oOutputChannel = {};
+        windowMock.expects("createOutputChannel").once().returns(oOutputChannel);
+        expect(oOutputChannel).to.be.equal(extension.getOutputChannel());
+        expect(oOutputChannel).to.be.equal(extension.getOutputChannel());
     });
 
+    describe("YeomanUIPanel.toggleOutput", () => {
+        it("YeomanUIPanel.currentPanel.yeomanui does not exist", () => {
+            _.set(extension.YeomanUIPanel, "currentPanel.yeomanui", undefined);
+            yeomanUiMock.expects("toggleOutput").never();
+            extension.YeomanUIPanel.toggleOutput();
+        });
+
+        it("YeomanUIPanel.currentPanel.yeomanui exists", () => {
+            yeomanUiMock.expects("toggleOutput");
+            extension.YeomanUIPanel.toggleOutput();
+        });
+    });
 });
