@@ -10,7 +10,7 @@ const oRegisteredCommands = {};
 const testVscode = {
     commands: {
         registerCommand: (id: string, cmd: any) => { _.set(oRegisteredCommands, id, cmd); return Promise.resolve(oRegisteredCommands); },
-        executeCommand: () => Promise.reject()
+        executeCommand: () => Promise.resolve()
     },
     window: {
         showOpenDialog: () => {},
@@ -18,6 +18,7 @@ const testVscode = {
         registerWebviewPanelSerializer: () => Promise.resolve(),
         createWebviewPanel: () => {
             return {
+                onDidChangeViewState: () => Promise.resolve(),
                 onDidDispose: () => Promise.resolve(),
                 webview: {
                     onDidReceiveMessage: () => Promise.resolve(),

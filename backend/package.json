@@ -43,7 +43,7 @@
 				{
 					"command": "yeomanUI.toggleOutput",
 					"group": "navigation",
-					"when": "focusedView === yeomanui"
+					"when": "yeomanUI.Focused"
 				}
 			]
 		},

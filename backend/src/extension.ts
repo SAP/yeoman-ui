@@ -51,7 +51,7 @@ export class YeomanUIPanel {
 	/**
 	 * Track the currently panel. Only allow a single panel to exist at a time.
 	 */
-	public static readonly viewType = 'yeomanui';
+	public static readonly viewType = "yeomanui";
 	public static extensionPath: string;
 	public static currentPanel: YeomanUIPanel;
 	private static mediaPath: string;
@@ -126,7 +126,23 @@ export class YeomanUIPanel {
 		// Set the webview's initial html content
 		this._update();
 
+		// Set the context (yeoman-ui is focused)
+		this.setFocused(this.panel.active);
+
 		this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
+
+		// Update the content based on view changes
+		this.panel.onDidChangeViewState(
+			e => {
+				this.setFocused(this.panel.active);
+			},
+			null,
+			this.disposables
+		);
+	}
+
+	private setFocused(focused: boolean) {
+		vscode.commands.executeCommand('setContext', 'yeomanUI.Focused', focused);
 	}
 
 	private async showOpenFileDialog(currentPath: string): Promise<string> {
@@ -160,8 +176,10 @@ export class YeomanUIPanel {
 	}
 	
 	private dispose() {
+		this.setFocused(false);
+		
 		YeomanUIPanel.currentPanel = undefined;
-
+		
 		// Clean up our resources
 		this.panel.dispose();
 
