@@ -5,7 +5,7 @@
 	"license": "Apache 2.0",
 	"description": "Provide rich user experience for Yeoman generators using VSCode extension or the browser",
 	"repository": "https://github.com/SAP/yeoman-ui",
-	"version": "0.0.76",
+	"version": "0.0.77",
 	"engines": {
 		"vscode": "^1.39.2"
 	},
@@ -13,8 +13,8 @@
 		"Other"
 	],
 	"activationEvents": [
-		"*",
-		"onCommand:loadYeomanUI"
+		"onCommand:loadYeomanUI",
+		"onWebviewPanel:yeomanui"
 	],
 	"main": "./dist/extension",
 	"contributes": {
@@ -43,7 +43,7 @@
 				{
 					"command": "yeomanUI.toggleOutput",
 					"group": "navigation",
-					"when": "focusedView === yeomanui"
+					"when": "yeomanUI.Focused"
 				}
 			]
 		},
