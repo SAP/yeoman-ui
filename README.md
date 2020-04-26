@@ -59,21 +59,16 @@ To develop and contribute you can build & install each package seperatly. Instru
 * transformer function not supported.
 
 ## How to obtain support
-To get more help, support and information please open a github issue.
+To get more help, support and information please open a github [issue](https://github.com/SAP/yeoman-ui/issues).
 
 ## Contributing
 Contributing information can be found in the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 ## TODO
-* provide yeoman generator best practice guide (also provide example)
-* use debounce when watching changes to input fields
 * implement ability for yeoman-ui to call methods in vscode extensions
     * support hook for executing commands after finish
     * support open readme.md file by default (with turn off setting)
 
-* support back
-* enable configuring destination root
-* support custom question rendering: generator set the ui renderer, example: tiles instead of dropdown, radio buttons instead of 
 * support extensible question type custom user interfaces for complex operations (e.g. choose odata source)
 * support inquirer plugins (e.g. date/time)
 
