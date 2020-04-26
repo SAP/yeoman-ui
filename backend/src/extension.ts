@@ -36,9 +36,9 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 let channel: vscode.OutputChannel;
-export function getOutputChannel(): vscode.OutputChannel {
+export function getOutputChannel(channelName: string): vscode.OutputChannel {
 	if (!channel) {
-		channel = vscode.window.createOutputChannel(`${YEOMAN_UI}.Generators`);
+		channel = vscode.window.createOutputChannel(`${YEOMAN_UI}.${channelName}`);
 	}
 
 	return channel;
@@ -117,9 +117,9 @@ export class YeomanUIPanel {
 		this.genFilter = GeneratorFilter.create(_.get(uiOptions, "filter")); 
 		this.messages = _.assign({}, backendMessages, _.get(uiOptions, "messages", {})); 
 		this.rpc = rpc;
-		const outputChannel: YouiLog = new OutputChannelLog();
+		const outputChannel: YouiLog = new OutputChannelLog(this.messages.channel_name);
 		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.panel, this.genFilter);
-		this.yeomanui = new YeomanUI(this.rpc, vscodeYouiEvents, outputChannel, this.logger, this.genFilter);
+		this.yeomanui = new YeomanUI(this.rpc, vscodeYouiEvents, outputChannel, this.logger, {genFilter: this.genFilter, messages: this.messages});
 		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
 		this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
 
