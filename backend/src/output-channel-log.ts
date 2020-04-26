@@ -3,11 +3,7 @@ import { getOutputChannel } from "./extension";
 const stripAnsi = require("strip-ansi");
 
 export class OutputChannelLog implements YouiLog {
-    private channel: import("vscode").OutputChannel;
-
-    public constructor(channelName: string) {
-        this.channel = getOutputChannel(channelName);
-    }
+    public constructor(private channelName: string) {}
 
     public log(value: string): void {
         this.appendLine(value);
@@ -37,11 +33,11 @@ export class OutputChannelLog implements YouiLog {
         this.appendLine(value);
     }
     public showOutput():boolean {
-        this.channel.show();
+        getOutputChannel(this.channelName).show();
         return true;
     }
 
     private appendLine(value: string) {
-        this.channel.appendLine(stripAnsi(value));
+        getOutputChannel(this.channelName).appendLine(stripAnsi(value));
     }
 }
