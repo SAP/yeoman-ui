@@ -110,8 +110,8 @@ describe('extension unit test', () => {
     it("getOutputChannel", () => {
         const oOutputChannel = {};
         windowMock.expects("createOutputChannel").once().returns(oOutputChannel);
-        expect(oOutputChannel).to.be.equal(extension.getOutputChannel());
-        expect(oOutputChannel).to.be.equal(extension.getOutputChannel());
+        expect(oOutputChannel).to.be.equal(extension.getOutputChannel("generators"));
+        expect(oOutputChannel).to.be.equal(extension.getOutputChannel("generators"));
     });
 
     describe("YeomanUIPanel.toggleOutput", () => {

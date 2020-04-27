@@ -35,6 +35,7 @@ export class YeomanUI {
     return _.isFunction(value) ? "__Function" : value;
   }
 
+  private uiOptions: any;
   private cwd: string;
   private rpc: IRpc;
   private youiEvents: YouiEvents;
@@ -45,12 +46,11 @@ export class YeomanUI {
   private gen: Generator | undefined;
   private promptCount: number;
   private currentQuestions: Environment.Adapter.Questions<any>;
-  private genFilter: GeneratorFilter;
   private generatorName: string;
   private replayUtils: ReplayUtils;
   private customQuestionEventHandlers: Map<string, Map<string, Function>>;
 
-  constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, genFilter: GeneratorFilter, outputPath: string = YeomanUI.PROJECTS) {
+  constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
     this.rpc = rpc;
     if (!this.rpc) {
       throw new Error("rpc must be set");
@@ -74,7 +74,7 @@ export class YeomanUI {
     this.promptCount = 0;
     this.genMeta = {};
     this.currentQuestions = {};
-    this.setGenFilter(genFilter);
+    this.uiOptions = uiOptions;
     this.customQuestionEventHandlers = new Map();
     this.setCwd(outputPath);
   }
@@ -86,10 +86,6 @@ export class YeomanUI {
       entry = this.customQuestionEventHandlers.get(questionType);
     }
     entry.set(methodName, handler);
-  }
-
-  public setGenFilter(genFilter: GeneratorFilter) {
-    this.genFilter = genFilter ? genFilter : GeneratorFilter.create();
   }
 
   public async logError(error: any, prefixMessage?: string) {
@@ -106,9 +102,10 @@ export class YeomanUI {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
 
+    const that = this;
     const promise: Promise<IQuestionsPrompt> = new Promise(resolve => {
       const env: Environment.Options = this.getEnv();
-      env.lookup(async () => this.onEnvLookup(env, resolve, this.genFilter));
+      env.lookup(async () => this.onEnvLookup(env, resolve, that.uiOptions.genFilter));
     });
 
     return promise;
@@ -338,7 +335,7 @@ export class YeomanUI {
 
     const questions: any[] = [];
 
-    if (genFilter.type !== GeneratorType.module) {
+    if (genFilter.type === GeneratorType.project) {
       const defaultPath = this.getCwd();
       const targetFolderQuestion: any = {
         type: "input",
@@ -366,7 +363,7 @@ export class YeomanUI {
       type: "list",
       guiType: "tiles",
       name: "generator",
-      message: "Select Generator",
+      message: this.uiOptions.messages.select_generator_question_message,
       choices: _.compact(generatorChoices)
     };
     questions.push(generatorQuestion);
@@ -374,7 +371,7 @@ export class YeomanUI {
     return questions;
   }
 
-  private async getGeneratorChoice(genName: string, filter?: GeneratorFilter): Promise<any> {
+  private async getGeneratorChoice(genName: string, filter: GeneratorFilter): Promise<any> {
     let packageJson: any;
     const genPackagePath: string = this.getGenMetaPackagePath(genName);
   
