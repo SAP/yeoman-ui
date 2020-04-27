@@ -38,7 +38,7 @@ class YeomanUIWebSocketServer {
       const logger: YouiLog = new ServerLog(this.rpc);
       const childLogger = {debug: () => {}, error: () => {}, fatal: () => {}, warn: () => {}, info: () => {}, trace: () => {}, getChildLogger: () => {return {} as IChildLogger;}};
       const youiEvents: YouiEvents = new ServerYouiEvents(this.rpc);
-      this.yeomanui = new YeomanUI(this.rpc, youiEvents, logger, childLogger as IChildLogger, GeneratorFilter.create());
+      this.yeomanui = new YeomanUI(this.rpc, youiEvents, logger, childLogger as IChildLogger, {genFilter: GeneratorFilter.create(), messages: backendMessages});
       this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.mockFolderDialog.bind(this));
       this.yeomanui.setState({messages: backendMessages});
     });
