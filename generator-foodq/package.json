@@ -10,7 +10,8 @@
     "directory": "generator-foodq"
   },
   "files": [
-    "generators"
+    "generators",
+    "yeoman.png"
   ],
   "keywords": [
     "yeoman-generator"
