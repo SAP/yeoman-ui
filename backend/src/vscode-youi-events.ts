@@ -16,9 +16,9 @@ export class VSCodeYouiEvents implements YouiEvents {
         this.genFilter = genFilter;    
     }
 
-    public doGeneratorDone(success: boolean, message: string, targetPath: string = ""): void {
+    public doGeneratorDone(success: boolean, message: string, targetFolderPath?: string): void {
         this.doClose();
-        this.showDoneMessage(success, message, targetPath);
+        this.showDoneMessage(success, message, targetFolderPath);
     }
 
     public doGeneratorInstall(): void {
@@ -52,7 +52,7 @@ export class VSCodeYouiEvents implements YouiEvents {
         });
     }
 
-    private showDoneMessage(success: boolean, errorMmessage: string, targetPath: string): Thenable<any> {
+    private showDoneMessage(success: boolean, errorMmessage: string, targetFolderPath?: string): Thenable<any> {
         VSCodeYouiEvents.installing = false;
         
         if (success) {
@@ -60,7 +60,7 @@ export class VSCodeYouiEvents implements YouiEvents {
             const openInNewWorkspace: any = "Open in New Workspace";
             const items: string[] = [];
             
-            const targetFolderUri: vscode.Uri = vscode.Uri.file(targetPath);
+            const targetFolderUri: vscode.Uri = vscode.Uri.file(targetFolderPath);
 
             if (this.genFilter.type !== GeneratorType.module) {
                 const workspacePath = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
