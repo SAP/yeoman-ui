@@ -18,7 +18,6 @@ import { GeneratorType, GeneratorFilter } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
 
-
 export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
 }
@@ -111,6 +110,24 @@ export class YeomanUI {
     return promise;
   }
 
+  private async getChildDirectories(folderPath: string) {
+    const childDirs: string[] = [];
+    const result = {targetFolderPath: folderPath, childDirs};
+
+    try {
+      for (const file of await fsextra.readdir(folderPath)) {
+        const resourcePath: string = path.join(folderPath, file);
+        if ((await fsextra.stat(resourcePath)).isDirectory()) {
+          result.childDirs.push(resourcePath);
+        }
+      }
+    } catch (error) {
+      result.childDirs = [];
+    }
+
+    return result;
+  }
+
   public async runGenerator(generatorName: string) {
     this.generatorName = generatorName;
     // TODO: should create and set target dir only after user has selected a generator;
@@ -119,6 +136,7 @@ export class YeomanUI {
     try {
       const targetFolder = this.getCwd();
       await fsextra.mkdirs(targetFolder);
+      const dirsBefore = await this.getChildDirectories(targetFolder);
       const env: Environment = Environment.createEnv(undefined, {}, this.youiAdapter);
       const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
       // TODO: support sub-generators
@@ -141,9 +159,10 @@ export class YeomanUI {
            https://yeoman.github.io/generator/Generator.html#run
          ... but .d.ts hasn't been updated for a while:
            https://www.npmjs.com/package/@types/yeoman-generator */
-        this.gen.run((err) => {
+        this.gen.run(async (err) => {
         if (!err) {
-          this.onGeneratorSuccess(generatorName, this.gen.destinationRoot());
+          const dirsAfter = await this.getChildDirectories(this.gen.destinationRoot());
+          this.onGeneratorSuccess(generatorName, dirsBefore, dirsAfter);
         } 
       });
       this.gen.on('error', (error: any) => {
@@ -253,10 +272,10 @@ export class YeomanUI {
     return (firstQuestionName ? _.startCase(firstQuestionName) : `Step ${this.promptCount}`);
   }
 
-  private onGeneratorSuccess(generatorName: string, destinationRoot: string) {
+  private onGeneratorSuccess(generatorName: string, dirsBefore?: any, dirsAfter?: any) {
     const message = `The '${generatorName}' project has been generated.`;
-    this.logger.debug("done running yeomanui! " + message + ` You can find it at ${destinationRoot}`);
-    this.youiEvents.doGeneratorDone(true, message, destinationRoot);
+    this.logger.debug("done running yeomanui! " + message + ` You can find it at ${dirsAfter.targetFolderPath}`);
+    this.youiEvents.doGeneratorDone(true, message, dirsBefore, dirsAfter);
   }
 
   private async onGeneratorFailure(generatorName: string, error: any) {

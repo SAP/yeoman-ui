@@ -717,9 +717,10 @@ describe('yeomanui unit test', () => {
         });
 
         it("onGeneratorSuccess", () => {
-            yeomanUi["onGeneratorSuccess"]("testGenName", "testDestinationRoot");
+            const result = {targetFolderPath: "testDestinationRoot"};
+            yeomanUi["onGeneratorSuccess"]("testGenName", result, result);
             // tslint:disable-next-line: no-unused-expression
-            expect(doGeneratorDoneSpy.calledWith(true, "The 'testGenName' project has been generated.", "testDestinationRoot")).to.be.true;
+            expect(doGeneratorDoneSpy.calledWith(true, "The 'testGenName' project has been generated.", result, result)).to.be.true;
         });
 
         it("onGeneratorFailure", async () => {

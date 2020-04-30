@@ -3,7 +3,7 @@ import { getOutputChannel } from "./extension";
 const stripAnsi = require("strip-ansi");
 
 export class OutputChannelLog implements YouiLog {
-    public constructor(private channelName: string) {}
+    public constructor() {}
 
     public log(value: string): void {
         this.appendLine(value);
@@ -33,11 +33,11 @@ export class OutputChannelLog implements YouiLog {
         this.appendLine(value);
     }
     public showOutput():boolean {
-        getOutputChannel(this.channelName).show();
+        getOutputChannel().show();
         return true;
     }
 
     private appendLine(value: string) {
-        getOutputChannel(this.channelName).appendLine(stripAnsi(value));
+        getOutputChannel().appendLine(stripAnsi(value));
     }
 }
