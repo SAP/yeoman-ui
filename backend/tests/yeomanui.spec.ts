@@ -717,16 +717,16 @@ describe('yeomanui unit test', () => {
         });
 
         it("onGeneratorSuccess - one dir was created", () => {
-            const beforeGen = {targetFolderPath: "testDestinationRoot", dirs: ["dirparh1"]};
-            const afterGen = {targetFolderPath: "testDestinationRoot", dirs: ["dirparh1", "dirpath2"]};
+            const beforeGen = {targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1"]};
+            const afterGen = {targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1", "dirpath2"]};
             yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
             // tslint:disable-next-line: no-unused-expression
             expect(doGeneratorDoneSpy.calledWith(true, "The 'testGenName' project has been generated.", "dirpath2")).to.be.true;
         });
 
         it("onGeneratorSuccess - two dirs were created", () => {
-            const beforeGen = {targetFolderPath: "testDestinationRoot", dirs: ["dirparh1"]};
-            const afterGen = {targetFolderPath: "testDestinationRoot", dirs: ["dirparh1", "dirpath2", "dirpath3"]};
+            const beforeGen = {targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1"]};
+            const afterGen = {targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1", "dirpath2", "dirpath3"]};
             yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
             // tslint:disable-next-line: no-unused-expression
             expect(doGeneratorDoneSpy.calledWith(true, "The 'testGenName' project has been generated.", "testDestinationRoot")).to.be.true;

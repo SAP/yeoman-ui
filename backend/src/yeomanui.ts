@@ -275,7 +275,7 @@ export class YeomanUI {
   private onGeneratorSuccess(generatorName: string, reourcesBeforeGen?: any, resourcesAfterGen?: any) {
     let targetFolderPath: string = _.get(resourcesAfterGen, "targetFolderPath");
     if (_.get(reourcesBeforeGen, "targetFolderPath") === targetFolderPath) {
-        const newDirs: string[] = _.difference(_.get(resourcesAfterGen, "dirs"), _.get(reourcesBeforeGen, "dirs"));
+        const newDirs: string[] = _.difference(_.get(resourcesAfterGen, "childDirs"), _.get(reourcesBeforeGen, "childDirs"));
         if (_.size(newDirs) === 1) {
             targetFolderPath = newDirs[0];
         }
