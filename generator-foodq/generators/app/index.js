@@ -267,7 +267,7 @@ module.exports = class extends Generator {
       },
       {
         name: "email",
-        message: "GitHub username",
+        message: "GitHub user name",
         store: true,
         validate: (value, answers) => {
           return (value.length > 0 ? true : "Mandatory field");
