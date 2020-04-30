@@ -1,4 +1,4 @@
 export interface YouiEvents {
-  doGeneratorDone(success: boolean, message: string, dirsBefore?: any, dirsAfter?: any): void;
+  doGeneratorDone(success: boolean, message: string, targetFolderPath?: string): void;
   doGeneratorInstall(): void;
 }

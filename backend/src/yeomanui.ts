@@ -272,10 +272,18 @@ export class YeomanUI {
     return (firstQuestionName ? _.startCase(firstQuestionName) : `Step ${this.promptCount}`);
   }
 
-  private onGeneratorSuccess(generatorName: string, dirsBefore?: any, dirsAfter?: any) {
+  private onGeneratorSuccess(generatorName: string, reourcesBeforeGen?: any, resourcesAfterGen?: any) {
+    let targetFolderPath: string = _.get(resourcesAfterGen, "targetFolderPath");
+    if (_.get(reourcesBeforeGen, "targetFolderPath") === targetFolderPath) {
+        const newDirs: string[] = _.difference(_.get(resourcesAfterGen, "dirs"), _.get(reourcesBeforeGen, "dirs"));
+        if (_.size(newDirs) === 1) {
+            targetFolderPath = newDirs[0];
+        }
+    } 
+
     const message = `The '${generatorName}' project has been generated.`;
-    this.logger.debug("done running yeomanui! " + message + ` You can find it at ${dirsAfter.targetFolderPath}`);
-    this.youiEvents.doGeneratorDone(true, message, dirsBefore, dirsAfter);
+    this.logger.debug("done running yeomanui! " + message + ` You can find it at ${targetFolderPath}`);
+    this.youiEvents.doGeneratorDone(true, message, targetFolderPath);
   }
 
   private async onGeneratorFailure(generatorName: string, error: any) {

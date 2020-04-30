@@ -16,11 +16,11 @@ rules:
   no-implicit-dependencies: false
   # Causes many errors and **not** auto-fixable
   object-literal-sort-keys: false
-  # We should evaluate enabling this rule
+  # We should  enabling this rule
   no-console: false
-  # We should evaluate enabling this rule
+  # We should  enabling this rule
   no-var-requires: false
-  # We should evaluate enabling this rule
+  # We should  enabling this rule
   no-require-imports: false
   # This is a Java style pattern, and classes can be used as interfaces in TS anyhow...
   interface-name: false
