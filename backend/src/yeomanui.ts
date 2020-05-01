@@ -198,7 +198,7 @@ export class YeomanUI {
     } catch (error) {
       const questionInfo = `Could not update method '${methodName}' in '${questionName}' question in generator '${this.gen.options.namespace}'`;
       const errorMessage = await this.logError(error, questionInfo);
-      return Promise.reject(errorMessage);
+      this.onGeneratorFailure(this.generatorName, errorMessage);
     } 
   }
 
