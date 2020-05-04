@@ -9,7 +9,7 @@
     "report-dir": "./reports/coverage",
     "check-coverage": true,
     "branches": 81.8,
-    "lines": 87.3,
+    "lines": 87.1,
     "functions": 81.3,
-    "statements": 86.8
+    "statements": 86.6
   }

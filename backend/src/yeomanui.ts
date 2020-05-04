@@ -137,9 +137,8 @@ export class YeomanUI {
       const targetFolder = this.getCwd();
       await fsextra.mkdirs(targetFolder);
       const dirsBefore = await this.getChildDirectories(targetFolder);
-      const env: Environment = Environment.createEnv(undefined, {}, this.youiAdapter);
+      const env: Environment = Environment.createEnv(undefined, {newErrorHandler: true}, this.youiAdapter);
       const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
-      // TODO: support sub-generators
       // @ts-ignore
       env.register(meta.resolved, meta.namespace, meta.packagePath);
 
@@ -155,12 +154,11 @@ export class YeomanUI {
       this.promptCount = 0;
       this.gen = (gen as Generator);
       this.gen.destinationRoot(targetFolder);
-      /* Generator.run() returns promise. Sending a callback is deprecated:
-           https://yeoman.github.io/generator/Generator.html#run
-         ... but .d.ts hasn't been updated for a while:
-           https://www.npmjs.com/package/@types/yeoman-generator */
-        this.gen.run(async (err) => {
-        if (!err) {
+      
+      env.run(generatorName, {}, async error => {
+        if (error) {
+          this.onGeneratorFailure(generatorName, error);
+        } else {
           const dirsAfter = await this.getChildDirectories(this.gen.destinationRoot());
           this.onGeneratorSuccess(generatorName, dirsBefore, dirsAfter);
         } 
