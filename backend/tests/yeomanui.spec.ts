@@ -104,7 +104,7 @@ describe('yeomanui unit test', () => {
     const rpc = new TestRpc();
     const outputChannel = new TestOutputChannel();
     const youiEvents = new TestEvents();
-    const yeomanUi: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {genFilter: GeneratorFilter.create(), messages: {select_generator_question_message: "test_question_message"}});
+    const yeomanUi: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {genFilter: GeneratorFilter.create(), messages: {select_generator_question_message: "test_question_message", select_generator_question_hint: "test_question_hint"}});
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -193,6 +193,9 @@ describe('yeomanui unit test', () => {
             const generatorQuestion: any = {
                 type: "list",
                 guiType: "tiles",
+                guiOptions: {
+                    hint: "test_question_hint"
+                },
                 name: "generator",
                 message: "test_question_message",
                 choices: []

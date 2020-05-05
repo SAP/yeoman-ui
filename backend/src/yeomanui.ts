@@ -364,7 +364,10 @@ export class YeomanUI {
       const defaultPath = this.getCwd();
       const targetFolderQuestion: any = {
         type: "input",
-        guiType: "folder-browser",
+        guiOptions: {
+          type: "folder-browser",
+          hint: this.uiOptions.messages.select_target_folder_question_hint
+        },
         name: "generator.target.folder",
         message: "Specify a target folder path",
         default: defaultPath,
@@ -387,6 +390,9 @@ export class YeomanUI {
     const generatorQuestion: any = {
       type: "list",
       guiType: "tiles",
+      guiOptions: {
+        hint: this.uiOptions.messages.select_generator_question_hint
+      },
       name: "generator",
       message: this.uiOptions.messages.select_generator_question_message,
       choices: _.compact(generatorChoices)
