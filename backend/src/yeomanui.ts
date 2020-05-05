@@ -154,17 +154,20 @@ export class YeomanUI {
       this.promptCount = 0;
       this.gen = (gen as Generator);
       this.gen.destinationRoot(targetFolder);
+      let errorFound = false;
       
       this.gen.run(async error => {
-        if (!error) {
+        if (!error && !errorFound) {
           const dirsAfter = await this.getChildDirectories(this.gen.destinationRoot());
           this.onGeneratorSuccess(generatorName, dirsBefore, dirsAfter);
         } 
       });
       this.gen.on('error', (error: any) => {
+        errorFound = true;
         this.onGeneratorFailure(generatorName, error);
       });
       env.on('error', (error: any) => {
+        errorFound = true;
         this.onGeneratorFailure(generatorName, error);
       });
     } catch (error) {
