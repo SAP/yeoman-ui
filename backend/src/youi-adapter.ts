@@ -62,7 +62,7 @@ export class YouiAdapter implements Adapter {
   ): Promise<T2> {
     if (this.yeomanui && questions) {
       const result: any = await (<Promise<T2>>this.yeomanui.showPrompt(questions));
-      if (cb) {
+      if (!_.isEmpty(cb)) {
         try {
           return await cb(result);
         } catch (err) {
