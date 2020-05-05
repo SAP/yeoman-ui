@@ -187,7 +187,8 @@ export class YeomanUI {
           return _.get(question, "name") === questionName;
         });
         if (relevantQuestion) {
-          const customQuestionEventHandler: Function = this.getCustomQuestionEventHandler(relevantQuestion["guiType"], methodName);
+          const guiType= relevantQuestion.guiOptions && relevantQuestion.guiOptions.type ? relevantQuestion.guiOptions.type : relevantQuestion.guiType;
+          const customQuestionEventHandler: Function = this.getCustomQuestionEventHandler(guiType, methodName);
           return _.isUndefined(customQuestionEventHandler) ? 
             await relevantQuestion[methodName].apply(this.gen, params) : 
             await customQuestionEventHandler.apply(this.gen, params);
@@ -497,7 +498,8 @@ export class YeomanUI {
   
   private addCustomQuestionEventHandlers(questions: Environment.Adapter.Questions<any>): void {
     for (const question of (questions as any[])) {
-      const questionHandlers = this.customQuestionEventHandlers.get(question["guiType"]);
+      const guiType= question.guiOptions && question.guiOptions.type ? question.guiOptions.type : question.guiType;
+      const questionHandlers = this.customQuestionEventHandlers.get(guiType);
       if (questionHandlers) {
         questionHandlers.forEach((handler, methodName) => {
           (question as any)[methodName] = handler;
