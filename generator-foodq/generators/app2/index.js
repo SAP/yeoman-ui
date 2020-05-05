@@ -30,7 +30,10 @@ module.exports = class extends Generator {
       },
       {
         type: "list",
-        guiType: "tiles",
+        guiOptions: {
+          type: "tiles",
+          hint: "Select the preferred delivery method"
+        },
         name: "deliveryMethod",
         message: "Delivery method",
         choices: [
@@ -78,7 +81,7 @@ module.exports = class extends Generator {
       {
         type: "number",
         name: "tip",
-        message: "how much would you like to tip?",
+        message: "How much would you like to tip?",
         default: "10"
       }
     ];
