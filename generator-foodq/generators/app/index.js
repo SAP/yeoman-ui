@@ -63,6 +63,9 @@ module.exports = class extends Generator {
         type: 'input',
         name: 'fav_color',
         message: "What's your favorite napkin color?",
+        guiOptions: {
+          hint: "Our recommendation is green"
+        },
         when: (response) => {
           this.log(response.hungry);
           return response.hungry;
@@ -87,7 +90,10 @@ module.exports = class extends Generator {
         },
         type: "number",
         name: "number",
-        message: "How many times have you been in this resturant?"
+        message: "How many times have you been in this resturant?",
+        guiOptions: {
+          hint: "We hope you have been in our resturant many times"
+        },
       },
       {
         when: async response => {
@@ -123,7 +129,9 @@ module.exports = class extends Generator {
         name: "food",
         type: "list",
         message: "",
-        guiType: "tiles",
+        guiOptions: {
+          type: "tiles",
+        },
         choices: [
           { value: "junk-food", name: "Junk Food", description: "It is the best food, but long term, junk food can increase the risk of a heart attack.", homepage: "https://www.betterhealthsolutions.org/junk-food-ruining-body/", image: this._getImage(path.join(this.sourceRoot(), "../images/junk-food.jpg")) },
           { value: "jerk-chicken", name: "Pulled Jerk Chicken", description: "A slow cooked pulled chicken.", image: this._getImage(path.join(this.sourceRoot(), "../images/jerk-chicken.jpeg"))},
@@ -182,14 +190,18 @@ module.exports = class extends Generator {
       },
       {
         type: "input",
-        guiType: "file-browser",
+        guiOptions: {
+          type: "file-browser",
+        },
         name: "uploadMenu",
         message: "Upload menu",
         default: "/"
       },
       {
         type: "input",
-        guiType: "folder-browser",
+        guiOptions: {
+          type: "folder-browser",
+        },
         name: "dump",
         message: "Choose dump folder",
         default: "/"
@@ -234,6 +246,9 @@ module.exports = class extends Generator {
     prompts = [
       {
         type: 'rawlist',
+        guiOptions: {
+          hint: "Select the repository type"
+        },
         name: 'repotype',
         message: 'Git repository type',
         choices: [
@@ -241,12 +256,15 @@ module.exports = class extends Generator {
           'GitLab',
           new Inquirer.Separator(),
           'Bitbucket',
-          new Inquirer.Separator("-*-*-*-*-*-*-*"),
+          new Inquirer.Separator("Text separator"),
           'Gitea'
         ]
       },
       {
         type: 'expand',
+        guiOptions: {
+          hint: "Select the repository permissions"
+        },
         name: 'repoperms',
         message: 'Git repository permissions',
         choices: [
@@ -266,6 +284,9 @@ module.exports = class extends Generator {
         },
       },
       {
+        guiOptions: {
+          hint: "Enter your user name"
+        },
         name: "email",
         message: "GitHub user name",
         store: true,
@@ -275,7 +296,10 @@ module.exports = class extends Generator {
       },
       {
         type: "password",
-        guiType: "login",
+        guiOptions: {
+          type: "login",
+          hint: "Enter your password"
+        },
         name: "password",
         message: "GitHub password",
         mask: '*',
