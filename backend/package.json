@@ -106,7 +106,7 @@
 		"strip-ansi": "^6.0.0",
 		"titleize": "^1.0.1",
 		"ws": "^7.2.5",
-		"yeoman-environment": "2.9.1"
+		"yeoman-environment": "2.9.4"
 	},
 	"devDependencies": {
 		"@types/chai": "^4.2.9",
