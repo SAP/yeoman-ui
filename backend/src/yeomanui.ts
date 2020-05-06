@@ -117,7 +117,8 @@ export class YeomanUI {
       const resPath = path.join(...parts.slice(0, index + 1), YeomanUI.NODE_MODULES);
       return YeomanUI.isWin32 ? resPath : path.join(path.sep, resPath);
     });
-    
+    // TODO: replace or remove this API
+    // it is very slow, takes more than 2 seconds 
     const defaultPaths = env.getNpmPaths();
     return _.uniq(userPaths.concat(defaultPaths));
   }
