@@ -103,11 +103,8 @@ export class YeomanUI {
     // on the other hand, we never look for newly installed generators...
     const that = this;
     const promise: Promise<IQuestionsPrompt> = new Promise(resolve => {
-      const before = Date.now();
       const env: Environment.Options = Environment.createEnv();
       const npmPaths = this.getNpmPaths(env); 
-      const after = Date.now();
-		  console.error(after - before);
       env.lookup({npmPaths}, async () => this.onEnvLookup(env, resolve, that.uiOptions.genFilter));
     });
 
@@ -120,8 +117,9 @@ export class YeomanUI {
       const resPath = path.join(...parts.slice(0, index + 1), YeomanUI.NODE_MODULES);
       return YeomanUI.isWin32 ? resPath : path.join(path.sep, resPath);
     });
-
-    return _.uniq(userPaths.concat(env.getNpmPaths()));
+    
+    const defaultPaths = env.getNpmPaths();
+    return _.uniq(userPaths.concat(defaultPaths));
   }
 
   private async getChildDirectories(folderPath: string) {
