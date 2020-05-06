@@ -13,6 +13,7 @@ import { GeneratorFilter } from './filter';
 import backendMessages from "./messages";
 import { getClassLogger, createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
 import { IChildLogger } from "@vscode-logging/logger";
+import Environment = require('yeoman-environment');
 
 const YEOMAN_UI = "Yeoman UI";
 
