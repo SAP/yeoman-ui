@@ -100,11 +100,10 @@ export class YeomanUI {
   public async getGeneratorsPrompt(): Promise<IQuestionsPrompt> {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
-
     const that = this;
     const promise: Promise<IQuestionsPrompt> = new Promise(resolve => {
-      const env: Environment.Options = this.getEnv();
-      env.lookup(async () => this.onEnvLookup(env, resolve, that.uiOptions.genFilter));
+      const env: Environment.Options = Environment.createEnv();
+      env.lookup({packagePaths: os.homedir()}, async () => this.onEnvLookup(env, resolve, that.uiOptions.genFilter));
     });
 
     return promise;
@@ -291,26 +290,6 @@ export class YeomanUI {
     const messagePrefix = `${generatorName} generator failed.`;
     const errorMessage: string = await this.logError(error, messagePrefix);
     this.youiEvents.doGeneratorDone(false, errorMessage);
-  }
-
-  private getEnv(): Environment.Options {
-    const env: Environment.Options = Environment.createEnv();
-    const envGetNpmPaths: () => any = env.getNpmPaths;
-    const that = this;
-    env.getNpmPaths = function (localOnly:boolean = false) {
-      // Start with the local paths derived by cwd in vscode 
-      // (as opposed to cwd of the plugin host process which is what is used by yeoman/environment)
-      // Walk up the CWD and add `node_modules/` folder lookup on each level
-      const parts: string[] = that.getCwd().split(path.sep);
-      const localPaths = _.map(parts, (part, index) => {
-        const resrpath = path.join(...parts.slice(0, index + 1), YeomanUI.NODE_MODULES);
-        return YeomanUI.isWin32 ? resrpath : path.join(path.sep, resrpath);
-      });
-      const defaultPaths = envGetNpmPaths.call(this, localOnly);
-      
-      return  _.uniq(localPaths.concat(defaultPaths));
-    };
-    return env;
   }
 
   private setGenInstall(gen: any) {
