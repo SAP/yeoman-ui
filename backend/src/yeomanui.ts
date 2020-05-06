@@ -477,7 +477,7 @@ export class YeomanUI {
 
   /**
    * 
-   * @param quesions 
+   * @param questions 
    * returns a deep copy of the original questions, but replaces Function properties with a placeholder
    * 
    * Functions are lost when being passed to client (using JSON.Stringify)
