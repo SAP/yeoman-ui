@@ -104,7 +104,7 @@ export class YeomanUI {
     const that = this;
     const promise: Promise<IQuestionsPrompt> = new Promise(resolve => {
       const env: Environment.Options = Environment.createEnv();
-      env.lookup({npmPath: this.getNpmPaths()}, async () => this.onEnvLookup(env, resolve, that.uiOptions.genFilter));
+      env.lookup({npmPaths: this.getNpmPaths()}, async () => this.onEnvLookup(env, resolve, that.uiOptions.genFilter));
     });
 
     return promise;
@@ -197,7 +197,7 @@ export class YeomanUI {
           return _.get(question, "name") === questionName;
         });
         if (relevantQuestion) {
-          const guiType= relevantQuestion.guiOptions && relevantQuestion.guiOptions.type ? relevantQuestion.guiOptions.type : relevantQuestion.guiType;
+          const guiType = _.get(relevantQuestion, "guiOptions.type", relevantQuestion.guiType);
           const customQuestionEventHandler: Function = this.getCustomQuestionEventHandler(guiType, methodName);
           return _.isUndefined(customQuestionEventHandler) ? 
             await relevantQuestion[methodName].apply(this.gen, params) : 
@@ -488,7 +488,7 @@ export class YeomanUI {
   
   private addCustomQuestionEventHandlers(questions: Environment.Adapter.Questions<any>): void {
     for (const question of (questions as any[])) {
-      const guiType= question.guiOptions && question.guiOptions.type ? question.guiOptions.type : question.guiType;
+      const guiType = _.get(question, "guiOptions.type", question.guiType);
       const questionHandlers = this.customQuestionEventHandlers.get(guiType);
       if (questionHandlers) {
         questionHandlers.forEach((handler, methodName) => {
