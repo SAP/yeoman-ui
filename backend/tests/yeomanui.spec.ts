@@ -143,7 +143,7 @@ describe('yeomanui unit test', () => {
         }
     });
 
-    describe.skip("receiveIsWebviewReady", () => {
+    describe("receiveIsWebviewReady", () => {
         it("flow is successfull", async () => {
             rpcMock.expects("invoke").withArgs("showPrompt").resolves({generator: "testGenerator"});
             youiEventsMock.expects("doGeneratorDone").withArgs(false);
@@ -165,17 +165,20 @@ describe('yeomanui unit test', () => {
         });
     });
 
-    describe.skip("getGenerators", () => {
+    describe("getGenerators", () => {
         let envMock: any;
 
         const environment = {
-            lookup: async (cb: any) => {
+            lookup: async (options: any, cb: any) => {
                 return cb.call();
             },
             getGeneratorsMeta: (): any => {
                 return {};
             },
             getGeneratorNames: (): string[] => {
+                return [];
+            },
+            getNpmPaths: (): string[] => {
                 return [];
             }
         };
