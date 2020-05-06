@@ -27,7 +27,8 @@ export class YeomanUI {
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
   private static YEOMAN_PNG = "yeoman.png";
   private static isWin32 = (process.platform === 'win32');
-  private static readonly PROJECTS: string = path.join(os.homedir(), 'projects');
+  private static HOME_DIR = os.homedir();
+  private static readonly PROJECTS: string = path.join(YeomanUI.HOME_DIR, 'projects');
   private static readonly NODE_MODULES = 'node_modules';
 
   private static funcReplacer(key: any, value: any) {
@@ -103,10 +104,18 @@ export class YeomanUI {
     const that = this;
     const promise: Promise<IQuestionsPrompt> = new Promise(resolve => {
       const env: Environment.Options = Environment.createEnv();
-      env.lookup({packagePaths: os.homedir()}, async () => this.onEnvLookup(env, resolve, that.uiOptions.genFilter));
+      env.lookup({npmPath: this.getNpmPaths()}, async () => this.onEnvLookup(env, resolve, that.uiOptions.genFilter));
     });
 
     return promise;
+  }
+
+  private getNpmPaths() {
+    const parts: string[] = YeomanUI.HOME_DIR.split(path.sep);
+    return _.map(parts, (part, index) => {
+      const resPath = path.join(...parts.slice(0, index + 1), YeomanUI.NODE_MODULES);
+      return YeomanUI.isWin32 ? resPath : path.join(path.sep, resPath);
+    });
   }
 
   private async getChildDirectories(folderPath: string) {
