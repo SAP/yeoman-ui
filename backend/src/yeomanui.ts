@@ -88,7 +88,7 @@ export class YeomanUI {
     entry.set(methodName, handler);
   }
 
-  public async logError(error: any, prefixMessage?: string) {
+  private async logError(error: any, prefixMessage?: string) {
     let errorMessage = this.getErrorInfo(error);
     if (prefixMessage) {
       errorMessage = `${prefixMessage}\n${errorMessage}`;
@@ -98,13 +98,16 @@ export class YeomanUI {
     return errorMessage;
   }
 
-  public async getGeneratorsPrompt(): Promise<IQuestionsPrompt> {
+  private async getGeneratorsPrompt(): Promise<IQuestionsPrompt> {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
     const that = this;
     const promise: Promise<IQuestionsPrompt> = new Promise(resolve => {
+      const before = Date.now();
       const env: Environment.Options = Environment.createEnv();
       const npmPaths = this.getNpmPaths(env); 
+      const after = Date.now();
+		  console.error(after - before);
       env.lookup({npmPaths}, async () => this.onEnvLookup(env, resolve, that.uiOptions.genFilter));
     });
 
@@ -139,7 +142,7 @@ export class YeomanUI {
     return result;
   }
 
-  public async runGenerator(generatorName: string) {
+  private async runGenerator(generatorName: string) {
     this.generatorName = generatorName;
     // TODO: should create and set target dir only after user has selected a generator;
     // see issue: https://github.com/yeoman/environment/issues/55
@@ -193,7 +196,7 @@ export class YeomanUI {
    * @param answers - partial answers for the current prompt -- the input parameter to the method to be evaluated
    * @param method
    */
-  public async evaluateMethod(params: any[], questionName: string, methodName: string): Promise<any> {
+  private async evaluateMethod(params: any[], questionName: string, methodName: string): Promise<any> {
     try {
       if (this.currentQuestions) {
         const relevantQuestion: any = _.find(this.currentQuestions, question => {
@@ -214,7 +217,7 @@ export class YeomanUI {
     } 
   }
 
-  public async receiveIsWebviewReady() {
+  private async receiveIsWebviewReady() {
     try {
       // TODO: loading generators takes a long time; consider prefetching list of generators
       const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
@@ -227,19 +230,15 @@ export class YeomanUI {
     }
   }
 
-  public toggleOutput(): boolean {
+  private toggleOutput(): boolean {
     return this.outputChannel.showOutput();
   }
 
-  public logMessage(message: string): void {
-    this.outputChannel.log(message);
-  }
-
-  public setCwd(cwd: string) {
+  private setCwd(cwd: string) {
     this.cwd = (cwd || YeomanUI.PROJECTS);
   }
 
-  public getCwd(): string {
+  private getCwd(): string {
     return this.cwd;
   }
 
@@ -267,7 +266,7 @@ export class YeomanUI {
     return answers;
   }
 
-  public back(partialAnswers: Environment.Adapter.Answers): void {
+  private back(partialAnswers: Environment.Adapter.Answers): void {
     this.replayUtils.start(this.currentQuestions, partialAnswers);
     this.runGenerator(this.generatorName);
   }

@@ -13,11 +13,16 @@ import { GeneratorFilter } from './filter';
 import backendMessages from "./messages";
 import { getClassLogger, createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
 import { IChildLogger } from "@vscode-logging/logger";
+import Environment = require('yeoman-environment');
 
 const YEOMAN_UI = "Yeoman UI";
 
 export function activate(context: vscode.ExtensionContext) {
 	try {
+		const before = Date.now();
+		Environment.createEnv();
+		const after = Date.now();
+		console.error(after - before);
 		createExtensionLoggerAndSubscribeToLogSettingsChanges(context);
 	} catch (error) {
 		console.error("Extension activation failed due to Logger configuration failure:", error.message);
