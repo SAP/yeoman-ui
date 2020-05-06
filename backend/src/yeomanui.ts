@@ -104,18 +104,21 @@ export class YeomanUI {
     const that = this;
     const promise: Promise<IQuestionsPrompt> = new Promise(resolve => {
       const env: Environment.Options = Environment.createEnv();
-      env.lookup({npmPaths: this.getNpmPaths()}, async () => this.onEnvLookup(env, resolve, that.uiOptions.genFilter));
+      const npmPaths = this.getNpmPaths(env); 
+      env.lookup({npmPaths}, async () => this.onEnvLookup(env, resolve, that.uiOptions.genFilter));
     });
 
     return promise;
   }
 
-  private getNpmPaths() {
+  private getNpmPaths(env: Environment.Options) {
     const parts: string[] = YeomanUI.HOME_DIR.split(path.sep);
-    return _.map(parts, (part, index) => {
+    const userPaths =  _.map(parts, (part, index) => {
       const resPath = path.join(...parts.slice(0, index + 1), YeomanUI.NODE_MODULES);
       return YeomanUI.isWin32 ? resPath : path.join(path.sep, resPath);
     });
+
+    return _.uniq(userPaths.concat(env.getNpmPaths()));
   }
 
   private async getChildDirectories(folderPath: string) {
