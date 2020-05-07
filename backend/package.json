@@ -1,9 +1,12 @@
 {
 	"name": "yeoman-ui",
-	"displayName": "Yeoman UI",
-	"publisher": "SAP",
+	"displayName": "Application Wizard",
+	"publisher": "SAPSE",
+	"author": {
+		"name": "SAP SE"
+	},
 	"license": "Apache 2.0",
-	"description": "Provide rich user experience for Yeoman generators using VSCode extension or the browser",
+	"description": "Provides rich user experience for Yeoman generators.",
 	"repository": "https://github.com/SAP/yeoman-ui",
 	"version": "1.0.0",
 	"engines": {
@@ -11,6 +14,13 @@
 	},
 	"categories": [
 		"Other"
+	],
+	"keywords": [
+		"yeoman",
+		"yo",
+		"wizard",
+		"sap",
+		"generator"
 	],
 	"activationEvents": [
 		"*",
