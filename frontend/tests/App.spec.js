@@ -131,7 +131,7 @@ describe('App.vue', () => {
     expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.generatorInstall, thisArg: wrapper.vm, name: 'generatorInstall'})
     expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.generatorDone, thisArg: wrapper.vm, name: 'generatorDone'})
     expect(registerMethodSpy).toHaveBeenCalledWith({func: wrapper.vm.log, thisArg: wrapper.vm, name: 'log'})
-    expect(invokeSpy).toHaveBeenCalledWith("receiveIsWebviewReady", [])
+    expect(invokeSpy).toHaveBeenCalledWith("getState")
 
     invokeSpy.mockRestore()
     registerMethodSpy.mockRestore()
@@ -158,14 +158,6 @@ describe('App.vue', () => {
     wrapper.vm.log('test_log');
     
     expect(wrapper.vm.logText).toBe('test_test_log')
-  })
-
-  it('setState - method', () => {
-    wrapper = initComponent(App, {}, true)
-    expect(wrapper.vm.messages).toEqual({})
-
-    wrapper.vm.setState({messages: {test: "test1"}});
-    expect(wrapper.vm.messages).toEqual({test: "test1"})
   })
 
   describe('next - method', () => {
@@ -258,7 +250,7 @@ describe('App.vue', () => {
       expect(wrapper.vm.promptIndex).toBe(0);
       expect(wrapper.vm.prompts.length).toBe(0);
       expect(wrapper.vm.isReplaying).toBe(false);
-      expect(invokeSpy).toHaveBeenCalledWith("receiveIsWebviewReady", []);
+      expect(invokeSpy).toHaveBeenCalledWith("getState");
     });
 
     test('promptIndex is updated', () => {
@@ -440,7 +432,7 @@ describe('App.vue', () => {
     wrapper.vm.reload();
     
     expect(initSpy).toHaveBeenCalled()
-    expect(invokeSpy).toHaveBeenCalledWith("receiveIsWebviewReady", [])
+    expect(invokeSpy).toHaveBeenCalledWith("getState")
 
     invokeSpy.mockRestore()
   })

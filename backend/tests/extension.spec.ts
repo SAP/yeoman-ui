@@ -134,29 +134,22 @@ describe('extension unit test', () => {
             registerMethod: () => Promise.resolve()
         };
 
-        let rpcExtensionMock: any;
         beforeEach(() => {
             extension.YeomanUIPanel.setPaths("testExtensionPath");
             loggerWrapperMock.expects("getClassLogger").returns({});
             yeomanUiPanelMock.expects("createRpc").returns(rpcExtension);
-            rpcExtensionMock = sandbox.mock(rpcExtension);
         });
 
-        afterEach(() => {
-            rpcExtensionMock.verify();
-        });
 
         it("YeomanUIPanel.currentPanel.panel not exists", () => {
             fsextraMock.expects("readFile").resolves("test file content");
             _.set(extension.YeomanUIPanel, "currentPanel.panel", undefined);
-            rpcExtensionMock.expects("invoke").resolves();
             extension.YeomanUIPanel.loadYeomanUI();
         });
 
         it("YeomanUIPanel.currentPanel.yeomanui exists", () => {
             fsextraMock.expects("readFile").resolves();
             _.set(extension.YeomanUIPanel, "currentPanel.panel", {dispose: () => {}});
-            rpcExtensionMock.expects("invoke").resolves();
             extension.YeomanUIPanel.loadYeomanUI();
         });
     });
@@ -168,21 +161,13 @@ describe('extension unit test', () => {
             registerMethod: () => Promise.resolve()
         };
 
-        let rpcExtensionMock: any;
-
         beforeEach(() => {
-            rpcExtensionMock = sandbox.mock(rpcExtension);
             fsextraMock.expects("readFile").resolves();
-            rpcExtensionMock.expects("invoke").resolves();
             extension.YeomanUIPanel.setPaths("testExtensionPath");
             loggerWrapperMock.expects("getClassLogger").returns({});
             yeomanUiPanelMock.expects("createRpc").returns(rpcExtension);
             _.set(extension.YeomanUIPanel, "currentPanel.panel", undefined);
             extension.YeomanUIPanel.loadYeomanUI();
-        });
-
-        afterEach(() => {
-            rpcExtensionMock.verify();
         });
 
         it("showOpenFileDialog", async () => {
@@ -241,21 +226,13 @@ describe('extension unit test', () => {
             registerMethod: () => Promise.resolve()
         };
 
-        let rpcExtensionMock: any;
-
         beforeEach(() => {
-            rpcExtensionMock = sandbox.mock(rpcExtension);
             fsextraMock.expects("readFile").resolves();
-            rpcExtensionMock.expects("invoke").resolves();
             extension.YeomanUIPanel.setPaths("testExtensionPath");
             loggerWrapperMock.expects("getClassLogger").returns({});
             yeomanUiPanelMock.expects("createRpc").returns(rpcExtension);
             _.set(extension.YeomanUIPanel, "currentPanel.panel", undefined);
             extension.YeomanUIPanel.loadYeomanUI();
-        });
-
-        afterEach(() => {
-            rpcExtensionMock.verify();
         });
 
         it("there are no disposables", async () => {

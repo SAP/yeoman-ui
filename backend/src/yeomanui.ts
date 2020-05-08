@@ -68,6 +68,7 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.logError, thisArg: this });
     this.rpc.registerMethod({ func: this.back, thisArg: this });
     this.rpc.registerMethod({ func: this.setCwd, thisArg: this });
+    this.rpc.registerMethod({ func: this.getState, thisArg: this });
 
     this.youiAdapter = new YouiAdapter(outputChannel, youiEvents);
     this.youiAdapter.setYeomanUI(this);
@@ -77,6 +78,10 @@ export class YeomanUI {
     this.uiOptions = uiOptions;
     this.customQuestionEventHandlers = new Map();
     this.setCwd(outputPath);
+  }
+
+  private async getState() {
+    return this.uiOptions;
   }
 
   public registerCustomQuestionEventHandler(questionType: string, methodName: string, handler: Function): void {
@@ -189,10 +194,6 @@ export class YeomanUI {
     } catch (error) {
       this.onGeneratorFailure(generatorName, error);
     }
-  }
-
-  public setState(messages: any): Promise<void> {
-    return this.rpc ? this.rpc.invoke("setState", [messages]) : Promise.resolve();
   }
 
   /**
