@@ -150,7 +150,7 @@ export class YeomanUI {
       const targetFolder = this.getCwd();
       await fsextra.mkdirs(targetFolder);
       const dirsBefore = await this.getChildDirectories(targetFolder);
-      const env: Environment = Environment.createEnv(undefined, {newErrorHandler: true}, this.youiAdapter);
+      const env: Environment = Environment.createEnv(undefined, {sharedOptions: {forwardErrorToEnvironment: true}}, this.youiAdapter);
       const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
       // @ts-ignore
       env.register(meta.resolved, meta.namespace, meta.packagePath);
@@ -171,6 +171,11 @@ export class YeomanUI {
       let errorThrown = false;
 
       env.addListener('error', (error: any) => {
+        errorThrown = true;
+        this.onGeneratorFailure(generatorName, error);
+      });
+
+      this.gen.addListener('error', (error: any) => {
         errorThrown = true;
         this.onGeneratorFailure(generatorName, error);
       });
