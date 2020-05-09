@@ -1,5 +1,6 @@
 {
 	"name": "yeoman-ui",
+	"version": "1.0.2",
 	"displayName": "Application Wizard",
 	"publisher": "SAPSE",
 	"author": {
@@ -7,8 +8,14 @@
 	},
 	"license": "Apache 2.0",
 	"description": "Provides rich user experience for Yeoman generators.",
-	"repository": "https://github.com/SAP/yeoman-ui",
-	"version": "1.0.2",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/SAP/yeoman-ui.git"
+	},
+	"bugs": {
+		"url": "https://github.com/SAP/yeoman-ui/issues"
+	},
+	"icon": "Wizard_logo.png",
 	"engines": {
 		"vscode": "^1.39.2"
 	},
