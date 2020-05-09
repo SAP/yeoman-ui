@@ -215,7 +215,5 @@ export class YeomanUIPanel {
 		
 		this.panel.title = this.messages.panel_title;
 		this.panel.webview.html = indexHtml;
-
-		await this.rpc.invoke("setState", [{messages: this.messages, filter: this.genFilter}]);
 	}
 }

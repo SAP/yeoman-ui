@@ -215,12 +215,6 @@ export default {
         currentPrompt.answers = answers;
       }
     },
-    setState(state) {
-      this.messages = state.messages;
-      if (this.isInVsCode()) {
-        window.vscode.setState(state);
-      }
-    },
     setPromptList(prompts) {
       let promptIndex = this.promptIndex;
       if (this.isReplaying) {
@@ -365,8 +359,7 @@ export default {
         "setPromptList",
         "generatorInstall",
         "generatorDone",
-        "log",
-        "setState"
+        "log"
       ];
       _.forEach(functions, funcName => {
         this.rpc.registerMethod({
@@ -376,7 +369,12 @@ export default {
         });
       });
 
-      this.rpc.invoke("receiveIsWebviewReady", []);
+      this.displayGeneratorsPrompt(); 
+    },
+    async displayGeneratorsPrompt() {
+      const uiOptions = await this.rpc.invoke("getState");
+      this.messages = uiOptions.messages;
+      await this.rpc.invoke("receiveIsWebviewReady", []);
     },
     toggleConsole() {
       this.showConsole = !this.showConsole;
@@ -414,10 +412,14 @@ export default {
     reload() {
       const dataObj = initialState();
       dataObj.rpc = this.rpc;
-      dataObj.messages = this.messages;
       Object.assign(this.$data, dataObj);
       this.init();
-      this.rpc.invoke("receiveIsWebviewReady", []);
+      
+      this.displayGeneratorsPrompt();
+    },
+    async setMessages() {
+      const state = await this.rpc.invoke("getState");
+      this.messages = state.messages;
     }
   },
   created() {

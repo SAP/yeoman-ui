@@ -71,7 +71,10 @@ module.exports = class extends Generator {
         {
           type: "input",
           name: "address",
-          message: "Home address"
+          message: "Home address",
+          filter: function (value) {
+            return `(${value})`
+          }
         }
       ];
       this.answers = await this.prompt(addressPrompt);

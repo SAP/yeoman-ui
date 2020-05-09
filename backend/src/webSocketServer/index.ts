@@ -40,7 +40,6 @@ class YeomanUIWebSocketServer {
       const youiEvents: YouiEvents = new ServerYouiEvents(this.rpc);
       this.yeomanui = new YeomanUI(this.rpc, youiEvents, logger, childLogger as IChildLogger, {genFilter: GeneratorFilter.create(), messages: backendMessages});
       this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.mockFolderDialog.bind(this));
-      this.yeomanui.setState({messages: backendMessages});
     });
   }
 }

@@ -500,16 +500,6 @@ describe('yeomanui unit test', () => {
         expect(yeomanUiInstance["getCwd"]()).equal(YeomanUI["PROJECTS"]);
     });
 
-    it("setState", async () => {
-        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {},  "testpathbefore");
-        // tslint:disable-next-line: no-unused-expression
-        expect(await yeomanUiInstance.setState(null)).to.be.undefined;
-        
-        rpc.invoke = async () => {};
-        const messages = {key: "value"};
-        await yeomanUiInstance.setState(messages);
-    });
-
     it("defaultOutputPath", () => {
         const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {});
         const projectsPath = path.join(os.homedir(), 'projects');
