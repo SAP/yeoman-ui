@@ -71,6 +71,7 @@ module.exports = class extends Generator {
           return response.hungry;
         },
         validate: (value, answers) => {
+          this.fav_color = value;
           return (value.length > 1 ? true : "Enter at least 2 characters");
         },
         transformer: function (color, answers, flags) {
@@ -84,6 +85,9 @@ module.exports = class extends Generator {
       {
         default: (answers) => {
           return (answers.fav_color === "green" ? "11" : "5");
+        },
+        filter: function (value) {
+          return (this.fav_color === "red" ? "255" : value);
         },
         validate: (value, answers) => {
           return (value > 10 ? true : "Enter a number > 10");
