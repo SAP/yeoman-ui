@@ -369,10 +369,12 @@ export default {
         });
       });
 
-      const that = this;
-      this.setMessages().then(() => {
-        that.rpc.invoke("receiveIsWebviewReady", []);
-      }); 
+      this.displayGeneratorsPrompt(); 
+    },
+    async displayGeneratorsPrompt() {
+      const uiOptions = await this.rpc.invoke("getState");
+      this.messages = uiOptions.messages;
+      await this.rpc.invoke("receiveIsWebviewReady", []);
     },
     toggleConsole() {
       this.showConsole = !this.showConsole;
@@ -410,14 +412,10 @@ export default {
     reload() {
       const dataObj = initialState();
       dataObj.rpc = this.rpc;
-      dataObj.messages = this.messages;
       Object.assign(this.$data, dataObj);
       this.init();
       
-      const that = this;
-      this.setMessages().then(() => {
-        that.rpc.invoke("receiveIsWebviewReady", []);
-      });
+      this.displayGeneratorsPrompt();
     },
     async setMessages() {
       const state = await this.rpc.invoke("getState");
