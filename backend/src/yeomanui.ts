@@ -17,6 +17,7 @@ import Generator = require("yeoman-generator");
 import { GeneratorType, GeneratorFilter } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
+import * as vscode from 'vscode';
 
 export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
@@ -161,7 +162,11 @@ export class YeomanUI {
       env.register(meta.resolved, meta.namespace, meta.packagePath);
 
       const genNamespace = this.getGenNamespace(generatorName);
-      const gen: any = env.create(genNamespace, {options: {logger: this.logger.getChildLogger({label: generatorName})}});
+      const options = {
+        logger: this.logger.getChildLogger({label: generatorName}),
+        vscode: vscode // TODO: remove this temporary workaround once a better solution is found
+      };
+      const gen: any = env.create(genNamespace, {options});
       // check if generator defined a helper function called setPromptsCallback()
       const setPromptsCallback = _.get(gen, "setPromptsCallback");
       if (setPromptsCallback) {
