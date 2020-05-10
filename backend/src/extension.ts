@@ -128,8 +128,7 @@ export class YeomanUIPanel {
 			this.logger, 
 			{
 				genFilter: this.genFilter, 
-				messages: this.messages, 
-				vscode // TODO: remove this temporary workaround once a better solution is found
+				messages: this.messages
 			},
 			_.get(vscode, "workspace.workspaceFolders[0].uri.fsPath"));
 		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
