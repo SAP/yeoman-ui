@@ -11,6 +11,13 @@ module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts);
 
+    this.vscode = opts.vscode;
+
+    const showInformationMessage = _.get(this.vscode, "window.showInformationMessage");
+    if (showInformationMessage) {
+      showInformationMessage("FoodQ started");
+    }
+
     this.setPromptsCallback = fn => {
       if (this.prompts) {
         this.prompts.setCallback(fn);
@@ -388,5 +395,9 @@ module.exports = class extends Generator {
 
   end() {
     this.log('in end');
+    const showInformationMessage = _.get(this.vscode, "window.showInformationMessage");
+    if (showInformationMessage) {
+      showInformationMessage("FoodQ ended");
+    }
   }
 };
