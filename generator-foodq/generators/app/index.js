@@ -13,11 +13,6 @@ module.exports = class extends Generator {
 
     this.vscode = opts.vscode;
 
-    const showInformationMessage = _.get(this.vscode, "window.showInformationMessage");
-    if (showInformationMessage) {
-      showInformationMessage("FoodQ started");
-    }
-
     this.setPromptsCallback = fn => {
       if (this.prompts) {
         this.prompts.setCallback(fn);
