@@ -161,7 +161,11 @@ export class YeomanUI {
       env.register(meta.resolved, meta.namespace, meta.packagePath);
 
       const genNamespace = this.getGenNamespace(generatorName);
-      const gen: any = env.create(genNamespace, {options: {logger: this.logger.getChildLogger({label: generatorName})}});
+      const options = {
+        logger: this.logger.getChildLogger({label: generatorName}),
+        vscode: this.uiOptions.vscode // TODO: remove this temporary workaround once a better solution is found
+      };
+      const gen: any = env.create(genNamespace, {options});
       // check if generator defined a helper function called setPromptsCallback()
       const setPromptsCallback = _.get(gen, "setPromptsCallback");
       if (setPromptsCallback) {
