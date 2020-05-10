@@ -21,12 +21,7 @@ function getCategories(filterObject?: any): string[] {
 }
 
 function getType(filterObject?: any): GeneratorType {
-    const genType: GeneratorType = _.get(filterObject, "type", GeneratorType.all);
-    if (_.includes(_.values(GeneratorType), genType)) {
-        return genType;
-    }
-
-    return GeneratorType.all;
+    return _.get(filterObject, "type", GeneratorType.all);
 }
 
 export class GeneratorFilter {
