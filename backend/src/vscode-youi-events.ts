@@ -37,25 +37,22 @@ export class VSCodeYouiEvents implements YouiEvents {
             title: "Installing dependencies..."
         },
         async () => {
-            const result = await new Promise(resolve => {
+            await new Promise(resolve => {
                 this.resolveFunc = resolve;
             });
-            
-            if (result) {
-                return "installing_dependencies_completed";
-            }
         });
     }
 
-    private resolveInstallingProgress(result: boolean) {
+    private resolveInstallingProgress() {
         if (this.resolveFunc) {
-            this.resolveFunc(result);
+            this.resolveFunc();
         }
     }
 
     private showDoneMessage(success: boolean, errorMmessage: string, targetFolderPath?: string): Thenable<any> {
+        this.resolveInstallingProgress();
+
         if (success) {
-            this.resolveInstallingProgress(true);
             const addToWorkspace: string = "Add to Workspace";
             const openInNewWorkspace: any = "Open in New Workspace";
             const items: string[] = [];
@@ -94,7 +91,6 @@ export class VSCodeYouiEvents implements YouiEvents {
             });
         }
 
-        this.resolveInstallingProgress(false);
         return vscode.window.showErrorMessage(errorMmessage);
     }
 }
