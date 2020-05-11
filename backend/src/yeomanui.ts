@@ -197,12 +197,14 @@ export class YeomanUI {
         this.onGeneratorFailure(generatorName, error);
       });
 
-      await this.gen.run();
-      
-      if (!errorThrown) {
-        const dirsAfter = await this.getChildDirectories(this.gen.destinationRoot());
-        this.onGeneratorSuccess(generatorName, dirsBefore, dirsAfter);
-      }
+      // we cannot use new async method, "await this.gen.run()", because generators based on older versions 
+      // (for example: 2.0.5) of "yeoman-generator" do not support it
+      this.gen.run(async () => {
+        if (!errorThrown) {
+          const dirsAfter = await this.getChildDirectories(this.gen.destinationRoot());
+          this.onGeneratorSuccess(generatorName, dirsBefore, dirsAfter);
+        }
+      });
     } catch (error) {
       this.onGeneratorFailure(generatorName, error);
     }
