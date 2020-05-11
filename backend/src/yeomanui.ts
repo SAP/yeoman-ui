@@ -49,6 +49,7 @@ export class YeomanUI {
   private generatorName: string;
   private replayUtils: ReplayUtils;
   private customQuestionEventHandlers: Map<string, Map<string, Function>>;
+  private errorThrown: boolean = false;
 
   constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
     this.rpc = rpc;
@@ -180,27 +181,23 @@ export class YeomanUI {
         setPromptsCallback(this.setPromptList.bind(this));
       }
 
-      this.setGenInstall(gen);
+      this.setGenInstall(gen, generatorName);
       this.promptCount = 0;
       this.gen = (gen as Generator);
       this.gen.destinationRoot(targetFolder);
 
-      let errorThrown = false;
-
       env.addListener('error', (error: any) => {
-        errorThrown = true;
         this.onGeneratorFailure(generatorName, error);
       });
 
       this.gen.addListener('error', (error: any) => {
-        errorThrown = true;
         this.onGeneratorFailure(generatorName, error);
       });
 
       // we cannot use new async method, "await this.gen.run()", because generators based on older versions 
       // (for example: 2.0.5) of "yeoman-generator" do not support it
       this.gen.run(async () => {
-        if (!errorThrown) {
+        if (!this.errorThrown) {
           const dirsAfter = await this.getChildDirectories(this.gen.destinationRoot());
           this.onGeneratorSuccess(generatorName, dirsBefore, dirsAfter);
         }
@@ -317,22 +314,23 @@ export class YeomanUI {
   }
 
   private async onGeneratorFailure(generatorName: string, error: any) {
+    this.errorThrown = true;
     const messagePrefix = `${generatorName} generator failed.`;
     const errorMessage: string = await this.logError(error, messagePrefix);
     this.youiEvents.doGeneratorDone(false, errorMessage);
   }
 
-  private setGenInstall(gen: any) {
+  private setGenInstall(gen: any, generatorName: string) {
     const originalPrototype = Object.getPrototypeOf(gen);
     const originalGenInstall = _.get(originalPrototype, "install");
     if (originalGenInstall && !originalPrototype._uiInstall) {
       originalPrototype._uiInstall = true;
-      originalPrototype.install = () => {
+      originalPrototype.install = async () => {
         try {
           this.youiEvents.doGeneratorInstall();
-          originalGenInstall.call(gen);
+          await originalGenInstall.call(gen);
         } catch (error) {
-          this.logError(error);
+          this.onGeneratorFailure(generatorName, error);
         } finally {
           originalPrototype.install = originalGenInstall;
           delete originalPrototype._uiInstall;
@@ -341,7 +339,7 @@ export class YeomanUI {
     }
   }
 
-  private getErrorInfo(error: any) {
+  private getErrorInfo(error: any = "") {
     if (_.isString(error)) {
       return error;
     } 
