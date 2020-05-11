@@ -5,13 +5,11 @@ import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorFilter, GeneratorType } from './filter';
 
 export class VSCodeYouiEvents implements YouiEvents {
-    private rpc: RpcCommon;
     private webviewPanel: vscode.WebviewPanel;
-    public static installing: boolean;
     private genFilter: GeneratorFilter;
+    private resolveFunc: any;
 
     constructor(rpc : RpcCommon, webviewPanel: vscode.WebviewPanel, genFilter: GeneratorFilter) {
-        this.rpc = rpc; 
         this.webviewPanel = webviewPanel;   
         this.genFilter = genFilter;    
     }
@@ -34,28 +32,30 @@ export class VSCodeYouiEvents implements YouiEvents {
     }
 
     private showInstallMessage(): void {
-        VSCodeYouiEvents.installing = true;
         vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: "Installing dependencies..."
         },
         async () => {
-            await new Promise(resolve => {
-                let intervalId = setInterval(() => {
-                    if (!VSCodeYouiEvents.installing) {
-                        clearInterval(intervalId);
-                        resolve(undefined);
-                    }
-                }, 3000);
+            const result = await new Promise(resolve => {
+                this.resolveFunc = resolve;
             });
-            return "installing_dependencies_completed";
+            
+            if (result) {
+                return "installing_dependencies_completed";
+            }
         });
     }
 
+    private resolveInstallingProgress(result: boolean) {
+        if (this.resolveFunc) {
+            this.resolveFunc(result);
+        }
+    }
+
     private showDoneMessage(success: boolean, errorMmessage: string, targetFolderPath?: string): Thenable<any> {
-        VSCodeYouiEvents.installing = false;
-        
         if (success) {
+            this.resolveInstallingProgress(true);
             const addToWorkspace: string = "Add to Workspace";
             const openInNewWorkspace: any = "Open in New Workspace";
             const items: string[] = [];
@@ -94,6 +94,7 @@ export class VSCodeYouiEvents implements YouiEvents {
             });
         }
 
+        this.resolveInstallingProgress(false);
         return vscode.window.showErrorMessage(errorMmessage);
     }
 }
