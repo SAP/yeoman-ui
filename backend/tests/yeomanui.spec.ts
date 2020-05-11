@@ -548,7 +548,7 @@ describe('yeomanui unit test', () => {
         it("install method not exist", () => {
             const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create());
             const gen: any = {};
-            yeomanUiInstance["setGenInstall"](gen);
+            yeomanUiInstance["setGenInstall"](gen, "testgen");
             // tslint:disable-next-line: no-unused-expression
             expect(gen.__proto__.install).to.be.undefined;
         });
@@ -565,7 +565,7 @@ describe('yeomanui unit test', () => {
             expect(gen.__proto__.install).to.be.not.undefined;
 
             const installSpy = sandbox.spy(youiEvents,"doGeneratorInstall");
-            yeomanUiInstance["setGenInstall"](gen);
+            yeomanUiInstance["setGenInstall"](gen, "testgen");
             gen.install();
             // tslint:disable-next-line: no-unused-expression
             expect(installSpy.called).to.be.true;
