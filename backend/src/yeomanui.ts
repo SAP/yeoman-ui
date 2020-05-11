@@ -339,7 +339,7 @@ export class YeomanUI {
     }
   }
 
-  private getErrorInfo(error: any) {
+  private getErrorInfo(error: any = "") {
     if (_.isString(error)) {
       return error;
     } 
