@@ -11,6 +11,8 @@ module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts);
 
+    this.vscode = opts.vscode;
+
     this.setPromptsCallback = fn => {
       if (this.prompts) {
         this.prompts.setCallback(fn);
@@ -84,10 +86,7 @@ module.exports = class extends Generator {
       },
       {
         default: (answers) => {
-          return (answers.fav_color === "green" ? "11" : "5");
-        },
-        filter: function (value) {
-          return (this.fav_color === "red" ? "255" : value);
+          return (answers.fav_color === "green" ? "11" : answers.fav_color === "red" ? "44" : "5");
         },
         validate: (value, answers) => {
           return (value > 10 ? true : "Enter a number > 10");
@@ -96,7 +95,8 @@ module.exports = class extends Generator {
         name: "number",
         message: "How many times have you been in this resturant?",
         guiOptions: {
-          hint: "We hope you have been in our resturant many times"
+          hint: "We hope you have been in our resturant many times",
+          applyDefaultWhenDirty: true
         },
       },
       {
@@ -390,5 +390,9 @@ module.exports = class extends Generator {
 
   end() {
     this.log('in end');
+    const showInformationMessage = _.get(this.vscode, "window.showInformationMessage");
+    if (showInformationMessage) {
+      showInformationMessage("FoodQ ended");
+    }
   }
 };

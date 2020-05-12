@@ -5,13 +5,11 @@ import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorFilter, GeneratorType } from './filter';
 
 export class VSCodeYouiEvents implements YouiEvents {
-    private rpc: RpcCommon;
     private webviewPanel: vscode.WebviewPanel;
-    public static installing: boolean;
     private genFilter: GeneratorFilter;
+    private resolveFunc: any;
 
     constructor(rpc : RpcCommon, webviewPanel: vscode.WebviewPanel, genFilter: GeneratorFilter) {
-        this.rpc = rpc; 
         this.webviewPanel = webviewPanel;   
         this.genFilter = genFilter;    
     }
@@ -34,27 +32,26 @@ export class VSCodeYouiEvents implements YouiEvents {
     }
 
     private showInstallMessage(): void {
-        VSCodeYouiEvents.installing = true;
         vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: "Installing dependencies..."
         },
         async () => {
             await new Promise(resolve => {
-                let intervalId = setInterval(() => {
-                    if (!VSCodeYouiEvents.installing) {
-                        clearInterval(intervalId);
-                        resolve(undefined);
-                    }
-                }, 3000);
+                this.resolveFunc = resolve;
             });
-            return "installing_dependencies_completed";
         });
     }
 
+    private resolveInstallingProgress() {
+        if (this.resolveFunc) {
+            this.resolveFunc();
+        }
+    }
+
     private showDoneMessage(success: boolean, errorMmessage: string, targetFolderPath?: string): Thenable<any> {
-        VSCodeYouiEvents.installing = false;
-        
+        this.resolveInstallingProgress();
+
         if (success) {
             const addToWorkspace: string = "Add to Workspace";
             const openInNewWorkspace: any = "Open in New Workspace";
