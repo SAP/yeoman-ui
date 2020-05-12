@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"displayName": "Application Wizard",
 	"publisher": "SAPSE",
 	"author": {
@@ -43,7 +43,7 @@
 			},
 			{
 				"command": "yeomanUI.toggleOutput",
-				"title": "Toggle Output",
+				"title": "Show Output",
 				"icon": {
 					"light": "./resources/images/icons/console_light.svg",
 					"dark": "./resources/images/icons/console_dark.svg"
