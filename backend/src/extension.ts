@@ -16,11 +16,14 @@ import { IChildLogger } from "@vscode-logging/logger";
 import Environment = require('yeoman-environment');
 
 const YEOMAN_UI = "Yeoman UI";
+let defaultNpmPaths: string[];
 
 export function activate(context: vscode.ExtensionContext) {
 	try {
 		// improves performance
-		Environment.createEnv();
+		// TODO: replace or remove this API
+        // it is very slow, takes more than 2 seconds 
+		defaultNpmPaths = Environment.createEnv().getNpmPaths();
 		createExtensionLoggerAndSubscribeToLogSettingsChanges(context);
 	} catch (error) {
 		console.error("Extension activation failed due to Logger configuration failure:", error.message);
@@ -126,7 +129,7 @@ export class YeomanUIPanel {
 			vscodeYouiEvents, 
 			outputChannel, 
 			this.logger, 
-			{genFilter: this.genFilter, messages: this.messages},
+			{genFilter: this.genFilter, messages: this.messages, defaultNpmPaths},
 			_.get(vscode, "workspace.workspaceFolders[0].uri.fsPath"));
 		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
 		this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));

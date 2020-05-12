@@ -43,7 +43,7 @@
 			},
 			{
 				"command": "yeomanUI.toggleOutput",
-				"title": "Toggle Output",
+				"title": "Show Output",
 				"icon": {
 					"light": "./resources/images/icons/console_light.svg",
 					"dark": "./resources/images/icons/console_dark.svg"

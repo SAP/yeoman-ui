@@ -6,10 +6,10 @@
       :height="64"
       :width="64"
       :color="isLoadingColor"
-      background-color="transparent"
+      background-color="transparent" 
       loader="spinner"
     ></loading>
-
+    
     <Header
       v-if="prompts.length"
       :headerTitle="headerTitle"
@@ -93,6 +93,7 @@ import TilesPlugin from "@sap-devx/inquirer-gui-tiles-plugin";
 
 const FUNCTION = "__Function";
 const PENDING = "pending";
+const EVALUATING = "evaluating";
 const INSTALLING = "Installing dependencies...";
 
 function initialState() {
@@ -113,7 +114,6 @@ function initialState() {
     showConsole: false,
     messages: {},
     showBusyIndicator: false,
-    transitionToggle: false,
     promptsInfoToDisplay: [],
     isReplaying: false
   };
@@ -168,7 +168,9 @@ export default {
     setBusyIndicator() {
       this.showBusyIndicator =
         _.isEmpty(this.prompts) ||
-        (this.currentPrompt && this.currentPrompt.status === PENDING && !this.isDone);
+        (this.currentPrompt 
+         && (this.currentPrompt.status === PENDING || this.currentPrompt.status === EVALUATING) 
+         && !this.isDone);
     },
     back() {
       try {
@@ -206,13 +208,15 @@ export default {
       this.promptIndex++;
       this.prompts[this.promptIndex - 1].active = false;
       this.prompts[this.promptIndex].active = true;
-      this.transitionToggle = !this.transitionToggle;
     },
     onAnswered(answers, issues) {
       this.stepValidated = issues === undefined;
       const currentPrompt = this.currentPrompt;
       if (currentPrompt) {
         currentPrompt.answers = answers;
+        if (currentPrompt.status === EVALUATING) {
+          currentPrompt.status = undefined;
+        }
       }
     },
     setPromptList(prompts) {
@@ -243,36 +247,35 @@ export default {
       }
     },
     prepQuestions(questions) {
+      if (this.currentPrompt) {
+        this.currentPrompt.status = EVALUATING;
+      }
+
       for (let question of questions) {
         for (let prop in question) {
           if (question[prop] === FUNCTION) {
             const that = this;
             question[prop] = async (...args) => {
-              let showBusy = true;
-              setTimeout(() => {
-                if (showBusy) {
-                  that.showBusyIndicator = true;
-                }
-              }, 1000);
+            if (this.currentPrompt) {
+              this.currentPrompt.status = EVALUATING;
+            }
 
-              try {
-                const response = await that.rpc.invoke("evaluateMethod", [
-                  args,
-                  question.name,
-                  prop
-                ]);
-                showBusy = false;
-                that.showBusyIndicator = false;
-
-                return response;
-              } catch(e) {
-                showBusy = false;
-                that.showBusyIndicator = false;
-                throw(e);
-              }
-            };
+            try {
+              return await that.rpc.invoke("evaluateMethod", [
+                args,
+                question.name,
+                prop
+              ]);
+            } catch(e) {
+              that.showBusyIndicator = false;
+              throw(e);
+            }};
           }
         }
+      }
+
+      if (this.currentPrompt) {
+        this.currentPrompt.status = undefined;
       }
     },
 
@@ -309,7 +312,8 @@ export default {
         name: promptName,
         description: promptDescription,
         answers: {},
-        active: true
+        active: true,
+        status: _.get(this.currentPrompt, "status")
       });
       return prompt;
     },
