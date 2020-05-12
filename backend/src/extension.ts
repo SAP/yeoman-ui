@@ -22,7 +22,7 @@ export function activate(context: vscode.ExtensionContext) {
 	try {
 		// improves performance
 		// TODO: replace or remove this API
-        // it is very slow, takes more than 2 seconds 
+        	// it is very slow, takes more than 2 seconds 
 		defaultNpmPaths = Environment.createEnv().getNpmPaths();
 		createExtensionLoggerAndSubscribeToLogSettingsChanges(context);
 	} catch (error) {
