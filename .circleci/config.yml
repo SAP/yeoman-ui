@@ -26,7 +26,7 @@ jobs: # a collection of steps
       - run:
           name: prepare backend
           working_directory: backend
-          command: npm run frontend:copy && npm run backend
+          command: npm run backend && npm run frontend:copy
       - run:
           name: webpack backend
           working_directory: backend
