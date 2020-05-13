@@ -13,9 +13,13 @@ jobs: # a collection of steps
       - restore_cache:
           key: dependency-cache-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}
       - run:
-          name: prepare frontend
-          working_directory: backend
-          command: npm run frontend:install && npm run frontend:build
+          name: install frontend
+          working_directory: frontend
+          command: npm install
+      - run:
+          name: build frontend
+          working_directory: frontend
+          command: npm run build
       - run:
           name: test frontend
           working_directory: frontend
@@ -24,9 +28,13 @@ jobs: # a collection of steps
           path: frontend/coverage
           destination: frontend-coverage
       - run:
-          name: prepare backend
+          name: build backend
           working_directory: backend
-          command: npm run backend && npm run frontend:copy
+          command: npm run backend
+      - run:
+          name: prepare frontend artifact
+          working_directory: backend
+          command: npm run frontend:copy
       - run:
           name: webpack backend
           working_directory: backend

@@ -41,7 +41,7 @@ const config = {
         ]
       },
       {
-        test: /yeoman-environment\\lib\\environment.js/,
+        test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
         loader: 'string-replace-loader',
         options: {
           search: 'require.resolve[(]([^\'"])',
@@ -50,7 +50,7 @@ const config = {
         }
       },
       {
-        test: /yeoman-environment\\lib\\store.js/,
+        test: /yeoman-environment[/|\\]lib[/|\\]store.js/,
         loader: 'string-replace-loader',
         options: {
           search: 'require[(]([^\'"])',
