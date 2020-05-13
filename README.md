@@ -54,20 +54,11 @@ To develop and contribute you can build & install each package seperatly. Instru
 * [Build & install the backend](backend/README.md)
 * [Build & install the yeoman example generator](generator-foodq/README.md)
 
-## Known Issues
-* inquirer.js plugins not supported.
-* transformer function not supported.
-
 ## How to obtain support
 To get more help, support and information please open a github [issue](https://github.com/SAP/yeoman-ui/issues).
 
 ## Contributing
 Contributing information can be found in the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
-## TODO
-* support extensible question type custom user interfaces for complex operations (e.g. choose odata source)
-* support inquirer plugins (e.g. date/time)
-
-
 ## License
-Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved. This file is licensed under the Apache Software License, v. 2 except as noted otherwise in the [LICENSE]() file.
+Copyright (c) 2020 SAP SE or an SAP affiliate company. All rights reserved. This file is licensed under the Apache Software License, v. 2 except as noted otherwise in the [LICENSE]() file.
