@@ -6,10 +6,10 @@
 ![](screenshot.png)
 
 ## Description
-Provide rich user experience for Yeoman generators using VSCode extension or the browser.
+With the Application Wizard extension, you can benefit from a rich user experience for yeoman generators. This extension allows developers to reuse existing yeoman generators and provide wizard-like experience with no development efforts.
 The repository contains three main packages:
 * **Frontend** - The Application Wizard as a standalone vue.js application.
-* **Backend** - The backend part which communicate with Yeoman and the system. Runs as a VSCode extension or node.js application.
+* **Backend** - The backend part which communicates with Yeoman and the system. Runs as a VSCode extension or node.js application.
 * **Yeoman example generator** - Example generator to show usages and test the platform.
 
 ## Requirements
@@ -17,7 +17,7 @@ The repository contains three main packages:
 * [VSCode](https://code.visualstudio.com/) 1.39.2 or higher or [Theia](https://www.theia-ide.org/) 0.12 or higher.
 
 ## Download and Installation
-To test run the framework you only need to build & install the backend package, which will automatically build & run the UI.
+To test run the framework you only need to build and install the backend package, which will automatically build and run the UI.
 ### installation
 * Clone this repository
 * cd into the backend folder
@@ -49,13 +49,13 @@ To run it do the following:
 * On the debug panel choose "Run Extension", and click on the "Run" button.
 
 #### Advanced scenarios
-To develop and contribute you can build & install each package seperatly. Instruction on each package in the dedicated readme.md file.
+To develop and contribute you can build and install each package separately. Instruction on each package in the dedicated readme.md file.
 * [Build & install the client](frontend/README.md)
 * [Build & install the backend](backend/README.md)
 * [Build & install the yeoman example generator](generator-foodq/README.md)
 
 ## How to obtain support
-To get more help, support and information please open a github [issue](https://github.com/SAP/yeoman-ui/issues).
+To get more help, support, and information please open a github [issue](https://github.com/SAP/yeoman-ui/issues).
 
 ## Contributing
 Contributing information can be found in the [CONTRIBUTING.md](CONTRIBUTING.md) file.
