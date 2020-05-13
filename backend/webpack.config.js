@@ -63,7 +63,8 @@ const config = {
   plugins: [
     new CopyPlugin([
       { from: '../frontend/dist/', to: 'media/', force: true },
-      { from: '../LICENSE', to: '../LICENSE', toType: "file", force: true }
+      { from: '../LICENSE', to: '../LICENSE', toType: "file", force: true },
+      { from: '../README.md', to: '../README.md', toType: "file", force: true }
     ])
   ]
 };
