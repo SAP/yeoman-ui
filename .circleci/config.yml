@@ -28,11 +28,15 @@ jobs: # a collection of steps
           path: frontend/coverage
           destination: frontend-coverage
       - run:
-          name: install backend
-          working_directory: backend
-          command: npm install
-      - run:
           name: build backend
+          working_directory: backend
+          command: npm run backend
+      - run:
+          name: prepare frontend artifact
+          working_directory: backend
+          command: npm run frontend:copy
+      - run:
+          name: webpack backend
           working_directory: backend
           command: npm run webpack-prod
       - run:

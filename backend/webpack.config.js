@@ -19,10 +19,8 @@ const config = {
     libraryTarget: 'commonjs2',
     devtoolModuleFilenameTemplate: '../[resource-path]'
   },
-  devtool: 'source-map',
   externals: {
     vscode: 'commonjs vscode', // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
-    "yeoman-environment": 'commonjs yeoman-environment'
   },
   resolve: {
     modules: [
@@ -41,6 +39,24 @@ const config = {
             loader: 'ts-loader'
           }
         ]
+      },
+      {
+        test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require.resolve[(]([^\'"])',
+          replace: '__non_webpack_require__.resolve($1',
+          flags: 'g'
+        }
+      },
+      {
+        test: /yeoman-environment[/|\\]lib[/|\\]store.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require[(]([^\'"])',
+          replace: '__non_webpack_require__($1',
+          flags: 'g'
+        }
       }
     ]
   },

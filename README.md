@@ -1,14 +1,14 @@
 [![CircleCI](https://circleci.com/gh/SAP/yeoman-ui.svg?style=svg)](https://circleci.com/gh/SAP/yeoman-ui)
 ![GitHub license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)
 
-# Yeoman UI
+# Application Wizard
 
 ![](screenshot.png)
 
 ## Description
 Provide rich user experience for Yeoman generators using VSCode extension or the browser.
 The repository contains three main packages:
-* **Frontend** - The Yeoman UI as a standalone vue.js application.
+* **Frontend** - The Application Wizard as a standalone vue.js application.
 * **Backend** - The backend part which communicate with Yeoman and the system. Runs as a VSCode extension or node.js application.
 * **Yeoman example generator** - Example generator to show usages and test the platform.
 
@@ -65,10 +65,6 @@ To get more help, support and information please open a github [issue](https://g
 Contributing information can be found in the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 ## TODO
-* implement ability for yeoman-ui to call methods in vscode extensions
-    * support hook for executing commands after finish
-    * support open readme.md file by default (with turn off setting)
-
 * support extensible question type custom user interfaces for complex operations (e.g. choose odata source)
 * support inquirer plugins (e.g. date/time)
 

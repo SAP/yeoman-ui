@@ -1,11 +1,7 @@
 **
 !LICENSE
+!README.md
 !package.json
 !Wizard_logo.png
-# TODO: because yeoman-environment is left out of the webpack, node_modules must still be included
-# however, it contains many dependencies that are not needed
-!node_modules
 !dist
 !resources
-out/tests/**
-tests/**
