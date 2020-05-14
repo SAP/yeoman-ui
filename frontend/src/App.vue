@@ -22,7 +22,7 @@
 
     <v-row class="main-row ma-0 pa-0">
       <v-col class="left-col ma-0 pa-0" cols="3">
-        <Navigation v-if="prompts.length" :promptIndex="promptIndex" :prompts="prompts" />
+        <Navigation v-if="prompts.length" :promptIndex="promptIndex" :prompts="prompts"  @onGotoStep="gotoStep" />
       </v-col>
       <v-col cols="9" class="right-col">
         <v-row class="prompts-col">
@@ -115,7 +115,8 @@ function initialState() {
     messages: {},
     showBusyIndicator: false,
     promptsInfoToDisplay: [],
-    isReplaying: false
+    isReplaying: false,
+    numOfSteps: 1
   };
 }
 
@@ -173,11 +174,15 @@ export default {
          && !this.isDone);
     },
     back() {
+      this.gotoStep(1);    // go 1 step back
+    },
+    gotoStep(numOfSteps) { // go numOfSteps step back
       try {
         this.isReplaying = true;
+        this.numOfSteps = numOfSteps;
         const answers = this.currentPrompt.answers;
-        if (this.promptIndex > 1) {
-          this.rpc.invoke("back", [answers]);
+        if (this.promptIndex - numOfSteps > 0) {
+          this.rpc.invoke("back", [answers, numOfSteps]);
         } else {
           this.reload();
         }
@@ -282,7 +287,7 @@ export default {
     async showPrompt(questions, name) {
       this.prepQuestions(questions);
       if (this.isReplaying) {
-        this.promptIndex--;
+        this.promptIndex -= this.numOfSteps;
         this.isReplaying = false;
       }
       const prompt = this.createPrompt(questions, name);

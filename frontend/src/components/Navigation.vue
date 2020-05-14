@@ -7,13 +7,16 @@
           :key="`${index}-step`"
           :step="index"
           :complete="currentStep > index"
-        >{{ prompts[index - 1] ? prompts[index - 1].name : "" }}</v-stepper-step>
+          @click="gotoStep(currentStep - index)"
+          :class="getStepClass(currentStep, index)"
+        >
+          {{ prompts[index - 1] ? prompts[index - 1].name : "" }}
+        </v-stepper-step>
         <v-stepper-content :step="index" :key="`${index}-content`"></v-stepper-content>
       </template>
     </v-stepper>
   </div>
 </template>
-
 
 <script>
 export default {
@@ -25,7 +28,16 @@ export default {
       steps: 1
     };
   },
-
+  methods: {
+    getStepClass(currentStep, index) { 
+      return {'step-linkable' : currentStep > index};
+    },
+    gotoStep(numOfSteps) { // numOfSteps is number of steps to go back
+      if (numOfSteps > 0) {
+        this.$emit("onGotoStep", numOfSteps);
+      }
+    }
+  },
   watch: {
     promptIndex(val) {
       this.$nextTick(() => {
@@ -104,6 +116,12 @@ div.v-application div.v-stepper.v-stepper--vertical .v-stepper__content:not(:las
   mask-size: 3px;
   background-position: left;
   background-color:var(--vscode-editorCodeLens-foreground, #999999);
+}
+.step-linkable {
+  cursor: pointer;
+}
+.step-linkable:hover {
+  background-color: var(--vscode-list-hoverBackground,#2a2d2e);
 }
 
 </style>
