@@ -61,4 +61,4 @@ To get more help, support, and information please open a github [issue](https://
 Contributing information can be found in the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 ## License
-Copyright (c) 2020 SAP SE or an SAP affiliate company. All rights reserved. This file is licensed under the Apache Software License, v. 2 except as noted otherwise in the [LICENSE]() file.
+Copyright (c) 2020 SAP SE or an SAP affiliate company. All rights reserved. This file is licensed under the Apache Software License, v. 2 except as noted otherwise in the [LICENSE](LICENSE) file.
