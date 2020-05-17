@@ -61,7 +61,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 
             if (this.genFilter.type !== GeneratorType.module) {
                 const workspacePath = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
-                // workspacePath should not be undefined or empty
+                // this action is available when at least one workspace is opened
                 if (!_.isEmpty(workspacePath)) {
                     items.push(addToWorkspace);
                 }
