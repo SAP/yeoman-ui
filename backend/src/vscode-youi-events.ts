@@ -61,12 +61,8 @@ export class VSCodeYouiEvents implements YouiEvents {
 
             if (this.genFilter.type !== GeneratorType.module) {
                 const workspacePath = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
-                // 1. target workspace folder should not already contain target generator folder
-                const foundInWorkspace = _.find(vscode.workspace.workspaceFolders, (wsFolder: vscode.WorkspaceFolder) => {
-                    return targetFolderUri.fsPath === wsFolder.uri.fsPath;
-                });
-                // 2. Theia bug: vscode.workspace.workspaceFolders should not be undefined or empty
-                if (!foundInWorkspace && workspacePath) {
+                // workspacePath should not be undefined or empty
+                if (!_.isEmpty(workspacePath)) {
                     items.push(addToWorkspace);
                 }
 

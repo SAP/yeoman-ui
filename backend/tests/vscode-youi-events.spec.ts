@@ -71,9 +71,10 @@ describe('vscode-youi-events unit test', () => {
         it("on success, open in new workspace button is visible", () => {
             eventsMock.expects("doClose");
             _.set(vscode, "workspace.workspaceFolders", [{uri: {fsPath: "rootFolderPath"}}, {uri: {fsPath: "testDestinationRoot"}}]);
-            const actionName = 'Open in New Workspace';
+            const actionName1 = 'Add to Workspace';
+            const actionName2 = 'Open in New Workspace';
             windowMock.expects("showInformationMessage").
-                withExactArgs('The project has been generated.\nWhat would you like to do with it?', actionName).resolves(actionName);
+                withExactArgs('The project has been generated.\nWhat would you like to do with it?', actionName1, actionName2).resolves(actionName2);
             commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
             return events.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
@@ -93,9 +94,8 @@ describe('vscode-youi-events unit test', () => {
             eventsMock.expects("doClose");
             _.set(vscode, "workspace.workspaceFolders", [{uri: {fsPath: "testDestinationRoot"}}]);
             const actionName1 = 'Add to Workspace';
-            const actionName2 = 'Open in New Workspace';
             windowMock.expects("showInformationMessage").
-                withExactArgs('The project has been generated.').resolves();
+                withExactArgs('The project has been generated.\nWhat would you like to do with it?', actionName1).resolves();
             return events.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
 
