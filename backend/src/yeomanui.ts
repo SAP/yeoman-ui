@@ -281,8 +281,8 @@ export class YeomanUI {
     return answers;
   }
 
-  private back(partialAnswers: Environment.Adapter.Answers): void {
-    this.replayUtils.start(this.currentQuestions, partialAnswers);
+  private back(partialAnswers: Environment.Adapter.Answers, numOfSteps: number): void {
+    this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
     this.runGenerator(this.generatorName);
   }
 

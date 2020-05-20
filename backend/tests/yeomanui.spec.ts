@@ -618,7 +618,7 @@ describe('yeomanui unit test', () => {
             // tslint:disable-next-line: no-unused-expression
             expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.false;
 
-            yeomanUiInstance["back"](undefined);
+            yeomanUiInstance["back"](undefined,1);
             // tslint:disable-next-line: no-unused-expression
             expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.true;
 

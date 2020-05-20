@@ -12,6 +12,7 @@ export class ReplayUtils {
   private answersCache: Map<string, Environment.Adapter.Answers>;
   private replayStack: Array<Environment.Adapter.Answers>;
   private replayQueue: Array<Environment.Adapter.Answers>;
+  private numOfSteps: number;
   private prompts: Array<IPrompt>;
   public isReplaying: boolean;
 
@@ -26,10 +27,12 @@ export class ReplayUtils {
     this.replayStack = [];
     this.prompts = [];
     this.answersCache.clear();
+    this.numOfSteps = 0;
   }
 
-  start(questions: Environment.Adapter.Questions<any>, answers: Environment.Adapter.Answers): void {
+  start(questions: Environment.Adapter.Questions<any>, answers: Environment.Adapter.Answers, numOfSteps: number): void {
       this._rememberAnswers(questions, answers);
+      this.numOfSteps = numOfSteps;
       this.replayQueue = JSON.parse(JSON.stringify(this.replayStack));
       this.isReplaying = true;
   }
@@ -41,6 +44,7 @@ export class ReplayUtils {
       this.replayQueue = [];
       const answers: Environment.Adapter.Answers = this.replayStack.pop();
       ReplayUtils.setDefaults(questions, answers);
+      this.replayStack.splice(this.replayStack.length - this.numOfSteps + 1);
       return prompts;
   }
 
@@ -74,7 +78,7 @@ export class ReplayUtils {
 
   getReplayState(): ReplayState{
     if (this.isReplaying) {
-      if (this.replayQueue.length > 1) {
+      if (this.replayQueue.length > this.numOfSteps) {
         return ReplayState.Replaying;
       } else {
         return ReplayState.EndingReplay;

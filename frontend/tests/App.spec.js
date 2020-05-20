@@ -267,10 +267,9 @@ describe('App.vue', () => {
 
       wrapper.vm.back();
 
-      expect(wrapper.vm.promptIndex).toBe(2);
-      expect(wrapper.vm.prompts.length).toBe(3);
       expect(wrapper.vm.isReplaying).toBe(true);
-      expect(invokeSpy).toHaveBeenCalledWith("back", [undefined]);
+      expect(wrapper.vm.numOfSteps).toBe(1);
+      expect(invokeSpy).toHaveBeenCalledWith("back", [undefined,1]);
     });
 
     test('set props', async () => {
@@ -284,6 +283,47 @@ describe('App.vue', () => {
       wrapper.vm.showPrompt(questions, 'promptName');
       await Vue.nextTick()
       expect(wrapper.vm.promptIndex).toBe(0);
+    });
+  });
+
+  describe('gotoStep - method', () => {
+    test('promptIndex is 1, goto 1 step back -> (Select Generator)', () => {
+      wrapper = initComponent(App, {}, true);
+      wrapper.vm.rpc = {
+        invoke: jest.fn(),
+        registerMethod: jest.fn()
+      }  
+      const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke');
+
+      wrapper.vm.resolve = undefined;
+      wrapper.vm.promptIndex = 1;
+      wrapper.vm.prompts = [{}, {}];
+
+      wrapper.vm.gotoStep(1);
+
+      expect(wrapper.vm.promptIndex).toBe(0);
+      expect(wrapper.vm.prompts.length).toBe(0);
+      expect(wrapper.vm.isReplaying).toBe(false);
+      expect(invokeSpy).toHaveBeenCalledWith("getState");
+    });
+
+    test('promptIndex is 3, goto 2 step back', async () => {
+      wrapper = initComponent(App, {}, true);
+      wrapper.vm.rpc = {
+        invoke: jest.fn(),
+        registerMethod: jest.fn()
+      }  
+      const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke');
+
+      wrapper.vm.resolve = undefined;
+      wrapper.vm.promptIndex = 3;
+      wrapper.vm.prompts = [{}, {}, {}, {}];
+
+      wrapper.vm.gotoStep(2);
+
+      expect(wrapper.vm.isReplaying).toBe(true);
+      expect(wrapper.vm.numOfSteps).toBe(2);
+      expect(invokeSpy).toHaveBeenCalledWith("back", [undefined,2]);
     });
   });
 
