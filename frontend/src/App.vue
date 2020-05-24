@@ -17,7 +17,6 @@
       :rpc="rpc"
       :isInVsCode="isInVsCode()"
       @parentShowConsole="toggleConsole"
-      @parentReload="reload"
     />
 
     <v-row class="main-row ma-0 pa-0">

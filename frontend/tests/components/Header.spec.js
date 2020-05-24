@@ -39,13 +39,4 @@ describe('Header.vue', () => {
         wrapper.findAll("button").wrappers[0].trigger('click')
         expect(rpcInvokeMockFunction).toHaveBeenCalled()
     })
-
-    test('click triggers reload method', async () => {
-        const rpcInvokeMockFunction = jest.fn()
-        wrapper = initComponent(Header, {
-        }, true)
-        
-        wrapper.findAll("button").wrappers[1].trigger('click')
-        expect(rpcInvokeMockFunction).not.toHaveBeenCalled()
-    })
 })
