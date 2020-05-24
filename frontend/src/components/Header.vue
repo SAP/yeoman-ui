@@ -8,16 +8,6 @@
           <v-icon>mdi-console</v-icon>
         </v-card-text>
       </v-btn>
-      <v-tooltip bottom>
-        <template v-slot:activator="{ on }">
-            <v-btn class="ma-2" @click="reload" icon v-on="on">
-              <v-card-text>
-                <v-icon>mdi-reload</v-icon>
-              </v-card-text>
-            </v-btn>
-        </template>
-        <span>Starting over will clear all the values you have entered and start the process from scratch</span>
-      </v-tooltip>
     </v-app-bar>
   </div>
 </template>
@@ -30,9 +20,6 @@ export default {
     collapseOutput() {
       this.rpc.invoke("toggleOutput", [{}]);
       this.$emit("parentShowConsole");
-    },
-    reload() {
-      this.$emit("parentReload");
     }
   }
 };
