@@ -112,7 +112,7 @@ export class YeomanUIPanel {
 
 	public yeomanui: YeomanUI;
 	private readonly panel: vscode.WebviewPanel;
-	private readonly logger: IChildLogger = getClassLogger(YeomanUI.name);
+	private readonly logger: IChildLogger = getClassLogger("");
 	private rpc: RpcExtension;
 	private disposables: vscode.Disposable[] = [];
 	private genFilter: any;
