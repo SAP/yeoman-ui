@@ -37,8 +37,8 @@ export function getLogger() : IVSCodeExtLogger {
   return logger;
 }
 
-export function getClassLogger(name: string) : IChildLogger {
-	return getLogger().getChildLogger({label:name});
+export function getClassLogger(className: string) : IChildLogger {
+	return getLogger().getChildLogger({label:className});
 }
 
 export function getYeomanUILibraryLogger() : IChildLogger {

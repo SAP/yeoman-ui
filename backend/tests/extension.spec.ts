@@ -136,7 +136,7 @@ describe('extension unit test', () => {
 
         beforeEach(() => {
             extension.YeomanUIPanel.setPaths("testExtensionPath");
-            loggerWrapperMock.expects("getClassLogger").returns({});
+            loggerWrapperMock.expects("getLogger").returns({});
             yeomanUiPanelMock.expects("createRpc").returns(rpcExtension);
         });
 
@@ -164,7 +164,7 @@ describe('extension unit test', () => {
         beforeEach(() => {
             fsextraMock.expects("readFile").resolves();
             extension.YeomanUIPanel.setPaths("testExtensionPath");
-            loggerWrapperMock.expects("getClassLogger").returns({});
+            loggerWrapperMock.expects("getLogger").returns({});
             yeomanUiPanelMock.expects("createRpc").returns(rpcExtension);
             _.set(extension.YeomanUIPanel, "currentPanel.panel", undefined);
             extension.YeomanUIPanel.loadYeomanUI();
@@ -229,7 +229,7 @@ describe('extension unit test', () => {
         beforeEach(() => {
             fsextraMock.expects("readFile").resolves();
             extension.YeomanUIPanel.setPaths("testExtensionPath");
-            loggerWrapperMock.expects("getClassLogger").returns({});
+            loggerWrapperMock.expects("getLogger").returns({});
             yeomanUiPanelMock.expects("createRpc").returns(rpcExtension);
             _.set(extension.YeomanUIPanel, "currentPanel.panel", undefined);
             extension.YeomanUIPanel.loadYeomanUI();
