@@ -11,7 +11,7 @@ import { YouiEvents } from "./youi-events";
 import { VSCodeYouiEvents } from './vscode-youi-events';
 import { GeneratorFilter } from './filter';
 import backendMessages from "./messages";
-import { getClassLogger, createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
+import { getLogger, createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
 import { IChildLogger } from "@vscode-logging/logger";
 import Environment = require('yeoman-environment');
 
@@ -112,7 +112,7 @@ export class YeomanUIPanel {
 
 	public yeomanui: YeomanUI;
 	private readonly panel: vscode.WebviewPanel;
-	private readonly logger: IChildLogger = getClassLogger("");
+	private readonly logger: IChildLogger = getLogger();
 	private rpc: RpcExtension;
 	private disposables: vscode.Disposable[] = [];
 	private genFilter: any;
