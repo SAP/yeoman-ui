@@ -96,11 +96,15 @@
 					"description": "If chosen, the location of the source code is added to log entries. Warning – this action may slow your extension. We recommend you use it only for debugging.",
 					"scope": "resource"
 				},
-				"Explore Generators.sourceLocationTracking": {
+				"Explore Generators.installInGlobalNodeModulesPath": {
 					"type": "boolean",
-					"default": false,
-					"description": "If chosen, the location of the source code is added to log entries. Warning – this action may slow your extension. We recommend you use it only for debugging.",
-					"scope": "resource"
+					"default": true,
+					"description": "Install generators in global npm node_modules path."
+				},
+				"Explore Generators.customNodeModulesPath": {
+					"type": "string",
+					"format": "uri",
+					"markdownDescription": "Install generators in custom npm node_modules path. Only applies when `#ExploreGenerators.installInGlobalNodeModulesPath#` is set to `false`."
 				}
 			}
 		}
