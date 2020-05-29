@@ -36,18 +36,18 @@
       "protocol": "inspector"
     },
     {
-      "name": "Run extension",
-      "type": "extensionHost",
-      "request": "launch",
-      "runtimeExecutable": "${execPath}",
-      "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}/backend"
-      ],
-      "outFiles": [
-        "${workspaceFolder}/backend/dist/**/*.js"
-      ],
-      "preLaunchTask": "watch backend (webpack)"
-    },
+			"name": "Run Extension",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}"
+			],
+			"outFiles": [
+				"${workspaceFolder}/out/**/*.js"
+			],
+			"preLaunchTask": "${defaultBuildTask}"
+		},
     {
       "name": "Test extension",
       "type": "extensionHost",
@@ -58,7 +58,7 @@
         "--extensionTestsPath=${workspaceFolder}/backend/out/tests"
       ],
       "outFiles": [
-        "${workspaceFolder}/backend/dist/**/*.js"
+        "${workspaceFolder}/backend/out/**/*.js"
       ],
       "preLaunchTask": "watch backend"
     },

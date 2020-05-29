@@ -1,12 +1,11 @@
 import * as fsextra from 'fs-extra';
 import * as _ from 'lodash';
 import * as path from 'path';
-import * as os from "os";
 import * as vscode from 'vscode';
 import {RpcExtension} from '@sap-devx/webview-rpc/out.ext/rpc-extension';
-import { YouiLog } from "./youi-log";
 import { IChildLogger } from "@vscode-logging/logger";
 import { getLogger } from "./logger/logger-wrapper";
+import * as npmFetch from 'npm-registry-fetch';
 
 /**
  * Manages webview panels
@@ -25,20 +24,18 @@ export class ExploreGensPanel {
 		ExploreGensPanel.mediaPath = path.join(extensionPath, 'dist', 'media');
 	}
 
-	public static loadYeomanUI(uiOptions?: any) {
+	public static async exploreGenerators(uiOptions?: any) {
 		const displayedPanel = _.get(ExploreGensPanel, "currentPanel.panel");
 		if (displayedPanel) {
 			displayedPanel.dispose();
 		}
-	
-		ExploreGensPanel.create(uiOptions);
-	}
+		
+		const result1: any = await 
+			//npmFetch.json("https://api.npms.io/v2/search?q=generator-+keywords:yeoman-generator+author:sap&size=25"); 
+			npmFetch.json("https://api.npms.io/v2/search?q=generator-+keywords:yeoman-generator&size=25");
+			console.error(result1);
 
-	public static toggleOutput() {
-		const yeomanUi = _.get(ExploreGensPanel, "currentPanel.yeomanui");
-		if (yeomanUi) {
-			yeomanUi.toggleOutput();
-		}
+		ExploreGensPanel.create(uiOptions);
 	}
 
 	public static setCurrentPanel(webviewPanel: vscode.WebviewPanel, uiOptions?: any) {
@@ -72,7 +69,6 @@ export class ExploreGensPanel {
 	private readonly logger: IChildLogger = getLogger();
 	private rpc: RpcExtension;
 	private disposables: vscode.Disposable[] = [];
-	private genFilter: any;
 	private messages: any;
 
 	public constructor(panel: vscode.WebviewPanel, rpc: RpcExtension, uiOptions: any) {
@@ -110,37 +106,7 @@ export class ExploreGensPanel {
 	}
 
 	private setFocused(focused: boolean) {
-		vscode.commands.executeCommand('setContext', 'yeomanUI.Focused', focused);
-	}
-
-	private async showOpenFileDialog(currentPath: string): Promise<string> {
-		return await this.showOpenDialog(currentPath, true);
-	}
-
-	private async showOpenFolderDialog(currentPath: string): Promise<string> {
-		return await this.showOpenDialog(currentPath, false);
-	}
-
-	private async showOpenDialog(currentPath: string, canSelectFiles: boolean): Promise<string> {
-		const canSelectFolders: boolean = !canSelectFiles;
-		
-		let uri;
-		try {
-			uri = vscode.Uri.file(currentPath);
-		} catch (e) {
-			uri = vscode.Uri.file(path.join(os.homedir()));
-		}
-
-		try {
-			const filePath = await vscode.window.showOpenDialog({
-				canSelectFiles,
-				canSelectFolders,
-				defaultUri: uri
-			});
-			return _.get(filePath, "[0].fsPath", currentPath);
-		} catch (error) {
-			return currentPath;
-		}
+		vscode.commands.executeCommand('setContext', 'exporegenerators.Focused', focused);
 	}
 	
 	private dispose() {
@@ -161,19 +127,19 @@ export class ExploreGensPanel {
 
     private async _update() {
 		let indexHtml: string = await fsextra.readFile(path.join(ExploreGensPanel.mediaPath, 'index.html'), "utf8");
-		if (indexHtml) {
-			// Local path to main script run in the webview
-			const scriptPathOnDisk = vscode.Uri.file(path.join(ExploreGensPanel.mediaPath, path.sep));
-			const scriptUri = this.panel.webview.asWebviewUri(scriptPathOnDisk);
+		// if (indexHtml) {
+		// 	// Local path to main script run in the webview
+		// 	const scriptPathOnDisk = vscode.Uri.file(path.join(ExploreGensPanel.mediaPath, path.sep));
+		// 	const scriptUri = this.panel.webview.asWebviewUri(scriptPathOnDisk);
 
-			// TODO: very fragile: assuming double quotes and src is first attribute
-			// specifically, doesn't work when building vue for development (vue-cli-service build --mode development)
-			indexHtml = indexHtml.replace(/<link href=/g, `<link href=${scriptUri.toString()}`);
-			indexHtml = indexHtml.replace(/<script src=/g, `<script src=${scriptUri.toString()}`);
-			indexHtml = indexHtml.replace(/<img src=/g, `<img src=${scriptUri.toString()}`);
-		}
+		// 	// TODO: very fragile: assuming double quotes and src is first attribute
+		// 	// specifically, doesn't work when building vue for development (vue-cli-service build --mode development)
+		// 	indexHtml = indexHtml.replace(/<link href=/g, `<link href=${scriptUri.toString()}`);
+		// 	indexHtml = indexHtml.replace(/<script src=/g, `<script src=${scriptUri.toString()}`);
+		// 	indexHtml = indexHtml.replace(/<img src=/g, `<img src=${scriptUri.toString()}`);
+		// }
 		
-		this.panel.title = this.messages.panel_title;
-		this.panel.webview.html = indexHtml;
+		//this.panel.title = this.messages.panel_title;
+		//this.panel.webview.html = indexHtml;
 	}
 }

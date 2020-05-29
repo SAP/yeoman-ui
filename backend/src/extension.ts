@@ -17,7 +17,9 @@ export function activate(context: vscode.ExtensionContext) {
 	YeomanUIPanel.setPaths(context.extensionPath);
 	context.subscriptions.push(vscode.commands.registerCommand("loadYeomanUI", YeomanUIPanel.loadYeomanUI));
 	context.subscriptions.push(vscode.commands.registerCommand("yeomanUI.toggleOutput", YeomanUIPanel.toggleOutput));
-	context.subscriptions.push(vscode.commands.registerCommand("exploreGenerators", ExploreGensPanel.loadYeomanUI));
+
+	ExploreGensPanel.setPaths(context.extensionPath);
+	context.subscriptions.push(vscode.commands.registerCommand("exploreGenerators", ExploreGensPanel.exploreGenerators));
 
 	vscode.window.registerWebviewPanelSerializer(YeomanUIPanel.viewType, {
 		async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
