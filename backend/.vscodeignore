@@ -3,5 +3,6 @@
 !README.md
 !package.json
 !Wizard_logo.png
-!dist
+!dist/media
+!dist/*.js
 !resources

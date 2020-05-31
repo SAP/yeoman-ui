@@ -12,6 +12,7 @@ const config = {
   entry: [
     './src/extension.ts'
   ], // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
+  devtool: 'source-map',
   output: {
     // the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
     path: path.resolve(__dirname, 'dist'),
@@ -69,3 +70,4 @@ const config = {
   ]
 };
 module.exports = config;
+
