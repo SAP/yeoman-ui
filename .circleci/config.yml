@@ -81,9 +81,6 @@ workflows:
   test-deploy:
     jobs:
       - build-and-test:
-          filters:
-            tags:
-              only: /.*/
       - deploy:
           requires:
             - build-and-test
