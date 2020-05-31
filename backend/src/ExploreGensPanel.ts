@@ -30,10 +30,12 @@ export class ExploreGensPanel {
 			displayedPanel.dispose();
 		}
 		
+		const before = Date.now();
 		const result1: any = await 
 			//npmFetch.json("https://api.npms.io/v2/search?q=generator-+keywords:yeoman-generator+author:sap&size=25"); 
 			npmFetch.json("https://api.npms.io/v2/search?q=generator-+keywords:yeoman-generator&size=25");
-			console.error(result1);
+		const after = Date.now();
+		console.error(after - before);
 
 		ExploreGensPanel.create(uiOptions);
 	}

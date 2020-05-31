@@ -44,7 +44,7 @@
 				"--extensionDevelopmentPath=${workspaceFolder}/backend"
 			],
 			"outFiles": [
-				"${workspaceFolder}/backend/out/**/*.js"
+				"${workspaceFolder}/backend/dist/**/*.js"
 			],
 			"preLaunchTask": "watch backend (webpack)"
 		},
@@ -58,7 +58,7 @@
         "--extensionTestsPath=${workspaceFolder}/backend/out/tests"
       ],
       "outFiles": [
-        "${workspaceFolder}/backend/out/**/*.js"
+        "${workspaceFolder}/backend/dist/**/*.js"
       ],
       "preLaunchTask": "watch backend"
     },
