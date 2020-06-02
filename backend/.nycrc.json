@@ -8,8 +8,8 @@
     "temp-dir": "./reports/.nyc_output",
     "report-dir": "./reports/coverage",
     "check-coverage": true,
-    "branches": 80.5,
-    "lines": 86.2,
-    "functions": 79.6,
-    "statements": 85.7
+    "branches": 79.8,
+    "lines": 86,
+    "functions": 81,
+    "statements": 86
   }
