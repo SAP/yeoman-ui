@@ -1,6 +1,7 @@
 [![CircleCI](https://circleci.com/gh/SAP/yeoman-ui.svg?style=svg)](https://circleci.com/gh/SAP/yeoman-ui)
 ![GitHub license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)
 
+
 # Application Wizard
 
 ![](screenshot.png)
