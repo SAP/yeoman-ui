@@ -16,14 +16,21 @@ import { IChildLogger } from "@vscode-logging/logger";
 import Environment = require('yeoman-environment');
 
 const YEOMAN_UI = "Yeoman UI";
-let defaultNpmPaths: string[];
+//let defaultNpmPaths: string[];
 
 export function activate(context: vscode.ExtensionContext) {
 	try {
 		// improves performance
 		// TODO: replace or remove this API
         	// it is very slow, takes more than 2 seconds 
-		defaultNpmPaths = Environment.createEnv().getNpmPaths();
+		// defaultNpmPaths = Environment.createEnv().getNpmPaths();
+		// const pocExt: vscode.Extension<any> = vscode.extensions.getExtension("slavik.poc");
+		// if (pocExt) {
+		// 	const location = pocExt.exports.getGeneratorsLocation();
+		// 	if (location) {
+		// 		defaultNpmPaths.push(location);
+		// 	}
+		// }
 		createExtensionLoggerAndSubscribeToLogSettingsChanges(context);
 	} catch (error) {
 		console.error("Extension activation failed due to Logger configuration failure:", error.message);
@@ -109,6 +116,18 @@ export class YeomanUIPanel {
 		YeomanUIPanel.setCurrentPanel(webviewPanel, uiOptions);
 	}
 
+	private getDefaultPaths() {
+		const defaultNpmPaths = Environment.createEnv().getNpmPaths();
+		const pocExt: vscode.Extension<any> = vscode.extensions.getExtension("slavik.poc");
+		if (pocExt) {
+			const location = pocExt.exports.getGeneratorsLocation();
+			if (location) {
+				defaultNpmPaths.push(location);
+			}
+		}
+
+		return defaultNpmPaths;
+	}
 
 	public yeomanui: YeomanUI;
 	private readonly panel: vscode.WebviewPanel;
@@ -129,7 +148,7 @@ export class YeomanUIPanel {
 			vscodeYouiEvents, 
 			outputChannel, 
 			this.logger, 
-			{genFilter: this.genFilter, messages: this.messages, defaultNpmPaths},
+			{genFilter: this.genFilter, messages: this.messages, defaultNpmPaths: this.getDefaultPaths()},
 			_.get(vscode, "workspace.workspaceFolders[0].uri.fsPath"));
 		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
 		this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
