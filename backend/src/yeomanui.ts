@@ -184,6 +184,12 @@ export class YeomanUI {
       this.promptCount = 0;
       this.gen = (gen as Generator);
       this.gen.destinationRoot(targetFolder);
+      
+      env.on("error", error => {
+        env.removeAllListeners("error");
+        this.onGeneratorFailure(generatorName, error);
+        env.emit("error", error);
+      });
       // we cannot use new async method, "await this.gen.run()", because generators based on older versions 
       // (for example: 2.0.5) of "yeoman-generator" do not support it
       this.gen.run(async (error) => {
