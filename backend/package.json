@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.0.12",
+	"version": "1.1.0",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -32,7 +32,9 @@
 	"activationEvents": [
 		"*",
 		"onCommand:loadYeomanUI",
-		"onWebviewPanel:yeomanui"
+		"onWebviewPanel:yeomanui",
+		"onCommand:exploreGenerators",
+		"onWebviewPanel:exploreGens"
 	],
 	"main": "./dist/extension",
 	"contributes": {
@@ -48,6 +50,10 @@
 					"light": "./resources/images/icons/console_light.svg",
 					"dark": "./resources/images/icons/console_dark.svg"
 				}
+			},
+			{
+				"command": "exploreGenerators",
+				"title": "Explore Generators"
 			}
 		],
 		"menus": {
@@ -89,6 +95,19 @@
 					"default": false,
 					"description": "If chosen, the location of the source code is added to log entries. Warning – this action may slow your extension. We recommend you use it only for debugging.",
 					"scope": "resource"
+				},
+				"Yeoman UI.customNodeModulesPath": {
+					"type": "string",
+					"markdownDescription": "Install generators in custom npm node_modules path. If not set, global node_modules path is used."
+				},
+				"Yeoman UI.autoUpdateGenerators": {
+					"type": "boolean",
+					"default": true,
+					"description": "Auto update downloaded generators"
+				},
+				"Yeoman UI.downloadedGenerators": {
+					"type": "array",
+					"description": "Downloaded generators"
 				}
 			}
 		}
@@ -123,9 +142,11 @@
 		"strip-ansi": "^6.0.0",
 		"titleize": "^1.0.1",
 		"ws": "^7.2.5",
-		"yeoman-environment": "2.8.0"
+		"yeoman-environment": "2.8.0",
+		"npm-registry-fetch": "8.1.0"
 	},
 	"devDependencies": {
+		"@types/npm-registry-fetch": "8.0.0",
 		"@types/chai": "^4.2.9",
 		"@types/fs-extra": "^8.1.0",
 		"@types/inquirer": "^6.5.0",
