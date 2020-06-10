@@ -1,5 +1,10 @@
 import * as _ from "lodash";
 
+export enum GeneratorType {
+    project = "project", 
+    module = "module"
+}
+
 function getCategories(filterObject?: any): string[] {
     const categories: string[] = _.get(filterObject, 'categories', []);
     if (_.isArray(categories)) {
@@ -19,9 +24,7 @@ function getTypes(filterObject?: any): string[] {
     const objectTypes: any = _.get(filterObject, "types", _.get(filterObject, "type"));
     if (_.isString(objectTypes)) {
         types.push(objectTypes);
-    }
-
-    if (_.isArray(objectTypes)) {
+    } else if (_.isArray(objectTypes)) {
         // leave only string values
         types = _.filter(objectTypes, type => {
             return _.isString(type);

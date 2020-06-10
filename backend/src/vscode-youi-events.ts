@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as _ from 'lodash';
 import { YouiEvents } from "./youi-events";
 import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-import { GeneratorFilter } from './filter';
+import { GeneratorFilter, GeneratorType } from './filter';
 
 export class VSCodeYouiEvents implements YouiEvents {
     private webviewPanel: vscode.WebviewPanel;
@@ -59,7 +59,7 @@ export class VSCodeYouiEvents implements YouiEvents {
             
             const targetFolderUri: vscode.Uri = vscode.Uri.file(targetFolderPath);
 
-            if (_.indexOf(this.genFilter.types, "module") === -1) {
+            if (_.indexOf(this.genFilter.types, GeneratorType.module) === -1) {
                 const workspacePath = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
                 // 1. target workspace folder should not already contain target generator folder
                 const foundInWorkspace = _.find(vscode.workspace.workspaceFolders, (wsFolder: vscode.WorkspaceFolder) => {
