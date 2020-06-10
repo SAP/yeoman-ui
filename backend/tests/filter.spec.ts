@@ -1,7 +1,7 @@
 import * as mocha from "mocha";
 import { expect } from "chai";
 
-import {GeneratorFilter, GeneratorType} from "../src/filter";
+import {GeneratorFilter} from "../src/filter";
 
 describe('filter unit test', () => {
     it('categories property is not of array type', () => {
@@ -18,28 +18,35 @@ describe('filter unit test', () => {
         const testCategories: string[] = ["test1", "test2"];
         const genFilter: GeneratorFilter = GeneratorFilter.create({type: "test123", categories: testCategories});
         // tslint:disable-next-line: no-unused-expression
-        expect(genFilter.type).to.be.equal("test123");
+        expect(genFilter.types).to.contain("test123");
         expect(genFilter.categories).to.be.deep.equal(testCategories);
     });
 
     it('filter obj is undefined', () => {
         const genFilter: GeneratorFilter = GeneratorFilter.create(undefined);
         // tslint:disable-next-line: no-unused-expression
-        expect(genFilter.type).to.be.equal(GeneratorType.all);
+        expect(genFilter.types).to.be.empty;
+        expect(genFilter.categories).to.be.deep.equal([]);
+    });
+
+    it('filter type is neither array nor string', () => {
+        const genFilter: GeneratorFilter = GeneratorFilter.create({type: {}});
+        // tslint:disable-next-line: no-unused-expression
+        expect(genFilter.types).to.be.empty;
         expect(genFilter.categories).to.be.deep.equal([]);
     });
 
     it('type property is project and category property has strings in array ', () => {
         const testCategories: string[] = ["test1", "test2"];
         const genFilter: GeneratorFilter = GeneratorFilter.create({type: "project", categories: testCategories});
-        expect(genFilter.type).to.be.equal(GeneratorType.project);
+        expect(genFilter.types).to.contain("project");
         expect(genFilter.categories).to.be.deep.equal(testCategories);
     });
 
     it('type property is module and category property has strings in array ', () => {
         const testCategories: string[] = ["test1", "test2"];
-        const genFilter: GeneratorFilter = GeneratorFilter.create({type: "module", categories: testCategories});
-        expect(genFilter.type).to.be.equal(GeneratorType.module);
+        const genFilter: GeneratorFilter = GeneratorFilter.create({type: ["  module"], categories: testCategories});
+        expect(genFilter.types).to.contain("module");
         expect(genFilter.categories).to.be.deep.equal(testCategories);
     });
 });
