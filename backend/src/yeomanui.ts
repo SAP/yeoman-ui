@@ -429,9 +429,9 @@ export class YeomanUI {
     }
 
     const genFilter: GeneratorFilter = GeneratorFilter.create(_.get(packageJson, ["generator-filter"]));
-    const typeEqual: boolean = (_.isEmpty(filter.types) || !_.isEmpty(_.intersection(filter.types, genFilter.types)));
-    const categoriesHasIntersection: boolean = (_.isEmpty(filter.categories) || !_.isEmpty(_.intersection(filter.categories, genFilter.categories)));
-    if (typeEqual && categoriesHasIntersection) {
+    const typesHasIntersection: boolean = GeneratorFilter.hasIntersection(filter.types, genFilter.types);
+    const categoriesHasIntersection: boolean = GeneratorFilter.hasIntersection(filter.categories, genFilter.categories);
+    if (typesHasIntersection && categoriesHasIntersection) {
       return this.createGeneratorChoice(genName, genPackagePath, packageJson);
     }
 

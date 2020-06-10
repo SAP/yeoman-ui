@@ -30,7 +30,7 @@ describe('filter unit test', () => {
     });
 
     it('filter type is neither array nor string', () => {
-        const genFilter: GeneratorFilter = GeneratorFilter.create({type: {}});
+        const genFilter: GeneratorFilter = GeneratorFilter.create({types: {}});
         // tslint:disable-next-line: no-unused-expression
         expect(genFilter.types).to.be.empty;
         expect(genFilter.categories).to.be.deep.equal([]);
@@ -45,7 +45,7 @@ describe('filter unit test', () => {
 
     it('type property is module and category property has strings in array ', () => {
         const testCategories: string[] = ["test1", "test2"];
-        const genFilter: GeneratorFilter = GeneratorFilter.create({type: ["  module"], categories: testCategories});
+        const genFilter: GeneratorFilter = GeneratorFilter.create({types: ["  module"], categories: testCategories});
         expect(genFilter.types).to.contain("module");
         expect(genFilter.categories).to.be.deep.equal(testCategories);
     });
