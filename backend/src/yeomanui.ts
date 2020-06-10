@@ -14,7 +14,7 @@ import { YouiLog } from "./youi-log";
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
-import { GeneratorType, GeneratorFilter } from "./filter";
+import { GeneratorFilter, GeneratorType } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
 
@@ -375,7 +375,7 @@ export class YeomanUI {
 
     const questions: any[] = [];
 
-    if (genFilter.type === GeneratorType.project) {
+    if (_.indexOf(genFilter.types, GeneratorType.project) > 0) {
       const defaultPath = this.getCwd();
       const targetFolderQuestion: any = {
         type: "input",
@@ -429,9 +429,9 @@ export class YeomanUI {
     }
 
     const genFilter: GeneratorFilter = GeneratorFilter.create(_.get(packageJson, ["generator-filter"]));
-    const typeEqual: boolean = (filter.type === GeneratorType.all || filter.type === genFilter.type);
-    const categoriesHasIntersection: boolean = (_.isEmpty(filter.categories) || !_.isEmpty(_.intersection(filter.categories, genFilter.categories)));
-    if (typeEqual && categoriesHasIntersection) {
+    const typesHasIntersection: boolean = GeneratorFilter.hasIntersection(filter.types, genFilter.types);
+    const categoriesHasIntersection: boolean = GeneratorFilter.hasIntersection(filter.categories, genFilter.categories);
+    if (typesHasIntersection && categoriesHasIntersection) {
       return this.createGeneratorChoice(genName, genPackagePath, packageJson);
     }
 

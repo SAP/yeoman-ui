@@ -3,7 +3,7 @@ import { expect } from "chai";
 import * as sinon from "sinon";
 import * as _ from "lodash";
 import * as vscode from "vscode";
-import { GeneratorFilter, GeneratorType } from '../src/filter';
+import { GeneratorFilter } from '../src/filter';
 
 import { VSCodeYouiEvents } from "../src/vscode-youi-events";
 
@@ -106,7 +106,7 @@ describe('vscode-youi-events unit test', () => {
         });
 
         it("generator filter type is module", () => {
-            const genFilter = GeneratorFilter.create({type: GeneratorType.module});
+            const genFilter = GeneratorFilter.create({type: ["module"]});
             const events = new VSCodeYouiEvents(undefined, undefined, genFilter);
             eventsMock = sandbox.mock(events);
             eventsMock.expects("doClose");
