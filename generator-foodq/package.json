@@ -29,6 +29,9 @@
     "@sap-devx/yeoman-ui-types": "0.0.1"
   },
   "generator-filter": {
-    "type": "project"
+    "types": [
+      "foodq",
+      "project"
+    ]
   }
 }
