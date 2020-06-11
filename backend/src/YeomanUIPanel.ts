@@ -12,6 +12,7 @@ import { YouiEvents } from "./youi-events";
 import { VSCodeYouiEvents } from './vscode-youi-events';
 import Environment = require('yeoman-environment');
 import { AbstractWebViewPanel } from './AbstractWebviewPanel';
+import { IRpc } from '@sap-devx/webview-rpc/out.ext/rpc-common';
 
 // let defaultNpmPaths: string[];
  
@@ -40,7 +41,7 @@ export class YeomanUIPanel extends AbstractWebViewPanel{
 		this.messages = _.assign({}, backendMessages, _.get(uiOptions, "messages", {}))
 		this.genFilter = GeneratorFilter.create(_.get(uiOptions, "filter"));
 
-		const rpc = new RpcExtension(this.panel.webview);
+		const rpc: IRpc = new RpcExtension(this.panel.webview);
 		const outputChannel: YouiLog = new OutputChannelLog(this.messages.channel_name);
 		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(rpc, this.panel, this.genFilter);
 		this.yeomanui = new YeomanUI(rpc, 
@@ -63,7 +64,7 @@ export class YeomanUIPanel extends AbstractWebViewPanel{
 		return this.channel;
 	}
 
-	public yeomanui: YeomanUI;
+	private yeomanui: YeomanUI;
 	private genFilter: any;
 	private messages: any;
 

@@ -92,7 +92,7 @@ export abstract class AbstractWebViewPanel {
 		let indexHtml = await fsextra.readFile(path.join(this.mediaPath, 'index.html'), "utf8");
 		if (indexHtml) {
 		  // Local path to main script run in the webview
-		  const scriptPathOnDisk = vscode.Uri.file(path.join(this.extensionPath, 'dist', path.sep));
+		  const scriptPathOnDisk = vscode.Uri.file(path.join(this.mediaPath, path.sep));
 		  const scriptUri = this.panel.webview.asWebviewUri(scriptPathOnDisk);
 
 		  // TODO: very fragile: assuming double quotes and src is first attribute
