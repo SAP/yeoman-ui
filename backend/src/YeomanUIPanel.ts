@@ -13,8 +13,6 @@ import { VSCodeYouiEvents } from './vscode-youi-events';
 import Environment = require('yeoman-environment');
 import { AbstractWebViewPanel } from './AbstractWebviewPanel';
 import { IRpc } from '@sap-devx/webview-rpc/out.ext/rpc-common';
-
-// let defaultNpmPaths: string[];
  
 
 export class YeomanUIPanel extends AbstractWebViewPanel{
@@ -48,7 +46,7 @@ export class YeomanUIPanel extends AbstractWebViewPanel{
 			vscodeYouiEvents, 
 			outputChannel, 
 			this.logger, 
-			{genFilter: this.genFilter, messages: this.messages, defaultNpmPaths: null},
+			{genFilter: this.genFilter, messages: this.messages, defaultNpmPaths: this.getDefaultPaths()},
 			_.get(vscode, "workspace.workspaceFolders[0].uri.fsPath"));
 		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
 		this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
@@ -67,6 +65,9 @@ export class YeomanUIPanel extends AbstractWebViewPanel{
 	private yeomanui: YeomanUI;
 	private genFilter: any;
 	private messages: any;
+	// improves first time performance
+	// TODO: replace or remove this API it is very slow, takes more than 2 seconds 
+	private readonly defaultNpmPaths: string[] = Environment.createEnv().getNpmPaths();
 
 	public constructor(context: vscode.ExtensionContext) {
         super(context);
@@ -74,23 +75,15 @@ export class YeomanUIPanel extends AbstractWebViewPanel{
         this.viewTitle = YeomanUIPanel.YEOMAN_UI;
 		this.focusedKey = "yeomanUI.Focused";
     } 
-	// // improves performance
-	// // TODO: replace or remove this API
-	// // it is very slow, takes more than 2 seconds 
-	// defaultNpmPaths = Environment.createEnv().getNpmPaths();
     
-    // private getDefaultPaths() {
-	// 	const defaultNpmPaths = Environment.createEnv().getNpmPaths();
-	// 	const pocExt: vscode.Extension<any> = vscode.extensions.getExtension("slavik.poc");
-	// 	if (pocExt) {
-	// 		const location = pocExt.exports.getGeneratorsLocation();
-	// 		if (location) {
-	// 			defaultNpmPaths.push(location);
-	// 		}
-	// 	}
+    private getDefaultPaths(): string[] {
+		const generatorsLocation: string = _.trim(this.workspaceConfig.get("Yeoman UI.generatorsLocation"));
+		if (!_.isEmpty(generatorsLocation)) {
+			return _.concat(this.defaultNpmPaths, path.join(generatorsLocation, "node_modules"));
+		}
 
-	// 	return defaultNpmPaths;
-	// }
+		return this.defaultNpmPaths;
+	}
 
 	private async showOpenFileDialog(currentPath: string): Promise<string> {
 		return await this.showOpenDialog(currentPath, true);

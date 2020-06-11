@@ -45,7 +45,7 @@ export class ExploreGens {
         }
     }
 
-    public async getFilteredGenerators(query = "", author = "") {
+    private async getFilteredGenerators(query = "", author = "") {
         const api_endpoint = "http://registry.npmjs.com/-/v1/search?text=";
         let actualQuery = _.isEmpty(query) ? `generator-` : query;
         actualQuery = _.replace(actualQuery, " ", "%20");
@@ -55,17 +55,17 @@ export class ExploreGens {
         this.rpc.invoke("setGenerators", [filteredGenerators, res.total]);
     }
 
-    public getGeneratorsLocation() {
+    private getGeneratorsLocation() {
         const generatorsLocation: string = _.trim(this.workspaceConfig.get("Yeoman UI.generatorsLocation"));
         return _.isEmpty(generatorsLocation) ? "" : generatorsLocation;
     }
 
-    public getGeneratorsLocationParams() {
+    private getGeneratorsLocationParams() {
         const location = this.getGeneratorsLocation();
         return _.isEmpty(location) ? "-g" : `--prefix ${location}`;
     }
 
-    public async updateAllInstalledGenerators() {
+    private async updateAllInstalledGenerators() {
         const autoUpdateEnabled = this.workspaceConfig.get("Yeoman UI.autoUpdateGenerators");
         if (autoUpdateEnabled) {
             const downloadedGenerators: string[] | undefined = this.workspaceConfig.get("Yeoman UI.downloadedGenerators");
@@ -79,10 +79,5 @@ export class ExploreGens {
                 exec(`${npm} install ${locationParams} ${genName}@latest`);
             });
         }
-    }
-
-    public getGeneratorsLocationNodeModules() {
-        const location: any = this.getGeneratorsLocation();
-        return _.isEmpty(location) ? "" : path.join(location, "node_modules");
     }
 }
