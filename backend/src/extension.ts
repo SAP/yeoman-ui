@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
+import { AbstractWebviewPanel } from "./panels/AbstractWebviewPanel";
 import { YeomanUIPanel } from "./panels/YeomanUIPanel";
 import { ExploreGensPanel } from "./panels/ExploreGensPanel";
 
@@ -19,24 +20,22 @@ export function activate(context: vscode.ExtensionContext) {
 	const yeomanUIPanel = new YeomanUIPanel(extContext);
 	registerAndSubscribeCommand("loadYeomanUI", yeomanUIPanel.loadYeomanUI.bind(yeomanUIPanel));
 	registerAndSubscribeCommand("yeomanUI.toggleOutput", yeomanUIPanel.toggleOutput.bind(yeomanUIPanel));
-
-	vscode.window.registerWebviewPanelSerializer(yeomanUIPanel.viewType, {
-		async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
-			yeomanUIPanel.setPanel(webviewPanel, state);
-		}
-	});
+	registerWebviewPanelSerializer(yeomanUIPanel);
 
 	// ExploreGensPanel
 	const exploreGensPanel = new ExploreGensPanel(extContext);
 	registerAndSubscribeCommand("exploreGenerators", exploreGensPanel.exploreGenerators.bind(exploreGensPanel));
-
-	vscode.window.registerWebviewPanelSerializer(exploreGensPanel.viewType, {
-		async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel) {
-			exploreGensPanel.setPanel(webviewPanel);
-		}
-	});
+	registerWebviewPanelSerializer(exploreGensPanel);
 }
 
 function registerAndSubscribeCommand(cId: string, cAction: any) {
 	extContext.subscriptions.push(vscode.commands.registerCommand(cId, cAction));
+}
+
+function registerWebviewPanelSerializer(panel: AbstractWebviewPanel) {
+	vscode.window.registerWebviewPanelSerializer(panel.viewType, {
+		async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state?: any) {
+			panel.setPanel(webviewPanel, state);
+		}
+	});
 }

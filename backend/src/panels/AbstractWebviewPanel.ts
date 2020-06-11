@@ -6,29 +6,29 @@ import { IChildLogger } from '@vscode-logging/logger';
 import { getLogger } from '../logger/logger-wrapper';
 
 
-export abstract class AbstractWebViewPanel {
-    public viewType: string;
+export abstract class AbstractWebviewPanel {
+	public viewType: string;
 	protected extensionPath: string;
-    protected mediaPath: string;
-    protected viewTitle: string;
-    protected panel: vscode.WebviewPanel;
-    protected focusedKey: string;
-    protected workspaceConfig: any;
+	protected mediaPath: string;
+	protected viewTitle: string;
+	protected panel: vscode.WebviewPanel;
+	protected focusedKey: string;
+	protected workspaceConfig: any;
 
 	protected readonly logger: IChildLogger = getLogger();
-    protected disposables: vscode.Disposable[] = [];
+	protected disposables: vscode.Disposable[] = [];
 
-    protected constructor(context: vscode.ExtensionContext) {
-        this.extensionPath = context.extensionPath;
-        this.mediaPath = path.join(context.extensionPath, "dist", "media");
-        this.workspaceConfig = vscode.workspace.getConfiguration();
-    }
+	protected constructor(context: vscode.ExtensionContext) {
+		this.extensionPath = context.extensionPath;
+		this.mediaPath = path.join(context.extensionPath, "dist", "media");
+		this.workspaceConfig = vscode.workspace.getConfiguration();
+	}
 
-    public setPanel(webviewPanel: vscode.WebviewPanel, state?: any) {
-        this.panel = webviewPanel;
-    };
-    
-    protected createWebviewPanel(): vscode.WebviewPanel {
+	public setPanel(webviewPanel: vscode.WebviewPanel, state?: any) {
+		this.panel = webviewPanel;
+	};
+
+	protected createWebviewPanel(): vscode.WebviewPanel {
 		return vscode.window.createWebviewPanel(
 			this.viewType,
 			this.viewTitle,
@@ -36,22 +36,22 @@ export abstract class AbstractWebViewPanel {
 			{
 				// Enable javascript in the webview
 				enableScripts: true,
-				retainContextWhenHidden : true,
+				retainContextWhenHidden: true,
 				// And restrict the webview to only loading content from our extension's `media` directory.
 				localResourceRoots: [vscode.Uri.file(this.mediaPath)]
 			}
 		);
-    }
+	}
 
-    protected disposePanel() {
-        const displayedPanel = this.panel;
+	protected disposePanel() {
+		const displayedPanel = this.panel;
 		if (displayedPanel) {
 			displayedPanel.dispose();
 		}
-    }
+	}
 
-    protected initWebviewPanel() {
-        // Set the webview's initial html content
+	protected initWebviewPanel() {
+		// Set the webview's initial html content
 		this._update();
 
 		// Set the context (current panel is focused)
@@ -67,18 +67,18 @@ export abstract class AbstractWebViewPanel {
 			null,
 			this.disposables
 		);
-    }
+	}
 
-    protected setFocused(focusedValue: boolean) {
+	protected setFocused(focusedValue: boolean) {
 		vscode.commands.executeCommand('setContext', this.focusedKey, focusedValue);
 	}
 
-    protected dispose() {
+	protected dispose() {
 		this.setFocused(false);
-		
+
 		// Clean up our resources
-        this.panel.dispose();
-        this.panel = null;
+		this.panel.dispose();
+		this.panel = null;
 
 		while (this.disposables.length) {
 			const x = this.disposables.pop();
@@ -86,21 +86,21 @@ export abstract class AbstractWebViewPanel {
 				x.dispose();
 			}
 		}
-    }
-    
-    private async _update() {
+	}
+
+	private async _update() {
 		let indexHtml = await fsextra.readFile(path.join(this.mediaPath, 'index.html'), "utf8");
 		if (indexHtml) {
-		  // Local path to main script run in the webview
-		  const scriptPathOnDisk = vscode.Uri.file(path.join(this.mediaPath, path.sep));
-		  const scriptUri = this.panel.webview.asWebviewUri(scriptPathOnDisk);
+			// Local path to main script run in the webview
+			const scriptPathOnDisk = vscode.Uri.file(path.join(this.mediaPath, path.sep));
+			const scriptUri = this.panel.webview.asWebviewUri(scriptPathOnDisk);
 
-		  // TODO: very fragile: assuming double quotes and src is first attribute
-		  // specifically, doesn't work when building vue for development (vue-cli-service build --mode development)
-		  indexHtml = indexHtml.replace(/<link href=/g, `<link href=${scriptUri.toString()}`);
-		  indexHtml = indexHtml.replace(/<script src=/g, `<script src=${scriptUri.toString()}`);
-		  indexHtml = indexHtml.replace(/<img src=/g, `<img src=${scriptUri.toString()}`);
-	  	}
+			// TODO: very fragile: assuming double quotes and src is first attribute
+			// specifically, doesn't work when building vue for development (vue-cli-service build --mode development)
+			indexHtml = indexHtml.replace(/<link href=/g, `<link href=${scriptUri.toString()}`);
+			indexHtml = indexHtml.replace(/<script src=/g, `<script src=${scriptUri.toString()}`);
+			indexHtml = indexHtml.replace(/<img src=/g, `<img src=${scriptUri.toString()}`);
+		}
 		this.panel.webview.html = indexHtml;
 	}
 }
