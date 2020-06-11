@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
-import {YeomanUIPanel} from "./YeomanUIPanel";
-import {ExploreGensPanel} from "./ExploreGensPanel";
+import { YeomanUIPanel } from "./YeomanUIPanel";
+import { ExploreGensPanel } from "./ExploreGensPanel";
 
 export function activate(context: vscode.ExtensionContext) {
 	try {
@@ -12,23 +12,23 @@ export function activate(context: vscode.ExtensionContext) {
 	}
 
 	// YeomanUIPanel
-	YeomanUIPanel.setPaths(context.extensionPath);
-	context.subscriptions.push(vscode.commands.registerCommand("loadYeomanUI", YeomanUIPanel.loadYeomanUI));
-	context.subscriptions.push(vscode.commands.registerCommand("yeomanUI.toggleOutput", YeomanUIPanel.toggleOutput));
+	const yeomanUIPanel = new YeomanUIPanel(context);
+	context.subscriptions.push(vscode.commands.registerCommand("loadYeomanUI", yeomanUIPanel.loadYeomanUI.bind(yeomanUIPanel)));
+	context.subscriptions.push(vscode.commands.registerCommand("yeomanUI.toggleOutput", yeomanUIPanel.toggleOutput.bind(yeomanUIPanel)));
 
-	vscode.window.registerWebviewPanelSerializer(YeomanUIPanel.viewType, {
+	vscode.window.registerWebviewPanelSerializer(yeomanUIPanel.viewType, {
 		async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
-			YeomanUIPanel.setCurrentPanel(webviewPanel, state);
+			yeomanUIPanel.setPanel(webviewPanel, state);
 		}
 	});
 
 	// ExploreGensPanel
-	ExploreGensPanel.setPaths(context.extensionPath);
-	context.subscriptions.push(vscode.commands.registerCommand("exploreGenerators", ExploreGensPanel.exploreGenerators));
+	const exploreGensPanel = new ExploreGensPanel(context);
+	context.subscriptions.push(vscode.commands.registerCommand("exploreGenerators", exploreGensPanel.exploreGenerators.bind(exploreGensPanel)));
 
-	vscode.window.registerWebviewPanelSerializer(ExploreGensPanel.viewType, {
-		async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
-			ExploreGensPanel.setCurrentPanel(webviewPanel);
+	vscode.window.registerWebviewPanelSerializer(exploreGensPanel.getViewType(), {
+		async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel) {
+			exploreGensPanel.setPanel(webviewPanel);
 		}
 	});
 }

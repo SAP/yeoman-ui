@@ -67,15 +67,15 @@ describe('extension unit test', () => {
         sandbox.restore();
     });
 
-    beforeEach(() => {
-        commandsMock = sandbox.mock(testVscode.commands);
-        windowMock = sandbox.mock(testVscode.window);
-        yeomanUiPanelMock = sandbox.mock(extension.YeomanUIPanel);
-        _.set(extension.YeomanUIPanel, "currentPanel.yeomanui", {toggleOutput: () => true});
-        yeomanUiMock = sandbox.mock(extension.YeomanUIPanel.currentPanel.yeomanui);
-        loggerWrapperMock = sandbox.mock(loggerWrapper);
-        fsextraMock = sandbox.mock(fsextra);
-    });
+    // beforeEach(() => {
+    //     commandsMock = sandbox.mock(testVscode.commands);
+    //     windowMock = sandbox.mock(testVscode.window);
+    //     yeomanUiPanelMock = sandbox.mock(extension.YeomanUIPanel);
+    //     _.set(extension.YeomanUIPanel, "currentPanel.yeomanui", {toggleOutput: () => true});
+    //     yeomanUiMock = sandbox.mock(extension.YeomanUIPanel.currentPanel.yeomanui);
+    //     loggerWrapperMock = sandbox.mock(loggerWrapper);
+    //     fsextraMock = sandbox.mock(fsextra);
+    // });
 
     afterEach(() => {
         commandsMock.verify();
@@ -107,25 +107,25 @@ describe('extension unit test', () => {
         });
     });
 
-    it("getOutputChannel", () => {
-        const oOutputChannel = {};
-        windowMock.expects("createOutputChannel").once().returns(oOutputChannel);
-        expect(oOutputChannel).to.be.equal(extension.getOutputChannel("generators"));
-        expect(oOutputChannel).to.be.equal(extension.getOutputChannel("generators"));
-    });
+    // it("getOutputChannel", () => {
+    //     const oOutputChannel = {};
+    //     windowMock.expects("createOutputChannel").once().returns(oOutputChannel);
+    //     expect(oOutputChannel).to.be.equal(extension.getOutputChannel("generators"));
+    //     expect(oOutputChannel).to.be.equal(extension.getOutputChannel("generators"));
+    // });
 
-    describe("YeomanUIPanel.toggleOutput", () => {
-        it("YeomanUIPanel.currentPanel.yeomanui not exist", () => {
-            _.set(extension.YeomanUIPanel, "currentPanel.yeomanui", undefined);
-            yeomanUiMock.expects("toggleOutput").never();
-            extension.YeomanUIPanel.toggleOutput();
-        });
+    // describe("YeomanUIPanel.toggleOutput", () => {
+    //     it("YeomanUIPanel.currentPanel.yeomanui not exist", () => {
+    //         _.set(extension.YeomanUIPanel, "currentPanel.yeomanui", undefined);
+    //         yeomanUiMock.expects("toggleOutput").never();
+    //         extension.YeomanUIPanel.toggleOutput();
+    //     });
 
-        it("YeomanUIPanel.currentPanel.yeomanui exists", () => {
-            yeomanUiMock.expects("toggleOutput");
-            extension.YeomanUIPanel.toggleOutput();
-        });
-    });
+    //     it("YeomanUIPanel.currentPanel.yeomanui exists", () => {
+    //         yeomanUiMock.expects("toggleOutput");
+    //         extension.YeomanUIPanel.toggleOutput();
+    //     });
+    // });
 
     describe("YeomanUIPanel.loadYeomanUI", () => {
         const rpcExtension = {
@@ -134,24 +134,24 @@ describe('extension unit test', () => {
             registerMethod: () => Promise.resolve()
         };
 
-        beforeEach(() => {
-            extension.YeomanUIPanel.setPaths("testExtensionPath");
-            loggerWrapperMock.expects("getLogger").returns({});
-            yeomanUiPanelMock.expects("createRpc").returns(rpcExtension);
-        });
+        // beforeEach(() => {
+        //     extension.YeomanUIPanel.setPaths("testExtensionPath");
+        //     loggerWrapperMock.expects("getLogger").returns({});
+        //     yeomanUiPanelMock.expects("createRpc").returns(rpcExtension);
+        // });
 
 
-        it("YeomanUIPanel.currentPanel.panel not exists", () => {
-            fsextraMock.expects("readFile").resolves("test file content");
-            _.set(extension.YeomanUIPanel, "currentPanel.panel", undefined);
-            extension.YeomanUIPanel.loadYeomanUI();
-        });
+        // it("YeomanUIPanel.currentPanel.panel not exists", () => {
+        //     fsextraMock.expects("readFile").resolves("test file content");
+        //     _.set(extension.YeomanUIPanel, "currentPanel.panel", undefined);
+        //     extension.YeomanUIPanel.loadYeomanUI();
+        // });
 
-        it("YeomanUIPanel.currentPanel.yeomanui exists", () => {
-            fsextraMock.expects("readFile").resolves();
-            _.set(extension.YeomanUIPanel, "currentPanel.panel", {dispose: () => {}});
-            extension.YeomanUIPanel.loadYeomanUI();
-        });
+        // it("YeomanUIPanel.currentPanel.yeomanui exists", () => {
+        //     fsextraMock.expects("readFile").resolves();
+        //     _.set(extension.YeomanUIPanel, "currentPanel.panel", {dispose: () => {}});
+        //     extension.YeomanUIPanel.loadYeomanUI();
+        // });
     });
 
     describe("showOpenDialog", () => {
@@ -161,62 +161,62 @@ describe('extension unit test', () => {
             registerMethod: () => Promise.resolve()
         };
 
-        beforeEach(() => {
-            fsextraMock.expects("readFile").resolves();
-            extension.YeomanUIPanel.setPaths("testExtensionPath");
-            loggerWrapperMock.expects("getLogger").returns({});
-            yeomanUiPanelMock.expects("createRpc").returns(rpcExtension);
-            _.set(extension.YeomanUIPanel, "currentPanel.panel", undefined);
-            extension.YeomanUIPanel.loadYeomanUI();
-        });
+        // beforeEach(() => {
+        //     fsextraMock.expects("readFile").resolves();
+        //     extension.YeomanUIPanel.setPaths("testExtensionPath");
+        //     loggerWrapperMock.expects("getLogger").returns({});
+        //     yeomanUiPanelMock.expects("createRpc").returns(rpcExtension);
+        //     _.set(extension.YeomanUIPanel, "currentPanel.panel", undefined);
+        //     extension.YeomanUIPanel.loadYeomanUI();
+        // });
 
-        it("showOpenFileDialog", async () => {
-            const currentPanel = _.get(extension.YeomanUIPanel, "currentPanel");
-            windowMock.expects("showOpenDialog").withExactArgs({
-				canSelectFiles: true,
-				canSelectFolders: false,
-				defaultUri: "testFilePath"
-			}).resolves();
-            const result = await currentPanel["showOpenFileDialog"]("testFilePath");
-            expect(result).to.be.equals("testFilePath");
-        });
+        // it("showOpenFileDialog", async () => {
+        //     const currentPanel = _.get(extension.YeomanUIPanel, "currentPanel");
+        //     windowMock.expects("showOpenDialog").withExactArgs({
+		// 		canSelectFiles: true,
+		// 		canSelectFolders: false,
+		// 		defaultUri: "testFilePath"
+		// 	}).resolves();
+        //     const result = await currentPanel["showOpenFileDialog"]("testFilePath");
+        //     expect(result).to.be.equals("testFilePath");
+        // });
 
-        it("showOpenFolderDialog", async () => {
-            const currentPanel = _.get(extension.YeomanUIPanel, "currentPanel");
-            windowMock.expects("showOpenDialog").withExactArgs({
-				canSelectFiles: false,
-				canSelectFolders: true,
-				defaultUri: "testFolderPath"
-			}).resolves();
-            const result = await currentPanel["showOpenFolderDialog"]("testFolderPath");
-            expect(result).to.be.equals("testFolderPath");
-        });
+        // it("showOpenFolderDialog", async () => {
+        //     const currentPanel = _.get(extension.YeomanUIPanel, "currentPanel");
+        //     windowMock.expects("showOpenDialog").withExactArgs({
+		// 		canSelectFiles: false,
+		// 		canSelectFolders: true,
+		// 		defaultUri: "testFolderPath"
+		// 	}).resolves();
+        //     const result = await currentPanel["showOpenFolderDialog"]("testFolderPath");
+        //     expect(result).to.be.equals("testFolderPath");
+        // });
 
-        it("showOpenFolderDialog - showOpenDialog throws error", async () => {
-            const currentPanel = _.get(extension.YeomanUIPanel, "currentPanel");
-            windowMock.expects("showOpenDialog").withExactArgs({
-				canSelectFiles: false,
-				canSelectFolders: true,
-				defaultUri: "testFolderPath"
-			}).rejects();
-            const result = await currentPanel["showOpenFolderDialog"]("testFolderPath");
-            expect(result).to.be.equals("testFolderPath");
-        });
+        // it("showOpenFolderDialog - showOpenDialog throws error", async () => {
+        //     const currentPanel = _.get(extension.YeomanUIPanel, "currentPanel");
+        //     windowMock.expects("showOpenDialog").withExactArgs({
+		// 		canSelectFiles: false,
+		// 		canSelectFolders: true,
+		// 		defaultUri: "testFolderPath"
+		// 	}).rejects();
+        //     const result = await currentPanel["showOpenFolderDialog"]("testFolderPath");
+        //     expect(result).to.be.equals("testFolderPath");
+        // });
         
-        it("showOpenFolderDialog - vscode.Uri.file fails", async () => {
-            const uriMock = sandbox.mock(testVscode.Uri);
-            const currentPanel = _.get(extension.YeomanUIPanel, "currentPanel");
-            windowMock.expects("showOpenDialog").withExactArgs({
-				canSelectFiles: false,
-				canSelectFolders: true,
-				defaultUri: "os_path"
-            }).resolves([{fsPath: "os_path"}]);
-            uriMock.expects("file").throws(new Error());
-            uriMock.expects("file").returns("os_path");
-            const result = await currentPanel["showOpenFolderDialog"]("testFolderPath");
-            expect(result).to.be.equals("os_path");
-            uriMock.verify();
-        });
+        // it("showOpenFolderDialog - vscode.Uri.file fails", async () => {
+        //     const uriMock = sandbox.mock(testVscode.Uri);
+        //     const currentPanel = _.get(extension.YeomanUIPanel, "currentPanel");
+        //     windowMock.expects("showOpenDialog").withExactArgs({
+		// 		canSelectFiles: false,
+		// 		canSelectFolders: true,
+		// 		defaultUri: "os_path"
+        //     }).resolves([{fsPath: "os_path"}]);
+        //     uriMock.expects("file").throws(new Error());
+        //     uriMock.expects("file").returns("os_path");
+        //     const result = await currentPanel["showOpenFolderDialog"]("testFolderPath");
+        //     expect(result).to.be.equals("os_path");
+        //     uriMock.verify();
+        // });
     });
     
     describe("dispose", () => {
@@ -226,23 +226,23 @@ describe('extension unit test', () => {
             registerMethod: () => Promise.resolve()
         };
 
-        beforeEach(() => {
-            fsextraMock.expects("readFile").resolves();
-            extension.YeomanUIPanel.setPaths("testExtensionPath");
-            loggerWrapperMock.expects("getLogger").returns({});
-            yeomanUiPanelMock.expects("createRpc").returns(rpcExtension);
-            _.set(extension.YeomanUIPanel, "currentPanel.panel", undefined);
-            extension.YeomanUIPanel.loadYeomanUI();
-        });
+        // beforeEach(() => {
+        //     fsextraMock.expects("readFile").resolves();
+        //     extension.YeomanUIPanel.setPaths("testExtensionPath");
+        //     loggerWrapperMock.expects("getLogger").returns({});
+        //     yeomanUiPanelMock.expects("createRpc").returns(rpcExtension);
+        //     _.set(extension.YeomanUIPanel, "currentPanel.panel", undefined);
+        //     extension.YeomanUIPanel.loadYeomanUI();
+        // });
 
-        it("there are no disposables", async () => {
-            const currentPanel = _.get(extension.YeomanUIPanel, "currentPanel");
-            currentPanel["disposables"] = [{dispose: () => {}}, {dispose: () => {}}];
-            currentPanel["dispose"]();
-            // tslint:disable-next-line: no-unused-expression
-            expect(_.get(extension.YeomanUIPanel, "currentPanel")).to.be.undefined;
-            // tslint:disable-next-line: no-unused-expression
-            expect(currentPanel["disposables"]).to.be.empty;
-        });
+        // it("there are no disposables", async () => {
+        //     const currentPanel = _.get(extension.YeomanUIPanel, "currentPanel");
+        //     currentPanel["disposables"] = [{dispose: () => {}}, {dispose: () => {}}];
+        //     currentPanel["dispose"]();
+        //     // tslint:disable-next-line: no-unused-expression
+        //     expect(_.get(extension.YeomanUIPanel, "currentPanel")).to.be.undefined;
+        //     // tslint:disable-next-line: no-unused-expression
+        //     expect(currentPanel["disposables"]).to.be.empty;
+        // });
     });
 });

@@ -96,9 +96,9 @@
 					"description": "If chosen, the location of the source code is added to log entries. Warning – this action may slow your extension. We recommend you use it only for debugging.",
 					"scope": "resource"
 				},
-				"Yeoman UI.customNodeModulesPath": {
+				"Yeoman UI.generatorsLocation": {
 					"type": "string",
-					"markdownDescription": "Install generators in custom npm node_modules path. If not set, global node_modules path is used."
+					"markdownDescription": "Install generators in specified location. If not set, global location is used."
 				},
 				"Yeoman UI.autoUpdateGenerators": {
 					"type": "boolean",
