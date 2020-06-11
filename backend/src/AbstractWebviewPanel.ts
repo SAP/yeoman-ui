@@ -7,10 +7,9 @@ import { getLogger } from './logger/logger-wrapper';
 
 
 export abstract class AbstractWebViewPanel {
+    public viewType: string;
 	protected extensionPath: string;
     protected mediaPath: string;
-    //protected currentPanel: any;
-    public viewType: string;
     protected viewTitle: string;
     protected panel: vscode.WebviewPanel;
     protected focusedKey: string;
@@ -25,7 +24,9 @@ export abstract class AbstractWebViewPanel {
         this.workspaceConfig = vscode.workspace.getConfiguration();
     }
 
-    public abstract setPanel(webviewPanel: vscode.WebviewPanel, state?: any): void;
+    public setPanel(webviewPanel: vscode.WebviewPanel, state?: any) {
+        this.panel = webviewPanel;
+    };
     
     protected createWebviewPanel(): vscode.WebviewPanel {
 		return vscode.window.createWebviewPanel(
@@ -42,16 +43,14 @@ export abstract class AbstractWebViewPanel {
 		);
     }
 
-    protected disposeCurrentPanel() {
-        //const displayedPanel = _.get(this.currentPanel, "panel");
+    protected disposePanel() {
         const displayedPanel = this.panel;
 		if (displayedPanel) {
 			displayedPanel.dispose();
 		}
     }
 
-    protected initWebviewPanel(panel: vscode.WebviewPanel) {
-        this.panel = panel;
+    protected initWebviewPanel() {
         // Set the webview's initial html content
 		this._update();
 
@@ -77,7 +76,6 @@ export abstract class AbstractWebViewPanel {
     protected dispose() {
 		this.setFocused(false);
 		
-        //this.currentPanel = undefined;
 		// Clean up our resources
         this.panel.dispose();
         this.panel = null;

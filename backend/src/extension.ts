@@ -26,7 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const exploreGensPanel = new ExploreGensPanel(context);
 	context.subscriptions.push(vscode.commands.registerCommand("exploreGenerators", exploreGensPanel.exploreGenerators.bind(exploreGensPanel)));
 
-	vscode.window.registerWebviewPanelSerializer(exploreGensPanel.getViewType(), {
+	vscode.window.registerWebviewPanelSerializer(exploreGensPanel.viewType, {
 		async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel) {
 			exploreGensPanel.setPanel(webviewPanel);
 		}

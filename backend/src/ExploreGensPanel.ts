@@ -6,23 +6,17 @@ import { AbstractWebViewPanel } from "./AbstractWebviewPanel";
 
 
 export class ExploreGensPanel extends AbstractWebViewPanel{
-    public getViewType(): string {
-        return this.viewType;
+    public setPanel(webviewPanel: vscode.WebviewPanel) {
+        super.setPanel(webviewPanel);
+        this.exploreGens = new ExploreGens(new RpcExtension(this.panel.webview), this.logger, this.workspaceConfig);
     }
 
-    public setPanel(webviewPanel: vscode.WebviewPanel): void {
-        this.exploreGens = 
-            new ExploreGens(new RpcExtension(this.panel.webview), 
-                            this.logger, 
-                            this.workspaceConfig)
-    }
-
-    public async exploreGenerators() {
-        this.disposeCurrentPanel();
+    public exploreGenerators() {
+        this.disposePanel();
 	
         const webViewPanel = this.createWebviewPanel();
-        this.initWebviewPanel(webViewPanel);
         this.setPanel(webViewPanel);
+        this.initWebviewPanel();
     }
     
     public dispose() {
