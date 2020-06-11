@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as _ from 'lodash';
 import * as fsextra from 'fs-extra';
 import { IChildLogger } from '@vscode-logging/logger';
-import { getLogger } from './logger/logger-wrapper';
+import { getLogger } from '../logger/logger-wrapper';
 
 
 export abstract class AbstractWebViewPanel {

@@ -1,5 +1,5 @@
 import { YouiLog } from "./youi-log";
-import { YeomanUIPanel } from "./YeomanUIPanel";
+import { YeomanUIPanel } from "./panels/YeomanUIPanel";
 const stripAnsi = require("strip-ansi");
 
 export class OutputChannelLog implements YouiLog {

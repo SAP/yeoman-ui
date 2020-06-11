@@ -2,17 +2,16 @@ import * as _ from 'lodash';
 import * as path from 'path';
 import * as os from "os";
 import * as vscode from 'vscode';
-import { YeomanUI } from "./yeomanui";
+import { YeomanUI } from "../yeomanui";
 import { RpcExtension } from '@sap-devx/webview-rpc/out.ext/rpc-extension';
-import { YouiLog } from "./youi-log";
-import { GeneratorFilter } from './filter';
-import backendMessages from "./messages";
-import { OutputChannelLog } from './output-channel-log';
-import { YouiEvents } from "./youi-events";
-import { VSCodeYouiEvents } from './vscode-youi-events';
+import { YouiLog } from "../youi-log";
+import { GeneratorFilter } from '../filter';
+import backendMessages from "../messages";
+import { OutputChannelLog } from '../output-channel-log';
+import { YouiEvents } from "../youi-events";
+import { VSCodeYouiEvents } from '../vscode-youi-events';
 import Environment = require('yeoman-environment');
 import { AbstractWebViewPanel } from './AbstractWebviewPanel';
-import { IRpc } from '@sap-devx/webview-rpc/out.ext/rpc-common';
  
 
 export class YeomanUIPanel extends AbstractWebViewPanel{
@@ -26,11 +25,7 @@ export class YeomanUIPanel extends AbstractWebViewPanel{
 	}
 
 	public toggleOutput() {
-		// const yeomanUi = _.get(this.currentPanel, "yeomanui");
-		const yeomanUi = _.get(this.panel, "yeomanui");
-		if (yeomanUi) {
-			yeomanUi.toggleOutput();
-		}
+		this.outputChannel.showOutput();
 	}
 
 	public setPanel(webViewPanel: vscode.WebviewPanel, uiOptions?: any) {
@@ -39,12 +34,12 @@ export class YeomanUIPanel extends AbstractWebViewPanel{
 		this.messages = _.assign({}, backendMessages, _.get(uiOptions, "messages", {}))
 		this.genFilter = GeneratorFilter.create(_.get(uiOptions, "filter"));
 
-		const rpc: IRpc = new RpcExtension(this.panel.webview);
-		const outputChannel: YouiLog = new OutputChannelLog(this.messages.channel_name);
+		const rpc = new RpcExtension(this.panel.webview);
+		this.outputChannel = new OutputChannelLog(this.messages.channel_name);
 		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(rpc, this.panel, this.genFilter);
 		this.yeomanui = new YeomanUI(rpc, 
 			vscodeYouiEvents, 
-			outputChannel, 
+			this.outputChannel, 
 			this.logger, 
 			{genFilter: this.genFilter, messages: this.messages, defaultNpmPaths: this.getDefaultPaths()},
 			_.get(vscode, "workspace.workspaceFolders[0].uri.fsPath"));
@@ -65,6 +60,7 @@ export class YeomanUIPanel extends AbstractWebViewPanel{
 	private yeomanui: YeomanUI;
 	private genFilter: any;
 	private messages: any;
+	private outputChannel: YouiLog;
 	// improves first time performance
 	// TODO: replace or remove this API it is very slow, takes more than 2 seconds 
 	private readonly defaultNpmPaths: string[] = Environment.createEnv().getNpmPaths();
