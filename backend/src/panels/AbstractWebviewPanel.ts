@@ -14,6 +14,7 @@ export abstract class AbstractWebviewPanel {
 	protected panel: vscode.WebviewPanel;
 	protected focusedKey: string;
 	protected workspaceConfig: any;
+	protected htmlFileName: string;
 
 	protected readonly logger: IChildLogger = getLogger();
 	protected disposables: vscode.Disposable[] = [];
@@ -22,6 +23,7 @@ export abstract class AbstractWebviewPanel {
 		this.extensionPath = context.extensionPath;
 		this.mediaPath = path.join(context.extensionPath, "dist", "media");
 		this.workspaceConfig = vscode.workspace.getConfiguration();
+		this.htmlFileName = "index.html"
 	}
 
 	public setPanel(webviewPanel: vscode.WebviewPanel, state?: any) {
@@ -52,7 +54,7 @@ export abstract class AbstractWebviewPanel {
 
 	protected initWebviewPanel() {
 		// Set the webview's initial html content
-		this._update();
+		this.initHtmlContent();
 
 		// Set the context (current panel is focused)
 		this.setFocused(this.panel.active);
@@ -88,8 +90,8 @@ export abstract class AbstractWebviewPanel {
 		}
 	}
 
-	private async _update() {
-		let indexHtml = await fsextra.readFile(path.join(this.mediaPath, 'index.html'), "utf8");
+	protected async initHtmlContent() {
+		let indexHtml = await fsextra.readFile(path.join(this.mediaPath, this.htmlFileName), "utf8");
 		if (indexHtml) {
 			// Local path to main script run in the webview
 			const scriptPathOnDisk = vscode.Uri.file(path.join(this.mediaPath, path.sep));

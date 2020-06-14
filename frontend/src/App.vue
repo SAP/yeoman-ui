@@ -345,11 +345,16 @@ export default {
     isInVsCode() {
       return typeof acquireVsCodeApi !== "undefined";
     },
+    setVscodeApiOnWindow() {
+      if (this.isInVsCode() && !window.vscode) {
+        // eslint-disable-next-line
+        window.vscode = acquireVsCodeApi();
+      }
+    },
     setupRpc() {
       /* istanbul ignore if */
       if (this.isInVsCode()) {
-        // eslint-disable-next-line
-        window.vscode = acquireVsCodeApi();
+        this.setVscodeApiOnWindow();
         this.rpc = new RpcBrowser(window, window.vscode);
         this.initRpc();
       } else {

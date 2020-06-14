@@ -3,7 +3,11 @@ module.exports = {
     publicPath: "./",
     transpileDependencies: ["vuetify"],
     productionSourceMap: false,
-    configureWebpack: (config) => {
-      config.devtool = 'source-map'
-  }
+    configureWebpack: {
+      devtool: 'source-map',
+      entry: {
+        app: './src/main.js',
+        exploregens: './src/exploreGensMain.js'
+      }
+    }
 };

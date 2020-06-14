@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as _ from 'lodash';
 import { RpcExtension } from '@sap-devx/webview-rpc/out.ext/rpc-extension';
-import { ExploreGens } from '../ExploreGens';
+import { ExploreGens } from '../exploregens';
 import { AbstractWebviewPanel } from "./AbstractWebviewPanel";
 
 
@@ -30,5 +30,6 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
         this.viewType = "exploreGens";
         this.viewTitle = "Explore Generators";
         this.focusedKey = "exploreGenerators.Focused";
+        this.htmlFileName = "exploreGensIndex.html";
     }
 }
