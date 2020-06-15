@@ -15,19 +15,23 @@ export abstract class AbstractWebviewPanel {
 	protected focusedKey: string;
 	protected workspaceConfig: any;
 	protected htmlFileName: string;
+	protected state: any;
 
-	protected readonly logger: IChildLogger = getLogger();
-	protected disposables: vscode.Disposable[] = [];
+	protected logger: IChildLogger;
+	protected disposables: vscode.Disposable[];
 
 	protected constructor(context: vscode.ExtensionContext) {
 		this.extensionPath = context.extensionPath;
 		this.mediaPath = path.join(context.extensionPath, "dist", "media");
 		this.workspaceConfig = vscode.workspace.getConfiguration();
 		this.htmlFileName = "index.html"
+		this.logger = getLogger();
+		this.disposables = [];
 	}
 
 	public setPanel(webviewPanel: vscode.WebviewPanel, state?: any) {
 		this.panel = webviewPanel;
+		this.state = state;
 	};
 
 	protected createWebviewPanel(): vscode.WebviewPanel {
