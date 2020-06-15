@@ -50,7 +50,7 @@ export class ExploreGens {
         this.rpc.invoke("setGenerators", [filteredGenerators, res.total]);
     }
 
-    private getGeneratorsLocation() {
+    public getGeneratorsLocation() {
         const generatorsLocation: string = _.trim(this.workspaceConfig.get("Yeoman UI.generatorsLocation"));
         return _.isEmpty(generatorsLocation) ? "" : generatorsLocation;
     }

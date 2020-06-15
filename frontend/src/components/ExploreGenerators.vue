@@ -96,8 +96,6 @@ import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
         this.rpc.invoke("getFilteredGenerators", [this.query, this.author]);
       },
       setVscodeApiOnWindow() {
-        // eslint-disable-next-line no-console
-        console.error("Explore - setVscodeApiOnWindow");
         if (this.isInVsCode() && !window.vscode) {
           // eslint-disable-next-line
           window.vscode = acquireVsCodeApi();
@@ -124,10 +122,6 @@ import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
         });
       },
       setGenerators(generators, total) {
-        // eslint-disable-next-line no-console
-        console.error("total - " + total);
-        // eslint-disable-next-line no-console
-        console.error("generators - " + generators);
         this.gens = generators;
         this.total = total;
       }
