@@ -9,6 +9,7 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
     public setPanel(webviewPanel: vscode.WebviewPanel) {
         super.setPanel(webviewPanel);
         this.exploreGens = new ExploreGens(new RpcExtension(this.panel.webview), this.logger, this.workspaceConfig);
+        this.initWebviewPanel();
     }
 
     public exploreGenerators() {

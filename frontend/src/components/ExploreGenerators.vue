@@ -49,6 +49,9 @@
   </v-card>
 </template>
 <script>
+// gens: [{package: {name: "n1", "description": "d1", "version": "111"}}, 
+//                 {package: {name: "n2", "description": "d2", "version": "222"}}, 
+//                 {package: {name: "n3", "description": "d3", "version": "333"}}],
 
 import * as _ from "lodash";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
@@ -57,9 +60,7 @@ import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
       return {
         items: ["all", "sap", "wix", "microsoft"],
         rpc: Object,
-        gens: [{package: {name: "n1", "description": "d1", "version": "111"}}, 
-                {package: {name: "n2", "description": "d2", "version": "222"}}, 
-                {package: {name: "n3", "description": "d3", "version": "333"}}],
+        gens: [],
         total: 0,
         readonly: true,
         query: "",
@@ -92,8 +93,10 @@ import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
       isInVsCode() {
         return typeof acquireVsCodeApi !== "undefined";
       },
-      getFilteredGenerators() {
-        this.rpc.invoke("getFilteredGenerators", [this.query, this.author]);
+      async getFilteredGenerators() {
+        const res = await this.rpc.invoke("getFilteredGenerators", [this.query, this.author]);
+        this.gens = res[0];
+        this.total = res[1];
       },
       setVscodeApiOnWindow() {
         if (this.isInVsCode() && !window.vscode) {
@@ -106,28 +109,12 @@ import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
         if (this.isInVsCode()) {
           this.setVscodeApiOnWindow();
           this.rpc = new RpcBrowser(window, window.vscode);
-          this.initRpc();
         }
-      },
-      initRpc() {
-        const functions = [
-          "setGenerators"
-        ];
-        _.forEach(functions, funcName => {
-          this.rpc.registerMethod({
-            func: this[funcName],
-            thisArg: this,
-            name: funcName
-          });
-        });
-      },
-      setGenerators(generators, total) {
-        this.gens = generators;
-        this.total = total;
       }
     },
-    created() {
+    async created() {
       this.setupRpc();
+      await this.getFilteredGenerators();
     }
   }
 </script>
