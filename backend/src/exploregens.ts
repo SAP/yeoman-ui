@@ -1,12 +1,10 @@
 import * as npmFetch from 'npm-registry-fetch';
-import * as path from 'path';
 import * as _ from 'lodash';
 import * as cp from 'child_process';
 import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
+import * as util from 'util';
 
-const util = require('util');
-const exec = util.promisify(cp.exec);
 const npm = (process.platform === 'win32' ? 'npm.cmd' : 'npm');
 
 export class ExploreGens {
@@ -29,17 +27,14 @@ export class ExploreGens {
     private async doDownload(gen: any) {
         const genName = gen.package.name;
         const locationParams = this.getGeneratorsLocationParams();
-        const info = (locationParams === "-g" ? "GLOBAL:" : "CUSTOM:");
         try {
-            this.logger.debug(`${info} Installing the latest version of ${genName} ...`);
-            await exec(`${npm} install ${locationParams} ${genName}@latest`);
-            this.logger.debug(`${info} ${genName} successfully installed.`);
-            let downloadedGens: string[] | undefined = this.workspaceConfig.get("Explore Generators.downloadedGenerators");
-            if (downloadedGens) {
-                downloadedGens.push(genName);
-                downloadedGens = _.uniq(downloadedGens);
-                this.workspaceConfig.update("Explore Generators.downloadedGenerators", downloadedGens, true);
-            }
+            this.logger.debug(`Installing the latest version of ${genName} ...`);
+            await this.exec(this.getNpmInstallParams(locationParams, genName));
+            this.logger.debug(`${genName} successfully installed.`);
+            let downloadedGens: string[] = this.workspaceConfig.get("Yeoman UI.downloadedGenerators") || [];
+            downloadedGens.push(genName);
+            downloadedGens = _.uniq(downloadedGens);
+            this.workspaceConfig.update("Yeoman UI.downloadedGenerators", downloadedGens, true);
         } catch (error) {
             this.logger.error(error.message || error);
         }
@@ -65,19 +60,27 @@ export class ExploreGens {
         return _.isEmpty(location) ? "-g" : `--prefix ${location}`;
     }
 
-    private async updateAllInstalledGenerators() {
+    private updateAllInstalledGenerators() {
         const autoUpdateEnabled = this.workspaceConfig.get("Yeoman UI.autoUpdateGenerators");
         if (autoUpdateEnabled) {
             const downloadedGenerators: string[] | undefined = this.workspaceConfig.get("Yeoman UI.downloadedGenerators");
             const locationParams = this.getGeneratorsLocationParams();
 
             if (_.size(downloadedGenerators) > 0) {
-                this.logger.debug(`Auto updating all downloaded generators...`);
+                this.logger.debug("Auto updating all downloaded generators...");
             }
 
             _.forEach(downloadedGenerators, genName => {
-                exec(`${npm} install ${locationParams} ${genName}@latest`);
+                this.exec(this.getNpmInstallParams(locationParams, genName));
             });
         }
+    }
+
+    private async exec(arg: string) {
+        return util.promisify(cp.exec)(arg);
+    }
+
+    private getNpmInstallParams(locationParams: string, genName: string) {
+        return `${npm} install ${locationParams} ${genName}@latest`;
     }
 }
