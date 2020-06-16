@@ -18,8 +18,8 @@ export class ExploreGens {
         this.workspaceConfig = workspaceConfig;
 
         this.rpc.setResponseTimeout(3600000);
-        this.rpc.registerMethod({ func: this.getFilteredGenerators, thisArg: {} });
-        this.rpc.registerMethod({ func: this.doDownload, thisArg: {} });
+        this.rpc.registerMethod({ func: this.getFilteredGenerators, thisArg: this });
+        this.rpc.registerMethod({ func: this.doDownload, thisArg: this });
         this.updateAllInstalledGenerators();
         this.getFilteredGenerators();
     }

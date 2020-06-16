@@ -10,7 +10,7 @@ import { IRpc, IPromiseCallbacks, IMethod } from "@sap-devx/webview-rpc/out.ext/
 import * as npmFetch from 'npm-registry-fetch';
 
 
-describe.only('exploregens unit test', () => {
+describe('exploregens unit test', () => {
     let sandbox: any;
     let rpcMock: any;
     let workspaceConfigMock: any;
