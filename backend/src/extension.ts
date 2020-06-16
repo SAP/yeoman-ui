@@ -36,8 +36,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.window.registerWebviewPanelSerializer(YeomanUIPanel.viewType, {
 		async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state?: any) {
-			state = state || {};
-			state.data = {name: "slavik"};
 			YeomanUIPanel.setCurrentPanel(webviewPanel, state);
 		}
 	});
@@ -74,8 +72,7 @@ export class YeomanUIPanel {
 		if (displayedPanel) {
 			displayedPanel.dispose();
 		}
-		uiOptions = uiOptions || {};
-		uiOptions.data = {name: "slavik"};
+		
 		YeomanUIPanel.create(uiOptions);
 	}
 

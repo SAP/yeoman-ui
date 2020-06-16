@@ -382,6 +382,7 @@ export default {
     async displayGeneratorsPrompt() {
       const uiOptions = await this.rpc.invoke("getState");
       this.messages = uiOptions.messages;
+      window.vscode.setState(uiOptions);
       await this.rpc.invoke("receiveIsWebviewReady", []);
     },
     toggleConsole() {
