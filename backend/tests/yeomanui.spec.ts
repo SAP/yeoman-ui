@@ -237,9 +237,10 @@ describe('yeomanui unit test', () => {
             yeomanUi["uiOptions"] = {genFilter, messages: {}};
             const result = await yeomanUi["getGeneratorsPrompt"]();
 
-            expect(result.questions[0].choices).to.have.lengthOf(2);
-            const test1Choice = result.questions[0].choices[0];
-            const test2Choice = result.questions[0].choices[1];
+            const question = result.questions[1];
+            expect(question.choices).to.have.lengthOf(2);
+            const test1Choice = question.choices[0];
+            const test2Choice = question.choices[1];
             expect(test1Choice.name).to.be.equal("Test1");
             expect(test1Choice.description).to.be.equal("test1Description");
             expect(test2Choice.name).to.be.equal("Test4");
@@ -364,7 +365,7 @@ describe('yeomanui unit test', () => {
             const result = await yeomanUi["getGeneratorsPrompt"]();
 
             // tslint:disable-next-line: no-unused-expression
-            expect(result.questions[0].choices).to.be.empty;
+            expect(result.questions[1].choices).to.be.empty;
         });
 
         it("get generators with type project and categories cat1 and cat2", async () => {
@@ -397,10 +398,11 @@ describe('yeomanui unit test', () => {
             yeomanUi["uiOptions"].genFilter = genFilter;
             const result = await yeomanUi["getGeneratorsPrompt"]();
 
-            expect(result.questions[0].choices).to.have.lengthOf(3);
-            const test1Choice = result.questions[0].choices[0];
-            const test2Choice = result.questions[0].choices[1];
-            const test3Choice = result.questions[0].choices[2];
+            const question = result.questions[1];
+            expect(question.choices).to.have.lengthOf(3);
+            const test1Choice = question.choices[0];
+            const test2Choice = question.choices[1];
+            const test3Choice = question.choices[2];
             expect(test1Choice.name).to.be.equal("Test1");
             expect(test2Choice.name).to.be.equal("Test2");
             expect(test3Choice.name).to.be.equal("Test4");
