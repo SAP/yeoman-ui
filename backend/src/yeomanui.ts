@@ -375,7 +375,7 @@ export class YeomanUI {
 
     const questions: any[] = [];
 
-    if (_.indexOf(genFilter.types, GeneratorType.project) > 0) {
+    if (_.indexOf(genFilter.types, GeneratorType.project) !== -1) {
       const defaultPath = this.getCwd();
       const targetFolderQuestion: any = {
         type: "input",
