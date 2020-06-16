@@ -20,8 +20,8 @@ export class ExploreGens {
         this.rpc.setResponseTimeout(3600000);
         this.rpc.registerMethod({ func: this.getFilteredGenerators, thisArg: this });
         this.rpc.registerMethod({ func: this.doDownload, thisArg: this });
+        this.rpc.registerMethod({ func: this.getGeneratorsAuthors, thisArg: this });
         this.updateAllInstalledGenerators();
-        this.getFilteredGenerators();
     }
 
     private async doDownload(gen: any) {
@@ -54,13 +54,14 @@ export class ExploreGens {
         return `${api_endpoint}${actualQuery}%20keywords:yeoman-generator%20author:${author}&size=25`;
     }
 
-    public getGeneratorsLocation() {
-        const generatorsLocation: string = _.trim(this.workspaceConfig.get("Yeoman UI.generatorsLocation"));
-        return _.isEmpty(generatorsLocation) ? "" : generatorsLocation;
+    private getGeneratorsAuthors() {
+        const authors: string[] = this.workspaceConfig.get("Yeoman UI.generatorAuthors") || [];
+        authors.push("all");
+        return _.uniq(authors);
     }
 
     private getGeneratorsLocationParams() {
-        const location = this.getGeneratorsLocation();
+        const location =  _.trim(this.workspaceConfig.get("Yeoman UI.generatorsLocation"));
         return _.isEmpty(location) ? "-g" : `--prefix ${location}`;
     }
 
