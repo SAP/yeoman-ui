@@ -183,19 +183,19 @@ describe('exploregens unit test', () => {
 
         it("authors array empty", () => {
             workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.generatorAuthors").returns([]);
-            expect(exploregens["getGeneratorsAuthors"]()).to.be.deep.equal(["all"]);
+            expect(exploregens["getGeneratorsAuthors"]()).to.be.deep.equal([]);
         });
         it("authors array is undefined", () => {
             workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.generatorAuthors").returns(undefined);
-            expect(exploregens["getGeneratorsAuthors"]()).to.be.deep.equal(["all"]);
+            expect(exploregens["getGeneratorsAuthors"]()).to.be.deep.equal([]);
         });
         it("authors array is a valid strings array", () => {
             workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.generatorAuthors").returns(["author1", "author2"]);
-            expect(exploregens["getGeneratorsAuthors"]()).to.be.deep.equal(["author1", "author2", "all"]);
+            expect(exploregens["getGeneratorsAuthors"]()).to.be.deep.equal(["author1", "author2"]);
         });
         it("authors array is a valid strings array with duplicate string", () => {
-            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.generatorAuthors").returns(["author1", "author1", "all"]);
-            expect(exploregens["getGeneratorsAuthors"]()).to.be.deep.equal(["author1", "all"]);
+            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.generatorAuthors").returns(["author1", "author1"]);
+            expect(exploregens["getGeneratorsAuthors"]()).to.be.deep.equal(["author1"]);
         });
     });
 
