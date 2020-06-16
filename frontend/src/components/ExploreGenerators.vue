@@ -1,23 +1,33 @@
 <template>
   <v-container>
-    <v-text-field :readonly="readonly" label="Total" :placeholder="placeholder" outlined></v-text-field>
-    <v-text-field label="Search" v-model="query" @input="onSearchChange"></v-text-field>
-    <v-select :items="items" label="Author" dense @change="onAuthorChange"></v-select>
+    <v-row class="mb-6">
+      <v-col :cols="8">
+        <v-text-field label="Search" v-model="query" @input="onSearchChange" />
+      </v-col>
+      <v-col :cols="2">
+        <v-select :items="items" label="Author" @change="onAuthorChange" />
+      </v-col>
+      <v-col :cols="2">
+        <v-text-field :readonly="readonly" label="Total" :placeholder="placeholder" outlined />
+      </v-col>
+    </v-row>
 
     <v-row class="ma-2">
       <v-col md="4" class="pa-3 d-flex flex-column" v-for="(gen, i) in gens" :key="i">
-        <v-card class="elevation-5 flex d-flex flex-column">
+        <v-card
+          width="400"
+          class="d-flex flex-column mx-auto"
+          height="380"
+          tile
+          hover
+          flat
+          elevation="2"
+        >
           <v-card-title primary-title>
             <h3 class="headline mb-0">{{ gen.package.name }}</h3>
           </v-card-title>
-
-          <v-card-text style="overflow-y: auto; height:100px">
-            <div class="body-1">{{ gen.package.description }}</div>
-            <v-divider light style="margin-top:15px;" />
-            <v-divider light />
-          </v-card-text>
-
-          <v-card-subtitle v-text="gen.package.version"></v-card-subtitle>
+          <v-card-text style="overflow-y: auto; height:150px" v-text="gen.package.description" />
+          <v-card-subtitle v-text="gen.package.version" />
           <v-card-actions>
             <v-btn color="orange" @click="onDownload(gen)" text>Download</v-btn>
           </v-card-actions>
