@@ -59,7 +59,6 @@ export class ExploreGens {
 
     private getGeneratorsAuthors() {
         const authors: string[] = this.workspaceConfig.get("Yeoman UI.generatorAuthors") || [];
-        authors.push("all");
         return _.uniq(authors);
     }
 

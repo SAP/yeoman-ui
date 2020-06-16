@@ -23,7 +23,6 @@ export abstract class AbstractWebviewPanel {
 	protected constructor(context: vscode.ExtensionContext) {
 		this.extensionPath = context.extensionPath;
 		this.mediaPath = path.join(context.extensionPath, "dist", "media");
-		this.workspaceConfig = vscode.workspace.getConfiguration();
 		this.htmlFileName = "index.html"
 		this.logger = getLogger();
 		this.disposables = [];
@@ -32,6 +31,7 @@ export abstract class AbstractWebviewPanel {
 	public setPanel(webviewPanel: vscode.WebviewPanel, state?: any) {
 		this.panel = webviewPanel;
 		this.state = state;
+		this.workspaceConfig = vscode.workspace.getConfiguration();
 	};
 
 	protected createWebviewPanel(): vscode.WebviewPanel {
