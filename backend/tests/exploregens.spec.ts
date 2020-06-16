@@ -85,14 +85,14 @@ describe('exploregens unit test', () => {
         npmMock.verify();
     });
 
-    it("constructor", () => {
-        try {
-            // tslint:disable-next-line: no-unused-expression
-            new ExploreGens(undefined, undefined, undefined);
-            fail("contructor should throw an exception");
-        } catch (error) {
-            expect(error.message).to.be.equal("Cannot read property 'setResponseTimeout' of undefined");
-        }
+    it("init", () => {
+        rpcMock.expects("setResponseTimeout").withExactArgs(3600000);
+        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getFilteredGenerators"], thisArg: exploregens });
+        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["doDownload"], thisArg: exploregens });
+        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getGeneratorsAuthors"], thisArg: exploregens});
+        exploreGensMock.expects("updateAllInstalledGenerators");
+
+        exploregens["init"]();
     });
 
     describe("doDownload", () => {
@@ -176,6 +176,26 @@ describe('exploregens unit test', () => {
         it("location is a string with unnecessary spaces", () => {
             workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.generatorsLocation").returns(`   ${TESTVALUE}   `);
             expect(exploregens["getGeneratorsLocationParams"]()).to.be.deep.equal(`--prefix ${TESTVALUE}`);
+        });
+    });
+
+    describe("getGeneratorsAuthors", () => {
+
+        it("authors array empty", () => {
+            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.generatorAuthors").returns([]);
+            expect(exploregens["getGeneratorsAuthors"]()).to.be.deep.equal(["all"]);
+        });
+        it("authors array is undefined", () => {
+            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.generatorAuthors").returns(undefined);
+            expect(exploregens["getGeneratorsAuthors"]()).to.be.deep.equal(["all"]);
+        });
+        it("authors array is a valid strings array", () => {
+            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.generatorAuthors").returns(["author1", "author2"]);
+            expect(exploregens["getGeneratorsAuthors"]()).to.be.deep.equal(["author1", "author2", "all"]);
+        });
+        it("authors array is a valid strings array with duplicate string", () => {
+            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.generatorAuthors").returns(["author1", "author1", "all"]);
+            expect(exploregens["getGeneratorsAuthors"]()).to.be.deep.equal(["author1", "all"]);
         });
     });
 

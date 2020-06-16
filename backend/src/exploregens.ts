@@ -16,7 +16,10 @@ export class ExploreGens {
         this.rpc = rpc;
         this.logger = logger;
         this.workspaceConfig = workspaceConfig;
+        this.init();
+    }
 
+    private init() {
         this.rpc.setResponseTimeout(3600000);
         this.rpc.registerMethod({ func: this.getFilteredGenerators, thisArg: this });
         this.rpc.registerMethod({ func: this.doDownload, thisArg: this });
