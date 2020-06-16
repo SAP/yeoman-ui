@@ -59,7 +59,7 @@ export class VSCodeYouiEvents implements YouiEvents {
             
             const targetFolderUri: vscode.Uri = vscode.Uri.file(targetFolderPath);
 
-            if (_.indexOf(this.genFilter.types, GeneratorType.module) === -1) {
+            if (!_.includes(this.genFilter.types, GeneratorType.module)) {
                 const workspacePath = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
                 // 1. target workspace folder should not already contain target generator folder
                 const foundInWorkspace = _.find(vscode.workspace.workspaceFolders, (wsFolder: vscode.WorkspaceFolder) => {
