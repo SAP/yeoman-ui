@@ -7,13 +7,16 @@ import * as util from 'util';
 import { ExploreGens } from "../src/exploregens";
 import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc, IPromiseCallbacks, IMethod } from "@sap-devx/webview-rpc/out.ext/rpc-common";
+import * as npmFetch from 'npm-registry-fetch';
 
-describe('exploregens unit test', () => {
+
+describe.only('exploregens unit test', () => {
     let sandbox: any;
     let rpcMock: any;
     let workspaceConfigMock: any;
     let exploreGensMock: any;
     let loggerMock: any;
+    let npmMock: any;
 
     class TestRpc implements IRpc {
         public  timeout: number;
@@ -71,6 +74,7 @@ describe('exploregens unit test', () => {
         workspaceConfigMock = sandbox.mock(config);
         loggerMock = sandbox.mock(childLogger);
         exploreGensMock = sandbox.mock(exploregens);
+        npmMock = sandbox.mock(npmFetch);
     });
 
     afterEach(() => {
@@ -78,6 +82,7 @@ describe('exploregens unit test', () => {
         workspaceConfigMock.verify();
         loggerMock.verify();
         exploreGensMock.verify();
+        npmMock.verify();
     });
 
     it("constructor", () => {
@@ -128,6 +133,29 @@ describe('exploregens unit test', () => {
 
     describe("getFilteredGenerators", async () => {
 
+        it("query and author parameters are empty strings", async () => {
+            const expectedResult = {
+                objects:["obj1","obj2"],
+                total:5
+            }
+            const url = exploregens["getGensQueryURL"]("","");
+            npmMock.expects("json").withExactArgs(url).resolves(expectedResult);
+            const res = await exploregens["getFilteredGenerators"]();
+            expect(res).to.be.deep.equal([expectedResult.objects, expectedResult.total]);
+
+        });
+
+        it("query parameter is some words", async () => {
+            const expectedResult = {
+                objects:["obj1"],
+                total:1
+            }
+            const url = exploregens["getGensQueryURL"]("test of query","");
+            npmMock.expects("json").withExactArgs(url).resolves(expectedResult);
+            const res = await exploregens["getFilteredGenerators"]("test of query");
+            expect(res).to.be.deep.equal([expectedResult.objects, expectedResult.total]);
+
+        });
     });
 
     describe("getGeneratorsLocationParams", () => {

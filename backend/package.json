@@ -108,6 +108,11 @@
 				"Yeoman UI.downloadedGenerators": {
 					"type": "array",
 					"description": "Downloaded generators"
+				},
+				"Yeoman UI.generatorAuthors": {
+					"type": "array",
+					"default": ["sap", "wix", "microsoft"],
+					"description": "Generator Authors"
 				}
 			}
 		}

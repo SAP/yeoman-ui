@@ -41,13 +41,17 @@ export class ExploreGens {
     }
 
     private async getFilteredGenerators(query = "", author = "") {
+        const gensQueryUrl = this.getGensQueryURL(query, author);
+        const res: any = await npmFetch.json(gensQueryUrl); 
+        const filteredGenerators = _.get(res, "results", res.objects);
+        return [filteredGenerators, res.total];
+    }
+
+    private getGensQueryURL(query: string, author: string) {
         const api_endpoint = "http://registry.npmjs.com/-/v1/search?text=";
         let actualQuery = _.isEmpty(query) ? `generator-` : query;
-        actualQuery = _.replace(actualQuery, " ", "%20");
-        const res: any = await
-            npmFetch.json(`${api_endpoint}${actualQuery}%20keywords:yeoman-generator%20author:${author}&size=25`);
-        const filteredGenerators = _.get(res, "results", res.objects);
-        this.rpc.invoke("setGenerators", [filteredGenerators, res.total]);
+        actualQuery = _.replace(actualQuery, new RegExp(" ", "g"), "%20");
+        return `${api_endpoint}${actualQuery}%20keywords:yeoman-generator%20author:${author}&size=25`;
     }
 
     public getGeneratorsLocation() {
