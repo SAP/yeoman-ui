@@ -1,8 +1,8 @@
 <template>
   <v-app id="exploregens">
-    <v-content>
+    <v-main>
       <ExploreGenerators/>
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 

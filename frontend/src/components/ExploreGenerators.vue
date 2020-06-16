@@ -5,7 +5,7 @@
         <v-text-field label="Search" v-model="query" @input="onSearchChange" />
       </v-col>
       <v-col :cols="2">
-        <v-select :items="items" label="Author" @change="onAuthorChange" />
+        <v-select :items="items" v-model="author" label="Author" @change="onAuthorChange" />
       </v-col>
       <v-col :cols="2">
         <v-text-field :readonly="readonly" label="Total" :placeholder="placeholder" outlined />
@@ -37,23 +37,22 @@
   </v-container>
 </template>
 
+
 <script>
-// gens: [{package: {name: "n1", "description": "d1", "version": "111"}},
-//                 {package: {name: "n2", "description": "d2", "version": "222"}},
-//                 {package: {name: "n3", "description": "d3", "version": "333"}}],
+const ALL_GENS = "-----";
 
 import * as _ from "lodash";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 export default {
   data() {
     return {
-      items: ["all", "sap", "wix", "microsoft"],
+      items: [],
       rpc: Object,
       gens: [],
       total: 0,
       readonly: true,
       query: "",
-      author: ""
+      author: ALL_GENS
     };
   },
   computed: {
@@ -65,7 +64,7 @@ export default {
       return `${_.size(this.gens)} / ${this.total}`;
     },
     debouncedGenFilterChange() {
-      return _.debounce(this.getFilteredGenerators, 500);
+      return _.debounce(this.getFilteredGenerators, 300);
     }
   },
   methods: {
@@ -75,20 +74,24 @@ export default {
     onDownload(gen) {
       this.rpc.invoke("doDownload", [gen]);
     },
-    onAuthorChange(author) {
-      this.author = author === "all" ? "" : author;
+    onAuthorChange() {
       this.debouncedGenFilterChange();
     },
     isInVsCode() {
       return typeof acquireVsCodeApi !== "undefined";
     },
     async getFilteredGenerators() {
+      const author = (this.author === ALL_GENS ? "" : this.author);
       const res = await this.rpc.invoke("getFilteredGenerators", [
         this.query,
-        this.author
+        author
       ]);
       this.gens = res[0];
       this.total = res[1];
+    },
+    async getGeneratorsAuthors() {
+      this.items = await this.rpc.invoke("getGeneratorsAuthors");
+      this.items.unshift(ALL_GENS);
     },
     setVscodeApiOnWindow() {
       if (this.isInVsCode() && !window.vscode) {
@@ -107,6 +110,7 @@ export default {
   async created() {
     this.setupRpc();
     await this.getFilteredGenerators();
+    await this.getGeneratorsAuthors();
   }
 };
 </script>
