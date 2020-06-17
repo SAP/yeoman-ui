@@ -23,7 +23,7 @@ export class ExploreGens {
         this.rpc.setResponseTimeout(3600000);
         this.rpc.registerMethod({ func: this.getFilteredGenerators, thisArg: this });
         this.rpc.registerMethod({ func: this.doDownload, thisArg: this });
-        this.rpc.registerMethod({ func: this.getGeneratorsAuthors, thisArg: this });
+        this.rpc.registerMethod({ func: this.getRecommendedQuery, thisArg: this });
         this.updateAllInstalledGenerators();
     }
 
@@ -50,16 +50,16 @@ export class ExploreGens {
         return [filteredGenerators, res.total];
     }
 
-    private getGensQueryURL(query: string, author: string) {
+    private getGensQueryURL(query: string, recommended: string) {
         const api_endpoint = "http://registry.npmjs.com/-/v1/search?text=";
-        let actualQuery = _.isEmpty(query) ? `generator-` : query;
+        let actualQuery = `${query} ${recommended}`;
         actualQuery = _.replace(actualQuery, new RegExp(" ", "g"), "%20");
-        return `${api_endpoint}${actualQuery}%20keywords:yeoman-generator%20author:${author}&size=25`;
+        return `${api_endpoint}${actualQuery}%20keywords:yeoman-generator%20&size=25&ranking=popularity`;
     }
 
-    private getGeneratorsAuthors() {
-        const authors: string[] = this.workspaceConfig.get("Yeoman UI.generatorAuthors") || [];
-        return _.uniq(authors);
+    private getRecommendedQuery() {
+        const recommended: string[] = this.workspaceConfig.get("Yeoman UI.recommendedQuery") || [];
+        return _.uniq(recommended);
     }
 
     private getGeneratorsLocationParams() {

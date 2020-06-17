@@ -2,8 +2,6 @@ import * as mocha from "mocha";
 import { expect } from "chai";
 import * as sinon from "sinon";
 import * as _ from "lodash";
-import { fail } from "assert";
-import * as util from 'util';
 import { ExploreGens } from "../src/exploregens";
 import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc, IPromiseCallbacks, IMethod } from "@sap-devx/webview-rpc/out.ext/rpc-common";
@@ -89,7 +87,7 @@ describe('exploregens unit test', () => {
         rpcMock.expects("setResponseTimeout").withExactArgs(3600000);
         rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getFilteredGenerators"], thisArg: exploregens });
         rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["doDownload"], thisArg: exploregens });
-        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getGeneratorsAuthors"], thisArg: exploregens});
+        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens});
         exploreGensMock.expects("updateAllInstalledGenerators");
 
         exploregens["init"]();
@@ -133,7 +131,7 @@ describe('exploregens unit test', () => {
 
     describe("getFilteredGenerators", async () => {
 
-        it("query and author parameters are empty strings", async () => {
+        it("query and recommended parameters are empty strings", async () => {
             const expectedResult = {
                 objects:["obj1","obj2"],
                 total:5
@@ -179,23 +177,23 @@ describe('exploregens unit test', () => {
         });
     });
 
-    describe("getGeneratorsAuthors", () => {
+    describe("getRecommendedQuery", () => {
 
-        it("authors array empty", () => {
-            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.generatorAuthors").returns([]);
-            expect(exploregens["getGeneratorsAuthors"]()).to.be.deep.equal([]);
+        it("recommended array empty", () => {
+            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.recommendedQuery").returns([]);
+            expect(exploregens["getRecommendedQuery"]()).to.be.deep.equal([]);
         });
-        it("authors array is undefined", () => {
-            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.generatorAuthors").returns(undefined);
-            expect(exploregens["getGeneratorsAuthors"]()).to.be.deep.equal([]);
+        it("recommended array is undefined", () => {
+            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.recommendedQuery").returns(undefined);
+            expect(exploregens["getRecommendedQuery"]()).to.be.deep.equal([]);
         });
-        it("authors array is a valid strings array", () => {
-            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.generatorAuthors").returns(["author1", "author2"]);
-            expect(exploregens["getGeneratorsAuthors"]()).to.be.deep.equal(["author1", "author2"]);
+        it("recommended array is a valid strings array", () => {
+            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.recommendedQuery").returns(["query1", "query2"]);
+            expect(exploregens["getRecommendedQuery"]()).to.be.deep.equal(["query1", "query2"]);
         });
-        it("authors array is a valid strings array with duplicate string", () => {
-            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.generatorAuthors").returns(["author1", "author1"]);
-            expect(exploregens["getGeneratorsAuthors"]()).to.be.deep.equal(["author1"]);
+        it("recommended array is a valid strings array with duplicate string", () => {
+            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.recommendedQuery").returns(["query1", "query1"]);
+            expect(exploregens["getRecommendedQuery"]()).to.be.deep.equal(["query1"]);
         });
     });
 

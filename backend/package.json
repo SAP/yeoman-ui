@@ -109,14 +109,15 @@
 					"type": "array",
 					"description": "Downloaded generators"
 				},
-				"Yeoman UI.generatorAuthors": {
+				"Yeoman UI.recommendedQuery": {
 					"type": "array",
 					"default": [
 						"sap",
-						"wix",
-						"microsoft"
+						"sap fiori",
+						"sap ui5",
+						"openui5"
 					],
-					"description": "Generator Authors"
+					"description": "Generator recommended query"
 				}
 			}
 		}

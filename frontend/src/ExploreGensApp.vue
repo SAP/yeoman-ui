@@ -3,10 +3,10 @@
     <v-container>
       <v-row class="mb-6">
         <v-col :cols="8">
-          <v-text-field label="Search" v-model="query" @input="onSearchChange" />
+          <v-text-field label="Search" v-model="query" @input="onQueryChange" />
         </v-col>
         <v-col :cols="2">
-          <v-select :items="items" v-model="author" label="Author" @change="onAuthorChange" />
+          <v-select :items="items" v-model="recommended" label="Recommended" @change="onQueryChange" />
         </v-col>
         <v-col :cols="2">
           <v-text-field :readonly="readonly" label="Total" :placeholder="placeholder" outlined />
@@ -55,7 +55,7 @@ export default {
       total: 0,
       readonly: true,
       query: "",
-      author: ALL_GENS
+      recommended: ALL_GENS
     };
   },
   computed: {
@@ -71,29 +71,26 @@ export default {
     }
   },
   methods: {
-    onSearchChange() {
-      this.debouncedGenFilterChange();
-    },
     onDownload(gen) {
       this.rpc.invoke("doDownload", [gen]);
     },
-    onAuthorChange() {
+    onQueryChange() {
       this.debouncedGenFilterChange();
     },
     isInVsCode() {
       return typeof acquireVsCodeApi !== "undefined";
     },
     async getFilteredGenerators() {
-      const author = this.author === ALL_GENS ? "" : this.author;
+      const recommended = this.recommended === ALL_GENS ? "" : this.recommended;
       const res = await this.rpc.invoke("getFilteredGenerators", [
         this.query,
-        author
+        recommended
       ]);
       this.gens = res[0];
       this.total = res[1];
     },
-    async getGeneratorsAuthors() {
-      this.items = await this.rpc.invoke("getGeneratorsAuthors");
+    async getRecommendedQuery() {
+      this.items = await this.rpc.invoke("getRecommendedQuery");
       this.items.unshift(ALL_GENS);
     },
     setVscodeApiOnWindow() {
@@ -113,7 +110,7 @@ export default {
   async created() {
     this.setupRpc();
     await this.getFilteredGenerators();
-    await this.getGeneratorsAuthors();
+    await this.getRecommendedQuery();
   }
 };
 </script>
