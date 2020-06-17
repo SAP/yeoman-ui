@@ -345,12 +345,20 @@ export default {
     isInVsCode() {
       return typeof acquireVsCodeApi !== "undefined";
     },
+    getVsCodeApi() {
+      if (this.isInVsCode()) {
+        if (!window.vscode) {
+          // eslint-disable-next-line
+          window.vscode = acquireVsCodeApi();
+        } 
+        
+        return window.vscode;
+      }
+    },
     setupRpc() {
       /* istanbul ignore if */
       if (this.isInVsCode()) {
-        // eslint-disable-next-line
-        window.vscode = acquireVsCodeApi();
-        this.rpc = new RpcBrowser(window, window.vscode);
+        this.rpc = new RpcBrowser(window, this.getVsCodeApi());
         this.initRpc();
       } else {
         const ws = new WebSocket("ws://127.0.0.1:8081");
@@ -379,12 +387,16 @@ export default {
 
       this.displayGeneratorsPrompt(); 
     },
-    async displayGeneratorsPrompt() {
+    async setMessagesAndSaveState() {
       const uiOptions = await this.rpc.invoke("getState");
       this.messages = uiOptions.messages;
-      if (this.isInVsCode()) {
-        window.vscode.setState(uiOptions);
+      const vscodeApi = this.getVsCodeApi();
+      if (vscodeApi) {
+        vscodeApi.setState(uiOptions);
       }
+    },
+    async displayGeneratorsPrompt() {
+      await this.setMessagesAndSaveState();
       await this.rpc.invoke("receiveIsWebviewReady", []);
     },
     toggleConsole() {

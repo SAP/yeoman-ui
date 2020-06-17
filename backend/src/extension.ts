@@ -36,6 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.window.registerWebviewPanelSerializer(YeomanUIPanel.viewType, {
 		async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state?: any) {
+			_.set(state, "filter", _.get(state, "genFilter"));
 			YeomanUIPanel.setCurrentPanel(webviewPanel, state);
 		}
 	});
