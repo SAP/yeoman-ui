@@ -130,7 +130,7 @@ export class YeomanUIPanel {
 			vscodeYouiEvents, 
 			outputChannel, 
 			this.logger, 
-			{genFilter: this.genFilter, messages: this.messages, data: _.get(uiOptions, "data", {}), defaultNpmPaths},
+			{genFilter: this.genFilter, messages: this.messages, data: _.get(uiOptions, "data"), defaultNpmPaths},
 			_.get(vscode, "workspace.workspaceFolders[0].uri.fsPath"));
 		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
 		this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
