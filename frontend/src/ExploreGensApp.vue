@@ -6,7 +6,12 @@
           <v-text-field label="Search" v-model="query" @input="onQueryChange" />
         </v-col>
         <v-col :cols="2">
-          <v-select :items="items" v-model="recommended" label="Recommended" @change="onQueryChange" />
+          <v-select
+            :items="items"
+            v-model="recommended"
+            label="Recommended"
+            @change="onQueryChange"
+          />
         </v-col>
         <v-col :cols="2">
           <v-text-field :readonly="readonly" label="Total" :placeholder="placeholder" outlined />
@@ -16,21 +21,20 @@
       <v-row class="ma-2">
         <v-col md="4" class="pa-3 d-flex flex-column" v-for="(gen, i) in gens" :key="i">
           <v-card
-            width="400"
+            width="350"
             class="d-flex flex-column mx-auto"
-            height="380"
+            height="350"
             tile
             hover
-            flat
             elevation="2"
           >
             <v-card-title primary-title>
               <h3 class="headline mb-0">{{ gen.package.name }}</h3>
             </v-card-title>
-            <v-card-text style="overflow-y: auto; height:150px" v-text="gen.package.description" />
-            <v-card-subtitle v-text="gen.package.version" />
+            <v-card-text style="overflow-y: auto; height:200px" v-text="gen.package.description" />
             <v-card-actions>
-              <v-btn color="orange" @click="onDownload(gen)" text>Download</v-btn>
+              <v-btn large dark color="blue" @click="onDownload(gen)">Download</v-btn>
+              <v-card-subtitle v-text="gen.package.version" />
             </v-card-actions>
           </v-card>
         </v-col>
@@ -46,7 +50,7 @@ const ALL_GENS = "-----";
 import * as _ from "lodash";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 export default {
-  name: 'exploregens',
+  name: "exploregens",
   data() {
     return {
       items: [],
