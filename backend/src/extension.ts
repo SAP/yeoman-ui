@@ -35,7 +35,8 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand("yeomanUI.toggleOutput", YeomanUIPanel.toggleOutput));
 
 	vscode.window.registerWebviewPanelSerializer(YeomanUIPanel.viewType, {
-		async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
+		async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state?: any) {
+			_.set(state, "filter", _.get(state, "genFilter"));
 			YeomanUIPanel.setCurrentPanel(webviewPanel, state);
 		}
 	});
@@ -72,7 +73,7 @@ export class YeomanUIPanel {
 		if (displayedPanel) {
 			displayedPanel.dispose();
 		}
-	
+		
 		YeomanUIPanel.create(uiOptions);
 	}
 
@@ -129,7 +130,7 @@ export class YeomanUIPanel {
 			vscodeYouiEvents, 
 			outputChannel, 
 			this.logger, 
-			{genFilter: this.genFilter, messages: this.messages, defaultNpmPaths},
+			{genFilter: this.genFilter, messages: this.messages, data: _.get(uiOptions, "data"), defaultNpmPaths},
 			_.get(vscode, "workspace.workspaceFolders[0].uri.fsPath"));
 		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
 		this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
