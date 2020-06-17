@@ -439,10 +439,6 @@ export default {
       this.init();
       
       this.displayGeneratorsPrompt();
-    },
-    async setMessages() {
-      const state = await this.rpc.invoke("getState");
-      this.messages = state.messages;
     }
   },
   created() {
