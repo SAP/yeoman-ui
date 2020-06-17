@@ -35,7 +35,8 @@ describe('vscode-youi-events unit test', () => {
     });
 
     beforeEach(() => {
-        events = new VSCodeYouiEvents(undefined, undefined, GeneratorFilter.create());
+        const webViewPanel: any = {dispose: () => true};
+        events = new VSCodeYouiEvents(undefined, webViewPanel, GeneratorFilter.create());
         windowMock = sandbox.mock(vscode.window);
         commandsMock = sandbox.mock(vscode.commands);
         workspaceMock = sandbox.mock(vscode.workspace);
@@ -49,14 +50,13 @@ describe('vscode-youi-events unit test', () => {
         workspaceMock.verify();
     });
 
-    // it("install", () => {
-    //     expect(genFilter.categories).to.be.deep.equal([]);
-    //     const showInstallMessageSpy = sandbox.spy(events,"showInstallMessage");
-    //     _.set(vscode, "window.withProgress", () => {return Promise.resolve("");});
-    //     events.doGeneratorInstall();
-    //     // tslint:disable-next-line: no-unused-expression
-    //     expect(showInstallMessageSpy.called).to.be.true;
-    // });
+    it("doGeneratorInstall", () => {
+        const showInstallMessageSpy = sandbox.spy(events,"showInstallMessage");
+        _.set(vscode, "window.withProgress", () => {return Promise.resolve("");});
+        events.doGeneratorInstall();
+        // tslint:disable-next-line: no-unused-expression
+        expect(showInstallMessageSpy.called).to.be.true;
+    });
 
     describe("doGeneratorDone", () => {
         it("on success, add to workspace button and open in new workspace button are visible", () => {

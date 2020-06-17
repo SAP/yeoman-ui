@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as _ from 'lodash';
 import { YouiEvents } from "./youi-events";
-import { RpcCommon, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
+import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorFilter, GeneratorType } from './filter';
 
 export class VSCodeYouiEvents implements YouiEvents {
