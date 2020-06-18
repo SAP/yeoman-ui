@@ -73,7 +73,8 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 	}
 
 	private getDefaultPaths(): string[] {
-		const generatorsLocation: string = _.trim(this.workspaceConfig.get("Yeoman UI.generatorsLocation"));
+		const wsConfig = vscode.workspace.getConfiguration();
+		const generatorsLocation: string = _.trim(wsConfig.get("Yeoman UI.generatorsLocation"));
 		if (!_.isEmpty(generatorsLocation)) {
 			return _.concat(this.defaultNpmPaths, path.join(generatorsLocation, "node_modules"));
 		}

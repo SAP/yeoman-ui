@@ -8,16 +8,14 @@ import { AbstractWebviewPanel } from "./AbstractWebviewPanel";
 export class ExploreGensPanel extends AbstractWebviewPanel {
     public setPanel(webviewPanel: vscode.WebviewPanel) {
         super.setPanel(webviewPanel);
-        this.exploreGens = new ExploreGens(new RpcExtension(this.panel.webview), this.logger, this.workspaceConfig);
+        this.exploreGens.initRpc(new RpcExtension(webviewPanel.webview));
         this.initWebviewPanel();
     }
 
     public exploreGenerators() {
         this.disposePanel();
-
         const webViewPanel = this.createWebviewPanel();
         this.setPanel(webViewPanel);
-        this.initWebviewPanel();
     }
 
     public dispose() {
@@ -32,5 +30,8 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
         this.viewTitle = "Explore Generators";
         this.focusedKey = "exploreGenerators.Focused";
         this.htmlFileName = "exploreGensIndex.html";
+
+        this.exploreGens = new ExploreGens(this.logger);
+        this.exploreGens.updateAllInstalledGenerators();
     }
 }

@@ -13,7 +13,6 @@ export abstract class AbstractWebviewPanel {
 	protected viewTitle: string;
 	protected panel: vscode.WebviewPanel;
 	protected focusedKey: string;
-	protected workspaceConfig: any;
 	protected htmlFileName: string;
 	protected state: any;
 
@@ -31,7 +30,6 @@ export abstract class AbstractWebviewPanel {
 	public setPanel(webviewPanel: vscode.WebviewPanel, state?: any) {
 		this.panel = webviewPanel;
 		this.state = state;
-		this.workspaceConfig = vscode.workspace.getConfiguration();
 	};
 
 	protected createWebviewPanel(): vscode.WebviewPanel {
