@@ -4,6 +4,8 @@ import { RpcExtension } from '@sap-devx/webview-rpc/out.ext/rpc-extension';
 import { ExploreGens } from '../exploregens';
 import { AbstractWebviewPanel } from "./AbstractWebviewPanel";
 
+const ONE_DAY = 60 * 60 * 24 * 1000;
+const GLOBAL_STATE_KEY = "Yeoman UI.autoUpdateInstalledGenerators";
 
 export class ExploreGensPanel extends AbstractWebviewPanel {
     public setPanel(webviewPanel: vscode.WebviewPanel) {
@@ -32,6 +34,12 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
         this.htmlFileName = "exploreGensIndex.html";
 
         this.exploreGens = new ExploreGens(this.logger);
-        this.exploreGens.updateAllInstalledGenerators();
+
+        const lastUpdateDate = context.globalState.get(GLOBAL_STATE_KEY, 0);
+        const currentDate = Date.now();
+        if ((currentDate - lastUpdateDate) > ONE_DAY) {
+            context.globalState.update(GLOBAL_STATE_KEY, currentDate);
+            this.exploreGens.updateAllInstalledGenerators();
+        }
     }
 }
