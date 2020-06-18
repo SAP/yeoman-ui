@@ -19,11 +19,11 @@
       </v-row>
 
       <v-row class="ma-2">
-        <v-col md="4" class="pa-3 d-flex flex-column" v-for="(gen, i) in gens" :key="i">
+        <v-col md="3" class="pa-3 d-flex flex-column" v-for="(gen, i) in gens" :key="i">
           <v-card
-            width="350"
+            width="300"
             class="d-flex flex-column mx-auto"
-            height="350"
+            height="300"
             tile
             hover
             elevation="2"

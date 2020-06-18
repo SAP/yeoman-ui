@@ -31,13 +31,10 @@ export class ExploreGens {
         const genName = gen.package.name;
         const locationParams = this.getGeneratorsLocationParams();
         try {
-            this.logger.debug(`Installing the latest version of ${genName} ...`);
-            await this.exec(this.getNpmInstallParams(locationParams, genName));
-            this.logger.debug(`${genName} successfully installed.`);
-            let downloadedGens: string[] = this.workspaceConfig.get("Yeoman UI.downloadedGenerators") || [];
+            await this.installGenerator(locationParams, genName);
+            const downloadedGens: string[] = this.getDownloadedGenerators();
             downloadedGens.push(genName);
-            downloadedGens = _.uniq(downloadedGens);
-            this.workspaceConfig.update("Yeoman UI.downloadedGenerators", downloadedGens, true);
+            this.workspaceConfig.update("Yeoman UI.downloadedGenerators", _.uniq(downloadedGens), true);
         } catch (error) {
             this.logger.error(error.message || error);
         }
@@ -64,13 +61,13 @@ export class ExploreGens {
 
     private getGeneratorsLocationParams() {
         const location =  _.trim(this.workspaceConfig.get("Yeoman UI.generatorsLocation"));
-        return _.isEmpty(location) ? "-g" : `--prefix ${location}`;
+        return _.isEmpty(location) ? "-g": `--prefix ${location}`;
     }
 
     private updateAllInstalledGenerators() {
         const autoUpdateEnabled = this.workspaceConfig.get("Yeoman UI.autoUpdateGenerators");
         if (autoUpdateEnabled) {
-            const downloadedGenerators: string[] | undefined = this.workspaceConfig.get("Yeoman UI.downloadedGenerators");
+            const downloadedGenerators: string[] = this.getDownloadedGenerators();
             const locationParams = this.getGeneratorsLocationParams();
 
             if (_.size(downloadedGenerators) > 0) {
@@ -78,13 +75,24 @@ export class ExploreGens {
             }
 
             _.forEach(downloadedGenerators, genName => {
-                this.exec(this.getNpmInstallParams(locationParams, genName));
+                this.installGenerator(locationParams, genName);
             });
         }
     }
 
+    private getDownloadedGenerators(): string[] {
+        return this.workspaceConfig.get("Yeoman UI.downloadedGenerators") || [];
+    }
+
     private async exec(arg: string) {
         return util.promisify(cp.exec)(arg);
+    }
+
+    private async installGenerator(locationParams: string, genName: string) {
+        this.logger.debug(`Installing the latest version of ${genName} ...`);
+        const installParams = this.getNpmInstallParams(locationParams, genName);
+        await this.exec(installParams);
+        this.logger.debug(`${genName} successfully installed.`);
     }
 
     private getNpmInstallParams(locationParams: string, genName: string) {
