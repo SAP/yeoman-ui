@@ -4,6 +4,7 @@ import * as cp from 'child_process';
 import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import * as util from 'util';
+import * as vscode from 'vscode';
 
 const npm = (process.platform === 'win32' ? 'npm.cmd' : 'npm');
 
@@ -11,11 +12,13 @@ export class ExploreGens {
     private logger: IChildLogger;
     private rpc: IRpc;
     private workspaceConfig: any;
+    private gensBeingInstalled: string[];
 
     constructor(rpc: IRpc, logger: IChildLogger, workspaceConfig: any) {
         this.rpc = rpc;
         this.logger = logger;
         this.workspaceConfig = workspaceConfig;
+        this.gensBeingInstalled = [];
         this.init();
     }
 
@@ -30,20 +33,33 @@ export class ExploreGens {
     private async doDownload(gen: any) {
         const genName = gen.package.name;
         const locationParams = this.getGeneratorsLocationParams();
-        try {
-            await this.installGenerator(locationParams, genName);
-            const downloadedGens: string[] = this.getDownloadedGenerators();
+        
+        await this.installGenerator(locationParams, genName);
+        
+        vscode.window.showInformationMessage(`${genName} successfully installed.`);
+
+        this.addToDownloadedGenerators(genName);
+    }
+
+    private addToDownloadedGenerators(genName: string) {
+        const downloadedGens: string[] = this.getDownloadedGenerators();
             downloadedGens.push(genName);
             this.workspaceConfig.update("Yeoman UI.downloadedGenerators", _.uniq(downloadedGens), true);
-        } catch (error) {
-            this.logger.error(error.message || error);
-        }
     }
 
     private async getFilteredGenerators(query = "", author = "") {
         const gensQueryUrl = this.getGensQueryURL(query, author);
         const res: any = await npmFetch.json(gensQueryUrl); 
-        const filteredGenerators = _.get(res, "results", res.objects);
+        let filteredGenerators = _.get(res, "results", res.objects);
+        filteredGenerators = _.map(filteredGenerators, gen => {
+            if (_.includes(this.gensBeingInstalled, gen.package.name)) {
+                gen.disabledToDownload = true;
+            } else {
+                gen.disabledToDownload = false;
+            }
+
+            return gen;
+        });
         return [filteredGenerators, res.total];
     }
 
@@ -71,7 +87,9 @@ export class ExploreGens {
             const locationParams = this.getGeneratorsLocationParams();
 
             if (_.size(downloadedGenerators) > 0) {
-                this.logger.debug("Auto updating all downloaded generators...");
+                const updatingMessage = "Auto updating all downloaded generators...";
+                this.logger.debug(updatingMessage);
+                vscode.window.setStatusBarMessage(updatingMessage, 8000);
             }
 
             _.forEach(downloadedGenerators, genName => {
@@ -89,10 +107,27 @@ export class ExploreGens {
     }
 
     private async installGenerator(locationParams: string, genName: string) {
-        this.logger.debug(`Installing the latest version of ${genName} ...`);
-        const installParams = this.getNpmInstallParams(locationParams, genName);
-        await this.exec(installParams);
-        this.logger.debug(`${genName} successfully installed.`);
+        this.gensBeingInstalled.push(genName);
+        const installingMessage = `Installing the latest version of ${genName} ...`;
+        const statusbarMessage = vscode.window.setStatusBarMessage(installingMessage, 3000);
+
+        try {
+            this.logger.debug(installingMessage);
+            const installParams = this.getNpmInstallParams(locationParams, genName);
+            this.rpc.invoke("updateBeingInstalledGenerator", [genName, true]);
+            await this.exec(installParams);
+            this.logger.debug(`${genName} successfully installed.`);
+        } catch (error) {
+            const errorMessage = error.message || error.toString();
+            this.logger.error(errorMessage);
+            vscode.window.showErrorMessage(`Failed to install ${genName}: ${errorMessage}`);
+        } finally {
+            _.remove(this.gensBeingInstalled, gen => {
+                return gen === genName;
+            });
+            this.rpc.invoke("updateBeingInstalledGenerator", [genName, false]);
+            statusbarMessage.dispose();
+        }
     }
 
     private getNpmInstallParams(locationParams: string, genName: string) {

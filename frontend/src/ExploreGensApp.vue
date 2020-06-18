@@ -25,7 +25,6 @@
             class="d-flex flex-column mx-auto"
             height="300"
             tile
-            hover
             elevation="2"
           >
             <v-card-title primary-title>
@@ -33,7 +32,9 @@
             </v-card-title>
             <v-card-text style="overflow-y: auto; height:200px" v-text="gen.package.description" />
             <v-card-actions>
-              <v-btn large dark color="blue" @click="onDownload(gen)">Download</v-btn>
+              <v-btn large dark :color="buttonColor(gen)" @click="onDownload(gen)">
+                {{buttonText(gen)}}
+              </v-btn>
               <v-card-subtitle v-text="gen.package.version" />
             </v-card-actions>
           </v-card>
@@ -42,7 +43,6 @@
     </v-container>
   </v-app>
 </template>
-
 
 <script>
 const ALL_GENS = "-----";
@@ -75,8 +75,16 @@ export default {
     }
   },
   methods: {
+    buttonText(gen) {
+      return gen.disabledToDownload ? "Downloading..." : "Download";
+    },
+    buttonColor(gen) {
+      return gen.disabledToDownload ? "grey" : "blue";
+    },
     onDownload(gen) {
-      this.rpc.invoke("doDownload", [gen]);
+      if (!gen.disabledToDownload) {
+        this.rpc.invoke("doDownload", [gen]);
+      }
     },
     onQueryChange() {
       this.debouncedGenFilterChange();
@@ -103,11 +111,26 @@ export default {
         window.vscode = acquireVsCodeApi();
       }
     },
+    async updateBeingInstalledGenerator(genName, beingInstalled) {
+      const gen = _.find(this.gens, gen => {
+        return gen.package.name === genName;
+      });
+      
+      if (gen) {
+        gen.disabledToDownload = beingInstalled;
+      }
+    },
     setupRpc() {
       /* istanbul ignore if */
       if (this.isInVsCode()) {
         this.setVscodeApiOnWindow();
         this.rpc = new RpcBrowser(window, window.vscode);
+
+        this.rpc.registerMethod({
+          func: this["updateBeingInstalledGenerator"],
+          thisArg: this,
+          name: "updateBeingInstalledGenerator"
+        });
       }
     }
   },
