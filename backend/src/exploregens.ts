@@ -35,8 +35,6 @@ export class ExploreGens {
         const locationParams = this.getGeneratorsLocationParams();
         
         await this.installGenerator(locationParams, genName);
-        
-        vscode.window.showInformationMessage(`${genName} successfully installed.`);
 
         this.addToDownloadedGenerators(genName);
     }
@@ -93,7 +91,7 @@ export class ExploreGens {
             }
 
             _.forEach(downloadedGenerators, genName => {
-                this.installGenerator(locationParams, genName);
+                this.installGenerator(locationParams, genName, false);
             });
         }
     }
@@ -106,7 +104,7 @@ export class ExploreGens {
         return util.promisify(cp.exec)(arg);
     }
 
-    private async installGenerator(locationParams: string, genName: string) {
+    private async installGenerator(locationParams: string, genName: string, isDownload = true) {
         this.gensBeingInstalled.push(genName);
         const installingMessage = `Installing the latest version of ${genName} ...`;
         const statusbarMessage = vscode.window.setStatusBarMessage(installingMessage, 3000);
@@ -116,7 +114,11 @@ export class ExploreGens {
             const installParams = this.getNpmInstallParams(locationParams, genName);
             this.rpc.invoke("updateBeingInstalledGenerator", [genName, true]);
             await this.exec(installParams);
-            this.logger.debug(`${genName} successfully installed.`);
+            const successMessage = `${genName} successfully installed.`;
+            this.logger.debug(successMessage);
+            if (isDownload) {
+                vscode.window.showInformationMessage(successMessage);
+            }
         } catch (error) {
             const errorMessage = error.message || error.toString();
             this.logger.error(errorMessage);
