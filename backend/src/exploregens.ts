@@ -30,7 +30,7 @@ export class ExploreGens {
         if (autoUpdateEnabled) {
             const downloadedGenerators: string[] = this.getDownloadedGenerators();
             if (!_.isEmpty(downloadedGenerators)) {
-                const updatingMessage = "Auto updating all downloaded generators...";
+                const updatingMessage = "Auto updating of downloaded generators...";
                 this.logger.debug(updatingMessage);
                 const statusBarMessage = vscode.window.setStatusBarMessage(updatingMessage);
                 const locationParams = this.getGeneratorsLocationParams();
@@ -40,7 +40,7 @@ export class ExploreGens {
 
                 await Promise.all(promises);
                 statusBarMessage.dispose();
-                vscode.window.setStatusBarMessage("Auto updating all downloaded generators completed.", 10000);
+                vscode.window.setStatusBarMessage("Auto updating of downloaded generators completed.", 10000);
             }
         }
     }
@@ -119,7 +119,7 @@ export class ExploreGens {
         try {
             this.logger.debug(installingMessage);
             const installParams = this.getNpmInstallParams(locationParams, genName);
-            this.updateWebviewAboutBeingInstalledGenerator(genName, true);
+            this.updateWebviewWithBeingInstalledGenerator(genName, true);
             await this.exec(installParams);
             const successMessage = `${genName} successfully installed.`;
             this.logger.debug(successMessage);
@@ -132,17 +132,15 @@ export class ExploreGens {
             _.remove(this.gensBeingInstalled, gen => {
                 return gen === genName;
             });
-            this.updateWebviewAboutBeingInstalledGenerator(genName, false);
+            this.updateWebviewWithBeingInstalledGenerator(genName, false);
             if (statusbarMessage) {
                 statusbarMessage.dispose();
             }
         }
     }
 
-    private updateWebviewAboutBeingInstalledGenerator(genName: string, isBeingInstalled: boolean) {
-        if (this.rpc) {
-            this.rpc.invoke("updateBeingInstalledGenerator", [genName, isBeingInstalled]);
-        }
+    private updateWebviewWithBeingInstalledGenerator(genName: string, isBeingInstalled: boolean) {
+        this.rpc.invoke("updateBeingInstalledGenerator", [genName, isBeingInstalled]);
     }
 
     private getNpmInstallParams(locationParams: string, genName: string) {

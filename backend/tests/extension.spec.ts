@@ -27,7 +27,11 @@ describe('extension unit test', () => {
     let windowMock: any;
     let workspaceMock: any;
     let loggerWrapperMock: any;
-    const testContext: any = { subscriptions: [], extensionPath: "testExtensionpath" };
+    const testContext: any = { 
+        subscriptions: [], 
+        extensionPath: "testExtensionpath", 
+        globalState: {get: () => true, update: () => true}
+    };
 
     before(() => {
         sandbox = sinon.createSandbox();
