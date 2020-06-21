@@ -19,24 +19,24 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 	private static channel: vscode.OutputChannel;
 
 	public loadYeomanUI(uiOptions?: any) {
-		this.disposePanel();
+		this.disposeWebviewPanel();
 		const webViewPanel = this.createWebviewPanel();
-		this.setPanel(webViewPanel, uiOptions);
+		this.setWebviewPanel(webViewPanel, uiOptions);
 	}
 
 	public toggleOutput() {
 		this.outputChannel.showOutput();
 	}
 
-	public setPanel(webViewPanel: vscode.WebviewPanel, uiOptions?: any) {
-		super.setPanel(webViewPanel);
+	public setWebviewPanel(webViewPanel: vscode.WebviewPanel, uiOptions?: any) {
+		super.setWebviewPanel(webViewPanel);
 
 		this.messages = _.assign({}, backendMessages, _.get(uiOptions, "messages", {}))
 		this.genFilter = GeneratorFilter.create(_.get(uiOptions, "filter"));
 
-		const rpc = new RpcExtension(this.panel.webview);
+		const rpc = new RpcExtension(this.webViewPanel.webview);
 		this.outputChannel = new OutputChannelLog(this.messages.channel_name);
-		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(rpc, this.panel, this.genFilter);
+		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(rpc, this.webViewPanel, this.genFilter);
 		this.yeomanui = new YeomanUI(rpc,
 			vscodeYouiEvents,
 			this.outputChannel,
@@ -112,13 +112,13 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 		}
 	}
 
-	public dispose() {
-		super.dispose();
+	public disposeWebviewPanel() {
+		super.disposeWebviewPanel();
 		this.yeomanui = null;
 	}
 
 	public initWebviewPanel() {
 		super.initWebviewPanel();
-		this.panel.title = this.messages.panel_title;
+		this.webViewPanel.title = this.messages.panel_title;
 	}
 }

@@ -57,7 +57,7 @@ describe('exploregens unit test', () => {
         get: () => true,
         update: () => true,
     };
-    const exploregens = new ExploreGens(rpc, childLogger as IChildLogger, config);
+    const exploregens = new ExploreGens(childLogger as IChildLogger);
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -83,14 +83,13 @@ describe('exploregens unit test', () => {
         npmMock.verify();
     });
 
-    it("init", () => {
-        rpcMock.expects("setResponseTimeout").withExactArgs(3600000);
+    it("initRpc", () => {
         rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getFilteredGenerators"], thisArg: exploregens });
         rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["doDownload"], thisArg: exploregens });
         rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens });
         exploreGensMock.expects("updateAllInstalledGenerators");
 
-        exploregens["init"]();
+        exploregens["initRpc"](rpc);
     });
 
     describe("doDownload", () => {

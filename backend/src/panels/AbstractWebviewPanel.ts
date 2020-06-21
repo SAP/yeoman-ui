@@ -11,7 +11,7 @@ export abstract class AbstractWebviewPanel {
 	protected extensionPath: string;
 	protected mediaPath: string;
 	protected viewTitle: string;
-	protected panel: vscode.WebviewPanel;
+	protected webViewPanel: vscode.WebviewPanel;
 	protected focusedKey: string;
 	protected htmlFileName: string;
 	protected state: any;
@@ -27,8 +27,8 @@ export abstract class AbstractWebviewPanel {
 		this.disposables = [];
 	}
 
-	public setPanel(webviewPanel: vscode.WebviewPanel, state?: any) {
-		this.panel = webviewPanel;
+	public setWebviewPanel(webviewPanel: vscode.WebviewPanel, state?: any) {
+		this.webViewPanel = webviewPanel;
 		this.state = state;
 	};
 
@@ -47,10 +47,10 @@ export abstract class AbstractWebviewPanel {
 		);
 	}
 
-	protected disposePanel() {
-		const displayedPanel = this.panel;
+	protected disposeWebviewPanel() {
+		const displayedPanel = this.webViewPanel;
 		if (displayedPanel) {
-			displayedPanel.dispose();
+			this.dispose();
 		}
 	}
 
@@ -59,14 +59,14 @@ export abstract class AbstractWebviewPanel {
 		this.initHtmlContent();
 
 		// Set the context (current panel is focused)
-		this.setFocused(this.panel.active);
+		this.setFocused(this.webViewPanel.active);
 
-		this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
+		this.webViewPanel.onDidDispose(() => this.dispose(), null, this.disposables);
 
 		// Update the content based on view changes
-		this.panel.onDidChangeViewState(
+		this.webViewPanel.onDidChangeViewState(
 			e => {
-				this.setFocused(this.panel.active);
+				this.setFocused(this.webViewPanel.active);
 			},
 			null,
 			this.disposables
@@ -77,12 +77,12 @@ export abstract class AbstractWebviewPanel {
 		vscode.commands.executeCommand('setContext', this.focusedKey, focusedValue);
 	}
 
-	protected dispose() {
+	private dispose() {
 		this.setFocused(false);
 
 		// Clean up our resources
-		this.panel.dispose();
-		this.panel = null;
+		this.webViewPanel.dispose();
+		this.webViewPanel = null;
 
 		while (this.disposables.length) {
 			const x = this.disposables.pop();
@@ -97,7 +97,7 @@ export abstract class AbstractWebviewPanel {
 		if (indexHtml) {
 			// Local path to main script run in the webview
 			const scriptPathOnDisk = vscode.Uri.file(path.join(this.mediaPath, path.sep));
-			const scriptUri = this.panel.webview.asWebviewUri(scriptPathOnDisk);
+			const scriptUri = this.webViewPanel.webview.asWebviewUri(scriptPathOnDisk);
 
 			// TODO: very fragile: assuming double quotes and src is first attribute
 			// specifically, doesn't work when building vue for development (vue-cli-service build --mode development)
@@ -105,6 +105,6 @@ export abstract class AbstractWebviewPanel {
 			indexHtml = indexHtml.replace(/<script src=/g, `<script src=${scriptUri.toString()}`);
 			indexHtml = indexHtml.replace(/<img src=/g, `<img src=${scriptUri.toString()}`);
 		}
-		this.panel.webview.html = indexHtml;
+		this.webViewPanel.webview.html = indexHtml;
 	}
 }
