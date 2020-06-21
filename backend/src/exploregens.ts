@@ -78,7 +78,7 @@ export class ExploreGens {
     }
 
     private showAndLogError(messagePrefix: string, error: any) {
-        const errorMessage = error.message || error.toString();
+        const errorMessage = error.toString();
         this.logger.error(errorMessage);
         vscode.window.showErrorMessage(`${messagePrefix}: ${errorMessage}`);
     }

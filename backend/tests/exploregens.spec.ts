@@ -35,7 +35,7 @@ describe('exploregens unit test', () => {
     let workspaceConfigMock: any;
     let exploreGensMock: any;
     let loggerMock: any;
-    let npmMock: any;
+    let npmFetchMock: any;
     let vscodeWindowMock: any;
     let statusBarMessageMock: any;
 
@@ -92,7 +92,7 @@ describe('exploregens unit test', () => {
         workspaceConfigMock = sandbox.mock(config);
         loggerMock = sandbox.mock(childLogger);
         exploreGensMock = sandbox.mock(exploregens);
-        npmMock = sandbox.mock(npmFetch);
+        npmFetchMock = sandbox.mock(npmFetch);
         vscodeWindowMock = sandbox.mock(testVscode.window);
         statusBarMessageMock = sandbox.mock(statusBarMessage);
     });
@@ -102,7 +102,7 @@ describe('exploregens unit test', () => {
         workspaceConfigMock.verify();
         loggerMock.verify();
         exploreGensMock.verify();
-        npmMock.verify();
+        npmFetchMock.verify();
         vscodeWindowMock.verify();
         statusBarMessageMock.verify();
     });
@@ -152,27 +152,43 @@ describe('exploregens unit test', () => {
         });
     });
 
-    describe.skip("getFilteredGenerators", async () => {
+    describe("getFilteredGenerators", async () => {
         it("query and recommended parameters are empty strings", async () => {
             const expectedResult = {
-                objects: ["obj1", "obj2"],
+                objects: [{package: {name: "obj1"}}, {package: {name: "obj2"}}],
                 total: 5
             }
             const url = exploregens["getGensQueryURL"]("", "");
-            npmMock.expects("json").withExactArgs(url).resolves(expectedResult);
+            npmFetchMock.expects("json").withExactArgs(url).resolves(expectedResult);
             const res = await exploregens["getFilteredGenerators"]();
             expect(res).to.be.deep.equal([expectedResult.objects, expectedResult.total]);
         });
 
         it("query parameter is some words", async () => {
             const expectedResult = {
-                objects: ["obj1"],
+                objects: [{package: {name: "obj1"}}],
                 total: 1
             }
             const url = exploregens["getGensQueryURL"]("test of query", "");
-            npmMock.expects("json").withExactArgs(url).resolves(expectedResult);
+            npmFetchMock.expects("json").withExactArgs(url).resolves(expectedResult);
             const res = await exploregens["getFilteredGenerators"]("test of query");
             expect(res).to.be.deep.equal([expectedResult.objects, expectedResult.total]);
+        });
+
+        it("npmFetch.json throws error", async () => {
+            const expectedResult = {
+                objects: [{package: {name: "obj1"}}],
+                total: 1
+            }
+            const url = exploregens["getGensQueryURL"]("test of query", "");
+            const errorMessage = "npmFetch enexpected error.";
+            npmFetchMock.expects("json").withExactArgs(url).throws(errorMessage);
+
+            loggerMock.expects("error").withExactArgs(errorMessage);
+
+            const prefixMessage = `Failed to get generators with the queryUrl ${url}`;
+            vscodeWindowMock.expects("showErrorMessage").withExactArgs(`${prefixMessage}: ${errorMessage}`).resolves();
+            await exploregens["getFilteredGenerators"]("test of query");
         });
     });
 
