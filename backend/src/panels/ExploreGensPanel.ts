@@ -11,6 +11,7 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
     public setWebviewPanel(webviewPanel: vscode.WebviewPanel) {
         super.setWebviewPanel(webviewPanel);
         this.exploreGens.initRpc(new RpcExtension(webviewPanel.webview));
+        this.exploreGens.updateCache();
         this.initWebviewPanel();
     }
 
@@ -22,7 +23,6 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
 
     public disposeWebviewPanel() {
         super.disposeWebviewPanel();
-        this.exploreGens = null;
     }
 
     private exploreGens: ExploreGens;
@@ -36,8 +36,6 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
         this.exploreGens = new ExploreGens(this.logger);
 
         this.doGeneratorsUpdate(context);
-
-        this.exploreGens.updateCache();
     }
 
     private doGeneratorsUpdate(context: vscode.ExtensionContext) {

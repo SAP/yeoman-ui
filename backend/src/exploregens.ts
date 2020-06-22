@@ -40,7 +40,8 @@ export class ExploreGens {
     public async updateAllInstalledGenerators() {
         const autoUpdateEnabled = this.getWsConfig().get("Yeoman UI.autoUpdateGenerators", true);
         if (autoUpdateEnabled) {
-            const installedGenerators: string[] = this.getInstalledGenerators();
+            this.updateCache();
+            const installedGenerators: string[] = await this.getAllInstalledGenerators();
             if (!_.isEmpty(installedGenerators)) {
                 const updatingMessage = "Auto updating of installed generators...";
                 this.logger.debug(updatingMessage);
@@ -113,10 +114,6 @@ export class ExploreGens {
         return _.isEmpty(location) ? "-g" : `--prefix ${location}`;
     }
 
-    private getInstalledGenerators(): string[] {
-        return  [];
-    }
-
     private async exec(arg: string) {
         return util.promisify(cp.exec)(arg);
     }
@@ -176,19 +173,18 @@ export class ExploreGens {
     }
 
     private async isInstalled(gen: any) {
-        const genName = gen.package.name;
-        const result: string = await this.cachedPromise;
-        const installedGens = this.getAllInstalledGenerators(result);
-        return _.includes(installedGens, genName);
+        const installedGens = await this.getAllInstalledGenerators();
+        return _.includes(installedGens, gen.package.name);
     }
 
     // TODO - improve logic
-    private getAllInstalledGenerators(str: string) {
+    private async getAllInstalledGenerators() {
+        const result: string = await this.cachedPromise;
         let installedGen: string[] = [];
         let tmpGen = "";
         let index;
         let index2;
-        let arrGen = str.split("+--");
+        let arrGen = result.split("+--");
         for (let i=0 ; i<arrGen.length ; i++){
             index = arrGen[i].indexOf("generator-");
             index2 = arrGen[i].indexOf("@");
