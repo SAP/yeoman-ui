@@ -175,24 +175,9 @@ export class ExploreGens {
         }
     }
 
-    private async isGeneratorInstalled(genName: string) {
+    private async isInstalled(genName: string) {
         const result: string = await this.cachedPromise;
-        const index = result.search(`${genName}@`);
-        
-        return index > -1;
-    }
-
-    private async isInstalled(gen: any) {
-        const genName = gen.package.name;
-
-        try {
-            this.updateBeingHandledGenerator(genName, true);
-            return await this.isGeneratorInstalled(genName);
-        } catch (error) {
-            this.showAndLogError(`Failed to get whether ${genName} is installed`, error);
-        } finally {
-            this.updateBeingHandledGenerator(genName, false);
-        }
+        return result.search(`${genName}@`) > -1;
     }
 
     private updateBeingHandledGenerator(genName: string, isBeingHandled: boolean) {

@@ -28,7 +28,7 @@
             <v-card-actions>
               <v-menu bottom left>
                 <template v-slot:activator="{ on, attrs }">
-                  <v-btn v-bind="attrs" v-on="on" :loading="loading" @click="getActions(gen)">
+                  <v-btn v-bind="attrs" v-on="on" :loading="gen.disabledToHandle" @click="getActions(gen)">
                     <v-icon>mdi-dots-vertical</v-icon>
                   </v-btn>
                 </template>
@@ -62,7 +62,6 @@ export default {
     return {
       items: [],
       genActions: [],
-      loading: false,
       rpc: Object,
       gens: [],
       total: 0,
@@ -80,26 +79,23 @@ export default {
       return `${_.size(this.gens)} / ${this.total}`;
     },
     debouncedGenFilterChange() {
-      return _.debounce(this.getFilteredGenerators, 300);
+      return _.debounce(this.getFilteredGenerators, 200);
     }
   },
   methods: {
     async getActions(gen) {
       if (!gen.disabledToHandle) {
         this.genActions = [];
-        this.loading = true;
+        gen.disabledToHandle = true;
         const isInstalled = await this.rpc.invoke("isInstalled", [gen]);
         this.genActions = isInstalled === true ? [`Uninstall`] : [`Install`];
-        this.loading = false;
+        gen.disabledToHandle = false;
       }
     },
     async onAction(gen, actionName) {
       gen.disabledToHandle = true;
-      this.loading = true;
-      const action = _.lowerCase(actionName);
-      await this.rpc.invoke(action, [gen]);
+      await this.rpc.invoke(_.lowerCase(actionName), [gen]);
       gen.disabledToHandle = false;
-      this.loading = false;
     },
     onQueryChange() {
       this.debouncedGenFilterChange();
