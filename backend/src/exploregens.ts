@@ -175,9 +175,29 @@ export class ExploreGens {
         }
     }
 
-    private async isInstalled(genName: string) {
+    private async isInstalled(gen: any) {
+        const genName = gen.package.name;
         const result: string = await this.cachedPromise;
-        return result.search(`${genName}@`) > -1;
+        const installedGens = this.getAllInstalledGenerators(result);
+        return _.includes(installedGens, genName);
+    }
+
+    // TODO - improve logic
+    private getAllInstalledGenerators(str: string) {
+        let installedGen: string[] = [];
+        let tmpGen = "";
+        let index;
+        let index2;
+        let arrGen = str.split("+--");
+        for (let i=0 ; i<arrGen.length ; i++){
+            index = arrGen[i].indexOf("generator-");
+            index2 = arrGen[i].indexOf("@");
+            if (index != -1 && index2 != -1) {
+                tmpGen = arrGen[i].substring(index,index2);
+                installedGen.push(tmpGen);
+            }
+        }
+        return installedGen;
     }
 
     private updateBeingHandledGenerator(genName: string, isBeingHandled: boolean) {
