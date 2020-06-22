@@ -18,7 +18,3 @@ npm run compile
 npm run ws:run
 ```
 
-## Learning
-* support all inquirer question types
-* support validate for none input type
-* disable next when not all answered or if some questions are invalid
