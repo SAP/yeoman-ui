@@ -1,7 +1,7 @@
 <template>
   <v-app id="exploregens">
     <v-container>
-      <v-row class="mb-6">
+      <v-row>
         <v-col :cols="8">
           <v-text-field label="Search" v-model="query" @input="onQueryChange" />
         </v-col>
@@ -18,23 +18,30 @@
         </v-col>
       </v-row>
 
-      <v-row class="ma-2">
+      <v-row>
         <v-col md="3" class="pa-3 d-flex flex-column" v-for="(gen, i) in gens" :key="i">
-          <v-card
-            width="300"
-            class="d-flex flex-column mx-auto"
-            height="300"
-            tile
-            elevation="2"
-          >
+          <v-card width="300" class="d-flex flex-column mx-auto" height="300" tile elevation="2">
             <v-card-title primary-title>
               <h3 class="headline mb-0">{{ gen.package.name }}</h3>
             </v-card-title>
             <v-card-text style="overflow-y: auto; height:200px" v-text="gen.package.description" />
             <v-card-actions>
-              <v-btn large dark :color="buttonColor(gen)" @click="onDownload(gen)">
-                {{buttonText(gen)}}
-              </v-btn>
+              <v-menu bottom left>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn v-bind="attrs" v-on="on" :loading="loading" @click="getActions(gen)">
+                    <v-icon>mdi-dots-vertical</v-icon>
+                  </v-btn>
+                </template>
+                <v-list>
+                  <v-list-item
+                    v-for="(item, i) in genActions"
+                    :key="i"
+                    @click="onAction(gen, item)"
+                  >
+                    <v-list-item-title>{{ item }}</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
               <v-card-subtitle v-text="gen.package.version" />
             </v-card-actions>
           </v-card>
@@ -54,6 +61,8 @@ export default {
   data() {
     return {
       items: [],
+      genActions: [],
+      loading: false,
       rpc: Object,
       gens: [],
       total: 0,
@@ -75,16 +84,22 @@ export default {
     }
   },
   methods: {
-    buttonText(gen) {
-      return gen.disabledToDownload ? "Downloading..." : "Download";
-    },
-    buttonColor(gen) {
-      return gen.disabledToDownload ? "grey" : "blue";
-    },
-    onDownload(gen) {
-      if (!gen.disabledToDownload) {
-        this.rpc.invoke("doDownload", [gen]);
+    async getActions(gen) {
+      if (!gen.disabledToHandle) {
+        this.genActions = [];
+        this.loading = true;
+        const isInstalled = await this.rpc.invoke("isInstalled", [gen]);
+        this.genActions = isInstalled === true ? [`Uninstall`] : [`Install`];
+        this.loading = false;
       }
+    },
+    async onAction(gen, actionName) {
+      gen.disabledToHandle = true;
+      this.loading = true;
+      const action = _.lowerCase(actionName);
+      await this.rpc.invoke(action, [gen]);
+      gen.disabledToHandle = false;
+      this.loading = false;
     },
     onQueryChange() {
       this.debouncedGenFilterChange();
@@ -111,13 +126,13 @@ export default {
         window.vscode = acquireVsCodeApi();
       }
     },
-    async updateBeingInstalledGenerator(genName, beingInstalled) {
+    async updateBeingHandledGenerator(genName, isBeingHandled) {
       const gen = _.find(this.gens, gen => {
         return gen.package.name === genName;
       });
-      
+
       if (gen) {
-        gen.disabledToDownload = beingInstalled;
+        gen.disabledToHandle = isBeingHandled;
       }
     },
     setupRpc() {
@@ -127,9 +142,9 @@ export default {
         this.rpc = new RpcBrowser(window, window.vscode);
 
         this.rpc.registerMethod({
-          func: this["updateBeingInstalledGenerator"],
+          func: this["updateBeingHandledGenerator"],
           thisArg: this,
-          name: "updateBeingInstalledGenerator"
+          name: "updateBeingHandledGenerator"
         });
       }
     }

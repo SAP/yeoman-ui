@@ -36,6 +36,8 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
         this.exploreGens = new ExploreGens(this.logger);
 
         this.doGeneratorsUpdate(context);
+
+        this.exploreGens.updateCache();
     }
 
     private doGeneratorsUpdate(context: vscode.ExtensionContext) {

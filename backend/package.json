@@ -103,11 +103,7 @@
 				"Yeoman UI.autoUpdateGenerators": {
 					"type": "boolean",
 					"default": true,
-					"description": "Auto update downloaded generators"
-				},
-				"Yeoman UI.downloadedGenerators": {
-					"type": "array",
-					"description": "Downloaded generators"
+					"description": "Auto update installed generators"
 				},
 				"Yeoman UI.recommendedQuery": {
 					"type": "array",

@@ -2,14 +2,15 @@ import * as mocha from "mocha";
 import { expect } from "chai";
 import * as sinon from "sinon";
 import * as _ from "lodash";
+import * as util from 'util';
 import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc, IPromiseCallbacks, IMethod } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import * as npmFetch from 'npm-registry-fetch';
 import { mockVscode } from "./mockUtil";
 
 const config = {
-    get: () => true,
-    update: () => true,
+    get: () => new Error("not implemented"),
+    update: () => new Error("not implemented"),
 };
 const statusBarMessage = {
     dispose: () => true
@@ -22,8 +23,8 @@ const testVscode = {
         setStatusBarMessage: () => {
             return statusBarMessage;
         },
-        showErrorMessage: () => true,
-        showInformationMessage: () => true
+        showErrorMessage: () => Promise.reject("not implemented"),
+        showInformationMessage: () => Promise.reject("not implemented")
     }
 };
 mockVscode(testVscode, "src/extension.ts");
@@ -109,7 +110,9 @@ describe('exploregens unit test', () => {
 
     it("initRpc", () => {
         rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getFilteredGenerators"], thisArg: exploregens });
-        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["doDownload"], thisArg: exploregens });
+        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["install"], thisArg: exploregens });
+        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["uninstall"], thisArg: exploregens });
+        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInstalled"], thisArg: exploregens });
         rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens });
 
         exploregens["initRpc"](rpc);
@@ -125,30 +128,30 @@ describe('exploregens unit test', () => {
         it("update already downloaded generator", async () => {
             workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.generatorsLocation").returns("");
             loggerMock.expects("debug").withExactArgs(`Installing the latest version of ${gen.package.name} ...`);
-            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallParams"]("-g", gen.package.name));
+            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", gen.package.name));
             loggerMock.expects("debug").withExactArgs(`${gen.package.name} successfully installed.`);
             workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.downloadedGenerators").returns([gen.package.name, "gen-test2"]);
             workspaceConfigMock.expects("update").withExactArgs("Yeoman UI.downloadedGenerators", [gen.package.name, "gen-test2"], true);
 
-            await exploregens["doDownload"](gen);
+            await exploregens["install"](gen);
         });
 
         it("download new generator", async () => {
             workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.generatorsLocation").returns("");
             loggerMock.expects("debug").withExactArgs(`Installing the latest version of ${gen.package.name} ...`);
-            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallParams"]("-g", gen.package.name));
+            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", gen.package.name));
             loggerMock.expects("debug").withExactArgs(`${gen.package.name} successfully installed.`);
             workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.downloadedGenerators").returns(undefined);
             workspaceConfigMock.expects("update").withExactArgs("Yeoman UI.downloadedGenerators", [gen.package.name], true);
 
-            await exploregens["doDownload"](gen);
+            await exploregens["install"](gen);
         });
 
         it.skip("an error is thrown", async () => {
             const errorStr = "npm install failed";
             exploreGensMock.expects("exec").throws(new Error(errorStr));
             loggerMock.expects("error").withExactArgs(errorStr);
-            await exploregens["doDownload"](gen);
+            await exploregens["install"](gen);
         });
     });
 
@@ -240,14 +243,14 @@ describe('exploregens unit test', () => {
 
     describe("updateAllInstalledGenerators", () => {
         it("generators auto update is false", async () => {
-            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.autoUpdateGenerators").returns(false);
+            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.autoUpdateGenerators", true).returns(false);
             workspaceConfigMock.expects("get").never();
 
             await exploregens["updateAllInstalledGenerators"]();
         });
 
         it("generators auto update is true and downloadedGenerators returns undefined", async () => {
-            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.autoUpdateGenerators").returns(true);
+            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.autoUpdateGenerators", true).returns(true);
             workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.downloadedGenerators").returns(undefined);
             loggerMock.expects("debug").never();
 
@@ -257,7 +260,7 @@ describe('exploregens unit test', () => {
         it("generators auto update is true and downloadedGenerators returns a generators list", async () => {
             const gensarry = ["generators-aa", "generators-bb"];
             
-            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.autoUpdateGenerators").returns(true);
+            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.autoUpdateGenerators", true).returns(true);
             workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.downloadedGenerators").returns(gensarry);
             workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.generatorsLocation").returns("");
 
@@ -277,8 +280,34 @@ describe('exploregens unit test', () => {
             rpcMock.expects("invoke").withExactArgs("updateBeingInstalledGenerator", ["generators-aa", false]);
             rpcMock.expects("invoke").withExactArgs("updateBeingInstalledGenerator", ["generators-bb", false]);
 
-            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallParams"]("-g", "generators-aa"));
-            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallParams"]("-g", "generators-bb"));
+            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", "generators-aa"));
+            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", "generators-bb"));
+
+            exploregens["initRpc"](rpc);
+            await exploregens["updateAllInstalledGenerators"]();
+        });
+
+        it.only("installGenerator fails on exec method", async () => {
+            const gensarry = ["generators-aa"];
+            
+            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.autoUpdateGenerators", true).returns(true);
+            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.downloadedGenerators").returns(gensarry);
+            workspaceConfigMock.expects("get").withExactArgs("Yeoman UI.generatorsLocation").returns("");
+
+            const updatingMessage = "Auto updating of downloaded generators...";
+            
+            vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(updatingMessage).returns(statusBarMessage);
+            vscodeWindowMock.expects("setStatusBarMessage").withExactArgs("Auto updating of downloaded generators completed.", 10000);
+            
+            loggerMock.expects("debug").withExactArgs(updatingMessage);
+            loggerMock.expects("debug").withExactArgs("Installing the latest version of generators-aa ...");
+
+            rpcMock.expects("invoke").withExactArgs("updateBeingInstalledGenerator", ["generators-aa", true]);
+            rpcMock.expects("invoke").withExactArgs("updateBeingInstalledGenerator", ["generators-aa", false]);
+
+            const expectedErrorMessage = `Failed to install generators-aa: util.promisify failure.`;
+            loggerMock.expects("error").withExactArgs(updatingMessage);
+            vscodeWindowMock.expects("showErrorMessage").withExactArgs(expectedErrorMessage).resolves();
 
             exploregens["initRpc"](rpc);
             await exploregens["updateAllInstalledGenerators"]();

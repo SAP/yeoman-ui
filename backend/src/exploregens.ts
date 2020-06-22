@@ -11,36 +11,48 @@ const NPM = (process.platform === 'win32' ? 'npm.cmd' : 'npm');
 export class ExploreGens {
     private logger: IChildLogger;
     private rpc: IRpc;
-    private gensBeingInstalled: string[];
+    private gensBeingHandled: string[];
+    private cachedPromise: Promise<any>;
 
     constructor(logger: IChildLogger) {
         this.logger = logger;
-        this.gensBeingInstalled = [];
+        this.gensBeingHandled = [];
+    }
+
+    public async updateCache() {
+        const locationParams = this.getGeneratorsLocationParams();
+        const listCommand = `${NPM} list ${locationParams} --depth=0`;
+        
+        this.cachedPromise = this.exec(listCommand).catch(error => {
+            return Promise.resolve(_.get(error, "stdout", ""));
+        });
     }
 
     public initRpc(rpc: IRpc) {
         this.rpc = rpc;
         this.rpc.registerMethod({ func: this.getFilteredGenerators, thisArg: this });
-        this.rpc.registerMethod({ func: this.doDownload, thisArg: this });
+        this.rpc.registerMethod({ func: this.install, thisArg: this });
+        this.rpc.registerMethod({ func: this.uninstall, thisArg: this });
+        this.rpc.registerMethod({ func: this.isInstalled, thisArg: this });
         this.rpc.registerMethod({ func: this.getRecommendedQuery, thisArg: this });
     }
 
     public async updateAllInstalledGenerators() {
-        const autoUpdateEnabled = this.getWsConfig().get("Yeoman UI.autoUpdateGenerators");
+        const autoUpdateEnabled = this.getWsConfig().get("Yeoman UI.autoUpdateGenerators", true);
         if (autoUpdateEnabled) {
-            const downloadedGenerators: string[] = this.getDownloadedGenerators();
-            if (!_.isEmpty(downloadedGenerators)) {
-                const updatingMessage = "Auto updating of downloaded generators...";
+            const installedGenerators: string[] = this.getInstalledGenerators();
+            if (!_.isEmpty(installedGenerators)) {
+                const updatingMessage = "Auto updating of installed generators...";
                 this.logger.debug(updatingMessage);
                 const statusBarMessage = vscode.window.setStatusBarMessage(updatingMessage);
                 const locationParams = this.getGeneratorsLocationParams();
-                const promises = _.map(downloadedGenerators, genName => {
+                const promises = _.map(installedGenerators, genName => {
                     return this.installGenerator(locationParams, genName, false);
                 });
 
                 await Promise.all(promises);
                 statusBarMessage.dispose();
-                vscode.window.setStatusBarMessage("Auto updating of downloaded generators completed.", 10000);
+                vscode.window.setStatusBarMessage("Auto updating of installed generators completed.", 10000);
             }
         }
     }
@@ -49,17 +61,18 @@ export class ExploreGens {
         return vscode.workspace.getConfiguration();
     }
 
-    private async doDownload(gen: any) {
+    private async install(gen: any) {
         const genName = gen.package.name;
         const locationParams = this.getGeneratorsLocationParams();
         await this.installGenerator(locationParams, genName);
-        this.addToDownloadedGenerators(genName);
+        this.updateCache();
     }
 
-    private addToDownloadedGenerators(genName: string) {
-        const downloadedGens: string[] = this.getDownloadedGenerators();
-        downloadedGens.push(genName);
-        this.getWsConfig().update("Yeoman UI.downloadedGenerators", _.uniq(downloadedGens), true);
+    private async uninstall(gen: any) {
+        const genName = gen.package.name;
+        const locationParams = this.getGeneratorsLocationParams();
+        await this.uninstallGenerator(locationParams, genName);
+        this.updateCache();
     }
 
     private async getFilteredGenerators(query = "", author = "") {
@@ -68,7 +81,7 @@ export class ExploreGens {
         try {
             const res: any = await npmFetch.json(gensQueryUrl);
             const filteredGenerators = _.map(_.get(res, "objects"), gen => {
-                gen.disabledToDownload = _.includes(this.gensBeingInstalled, gen.package.name) ? true : false;
+                gen.disabledToHandle = _.includes(this.gensBeingHandled, gen.package.name) ? true : false;
                 return gen;
             });
             return [filteredGenerators, res.total];
@@ -100,50 +113,97 @@ export class ExploreGens {
         return _.isEmpty(location) ? "-g" : `--prefix ${location}`;
     }
 
-    private getDownloadedGenerators(): string[] {
-        return this.getWsConfig().get("Yeoman UI.downloadedGenerators") || [];
+    private getInstalledGenerators(): string[] {
+        return  [];
     }
 
     private async exec(arg: string) {
         return util.promisify(cp.exec)(arg);
     }
 
-    private async installGenerator(locationParams: string, genName: string, isDownload = true) {
-        this.gensBeingInstalled.push(genName);
+    private async installGenerator(locationParams: string, genName: string, isInstall = true) {
+        this.gensBeingHandled.push(genName);
         const installingMessage = `Installing the latest version of ${genName} ...`;
         let statusbarMessage;
-        if (isDownload) {
+        if (isInstall) {
             statusbarMessage = vscode.window.setStatusBarMessage(installingMessage);
         }
 
         try {
             this.logger.debug(installingMessage);
-            const installParams = this.getNpmInstallParams(locationParams, genName);
-            this.updateWebviewWithBeingInstalledGenerator(genName, true);
-            await this.exec(installParams);
+            const installCommand = this.getNpmInstallCommand(locationParams, genName);
+            this.updateBeingHandledGenerator(genName, true);
+            await this.exec(installCommand);
             const successMessage = `${genName} successfully installed.`;
             this.logger.debug(successMessage);
-            if (isDownload) {
+            if (isInstall) {
                 vscode.window.showInformationMessage(successMessage);
             }
         } catch (error) {
             this.showAndLogError(`Failed to install ${genName}`, error);
         } finally {
-            _.remove(this.gensBeingInstalled, gen => {
+            _.remove(this.gensBeingHandled, gen => {
                 return gen === genName;
             });
-            this.updateWebviewWithBeingInstalledGenerator(genName, false);
+            this.updateBeingHandledGenerator(genName, false);
             if (statusbarMessage) {
                 statusbarMessage.dispose();
             }
         }
     }
 
-    private updateWebviewWithBeingInstalledGenerator(genName: string, isBeingInstalled: boolean) {
-        this.rpc.invoke("updateBeingInstalledGenerator", [genName, isBeingInstalled]);
+    private async uninstallGenerator(locationParams: string, genName: string) {
+        this.gensBeingHandled.push(genName);
+        const uninstallingMessage = `Uninstalling of ${genName} ...`;
+        const statusbarMessage = vscode.window.setStatusBarMessage(uninstallingMessage);
+
+        try {
+            this.logger.debug(uninstallingMessage);
+            const uninstallCommand = this.getNpmUninstallCommand(locationParams, genName);
+            
+            await this.exec(uninstallCommand);
+            const successMessage = `${genName} successfully uninstalled.`;
+            this.logger.debug(successMessage);
+            vscode.window.showInformationMessage(successMessage);
+        } catch (error) {
+            this.showAndLogError(`Failed to uninstall ${genName}`, error);
+        } finally {
+            _.remove(this.gensBeingHandled, gen => {
+                return gen === genName;
+            });
+            statusbarMessage.dispose();
+        }
     }
 
-    private getNpmInstallParams(locationParams: string, genName: string) {
+    private async isGeneratorInstalled(genName: string) {
+        const result: string = await this.cachedPromise;
+        const index = result.search(`${genName}@`);
+        
+        return index > -1;
+    }
+
+    private async isInstalled(gen: any) {
+        const genName = gen.package.name;
+
+        try {
+            this.updateBeingHandledGenerator(genName, true);
+            return await this.isGeneratorInstalled(genName);
+        } catch (error) {
+            this.showAndLogError(`Failed to get whether ${genName} is installed`, error);
+        } finally {
+            this.updateBeingHandledGenerator(genName, false);
+        }
+    }
+
+    private updateBeingHandledGenerator(genName: string, isBeingHandled: boolean) {
+        this.rpc.invoke("updateBeingHandledGenerator", [genName, isBeingHandled]);
+    }
+
+    private getNpmInstallCommand(locationParams: string, genName: string) {
         return `${NPM} install ${locationParams} ${genName}@latest`;
+    }
+
+    private getNpmUninstallCommand(locationParams: string, genName: string) {
+        return `${NPM} uninstall ${locationParams} ${genName}`;
     }
 }
