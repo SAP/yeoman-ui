@@ -3,32 +3,55 @@ import * as _ from 'lodash';
 import * as cp from 'child_process';
 import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
+import { RpcExtension } from '@sap-devx/webview-rpc/out.ext/rpc-extension';
 import * as util from 'util';
 import * as vscode from 'vscode';
 
 const NPM = (process.platform === 'win32' ? 'npm.cmd' : 'npm');
+const ONE_DAY = 1000 * 60 * 60 * 24;
+const GLOBAL_STATE_KEY = "Explore Generators.autoUpdateInstalledGenerators";
 
 export class ExploreGens {
     private logger: IChildLogger;
     private rpc: IRpc;
     private gensBeingHandled: string[];
-    private cachedPromise: Promise<any>;
+    private cachedPromise: Promise<string[]>;
 
-    constructor(logger: IChildLogger) {
+    constructor(context: vscode.ExtensionContext, logger: IChildLogger) {
         this.logger = logger;
         this.gensBeingHandled = [];
+
+        this.doGeneratorsUpdate(context);
     }
 
-    public async updateCache() {
+    public init(webviewPanel: vscode.WebviewPanel) {
+        this.initRpc(new RpcExtension(webviewPanel.webview));
+        this.cachedPromise = this.getAllInstalledGenerators();
+    }
+
+    private doGeneratorsUpdate(context: vscode.ExtensionContext) {
+        const lastUpdateDate = context.globalState.get(GLOBAL_STATE_KEY, 0);
+        const currentDate = Date.now();
+        if ((currentDate - lastUpdateDate) > ONE_DAY) {
+            context.globalState.update(GLOBAL_STATE_KEY, currentDate);
+            this.updateAllInstalledGenerators();
+        }
+    }
+
+    private async getAllInstalledGenerators() {
         const locationParams = this.getGeneratorsLocationParams();
         const listCommand = `${NPM} list ${locationParams} --depth=0`;
-        
-        this.cachedPromise = this.exec(listCommand).catch(error => {
-            return Promise.resolve(_.get(error, "stdout", ""));
+
+        const gensString = await this.exec(listCommand).then(result => {
+            return _.get(result, "stdout", "");
+        }).catch(error => {
+            return _.get(error, "stdout", "");
         });
+
+        return this.getGenerators(gensString);
     }
 
-    public initRpc(rpc: IRpc) {
+    private initRpc(rpc: IRpc) {
         this.rpc = rpc;
         this.rpc.registerMethod({ func: this.getFilteredGenerators, thisArg: this });
         this.rpc.registerMethod({ func: this.install, thisArg: this });
@@ -37,10 +60,9 @@ export class ExploreGens {
         this.rpc.registerMethod({ func: this.getRecommendedQuery, thisArg: this });
     }
 
-    public async updateAllInstalledGenerators() {
+    private async updateAllInstalledGenerators() {
         const autoUpdateEnabled = this.getWsConfig().get("Yeoman UI.autoUpdateGenerators", true);
         if (autoUpdateEnabled) {
-            this.updateCache();
             const installedGenerators: string[] = await this.getAllInstalledGenerators();
             if (!_.isEmpty(installedGenerators)) {
                 const updatingMessage = "Auto updating of installed generators...";
@@ -63,17 +85,21 @@ export class ExploreGens {
     }
 
     private async install(gen: any) {
-        const genName = gen.package.name;
+        const genName: string = gen.package.name;
         const locationParams = this.getGeneratorsLocationParams();
         await this.installGenerator(locationParams, genName);
-        this.updateCache();
+        const installedGens: string[] = await this.cachedPromise;
+        installedGens.push(genName);
+        this.cachedPromise = Promise.resolve(_.uniq(installedGens));
     }
 
     private async uninstall(gen: any) {
         const genName = gen.package.name;
         const locationParams = this.getGeneratorsLocationParams();
         await this.uninstallGenerator(locationParams, genName);
-        this.updateCache();
+        const installedGens: string[] = await this.cachedPromise;
+        this.removeFromArray(installedGens, genName);
+        this.cachedPromise = Promise.resolve(installedGens);
     }
 
     private async getFilteredGenerators(query = "", author = "") {
@@ -139,9 +165,7 @@ export class ExploreGens {
         } catch (error) {
             this.showAndLogError(`Failed to install ${genName}`, error);
         } finally {
-            _.remove(this.gensBeingHandled, gen => {
-                return gen === genName;
-            });
+            this.removeFromArray(this.gensBeingHandled, genName);
             this.updateBeingHandledGenerator(genName, false);
             if (statusbarMessage) {
                 statusbarMessage.dispose();
@@ -165,35 +189,27 @@ export class ExploreGens {
         } catch (error) {
             this.showAndLogError(`Failed to uninstall ${genName}`, error);
         } finally {
-            _.remove(this.gensBeingHandled, gen => {
-                return gen === genName;
-            });
+            this.removeFromArray(this.gensBeingHandled, genName);
             statusbarMessage.dispose();
         }
     }
 
     private async isInstalled(gen: any) {
-        const installedGens = await this.getAllInstalledGenerators();
+        const installedGens = await this.cachedPromise;
         return _.includes(installedGens, gen.package.name);
     }
 
-    // TODO - improve logic
-    private async getAllInstalledGenerators() {
-        const result: string = await this.cachedPromise;
-        let installedGen: string[] = [];
-        let tmpGen = "";
-        let index;
-        let index2;
-        let arrGen = result.split("+--");
-        for (let i=0 ; i<arrGen.length ; i++){
-            index = arrGen[i].indexOf("generator-");
-            index2 = arrGen[i].indexOf("@");
-            if (index != -1 && index2 != -1) {
-                tmpGen = arrGen[i].substring(index,index2);
-                installedGen.push(tmpGen);
-            }
-        }
-        return installedGen;
+    private getGenerators(gensString: string): string[] {
+        const genNames: string[] = gensString.match(/[+--].*?generator-.+?@/gm);
+        return _.map(genNames, genName => {
+            return genName.substring(4, genName.length - 1);
+        });
+    }
+
+    private removeFromArray(array: string[], valueToRemove: string) {
+        _.remove(array, value => {
+            return value === valueToRemove;
+        });
     }
 
     private updateBeingHandledGenerator(genName: string, isBeingHandled: boolean) {
