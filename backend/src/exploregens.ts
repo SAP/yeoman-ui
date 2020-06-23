@@ -9,13 +9,13 @@ import * as vscode from 'vscode';
 
 const NPM = (process.platform === 'win32' ? 'npm.cmd' : 'npm');
 const ONE_DAY = 1000 * 60 * 60 * 24;
-const GLOBAL_STATE_KEY = "Explore Generators.autoUpdateDate";
+const GLOBAL_STATE_KEY = "Explore Generators.lastAutoUpdateDate";
 
 export class ExploreGens {
     private logger: IChildLogger;
     private rpc: IRpc;
     private gensBeingHandled: string[];
-    private cachedPromise: Promise<string[]>;
+    private cachedInstalledGeneratorsPromise: Promise<string[]>;
 
     constructor(context: vscode.ExtensionContext, logger: IChildLogger) {
         this.logger = logger;
@@ -26,7 +26,7 @@ export class ExploreGens {
 
     public init(webviewPanel: vscode.WebviewPanel) {
         this.initRpc(new RpcExtension(webviewPanel.webview));
-        this.cachedPromise = this.getAllInstalledGenerators();
+        this.cachedInstalledGeneratorsPromise = this.getAllInstalledGenerators();
     }
 
     private doGeneratorsUpdate(context: vscode.ExtensionContext) {
@@ -38,7 +38,7 @@ export class ExploreGens {
         }
     }
 
-    private async getAllInstalledGenerators() {
+    private async getAllInstalledGenerators(): Promise<string[]> {
         const locationParams = this.getGeneratorsLocationParams();
         const listCommand = `${NPM} list ${locationParams} --depth=0`;
 
@@ -88,18 +88,18 @@ export class ExploreGens {
         const genName: string = gen.package.name;
         const locationParams = this.getGeneratorsLocationParams();
         await this.installGenerator(locationParams, genName);
-        const installedGens: string[] = await this.cachedPromise;
+        const installedGens: string[] = await this.cachedInstalledGeneratorsPromise;
         installedGens.push(genName);
-        this.cachedPromise = Promise.resolve(_.uniq(installedGens));
+        this.cachedInstalledGeneratorsPromise = Promise.resolve(_.uniq(installedGens));
     }
 
     private async uninstall(gen: any) {
         const genName = gen.package.name;
         const locationParams = this.getGeneratorsLocationParams();
         await this.uninstallGenerator(locationParams, genName);
-        const installedGens: string[] = await this.cachedPromise;
+        const installedGens: string[] = await this.cachedInstalledGeneratorsPromise;
         this.removeFromArray(installedGens, genName);
-        this.cachedPromise = Promise.resolve(installedGens);
+        this.cachedInstalledGeneratorsPromise = Promise.resolve(installedGens);
     }
 
     private async getFilteredGenerators(query = "", author = "") {
@@ -195,7 +195,7 @@ export class ExploreGens {
     }
 
     private async isInstalled(gen: any) {
-        const installedGens: string[] = await this.cachedPromise;
+        const installedGens: string[] = await this.cachedInstalledGeneratorsPromise;
         return _.includes(installedGens, gen.package.name);
     }
 
