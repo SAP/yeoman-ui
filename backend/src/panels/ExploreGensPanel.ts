@@ -17,10 +17,6 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
         this.setWebviewPanel(webViewPanel);
     }
 
-    public disposeWebviewPanel() {
-        super.disposeWebviewPanel();
-    }
-
     private exploreGens: ExploreGens;
     public constructor(context: vscode.ExtensionContext) {
         super(context);

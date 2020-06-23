@@ -9,7 +9,7 @@ import * as vscode from 'vscode';
 
 const NPM = (process.platform === 'win32' ? 'npm.cmd' : 'npm');
 const ONE_DAY = 1000 * 60 * 60 * 24;
-const GLOBAL_STATE_KEY = "Explore Generators.autoUpdateInstalledGenerators";
+const GLOBAL_STATE_KEY = "Explore Generators.autoUpdateDate";
 
 export class ExploreGens {
     private logger: IChildLogger;
@@ -61,7 +61,7 @@ export class ExploreGens {
     }
 
     private async updateAllInstalledGenerators() {
-        const autoUpdateEnabled = this.getWsConfig().get("Yeoman UI.autoUpdateGenerators", true);
+        const autoUpdateEnabled = this.getWsConfig().get("Explore Generators.autoUpdate", true);
         if (autoUpdateEnabled) {
             const installedGenerators: string[] = await this.getAllInstalledGenerators();
             if (!_.isEmpty(installedGenerators)) {
@@ -75,7 +75,7 @@ export class ExploreGens {
 
                 await Promise.all(promises);
                 statusBarMessage.dispose();
-                vscode.window.setStatusBarMessage("Auto updating of installed generators completed.", 10000);
+                vscode.window.setStatusBarMessage("Finished auto updating of installed generators.", 10000);
             }
         }
     }
@@ -131,12 +131,12 @@ export class ExploreGens {
     }
 
     private getRecommendedQuery() {
-        const recommended: string[] = this.getWsConfig().get("Yeoman UI.recommendedQuery") || [];
+        const recommended: string[] = this.getWsConfig().get("Explore Generators.searchQuery") || [];
         return _.uniq(recommended);
     }
 
     private getGeneratorsLocationParams() {
-        const location = _.trim(this.getWsConfig().get("Yeoman UI.generatorsLocation"));
+        const location = _.trim(this.getWsConfig().get("Explore Generators.installationLocation"));
         return _.isEmpty(location) ? "-g" : `--prefix ${location}`;
     }
 
@@ -175,7 +175,7 @@ export class ExploreGens {
 
     private async uninstallGenerator(locationParams: string, genName: string) {
         this.gensBeingHandled.push(genName);
-        const uninstallingMessage = `Uninstalling of ${genName} ...`;
+        const uninstallingMessage = `Uninstalling ${genName} ...`;
         const statusbarMessage = vscode.window.setStatusBarMessage(uninstallingMessage);
 
         try {
@@ -195,7 +195,7 @@ export class ExploreGens {
     }
 
     private async isInstalled(gen: any) {
-        const installedGens = await this.cachedPromise;
+        const installedGens: string[] = await this.cachedPromise;
         return _.includes(installedGens, gen.package.name);
     }
 

@@ -96,16 +96,16 @@
 					"description": "If chosen, the location of the source code is added to log entries. Warning – this action may slow your extension. We recommend you use it only for debugging.",
 					"scope": "resource"
 				},
-				"Yeoman UI.generatorsLocation": {
+				"Explore Generators.installationLocation": {
 					"type": "string",
-					"markdownDescription": "Install generators in specified location. If not set, global location is used."
+					"markdownDescription": "Install generators in a specified location. If not set, global location is used."
 				},
-				"Yeoman UI.autoUpdateGenerators": {
+				"Explore Generators.autoUpdate": {
 					"type": "boolean",
 					"default": true,
-					"description": "Auto update installed generators"
+					"description": "Auto update installed generators."
 				},
-				"Yeoman UI.recommendedQuery": {
+				"Explore Generators.searchQuery": {
 					"type": "array",
 					"default": [
 						"sap",
@@ -113,7 +113,7 @@
 						"sap ui5",
 						"openui5"
 					],
-					"description": "Generator recommended query"
+					"description": "Saved search query."
 				}
 			}
 		}
