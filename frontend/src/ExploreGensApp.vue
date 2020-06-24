@@ -2,8 +2,15 @@
   <v-app id="exploregens">
     <v-container>
       <v-row>
-        <v-col :cols="8">
-          <v-text-field label="Search" v-model="query" @input="onQueryChange" />
+        <v-text-label>Explore Generators</v-text-label>
+      </v-row>
+      <v-row>
+        <v-text-label>This view enables the exploration and installation of external open source Yeoman generators.</v-text-label>
+      </v-row>
+
+      <v-row class="prompts-col">
+        <v-col :cols="10">
+          <v-text-field label="Search for Generators" v-model="query" @input="onQueryChange" />
         </v-col>
         <v-col :cols="2">
           <v-select
@@ -13,8 +20,10 @@
             @change="onQueryChange"
           />
         </v-col>
-        <v-col :cols="2">
-          <v-text-field :readonly="readonly" label="Total" :placeholder="placeholder" outlined />
+      </v-row>
+      <v-row>
+        <v-col >
+          <v-text-label>{{searchResults}}</v-text-label>
         </v-col>
       </v-row>
 
@@ -25,11 +34,19 @@
               <h3 class="headline mb-0">{{ gen.package.name }}</h3>
             </v-card-title>
             <v-card-text style="overflow-y: auto; height:200px" v-text="gen.package.description" />
+            <v-card-text class="homepage">
+              <a :href="gen.package.links.npm">More Information</a>
+            </v-card-text>
             <v-card-actions>
               <v-menu bottom left>
                 <template v-slot:activator="{ on, attrs }">
-                  <v-btn v-bind="attrs" v-on="on" :loading="gen.disabledToHandle" @click="getActions(gen)">
-                    <v-icon>mdi-dots-vertical</v-icon>
+                  <v-btn
+                    v-bind="attrs"
+                    v-on="on"
+                    :loading="gen.disabledToHandle"
+                    @click="getActions(gen)"
+                  >
+                    <v-icon>mdi-cog-outline</v-icon>
                   </v-btn>
                 </template>
                 <v-list>
@@ -71,12 +88,13 @@ export default {
     };
   },
   computed: {
-    placeholder() {
-      if (this.total === _.size(this.gens)) {
-        return _.toString(this.total);
+    searchResults() {
+      const gensQuantity = _.size(this.gens);
+      if (this.total === gensQuantity) {
+        return `Showing ${this.total} results`;
       }
 
-      return `${_.size(this.gens)} / ${this.total}`;
+      return `Showing ${gensQuantity} out of  ${this.total} results`;
     },
     debouncedGenFilterChange() {
       return _.debounce(this.getFilteredGenerators, 200);
@@ -152,3 +170,66 @@ export default {
   }
 };
 </script>
+<style scoped>
+@import "./../node_modules/vue-loading-overlay/dist/vue-loading.css";
+.consoleClassVisible {
+  visibility: visible;
+}
+.consoleClassHidden {
+  visibility: hidden;
+}
+div.consoleClassVisible .v-footer {
+  background-color: var(--vscode-editor-background, #1e1e1e);
+  color: var(--vscode-foreground, #cccccc);
+}
+#logArea {
+  font-family: monospace;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+.left-col {
+  background-color: var(--vscode-editorWidget-background, #252526);
+}
+.prompts-col {
+  overflow-y: auto;
+  margin: 0px;
+}
+.main-row,
+.prompts-col {
+  height: calc(100% - 4rem);
+}
+.left-col,
+.right-col,
+.right-row,
+#step-component-div,
+#QuestionTypeSelector,
+#QuestionTypeSelector > .col,
+#QuestionTypeSelector > .col > div {
+  height: 100%;
+}
+.right-col {
+  padding: 0 !important;
+}
+.diagonal {
+  width: 80px;
+  background: linear-gradient(
+    120deg,
+    var(--vscode-editor-background, #1e1e1e) 0%,
+    var(--vscode-editor-background, #1e1e1e) 50%,
+    transparent 50%
+  );
+  background-color: var(--vscode-editorWidget-background, #252526);
+}
+.bottom-right-col {
+  background: var(--vscode-editor-background, #1e1e1e);
+  overflow: hidden;
+  margin: 0px;
+}
+.bottom-buttons-col {
+  background-color: var(--vscode-editorWidget-background, #252526);
+  padding-right: 25px;
+}
+.bottom-buttons-col > .v-btn:not(:last-child) {
+  margin-right: 10px !important;
+}
+</style>
