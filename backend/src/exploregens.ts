@@ -6,9 +6,6 @@ import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import * as util from 'util';
 import * as vscode from 'vscode';
 
-const NPM = (process.platform === 'win32' ? 'npm.cmd' : 'npm');
-const ONE_DAY = 1000 * 60 * 60 * 24;
-
 export class ExploreGens {
     private logger: IChildLogger;
     private rpc: IRpc;
@@ -18,6 +15,8 @@ export class ExploreGens {
     private readonly INSTALLATION_LOCATION = "Explore Generators.installationLocation";
     private readonly SEARCH_QUERY = "Explore Generators.searchQuery";
     private readonly AUTO_UPDATE = "Explore Generators.autoUpdate"
+    private readonly NPM = (process.platform === 'win32' ? 'npm.cmd' : 'npm');
+    private readonly ONE_DAY = 1000 * 60 * 60 * 24;
 
 
     constructor(context: any, logger: IChildLogger) {
@@ -35,7 +34,7 @@ export class ExploreGens {
     private doGeneratorsUpdate(context: any) {
         const lastUpdateDate = context.globalState.get(this.LAST_AUTO_UPDATE_DATE, 0);
         const currentDate = Date.now();
-        if ((currentDate - lastUpdateDate) > ONE_DAY) {
+        if ((currentDate - lastUpdateDate) > this.ONE_DAY) {
             context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
             this.updateAllInstalledGenerators();
         }
@@ -220,14 +219,14 @@ export class ExploreGens {
     }
 
     private getNpmInstallCommand(locationParams: string, genName: string) {
-        return `${NPM} install ${locationParams} ${genName}@latest`;
+        return `${this.NPM} install ${locationParams} ${genName}@latest`;
     }
 
     private getNpmUninstallCommand(locationParams: string, genName: string) {
-        return `${NPM} uninstall ${locationParams} ${genName}`;
+        return `${this.NPM} uninstall ${locationParams} ${genName}`;
     }
 
     private getNpmListCommand(locationParams: string) {
-        return `${NPM} list ${locationParams} --depth=0`;
+        return `${this.NPM} list ${locationParams} --depth=0`;
     }
 }
