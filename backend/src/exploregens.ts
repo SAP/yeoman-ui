@@ -17,19 +17,19 @@ export class ExploreGens {
     private gensBeingHandled: string[];
     private cachedInstalledGeneratorsPromise: Promise<string[]>;
 
-    constructor(context: vscode.ExtensionContext, logger: IChildLogger) {
+    constructor(context: any, logger: IChildLogger) {
         this.logger = logger;
         this.gensBeingHandled = [];
 
         this.doGeneratorsUpdate(context);
     }
 
-    public init(webviewPanel: vscode.WebviewPanel) {
+    public init(webviewPanel: any) {
         this.initRpc(new RpcExtension(webviewPanel.webview));
         this.cachedInstalledGeneratorsPromise = this.getAllInstalledGenerators();
     }
 
-    private doGeneratorsUpdate(context: vscode.ExtensionContext) {
+    private doGeneratorsUpdate(context: any) {
         const lastUpdateDate = context.globalState.get(GLOBAL_STATE_KEY, 0);
         const currentDate = Date.now();
         if ((currentDate - lastUpdateDate) > ONE_DAY) {
@@ -40,7 +40,7 @@ export class ExploreGens {
 
     private async getAllInstalledGenerators(): Promise<string[]> {
         const locationParams = this.getGeneratorsLocationParams();
-        const listCommand = `${NPM} list ${locationParams} --depth=0`;
+        const listCommand = this.getNpmListCommand(locationParams);
 
         const gensString = await this.exec(listCommand).then(result => {
             return _.get(result, "stdout", "");
@@ -200,7 +200,7 @@ export class ExploreGens {
     }
 
     private getGenerators(gensString: string): string[] {
-        const genNames: string[] = gensString.match(/\+-- .*?generator-.+?@/gm);
+        const genNames: string[] = gensString.match(/\+--.*?generator-.+?@/gm);
         return _.map(genNames, genName => {
             return genName.substring(4, genName.length - 1);
         });
@@ -222,5 +222,9 @@ export class ExploreGens {
 
     private getNpmUninstallCommand(locationParams: string, genName: string) {
         return `${NPM} uninstall ${locationParams} ${genName}`;
+    }
+
+    private getNpmListCommand(locationParams: string) {
+        return `${NPM} list ${locationParams} --depth=0`;
     }
 }
