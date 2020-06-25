@@ -145,11 +145,11 @@ describe('exploregens unit test', () => {
         };
 
         it("update already downloaded generator", async () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
             exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({stdout: "+-- generator-aa@1.2.16 +-- generator-bb@0.0.1 -> C:\wing\yeoman-ui\generator-foodq +-- generator-cc@2.0.4"});
             exploregens["cachedInstalledGeneratorsPromise"] = exploregens["getAllInstalledGenerators"]();
 
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
             vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(`Installing the latest version of ${gen.package.name} ...`).returns(statusBarMessage);
             loggerMock.expects("debug").withExactArgs(`Installing the latest version of ${gen.package.name} ...`);
             exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", gen.package.name));
@@ -162,11 +162,11 @@ describe('exploregens unit test', () => {
         });
 
         it("download new generator", async () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
             exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({});
             exploregens["cachedInstalledGeneratorsPromise"] = exploregens["getAllInstalledGenerators"]();
             
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
             vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(`Installing the latest version of ${gen.package.name} ...`).returns(statusBarMessage);
             loggerMock.expects("debug").withExactArgs(`Installing the latest version of ${gen.package.name} ...`);
             rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [gen.package.name, true]);
@@ -179,11 +179,11 @@ describe('exploregens unit test', () => {
         });
 
         it("an error is thrown", async () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
             exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({stdout: "+-- generator-aa@1.2.16 +-- generator-bb@0.0.1 -> C:\wing\yeoman-ui\generator-foodq +-- generator-cc@2.0.4"});
             exploregens["cachedInstalledGeneratorsPromise"] = exploregens["getAllInstalledGenerators"]();
 
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
             vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(`Installing the latest version of ${gen.package.name} ...`).returns(statusBarMessage);
             loggerMock.expects("debug").withExactArgs(`Installing the latest version of ${gen.package.name} ...`);
             rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [gen.package.name, true]);
@@ -208,17 +208,22 @@ describe('exploregens unit test', () => {
             npmFetchMock.expects("json").withExactArgs(url).resolves(expectedResult);
             const res = await exploregens["getFilteredGenerators"]();
             expect(res).to.be.deep.equal([expectedResult.objects, expectedResult.total]);
+            expect(res[0][0].disabledToHandle).to.be.false;
+            expect(res[0][1].disabledToHandle).to.be.false;
         });
 
         it("query parameter is some words", async () => {
             const expectedResult = {
-                objects: [{package: {name: "obj1"}}],
+                objects: [{package: {name: "generator-aa"}}],
                 total: 1
             }
             const url = exploregens["getGensQueryURL"]("test of query", "");
             npmFetchMock.expects("json").withExactArgs(url).resolves(expectedResult);
+            exploregens["gensBeingHandled"] = ["generator-aa"];
             const res = await exploregens["getFilteredGenerators"]("test of query");
-            expect(res).to.be.deep.equal([expectedResult.objects, expectedResult.total]);
+            expect(res[0]).to.be.deep.equal(expectedResult.objects);
+            expect(res[1]).to.be.equal(expectedResult.total);
+            expect(res[0][0].disabledToHandle).to.be.true;
         });
 
         it("npmFetch.json throws error", async () => {
@@ -242,44 +247,44 @@ describe('exploregens unit test', () => {
         const TESTVALUE = "test location"
 
         it("location empty", () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
             expect(exploregens["getGeneratorsLocationParams"]()).to.be.deep.equal("-g");
         });
 
         it("location undefined", () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns(undefined);
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns(undefined);
             expect(exploregens["getGeneratorsLocationParams"]()).to.be.deep.equal("-g");
         });
 
         it("location is a valid string", () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns(TESTVALUE);
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns(TESTVALUE);
             expect(exploregens["getGeneratorsLocationParams"]()).to.be.deep.equal(`--prefix ${TESTVALUE}`);
         });
 
         it("location is a string with unnecessary spaces", () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns(`   ${TESTVALUE}   `);
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns(`   ${TESTVALUE}   `);
             expect(exploregens["getGeneratorsLocationParams"]()).to.be.deep.equal(`--prefix ${TESTVALUE}`);
         });
     });
 
     describe("getRecommendedQuery", () => {
         it("recommended array empty", () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.searchQuery").returns([]);
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["SEARCH_QUERY"]).returns([]);
             expect(exploregens["getRecommendedQuery"]()).to.be.deep.equal([]);
         });
 
         it("recommended array is undefined", () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.searchQuery").returns(undefined);
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["SEARCH_QUERY"]).returns(undefined);
             expect(exploregens["getRecommendedQuery"]()).to.be.deep.equal([]);
         });
 
         it("recommended array is a valid strings array", () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.searchQuery").returns(["query1", "query2"]);
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["SEARCH_QUERY"]).returns(["query1", "query2"]);
             expect(exploregens["getRecommendedQuery"]()).to.be.deep.equal(["query1", "query2"]);
         });
 
         it("recommended array is a valid strings array with duplicate string", () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.searchQuery").returns(["query1", "query1"]);
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["SEARCH_QUERY"]).returns(["query1", "query1"]);
             expect(exploregens["getRecommendedQuery"]()).to.be.deep.equal(["query1"]);
         });
     });
@@ -287,24 +292,24 @@ describe('exploregens unit test', () => {
     describe("doGeneratorsUpdate", () => {
 
         it("updateAllInstalledGenerators doesn't called", async () => {
-            globalStateMock.expects("get").withExactArgs(exploregens["GLOBAL_STATE_KEY"], 0).returns(Date.now());
+            globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(Date.now());
             workspaceConfigMock.expects("get").never();
             await exploregens["doGeneratorsUpdate"](testVscode.context);
         });
 
         it("generators auto update is false", async () => {
-            globalStateMock.expects("get").withExactArgs(exploregens["GLOBAL_STATE_KEY"], 0).returns(100);
+            globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
 
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.autoUpdate", true).returns(false);
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(false);
             workspaceConfigMock.expects("get").never();
             await exploregens["doGeneratorsUpdate"](testVscode.context);
         });
 
         it("generators auto update is true and downloadedGenerators returns undefined", async () => {
-            globalStateMock.expects("get").withExactArgs(exploregens["GLOBAL_STATE_KEY"], 0).returns(100);
+            globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
 
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.autoUpdate", true).returns(true);
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns(undefined);
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(true);
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns(undefined);
             exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves("");
             loggerMock.expects("debug").never();
 
@@ -312,12 +317,12 @@ describe('exploregens unit test', () => {
         });
 
         it("generators auto update is true and downloadedGenerators returns a generators list", async () => {
-            globalStateMock.expects("get").withExactArgs(exploregens["GLOBAL_STATE_KEY"], 0).returns(100);
+            globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
 
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").twice().returns("");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).twice().returns("");
             exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({stdout: "+-- generator-aa@1.2.16 +-- @sap/generator-bb@0.0.1 -> C:\wing\yeoman-ui\generator-foodq"});
             
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.autoUpdate", true).returns(true);
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(true);
             const updatingMessage = "Auto updating of installed generators...";
             loggerMock.expects("debug").withExactArgs(updatingMessage);
             vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(updatingMessage).returns(statusBarMessage);
@@ -342,12 +347,12 @@ describe('exploregens unit test', () => {
         });
 
         it("installGenerator fails on exec method", async () => {
-            globalStateMock.expects("get").withExactArgs(exploregens["GLOBAL_STATE_KEY"], 0).returns(100);
+            globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
 
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").twice().returns("");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).twice().returns("");
             exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({stdout: "+-- generator-aa@1.2.16"});
             
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.autoUpdate", true).returns(true);
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(true);
             const updatingMessage = "Auto updating of installed generators...";
             loggerMock.expects("debug").withExactArgs(updatingMessage);
             vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(updatingMessage).returns(statusBarMessage);
@@ -402,7 +407,7 @@ describe('exploregens unit test', () => {
         };
 
         it("cache is empty", async () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
             exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({});
             exploregens["cachedInstalledGeneratorsPromise"] = exploregens["getAllInstalledGenerators"]();
             const res: boolean = await exploregens["isInstalled"](gen);
@@ -410,7 +415,7 @@ describe('exploregens unit test', () => {
         });
 
         it("generator-aa generator should be in the cache", async () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
             exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({stdout: "+-- generator-aa@1.2.16 +-- generator-bb@0.0.1 -> C:\wing\yeoman-ui\generator-foodq +-- generator-cc@2.0.4"});
             exploregens["cachedInstalledGeneratorsPromise"] = exploregens["getAllInstalledGenerators"]();
             const res: boolean = await exploregens["isInstalled"](gen);
@@ -418,7 +423,7 @@ describe('exploregens unit test', () => {
         });
 
         it("generator-aa generator is not in the cache", async () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
             exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({stdout: "+-- generator-bb@0.0.1 -> C:\wing\yeoman-ui\generator-foodq +-- generator-cc@2.0.4"});
             exploregens["cachedInstalledGeneratorsPromise"] = exploregens["getAllInstalledGenerators"]();
             const res: boolean = await exploregens["isInstalled"](gen);
@@ -434,7 +439,7 @@ describe('exploregens unit test', () => {
         };
 
         it("uninstall succsessfully", async () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
 
             const uninstallingMessage = `Uninstalling ${gen.package.name} ...`;
             vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(uninstallingMessage).returns(statusBarMessage);
@@ -449,7 +454,7 @@ describe('exploregens unit test', () => {
         });
 
         it("uninstall fails on exec method", async () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
 
             const uninstallingMessage = `Uninstalling ${gen.package.name} ...`;
             vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(uninstallingMessage).returns(statusBarMessage);;
@@ -545,7 +550,7 @@ describe('exploregens unit test', () => {
         };
 
         it("No generators installed", async () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
             exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({});
             
             const res = await exploregens["getAllInstalledGenerators"]();
@@ -553,7 +558,7 @@ describe('exploregens unit test', () => {
         });
 
         it("There are generators installed", async () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
             exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({stdout: "+-- @sap/generator-bb@0.0.1 -> C:\wing\yeoman-ui\generator-foodq +-- generator-cc@2.0.4"});
             
             const res = await exploregens["getAllInstalledGenerators"]();
@@ -561,7 +566,7 @@ describe('exploregens unit test', () => {
         });
 
         it("fails on exec method", async () => {
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
             exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).rejects({stdout: "+-- @sap/generator-bb@0.0.1 -> C:\wing\yeoman-ui\generator-foodq"});
             
             const res = await exploregens["getAllInstalledGenerators"]();
