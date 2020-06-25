@@ -3,7 +3,6 @@ import * as _ from 'lodash';
 import * as cp from 'child_process';
 import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-import { RpcExtension } from '@sap-devx/webview-rpc/out.ext/rpc-extension';
 import * as util from 'util';
 import * as vscode from 'vscode';
 
@@ -24,8 +23,8 @@ export class ExploreGens {
         this.doGeneratorsUpdate(context);
     }
 
-    public init(webviewPanel: any) {
-        this.initRpc(new RpcExtension(webviewPanel.webview));
+    public init(rpc: IRpc) {
+        this.initRpc(rpc);
         this.cachedInstalledGeneratorsPromise = this.getAllInstalledGenerators();
     }
 

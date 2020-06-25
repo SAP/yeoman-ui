@@ -2,12 +2,13 @@ import * as vscode from 'vscode';
 import * as _ from 'lodash';
 import { ExploreGens } from '../exploregens';
 import { AbstractWebviewPanel } from "./AbstractWebviewPanel";
+import { RpcExtension } from '@sap-devx/webview-rpc/out.ext/rpc-extension';
 
 
 export class ExploreGensPanel extends AbstractWebviewPanel {
     public setWebviewPanel(webviewPanel: vscode.WebviewPanel) {
         super.setWebviewPanel(webviewPanel);
-        this.exploreGens.init(webviewPanel);
+        this.exploreGens.init(new RpcExtension(webviewPanel.webview));
         this.initWebviewPanel();
     }
 

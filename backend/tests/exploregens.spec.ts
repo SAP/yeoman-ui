@@ -15,8 +15,8 @@ const statusBarMessage = {
     dispose: () => true
 };
 const globalState = {
-    get: (str: string, num: any) => new Error("not implemented"),
-    update: (str: string, num: any) => new Error("not implemented"),
+    get: () => new Error("not implemented"),
+    update: () => new Error("not implemented"),
 }
 const testVscode = {
     workspace: {
@@ -89,7 +89,6 @@ describe('exploregens unit test', () => {
     const rpc = new TestRpc();
     const childLogger = { debug: () => true, error: () => true, fatal: () => true, warn: () => true, info: () => true, trace: () => true, getChildLogger: () => { return {} as IChildLogger; } };
     const exploregens = new ExploreGens({globalState}, childLogger as IChildLogger);
-    exploregens["initRpc"](rpc);
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -100,7 +99,7 @@ describe('exploregens unit test', () => {
     });
 
     beforeEach(() => {
-        rpcMock = sandbox.mock(rpc);
+        rpcMock  = sandbox.mock(rpc);
         workspaceConfigMock = sandbox.mock(config);
         loggerMock = sandbox.mock(childLogger);
         exploreGensMock = sandbox.mock(exploregens);
@@ -123,14 +122,18 @@ describe('exploregens unit test', () => {
         globalStateMock.verify();
     });
 
-    it("initRpc", () => {
+    it.only("init", async () => {
         rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getFilteredGenerators"], thisArg: exploregens });
         rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["install"], thisArg: exploregens });
         rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["uninstall"], thisArg: exploregens });
         rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInstalled"], thisArg: exploregens });
         rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens });
 
-        exploregens["initRpc"](rpc);
+        workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("/home/user/projects");
+        exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("--prefix /home/user/projects")).rejects({stdout: "+-- generator-aa@1.2.16 +-- generator-bb@0.0.1 -> C:\wing\yeoman-ui\generator-foodq +-- @sap/generator-cc@2.0.4"});
+        exploregens.init(rpc);
+        const installedGenerators = await exploregens["cachedInstalledGeneratorsPromise"];
+        expect(installedGenerators).includes(["generator-aa", "generator-bb", "@sap/generator-cc"]);
     });
 
     describe("install", () => {
