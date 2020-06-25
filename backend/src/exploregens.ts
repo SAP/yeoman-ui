@@ -14,7 +14,10 @@ export class ExploreGens {
     private rpc: IRpc;
     private gensBeingHandled: string[];
     private cachedInstalledGeneratorsPromise: Promise<string[]>;
-    private readonly GLOBAL_STATE_KEY = "Explore Generators.lastAutoUpdateDate";
+    private readonly LAST_AUTO_UPDATE_DATE = "Explore Generators.lastAutoUpdateDate";
+    private readonly INSTALLATION_LOCATION = "Explore Generators.installationLocation";
+    private readonly SEARCH_QUERY = "Explore Generators.searchQuery";
+    private readonly AUTO_UPDATE = "Explore Generators.autoUpdate"
 
 
     constructor(context: any, logger: IChildLogger) {
@@ -30,10 +33,10 @@ export class ExploreGens {
     }
 
     private doGeneratorsUpdate(context: any) {
-        const lastUpdateDate = context.globalState.get(this.GLOBAL_STATE_KEY, 0);
+        const lastUpdateDate = context.globalState.get(this.LAST_AUTO_UPDATE_DATE, 0);
         const currentDate = Date.now();
         if ((currentDate - lastUpdateDate) > ONE_DAY) {
-            context.globalState.update(this.GLOBAL_STATE_KEY, currentDate);
+            context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
             this.updateAllInstalledGenerators();
         }
     }
@@ -61,7 +64,7 @@ export class ExploreGens {
     }
 
     private async updateAllInstalledGenerators() {
-        const autoUpdateEnabled = this.getWsConfig().get("Explore Generators.autoUpdate", true);
+        const autoUpdateEnabled = this.getWsConfig().get(this.AUTO_UPDATE, true);
         if (autoUpdateEnabled) {
             const installedGenerators: string[] = await this.getAllInstalledGenerators();
             if (!_.isEmpty(installedGenerators)) {
@@ -131,12 +134,12 @@ export class ExploreGens {
     }
 
     private getRecommendedQuery() {
-        const recommended: string[] = this.getWsConfig().get("Explore Generators.searchQuery") || [];
+        const recommended: string[] = this.getWsConfig().get(this.SEARCH_QUERY) || [];
         return _.uniq(recommended);
     }
 
     private getGeneratorsLocationParams() {
-        const location = _.trim(this.getWsConfig().get("Explore Generators.installationLocation"));
+        const location = _.trim(this.getWsConfig().get(this.INSTALLATION_LOCATION));
         return _.isEmpty(location) ? "-g" : `--prefix ${location}`;
     }
 
