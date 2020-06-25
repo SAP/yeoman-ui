@@ -200,7 +200,7 @@ export class ExploreGens {
     }
 
     private getGenerators(gensString: string): string[] {
-        const genNames: string[] = gensString.match(/[+--].*?generator-.+?@/gm);
+        const genNames: string[] = gensString.match(/\+-- .*?generator-.+?@/gm);
         return _.map(genNames, genName => {
             return genName.substring(4, genName.length - 1);
         });
