@@ -8,13 +8,14 @@ import * as vscode from 'vscode';
 
 const NPM = (process.platform === 'win32' ? 'npm.cmd' : 'npm');
 const ONE_DAY = 1000 * 60 * 60 * 24;
-const GLOBAL_STATE_KEY = "Explore Generators.lastAutoUpdateDate";
 
 export class ExploreGens {
     private logger: IChildLogger;
     private rpc: IRpc;
     private gensBeingHandled: string[];
     private cachedInstalledGeneratorsPromise: Promise<string[]>;
+    private readonly GLOBAL_STATE_KEY = "Explore Generators.lastAutoUpdateDate";
+
 
     constructor(context: any, logger: IChildLogger) {
         this.logger = logger;
@@ -29,10 +30,10 @@ export class ExploreGens {
     }
 
     private doGeneratorsUpdate(context: any) {
-        const lastUpdateDate = context.globalState.get(GLOBAL_STATE_KEY, 0);
+        const lastUpdateDate = context.globalState.get(this.GLOBAL_STATE_KEY, 0);
         const currentDate = Date.now();
         if ((currentDate - lastUpdateDate) > ONE_DAY) {
-            context.globalState.update(GLOBAL_STATE_KEY, currentDate);
+            context.globalState.update(this.GLOBAL_STATE_KEY, currentDate);
             this.updateAllInstalledGenerators();
         }
     }
