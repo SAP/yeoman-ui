@@ -1,8 +1,25 @@
 <template>
   <v-app id="exploregens">
     <v-container class="explore-generators">
-      <PromptInfo :currentPrompt="headerInfo" />
-      <div>
+      <div id="prompt-info-component">
+        <div>
+          <v-card-title class="explore-generators-title">Explore Generators</v-card-title>
+          <v-expansion-panels class="explore-generators-description" flat>
+            <v-expansion-panel>
+              <v-expansion-panel-header disable-icon-rotate>
+                This view enables the exploration and installation of external open source Yeoman generators.
+                <template
+                  v-slot:actions
+                >
+                  <v-icon color="primary">$expand</v-icon>
+                </template>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <v-icon color="blue">mdi-information-outline</v-icon>NOTE: IN NO EVENT WILL SAP BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, PUNITIVE, SPECIAL ORCONSEQUENTIAL DAMAGES RELATED TO ANY USE OF EXTERNAL GENERATORS EXPLORED AND INSTALLED.
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </div>
         <v-row class="prompts-col">
           <v-col :cols="10">
             <v-text-field label="Search for Generators" v-model="query" @input="onQueryChange" />
@@ -63,13 +80,9 @@ const ALL_GENS = "-----";
 
 import * as _ from "lodash";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
-import PromptInfo from "./components/PromptInfo.vue";
 
 export default {
   name: "exploregens",
-  components: {
-    PromptInfo
-  },
   data() {
     return {
       items: [],
