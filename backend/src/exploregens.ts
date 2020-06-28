@@ -111,6 +111,7 @@ export class ExploreGens {
             const res: any = await npmFetch.json(gensQueryUrl);
             const filteredGenerators = _.map(_.get(res, "objects"), gen => {
                 gen.disabledToHandle = _.includes(this.gensBeingHandled, gen.package.name) ? true : false;
+                gen.actions = [];
                 return gen;
             });
             return [filteredGenerators, res.total];

@@ -15,7 +15,14 @@
                 </template>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
-                <v-icon color="blue">mdi-information-outline</v-icon>NOTE: IN NO EVENT WILL SAP BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, PUNITIVE, SPECIAL ORCONSEQUENTIAL DAMAGES RELATED TO ANY USE OF EXTERNAL GENERATORS EXPLORED AND INSTALLED.
+                <v-row>
+                  <v-col :cols="1">
+                    <v-icon color="blue">mdi-information-outline</v-icon>
+                  </v-col>
+                  <v-col :cols="11">
+                    <v-text>NOTE: IN NO EVENT WILL SAP BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, PUNITIVE, SPECIAL ORCONSEQUENTIAL DAMAGES RELATED TO ANY USE OF EXTERNAL GENERATORS EXPLORED AND INSTALLED.</v-text>
+                  </v-col>
+                </v-row>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </v-expansion-panels>
@@ -34,9 +41,16 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-col>
+          <v-col :cols="3">
             <v-text-label>{{searchResults}}</v-text-label>
           </v-col>
+          <v-row v-if="refineSearch">
+            <v-icon color="blue">mdi-information-outline</v-icon>
+            <v-text-label>You may refine your search</v-text-label>
+          </v-row>
+          <!-- <v-col :cols="9" v-if="refineSearch">
+            <v-text-label>You may refine your search</v-text-label>
+          </v-col> -->
         </v-row>
         <v-row>
           <v-col md="3" class="pa-3 d-flex flex-column" v-for="(gen, i) in gens" :key="i">
@@ -56,9 +70,9 @@
                       <v-icon>mdi-cog-outline</v-icon>
                     </v-btn>
                   </template>
-                  <v-list>
+                  <v-list v-if="gen.actions.length > 0">
                     <v-list-item
-                      v-for="(item, i) in genActions"
+                      v-for="(item, i) in gen.actions"
                       :key="i"
                       @click="onAction(gen, item)"
                     >
@@ -86,28 +100,26 @@ export default {
   data() {
     return {
       items: [],
-      genActions: [],
       rpc: Object,
       gens: [],
       total: 0,
       readonly: true,
       query: "",
-      recommended: ALL_GENS,
-      headerInfo: {
-        name: "Explore Generators",
-        description:
-          "This view enables the exploration and installation of external open source Yeoman generators."
-      }
+      recommended: ALL_GENS
     };
   },
   computed: {
+    refineSearch() {
+      const gensQuantity = _.size(this.gens);
+      return !(this.total === gensQuantity);
+    },
     searchResults() {
       const gensQuantity = _.size(this.gens);
-      if (this.total === gensQuantity) {
-        return `Showing ${this.total} results`;
+      if (this.refineSearch) {
+        return `Showing ${gensQuantity} out of ${this.total} results.`;
       }
 
-      return `Showing ${gensQuantity} out of ${this.total} results. You may refine your search`;
+      return `Showing ${this.total} results.`;
     },
     debouncedGenFilterChange() {
       return _.debounce(this.getFilteredGenerators, 200);
@@ -116,10 +128,10 @@ export default {
   methods: {
     async getActions(gen) {
       if (!gen.disabledToHandle) {
-        this.genActions = [];
+        gen.actions = [];
         gen.disabledToHandle = true;
         const isInstalled = await this.rpc.invoke("isInstalled", [gen]);
-        this.genActions = isInstalled === true ? [`Uninstall`] : [`Install`];
+        gen.actions = isInstalled === true ? [`Uninstall`] : [`Install`];
         gen.disabledToHandle = false;
       }
     },
