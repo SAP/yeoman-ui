@@ -6,7 +6,7 @@ import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc, IPromiseCallbacks, IMethod } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import * as npmFetch from 'npm-registry-fetch';
 import { mockVscode } from "./mockUtil";
-import messages from "../src/exploregens/messages";
+import messages from "../src/exploreGensMessages";
 
 const config = {
     get: () => new Error("not implemented"),
@@ -41,8 +41,8 @@ const testVscode = {
     }
 };
 
-mockVscode(testVscode, "src/exploregens/exploregens.ts");
-import { ExploreGens } from "../src/exploregens/exploregens";
+mockVscode(testVscode, "src/exploregens.ts");
+import { ExploreGens } from "../src/exploregens";
 
 describe('exploregens unit test', () => {
     let sandbox: any;

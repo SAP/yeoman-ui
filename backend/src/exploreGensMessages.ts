@@ -1,5 +1,4 @@
 export default {
-    explore_generators: "Explore Generators",
     auto_update_started: "Auto updating of installed generators...",
     auto_update_finished: "Finished auto updating of installed generators",
     failed_to_install: (genName: string) => `Failed to install ${genName}`,

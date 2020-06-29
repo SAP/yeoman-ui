@@ -4,7 +4,7 @@ import * as cp from "child_process";
 import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import * as util from "util";
-import messages from "./messages";
+import messages from "./exploreGensMessages";
 import * as vscode from "vscode";
 
 export class ExploreGens {

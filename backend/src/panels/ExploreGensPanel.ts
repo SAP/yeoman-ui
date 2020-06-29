@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as _ from 'lodash';
-import { ExploreGens } from '../exploregens/exploregens';
+import { ExploreGens } from '../exploregens';
 import { AbstractWebviewPanel } from "./AbstractWebviewPanel";
 import { RpcExtension } from '@sap-devx/webview-rpc/out.ext/rpc-extension';
 

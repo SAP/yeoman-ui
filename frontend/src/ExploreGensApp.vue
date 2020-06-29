@@ -2,11 +2,11 @@
   <v-app id="exploregens">
     <v-container id="explore" class="explore-generators">
       <div>
-        <v-card-title class="explore-generators-title">Explore Generators</v-card-title>
+        <v-card-title class="explore-generators-title">{{messages.ui_title}}</v-card-title>
         <v-expansion-panels class="explore-generators-description" flat>
           <v-expansion-panel>
             <v-expansion-panel-header disable-icon-rotate>
-              This view enables the exploration and installation of external open source Yeoman generators.
+              {{messages.ui_description}}
               <template
                 v-slot:actions
               >
@@ -19,7 +19,7 @@
                   <v-icon color="blue">mdi-information-outline</v-icon>
                 </v-col>
                 <v-col :cols="11">
-                  <v-text>NOTE: IN NO EVENT WILL SAP BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, PUNITIVE, SPECIAL ORCONSEQUENTIAL DAMAGES RELATED TO ANY USE OF EXTERNAL GENERATORS EXPLORED AND INSTALLED.</v-text>
+                  <v-text>{{messages.ui_legal_note}}</v-text>
                 </v-col>
               </v-row>
             </v-expansion-panel-content>
@@ -28,13 +28,13 @@
       </div>
       <v-row class="prompts-col">
         <v-col :cols="10">
-          <v-text-field label="Search for Generators" v-model="query" @input="onQueryChange" />
+          <v-text-field :label="messages.ui_search" v-model="query" @input="onQueryChange" />
         </v-col>
         <v-col :cols="2">
           <v-select
             :items="items"
             v-model="recommended"
-            label="Recommended"
+            :label="messages.ui_recommended"
             @change="onQueryChange"
           />
         </v-col>
@@ -95,6 +95,7 @@ const ALL_GENS = "-----";
 
 import * as _ from "lodash";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
+import messages from "./exploreGensMessages";
 
 export default {
   name: "exploregens",
@@ -106,7 +107,8 @@ export default {
       total: 0,
       readonly: true,
       query: "",
-      recommended: ALL_GENS
+      recommended: ALL_GENS,
+      messages
     };
   },
   computed: {
@@ -117,10 +119,10 @@ export default {
     searchResults() {
       const gensQuantity = _.size(this.gens);
       if (this.refineSearch) {
-        return `Showing ${gensQuantity} out of ${this.total} results.`;
+        return this.messages.ui_results_out_of_total(gensQuantity, this.total);
       }
 
-      return `Showing ${this.total} results.`;
+      return this.messages.ui_results(this.total);
     },
     debouncedGenFilterChange() {
       return _.debounce(this.getFilteredGenerators, 200);
@@ -191,8 +193,7 @@ export default {
   },
   async created() {
     this.setupRpc();
-    await this.getFilteredGenerators();
-    await this.getRecommendedQuery();
+    await Promise.all([this.getRecommendedQuery(), this.getFilteredGenerators()]);
   }
 };
 </script>
