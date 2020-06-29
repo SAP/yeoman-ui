@@ -1,23 +1,26 @@
-import * as npmFetch from 'npm-registry-fetch';
-import * as _ from 'lodash';
-import * as cp from 'child_process';
+import * as npmFetch from "npm-registry-fetch";
+import * as _ from "lodash";
+import * as cp from "child_process";
 import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-import * as util from 'util';
-import * as vscode from 'vscode';
+import * as util from "util";
+import messages from "./messages";
+import * as vscode from "vscode";
 
 export class ExploreGens {
     private logger: IChildLogger;
     private rpc: IRpc;
     private gensBeingHandled: string[];
     private cachedInstalledGeneratorsPromise: Promise<string[]>;
+
     private readonly LAST_AUTO_UPDATE_DATE = "Explore Generators.lastAutoUpdateDate";
     private readonly INSTALLATION_LOCATION = "Explore Generators.installationLocation";
     private readonly SEARCH_QUERY = "Explore Generators.searchQuery";
     private readonly AUTO_UPDATE = "Explore Generators.autoUpdate"
-    private readonly NPM = (process.platform === 'win32' ? 'npm.cmd' : 'npm');
+    private readonly NPM = (process.platform === "win32" ? "npm.cmd" : "npm");
+    private readonly STDOUT = "stdout";
+    private readonly EMPTY = "";
     private readonly ONE_DAY = 1000 * 60 * 60 * 24;
-
 
     constructor(context: any, logger: IChildLogger) {
         this.logger = logger;
@@ -43,14 +46,8 @@ export class ExploreGens {
     private async getAllInstalledGenerators(): Promise<string[]> {
         const locationParams = this.getGeneratorsLocationParams();
         const listCommand = this.getNpmListCommand(locationParams);
-
-        const gensString = await this.exec(listCommand).then(result => {
-            return _.get(result, "stdout", "");
-        }).catch(error => {
-            return _.get(error, "stdout", "");
-        });
-
-        return this.getGenerators(gensString);
+        const result = await this.exec(listCommand).catch(error => error);
+        return this.getGenerators(_.get(result, this.STDOUT, this.EMPTY));
     }
 
     private initRpc(rpc: IRpc) {
@@ -67,9 +64,8 @@ export class ExploreGens {
         if (autoUpdateEnabled) {
             const installedGenerators: string[] = await this.getAllInstalledGenerators();
             if (!_.isEmpty(installedGenerators)) {
-                const updatingMessage = "Auto updating of installed generators...";
-                this.logger.debug(updatingMessage);
-                const statusBarMessage = vscode.window.setStatusBarMessage(updatingMessage);
+                this.logger.debug(messages.auto_update_started);
+                const statusBarMessage = vscode.window.setStatusBarMessage(messages.auto_update_started);
                 const locationParams = this.getGeneratorsLocationParams();
                 const promises = _.map(installedGenerators, genName => {
                     return this.installGenerator(locationParams, genName, false);
@@ -77,7 +73,7 @@ export class ExploreGens {
 
                 await Promise.all(promises);
                 statusBarMessage.dispose();
-                vscode.window.setStatusBarMessage("Finished auto updating of installed generators.", 10000);
+                vscode.window.setStatusBarMessage(messages.auto_update_finished, 10000);
             }
         }
     }
@@ -104,7 +100,7 @@ export class ExploreGens {
         this.cachedInstalledGeneratorsPromise = Promise.resolve(installedGens);
     }
 
-    private async getFilteredGenerators(query = "", author = "") {
+    private async getFilteredGenerators(query = this.EMPTY, author = this.EMPTY) {
         const gensQueryUrl = this.getGensQueryURL(query, author);
 
         try {
@@ -116,7 +112,7 @@ export class ExploreGens {
             });
             return [filteredGenerators, res.total];
         } catch (error) {
-            this.showAndLogError(`Failed to get generators with the queryUrl ${gensQueryUrl}`, error);
+            this.showAndLogError(messages.failed_to_get(gensQueryUrl), error);
         }
     }
 
@@ -149,7 +145,7 @@ export class ExploreGens {
 
     private async installGenerator(locationParams: string, genName: string, isInstall = true) {
         this.gensBeingHandled.push(genName);
-        const installingMessage = `Installing the latest version of ${genName} ...`;
+        const installingMessage = messages.installing(genName);
         let statusbarMessage;
         if (isInstall) {
             statusbarMessage = vscode.window.setStatusBarMessage(installingMessage);
@@ -160,13 +156,13 @@ export class ExploreGens {
             const installCommand = this.getNpmInstallCommand(locationParams, genName);
             this.updateBeingHandledGenerator(genName, true);
             await this.exec(installCommand);
-            const successMessage = `${genName} successfully installed.`;
+            const successMessage = messages.installed(genName);
             this.logger.debug(successMessage);
             if (isInstall) {
                 vscode.window.showInformationMessage(successMessage);
             }
         } catch (error) {
-            this.showAndLogError(`Failed to install ${genName}`, error);
+            this.showAndLogError(messages.failed_to_install(genName), error);
         } finally {
             this.removeFromArray(this.gensBeingHandled, genName);
             this.updateBeingHandledGenerator(genName, false);
@@ -178,7 +174,7 @@ export class ExploreGens {
 
     private async uninstallGenerator(locationParams: string, genName: string) {
         this.gensBeingHandled.push(genName);
-        const uninstallingMessage = `Uninstalling ${genName} ...`;
+        const uninstallingMessage = messages.uninstalling(genName);
         const statusbarMessage = vscode.window.setStatusBarMessage(uninstallingMessage);
 
         try {
@@ -186,11 +182,11 @@ export class ExploreGens {
             const uninstallCommand = this.getNpmUninstallCommand(locationParams, genName);
             
             await this.exec(uninstallCommand);
-            const successMessage = `${genName} successfully uninstalled.`;
+            const successMessage = messages.uninstalled(genName);
             this.logger.debug(successMessage);
             vscode.window.showInformationMessage(successMessage);
         } catch (error) {
-            this.showAndLogError(`Failed to uninstall ${genName}`, error);
+            this.showAndLogError(messages.failed_to_uninstall(genName), error);
         } finally {
             this.removeFromArray(this.gensBeingHandled, genName);
             statusbarMessage.dispose();
