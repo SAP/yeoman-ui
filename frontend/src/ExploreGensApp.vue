@@ -7,9 +7,7 @@
           <v-expansion-panel>
             <v-expansion-panel-header disable-icon-rotate>
               {{messages.description}}
-              <template
-                v-slot:actions
-              >
+              <template v-slot:actions>
                 <v-icon color="primary">$expand</v-icon>
               </template>
             </v-expansion-panel-header>
@@ -60,28 +58,14 @@
               <a :href="gen.package.links.npm">More information</a>
             </v-card-text>
             <v-card-actions>
-              <v-menu bottom left>
-                <template v-slot:activator="{on}">
-                  <v-btn
-                    class="explore-generators-loading"
-                    icon
-                    v-on="on"
-                    :loading="gen.disabledToHandle"
-                    @click="getActions(gen)"
-                  >
-                    <v-icon>mdi-cog-outline</v-icon>
-                  </v-btn>
-                </template>
-                <v-list v-if="gen.actions.length > 0">
-                  <v-list-item
-                    v-for="(item, i) in gen.actions"
-                    :key="i"
-                    @click="onAction(gen, item)"
-                  >
-                    <v-list-item-title>{{ item }}</v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
+              <v-btn
+                class="explore-generators-loading"
+                text
+                :loading="gen.disabledToHandle"
+                @click="onAction(gen)"
+              >
+                {{gen.action}}
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -129,19 +113,16 @@ export default {
     }
   },
   methods: {
-    async getActions(gen) {
+    async onAction(gen) {
       if (!gen.disabledToHandle) {
-        gen.actions = [];
         gen.disabledToHandle = true;
-        const isInstalled = await this.rpc.invoke("isInstalled", [gen]);
-        gen.actions = isInstalled === true ? [`uninstall`] : [`install`];
-        gen.disabledToHandle = false;
+        try {
+          await this.rpc.invoke(_.lowerCase(gen.action), [gen]);
+          gen.action = (gen.action === "Uninstall" ? "Install": "Uninstall");
+        } finally {
+          gen.disabledToHandle = false;
+        } 
       }
-    },
-    async onAction(gen, actionName) {
-      gen.disabledToHandle = true;
-      await this.rpc.invoke(_.lowerCase(actionName), [gen]);
-      gen.disabledToHandle = false;
     },
     onQueryChange() {
       this.debouncedGenFilterChange();
@@ -193,7 +174,10 @@ export default {
   },
   async created() {
     this.setupRpc();
-    await Promise.all([this.getRecommendedQuery(), this.getFilteredGenerators()]);
+    await Promise.all([
+      this.getRecommendedQuery(),
+      this.getFilteredGenerators()
+    ]);
   }
 };
 </script>

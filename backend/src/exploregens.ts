@@ -4,8 +4,10 @@ import * as cp from "child_process";
 import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import * as util from "util";
+import * as path from "path";
 import messages from "./exploreGensMessages";
 import * as vscode from "vscode";
+import Environment = require("yeoman-environment");
 
 export class ExploreGens {
     private logger: IChildLogger;
@@ -18,8 +20,8 @@ export class ExploreGens {
     private readonly SEARCH_QUERY = "Explore Generators.searchQuery";
     private readonly AUTO_UPDATE = "Explore Generators.autoUpdate"
     private readonly NPM = (process.platform === "win32" ? "npm.cmd" : "npm");
-    private readonly STDOUT = "stdout";
     private readonly EMPTY = "";
+    private readonly NODE_MODULES = "node_modules";
     private readonly ONE_DAY = 1000 * 60 * 60 * 24;
 
     constructor(context: any, logger: IChildLogger) {
@@ -44,10 +46,13 @@ export class ExploreGens {
     }
 
     private async getAllInstalledGenerators(): Promise<string[]> {
-        const locationParams = this.getGeneratorsLocationParams();
-        const listCommand = this.getNpmListCommand(locationParams);
-        const result = await this.exec(listCommand).catch(error => error);
-        return this.getGenerators(_.get(result, this.STDOUT, this.EMPTY));
+        const promise: Promise<any> = new Promise(resolve => {
+            const env: Environment.Options = Environment.createEnv();
+            const npmPaths = this.getNpmPaths(env);
+            env.lookup({ npmPaths }, async () => this.onEnvLookup(env, resolve));
+        });
+
+        return promise;
     }
 
     private initRpc(rpc: IRpc) {
@@ -105,10 +110,15 @@ export class ExploreGens {
 
         try {
             const res: any = await npmFetch.json(gensQueryUrl);
-            const filteredGenerators = _.map(_.get(res, "objects"), gen => {
+            let filteredGenerators = _.map(_.get(res, "objects"), gen => {
                 gen.disabledToHandle = _.includes(this.gensBeingHandled, gen.package.name) ? true : false;
-                gen.actions = [];
                 return gen;
+            });
+
+            const cachedGens = await this.cachedInstalledGeneratorsPromise;
+            filteredGenerators = _.map(filteredGenerators, filteredGen => {
+                filteredGen.action = (_.includes(cachedGens, filteredGen.package.name)) ? "Uninstall" : "Install";
+                return filteredGen;
             });
             return [filteredGenerators, res.total];
         } catch (error) {
@@ -179,7 +189,7 @@ export class ExploreGens {
         try {
             this.logger.debug(uninstallingMessage);
             const uninstallCommand = this.getNpmUninstallCommand(locationParams, genName);
-            
+
             await this.exec(uninstallCommand);
             const successMessage = messages.uninstalled(genName);
             this.logger.debug(successMessage);
@@ -195,13 +205,6 @@ export class ExploreGens {
     private async isInstalled(gen: any) {
         const installedGens: string[] = await this.cachedInstalledGeneratorsPromise;
         return _.includes(installedGens, gen.package.name);
-    }
-
-    private getGenerators(gensString: string): string[] {
-        const genNames: string[] = gensString.match(/\+--.*?generator-.+?@/gm);
-        return _.map(genNames, genName => {
-            return genName.substring(4, genName.length - 1);
-        });
     }
 
     private removeFromArray(array: string[], valueToRemove: string) {
@@ -222,7 +225,23 @@ export class ExploreGens {
         return `${this.NPM} uninstall ${locationParams} ${genName}`;
     }
 
-    private getNpmListCommand(locationParams: string) {
-        return `${this.NPM} list ${locationParams} --depth=0`;
+    private getNpmPaths(env: Environment.Options) {
+        const customLocation = _.trim(this.getWsConfig().get(this.INSTALLATION_LOCATION));
+        const defaultPaths: string[] = env.getNpmPaths();
+        if (!_.isEmpty(customLocation)) {
+            defaultPaths.push(path.join(customLocation, this.NODE_MODULES));
+        }
+        
+        return _.uniq(defaultPaths);
     }
+
+    private async onEnvLookup(env: Environment.Options, resolve: any) {
+        const gensMeta: string[] = env.getGeneratorsMeta();
+        const gensFullNames = _.map(gensMeta, (genMeta: any) => {
+            const packagePath = genMeta.packagePath;
+            const nodeModulesIndex = packagePath.indexOf(this.NODE_MODULES);
+            return packagePath.substring(nodeModulesIndex + this.NODE_MODULES.length + 1);
+        })
+        resolve(_.uniq(gensFullNames));
+      }
 }
