@@ -31,6 +31,40 @@ describe('App.vue', () => {
     })
   })
 
+  describe('getVsCodeApi - method', () => {
+    it('not in vscode', () => {
+      wrapper = initComponent(App, {}, true)
+      wrapper.vm.isInVsCode = () => false;
+      const vscodeApi = wrapper.vm.getVsCodeApi();
+      expect(vscodeApi).toBeUndefined();
+    })
+  })
+
+  describe('setMessagesAndSaveState - method', () => {
+    it('vscode api exists', async () => {
+      wrapper = initComponent(App, {}, true)
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => { return {data: {}};})
+      }
+      wrapper.vm.getVsCodeApi = () => {
+        return {setState: () => true};
+      };
+      wrapper.vm.setMessagesAndSaveState();
+    })
+
+    it('vscode api no exists', async () => {
+      wrapper = initComponent(App, {}, true)
+      wrapper.vm.rpc = {
+        invoke: () => new Promise({data: {}})
+      }
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => { return {data: {}};})
+      }
+      wrapper.vm.getVsCodeApi = () => undefined;
+      wrapper.vm.setMessagesAndSaveState();
+    })
+  })
+
   describe('setQuestionProps - method', () => {
     it('set props', async () => {
       wrapper = initComponent(App, {}, true)
