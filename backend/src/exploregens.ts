@@ -124,8 +124,7 @@ export class ExploreGens {
 
     private getGensQueryURL(query: string, recommended: string) {
         const api_endpoint = "http://registry.npmjs.com/-/v1/search?text=";
-        let actualQuery = `${query} ${recommended}`;
-        actualQuery = _.replace(actualQuery, new RegExp(" ", "g"), "%20");
+        const actualQuery = encodeURI(`${query} ${recommended}`);
         return `${api_endpoint}${actualQuery}%20keywords:yeoman-generator%20&size=25&ranking=popularity`;
     }
 
