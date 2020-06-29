@@ -4,6 +4,7 @@ body {
   background-color: var(--vscode-editor-background, #1e1e1e);
   overflow: hidden !important;
 }
+#exploregens,
 #app {
   height: 100%;
   color: var(--vscode-foreground, #cccccc); 
