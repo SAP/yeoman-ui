@@ -7,6 +7,7 @@ module.exports = {
     "!**/node_modules/**",
     "!<rootDir>/src/main.js",
     "!<rootDir>/src/exploreGensMain.js",
+    "!<rootDir>/src/ExploreGensApp.vue",
     "!<rootDir>/src/plugins/**"
   ],
   coverageReporters: [
