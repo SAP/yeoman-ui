@@ -2,11 +2,11 @@
   <v-app id="exploregens">
     <v-container id="explore" class="explore-generators">
       <div>
-        <v-card-title class="explore-generators-title">{{messages.ui_title}}</v-card-title>
+        <v-card-title class="explore-generators-title">{{messages.title}}</v-card-title>
         <v-expansion-panels class="explore-generators-description" flat>
           <v-expansion-panel>
             <v-expansion-panel-header disable-icon-rotate>
-              {{messages.ui_description}}
+              {{messages.description}}
               <template
                 v-slot:actions
               >
@@ -19,7 +19,7 @@
                   <v-icon color="blue">mdi-information-outline</v-icon>
                 </v-col>
                 <v-col :cols="11">
-                  <v-text>{{messages.ui_legal_note}}</v-text>
+                  <v-text>{{messages.legal_note}}</v-text>
                 </v-col>
               </v-row>
             </v-expansion-panel-content>
@@ -28,13 +28,13 @@
       </div>
       <v-row class="prompts-col">
         <v-col :cols="10">
-          <v-text-field :label="messages.ui_search" v-model="query" @input="onQueryChange" />
+          <v-text-field :label="messages.search" v-model="query" @input="onQueryChange" />
         </v-col>
         <v-col :cols="2">
           <v-select
             :items="items"
             v-model="recommended"
-            :label="messages.ui_recommended"
+            :label="messages.recommended"
             @change="onQueryChange"
           />
         </v-col>
@@ -45,7 +45,7 @@
         </v-col>
         <v-row v-if="refineSearch">
           <v-icon color="blue">mdi-information-outline</v-icon>
-          <v-text-label>You may refine your search</v-text-label>
+          <v-text-label>{{messages.refine_search}}</v-text-label>
         </v-row>
       </v-row>
       <v-row>
@@ -119,10 +119,10 @@ export default {
     searchResults() {
       const gensQuantity = _.size(this.gens);
       if (this.refineSearch) {
-        return this.messages.ui_results_out_of_total(gensQuantity, this.total);
+        return this.messages.results_out_of_total(gensQuantity, this.total);
       }
 
-      return this.messages.ui_results(this.total);
+      return this.messages.results(this.total);
     },
     debouncedGenFilterChange() {
       return _.debounce(this.getFilteredGenerators, 200);
