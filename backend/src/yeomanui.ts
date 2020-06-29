@@ -97,10 +97,10 @@ export class YeomanUI {
   private async logError(error: any, prefixMessage?: string) {
     const errorObj: any = this.getErrorInfo(error);
     if (prefixMessage) {
-      errorObj.message = `${prefixMessage}- ${errorObj.message}`;
+      errorObj.message = `${prefixMessage} - ${errorObj.message}`;
     }
 
-    this.logger.error(errorObj.message, {name: errorObj.name, stack: errorObj.stack});
+    this.logger.error(errorObj.message, {stack: errorObj.stack});
     return JSON.stringify(errorObj);
   }
 
@@ -351,7 +351,6 @@ export class YeomanUI {
     }
 
    const res = {
-     name: _.get(error, "name", ""), 
      message: _.get(error, "message", ""),
      stack: _.get(error, "stack", "")
    };

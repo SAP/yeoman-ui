@@ -660,7 +660,7 @@ describe('yeomanui unit test', () => {
         it("onGeneratorFailure", async () => {
             await yeomanUi["onGeneratorFailure"]("testGenName", "testError");
             // tslint:disable-next-line: no-unused-expression
-            expect(doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed- testError"}`)).to.be.true;
+            expect(doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed - testError"}`)).to.be.true;
         });
     });
 
