@@ -1,4 +1,3 @@
-
 # Extension
 
 ## Project setup
@@ -18,3 +17,4 @@ npm run compile
 # run the websocket server: 
 npm run ws:run
 ```
+
