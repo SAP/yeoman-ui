@@ -132,7 +132,7 @@ export default {
         gen.actions = [];
         gen.disabledToHandle = true;
         const isInstalled = await this.rpc.invoke("isInstalled", [gen]);
-        gen.actions = isInstalled === true ? [`Uninstall`] : [`Install`];
+        gen.actions = isInstalled === true ? [`uninstall`] : [`install`];
         gen.disabledToHandle = false;
       }
     },
