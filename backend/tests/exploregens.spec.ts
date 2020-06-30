@@ -215,50 +215,52 @@ describe('exploregens unit test', () => {
         });
     });
 
-    // describe.skip("getFilteredGenerators", async () => {
-    //     it("query and recommended parameters are empty strings", async () => {
-    //         const expectedResult = {
-    //             objects: [{ package: { name: "obj1" } }, { package: { name: "obj2" } }],
-    //             total: 5
-    //         }
-    //         const url = exploregens["getGensQueryURL"]("", "");
-    //         npmFetchMock.expects("json").withExactArgs(url).resolves(expectedResult);
-    //         const res = await exploregens["getFilteredGenerators"]();
-    //         expect(res).to.be.deep.equal([expectedResult.objects, expectedResult.total]);
-    //         expect(res[0][0].disabledToHandle).to.be.false;
-    //         expect(res[0][1].disabledToHandle).to.be.false;
-    //     });
+    describe("getFilteredGenerators", async () => {
+        it("query and recommended parameters are empty strings", async () => {
+            const expectedResult = {
+                objects: [{ package: { name: "generator-aa" } }, { package: { name: "generator-bb" } }],
+                total: 5
+            }
+            const url = exploregens["getGensQueryURL"]("", "");
+            npmFetchMock.expects("json").withExactArgs(url).resolves(expectedResult);
+            exploregens["cachedInstalledGeneratorsPromise"] = Promise.resolve(["generator-bb"]);
+            const res = await exploregens["getFilteredGenerators"]();
+            expect(res).to.be.deep.equal([expectedResult.objects, expectedResult.total]);
+            expect(res[0][0].disabledToHandle).to.be.false;
+            expect(res[0][1].disabledToHandle).to.be.false;
+            expect(res[0][0].installed).to.be.false;
+            expect(res[0][1].installed).to.be.true;
+        });
 
-    //     it("query parameter is some words", async () => {
-    //         const expectedResult = {
-    //             objects: [{ package: { name: "generator-aa" } }],
-    //             total: 1
-    //         }
-    //         const url = exploregens["getGensQueryURL"]("test of query", "");
-    //         npmFetchMock.expects("json").withExactArgs(url).resolves(expectedResult);
-    //         exploregens["gensBeingHandled"] = ["generator-aa"];
-    //         const res = await exploregens["getFilteredGenerators"]("test of query");
-    //         expect(res[0]).to.be.deep.equal(expectedResult.objects);
-    //         expect(res[1]).to.be.equal(expectedResult.total);
-    //         expect(res[0][0].disabledToHandle).to.be.true;
-    //     });
+        it("query parameter is some words", async () => {
+            const expectedResult = {
+                objects: [{ package: { name: "generator-aa" } }],
+                total: 1
+            }
+            const url = exploregens["getGensQueryURL"]("test of query", "");
+            npmFetchMock.expects("json").withExactArgs(url).resolves(expectedResult);
+            exploregens["gensBeingHandled"] = ["generator-aa"];
+            exploregens["cachedInstalledGeneratorsPromise"] = Promise.resolve(["generator-aa"]);
+            const res = await exploregens["getFilteredGenerators"]("test of query");
+            expect(res[0]).to.be.deep.equal(expectedResult.objects);
+            expect(res[1]).to.be.equal(expectedResult.total);
+            expect(res[0][0].disabledToHandle).to.be.true;
+            expect(res[0][0].installed).to.be.true;
+        });
 
-    //     it("npmFetch.json throws error", async () => {
-    //         const expectedResult = {
-    //             objects: [{ package: { name: "obj1" } }],
-    //             total: 1
-    //         }
-    //         const url = exploregens["getGensQueryURL"]("test of query", "");
-    //         const errorMessage = "npmFetch enexpected error.";
-    //         npmFetchMock.expects("json").withExactArgs(url).throws(errorMessage);
+        it("npmFetch.json throws error", async () => {
+            const url = exploregens["getGensQueryURL"]("test of query", "");
+            const errorMessage = "npmFetch enexpected error.";
+            const prefixMessage = messages.failed_to_get(url);
 
-    //         loggerMock.expects("error").withExactArgs(errorMessage);
+            npmFetchMock.expects("json").withExactArgs(url).throws(errorMessage);
+            loggerMock.expects("error").withExactArgs(errorMessage);
+            vscodeWindowMock.expects("showErrorMessage").withExactArgs(`${prefixMessage}: ${errorMessage}`).resolves();
+            exploregens["cachedInstalledGeneratorsPromise"] = Promise.resolve([]);
 
-    //         const prefixMessage = messages.failed_to_get(url);
-    //         vscodeWindowMock.expects("showErrorMessage").withExactArgs(`${prefixMessage}: ${errorMessage}`).resolves();
-    //         await exploregens["getFilteredGenerators"]("test of query");
-    //     });
-    // });
+            await exploregens["getFilteredGenerators"]("test of query");
+        });
+    });
 
     describe("getGeneratorsLocationParams", () => {
         const TESTVALUE = "test location"
