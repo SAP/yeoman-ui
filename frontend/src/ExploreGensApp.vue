@@ -55,17 +55,15 @@
             <v-card-text style="overflow-y: auto; height:200px" v-text="gen.package.description" />
             <v-card-subtitle v-text="gen.package.version" />
             <v-card-text class="homepage">
-              <a :href="gen.package.links.npm">More information</a>
+              <a :href="gen.package.links.npm">{{messages.more_info}}</a>
             </v-card-text>
             <v-card-actions>
               <v-btn
                 class="explore-generators-loading"
-                :loading="gen.disabledToHandle"
+                :loading="isLoading(gen)"
                 color="primary"
                 @click="onAction(gen)"
-              >
-                {{actionName(gen)}}
-              </v-btn>
+              >{{gen.action}}</v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -89,7 +87,6 @@ export default {
       rpc: Object,
       gens: [],
       total: 0,
-      readonly: true,
       query: "",
       recommended: ALL_GENS,
       messages
@@ -113,15 +110,25 @@ export default {
     }
   },
   methods: {
+    isLoading(gen) {
+      return gen.disabledToHandle;
+    },
     actionName(gen) {
-      return gen.installed ? this.messages.uninstall: this.messages.install;
+      return gen.installed ? this.messages.uninstall : this.messages.install;
     },
     async onAction(gen) {
       if (!gen.disabledToHandle) {
         gen.disabledToHandle = true;
-        gen.installed = await this.rpc.invoke(_.lowerCase(this.actionName(gen)), [gen]);
-        this.actionName(gen);
-        gen.disabledToHandle = false;
+        gen.installed = await this.rpc.invoke(_.lowerCase(gen.action), [gen]);
+
+        const currentGen = _.find(this.gens, currentGen => {
+          return gen.package.name === currentGen.package.name;
+        });
+
+        if (currentGen) {
+          currentGen.action = this.actionName(gen);
+          currentGen.disabledToHandle = false;
+        }
       }
     },
     onQueryChange() {
@@ -136,7 +143,10 @@ export default {
         this.query,
         recommended
       ]);
-      this.gens = res[0];
+      this.gens = _.map(res[0], gen => {
+        gen.action = this.actionName(gen);
+        return gen;
+      });
       this.total = res[1];
     },
     async getRecommendedQuery() {
@@ -156,7 +166,7 @@ export default {
       if (this.isInVsCode()) {
         if (!window.vscode) {
           // eslint-disable-next-line no-undef
-          window.vscode = acquireVsCodeApi(); 
+          window.vscode = acquireVsCodeApi();
         }
         return window.vscode;
       }

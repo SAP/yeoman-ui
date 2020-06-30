@@ -10,5 +10,6 @@ export default {
     install: "Install",
     uninstall: "Uninstall",
     installing: "Installing ...",
-    uninstalling: "Uninstalling ..."
+    uninstalling: "Uninstalling ...",
+    more_info: "More information"
 }; 
