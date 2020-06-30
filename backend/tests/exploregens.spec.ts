@@ -159,18 +159,33 @@ describe('exploregens unit test', () => {
         });
     });
 
-    it("init", async () => {
-        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getFilteredGenerators"], thisArg: exploregens });
-        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["install"], thisArg: exploregens });
-        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["uninstall"], thisArg: exploregens });
-        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInstalled"], thisArg: exploregens });
-        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens });
+    describe("init", () => {
+        it("global installation location", () => {
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getFilteredGenerators"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["install"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["uninstall"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInstalled"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens });
 
-        const customLocation = path.join("home", "user", "projects");
-        workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns(customLocation);
-        yoEnvMock.expects("createEnv").returns(testYoEnv);
-        testYoEnvMock.expects("lookup").withArgs({npmPaths: [path.join(customLocation, exploregens["NODE_MODULES"])]});
-        exploregens.init(rpc);
+            const customLocation = path.join("home", "user", "projects");
+            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns(customLocation);
+            yoEnvMock.expects("createEnv").returns(testYoEnv);
+            testYoEnvMock.expects("lookup").withArgs({npmPaths: [path.join(customLocation, exploregens["NODE_MODULES"])]});
+            exploregens.init(rpc);
+        });
+
+        it("custom installation location", () => {
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getFilteredGenerators"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["install"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["uninstall"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInstalled"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens });
+
+            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("");
+            yoEnvMock.expects("createEnv").returns(testYoEnv);
+            testYoEnvMock.expects("lookup").withArgs({npmPaths: []});
+            exploregens.init(rpc);
+        });
     });
 
     describe("install", () => {
@@ -320,81 +335,51 @@ describe('exploregens unit test', () => {
         it("updateAllInstalledGenerators doesn't called", async () => {
             globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(Date.now());
             workspaceConfigMock.expects("get").never();
+            
             await exploregens["doGeneratorsUpdate"](testVscode.context);
         });
 
         it("generators auto update is false", async () => {
             globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
-
             workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(false);
             workspaceConfigMock.expects("get").never();
+            
             await exploregens["doGeneratorsUpdate"](testVscode.context);
         });
 
-        // it("generators auto update is true and downloadedGenerators returns undefined", async () => {
-        //     globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
+        it("generators auto update is true and downloadedGenerators returns undefined", async () => {
+            globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(true);
+            exploreGensMock.expects("getAllInstalledGenerators").resolves();
+            loggerMock.expects("debug").never();
 
-        //     workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(true);
-        //     workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns(undefined);
-        //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves("");
-        //     loggerMock.expects("debug").never();
+            await exploregens["doGeneratorsUpdate"](testVscode.context);
+        });
 
-        //     await exploregens["doGeneratorsUpdate"](testVscode.context);
-        // });
+        it("generators auto update is true and downloadedGenerators returns a generators list", async () => {
+            globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(true);
+            vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(messages.auto_update_started).returns(statusBarMessage);
+            vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(messages.auto_update_finished, 10000);
+            loggerMock.expects("debug").withExactArgs(messages.auto_update_started);
+            loggerMock.expects("debug").withExactArgs(messages.installing("generator-aa"));
+            loggerMock.expects("debug").withExactArgs(messages.installing("@sap/generator-bb"));
+            loggerMock.expects("debug").withExactArgs(messages.installed("generator-aa"));
+            loggerMock.expects("debug").withExactArgs(messages.installed("@sap/generator-bb"));
+            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", "generator-aa")).resolves();
+            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", "@sap/generator-bb")).resolves();
+            exploreGensMock.expects("getAllInstalledGenerators").resolves(["generator-aa", "@sap/generator-bb"]);
+            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["generator-aa", true]);
+            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["@sap/generator-bb", true]);
+            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["generator-aa", false]);
+            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["@sap/generator-bb", false]);
 
-        // it("generators auto update is true and downloadedGenerators returns a generators list", async () => {
-        //     globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
-
-        //     workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).twice().returns("");
-        //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({ stdout: "+-- generator-aa@1.2.16 +-- @sap/generator-bb@0.0.1 -> C:\wing\yeoman-ui\generator-foodq" });
-
-        //     workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(true);
-        //     loggerMock.expects("debug").withExactArgs(messages.auto_update_started);
-        //     vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(messages.auto_update_started).returns(statusBarMessage);
-        //     vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(messages.auto_update_finished, 10000);
-
-        //     loggerMock.expects("debug").withExactArgs(messages.installing("generator-aa"));
-        //     loggerMock.expects("debug").withExactArgs(messages.installing("@sap/generator-bb"));
-
-        //     rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["generator-aa", true]);
-        //     rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["@sap/generator-bb", true]);
-
-        //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", "generator-aa")).resolves();
-        //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", "@sap/generator-bb")).resolves();
-
-        //     loggerMock.expects("debug").withExactArgs(messages.installed("generator-aa"));
-        //     loggerMock.expects("debug").withExactArgs(messages.installed("@sap/generator-bb"));
-
-        //     rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["generator-aa", false]);
-        //     rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["@sap/generator-bb", false]);
-
-        //     await exploregens["doGeneratorsUpdate"](testVscode.context);
-        // });
-
-        // it("installGenerator fails on exec method", async () => {
-        //     globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
-
-        //     workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).twice().returns("");
-        //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({ stdout: "+-- generator-aa@1.2.16" });
-
-        //     workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(true);
-        //     loggerMock.expects("debug").withExactArgs(messages.auto_update_started);
-        //     vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(messages.auto_update_started).returns(statusBarMessage);
-        //     vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(messages.auto_update_finished, 10000);
-        //     loggerMock.expects("debug").withExactArgs(messages.installing("generator-aa"));
-        //     rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["generator-aa", true]);
-        //     rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["generator-aa", false]);
-
-        //     const errorMessage = `util.promisify failure.`;
-        //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", "generator-aa")).throws(errorMessage);
-        //     loggerMock.expects("error").withExactArgs(errorMessage);
-        //     vscodeWindowMock.expects("showErrorMessage").withExactArgs(messages.failed_to_install("generator-aa") + `: ${errorMessage}`).resolves();
-
-        //     await exploregens["doGeneratorsUpdate"](testVscode.context);
-        // });
+            await exploregens["doGeneratorsUpdate"](testVscode.context);
+        });
     });
 
-    // describe("getGenerators", () => {
+    describe("onEnvLookup", () => {
 
     //     it("input string is empty", () => {
     //         expect(exploregens["getGenerators"]("")).to.be.deep.equal([]);
@@ -408,7 +393,7 @@ describe('exploregens unit test', () => {
     //     it("input string is valid string but without generators", () => {
     //         expect(exploregens["getGenerators"]("hfksajhsfiweurfjh")).to.be.deep.equal([]);
     //     });
-    // });
+    });
 
     describe("updateBeingHandledGenerator", () => {
         it("invoke method with isBeingHandled param equal true", () => {
@@ -534,38 +519,5 @@ describe('exploregens unit test', () => {
     it("getGensQueryURL", () => {
         const res = exploregens["getGensQueryURL"](" test ", "  ");
         expect(res).that.does.not.include(" ");
-    });
-
-    describe("getAllInstalledGenerators", () => {
-        const gen: any = {
-            package: {
-                name: "generator-aa"
-            }
-        };
-        const genName = gen.package.name;
-
-        // it("No generators installed", async () => {
-        //     workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
-        //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({});
-
-        //     const res = await exploregens["getAllInstalledGenerators"]();
-        //     expect(res).to.have.lengthOf(0);
-        // });
-
-        // it("There are generators installed", async () => {
-        //     workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
-        //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({ stdout: "+-- @sap/generator-bb@0.0.1 -> C:\wing\yeoman-ui\generator-foodq +-- generator-cc@2.0.4" });
-
-        //     const res = await exploregens["getAllInstalledGenerators"]();
-        //     expect(res).contains("@sap/generator-bb", "generator-cc");
-        // });
-
-        // it("fails on exec method", async () => {
-        //     workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
-        //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).rejects({ stdout: "+-- @sap/generator-bb@0.0.1 -> C:\wing\yeoman-ui\generator-foodq" });
-
-        //     const res = await exploregens["getAllInstalledGenerators"]();
-        //     expect(res).includes("@sap/generator-bb");
-        // });
     });
 });
