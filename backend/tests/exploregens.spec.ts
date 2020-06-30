@@ -2,12 +2,19 @@ import * as mocha from "mocha";
 import { expect } from "chai";
 import * as sinon from "sinon";
 import * as _ from "lodash";
+import * as path from "path";
 import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc, IPromiseCallbacks, IMethod } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import * as npmFetch from 'npm-registry-fetch';
 import { mockVscode } from "./mockUtil";
 import messages from "../src/exploreGensMessages";
+import Environment = require("yeoman-environment");
 
+const testYoEnv = {
+    lookup: () => true,
+    getNpmPaths: (): any[] => [],
+    getGeneratorsMeta: () => new Error("not implemented")
+};
 const config = {
     get: () => new Error("not implemented"),
     update: () => new Error("not implemented"),
@@ -56,6 +63,8 @@ describe('exploregens unit test', () => {
     let statusBarMessageMock: any;
     let globalStateMock: any;
     let processMock: any;
+    let yoEnvMock: any;
+    let testYoEnvMock: any;
 
     class TestRpc implements IRpc {
         public timeout: number;
@@ -115,6 +124,8 @@ describe('exploregens unit test', () => {
         globalStateMock = sandbox.mock(globalState);
         statusBarMessageMock = sandbox.mock(statusBarMessage);
         processMock = sandbox.mock(process);
+        yoEnvMock = sandbox.mock(Environment);
+        testYoEnvMock = sandbox.mock(testYoEnv);
     });
 
     afterEach(() => {
@@ -128,6 +139,8 @@ describe('exploregens unit test', () => {
         statusBarMessageMock.verify();
         globalStateMock.verify();
         processMock.verify();
+        yoEnvMock.verify();
+        testYoEnvMock.verify();
     });
 
     describe("NPM", () => {
@@ -146,21 +159,19 @@ describe('exploregens unit test', () => {
         });
     });
 
-    // it("init", async () => {
-    //     rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getFilteredGenerators"], thisArg: exploregens });
-    //     rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["install"], thisArg: exploregens });
-    //     rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["uninstall"], thisArg: exploregens });
-    //     rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInstalled"], thisArg: exploregens });
-    //     rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens });
+    it("init", async () => {
+        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getFilteredGenerators"], thisArg: exploregens });
+        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["install"], thisArg: exploregens });
+        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["uninstall"], thisArg: exploregens });
+        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInstalled"], thisArg: exploregens });
+        rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens });
 
-    //     workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("/home/user/projects");
-    //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("--prefix /home/user/projects")).rejects({ stdout: "+-- generator-aa@1.2.16 +-- generator-bb@0.0.1 -> C:\wing\yeoman-ui\generator-foodq +-- @sap/generator-cc@2.0.4" });
-    //     exploregens.init(rpc);
-    //     const installedGenerators = await exploregens["cachedInstalledGeneratorsPromise"];
-    //     expect(installedGenerators).includes("generator-aa");
-    //     expect(installedGenerators).includes("generator-bb");
-    //     expect(installedGenerators).includes("@sap/generator-cc");
-    // });
+        const customLocation = path.join("home", "user", "projects");
+        workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns(customLocation);
+        yoEnvMock.expects("createEnv").returns(testYoEnv);
+        testYoEnvMock.expects("lookup").withArgs({npmPaths: [path.join(customLocation, exploregens["NODE_MODULES"])]});
+        exploregens.init(rpc);
+    });
 
     describe("install", () => {
         const gen: any = {
@@ -168,149 +179,138 @@ describe('exploregens unit test', () => {
                 name: "gen-test"
             }
         };
+        const genName = gen.package.name;
 
-        // it("update already downloaded generator", async () => {
-        //     workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
-        //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({ stdout: "+-- generator-aa@1.2.16 +-- generator-bb@0.0.1 -> C:\wing\yeoman-ui\generator-foodq +-- generator-cc@2.0.4" });
-        //     exploregens["cachedInstalledGeneratorsPromise"] = exploregens["getAllInstalledGenerators"]();
+        it("update generator", async () => {
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
+            loggerMock.expects("debug").withExactArgs(messages.installing(genName));
+            loggerMock.expects("debug").withExactArgs(messages.installed(genName));
+            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", genName));
+            exploreGensMock.expects("setInstalledGens");
+            vscodeWindowMock.expects("showInformationMessage").withExactArgs(messages.installed(genName));
+            vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(messages.installing(genName)).returns(statusBarMessage);
+            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, true]);
+            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, false]);
 
-        //     workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
-        //     vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(messages.installing(gen.package.name)).returns(statusBarMessage);
-        //     loggerMock.expects("debug").withExactArgs(messages.installing(gen.package.name));
-        //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", gen.package.name));
-        //     loggerMock.expects("debug").withExactArgs(messages.installed(gen.package.name));
-        //     vscodeWindowMock.expects("showInformationMessage").withExactArgs(messages.installed(gen.package.name));
-        //     rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [gen.package.name, true]);
-        //     rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [gen.package.name, false]);
-
-        //     await exploregens["install"](gen);
-        // });
-
-        // it("download new generator", async () => {
-        //     workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
-        //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({});
-        //     exploregens["cachedInstalledGeneratorsPromise"] = exploregens["getAllInstalledGenerators"]();
-
-        //     workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
-        //     vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(messages.installing(gen.package.name)).returns(statusBarMessage);
-        //     loggerMock.expects("debug").withExactArgs(messages.installing(gen.package.name));
-        //     rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [gen.package.name, true]);
-        //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", gen.package.name));
-        //     loggerMock.expects("debug").withExactArgs(messages.installed(gen.package.name));
-        //     vscodeWindowMock.expects("showInformationMessage").withExactArgs(messages.installed(gen.package.name));
-        //     rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [gen.package.name, false]);
-
-        //     await exploregens["install"](gen);
-        // });
-
-        // it("an error is thrown", async () => {
-        //     workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
-        //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({ stdout: "+-- generator-aa@1.2.16 +-- generator-bb@0.0.1 -> C:\wing\yeoman-ui\generator-foodq +-- generator-cc@2.0.4" });
-        //     exploregens["cachedInstalledGeneratorsPromise"] = exploregens["getAllInstalledGenerators"]();
-
-        //     workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
-        //     vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(messages.installing(gen.package.name)).returns(statusBarMessage);
-        //     loggerMock.expects("debug").withExactArgs(messages.installing(gen.package.name));
-        //     rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [gen.package.name, true]);
-        //     const errorMessage = "npm install failed";
-        //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", gen.package.name)).throws(errorMessage);
-        //     loggerMock.expects("error").withExactArgs(errorMessage);
-        //     vscodeWindowMock.expects("showErrorMessage").withExactArgs(messages.failed_to_install(gen.package.name) + `: ${errorMessage}`).resolves();
-        //     rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [gen.package.name, false]);
-        //     statusBarMessageMock.expects("dispose");
-
-        //     await exploregens["install"](gen);
-        // });
-    });
-
-    describe("getFilteredGenerators", async () => {
-        it("query and recommended parameters are empty strings", async () => {
-            const expectedResult = {
-                objects: [{ package: { name: "obj1" } }, { package: { name: "obj2" } }],
-                total: 5
-            }
-            const url = exploregens["getGensQueryURL"]("", "");
-            npmFetchMock.expects("json").withExactArgs(url).resolves(expectedResult);
-            const res = await exploregens["getFilteredGenerators"]();
-            expect(res).to.be.deep.equal([expectedResult.objects, expectedResult.total]);
-            expect(res[0][0].disabledToHandle).to.be.false;
-            expect(res[0][1].disabledToHandle).to.be.false;
+            const res = await exploregens["install"](gen);
+            expect(res).to.be.true;
         });
 
-        it("query parameter is some words", async () => {
-            const expectedResult = {
-                objects: [{ package: { name: "generator-aa" } }],
-                total: 1
-            }
-            const url = exploregens["getGensQueryURL"]("test of query", "");
-            npmFetchMock.expects("json").withExactArgs(url).resolves(expectedResult);
-            exploregens["gensBeingHandled"] = ["generator-aa"];
-            const res = await exploregens["getFilteredGenerators"]("test of query");
-            expect(res[0]).to.be.deep.equal(expectedResult.objects);
-            expect(res[1]).to.be.equal(expectedResult.total);
-            expect(res[0][0].disabledToHandle).to.be.true;
-        });
+        it("an error is thrown", async () => {
+            const errorMessage = "npm install failed";
 
-        it("npmFetch.json throws error", async () => {
-            const expectedResult = {
-                objects: [{ package: { name: "obj1" } }],
-                total: 1
-            }
-            const url = exploregens["getGensQueryURL"]("test of query", "");
-            const errorMessage = "npmFetch enexpected error.";
-            npmFetchMock.expects("json").withExactArgs(url).throws(errorMessage);
-
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
+            vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(messages.installing(genName)).returns(statusBarMessage);
+            vscodeWindowMock.expects("showErrorMessage").withExactArgs(messages.failed_to_install(genName) + `: ${errorMessage}`).resolves();
+            loggerMock.expects("debug").withExactArgs(messages.installing(genName));
             loggerMock.expects("error").withExactArgs(errorMessage);
+            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, true]);
+            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, false]);
+            statusBarMessageMock.expects("dispose");
+            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", genName)).throws(errorMessage);
+            exploreGensMock.expects("setInstalledGens");
 
-            const prefixMessage = messages.failed_to_get(url);
-            vscodeWindowMock.expects("showErrorMessage").withExactArgs(`${prefixMessage}: ${errorMessage}`).resolves();
-            await exploregens["getFilteredGenerators"]("test of query");
+            const res = await exploregens["install"](gen);
+            expect(res).to.be.false;
         });
     });
+
+    // describe.skip("getFilteredGenerators", async () => {
+    //     it("query and recommended parameters are empty strings", async () => {
+    //         const expectedResult = {
+    //             objects: [{ package: { name: "obj1" } }, { package: { name: "obj2" } }],
+    //             total: 5
+    //         }
+    //         const url = exploregens["getGensQueryURL"]("", "");
+    //         npmFetchMock.expects("json").withExactArgs(url).resolves(expectedResult);
+    //         const res = await exploregens["getFilteredGenerators"]();
+    //         expect(res).to.be.deep.equal([expectedResult.objects, expectedResult.total]);
+    //         expect(res[0][0].disabledToHandle).to.be.false;
+    //         expect(res[0][1].disabledToHandle).to.be.false;
+    //     });
+
+    //     it("query parameter is some words", async () => {
+    //         const expectedResult = {
+    //             objects: [{ package: { name: "generator-aa" } }],
+    //             total: 1
+    //         }
+    //         const url = exploregens["getGensQueryURL"]("test of query", "");
+    //         npmFetchMock.expects("json").withExactArgs(url).resolves(expectedResult);
+    //         exploregens["gensBeingHandled"] = ["generator-aa"];
+    //         const res = await exploregens["getFilteredGenerators"]("test of query");
+    //         expect(res[0]).to.be.deep.equal(expectedResult.objects);
+    //         expect(res[1]).to.be.equal(expectedResult.total);
+    //         expect(res[0][0].disabledToHandle).to.be.true;
+    //     });
+
+    //     it("npmFetch.json throws error", async () => {
+    //         const expectedResult = {
+    //             objects: [{ package: { name: "obj1" } }],
+    //             total: 1
+    //         }
+    //         const url = exploregens["getGensQueryURL"]("test of query", "");
+    //         const errorMessage = "npmFetch enexpected error.";
+    //         npmFetchMock.expects("json").withExactArgs(url).throws(errorMessage);
+
+    //         loggerMock.expects("error").withExactArgs(errorMessage);
+
+    //         const prefixMessage = messages.failed_to_get(url);
+    //         vscodeWindowMock.expects("showErrorMessage").withExactArgs(`${prefixMessage}: ${errorMessage}`).resolves();
+    //         await exploregens["getFilteredGenerators"]("test of query");
+    //     });
+    // });
 
     describe("getGeneratorsLocationParams", () => {
         const TESTVALUE = "test location"
 
         it("location empty", () => {
             workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
-            expect(exploregens["getGeneratorsLocationParams"]()).to.be.deep.equal("-g");
+            const res = exploregens["getGeneratorsLocationParams"]();
+            expect(res).to.be.equal("-g");
         });
 
         it("location undefined", () => {
-            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns(undefined);
-            expect(exploregens["getGeneratorsLocationParams"]()).to.be.deep.equal("-g");
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns();
+            const res = exploregens["getGeneratorsLocationParams"]();
+            expect(res).to.be.equal("-g");
         });
 
         it("location is a valid string", () => {
             workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns(TESTVALUE);
-            expect(exploregens["getGeneratorsLocationParams"]()).to.be.deep.equal(`--prefix ${TESTVALUE}`);
+            const res = exploregens["getGeneratorsLocationParams"]();
+            expect(res).to.be.equal(`--prefix ${TESTVALUE}`);
         });
 
         it("location is a string with unnecessary spaces", () => {
             workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns(`   ${TESTVALUE}   `);
-            expect(exploregens["getGeneratorsLocationParams"]()).to.be.deep.equal(`--prefix ${TESTVALUE}`);
+            const res = exploregens["getGeneratorsLocationParams"]();
+            expect(res).to.be.deep.equal(`--prefix ${TESTVALUE}`);
         });
     });
 
     describe("getRecommendedQuery", () => {
         it("recommended array empty", () => {
             workspaceConfigMock.expects("get").withExactArgs(exploregens["SEARCH_QUERY"]).returns([]);
-            expect(exploregens["getRecommendedQuery"]()).to.be.deep.equal([]);
+            const res = exploregens["getRecommendedQuery"]();
+            expect(res).to.have.lengthOf(0);
         });
 
         it("recommended array is undefined", () => {
-            workspaceConfigMock.expects("get").withExactArgs(exploregens["SEARCH_QUERY"]).returns(undefined);
-            expect(exploregens["getRecommendedQuery"]()).to.be.deep.equal([]);
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["SEARCH_QUERY"]).returns();
+            const res = exploregens["getRecommendedQuery"]();
+            expect(res).to.have.lengthOf(0);
         });
 
         it("recommended array is a valid strings array", () => {
             workspaceConfigMock.expects("get").withExactArgs(exploregens["SEARCH_QUERY"]).returns(["query1", "query2"]);
-            expect(exploregens["getRecommendedQuery"]()).to.be.deep.equal(["query1", "query2"]);
+            const res = exploregens["getRecommendedQuery"]();
+            expect(res).to.be.deep.equal(["query1", "query2"]);
         });
 
         it("recommended array is a valid strings array with duplicate string", () => {
             workspaceConfigMock.expects("get").withExactArgs(exploregens["SEARCH_QUERY"]).returns(["query1", "query1"]);
-            expect(exploregens["getRecommendedQuery"]()).to.be.deep.equal(["query1"]);
+            const res = exploregens["getRecommendedQuery"]();
+            expect(res).to.be.deep.equal(["query1"]);
         });
     });
 
@@ -409,48 +409,31 @@ describe('exploregens unit test', () => {
     // });
 
     describe("updateBeingHandledGenerator", () => {
-
-        it("invoke method with isBeingHandled param equel true", () => {
+        it("invoke method with isBeingHandled param equal true", () => {
             rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["generator-aa", true]);
-            expect(exploregens["updateBeingHandledGenerator"]("generator-aa", true));
+            exploregens["updateBeingHandledGenerator"]("generator-aa", true);
         });
 
         it("invoke method with isBeingHandled param equel false", () => {
             rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["generator-aa", false]);
-            expect(exploregens["updateBeingHandledGenerator"]("generator-aa", false));
+            exploregens["updateBeingHandledGenerator"]("generator-aa", false);
         });
     });
 
-    describe("isInstalled", () => {
+    it("isInstalled", async () => {
         const gen: any = {
             package: {
                 name: "generator-aa"
             }
         };
 
-        // it("cache is empty", async () => {
-        //     workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
-        //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({});
-        //     exploregens["cachedInstalledGeneratorsPromise"] = exploregens["getAllInstalledGenerators"]();
-        //     const res: boolean = await exploregens["isInstalled"](gen);
-        //     expect(res).to.be.false;
-        // });
+        exploreGensMock.expects("getInstalledGens").resolves(["generator-cc", "generator-test", "generator-aa"]);
+        let res: boolean = await exploregens["isInstalled"](gen);
+        expect(res).to.be.true;
 
-        // it("generator-aa generator should be in the cache", async () => {
-        //     workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
-        //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({ stdout: "+-- generator-aa@1.2.16 +-- generator-bb@0.0.1 -> C:\wing\yeoman-ui\generator-foodq +-- generator-cc@2.0.4" });
-        //     exploregens["cachedInstalledGeneratorsPromise"] = exploregens["getAllInstalledGenerators"]();
-        //     const res: boolean = await exploregens["isInstalled"](gen);
-        //     expect(res).to.be.true;
-        // });
-
-        // it("generator-aa generator is not in the cache", async () => {
-        //     workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
-        //     exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmListCommand"]("-g")).resolves({ stdout: "+-- generator-bb@0.0.1 -> C:\wing\yeoman-ui\generator-foodq +-- generator-cc@2.0.4" });
-        //     exploregens["cachedInstalledGeneratorsPromise"] = exploregens["getAllInstalledGenerators"]();
-        //     const res: boolean = await exploregens["isInstalled"](gen);
-        //     expect(res).to.be.false;
-        // });
+        exploreGensMock.expects("getInstalledGens").resolves(["generator-cc"]);
+        res = await exploregens["isInstalled"](gen);
+        expect(res).to.be.false;
     });
 
     describe("uninstall", () => {
@@ -461,34 +444,39 @@ describe('exploregens unit test', () => {
         };
 
         it("uninstall succsessfully", async () => {
-            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
+            const genName = gen.package.name;
+            const uninstallingMessage = messages.uninstalling(genName);
+            const successMessage = messages.uninstalled(genName);
 
-            const uninstallingMessage = messages.uninstalling(gen.package.name);
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
             vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(uninstallingMessage).returns(statusBarMessage);
-            loggerMock.expects("debug").withExactArgs(uninstallingMessage);
-            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmUninstallCommand"]("-g", gen.package.name)).resolves();
-            const successMessage = messages.uninstalled(gen.package.name);
-            loggerMock.expects("debug").withExactArgs(successMessage);
             vscodeWindowMock.expects("showInformationMessage").withExactArgs(successMessage);
+            loggerMock.expects("debug").withExactArgs(uninstallingMessage);
+            loggerMock.expects("debug").withExactArgs(successMessage);
+            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmUninstallCommand"]("-g", genName)).resolves();
+            exploreGensMock.expects("setInstalledGens");
             statusBarMessageMock.expects("dispose");
 
-            await expect(exploregens["uninstall"](gen));
+            const res = await exploregens["uninstall"](gen);
+            expect(res).to.be.false;
         });
 
         it("uninstall fails on exec method", async () => {
-            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
-
-            const uninstallingMessage = messages.uninstalling(gen.package.name);
-            vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(uninstallingMessage).returns(statusBarMessage);;
-            loggerMock.expects("debug").withExactArgs(uninstallingMessage);
-
+            const genName = gen.package.name;
+            const uninstallingMessage = messages.uninstalling(genName);
             const errorMessage = `uninstall failure.`;
-            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmUninstallCommand"]("-g", gen.package.name)).throws(errorMessage);
+
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
+            vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(uninstallingMessage).returns(statusBarMessage);
+            vscodeWindowMock.expects("showErrorMessage").withExactArgs(messages.failed_to_uninstall(genName) + `: ${errorMessage}`).resolves();
+            loggerMock.expects("debug").withExactArgs(uninstallingMessage);
             loggerMock.expects("error").withExactArgs(errorMessage);
-            vscodeWindowMock.expects("showErrorMessage").withExactArgs(messages.failed_to_uninstall(gen.package.name) + `: ${errorMessage}`).resolves();
+            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmUninstallCommand"]("-g", genName)).throws(errorMessage);
+            exploreGensMock.expects("setInstalledGens");
             statusBarMessageMock.expects("dispose");
 
-            await expect(exploregens["uninstall"](gen));
+            const res = await exploregens["uninstall"](gen);
+            expect(res).to.be.true;
         });
     });
 
@@ -498,68 +486,52 @@ describe('exploregens unit test', () => {
                 name: "generator-aa"
             }
         };
+        const genName = gen.package.name;
 
         it("generator is already installed", async () => {
-            const installingMessage = messages.installing(gen.package.name);
-            vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(installingMessage);
-            loggerMock.expects("debug").withExactArgs(installingMessage);
-            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [gen.package.name, true]);
-            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", gen.package.name)).resolves();
-            const successMessage = messages.installed(gen.package.name);
-            loggerMock.expects("debug").withExactArgs(successMessage);
-            vscodeWindowMock.expects("showInformationMessage").withExactArgs(successMessage);
-            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [gen.package.name, false]);
+            const installingMessage = messages.installing(genName);
+            const successMessage = messages.installed(genName);
 
-            expect(exploregens["installGenerator"]("-g", gen.package.name));
+            vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(installingMessage);
+            vscodeWindowMock.expects("showInformationMessage").withExactArgs(successMessage);
+            loggerMock.expects("debug").withExactArgs(installingMessage);
+            loggerMock.expects("debug").withExactArgs(successMessage);
+            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, true]);
+            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, false]);
+            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", genName)).resolves();
+
+            expect(exploregens["installGenerator"]("-g", genName));
         });
 
         it("generator doesn't installed", async () => {
-            loggerMock.expects("debug").withExactArgs(messages.installing(gen.package.name));
-            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [gen.package.name, true]);
-            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", gen.package.name)).resolves();
-            const successMessage = messages.installed(gen.package.name);
-            loggerMock.expects("debug").withExactArgs(successMessage);
-            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [gen.package.name, false]);
+            const successMessage = messages.installed(genName);
 
-            expect(exploregens["installGenerator"]("-g", gen.package.name, false));
+            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, false]);
+            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, true]);
+            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", genName)).resolves();
+            loggerMock.expects("debug").withExactArgs(messages.installing(genName));
+            loggerMock.expects("debug").withExactArgs(successMessage);
+
+            await exploregens["installGenerator"]("-g", genName, false);
         });
 
         it("install fails on exec method", async () => {
-            loggerMock.expects("debug").withExactArgs(messages.installing(gen.package.name));
-            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [gen.package.name, true]);
             const errorMessage = `install failure.`;
-            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", gen.package.name)).throws(errorMessage);
+
             loggerMock.expects("error").withExactArgs(errorMessage);
-            vscodeWindowMock.expects("showErrorMessage").withExactArgs(messages.failed_to_install(gen.package.name) + `: ${errorMessage}`).resolves();
-            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [gen.package.name, false]);
+            loggerMock.expects("debug").withExactArgs(messages.installing(genName));
+            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, true]);
+            rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, false]);
+            exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", genName)).throws(errorMessage);
+            vscodeWindowMock.expects("showErrorMessage").withExactArgs(messages.failed_to_install(genName) + `: ${errorMessage}`).resolves();
 
-            expect(exploregens["installGenerator"]("-g", gen.package.name, false));
+            await exploregens["installGenerator"]("-g", genName, false);
         });
     });
 
-    describe("getGensQueryURL", () => {
-        const api_endpoint = "http://registry.npmjs.com/-/v1/search?text=";
-
-        it("query and recommended are empty", () => {
-            const res = `${api_endpoint}%20%20keywords:yeoman-generator%20&size=25&ranking=popularity`
-            expect(exploregens["getGensQueryURL"]("", "")).to.be.deep.equal(res);
-        });
-
-        it("query and recommended are valid string", () => {
-            const res = `${api_endpoint}sap%20keywords:microsoft%20keywords:yeoman-generator%20&size=25&ranking=popularity`
-            expect(exploregens["getGensQueryURL"]("sap", "keywords:microsoft")).to.be.deep.equal(res);
-        });
-    });
-
-    describe("showAndLogError", () => {
-        const api_endpoint = "http://registry.npmjs.com/-/v1/search?text=";
-
-        it("query and recommended are empty", () => {
-            loggerMock.expects("error").withExactArgs("error message");
-            vscodeWindowMock.expects("showErrorMessage").withExactArgs(`in showAndLogError: error message`).resolves();
-
-            expect(exploregens["showAndLogError"]("in showAndLogError", "error message"));
-        });
+    it("getGensQueryURL", () => {
+        const res = exploregens["getGensQueryURL"](" test ", "  ");
+        expect(res).that.does.not.include(" ");
     });
 
     describe("getAllInstalledGenerators", () => {
@@ -568,6 +540,7 @@ describe('exploregens unit test', () => {
                 name: "generator-aa"
             }
         };
+        const genName = gen.package.name;
 
         // it("No generators installed", async () => {
         //     workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");

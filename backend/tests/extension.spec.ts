@@ -7,7 +7,7 @@ import { mockVscode } from "./mockUtil";
 const oRegisteredCommands = {};
 const testVscode = {
     workspace: {
-        getConfiguration: () => true
+        getConfiguration: (): any => undefined
     },
     commands: {
         registerCommand: (id: string, cmd: any) => { _.set(oRegisteredCommands, id, cmd); return Promise.resolve(oRegisteredCommands); },
@@ -30,7 +30,7 @@ describe('extension unit test', () => {
     const testContext: any = { 
         subscriptions: [], 
         extensionPath: "testExtensionpath", 
-        globalState: {get: () => true, update: () => true}
+        globalState: {get: () => Date.now(), update: () => true}
     };
 
     before(() => {

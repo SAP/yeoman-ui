@@ -28,7 +28,6 @@ export class ExploreGens {
     constructor(context: any, logger: IChildLogger) {
         this.logger = logger;
         this.gensBeingHandled = [];
-
         this.doGeneratorsUpdate(context);
     }
 
@@ -56,9 +55,9 @@ export class ExploreGens {
 
     private async getAllInstalledGenerators(): Promise<string[]> {
         return new Promise(resolve => {
-            const env: Environment.Options = Environment.createEnv();
-            const npmPaths = this.getNpmPaths(env);
-            env.lookup({ npmPaths }, async () => this.onEnvLookup(env, resolve));
+            const yoEnv: Environment.Options = Environment.createEnv();
+            const npmPaths = this.getNpmPaths(yoEnv);
+            yoEnv.lookup({ npmPaths }, async () => this.onEnvLookup(yoEnv, resolve));
         });
     }
 
@@ -95,19 +94,17 @@ export class ExploreGens {
     }
 
     private async install(gen: any) {
-        const genName: string = gen.package.name;
         const locationParams = this.getGeneratorsLocationParams();
-        await this.installGenerator(locationParams, genName);
+        const res = await this.installGenerator(locationParams, gen.package.name);
         this.setInstalledGens();
-        return true;
+        return res;
     }
 
     private async uninstall(gen: any) {
-        const genName = gen.package.name;
         const locationParams = this.getGeneratorsLocationParams();
-        await this.uninstallGenerator(locationParams, genName);
+        const res = await this.uninstallGenerator(locationParams, gen.package.name);
         this.setInstalledGens();
-        return false;
+        return !res;
     }
 
     private async getFilteredGenerators(query = this.EMPTY, author = this.EMPTY) {
@@ -155,7 +152,7 @@ export class ExploreGens {
         return util.promisify(cp.exec)(arg);
     }
 
-    private async installGenerator(locationParams: string, genName: string, isInstall = true) {
+    private async installGenerator(locationParams: string, genName: string, isInstall = true): Promise<boolean> {
         this.gensBeingHandled.push(genName);
         const installingMessage = messages.installing(genName);
         let statusbarMessage;
@@ -173,8 +170,10 @@ export class ExploreGens {
             if (isInstall) {
                 vscode.window.showInformationMessage(successMessage);
             }
+            return true;
         } catch (error) {
             this.showAndLogError(messages.failed_to_install(genName), error);
+            return false;
         } finally {
             this.removeFromArray(this.gensBeingHandled, genName);
             this.updateBeingHandledGenerator(genName, false);
@@ -184,7 +183,7 @@ export class ExploreGens {
         }
     }
 
-    private async uninstallGenerator(locationParams: string, genName: string) {
+    private async uninstallGenerator(locationParams: string, genName: string): Promise<boolean> {
         this.gensBeingHandled.push(genName);
         const uninstallingMessage = messages.uninstalling(genName);
         const statusbarMessage = vscode.window.setStatusBarMessage(uninstallingMessage);
@@ -192,13 +191,14 @@ export class ExploreGens {
         try {
             this.logger.debug(uninstallingMessage);
             const uninstallCommand = this.getNpmUninstallCommand(locationParams, genName);
-
             await this.exec(uninstallCommand);
             const successMessage = messages.uninstalled(genName);
             this.logger.debug(successMessage);
             vscode.window.showInformationMessage(successMessage);
+            return true;
         } catch (error) {
             this.showAndLogError(messages.failed_to_uninstall(genName), error);
+            return false;
         } finally {
             this.removeFromArray(this.gensBeingHandled, genName);
             statusbarMessage.dispose();
