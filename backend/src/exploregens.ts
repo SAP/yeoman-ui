@@ -24,6 +24,8 @@ export class ExploreGens {
     private readonly EMPTY = "";
     private readonly NODE_MODULES = "node_modules";
     private readonly ONE_DAY = 1000 * 60 * 60 * 24;
+    private readonly SEARCH_QUERY_PREFIX = "http://registry.npmjs.com/-/v1/search?text=";
+    private readonly SEARCH_QUERY_SUFFIX = "keywords:yeoman-generator &size=25&ranking=popularity";
 
     constructor(context: any, logger: IChildLogger) {
         this.logger = logger;
@@ -133,9 +135,7 @@ export class ExploreGens {
     }
 
     private getGensQueryURL(query: string, recommended: string) {
-        const api_endpoint = "http://registry.npmjs.com/-/v1/search?text=";
-        const querySuffix = "keywords:yeoman-generator &size=25&ranking=popularity";
-        return encodeURI(`${api_endpoint} ${query} ${recommended} ${querySuffix}`);
+        return encodeURI(`${this.SEARCH_QUERY_PREFIX} ${query} ${recommended} ${this.SEARCH_QUERY_SUFFIX}`);
     }
 
     private getRecommendedQuery() {
