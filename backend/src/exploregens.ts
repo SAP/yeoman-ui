@@ -9,6 +9,7 @@ import messages from "./exploreGensMessages";
 import * as vscode from "vscode";
 import Environment = require("yeoman-environment");
 
+
 export class ExploreGens {
     private logger: IChildLogger;
     private rpc: IRpc;
@@ -33,6 +34,14 @@ export class ExploreGens {
 
     public init(rpc: IRpc) {
         this.initRpc(rpc);
+        this.setInstalledGens();
+    }
+
+    private async getInstalledGens() {
+        return this.cachedInstalledGeneratorsPromise;
+    }
+
+    private setInstalledGens() {
         this.cachedInstalledGeneratorsPromise = this.getAllInstalledGenerators();
     }
 
@@ -46,13 +55,11 @@ export class ExploreGens {
     }
 
     private async getAllInstalledGenerators(): Promise<string[]> {
-        const promise: Promise<any> = new Promise(resolve => {
+        return new Promise(resolve => {
             const env: Environment.Options = Environment.createEnv();
             const npmPaths = this.getNpmPaths(env);
             env.lookup({ npmPaths }, async () => this.onEnvLookup(env, resolve));
         });
-
-        return promise;
     }
 
     private initRpc(rpc: IRpc) {
@@ -91,35 +98,31 @@ export class ExploreGens {
         const genName: string = gen.package.name;
         const locationParams = this.getGeneratorsLocationParams();
         await this.installGenerator(locationParams, genName);
-        const installedGens: string[] = await this.cachedInstalledGeneratorsPromise;
-        installedGens.push(genName);
-        this.cachedInstalledGeneratorsPromise = Promise.resolve(_.uniq(installedGens));
+        this.setInstalledGens();
+        return true;
     }
 
     private async uninstall(gen: any) {
         const genName = gen.package.name;
         const locationParams = this.getGeneratorsLocationParams();
         await this.uninstallGenerator(locationParams, genName);
-        const installedGens: string[] = await this.cachedInstalledGeneratorsPromise;
-        this.removeFromArray(installedGens, genName);
-        this.cachedInstalledGeneratorsPromise = Promise.resolve(installedGens);
+        this.setInstalledGens();
+        return false;
     }
 
     private async getFilteredGenerators(query = this.EMPTY, author = this.EMPTY) {
         const gensQueryUrl = this.getGensQueryURL(query, author);
 
         try {
+            const cachedGens = await this.getInstalledGens();
             const res: any = await npmFetch.json(gensQueryUrl);
-            let filteredGenerators = _.map(_.get(res, "objects"), gen => {
-                gen.disabledToHandle = _.includes(this.gensBeingHandled, gen.package.name) ? true : false;
+            const filteredGenerators = _.map(_.get(res, "objects"), gen => {
+                const genName = gen.package.name;
+                gen.disabledToHandle = _.includes(this.gensBeingHandled, genName) ? true : false;
+                gen.installed = _.includes(cachedGens, genName);
                 return gen;
             });
 
-            const cachedGens = await this.cachedInstalledGeneratorsPromise;
-            filteredGenerators = _.map(filteredGenerators, filteredGen => {
-                filteredGen.action = (_.includes(cachedGens, filteredGen.package.name)) ? "Uninstall" : "Install";
-                return filteredGen;
-            });
             return [filteredGenerators, res.total];
         } catch (error) {
             this.showAndLogError(messages.failed_to_get(gensQueryUrl), error);
@@ -134,8 +137,8 @@ export class ExploreGens {
 
     private getGensQueryURL(query: string, recommended: string) {
         const api_endpoint = "http://registry.npmjs.com/-/v1/search?text=";
-        const actualQuery = encodeURI(`${query} ${recommended}`);
-        return `${api_endpoint}${actualQuery}%20keywords:yeoman-generator%20&size=25&ranking=popularity`;
+        const querySuffix = "keywords:yeoman-generator &size=25&ranking=popularity";
+        return encodeURI(`${api_endpoint} ${query} ${recommended} ${querySuffix}`);
     }
 
     private getRecommendedQuery() {
@@ -203,7 +206,7 @@ export class ExploreGens {
     }
 
     private async isInstalled(gen: any) {
-        const installedGens: string[] = await this.cachedInstalledGeneratorsPromise;
+        const installedGens: string[] = await this.getInstalledGens();
         return _.includes(installedGens, gen.package.name);
     }
 

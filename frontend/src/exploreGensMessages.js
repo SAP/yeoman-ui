@@ -6,5 +6,9 @@ export default {
     recommended: "Recommended",
     refine_search: "You may need to refine your search",
     results_out_of_total: (gensQuantity, totalGensQuantity) => `Showing ${gensQuantity} out of ${totalGensQuantity} results.`,
-    results: (totalGensQuantity) => `Showing ${totalGensQuantity} results.`
+    results: (totalGensQuantity) => `Showing ${totalGensQuantity} results.`,
+    install: "Install",
+    uninstall: "Uninstall",
+    installing: "Installing ...",
+    uninstalling: "Uninstalling ..."
 }; 

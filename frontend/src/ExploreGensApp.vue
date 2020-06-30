@@ -60,11 +60,11 @@
             <v-card-actions>
               <v-btn
                 class="explore-generators-loading"
-                text
                 :loading="gen.disabledToHandle"
+                color="primary"
                 @click="onAction(gen)"
               >
-                {{gen.action}}
+                {{actionName(gen)}}
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -113,15 +113,15 @@ export default {
     }
   },
   methods: {
+    actionName(gen) {
+      return gen.installed ? this.messages.uninstall: this.messages.install;
+    },
     async onAction(gen) {
       if (!gen.disabledToHandle) {
         gen.disabledToHandle = true;
-        try {
-          await this.rpc.invoke(_.lowerCase(gen.action), [gen]);
-          gen.action = (gen.action === "Uninstall" ? "Install": "Uninstall");
-        } finally {
-          gen.disabledToHandle = false;
-        } 
+        gen.installed = await this.rpc.invoke(_.lowerCase(this.actionName(gen)), [gen]);
+        this.actionName(gen);
+        gen.disabledToHandle = false;
       }
     },
     onQueryChange() {
@@ -143,12 +143,6 @@ export default {
       this.items = await this.rpc.invoke("getRecommendedQuery");
       this.items.unshift(ALL_GENS);
     },
-    setVscodeApiOnWindow() {
-      if (this.isInVsCode() && !window.vscode) {
-        // eslint-disable-next-line
-        window.vscode = acquireVsCodeApi();
-      }
-    },
     async updateBeingHandledGenerator(genName, isBeingHandled) {
       const gen = _.find(this.gens, gen => {
         return gen.package.name === genName;
@@ -158,16 +152,23 @@ export default {
         gen.disabledToHandle = isBeingHandled;
       }
     },
-    setupRpc() {
-      /* istanbul ignore if */
+    getVscodeApi() {
       if (this.isInVsCode()) {
-        this.setVscodeApiOnWindow();
-        this.rpc = new RpcBrowser(window, window.vscode);
-
+        if (!window.vscode) {
+          // eslint-disable-next-line no-undef
+          window.vscode = acquireVsCodeApi(); 
+        }
+        return window.vscode;
+      }
+    },
+    setupRpc() {
+      const vscodeApi = this.getVscodeApi();
+      if (vscodeApi) {
+        this.rpc = new RpcBrowser(window, vscodeApi);
         this.rpc.registerMethod({
-          func: this["updateBeingHandledGenerator"],
+          func: this.updateBeingHandledGenerator,
           thisArg: this,
-          name: "updateBeingHandledGenerator"
+          name: this.updateBeingHandledGenerator.name
         });
       }
     }
