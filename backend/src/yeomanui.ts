@@ -56,6 +56,7 @@ export class YeomanUI {
     if (!this.rpc) {
       throw new Error("rpc must be set");
     }
+    
     this.generatorName = "";
     this.replayUtils = new ReplayUtils();
     this.youiEvents = youiEvents;
@@ -95,13 +96,13 @@ export class YeomanUI {
   }
 
   private async logError(error: any, prefixMessage?: string) {
-    let errorMessage = this.getErrorInfo(error);
+    const errorObj: any = this.getErrorInfo(error);
     if (prefixMessage) {
-      errorMessage = `${prefixMessage}\n${errorMessage}`;
+      errorObj.message = `${prefixMessage} - ${errorObj.message}`;
     }
 
-    this.logger.error(errorMessage);
-    return errorMessage;
+    this.logger.error(errorObj.message, {stack: errorObj.stack});
+    return JSON.stringify(errorObj);
   }
 
   private async getGeneratorsPrompt(): Promise<IQuestionsPrompt> {
@@ -321,7 +322,7 @@ export class YeomanUI {
 
   private async onGeneratorFailure(generatorName: string, error: any) {
     this.errorThrown = true;
-    const messagePrefix = `${generatorName} generator failed.`;
+    const messagePrefix = `${generatorName} generator failed`;
     const errorMessage: string = await this.logError(error, messagePrefix);
     this.youiEvents.doGeneratorDone(false, errorMessage);
   }
@@ -347,15 +348,16 @@ export class YeomanUI {
 
   private getErrorInfo(error: any = "") {
     if (_.isString(error)) {
-      return error;
-    } 
+      return {message: error};
+    }
 
-    const name = _.get(error, "name", "");
-    const message = _.get(error, "message", "");
-    const stack = _.get(error, "stack", "");
+   const res = {
+     message: _.get(error, "message", ""),
+     stack: _.get(error, "stack", "")
+   };
 
-    return `name: ${name}\n message: ${message}\n stack: ${stack}\n string: ${error.toString()}\n`;
-  }
+   return res;
+ }
   
   private async onEnvLookup(env: Environment.Options, resolve: any, filter: GeneratorFilter) {
     this.genMeta = env.getGeneratorsMeta();
