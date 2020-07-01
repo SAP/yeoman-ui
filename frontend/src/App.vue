@@ -26,21 +26,26 @@
       <v-col cols="9" class="right-col">
         <v-row class="prompts-col">
           <v-col>
-          <Done
-            v-if="isDone"
-            :doneStatus="doneStatus"
-            :doneMessage="doneMessage"
-            :donePath="donePath"
-          />
-
-          <PromptInfo v-if="currentPrompt && !isDone" :currentPrompt="currentPrompt" />
-          <v-slide-x-transition>
-            <Form
-              ref="form"
-              :questions="currentPrompt ? currentPrompt.questions : []"
-              @answered="onAnswered"
+            <Done
+              v-if="isDone"
+              :doneStatus="doneStatus"
+              :doneMessage="doneMessage"
+              :donePath="donePath"
             />
-          </v-slide-x-transition>
+
+            <PromptInfo v-if="currentPrompt && !isDone" :currentPrompt="currentPrompt" />
+            <v-slide-x-transition>
+              <Form
+                ref="form"
+                :questions="currentPrompt ? currentPrompt.questions : []"
+                @answered="onAnswered"
+              />
+            </v-slide-x-transition>
+            <Info
+              v-if="isNoGenerators()"
+              :infoMessage="messages.select_generator_not_found"
+              :infoUrl="'https://wwww.sap.com'"
+            />
           </v-col>
         </v-row>
         <v-row
@@ -81,6 +86,7 @@ import Loading from "vue-loading-overlay";
 import Header from "./components/Header.vue";
 import Navigation from "./components/Navigation.vue";
 import Done from "./components/Done.vue";
+import Info from "./components/Info.vue";
 import PromptInfo from "./components/PromptInfo.vue";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
@@ -125,6 +131,7 @@ export default {
     Header,
     Navigation,
     Done,
+    Info,
     PromptInfo,
     Loading
   },
@@ -165,6 +172,12 @@ export default {
     }
   },
   methods: {
+    isNoGenerators() {
+      return (this.currentPrompt &&
+        this.currentPrompt.name === this.messages.select_generator_name &&
+        this.currentPrompt.questions && this.currentPrompt.questions[0] &&
+        _.isEmpty(this.currentPrompt.questions[0].choices) );
+    },
     setBusyIndicator() {
       this.showBusyIndicator =
         _.isEmpty(this.prompts) ||
