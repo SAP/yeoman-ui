@@ -56,6 +56,7 @@ export class YeomanUI {
     if (!this.rpc) {
       throw new Error("rpc must be set");
     }
+    
     this.generatorName = "";
     this.replayUtils = new ReplayUtils();
     this.youiEvents = youiEvents;
