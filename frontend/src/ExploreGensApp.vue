@@ -61,7 +61,7 @@
               <v-btn
                 class="explore-generators-loading"
                 :loading="isLoading(gen)"
-                color="primary"
+                color="gen.actionColor"
                 @click="onAction(gen)"
               >{{gen.action}}</v-btn>
             </v-card-actions>
@@ -116,6 +116,9 @@ export default {
     actionName(gen) {
       return gen.installed ? this.messages.uninstall : this.messages.install;
     },
+    actionColor(gen) {
+      return gen.installed ? "grey" : "primary";
+    },
     async onAction(gen) {
       if (!gen.disabledToHandle) {
         gen.disabledToHandle = true;
@@ -128,6 +131,7 @@ export default {
         if (currentGen) {
           currentGen.action = this.actionName(gen);
           currentGen.disabledToHandle = false;
+          currentGen.actionColor = this.actionColor(gen);
         }
       }
     },
@@ -145,6 +149,7 @@ export default {
       ]);
       this.gens = _.map(res[0], gen => {
         gen.action = this.actionName(gen);
+        gen.actionColor = this.actionColor(gen);
         return gen;
       });
       this.total = res[1];
