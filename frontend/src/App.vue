@@ -42,8 +42,8 @@
               />
             </v-slide-x-transition>
             <Info
-              v-if="isNoGenerators()"
-              :infoMessage="messages.select_generator_not_found"
+              v-if="isNoGenerators"
+              :infoMessage="messages ? messages.select_generator_not_found : ``"
               :infoUrl="'https://wwww.sap.com'"
             />
           </v-col>
@@ -152,6 +152,12 @@ export default {
     },
     currentPrompt() {
       return _.get(this.prompts, "[" + this.promptIndex + "]");
+    },
+    isNoGenerators() {
+      const promptName = _.get(this.currentPrompt, "name");
+      const message = _.get(this.messages, "select_generator_name", "");
+      const noChoices = _.isEmpty(_.get(this.currentPrompt, "questions[0].choices"));
+      return (promptName === message) && noChoices;
     }
   },
   watch: {
@@ -172,12 +178,6 @@ export default {
     }
   },
   methods: {
-    isNoGenerators() {
-      return (this.currentPrompt &&
-        this.currentPrompt.name === this.messages.select_generator_name &&
-        this.currentPrompt.questions && this.currentPrompt.questions[0] &&
-        _.isEmpty(this.currentPrompt.questions[0].choices) );
-    },
     setBusyIndicator() {
       this.showBusyIndicator =
         _.isEmpty(this.prompts) ||

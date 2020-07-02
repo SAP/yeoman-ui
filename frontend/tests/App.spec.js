@@ -37,8 +37,7 @@ describe('App.vue', () => {
       wrapper.vm.promptIndex = 0 
       wrapper.vm.prompts = [{name: "Select Generator", questions: [{choices: []}]}]
       wrapper.vm.$data.messages = {select_generator_name: "Select Generator"};
-      const isNoGenerators = wrapper.vm.isNoGenerators();
-      expect(isNoGenerators).toBeTruthy();
+      expect(wrapper.vm.isNoGenerators).toBeTruthy();
     })
 
     it('generators exist', () => {
@@ -46,8 +45,7 @@ describe('App.vue', () => {
       wrapper.vm.promptIndex = 0 
       wrapper.vm.prompts = [{name: "Select Generator", questions: [{choices: [{}]}]}]
       wrapper.vm.$data.messages = {select_generator_name: "Select Generator"};
-      const isNoGenerators = wrapper.vm.isNoGenerators();
-      expect(isNoGenerators).toBeFalsy();
+      expect(wrapper.vm.isNoGenerators).toBeFalsy();
     })
 
     it('prompt name != generators', () => {
@@ -55,8 +53,7 @@ describe('App.vue', () => {
       wrapper.vm.promptIndex = 0 
       wrapper.vm.prompts = [{name: "Prompt Name", questions: [{choices: [{}]}]}]
       wrapper.vm.$data.messages = {select_generator_name: "Select Generator"};
-      const isNoGenerators = wrapper.vm.isNoGenerators();
-      expect(isNoGenerators).toBeFalsy();
+      expect(wrapper.vm.isNoGenerators).toBeFalsy();
     })
   })
 
