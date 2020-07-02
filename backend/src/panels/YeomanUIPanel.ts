@@ -12,6 +12,7 @@ import { YouiEvents } from "../youi-events";
 import { VSCodeYouiEvents } from '../vscode-youi-events';
 import Environment = require('yeoman-environment');
 import { AbstractWebviewPanel } from './AbstractWebviewPanel';
+import { ExploreGens } from '../exploregens';
 
 
 export class YeomanUIPanel extends AbstractWebviewPanel {
@@ -73,10 +74,9 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 	}
 
 	private getDefaultPaths(): string[] {
-		const wsConfig = vscode.workspace.getConfiguration();
-		const generatorsLocation: string = _.trim(wsConfig.get("Yeoman UI.generatorsLocation"));
-		if (!_.isEmpty(generatorsLocation)) {
-			return _.concat(this.defaultNpmPaths, path.join(generatorsLocation, "node_modules"));
+		const customGensLocation: string = ExploreGens.getInstallationLocation(vscode.workspace.getConfiguration());
+		if (!_.isEmpty(customGensLocation)) {
+			return _.concat(this.defaultNpmPaths, path.join(customGensLocation, "node_modules"));
 		}
 
 		return this.defaultNpmPaths;

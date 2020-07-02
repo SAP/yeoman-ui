@@ -160,20 +160,6 @@ describe('exploregens unit test', () => {
     });
 
     describe("init", () => {
-        it("global installation location", () => {
-            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getFilteredGenerators"], thisArg: exploregens });
-            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["install"], thisArg: exploregens });
-            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["uninstall"], thisArg: exploregens });
-            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInstalled"], thisArg: exploregens });
-            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens });
-
-            const customLocation = path.join("home", "user", "projects");
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns(customLocation);
-            yoEnvMock.expects("createEnv").returns(testYoEnv);
-            testYoEnvMock.expects("lookup").withArgs({npmPaths: [path.join(customLocation, exploregens["NODE_MODULES"])]});
-            exploregens.init(rpc);
-        });
-
         it("custom installation location", () => {
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getFilteredGenerators"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["install"], thisArg: exploregens });
@@ -181,7 +167,21 @@ describe('exploregens unit test', () => {
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInstalled"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens });
 
-            workspaceConfigMock.expects("get").withExactArgs("Explore Generators.installationLocation").returns("");
+            const customLocation = path.join("home", "user", "projects");
+            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns(customLocation);
+            yoEnvMock.expects("createEnv").returns(testYoEnv);
+            testYoEnvMock.expects("lookup").withArgs({npmPaths: [path.join(customLocation, exploregens["NODE_MODULES"])]});
+            exploregens.init(rpc);
+        });
+
+        it("global installation location", () => {
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getFilteredGenerators"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["install"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["uninstall"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInstalled"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens });
+
+            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns("");
             yoEnvMock.expects("createEnv").returns(testYoEnv);
             testYoEnvMock.expects("lookup").withArgs({npmPaths: []});
             exploregens.init(rpc);
@@ -197,7 +197,7 @@ describe('exploregens unit test', () => {
         const genName = gen.package.name;
 
         it("update generator", async () => {
-            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
+            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns("");
             loggerMock.expects("debug").withExactArgs(messages.installing(genName));
             loggerMock.expects("debug").withExactArgs(messages.installed(genName));
             exploreGensMock.expects("exec").withExactArgs(exploregens["getNpmInstallCommand"]("-g", genName));
@@ -214,7 +214,7 @@ describe('exploregens unit test', () => {
         it("an error is thrown", async () => {
             const errorMessage = "npm install failed";
 
-            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
+            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns("");
             vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(messages.installing(genName)).returns(statusBarMessage);
             vscodeWindowMock.expects("showErrorMessage").withExactArgs(messages.failed_to_install(genName) + `: ${errorMessage}`).resolves();
             loggerMock.expects("debug").withExactArgs(messages.installing(genName));
@@ -281,25 +281,25 @@ describe('exploregens unit test', () => {
         const TESTVALUE = "test location"
 
         it("location empty", () => {
-            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
+            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns("");
             const res = exploregens["getGeneratorsLocationParams"]();
             expect(res).to.be.equal("-g");
         });
 
         it("location undefined", () => {
-            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns();
+            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns();
             const res = exploregens["getGeneratorsLocationParams"]();
             expect(res).to.be.equal("-g");
         });
 
         it("location is a valid string", () => {
-            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns(TESTVALUE);
+            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns(TESTVALUE);
             const res = exploregens["getGeneratorsLocationParams"]();
             expect(res).to.be.equal(`--prefix ${TESTVALUE}`);
         });
 
         it("location is a string with unnecessary spaces", () => {
-            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns(`   ${TESTVALUE}   `);
+            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns(`   ${TESTVALUE}   `);
             const res = exploregens["getGeneratorsLocationParams"]();
             expect(res).to.be.deep.equal(`--prefix ${TESTVALUE}`);
         });
@@ -358,7 +358,7 @@ describe('exploregens unit test', () => {
 
         it("generators auto update is true and downloadedGenerators returns a generators list", async () => {
             globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
-            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
+            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns("");
             workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(true);
             vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(messages.auto_update_started).returns(statusBarMessage);
             vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(messages.auto_update_finished, 10000);
@@ -435,7 +435,7 @@ describe('exploregens unit test', () => {
             const uninstallingMessage = messages.uninstalling(genName);
             const successMessage = messages.uninstalled(genName);
 
-            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
+            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns("");
             vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(uninstallingMessage).returns(statusBarMessage);
             vscodeWindowMock.expects("showInformationMessage").withExactArgs(successMessage);
             loggerMock.expects("debug").withExactArgs(uninstallingMessage);
@@ -453,7 +453,7 @@ describe('exploregens unit test', () => {
             const uninstallingMessage = messages.uninstalling(genName);
             const errorMessage = `uninstall failure.`;
 
-            workspaceConfigMock.expects("get").withExactArgs(exploregens["INSTALLATION_LOCATION"]).returns("");
+            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns("");
             vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(uninstallingMessage).returns(statusBarMessage);
             vscodeWindowMock.expects("showErrorMessage").withExactArgs(messages.failed_to_uninstall(genName) + `: ${errorMessage}`).resolves();
             loggerMock.expects("debug").withExactArgs(uninstallingMessage);

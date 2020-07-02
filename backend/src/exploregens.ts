@@ -11,13 +11,14 @@ import Environment = require("yeoman-environment");
 
 
 export class ExploreGens {
+    private static readonly INSTALLATION_LOCATION = "Explore Generators.installationLocation";
+
     private logger: IChildLogger;
     private rpc: IRpc;
     private gensBeingHandled: string[];
     private cachedInstalledGeneratorsPromise: Promise<string[]>;
 
     private readonly LAST_AUTO_UPDATE_DATE = "Explore Generators.lastAutoUpdateDate";
-    private readonly INSTALLATION_LOCATION = "Explore Generators.installationLocation";
     private readonly SEARCH_QUERY = "Explore Generators.searchQuery";
     private readonly AUTO_UPDATE = "Explore Generators.autoUpdate"
     private readonly NPM = (process.platform === "win32" ? "npm.cmd" : "npm");
@@ -36,6 +37,10 @@ export class ExploreGens {
     public init(rpc: IRpc) {
         this.initRpc(rpc);
         this.setInstalledGens();
+    }
+
+    public static getInstallationLocation(wsConfig: vscode.WorkspaceConfiguration) {
+        return _.trim(wsConfig.get(ExploreGens.INSTALLATION_LOCATION));
     }
 
     private async getInstalledGens() {
@@ -144,7 +149,7 @@ export class ExploreGens {
     }
 
     private getGeneratorsLocationParams() {
-        const location = _.trim(this.getWsConfig().get(this.INSTALLATION_LOCATION));
+        const location = ExploreGens.getInstallationLocation(this.getWsConfig());
         return _.isEmpty(location) ? "-g" : `--prefix ${location}`;
     }
 
@@ -229,13 +234,12 @@ export class ExploreGens {
     }
 
     private getNpmPaths(env: Environment.Options) {
-        const customLocation = _.trim(this.getWsConfig().get(this.INSTALLATION_LOCATION));
-        const defaultPaths: string[] = env.getNpmPaths();
-        if (!_.isEmpty(customLocation)) {
-            defaultPaths.push(path.join(customLocation, this.NODE_MODULES));
+        const customLocation = ExploreGens.getInstallationLocation(this.getWsConfig());
+        if (_.isEmpty(customLocation)) {
+            return env.getNpmPaths();
         }
         
-        return _.uniq(defaultPaths);
+        return [path.join(customLocation, this.NODE_MODULES)];
     }
 
     private async onEnvLookup(env: Environment.Options, resolve: any) {
