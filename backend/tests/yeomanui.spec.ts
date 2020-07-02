@@ -503,7 +503,7 @@ describe('yeomanui unit test', () => {
         const errorInfo: string = "Error Info";
         const res = yeomanUiInstance["getErrorInfo"](errorInfo);
         // tslint:disable-next-line: no-unused-expression
-        expect(res).to.be.equal(errorInfo);
+        expect(res.message).to.be.equal(errorInfo);
     });
 
     describe("answersUtils", () => {
@@ -650,7 +650,7 @@ describe('yeomanui unit test', () => {
         it("onGeneratorFailure", async () => {
             await yeomanUi["onGeneratorFailure"]("testGenName", "testError");
             // tslint:disable-next-line: no-unused-expression
-            expect(doGeneratorDoneSpy.calledWith(false, "testGenName generator failed.\ntestError")).to.be.true;
+            expect(doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed - testError"}`)).to.be.true;
         });
     });
 
