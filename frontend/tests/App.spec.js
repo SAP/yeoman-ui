@@ -31,6 +31,32 @@ describe('App.vue', () => {
     })
   })
 
+  describe('isNoGenerators - method', () => {
+    it('no generators', () => {
+      wrapper = initComponent(App, {}, true)
+      wrapper.vm.promptIndex = 0 
+      wrapper.vm.prompts = [{name: "Select Generator", questions: [{choices: []}]}]
+      wrapper.vm.$data.messages = {select_generator_name: "Select Generator"};
+      expect(wrapper.vm.isNoGenerators).toBeTruthy();
+    })
+
+    it('generators exist', () => {
+      wrapper = initComponent(App, {}, true)
+      wrapper.vm.promptIndex = 0 
+      wrapper.vm.prompts = [{name: "Select Generator", questions: [{choices: [{}]}]}]
+      wrapper.vm.$data.messages = {select_generator_name: "Select Generator"};
+      expect(wrapper.vm.isNoGenerators).toBeFalsy();
+    })
+
+    it('prompt name != generators', () => {
+      wrapper = initComponent(App, {}, true)
+      wrapper.vm.promptIndex = 0 
+      wrapper.vm.prompts = [{name: "Prompt Name", questions: [{choices: [{}]}]}]
+      wrapper.vm.$data.messages = {select_generator_name: "Select Generator"};
+      expect(wrapper.vm.isNoGenerators).toBeFalsy();
+    })
+  })
+
   describe('getVsCodeApi - method', () => {
     it('not in vscode', () => {
       wrapper = initComponent(App, {}, true)
