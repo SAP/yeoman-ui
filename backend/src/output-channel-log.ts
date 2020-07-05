@@ -1,5 +1,5 @@
 import { YouiLog } from "./youi-log";
-import { getOutputChannel } from "./extension";
+import { YeomanUIPanel } from "./panels/YeomanUIPanel";
 const stripAnsi = require("strip-ansi");
 
 export class OutputChannelLog implements YouiLog {
@@ -33,11 +33,11 @@ export class OutputChannelLog implements YouiLog {
         this.appendLine(value);
     }
     public showOutput():boolean {
-        getOutputChannel(this.channelName).show();
+        YeomanUIPanel.getOutputChannel(this.channelName).show();
         return true;
     }
 
     private appendLine(value: string) {
-        getOutputChannel(this.channelName).appendLine(stripAnsi(value));
+        YeomanUIPanel.getOutputChannel(this.channelName).appendLine(stripAnsi(value));
     }
 }

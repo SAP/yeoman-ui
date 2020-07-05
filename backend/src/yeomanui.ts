@@ -53,9 +53,6 @@ export class YeomanUI {
 
   constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
     this.rpc = rpc;
-    if (!this.rpc) {
-      throw new Error("rpc must be set");
-    }
     
     this.generatorName = "";
     this.replayUtils = new ReplayUtils();

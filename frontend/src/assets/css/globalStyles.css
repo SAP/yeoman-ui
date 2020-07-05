@@ -4,6 +4,7 @@ body {
   background-color: var(--vscode-editor-background, #1e1e1e);
   overflow: hidden !important;
 }
+#exploregens,
 #app {
   height: 100%;
   color: var(--vscode-foreground, #cccccc); 
@@ -49,6 +50,7 @@ p.question-label{
   margin-bottom: 0.25rem ;
 }
 
+.theme--light.v-input input, .theme--light.v-input textarea,
 div.v-input__slot .v-select__selection,
 .v-input div label.v-label{
   color: var(--vscode-input-foreground, #cccccc) !important;

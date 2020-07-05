@@ -6,6 +6,8 @@ module.exports = {
     "src/**/*.{js,vue}",
     "!**/node_modules/**",
     "!<rootDir>/src/main.js",
+    "!<rootDir>/src/exploreGensMain.js",
+    "!<rootDir>/src/ExploreGensApp.vue",
     "!<rootDir>/src/plugins/**"
   ],
   coverageReporters: [
@@ -37,9 +39,9 @@ module.exports = {
   coverageThreshold: {
     "global": {
       "branches": 93,
-      "functions": 100,
-      "lines": 96,
-      "statements": 96
+      "functions": 95,
+      "lines": 95,
+      "statements": 95
     }
   }
 }

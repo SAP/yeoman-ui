@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as _ from 'lodash';
 import { YouiEvents } from "./youi-events";
-import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
+import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorFilter, GeneratorType } from './filter';
 
 export class VSCodeYouiEvents implements YouiEvents {
@@ -9,7 +9,7 @@ export class VSCodeYouiEvents implements YouiEvents {
     private genFilter: GeneratorFilter;
     private resolveFunc: any;
 
-    constructor(rpc : RpcCommon, webviewPanel: vscode.WebviewPanel, genFilter: GeneratorFilter) {
+    constructor(rpc : IRpc, webviewPanel: vscode.WebviewPanel, genFilter: GeneratorFilter) {
         this.webviewPanel = webviewPanel;   
         this.genFilter = genFilter;    
     }

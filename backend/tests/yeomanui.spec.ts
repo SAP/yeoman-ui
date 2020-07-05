@@ -133,16 +133,6 @@ describe('yeomanui unit test', () => {
         youiEventsMock.verify();
     });
 
-    it("constructor", () => {
-        try {
-            // tslint:disable-next-line: no-unused-expression
-            new YeomanUI(undefined, undefined, undefined, undefined, undefined);
-            fail("contructor should throw an exception");
-        } catch (error) {
-            expect(error.message).to.be.equal("rpc must be set");
-        }
-    });
-
     describe("receiveIsWebviewReady", () => {
         it("flow is successfull", async () => {
             rpcMock.expects("invoke").withArgs("showPrompt").resolves({generator: "testGenerator"});

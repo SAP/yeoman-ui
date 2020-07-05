@@ -415,31 +415,20 @@ export default {
     toggleConsole() {
       this.showConsole = !this.showConsole;
     },
+    registerPlugin(plugin) {
+      const options = {};
+      Vue.use(plugin, options);
+      if (options.plugin) {
+        const registerPluginFunc = _.get(this.$refs, "form.registerPlugin");
+        registerPluginFunc(options.plugin);
+      }
+    },
     init() {
       // register custom inquirer-gui plugins
-      let options = {};
-      Vue.use(FileBrowserPlugin, options);
-      if (options.plugin) {
-        this.$refs.form.registerPlugin(options.plugin);
-      }
-
-      options = {};
-      Vue.use(FolderBrowserPlugin, options);
-      if (options.plugin) {
-        this.$refs.form.registerPlugin(options.plugin);
-      }
-
-      options = {};
-      Vue.use(LoginPlugin, options);
-      if (options.plugin) {
-        this.$refs.form.registerPlugin(options.plugin);
-      }
-
-      options = {};
-      Vue.use(TilesPlugin, options);
-      if (options.plugin) {
-        this.$refs.form.registerPlugin(options.plugin);
-      }
+      this.registerPlugin(FileBrowserPlugin);
+      this.registerPlugin(FolderBrowserPlugin);
+      this.registerPlugin(LoginPlugin);
+      this.registerPlugin(TilesPlugin);
 
       this.isInVsCode()
         ? (this.consoleClass = "consoleClassHidden")

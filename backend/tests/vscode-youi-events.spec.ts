@@ -35,7 +35,8 @@ describe('vscode-youi-events unit test', () => {
     });
 
     beforeEach(() => {
-        events = new VSCodeYouiEvents(undefined, undefined, GeneratorFilter.create());
+        const webViewPanel: any = {dispose: () => true};
+        events = new VSCodeYouiEvents(undefined, webViewPanel, GeneratorFilter.create());
         windowMock = sandbox.mock(vscode.window);
         commandsMock = sandbox.mock(vscode.commands);
         workspaceMock = sandbox.mock(vscode.workspace);
@@ -49,7 +50,7 @@ describe('vscode-youi-events unit test', () => {
         workspaceMock.verify();
     });
 
-    it("install", () => {
+    it("doGeneratorInstall", () => {
         const showInstallMessageSpy = sandbox.spy(events,"showInstallMessage");
         _.set(vscode, "window.withProgress", () => {return Promise.resolve("");});
         events.doGeneratorInstall();
