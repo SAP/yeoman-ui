@@ -103,7 +103,7 @@ describe('exploregens unit test', () => {
     }
     const rpc = new TestRpc();
     const childLogger = { debug: () => true, error: () => true, fatal: () => true, warn: () => true, info: () => true, trace: () => true, getChildLogger: () => { return {} as IChildLogger; } };
-    const exploregens = new ExploreGens(rpc, childLogger as IChildLogger);
+    const exploregens = new ExploreGens(rpc, childLogger as IChildLogger, testVscode.context, testVscode);
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -146,14 +146,14 @@ describe('exploregens unit test', () => {
     describe("NPM", () => {
         it("win32 platform", () => {
             const stub = sinon.stub(process, 'platform').value("win32");
-            const exploregens1 = new ExploreGens(null, null);
+            const exploregens1 = new ExploreGens(rpc, null, testVscode.context, testVscode);
             expect(exploregens1["NPM"]).to.be.equal("npm.cmd");
             stub.restore();
         });
 
         it("linux platfrom", () => {
             const stub = sinon.stub(process, 'platform').value("linux");
-            const exploregens2 = new ExploreGens(null, null);
+            const exploregens2 = new ExploreGens(rpc, null, testVscode.context, testVscode);
             expect(exploregens2["NPM"]).to.be.equal("npm");
             stub.restore();
         });
@@ -171,7 +171,7 @@ describe('exploregens unit test', () => {
             workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns(customLocation);
             yoEnvMock.expects("createEnv").returns(testYoEnv);
             testYoEnvMock.expects("lookup").withArgs({npmPaths: [path.join(customLocation, exploregens["NODE_MODULES"])]});
-            //exploregens.init(rpc);
+            exploregens["init"](rpc);
         });
 
         it("global installation location", () => {
@@ -184,7 +184,7 @@ describe('exploregens unit test', () => {
             workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns("");
             yoEnvMock.expects("createEnv").returns(testYoEnv);
             testYoEnvMock.expects("lookup").withArgs({npmPaths: []});
-            //exploregens.init(rpc);
+            exploregens["init"](rpc);
         });
     });
 

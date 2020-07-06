@@ -27,7 +27,31 @@ class ExploreGensWebSocketServer {
       this.rpc = new RpcExtensionWebSockets(ws);
       //TODO: Use RPC to send it to the browser log (as a collapsed pannel in Vue)
       const childLogger = {debug: () => {}, error: () => {}, fatal: () => {}, warn: () => {}, info: () => {}, trace: () => {}, getChildLogger: () => {return {} as IChildLogger;}};
-      this.exploreGens = new ExploreGens(this.rpc, childLogger as IChildLogger);
+      const context = {
+        globalState: {
+          get: () => true,
+          update: () => true
+        }
+      };
+      const vscode = {
+        window: {
+          showErrorMessage: () => true,
+          showInformationMessage: () => true,
+          setStatusBarMessage: () => {
+            return {
+              dispose: () => true
+            }
+          }
+        },
+        workspace: {
+          getConfiguration: () => {
+            return {
+              get: () => true
+            }
+          }
+        }
+      };
+      this.exploreGens = new ExploreGens(this.rpc, childLogger as IChildLogger, context, vscode);
     });
   }
 }
