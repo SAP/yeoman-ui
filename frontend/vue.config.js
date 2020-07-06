@@ -1,14 +1,13 @@
 const _ = require("lodash");
 const path = require("path");
 
-
-const pPath = _.get(process, "argv[3]") ? path.join(".", "exploregens") : path.join(".");
-// eslint-disable-next-line no-console
-console.error("HELLO - " + pPath);
+const argv3 = _.get(process, "argv[3]");
+const publicPath = argv3 ? path.join(".", "exploregens") : path.join(".");
+const filename = argv3 ? "index.html" : path.join("exploregens", "index.html")
 
 module.exports = {
   runtimeCompiler: true,
-  publicPath: pPath,
+  publicPath,
   transpileDependencies: ["vuetify"],
   productionSourceMap: false,
   configureWebpack: {
@@ -32,7 +31,7 @@ module.exports = {
       // the source template
       template: path.join("public", "exploregens", "index.html"),
       // output as dist/exploregens/index.html
-      filename: "index.html", // filename: path.join("exploregens", "index.html"),
+      filename,
       // chunks to include on this page, by default includes
       // extracted common chunks and vendor chunks.
       chunks: ['chunk-vendors', 'chunk-common', 'exploreGensIndex']
