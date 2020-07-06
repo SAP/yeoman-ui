@@ -6,11 +6,12 @@ import { ExploreGens } from '../exploregens';
 class ExploreGensWebSocketServer {
   private rpc: RpcExtensionWebSockets;
   private exploreGens: ExploreGens;
-
+ 
   init() {
     // web socket server
     const port = (process.env.PORT ? Number.parseInt(process.env.PORT) : 8082);
-    const wss = new WebSocket.Server({ port: port }, () => {
+    
+    const wss = new WebSocket.Server({ port: port}, () => {
       console.log('started websocket server');
     });
     wss.on('listening', () => {
@@ -26,7 +27,7 @@ class ExploreGensWebSocketServer {
 
       this.rpc = new RpcExtensionWebSockets(ws);
       //TODO: Use RPC to send it to the browser log (as a collapsed pannel in Vue)
-      const childLogger = {debug: () => {}, error: () => {}, fatal: () => {}, warn: () => {}, info: () => {}, trace: () => {}, getChildLogger: () => {return {} as IChildLogger;}};
+      const childLogger = { debug: () => { }, error: () => { }, fatal: () => { }, warn: () => { }, info: () => { }, trace: () => { }, getChildLogger: () => { return {} as IChildLogger; } };
       const context = {
         globalState: {
           get: () => true,
@@ -47,7 +48,7 @@ class ExploreGensWebSocketServer {
           getConfiguration: () => {
             return {
               get: () => true
-            }
+            };
           }
         }
       };

@@ -132,8 +132,8 @@
 		"watch": "tsc -watch -p ./",
 		"package": "vsce package .",
 		"test": "nyc mocha -p tsconfig.json --opts ./mocha.opts",
-		"ws:_run": "node ./out/src/webSocketServer/index.js",
-		"ws:run": "node ./out/src/webSocketServer/exploreGensIndex.js",
+		"ws:run": "node ./out/src/webSocketServer/index.js",
+		"ws:egRun": "node ./out/src/webSocketServer/exploreGensIndex.js",
 		"lint": "tslint '*/*.{ts,tsx}' -c ./tslint.yml"
 	},
 	"dependencies": {
