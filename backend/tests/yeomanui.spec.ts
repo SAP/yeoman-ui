@@ -100,12 +100,15 @@ describe('yeomanui unit test', () => {
         }  
     }
 
-    const testLogger = {debug: () => {}, error: () => {}, fatal: () => {}, warn: () => {}, info: () => {}, trace: () => {}, getChildLogger: () => ({} as IChildLogger)};
+    const testLogger = {debug: () => true, error: () => true, 
+        fatal: () => true, warn: () => true, info: () => true, trace: () => true, getChildLogger: () => (null as IChildLogger)};
 
     const rpc = new TestRpc();
     const outputChannel = new TestOutputChannel();
     const youiEvents = new TestEvents();
-    const yeomanUi: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {genFilter: GeneratorFilter.create(), messages: {select_generator_question_message: "test_question_message", select_generator_question_hint: "test_question_hint"}});
+    const yeomanUi: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, 
+        {genFilter: GeneratorFilter.create(), messages: {select_generator_question_message: "test_question_message", 
+        select_generator_question_hint: "test_question_hint"}});
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -499,7 +502,7 @@ describe('yeomanui unit test', () => {
     });
 
     it("getErrorInfo", () => {
-        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {});
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, null);
         const errorInfo: string = "Error Info";
         const res = yeomanUiInstance["getErrorInfo"](errorInfo);
         // tslint:disable-next-line: no-unused-expression

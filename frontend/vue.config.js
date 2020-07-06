@@ -22,9 +22,9 @@ module.exports = {
       // entry for the page
       entry: 'src/exploreGensMain.js',
       // the source template
-      template: 'public/exploreGensIndex.html',
-      // output as dist/index.html
-      filename: 'exploreGensIndex.html',
+      template: 'public/exploregens/index.html',
+      // output as dist/exploregens/index.html
+      filename: 'exploregens/index.html',
       // chunks to include on this page, by default includes
       // extracted common chunks and vendor chunks.
       chunks: ['chunk-vendors', 'chunk-common', 'exploreGensIndex']

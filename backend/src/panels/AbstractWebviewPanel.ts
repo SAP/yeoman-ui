@@ -15,6 +15,7 @@ export abstract class AbstractWebviewPanel {
 	protected focusedKey: string;
 	protected htmlFileName: string;
 	protected state: any;
+	protected context: vscode.ExtensionContext;
 
 	protected logger: IChildLogger;
 	protected disposables: vscode.Disposable[];
@@ -25,6 +26,7 @@ export abstract class AbstractWebviewPanel {
 		this.htmlFileName = "index.html"
 		this.logger = getLogger();
 		this.disposables = [];
+		this.context = context;
 	}
 
 	public setWebviewPanel(webviewPanel: vscode.WebviewPanel, state?: any) {
