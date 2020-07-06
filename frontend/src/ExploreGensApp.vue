@@ -29,6 +29,7 @@
           :label="messages.search"
           v-model="query"
           @input="onQueryChange"
+          border-radius="5px"
           background-color="var(--vscode-input-background, #3c3c3c)"
         />
       </v-col>
@@ -44,14 +45,14 @@
     </v-row>
     <v-row>
       <v-col :cols="3">
-        <v-text-label>{{searchResults}}</v-text-label>
+        <v-card-title>{{searchResults}}</v-card-title>
       </v-col>
       <v-row v-if="refineSearch">
         <v-col :cols="1">
           <v-icon color="blue">mdi-information-outline</v-icon>
         </v-col>
         <v-col :cols="11">
-          <v-text-label>{{messages.refine_search}}</v-text-label>
+          <v-card-title>{{messages.refine_search}}</v-card-title>
         </v-col>
       </v-row>
     </v-row>
@@ -85,6 +86,7 @@ const ALL_GENS = "-----";
 
 import * as _ from "lodash";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
+import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import messages from "./exploreGensMessages";
 
 export default {
@@ -92,7 +94,7 @@ export default {
   data() {
     return {
       items: [],
-      rpc: Object,
+      rpc: null,
       gens: [],
       total: 0,
       query: "",
@@ -184,20 +186,32 @@ export default {
         return window.vscode;
       }
     },
-    setupRpc() {
+    initRpc(rpc) {
+      this.rpc = rpc;
+      rpc.registerMethod({
+        func: this.updateBeingHandledGenerator,
+        thisArg: this,
+        name: this.updateBeingHandledGenerator.name
+      });
+    },
+    async setupRpc() {
       const vscodeApi = this.getVscodeApi();
       if (vscodeApi) {
-        this.rpc = new RpcBrowser(window, vscodeApi);
-        this.rpc.registerMethod({
-          func: this.updateBeingHandledGenerator,
-          thisArg: this,
-          name: this.updateBeingHandledGenerator.name
+        this.initRpc(new RpcBrowser(window, vscodeApi));
+      } else {
+        const ws = new WebSocket("ws://127.0.0.1:8082");
+        const that = this;
+        return new Promise(resolve => {
+          ws.onopen = () => {
+            that.initRpc(new RpcBrowserWebSockets(ws));
+            resolve();
+          };
         });
       }
     }
   },
   async created() {
-    this.setupRpc();
+    await this.setupRpc();
     await Promise.all([
       this.getRecommendedQuery(),
       this.getFilteredGenerators()

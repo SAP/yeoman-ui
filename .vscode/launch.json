@@ -8,6 +8,19 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Run ExploreGens websocket server",
+      "program": "${workspaceFolder}/backend/src/webSocketServer/exploreGensIndex.ts",
+      "outFiles": [
+        "${workspaceFolder}/backend/out/**/*.js"
+      ],
+      "env": {
+        "PORT": "8082"
+      },
+      "preLaunchTask": "watch backend (tsc)"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Run websocket server",
       "program": "${workspaceFolder}/backend/src/webSocketServer/index.ts",
       "outFiles": [
