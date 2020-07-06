@@ -56,13 +56,11 @@ export class ExploreGens {
     }
 
     private doGeneratorsUpdate() {
-        if (this.context) {
-            const lastUpdateDate = this.context.globalState.get(this.LAST_AUTO_UPDATE_DATE, 0);
-            const currentDate = Date.now();
-            if ((currentDate - lastUpdateDate) > this.ONE_DAY) {
-                this.context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
-                this.updateAllInstalledGenerators();
-            }
+        const lastUpdateDate = this.context.globalState.get(this.LAST_AUTO_UPDATE_DATE, 0);
+        const currentDate = Date.now();
+        if ((currentDate - lastUpdateDate) > this.ONE_DAY) {
+            this.context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
+            this.updateAllInstalledGenerators();
         }
     }
 
