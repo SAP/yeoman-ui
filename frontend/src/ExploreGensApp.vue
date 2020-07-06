@@ -29,6 +29,7 @@
           :label="messages.search"
           v-model="query"
           @input="onQueryChange"
+          border-radius="5px"
           background-color="var(--vscode-input-background, #3c3c3c)"
         />
       </v-col>
