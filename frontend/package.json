@@ -7,6 +7,7 @@
   "description": "Frontend for the yeoman UI framework",
   "private": true,
   "scripts": {
+    "serve-eg": "vue-cli-service serve --eg",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "build-dev": "vue-cli-service build --mode development",
