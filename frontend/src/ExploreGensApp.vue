@@ -1,5 +1,5 @@
 <template>
-  <v-app id="exploregens">
+  <v-app id="exploregens" class="exploregens-main">
     <div class="explore-generators">
       <v-card-title class="explore-generators-title">{{messages.title}}</v-card-title>
       <v-expansion-panels class="explore-generators-description" flat>
@@ -11,14 +11,15 @@
             </template>
           </v-expansion-panel-header>
           <v-expansion-panel-content>
-            <v-row>
-              <v-col :cols="1">
-                <v-icon color="blue">mdi-information-outline</v-icon>
-              </v-col>
-              <v-col :cols="11">
-                <v-text>{{messages.legal_note}}</v-text>
-              </v-col>
-            </v-row>
+            <v-container fluid>
+              <!-- <v-col :cols="1"> -->
+                <!-- <v-icon color="blue">mdi-information-outline</v-icon> -->
+              <!-- </v-col> -->
+              <!-- <v-col :cols="11"> -->
+                <v-text-field prepend-icon="mdi-information-outline">{{messages.legal_note}}</v-text-field>
+                <!-- <v-card-title >{{messages.legal_note}}</v-card-title> -->
+              <!-- </v-col> -->
+            </v-container>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
@@ -29,12 +30,15 @@
           :label="messages.search"
           v-model="query"
           @input="onQueryChange"
-          border-radius="5px"
+          rounded
+          clearable
+          @click:clear="onQueryChange"
           background-color="var(--vscode-input-background, #3c3c3c)"
         />
       </v-col>
       <v-col :cols="2">
         <v-select
+          rounded
           background-color="var(--vscode-input-background, #3c3c3c)"
           :items="items"
           v-model="recommended"
@@ -43,41 +47,37 @@
         />
       </v-col>
     </v-row>
+
     <v-row>
-      <v-col :cols="3">
-        <v-card-title>{{searchResults}}</v-card-title>
-      </v-col>
-      <v-row v-if="refineSearch">
-        <v-col :cols="1">
-          <v-icon color="blue">mdi-information-outline</v-icon>
-        </v-col>
-        <v-col :cols="11">
-          <v-card-title>{{messages.refine_search}}</v-card-title>
+      <v-card-title>{{searchResults}}</v-card-title>
+      <v-icon v-if="refineSearch" color="blue">mdi-information-outline</v-icon>
+      <v-card-title v-if="refineSearch">{{messages.refine_search}}</v-card-title>
+    </v-row>
+
+    <v-slide-x-transition>
+      <v-row class="explore-generators-cards">
+        <v-col md="4" class="pa-3 d-flex flex-column" v-for="(gen, i) in gens" :key="i">
+          <v-card width="430" class="d-flex flex-column mx-auto" height="280" tile elevation="2">
+            <v-card-title primary-title>
+              <h3 class="headline mb-0">{{ gen.package.name }}</h3>
+            </v-card-title>
+            <v-card-text style="overflow-y: auto; height:200px" v-text="gen.package.description" />
+            <v-card-subtitle v-text="gen.package.version" />
+            <v-card-text class="homepage">
+              <a :href="gen.package.links.npm">{{messages.more_info}}</a>
+            </v-card-text>
+            <v-card-actions>
+              <v-btn
+                class="explore-generators-loading"
+                :loading="isLoading(gen)"
+                :color="gen.actionColor"
+                @click="onAction(gen)"
+              >{{gen.action}}</v-btn>
+            </v-card-actions>
+          </v-card>
         </v-col>
       </v-row>
-    </v-row>
-    <v-row class="explore-generators-cards">
-      <v-col md="4" class="pa-3 d-flex flex-column" v-for="(gen, i) in gens" :key="i">
-        <v-card width="430" class="d-flex flex-column mx-auto" height="280" tile elevation="2">
-          <v-card-title primary-title>
-            <h3 class="headline mb-0">{{ gen.package.name }}</h3>
-          </v-card-title>
-          <v-card-text style="overflow-y: auto; height:200px" v-text="gen.package.description" />
-          <v-card-subtitle v-text="gen.package.version" />
-          <v-card-text class="homepage">
-            <a :href="gen.package.links.npm">{{messages.more_info}}</a>
-          </v-card-text>
-          <v-card-actions>
-            <v-btn
-              class="explore-generators-loading"
-              :loading="isLoading(gen)"
-              :color="gen.actionColor"
-              @click="onAction(gen)"
-            >{{gen.action}}</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
+    </v-slide-x-transition>
   </v-app>
 </template>
 
@@ -220,6 +220,9 @@ export default {
 };
 </script>
 <style scoped>
+.exploregens-main {
+  margin: 20px;
+}
 .explore-generators .theme--light.v-expansion-panels .v-expansion-panel,
 .explore-generators-cards .v-card {
   background-color: var(--vscode-editorWidget-background, #252526);

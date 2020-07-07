@@ -119,6 +119,7 @@ export class ExploreGens {
     }
 
     private async getFilteredGenerators(query = this.EMPTY, author = this.EMPTY) {
+        query = query || this.EMPTY;
         const gensQueryUrl = this.getGensQueryURL(query, author);
 
         try {
@@ -143,7 +144,7 @@ export class ExploreGens {
         this.vscode.window.showErrorMessage(`${messagePrefix}: ${errorMessage}`);
     }
 
-    private getGensQueryURL(query: string, recommended: string) {
+    private getGensQueryURL(query = this.EMPTY, recommended: string) {
         return encodeURI(`${this.SEARCH_QUERY_PREFIX} ${query} ${recommended} ${this.SEARCH_QUERY_SUFFIX}`);
     }
 
