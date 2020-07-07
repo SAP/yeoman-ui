@@ -14,9 +14,13 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
     }
 
     public exploreGenerators() {
-        this.disposeWebviewPanel();
-        const webViewPanel = this.createWebviewPanel();
-        this.setWebviewPanel(webViewPanel);
+        if (this.webViewPanel) {
+			this.webViewPanel.reveal();
+		} else {
+            this.disposeWebviewPanel();
+            const webViewPanel = this.createWebviewPanel();
+            this.setWebviewPanel(webViewPanel);
+        }
     }
 
     private exploreGens: ExploreGens;
