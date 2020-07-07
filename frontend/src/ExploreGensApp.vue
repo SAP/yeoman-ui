@@ -11,15 +11,14 @@
             </template>
           </v-expansion-panel-header>
           <v-expansion-panel-content>
-            <v-container fluid>
-              <!-- <v-col :cols="1"> -->
-                <!-- <v-icon color="blue">mdi-information-outline</v-icon> -->
-              <!-- </v-col> -->
-              <!-- <v-col :cols="11"> -->
-                <v-text-field prepend-icon="mdi-information-outline">{{messages.legal_note}}</v-text-field>
-                <!-- <v-card-title >{{messages.legal_note}}</v-card-title> -->
-              <!-- </v-col> -->
-            </v-container>
+            <v-row>
+              <v-col class="pa-0" :cols="1">
+                <v-icon color="blue">mdi-information-outline</v-icon>
+              </v-col>
+              <v-col class="pa-0" :cols="11">
+                <v-text>{{messages.legal_note}}</v-text>
+              </v-col>
+            </v-row>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
@@ -49,9 +48,13 @@
     </v-row>
 
     <v-row>
-      <v-card-title>{{searchResults}}</v-card-title>
+      <v-card-title style="font-size:14px">{{searchResults}}</v-card-title>
       <v-icon v-if="refineSearch" color="blue">mdi-information-outline</v-icon>
-      <v-card-title v-if="refineSearch">{{messages.refine_search}}</v-card-title>
+      <v-card-title
+        class="pa-0"
+        style="font-size:14px"
+        v-if="refineSearch"
+      >{{messages.refine_search}}</v-card-title>
     </v-row>
 
     <v-slide-x-transition>
@@ -67,12 +70,22 @@
               <a :href="gen.package.links.npm">{{messages.more_info}}</a>
             </v-card-text>
             <v-card-actions>
-              <v-btn
-                class="explore-generators-loading"
-                :loading="isLoading(gen)"
-                :color="gen.actionColor"
-                @click="onAction(gen)"
-              >{{gen.action}}</v-btn>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    rounded
+                    raised
+                    elevation="5"
+                    class="ma-2"
+                    :loading="isLoading(gen)"
+                    :color="gen.actionColor"
+                    @click="onAction(gen)"
+                    v-bind="attrs"
+                    v-on="on"
+                  >{{gen.action}}</v-btn>
+                </template>
+                <span>{{gen.tooltip}}</span>
+              </v-tooltip>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -120,6 +133,13 @@ export default {
     }
   },
   methods: {
+    tooltip(gen) {
+      if (gen.disabledToHandle) {
+        return gen.installed ? messages.uninstalling : messages.installing; 
+      }
+
+      return `${this.actionName(gen)} ${gen.package.name}`;
+    },
     isLoading(gen) {
       return gen.disabledToHandle;
     },
@@ -142,6 +162,7 @@ export default {
           currentGen.action = this.actionName(gen);
           currentGen.disabledToHandle = false;
           currentGen.actionColor = this.actionColor(gen);
+          currentGen.tooltip = this.tooltip(gen);
         }
       }
     },
@@ -160,6 +181,7 @@ export default {
       this.gens = _.map(res[0], gen => {
         gen.action = this.actionName(gen);
         gen.actionColor = this.actionColor(gen);
+        gen.tooltip = this.tooltip(gen);
         return gen;
       });
       this.total = res[1];
