@@ -150,7 +150,7 @@
 		"titleize": "^1.0.1",
 		"ws": "^7.2.5",
 		"yeoman-environment": "2.8.0",
-		"npm-registry-fetch": "8.1.0"
+		"npm-registry-fetch": "8.1.1"
 	},
 	"devDependencies": {
 		"@types/npm-registry-fetch": "8.0.0",
