@@ -118,7 +118,7 @@ export class ExploreGens {
         return !res;
     }
 
-    private async getFilteredGenerators(query: string, author: string) {
+    private async getFilteredGenerators(query?: string, author?: string) {
         query = query || this.EMPTY;
         author = author || this.EMPTY;
         const gensQueryUrl = this.getGensQueryURL(query, author);
