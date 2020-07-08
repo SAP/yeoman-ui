@@ -4,7 +4,6 @@
       <v-app-bar class="elevation-0">
         <v-toolbar-title>{{messages.title}}</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn text small color="primary" @click="openYeomanUi">Yeoman UI ...</v-btn>
       </v-app-bar>
       <v-expansion-panels class="explore-generators-description" flat>
         <v-expansion-panel>
@@ -140,9 +139,6 @@ export default {
     }
   },
   methods: {
-    openYeomanUi() {
-      this.rpc.invoke("loadYeomanUI", [{}]);
-    },
     tooltip(gen) {
       if (gen.disabledToHandle) {
         return gen.installed ? messages.uninstalling : messages.installing;
@@ -253,7 +249,7 @@ export default {
 </script>
 <style scoped>
 .exploregens-main {
-  margin: 20px;
+  margin: 0px 20px 20px;
 }
 .explore-generators .theme--light.v-expansion-panels .v-expansion-panel,
 .explore-generators-cards .v-card {

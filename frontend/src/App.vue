@@ -16,6 +16,7 @@
       :stepName="(promptIndex < prompts.length ? prompts[promptIndex].name : '')"
       :rpc="rpc"
       :isInVsCode="isInVsCode()"
+      :isGeneric="isGeneric"
       @parentShowConsole="toggleConsole"
     />
 
@@ -121,7 +122,8 @@ function initialState() {
     showBusyIndicator: false,
     promptsInfoToDisplay: [],
     isReplaying: false,
-    numOfSteps: 1
+    numOfSteps: 1,
+    isGeneric: false
   };
 }
 
@@ -403,6 +405,7 @@ export default {
     async setMessagesAndSaveState() {
       const uiOptions = await this.rpc.invoke("getState");
       this.messages = uiOptions.messages;
+      this.isGeneric = _.isEmpty(uiOptions.genFilter.types) && _.isEmpty(uiOptions.genFilter.categories);
       const vscodeApi = this.getVsCodeApi();
       if (vscodeApi) {
         vscodeApi.setState(uiOptions);
