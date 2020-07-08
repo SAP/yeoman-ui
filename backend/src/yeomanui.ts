@@ -64,6 +64,7 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.runGenerator, thisArg: this });
     this.rpc.registerMethod({ func: this.evaluateMethod, thisArg: this });
     this.rpc.registerMethod({ func: this.toggleOutput, thisArg: this });
+    this.rpc.registerMethod({ func: this.exploreGenerators, thisArg: this });
     this.rpc.registerMethod({ func: this.logError, thisArg: this });
     this.rpc.registerMethod({ func: this.back, thisArg: this });
     this.rpc.registerMethod({ func: this.setCwd, thisArg: this });
@@ -252,6 +253,13 @@ export class YeomanUI {
 
   private toggleOutput(): boolean {
     return this.outputChannel.showOutput();
+  }
+
+  private exploreGenerators() {
+    const vscodeInstance = this.getVscode();
+    if (vscodeInstance) {
+      return vscodeInstance.commands.executeCommand("exploreGenerators");
+    }
   }
 
   private setCwd(cwd: string) {
