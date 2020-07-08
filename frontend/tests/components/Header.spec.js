@@ -18,7 +18,7 @@ describe('Header.vue', () => {
 
     test('component props', () => {
         wrapper = initComponent(Header)
-        expect(_.keys(wrapper.props())).toHaveLength(4)
+        expect(_.keys(wrapper.props())).toHaveLength(5)
     })
 
     test('generator brand', () => {
