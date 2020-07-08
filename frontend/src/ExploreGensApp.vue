@@ -1,7 +1,11 @@
 <template>
   <v-app id="exploregens" class="exploregens-main">
     <div class="explore-generators">
-      <v-card-title class="explore-generators-title">{{messages.title}}</v-card-title>
+      <v-app-bar class="elevation-0">
+        <v-toolbar-title>{{messages.title}}</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn text small color="primary" @click="openYeomanUi">Yeoman UI ...</v-btn>
+      </v-app-bar>
       <v-expansion-panels class="explore-generators-description" flat>
         <v-expansion-panel>
           <v-expansion-panel-header disable-icon-rotate>
@@ -50,16 +54,19 @@
     <v-row class="explore-generators-search">
       <v-card-title>{{searchResults}}</v-card-title>
       <v-icon v-if="refineSearch" color="blue">mdi-information-outline</v-icon>
-      <v-card-title
-        class="pa-0"
-        v-if="refineSearch"
-      >{{messages.refine_search}}</v-card-title>
+      <v-card-title class="pa-0" v-if="refineSearch">{{messages.refine_search}}</v-card-title>
     </v-row>
 
     <v-slide-x-transition>
       <v-row class="explore-generators-cards">
-        
-        <v-col cols="12" md="4" sm="6" class="pa-3 d-flex flex-column" v-for="(gen, i) in gens" :key="i">
+        <v-col
+          cols="12"
+          md="4"
+          sm="6"
+          class="pa-3 d-flex flex-column"
+          v-for="(gen, i) in gens"
+          :key="i"
+        >
           <v-card width="430" class="d-flex flex-column mx-auto" height="280" tile elevation="2">
             <v-card-title primary-title>
               <h3 class="headline mb-0">{{ gen.package.name }}</h3>
@@ -133,6 +140,9 @@ export default {
     }
   },
   methods: {
+    openYeomanUi() {
+      this.rpc.invoke("loadYeomanUI", [{}]);
+    },
     tooltip(gen) {
       if (gen.disabledToHandle) {
         return gen.installed ? messages.uninstalling : messages.installing;
@@ -248,6 +258,16 @@ export default {
 .explore-generators .theme--light.v-expansion-panels .v-expansion-panel,
 .explore-generators-cards .v-card {
   background-color: var(--vscode-editorWidget-background, #252526);
+}
+.explore-generators .v-app-bar.v-toolbar,
+.explore-generators .v-app-bar.v-toolbar .v-btn {
+  background-color: var(--vscode-editor-background, #1e1e1e);
+  color: var(--vscode-foreground, #cccccc);
+}
+.explore-generators .v-app-bar.v-toolbar {
+  border-bottom: 1px solid var(--vscode-editorWidget-background, #252526);
+  box-shadow: none;
+  background-color: var(--vscode-editor-background, #1e1e1e) !important;
 }
 .explore-generators-cards .v-card:hover {
   background-color: var(--vscode-list-hoverBackground, #2a2d2e);

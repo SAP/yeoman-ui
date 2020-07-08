@@ -79,6 +79,7 @@ export class ExploreGens {
         this.rpc.registerMethod({ func: this.uninstall, thisArg: this });
         this.rpc.registerMethod({ func: this.isInstalled, thisArg: this });
         this.rpc.registerMethod({ func: this.getRecommendedQuery, thisArg: this });
+        this.rpc.registerMethod({ func: this.loadYeomanUI, thisArg: this });
     }
 
     private async updateAllInstalledGenerators() {
@@ -98,6 +99,10 @@ export class ExploreGens {
                 this.vscode.window.setStatusBarMessage(messages.auto_update_finished, 10000);
             }
         }
+    }
+
+    private loadYeomanUI() {
+      return this.vscode.commands.executeCommand("loadYeomanUI");
     }
 
     private getWsConfig() {
