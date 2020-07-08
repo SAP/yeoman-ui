@@ -20,9 +20,13 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 	private static channel: vscode.OutputChannel;
 
 	public loadYeomanUI(uiOptions?: any) {
-		this.disposeWebviewPanel();
-		const webViewPanel = this.createWebviewPanel();
-		this.setWebviewPanel(webViewPanel, uiOptions);
+		if (this.webViewPanel && _.isEmpty(uiOptions)) {
+			this.webViewPanel.reveal();
+		} else {
+			this.disposeWebviewPanel();
+			const webViewPanel = this.createWebviewPanel();
+			this.setWebviewPanel(webViewPanel, uiOptions);
+		}
 	}
 
 	public toggleOutput() {
