@@ -47,19 +47,19 @@
       </v-col>
     </v-row>
 
-    <v-row>
-      <v-card-title style="font-size:14px">{{searchResults}}</v-card-title>
+    <v-row class="explore-generators-search">
+      <v-card-title>{{searchResults}}</v-card-title>
       <v-icon v-if="refineSearch" color="blue">mdi-information-outline</v-icon>
       <v-card-title
         class="pa-0"
-        style="font-size:14px"
         v-if="refineSearch"
       >{{messages.refine_search}}</v-card-title>
     </v-row>
 
     <v-slide-x-transition>
       <v-row class="explore-generators-cards">
-        <v-col md="4" class="pa-3 d-flex flex-column" v-for="(gen, i) in gens" :key="i">
+        
+        <v-col cols="12" md="4" sm="6" class="pa-3 d-flex flex-column" v-for="(gen, i) in gens" :key="i">
           <v-card width="430" class="d-flex flex-column mx-auto" height="280" tile elevation="2">
             <v-card-title primary-title>
               <h3 class="headline mb-0">{{ gen.package.name }}</h3>
@@ -261,9 +261,6 @@ export default {
   .theme--light.v-card
   .v-card__subtitle.v-card__subtitle,
 .explore-generators-cards .v-icon.v-icon,
-.explore-generators-cards .v-card__title {
-  color: var(--vscode-foreground, #cccccc);
-}
 .explore-generators-cards .v-card > div.v-card__text {
   color: var(--vscode-editorCodeLens-foreground, #999999);
 }
@@ -271,5 +268,8 @@ export default {
   overflow-y: auto;
   margin: 0px;
   height: calc(100% - 4rem);
+}
+.explore-generators-search .v-card__title {
+  font-size: 14px;
 }
 </style>
