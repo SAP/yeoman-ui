@@ -45,11 +45,15 @@ const testVscode = {
     },
     context: {
         globalState
+    },
+    commands: {
+        executeCommand: () => true
     }
 };
 
 mockVscode(testVscode, "src/exploregens.ts");
 import { ExploreGens } from "../src/exploregens";
+import { fail } from "assert";
 
 describe('exploregens unit test', () => {
     let sandbox: any;
@@ -59,6 +63,7 @@ describe('exploregens unit test', () => {
     let loggerMock: any;
     let npmFetchMock: any;
     let vscodeWindowMock: any;
+    let vscodeCommandsMock: any;
     let vscodeWorkspaceMock: any;
     let statusBarMessageMock: any;
     let globalStateMock: any;
@@ -126,6 +131,7 @@ describe('exploregens unit test', () => {
         processMock = sandbox.mock(process);
         yoEnvMock = sandbox.mock(Environment);
         testYoEnvMock = sandbox.mock(testYoEnv);
+        vscodeCommandsMock = sandbox.mock(testVscode.commands);
     });
 
     afterEach(() => {
@@ -141,6 +147,7 @@ describe('exploregens unit test', () => {
         processMock.verify();
         yoEnvMock.verify();
         testYoEnvMock.verify();
+        vscodeCommandsMock.verify();
     });
 
     describe("NPM", () => {
@@ -180,7 +187,7 @@ describe('exploregens unit test', () => {
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["uninstall"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInstalled"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens });
-
+            
             workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns("");
             yoEnvMock.expects("createEnv").returns(testYoEnv);
             testYoEnvMock.expects("lookup").withArgs({npmPaths: []});
@@ -305,6 +312,15 @@ describe('exploregens unit test', () => {
         });
     });
 
+    it("exec", async () => {
+        try {
+            await exploregens["exec"]("test");
+            fail("exec test should fail");
+        } catch (error) {
+            expect(error).to.be.not.undefined;
+        }
+    });
+
     describe("getRecommendedQuery", () => {
         it("recommended array empty", () => {
             workspaceConfigMock.expects("get").withExactArgs(exploregens["SEARCH_QUERY"]).returns([]);
@@ -380,19 +396,29 @@ describe('exploregens unit test', () => {
     });
 
     describe("onEnvLookup", () => {
+        it("there are no installed generators", async () => {
+            testYoEnvMock.expects("getGeneratorsMeta").returns([]);
+            const res = await new Promise(resolve => {
+                exploregens["onEnvLookup"](testYoEnv, resolve);
+            });
+            expect(res).to.have.lengthOf(0);
+        });
 
-    //     it("input string is empty", () => {
-    //         expect(exploregens["getGenerators"]("")).to.be.deep.equal([]);
-    //     });
-
-    //     it("input string is valid string", () => {
-    //         expect(exploregens["getGenerators"]("+-- generator-aa@1.2.16 +-- generator-bb@0.0.1 -> C:\wing\yeoman-ui\generator-foodq +-- generator-cc@2.0.4 +-- @sap-test/generator-dd@4.2.4")).to.be.deep.equal(["generator-aa", "generator-bb", "generator-cc", "@sap-test/generator-dd"]);
-
-    //     });
-
-    //     it("input string is valid string but without generators", () => {
-    //         expect(exploregens["getGenerators"]("hfksajhsfiweurfjh")).to.be.deep.equal([]);
-    //     });
+        it("there are installed generators", async () => {
+            testYoEnvMock.expects("getGeneratorsMeta").returns([{
+                packagePath: path.join("path1", "node_modules", "generator-aa")
+            }, {
+                packagePath: path.join("path2", "node_modules", "generator-bb")
+            }, {
+                packagePath: path.join("path3", "node_modules", "generator-aa")
+            }]);
+            const res = await new Promise(resolve => {
+                exploregens["onEnvLookup"](testYoEnv, resolve);
+            });
+            expect(res).to.have.lengthOf(2);
+            expect(res).includes("generator-bb");
+            expect(res).includes("generator-aa");
+        });
     });
 
     describe("updateBeingHandledGenerator", () => {

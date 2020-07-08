@@ -119,6 +119,7 @@ export class ExploreGens {
     }
 
     private async getFilteredGenerators(query = this.EMPTY, author = this.EMPTY) {
+        query = query || this.EMPTY;
         const gensQueryUrl = this.getGensQueryURL(query, author);
 
         try {
@@ -246,7 +247,7 @@ export class ExploreGens {
         return [path.join(customLocation, this.NODE_MODULES)];
     }
 
-    private async onEnvLookup(env: Environment.Options, resolve: any) {
+    private onEnvLookup(env: Environment.Options, resolve: any) {
         const gensMeta: string[] = env.getGeneratorsMeta();
         const gensFullNames = _.map(gensMeta, (genMeta: any) => {
             const packagePath = genMeta.packagePath;
