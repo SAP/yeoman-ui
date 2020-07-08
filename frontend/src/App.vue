@@ -405,7 +405,8 @@ export default {
     async setMessagesAndSaveState() {
       const uiOptions = await this.rpc.invoke("getState");
       this.messages = uiOptions.messages;
-      this.isGeneric = _.isEmpty(uiOptions.genFilter.types) && _.isEmpty(uiOptions.genFilter.categories);
+      const genFilter = uiOptions.genFilter;
+      this.isGeneric = _.isEmpty(_.get(genFilter, "types")) && _.isEmpty(_.get(genFilter, "categories"));
       const vscodeApi = this.getVsCodeApi();
       if (vscodeApi) {
         vscodeApi.setState(uiOptions);
