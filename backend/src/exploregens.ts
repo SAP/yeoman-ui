@@ -149,7 +149,7 @@ export class ExploreGens {
         this.vscode.window.showErrorMessage(`${messagePrefix}: ${errorMessage}`);
     }
 
-    private getGensQueryURL(query = this.EMPTY, recommended: string) {
+    private getGensQueryURL(query: string, recommended: string) {
         return encodeURI(`${this.SEARCH_QUERY_PREFIX} ${query} ${recommended} ${this.SEARCH_QUERY_SUFFIX}`);
     }
 
@@ -252,7 +252,7 @@ export class ExploreGens {
         return [path.join(customLocation, this.NODE_MODULES)];
     }
 
-    private async onEnvLookup(env: Environment.Options, resolve: any) {
+    private onEnvLookup(env: Environment.Options, resolve: any) {
         const gensMeta: string[] = env.getGeneratorsMeta();
         const gensFullNames = _.map(gensMeta, (genMeta: any) => {
             const packagePath = genMeta.packagePath;
