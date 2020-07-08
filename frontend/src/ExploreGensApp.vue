@@ -65,7 +65,7 @@
               <h3 class="headline mb-0">{{ gen.package.name }}</h3>
             </v-card-title>
             <v-card-text style="overflow-y: auto; height:200px" v-text="gen.package.description" />
-            <v-card-subtitle v-text="gen.package.version" />
+            <v-card-text v-text="gen.package.version" />
             <v-card-text class="homepage">
               <a :href="gen.package.links.npm">{{messages.more_info}}</a>
             </v-card-text>
@@ -135,7 +135,7 @@ export default {
   methods: {
     tooltip(gen) {
       if (gen.disabledToHandle) {
-        return gen.installed ? messages.uninstalling : messages.installing; 
+        return gen.installed ? messages.uninstalling : messages.installing;
       }
 
       return `${this.actionName(gen)} ${gen.package.name}`;
