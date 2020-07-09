@@ -20,13 +20,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// YeomanUIPanel
 	yeomanUIPanel = new YeomanUIPanel(extContext);
-	registerAndSubscribeCommand("loadYeomanUI", yeomanUIPanel.loadYeomanUI.bind(yeomanUIPanel));
+	registerAndSubscribeCommand("loadYeomanUI", yeomanUIPanel.loadWebviewPanel.bind(yeomanUIPanel));
 	registerAndSubscribeCommand("yeomanUI.toggleOutput", yeomanUIPanel.toggleOutput.bind(yeomanUIPanel));
 	registerWebviewPanelSerializer(yeomanUIPanel);
 
 	// ExploreGensPanel
 	exploreGensPanel = new ExploreGensPanel(extContext);
-	registerAndSubscribeCommand("exploreGenerators", exploreGensPanel.exploreGenerators.bind(exploreGensPanel));
+	registerAndSubscribeCommand("exploreGenerators", exploreGensPanel.loadWebviewPanel.bind(exploreGensPanel));
 	registerWebviewPanelSerializer(exploreGensPanel);
 }
 

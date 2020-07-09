@@ -10,7 +10,6 @@ import backendMessages from "../messages";
 import { OutputChannelLog } from '../output-channel-log';
 import { YouiEvents } from "../youi-events";
 import { VSCodeYouiEvents } from '../vscode-youi-events';
-import Environment = require('yeoman-environment');
 import { AbstractWebviewPanel } from './AbstractWebviewPanel';
 import { ExploreGens } from '../exploregens';
 
@@ -18,16 +17,6 @@ import { ExploreGens } from '../exploregens';
 export class YeomanUIPanel extends AbstractWebviewPanel {
 	public static YEOMAN_UI = "Yeoman UI";
 	private static channel: vscode.OutputChannel;
-
-	public loadYeomanUI(uiOptions?: any) {
-		if (this.webViewPanel && _.isEmpty(uiOptions)) {
-			this.webViewPanel.reveal();
-		} else {
-			this.disposeWebviewPanel();
-			const webViewPanel = this.createWebviewPanel();
-			this.setWebviewPanel(webViewPanel, uiOptions);
-		}
-	}
 
 	public toggleOutput() {
 		this.outputChannel.showOutput();
@@ -66,9 +55,6 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 	private genFilter: any;
 	private messages: any;
 	private outputChannel: YouiLog;
-	// improves first time performance
-	// TODO: replace or remove this API it is very slow, takes more than 2 seconds 
-	private readonly defaultNpmPaths: string[] = Environment.createEnv().getNpmPaths();
 
 	public constructor(context: vscode.ExtensionContext) {
 		super(context);

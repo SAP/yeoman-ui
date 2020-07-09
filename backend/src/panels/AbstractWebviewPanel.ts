@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import * as fsextra from 'fs-extra';
 import { IChildLogger } from '@vscode-logging/logger';
 import { getLogger } from '../logger/logger-wrapper';
+import Environment = require('yeoman-environment');
 
 
 export abstract class AbstractWebviewPanel {
@@ -19,6 +20,19 @@ export abstract class AbstractWebviewPanel {
 
 	protected logger: IChildLogger;
 	protected disposables: vscode.Disposable[];
+
+	// improves first time performance 
+	protected readonly defaultNpmPaths: string[] = Environment.createEnv().getNpmPaths();
+
+	public loadWebviewPanel(uiOptions?: any) {
+		if (this.webViewPanel && _.isEmpty(uiOptions)) {
+			this.webViewPanel.reveal();
+		} else {
+			this.disposeWebviewPanel();
+			const webViewPanel = this.createWebviewPanel();
+			this.setWebviewPanel(webViewPanel, uiOptions);
+		}
+	}
 
 	protected constructor(context: vscode.ExtensionContext) {
 		this.extensionPath = context.extensionPath;

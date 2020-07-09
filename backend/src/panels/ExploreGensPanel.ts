@@ -13,16 +13,6 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
         this.initWebviewPanel();
     }
 
-    public exploreGenerators() {
-        if (this.webViewPanel) {
-            this.webViewPanel.reveal();
-        } else {
-            this.disposeWebviewPanel();
-            const webViewPanel = this.createWebviewPanel();
-            this.setWebviewPanel(webViewPanel);
-        }
-    }
-
     private exploreGens: ExploreGens;
     public constructor(context: vscode.ExtensionContext) {
         super(context);
@@ -31,4 +21,9 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
         this.focusedKey = "exploreGens.Focused";
         this.htmlFileName = path.join("exploregens", "index.html");
     }
+
+    public disposeWebviewPanel() {
+		super.disposeWebviewPanel();
+		this.exploreGens = null;
+	}
 }

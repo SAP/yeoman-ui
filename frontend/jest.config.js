@@ -40,8 +40,8 @@ module.exports = {
     "global": {
       "branches": 93,
       "functions": 94,
-      "lines": 94,
-      "statements": 94
+      "lines": 95,
+      "statements": 95
     }
   }
 }
