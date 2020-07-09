@@ -151,7 +151,6 @@ export default {
       const action = gen.installed ? "uninstall" : "install";
       gen.installed = await this.rpc.invoke(action, [gen]);
 
-      
       const currentGen = _.find(this.gens, currentGen => {
         return gen.package.name === currentGen.package.name;
       });
