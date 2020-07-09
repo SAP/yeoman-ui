@@ -167,6 +167,7 @@ form.inquirer-gui .v-card.selected {
   border: 1px solid var(--vscode-button-background, #0e639c);
   background-color: var(--vscode-list-hoverBackground,#2a2d2e) ;
 }
+.explore-generators-cards .v-card__title,
 form.inquirer-gui .v-card__title {
   color: var(--vscode-foreground, #cccccc);
 }

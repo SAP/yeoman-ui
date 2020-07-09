@@ -1,7 +1,10 @@
 <template>
-  <v-app id="exploregens">
+  <v-app id="exploregens" class="exploregens-main">
     <div class="explore-generators">
-      <v-card-title class="explore-generators-title">{{messages.title}}</v-card-title>
+      <v-app-bar class="elevation-0">
+        <v-toolbar-title>{{messages.title}}</v-toolbar-title>
+        <v-spacer></v-spacer>
+      </v-app-bar>
       <v-expansion-panels class="explore-generators-description" flat>
         <v-expansion-panel>
           <v-expansion-panel-header disable-icon-rotate>
@@ -12,10 +15,10 @@
           </v-expansion-panel-header>
           <v-expansion-panel-content>
             <v-row>
-              <v-col :cols="1">
+              <v-col class="pa-0" :cols="1">
                 <v-icon color="blue">mdi-information-outline</v-icon>
               </v-col>
-              <v-col :cols="11">
+              <v-col class="pa-0" :cols="11">
                 <v-text>{{messages.legal_note}}</v-text>
               </v-col>
             </v-row>
@@ -29,12 +32,15 @@
           :label="messages.search"
           v-model="query"
           @input="onQueryChange"
-          border-radius="5px"
+          rounded
+          clearable
+          @click:clear="onQueryChange"
           background-color="var(--vscode-input-background, #3c3c3c)"
         />
       </v-col>
       <v-col :cols="2">
         <v-select
+          rounded
           background-color="var(--vscode-input-background, #3c3c3c)"
           :items="items"
           v-model="recommended"
@@ -43,41 +49,54 @@
         />
       </v-col>
     </v-row>
-    <v-row>
-      <v-col :cols="3">
-        <v-card-title>{{searchResults}}</v-card-title>
-      </v-col>
-      <v-row v-if="refineSearch">
-        <v-col :cols="1">
-          <v-icon color="blue">mdi-information-outline</v-icon>
-        </v-col>
-        <v-col :cols="11">
-          <v-card-title>{{messages.refine_search}}</v-card-title>
+
+    <v-row class="explore-generators-search">
+      <v-card-title>{{searchResults}}</v-card-title>
+      <v-icon v-if="refineSearch" color="blue">mdi-information-outline</v-icon>
+      <v-card-title class="pa-0" v-if="refineSearch">{{messages.refine_search}}</v-card-title>
+    </v-row>
+
+    <v-slide-x-transition>
+      <v-row class="explore-generators-cards">
+        <v-col
+          cols="12"
+          md="4"
+          sm="6"
+          class="pa-3 d-flex flex-column"
+          v-for="(gen, i) in gens"
+          :key="i"
+        >
+          <v-card width="430" class="d-flex flex-column mx-auto" height="280" tile elevation="2">
+            <v-card-title primary-title>
+              <h3 class="headline mb-0">{{ gen.package.name }}</h3>
+            </v-card-title>
+            <v-card-text style="overflow-y: auto; height:200px" v-text="gen.package.description" />
+            <v-card-text v-text="gen.package.version" />
+            <v-card-text class="homepage">
+              <a :href="gen.package.links.npm">{{messages.more_info}}</a>
+            </v-card-text>
+            <v-card-actions>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    rounded
+                    raised
+                    elevation="5"
+                    class="ma-2"
+                    :loading="isLoading(gen)"
+                    :color="gen.actionColor"
+                    @click="onAction(gen)"
+                    v-bind="attrs"
+                    v-on="on"
+                  >{{gen.action}}</v-btn>
+                </template>
+                <span>{{gen.tooltip}}</span>
+              </v-tooltip>
+            </v-card-actions>
+          </v-card>
         </v-col>
       </v-row>
-    </v-row>
-    <v-row class="explore-generators-cards">
-      <v-col md="4" class="pa-3 d-flex flex-column" v-for="(gen, i) in gens" :key="i">
-        <v-card width="430" class="d-flex flex-column mx-auto" height="280" tile elevation="2">
-          <v-card-title primary-title>
-            <h3 class="headline mb-0">{{ gen.package.name }}</h3>
-          </v-card-title>
-          <v-card-text style="overflow-y: auto; height:200px" v-text="gen.package.description" />
-          <v-card-subtitle v-text="gen.package.version" />
-          <v-card-text class="homepage">
-            <a :href="gen.package.links.npm">{{messages.more_info}}</a>
-          </v-card-text>
-          <v-card-actions>
-            <v-btn
-              class="explore-generators-loading"
-              :loading="isLoading(gen)"
-              :color="gen.actionColor"
-              @click="onAction(gen)"
-            >{{gen.action}}</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
+    </v-slide-x-transition>
   </v-app>
 </template>
 
@@ -120,6 +139,13 @@ export default {
     }
   },
   methods: {
+    tooltip(gen) {
+      if (gen.disabledToHandle) {
+        return gen.installed ? messages.uninstalling : messages.installing;
+      }
+
+      return `${this.actionName(gen)} ${gen.package.name}`;
+    },
     isLoading(gen) {
       return gen.disabledToHandle;
     },
@@ -142,6 +168,7 @@ export default {
           currentGen.action = this.actionName(gen);
           currentGen.disabledToHandle = false;
           currentGen.actionColor = this.actionColor(gen);
+          currentGen.tooltip = this.tooltip(gen);
         }
       }
     },
@@ -160,6 +187,7 @@ export default {
       this.gens = _.map(res[0], gen => {
         gen.action = this.actionName(gen);
         gen.actionColor = this.actionColor(gen);
+        gen.tooltip = this.tooltip(gen);
         return gen;
       });
       this.total = res[1];
@@ -220,9 +248,22 @@ export default {
 };
 </script>
 <style scoped>
+.exploregens-main {
+  margin: 0px 20px 20px;
+}
 .explore-generators .theme--light.v-expansion-panels .v-expansion-panel,
 .explore-generators-cards .v-card {
   background-color: var(--vscode-editorWidget-background, #252526);
+}
+.explore-generators .v-app-bar.v-toolbar,
+.explore-generators .v-app-bar.v-toolbar .v-btn {
+  background-color: var(--vscode-editor-background, #1e1e1e);
+  color: var(--vscode-foreground, #cccccc);
+}
+.explore-generators .v-app-bar.v-toolbar {
+  border-bottom: 1px solid var(--vscode-editorWidget-background, #252526);
+  box-shadow: none;
+  background-color: var(--vscode-editor-background, #1e1e1e) !important;
 }
 .explore-generators-cards .v-card:hover {
   background-color: var(--vscode-list-hoverBackground, #2a2d2e);
@@ -236,9 +277,6 @@ export default {
   .theme--light.v-card
   .v-card__subtitle.v-card__subtitle,
 .explore-generators-cards .v-icon.v-icon,
-.explore-generators-cards .v-card__title {
-  color: var(--vscode-foreground, #cccccc);
-}
 .explore-generators-cards .v-card > div.v-card__text {
   color: var(--vscode-editorCodeLens-foreground, #999999);
 }
@@ -246,5 +284,8 @@ export default {
   overflow-y: auto;
   margin: 0px;
   height: calc(100% - 4rem);
+}
+.explore-generators-search .v-card__title {
+  font-size: 14px;
 }
 </style>
