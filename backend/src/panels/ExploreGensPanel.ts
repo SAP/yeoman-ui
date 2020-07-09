@@ -28,7 +28,7 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
         super(context);
         this.viewType = "exploreGens";
         this.viewTitle = "Explore Generators";
-        this.focusedKey = "exploreGenerators.Focused";
+        this.focusedKey = "exploreGens.Focused";
         this.htmlFileName = path.join("exploregens", "index.html");
     }
 }

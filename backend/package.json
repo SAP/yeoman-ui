@@ -67,7 +67,7 @@
 				{
 					"command": "yeomanUI.toggleOutput",
 					"group": "navigation",
-					"when": "yeomanUI.Focused"
+					"when": "yeomanUI.Focused || exploreGens.Focused"
 				}
 			]
 		},
