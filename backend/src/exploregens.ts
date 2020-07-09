@@ -30,7 +30,8 @@ export class ExploreGens {
     private readonly EMPTY = "";
     private readonly NODE_MODULES = "node_modules";
     private readonly ONE_DAY = 1000 * 60 * 60 * 24;
-    private readonly SEARCH_QUERY_PREFIX = "http://registry.npmjs.com/-/v1/search?text=";
+    private readonly NPM_REGISTRY_HOST = _.get(process, "env.NPM_CFG_REGISTRY", "http://registry.npmjs.com/");
+    private readonly SEARCH_QUERY_PREFIX = `${this.NPM_REGISTRY_HOST}-/v1/search?text=`;
     private readonly SEARCH_QUERY_SUFFIX = "keywords:yeoman-generator &size=25&ranking=popularity";
 
     constructor(rpc: IRpc, logger: IChildLogger, context?: any, vscode?: any) {
