@@ -61,11 +61,8 @@ describe('extension unit test', () => {
             loggerWrapperMock.expects("getLogger").twice();
             extension.activate(testContext);
             expect(_.size(_.keys(oRegisteredCommands))).to.be.equal(3);
-            // tslint:disable-next-line: no-unused-expression
             expect( _.get(oRegisteredCommands, "loadYeomanUI")).to.be.not.undefined;
-            // tslint:disable-next-line: no-unused-expression
             expect(_.get(oRegisteredCommands, "yeomanUI.toggleOutput")).to.be.not.undefined;
-            // tslint:disable-next-line: no-unused-expression
             expect(_.get(oRegisteredCommands, "exploreGenerators")).to.be.not.undefined;
         });
 

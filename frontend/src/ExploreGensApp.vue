@@ -76,22 +76,16 @@
               <a :href="gen.package.links.npm">{{messages.more_info}}</a>
             </v-card-text>
             <v-card-actions>
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    rounded
-                    raised
-                    elevation="5"
-                    class="ma-2"
-                    :loading="isLoading(gen)"
-                    :color="gen.actionColor"
-                    @click="onAction(gen)"
-                    v-bind="attrs"
-                    v-on="on"
-                  >{{gen.action}}</v-btn>
-                </template>
-                <span>{{gen.tooltip}}</span>
-              </v-tooltip>
+              <div class="ma-2">
+                <v-btn
+                  raised
+                  elevation="5"
+                  :disabled="gen.disabledToHandle"
+                  :color="gen.color"
+                  @click="onAction(gen)"
+                >{{gen.action}}</v-btn>
+                <v-progress-linear v-if="gen.disabledToHandle" indeterminate color="primary"></v-progress-linear>
+              </div>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -139,37 +133,32 @@ export default {
     }
   },
   methods: {
-    tooltip(gen) {
+    actionName(gen) {
       if (gen.disabledToHandle) {
-        return gen.installed ? messages.uninstalling : messages.installing;
+        return gen.installed
+          ? this.messages.uninstalling
+          : this.messages.installing;
       }
 
-      return `${this.actionName(gen)} ${gen.package.name}`;
-    },
-    isLoading(gen) {
-      return gen.disabledToHandle;
-    },
-    actionName(gen) {
       return gen.installed ? this.messages.uninstall : this.messages.install;
     },
     actionColor(gen) {
       return gen.installed ? "grey" : "primary";
     },
     async onAction(gen) {
-      if (!gen.disabledToHandle) {
-        gen.disabledToHandle = true;
-        gen.installed = await this.rpc.invoke(_.lowerCase(gen.action), [gen]);
+      gen.disabledToHandle = true;
+      gen.action = this.actionName(gen);
+      const action = gen.installed ? "uninstall" : "install";
+      gen.installed = await this.rpc.invoke(action, [gen]);
 
-        const currentGen = _.find(this.gens, currentGen => {
-          return gen.package.name === currentGen.package.name;
-        });
+      const currentGen = _.find(this.gens, currentGen => {
+        return gen.package.name === currentGen.package.name;
+      });
 
-        if (currentGen) {
-          currentGen.action = this.actionName(gen);
-          currentGen.disabledToHandle = false;
-          currentGen.actionColor = this.actionColor(gen);
-          currentGen.tooltip = this.tooltip(gen);
-        }
+      if (currentGen) {
+        gen.disabledToHandle = false;
+        currentGen.action = this.actionName(gen);
+        currentGen.color = this.actionColor(gen);
       }
     },
     onQueryChange() {
@@ -186,8 +175,7 @@ export default {
       ]);
       this.gens = _.map(res[0], gen => {
         gen.action = this.actionName(gen);
-        gen.actionColor = this.actionColor(gen);
-        gen.tooltip = this.tooltip(gen);
+        gen.color = this.actionColor(gen);
         return gen;
       });
       this.total = res[1];
@@ -249,7 +237,7 @@ export default {
 </script>
 <style scoped>
 .exploregens-main {
-  margin: 0px 20px 20px;
+  margin: 0px 5px 5px;
 }
 .explore-generators .theme--light.v-expansion-panels .v-expansion-panel,
 .explore-generators-cards .v-card {
