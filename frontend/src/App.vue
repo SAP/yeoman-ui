@@ -6,10 +6,10 @@
       :height="64"
       :width="64"
       :color="isLoadingColor"
-      background-color="transparent" 
+      background-color="transparent"
       loader="spinner"
     ></loading>
-    
+
     <Header
       v-if="prompts.length"
       :headerTitle="headerTitle"
@@ -22,7 +22,12 @@
 
     <v-row class="main-row ma-0 pa-0">
       <v-col class="left-col ma-0 pa-0" cols="3">
-        <Navigation v-if="prompts.length" :promptIndex="promptIndex" :prompts="prompts"  @onGotoStep="gotoStep" />
+        <Navigation
+          v-if="prompts.length"
+          :promptIndex="promptIndex"
+          :prompts="prompts"
+          @onGotoStep="gotoStep"
+        />
       </v-col>
       <v-col cols="9" class="right-col">
         <v-row class="prompts-col">
@@ -49,21 +54,21 @@
             />
           </v-col>
         </v-row>
-        <v-row
-          v-if="prompts.length > 0 && !isDone"
-          style="height: 4rem; margin: 0;"
-          sm="auto"
-        >
-          <div class="bottom-right-col" style="flex:1;">
-          </div>
-          <div class="diagonal">
-          </div>
+        <v-row v-if="prompts.length > 0 && !isDone" style="height: 4rem; margin: 0;" sm="auto">
+          <div class="bottom-right-col" style="flex:1;"></div>
+          <div class="diagonal"></div>
           <div class="bottom-buttons-col" style="display:flex;align-items: center;">
-            <v-btn id="back" :disabled="promptIndex<1 || isReplaying" @click="back" v-show="promptIndex > 0">
+            <v-btn
+              id="back"
+              :disabled="promptIndex<1 || isReplaying"
+              @click="back"
+              v-show="promptIndex > 0"
+            >
               <v-icon left>mdi-chevron-left</v-icon>Back
             </v-btn>
             <v-btn id="next" :disabled="!stepValidated" @click="next">
-              Next<v-icon right>mdi-chevron-right</v-icon>
+              Next
+              <v-icon right>mdi-chevron-right</v-icon>
             </v-btn>
           </div>
         </v-row>
@@ -149,7 +154,9 @@ export default {
       );
     },
     headerTitle() {
-      const titleSuffix = _.isEmpty(this.generatorPrettyName) ? "" : ` - ${this.generatorPrettyName}`;
+      const titleSuffix = _.isEmpty(this.generatorPrettyName)
+        ? ""
+        : ` - ${this.generatorPrettyName}`;
       return `${this.messages.yeoman_ui_title}${titleSuffix}`;
     },
     currentPrompt() {
@@ -158,8 +165,10 @@ export default {
     isNoGenerators() {
       const promptName = _.get(this.currentPrompt, "name");
       const message = _.get(this.messages, "select_generator_name", "");
-      const noChoices = _.isEmpty(_.get(this.currentPrompt, "questions[0].choices"));
-      return (promptName === message) && noChoices;
+      const noChoices = _.isEmpty(
+        _.get(this.currentPrompt, "questions[0].choices")
+      );
+      return promptName === message && noChoices;
     }
   },
   watch: {
@@ -183,14 +192,16 @@ export default {
     setBusyIndicator() {
       this.showBusyIndicator =
         _.isEmpty(this.prompts) ||
-        (this.currentPrompt 
-         && (this.currentPrompt.status === PENDING || this.currentPrompt.status === EVALUATING) 
-         && !this.isDone);
+        (this.currentPrompt &&
+          (this.currentPrompt.status === PENDING ||
+            this.currentPrompt.status === EVALUATING) &&
+          !this.isDone);
     },
     back() {
-      this.gotoStep(1);    // go 1 step back
+      this.gotoStep(1); // go 1 step back
     },
-    gotoStep(numOfSteps) { // go numOfSteps step back
+    gotoStep(numOfSteps) {
+      // go numOfSteps step back
       try {
         this.isReplaying = true;
         this.numOfSteps = numOfSteps;
@@ -275,20 +286,21 @@ export default {
           if (question[prop] === FUNCTION) {
             const that = this;
             question[prop] = async (...args) => {
-            if (this.currentPrompt) {
-              this.currentPrompt.status = EVALUATING;
-            }
+              if (this.currentPrompt) {
+                this.currentPrompt.status = EVALUATING;
+              }
 
-            try {
-              return await that.rpc.invoke("evaluateMethod", [
-                args,
-                question.name,
-                prop
-              ]);
-            } catch(e) {
-              that.showBusyIndicator = false;
-              throw(e);
-            }};
+              try {
+                return await that.rpc.invoke("evaluateMethod", [
+                  args,
+                  question.name,
+                  prop
+                ]);
+              } catch (e) {
+                that.showBusyIndicator = false;
+                throw e;
+              }
+            };
           }
         }
       }
@@ -321,7 +333,10 @@ export default {
         promptDescription = this.messages.select_generator_description;
         promptName = this.messages.select_generator_name;
       } else {
-        const promptToDisplay = _.get(this.promptsInfoToDisplay, "[" + (this.promptIndex - 1) +"]");
+        const promptToDisplay = _.get(
+          this.promptsInfoToDisplay,
+          "[" + (this.promptIndex - 1) + "]"
+        );
         promptDescription = _.get(promptToDisplay, "description", "");
         promptName = _.get(promptToDisplay, "name", name);
       }
@@ -365,8 +380,8 @@ export default {
         if (!window.vscode) {
           // eslint-disable-next-line
           window.vscode = acquireVsCodeApi();
-        } 
-        
+        }
+
         return window.vscode;
       }
     },
@@ -400,13 +415,12 @@ export default {
         });
       });
 
-      this.displayGeneratorsPrompt(); 
+      this.displayGeneratorsPrompt();
     },
     async setMessagesAndSaveState() {
       const uiOptions = await this.rpc.invoke("getState");
       this.messages = uiOptions.messages;
-      const genFilter = uiOptions.genFilter;
-      this.isGeneric = _.isEmpty(_.get(genFilter, "types")) && _.isEmpty(_.get(genFilter, "categories"));
+      this.isGeneric = _.get(this.messages, "panel_title") === "Yeoman UI";
       const vscodeApi = this.getVsCodeApi();
       if (vscodeApi) {
         vscodeApi.setState(uiOptions);
@@ -443,7 +457,7 @@ export default {
       dataObj.rpc = this.rpc;
       Object.assign(this.$data, dataObj);
       this.init();
-      
+
       this.displayGeneratorsPrompt();
     }
   },
@@ -497,7 +511,12 @@ div.consoleClassVisible .v-footer {
 }
 .diagonal {
   width: 80px;
-  background: linear-gradient(120deg, var(--vscode-editor-background, #1e1e1e) 0%, var(--vscode-editor-background, #1e1e1e) 50%, transparent 50%);
+  background: linear-gradient(
+    120deg,
+    var(--vscode-editor-background, #1e1e1e) 0%,
+    var(--vscode-editor-background, #1e1e1e) 50%,
+    transparent 50%
+  );
   background-color: var(--vscode-editorWidget-background, #252526);
 }
 .bottom-right-col {
@@ -510,6 +529,6 @@ div.consoleClassVisible .v-footer {
   padding-right: 25px;
 }
 .bottom-buttons-col > .v-btn:not(:last-child) {
-    margin-right: 10px !important;
+  margin-right: 10px !important;
 }
 </style>

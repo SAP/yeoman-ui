@@ -3,7 +3,7 @@
     <v-app-bar class="elevation-0">
       <v-toolbar-title>{{headerTitle}}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn v-if="isGeneric" text small color="primary" class="ma-2" @click="openExploreGenerators">Explore Generators ...</v-btn>
+      <v-btn v-if="isGeneric" text x-small color="primary" class="ma-2" @click="openExploreGenerators">Explore and Install Generators...</v-btn>
       <v-btn v-if="!isInVsCode" class="ma-2" icon @click="collapseOutput">
         <v-card-text>
           <v-icon>mdi-console</v-icon>

@@ -13,7 +13,7 @@ export class ExploreGens {
     public static getInstallationLocation(wsConfig: any) {
         return _.trim(wsConfig.get(ExploreGens.INSTALLATION_LOCATION));
     }
-    
+
     private static readonly INSTALLATION_LOCATION = "Explore Generators.installationLocation";
 
     private logger: IChildLogger;
@@ -22,7 +22,9 @@ export class ExploreGens {
     private cachedInstalledGeneratorsPromise: Promise<string[]>;
     private context: any;
     private vscode: any;
+    private isInTheiaCached: boolean;
 
+    private readonly theiaCommands: string[] = ["theia.open", "preferences:open", "keymaps:open", "workspace:openRecent"];
     private readonly LAST_AUTO_UPDATE_DATE = "Explore Generators.lastAutoUpdateDate";
     private readonly SEARCH_QUERY = "Explore Generators.searchQuery";
     private readonly AUTO_UPDATE = "Explore Generators.autoUpdate"
@@ -80,6 +82,7 @@ export class ExploreGens {
         this.rpc.registerMethod({ func: this.uninstall, thisArg: this });
         this.rpc.registerMethod({ func: this.isInstalled, thisArg: this });
         this.rpc.registerMethod({ func: this.getRecommendedQuery, thisArg: this });
+        this.rpc.registerMethod({ func: this.isInTheia, thisArg: this });
     }
 
     private async updateAllInstalledGenerators() {
@@ -245,7 +248,7 @@ export class ExploreGens {
         if (_.isEmpty(customLocation)) {
             return env.getNpmPaths();
         }
-        
+
         return [path.join(customLocation, this.NODE_MODULES)];
     }
 
@@ -257,5 +260,15 @@ export class ExploreGens {
             return packagePath.substring(nodeModulesIndex + this.NODE_MODULES.length + 1);
         })
         resolve(_.uniq(gensFullNames));
-      }
+    }
+
+    private async isInTheia() {
+        if (_.isNil(this.isInTheiaCached)) {
+            const commands = await this.vscode.commands.getCommands(true);
+            const foundCommands = _.intersection(commands, this.theiaCommands);
+            this.isInTheiaCached = !_.isEmpty(foundCommands);
+        }
+
+        return this.isInTheiaCached;
+    }
 }
