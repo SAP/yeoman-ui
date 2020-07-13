@@ -1,7 +1,7 @@
 <template>
   <v-app id="exploregens" class="exploregens-main">
     <div class="explore-generators">
-      <v-app-bar>
+      <v-app-bar class="pa-0 ma-0">
         <v-toolbar-title>{{messages.title}}</v-toolbar-title>
         <v-spacer></v-spacer>
       </v-app-bar>
@@ -27,20 +27,18 @@
     <v-row class="mt-3">
       <v-col :cols="10">
         <v-text-field
-          class="explore-generators-search-gens ma-0 pa-0"
+          class="explore-generators-search-gens pa-2"
           :label="messages.search"
           v-model="query"
           hide-details="auto"
           @input="onQueryChange"
-          rounded
           clearable
           @click:clear="onQueryChange"
         />
       </v-col>
       <v-col :cols="2">
         <v-select
-          class="explore-generators-search-gens ma-0 pa-0"
-          rounded
+          class="explore-generators-search-gens pa-2"
           hide-details="auto"
           :items="items"
           v-model="recommended"
@@ -53,7 +51,7 @@
     <v-row class="explore-generators-search">
       <v-card-title>{{searchResults}}</v-card-title>
       <v-icon v-if="refineSearch" color="blue">mdi-information-outline</v-icon>
-      <v-card-title class="pa-0" v-if="refineSearch">{{messages.refine_search}}</v-card-title>
+      <v-card-title class="pa-0 ml-2" v-if="refineSearch">{{messages.refine_search}}</v-card-title>
     </v-row>
 
     <v-slide-x-transition>
@@ -64,7 +62,7 @@
           cols="12"
           md="4"
           sm="6"
-          class="pa-3 d-flex flex-column"
+          class="pb-2 d-flex flex-column"
         >
           <v-item>
             <v-card
@@ -86,6 +84,7 @@
               <v-card-actions>
                 <div class="ma-2">
                   <v-btn
+                    min-width="140px"
                     raised
                     elevation="5"
                     :disabled="gen.disabledToHandle"
@@ -104,7 +103,7 @@
 </template>
 
 <script>
-const ALL_GENS = "-----";
+const ALL_GENS = "all";
 
 import * as _ from "lodash";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
