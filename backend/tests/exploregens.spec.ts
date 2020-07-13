@@ -47,7 +47,8 @@ const testVscode = {
         globalState
     },
     commands: {
-        executeCommand: () => true
+        executeCommand: () => Promise.reject("not implemented"),
+        getCommands: () => Promise.reject("not implemented")
     }
 };
 
@@ -150,18 +151,43 @@ describe('exploregens unit test', () => {
         vscodeCommandsMock.verify();
     });
 
+    describe("isInTheia", () => {
+        it("use cached value", async () => {
+            exploregens["isInTheiaCached"] = true;
+            vscodeCommandsMock.expects("getCommands").never();
+            const res = await exploregens["isInTheia"]();  
+            expect(res).to.be.true;
+        });
+
+        it("returns true", async () => {
+            exploregens["isInTheiaCached"] = undefined;
+            vscodeCommandsMock.expects("getCommands").withExactArgs(true).resolves(["theia.open", "preferences:open"]);
+            const res = await exploregens["isInTheia"]();  
+            expect(res).to.be.true;
+        });
+
+        it("returns false", async () => {
+            exploregens["isInTheiaCached"] = undefined;
+            vscodeCommandsMock.expects("getCommands").withExactArgs(true).resolves(["workbench.action.openGlobalKeybindings"]);
+            const res = await exploregens["isInTheia"]();   
+            expect(res).to.be.false;
+        });
+    });
+
     describe("NPM", () => {
         it("win32 platform", () => {
             const stub = sinon.stub(process, 'platform').value("win32");
             const exploregens1 = new ExploreGens(rpc, null, testVscode.context, testVscode);
-            expect(exploregens1["NPM"]).to.be.equal("npm.cmd");
+            const res = exploregens1["NPM"];
+            expect(res).to.be.equal("npm.cmd");
             stub.restore();
         });
 
         it("linux platfrom", () => {
             const stub = sinon.stub(process, 'platform').value("linux");
             const exploregens2 = new ExploreGens(rpc, null, testVscode.context, testVscode);
-            expect(exploregens2["NPM"]).to.be.equal("npm");
+            const res = exploregens2["NPM"];
+            expect(res).to.be.equal("npm");
             stub.restore();
         });
     });
@@ -172,6 +198,7 @@ describe('exploregens unit test', () => {
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["install"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["uninstall"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInstalled"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInTheia"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens });
 
             const customLocation = path.join("home", "user", "projects");
@@ -186,6 +213,7 @@ describe('exploregens unit test', () => {
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["install"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["uninstall"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInstalled"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInTheia"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens });
             
             workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns("");

@@ -1,12 +1,12 @@
 <template>
   <v-app id="exploregens" class="exploregens-main">
     <div class="explore-generators">
-      <v-app-bar class="elevation-0">
+      <v-app-bar>
         <v-toolbar-title>{{messages.title}}</v-toolbar-title>
         <v-spacer></v-spacer>
       </v-app-bar>
-      <v-expansion-panels class="explore-generators-description" flat>
-        <v-expansion-panel>
+      <v-expansion-panels v-if="isInTheia" flat>
+        <v-expansion-panel class="explore-generators-panel">
           <v-expansion-panel-header disable-icon-rotate>
             {{messages.description}}
             <template v-slot:actions>
@@ -15,10 +15,8 @@
           </v-expansion-panel-header>
           <v-expansion-panel-content>
             <v-row>
-              <v-col class="pa-0" :cols="1">
-                <v-icon color="blue">mdi-information-outline</v-icon>
-              </v-col>
-              <v-col class="pa-0" :cols="11">
+              <v-icon class="mr-3" color="blue">mdi-information-outline</v-icon>
+              <v-col class="pa-2">
                 <v-text>{{messages.legal_note}}</v-text>
               </v-col>
             </v-row>
@@ -26,22 +24,24 @@
         </v-expansion-panel>
       </v-expansion-panels>
     </div>
-    <v-row class="prompts-col">
+    <v-row class="mt-3">
       <v-col :cols="10">
         <v-text-field
+          class="explore-generators-search-gens ma-0 pa-0"
           :label="messages.search"
           v-model="query"
+          hide-details="auto"
           @input="onQueryChange"
           rounded
           clearable
           @click:clear="onQueryChange"
-          background-color="var(--vscode-input-background, #3c3c3c)"
         />
       </v-col>
       <v-col :cols="2">
         <v-select
+          class="explore-generators-search-gens ma-0 pa-0"
           rounded
-          background-color="var(--vscode-input-background, #3c3c3c)"
+          hide-details="auto"
           :items="items"
           v-model="recommended"
           :label="messages.recommended"
@@ -59,35 +59,44 @@
     <v-slide-x-transition>
       <v-row class="explore-generators-cards">
         <v-col
+          v-for="(gen, i) in gens"
+          :key="i"
           cols="12"
           md="4"
           sm="6"
           class="pa-3 d-flex flex-column"
-          v-for="(gen, i) in gens"
-          :key="i"
         >
-          <v-card width="430" class="d-flex flex-column mx-auto" height="280" tile elevation="2">
-            <v-card-title primary-title>
-              <h3 class="headline mb-0">{{ gen.package.name }}</h3>
-            </v-card-title>
-            <v-card-text style="overflow-y: auto; height:200px" v-text="gen.package.description" />
-            <v-card-text v-text="gen.package.version" />
-            <v-card-text class="homepage">
-              <a :href="gen.package.links.npm">{{messages.more_info}}</a>
-            </v-card-text>
-            <v-card-actions>
-              <div class="ma-2">
-                <v-btn
-                  raised
-                  elevation="5"
-                  :disabled="gen.disabledToHandle"
-                  :color="gen.color"
-                  @click="onAction(gen)"
-                >{{gen.action}}</v-btn>
-                <v-progress-linear v-if="gen.disabledToHandle" indeterminate color="primary"></v-progress-linear>
-              </div>
-            </v-card-actions>
-          </v-card>
+          <v-item>
+            <v-card
+              width="500"
+              class="d-flex flex-column mx-auto"
+              height="250"
+              tile
+              hover
+              flat
+              dark
+              elevation="2"
+            >
+              <v-card-title>{{genDisplayName(gen)}}</v-card-title>
+              <v-card-text scrollable class="description">{{gen.package.description}}</v-card-text>
+              <v-card-text class="homepage">
+                <a :href="gen.package.links.npm">{{messages.more_info}}</a>
+              </v-card-text>
+              <v-spacer></v-spacer>
+              <v-card-actions>
+                <div class="ma-2">
+                  <v-btn
+                    raised
+                    elevation="5"
+                    :disabled="gen.disabledToHandle"
+                    :color="gen.color"
+                    @click="onAction(gen)"
+                  >{{gen.action}}</v-btn>
+                  <v-progress-linear v-if="gen.disabledToHandle" indeterminate color="primary"></v-progress-linear>
+                </div>
+              </v-card-actions>
+            </v-card>
+          </v-item>
         </v-col>
       </v-row>
     </v-slide-x-transition>
@@ -112,7 +121,8 @@ export default {
       total: 0,
       query: "",
       recommended: ALL_GENS,
-      messages
+      messages,
+      isInTheia: false
     };
   },
   computed: {
@@ -133,6 +143,9 @@ export default {
     }
   },
   methods: {
+    genDisplayName(gen) {
+      return `${gen.package.name} ${gen.package.version}`;
+    },
     actionName(gen) {
       if (gen.disabledToHandle) {
         return gen.installed
@@ -156,9 +169,10 @@ export default {
       });
 
       if (currentGen) {
-        gen.disabledToHandle = false;
-        currentGen.action = this.actionName(gen);
-        currentGen.color = this.actionColor(gen);
+        currentGen.disabledToHandle = false;
+        currentGen.installed = gen.installed;
+        currentGen.action = this.actionName(currentGen);
+        currentGen.color = this.actionColor(currentGen);
       }
     },
     onQueryChange() {
@@ -183,6 +197,9 @@ export default {
     async getRecommendedQuery() {
       this.items = await this.rpc.invoke("getRecommendedQuery");
       this.items.unshift(ALL_GENS);
+    },
+    async setIsInTheia() {
+      this.isInTheia = await this.rpc.invoke("isInTheia");
     },
     async updateBeingHandledGenerator(genName, isBeingHandled) {
       const gen = _.find(this.gens, gen => {
@@ -230,7 +247,8 @@ export default {
     await this.setupRpc();
     await Promise.all([
       this.getRecommendedQuery(),
-      this.getFilteredGenerators()
+      this.getFilteredGenerators(),
+      this.setIsInTheia()
     ]);
   }
 };
@@ -272,6 +290,30 @@ export default {
   overflow-y: auto;
   margin: 0px;
   height: calc(100% - 4rem);
+}
+
+.v-card__title {
+  word-wrap: break-word;
+  word-break: normal;
+}
+.description.v-card__text {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.homepage.v-card__text {
+  padding-bottom: 0;
+}
+a {
+  font-size: 11px;
+}
+.explore-generators-panel {
+  background-color: var(--vscode-editor-background, #1e1e1e) !important;
+  box-shadow: none;
+  text-align: justify;
+}
+
+.explore-generators-search-gens {
+  background-color: var(--vscode-editorWidget-background, #252526);
 }
 .explore-generators-search .v-card__title {
   font-size: 14px;

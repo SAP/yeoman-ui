@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.1",
+	"version": "1.1.2",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -53,7 +53,7 @@
 			},
 			{
 				"command": "exploreGenerators",
-				"title": "Explore Generators"
+				"title": "Explore and Install Generators"
 			}
 		],
 		"menus": {

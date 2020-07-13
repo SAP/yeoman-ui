@@ -25,13 +25,9 @@ export abstract class AbstractWebviewPanel {
 	protected readonly defaultNpmPaths: string[] = Environment.createEnv().getNpmPaths();
 
 	public loadWebviewPanel(uiOptions?: any) {
-		if (this.webViewPanel && _.isEmpty(uiOptions)) {
-			this.webViewPanel.reveal();
-		} else {
-			this.disposeWebviewPanel();
-			const webViewPanel = this.createWebviewPanel();
-			this.setWebviewPanel(webViewPanel, uiOptions);
-		}
+		this.disposeWebviewPanel();
+		const webViewPanel = this.createWebviewPanel();
+		this.setWebviewPanel(webViewPanel, uiOptions);
 	}
 
 	protected constructor(context: vscode.ExtensionContext) {
