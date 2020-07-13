@@ -420,7 +420,7 @@ export default {
     async setMessagesAndSaveState() {
       const uiOptions = await this.rpc.invoke("getState");
       this.messages = uiOptions.messages;
-      this.isGeneric = this.messages.panel_title === "Yeoman UI";
+      this.isGeneric = _.get(this.messages, "panel_title") === "Yeoman UI";
       const vscodeApi = this.getVsCodeApi();
       if (vscodeApi) {
         vscodeApi.setState(uiOptions);
