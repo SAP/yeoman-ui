@@ -79,10 +79,10 @@
             >
               <v-card-title>{{genDisplayName(gen)}}</v-card-title>
               <v-card-text scrollable class="description">{{gen.package.description}}</v-card-text>
+              <v-spacer></v-spacer>
               <v-card-text class="homepage">
                 <a :href="gen.package.links.npm">{{messages.more_info}}</a>
               </v-card-text>
-              <v-spacer></v-spacer>
               <v-card-actions>
                 <div class="ma-2">
                   <v-btn
