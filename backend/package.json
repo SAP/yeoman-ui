@@ -108,10 +108,11 @@
 				"Explore Generators.searchQuery": {
 					"type": "array",
 					"default": [
-						"sap",
-						"sap fiori",
-						"sap ui5",
-						"openui5"
+						"SAP",
+						"SAP CAP",
+						"SAP UI5",
+						"SAP Fiori",
+						"SAP Fiori Elements"
 					],
 					"description": "Saved search query."
 				}

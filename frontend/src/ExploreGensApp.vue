@@ -1,9 +1,13 @@
 <template>
-  <v-app id="exploregens" class="exploregens-main">
-    <v-toolbar-title class="pa-2">{{messages.title}}</v-toolbar-title>
+  <v-app id="exploregens" class="exploregens-main explore-generators">
+    <v-app-bar class="pl-2 elevation-0">
+      <v-toolbar-title>{{messages.title}}</v-toolbar-title>
+      <v-spacer></v-spacer>
+    </v-app-bar>
+
     <v-expansion-panels v-if="isInTheia && isLegalNoteAccepted" flat>
       <v-expansion-panel class="explore-generators-panel">
-        <v-expansion-panel-header disable-icon-rotate>
+        <v-expansion-panel-header disable-icon-rotate style="font-size:14px">
           {{messages.description}}
           <template v-slot:actions>
             <v-icon color="primary">$expand</v-icon>
@@ -13,13 +17,13 @@
           <v-row>
             <v-icon class="ma-2" color="blue">mdi-information-outline</v-icon>
             <v-col class="pa-2">
-              <v-text style="text-align:justify">{{messages.legal_note}}</v-text>
+              <v-card-title style="text-align:justify">{{messages.legal_note}}</v-card-title>
             </v-col>
           </v-row>
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
-    <v-text v-else class="pa-2">{{messages.description}}</v-text>
+    <v-card-title v-else class="pa-2" style="font-size:14px">{{messages.description}}</v-card-title>
 
     <div v-if="isLegalNoteAccepted" class="explore-generators">
       <v-row>
@@ -62,56 +66,54 @@
             sm="6"
             class="pb-2 d-flex flex-column"
           >
-            <v-item>
-              <v-card
-                width="500"
-                class="d-flex flex-column mx-auto"
-                height="250"
-                tile
-                hover
-                flat
-                dark
-                elevation="2"
-              >
-                <v-row class="ml-1">
-                  <v-card-title>{{gen.package.name}}</v-card-title>
-                  <v-col class="mt-6 pa-1">
-                    <v-text>{{gen.package.version}}</v-text>
-                  </v-col>
-                </v-row>
+            <v-card
+              width="500"
+              class="d-flex flex-column mx-auto"
+              height="250"
+              tile
+              hover
+              flat
+              dark
+              elevation="2"
+            >
+              <v-row class="ml-1">
+                <v-card-title>{{gen.package.name}}</v-card-title>
+                <v-col class="mt-1">
+                  <v-card-title style="font-size:12px">{{gen.package.version}}</v-card-title>
+                </v-col>
+              </v-row>
 
-                <v-card-text scrollable class="description">{{gen.package.description}}</v-card-text>
-                <v-spacer></v-spacer>
-                <v-card-text class="homepage">
-                  <a :href="gen.package.links.npm">{{messages.more_info}}</a>
-                </v-card-text>
-                <v-card-actions>
-                  <div class="pa-2">
-                    <v-btn
-                      min-width="140px"
-                      raised
-                      elevation="5"
-                      :disabled="gen.disabledToHandle"
-                      :color="gen.color"
-                      @click="onAction(gen)"
-                    >{{gen.action}}</v-btn>
-                  </div>
-                  <v-spacer v-if="!gen.disabledToHandle"></v-spacer>
-                </v-card-actions>
-                <v-progress-linear
-                  v-if="gen.disabledToHandle"
-                  class="ma-0 pa-0"
-                  indeterminate
-                  color="primary"
-                ></v-progress-linear>
-              </v-card>
-            </v-item>
+              <v-card-text scrollable class="description">{{gen.package.description}}</v-card-text>
+              <v-spacer></v-spacer>
+              <v-card-text class="homepage">
+                <a :href="gen.package.links.npm">{{messages.more_info}}</a>
+              </v-card-text>
+              <v-card-actions>
+                <div class="pa-2">
+                  <v-btn
+                    min-width="140px"
+                    raised
+                    elevation="5"
+                    :disabled="gen.disabledToHandle"
+                    :color="gen.color"
+                    @click="onAction(gen)"
+                  >{{gen.action}}</v-btn>
+                </div>
+                <v-spacer v-if="!gen.disabledToHandle"></v-spacer>
+              </v-card-actions>
+              <v-progress-linear
+                v-if="gen.disabledToHandle"
+                class="ma-0 pa-0"
+                indeterminate
+                color="primary"
+              ></v-progress-linear>
+            </v-card>
           </v-col>
         </v-row>
       </v-slide-x-transition>
     </div>
     <div v-else class="pa-2">
-      <v-row>
+      <v-row class="pa-2">
         <v-icon class="ma-2" color="blue">mdi-information-outline</v-icon>
         <v-col class="pa-2">
           <v-text style="text-align:justify">{{messages.legal_note}}</v-text>
@@ -124,7 +126,7 @@
   </v-app>
 </template>
 <script>
-const ALL_GENS = "all";
+const ALL_GENS = "All";
 
 import * as _ from "lodash";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
@@ -143,7 +145,7 @@ export default {
       recommended: ALL_GENS,
       messages,
       isInTheia: false,
-      isLegalNoteAccepted: false
+      isLegalNoteAccepted: true
     };
   },
   computed: {
