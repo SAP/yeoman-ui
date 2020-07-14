@@ -4,6 +4,7 @@
       <v-toolbar-title>{{messages.title}}</v-toolbar-title>
     </v-app-bar>
 
+    <div v-if="ready">
     <v-expansion-panels v-if="isInTheia && isLegalNoteAccepted" flat>
       <v-expansion-panel class="explore-generators-panel">
         <v-expansion-panel-header disable-icon-rotate style="font-size:14px">
@@ -24,7 +25,7 @@
     </v-expansion-panels>
     <v-card-title v-else class="pa-2" style="font-size:14px">{{messages.description}}</v-card-title>
 
-    <div v-if="isLegalNoteAccepted" class="explore-generators">
+    <div v-if="isLegalNoteAccepted">
       <v-row>
         <v-col :cols="10">
           <v-text-field
@@ -94,6 +95,7 @@
                   <v-btn
                     min-width="140px"
                     raised
+                    dark
                     elevation="5"
                     :disabled="gen.disabledToHandle"
                     :color="gen.color"
@@ -124,6 +126,7 @@
         <v-btn @click="onAcceptLegalNote">{{messages.accept}}</v-btn>
       </v-col>
     </div>
+    </div>
   </v-app>
 </template>
 <script>
@@ -146,7 +149,8 @@ export default {
       recommended: ALL_GENS,
       messages,
       isInTheia: false,
-      isLegalNoteAccepted: true
+      isLegalNoteAccepted: true,
+      ready: false
     };
   },
   computed: {
@@ -275,11 +279,15 @@ export default {
   },
   async created() {
     await this.setupRpc();
-    await Promise.all([this.setIsLegalNoteAccepted(), this.setIsInTheia()]);
+    await Promise.all([
+      await this.setIsLegalNoteAccepted(),
+      this.setIsInTheia()
+    ]);
     await Promise.all([
       this.getRecommendedQuery(),
       this.getFilteredGenerators()
     ]);
+    this.ready = true;
   }
 };
 </script>
@@ -319,7 +327,6 @@ export default {
 .explore-generators-cards {
   overflow-y: auto;
   margin: 0px;
-  height: calc(100% - 4rem);
 }
 
 .v-card__title {
