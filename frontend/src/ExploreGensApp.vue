@@ -1,8 +1,7 @@
 <template>
   <v-app id="exploregens" class="exploregens-main explore-generators">
-    <v-app-bar class="pl-2 elevation-0">
+    <v-app-bar class="pa-0 elevation-0">
       <v-toolbar-title>{{messages.title}}</v-toolbar-title>
-      <v-spacer></v-spacer>
     </v-app-bar>
 
     <v-expansion-panels v-if="isInTheia && isLegalNoteAccepted" flat>
@@ -29,9 +28,10 @@
       <v-row>
         <v-col :cols="10">
           <v-text-field
-            class="explore-generators-search-gens pl-2"
+            class="explore-generators-search-gens"
             :label="messages.search"
             v-model="query"
+            outlined
             hide-details="auto"
             @input="onQueryChange"
             clearable
@@ -40,8 +40,9 @@
         </v-col>
         <v-col :cols="2">
           <v-select
-            class="explore-generators-search-gens pl-2"
+            class="explore-generators-search-gens"
             hide-details="auto"
+            outlined
             :items="items"
             v-model="recommended"
             :label="messages.recommended"
@@ -50,7 +51,7 @@
         </v-col>
       </v-row>
 
-      <v-row class="explore-generators-search">
+      <v-row class="explore-generators-search pa-2">
         <v-card-title>{{searchResults}}</v-card-title>
         <v-icon v-if="refineSearch" color="blue">mdi-information-outline</v-icon>
         <v-card-title class="pa-0 ml-2" v-if="refineSearch">{{messages.refine_search}}</v-card-title>
