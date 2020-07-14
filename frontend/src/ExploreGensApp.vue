@@ -1,107 +1,128 @@
 <template>
   <v-app id="exploregens" class="exploregens-main">
-    <div class="explore-generators">
-      <v-app-bar class="pa-0 ma-0">
-        <v-toolbar-title>{{messages.title}}</v-toolbar-title>
-        <v-spacer></v-spacer>
-      </v-app-bar>
-      <v-expansion-panels v-if="isInTheia" flat>
-        <v-expansion-panel class="explore-generators-panel">
-          <v-expansion-panel-header disable-icon-rotate>
-            {{messages.description}}
-            <template v-slot:actions>
-              <v-icon color="primary">$expand</v-icon>
-            </template>
-          </v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <v-row>
-              <v-icon class="mr-3" color="blue">mdi-information-outline</v-icon>
-              <v-col class="pa-2">
-                <v-text>{{messages.legal_note}}</v-text>
-              </v-col>
-            </v-row>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels>
-    </div>
-    <v-row class="mt-3">
-      <v-col :cols="10">
-        <v-text-field
-          class="explore-generators-search-gens pa-2"
-          :label="messages.search"
-          v-model="query"
-          hide-details="auto"
-          @input="onQueryChange"
-          clearable
-          @click:clear="onQueryChange"
-        />
-      </v-col>
-      <v-col :cols="2">
-        <v-select
-          class="explore-generators-search-gens pa-2"
-          hide-details="auto"
-          :items="items"
-          v-model="recommended"
-          :label="messages.recommended"
-          @change="onQueryChange"
-        />
-      </v-col>
-    </v-row>
+    <v-toolbar-title class="pa-2">{{messages.title}}</v-toolbar-title>
+    <v-expansion-panels v-if="isInTheia && isLegalNoteAccepted" flat>
+      <v-expansion-panel class="explore-generators-panel">
+        <v-expansion-panel-header disable-icon-rotate>
+          {{messages.description}}
+          <template v-slot:actions>
+            <v-icon color="primary">$expand</v-icon>
+          </template>
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-row>
+            <v-icon class="ma-2" color="blue">mdi-information-outline</v-icon>
+            <v-col class="pa-2">
+              <v-text style="text-align:justify">{{messages.legal_note}}</v-text>
+            </v-col>
+          </v-row>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </v-expansion-panels>
+    <v-text v-else class="pa-2">{{messages.description}}</v-text>
 
-    <v-row class="explore-generators-search">
-      <v-card-title>{{searchResults}}</v-card-title>
-      <v-icon v-if="refineSearch" color="blue">mdi-information-outline</v-icon>
-      <v-card-title class="pa-0 ml-2" v-if="refineSearch">{{messages.refine_search}}</v-card-title>
-    </v-row>
-
-    <v-slide-x-transition>
-      <v-row class="explore-generators-cards">
-        <v-col
-          v-for="(gen, i) in gens"
-          :key="i"
-          cols="12"
-          md="4"
-          sm="6"
-          class="pb-2 d-flex flex-column"
-        >
-          <v-item>
-            <v-card
-              width="500"
-              class="d-flex flex-column mx-auto"
-              height="250"
-              tile
-              hover
-              flat
-              dark
-              elevation="2"
-            >
-              <v-card-title>{{genDisplayName(gen)}}</v-card-title>
-              <v-card-text scrollable class="description">{{gen.package.description}}</v-card-text>
-              <v-spacer></v-spacer>
-              <v-card-text class="homepage">
-                <a :href="gen.package.links.npm">{{messages.more_info}}</a>
-              </v-card-text>
-              <v-card-actions>
-                <div class="ma-2">
-                  <v-btn
-                    min-width="140px"
-                    raised
-                    elevation="5"
-                    :disabled="gen.disabledToHandle"
-                    :color="gen.color"
-                    @click="onAction(gen)"
-                  >{{gen.action}}</v-btn>
-                  <v-progress-linear v-if="gen.disabledToHandle" indeterminate color="primary"></v-progress-linear>
-                </div>
-              </v-card-actions>
-            </v-card>
-          </v-item>
+    <div v-if="isLegalNoteAccepted" class="explore-generators">
+      <v-row>
+        <v-col :cols="10">
+          <v-text-field
+            class="explore-generators-search-gens pl-2"
+            :label="messages.search"
+            v-model="query"
+            hide-details="auto"
+            @input="onQueryChange"
+            clearable
+            @click:clear="onQueryChange"
+          />
+        </v-col>
+        <v-col :cols="2">
+          <v-select
+            class="explore-generators-search-gens pl-2"
+            hide-details="auto"
+            :items="items"
+            v-model="recommended"
+            :label="messages.recommended"
+            @change="onQueryChange"
+          />
         </v-col>
       </v-row>
-    </v-slide-x-transition>
+
+      <v-row class="explore-generators-search">
+        <v-card-title>{{searchResults}}</v-card-title>
+        <v-icon v-if="refineSearch" color="blue">mdi-information-outline</v-icon>
+        <v-card-title class="pa-0 ml-2" v-if="refineSearch">{{messages.refine_search}}</v-card-title>
+      </v-row>
+
+      <v-slide-x-transition>
+        <v-row class="explore-generators-cards">
+          <v-col
+            v-for="(gen, i) in gens"
+            :key="i"
+            cols="12"
+            md="4"
+            sm="6"
+            class="pb-2 d-flex flex-column"
+          >
+            <v-item>
+              <v-card
+                width="500"
+                class="d-flex flex-column mx-auto"
+                height="250"
+                tile
+                hover
+                flat
+                dark
+                elevation="2"
+              >
+                <v-row class="ml-1">
+                  <v-card-title>{{gen.package.name}}</v-card-title>
+                  <v-col class="mt-6 pa-1">
+                    <v-text>{{gen.package.version}}</v-text>
+                  </v-col>
+                </v-row>
+
+                <v-card-text scrollable class="description">{{gen.package.description}}</v-card-text>
+                <v-spacer></v-spacer>
+                <v-card-text class="homepage">
+                  <a :href="gen.package.links.npm">{{messages.more_info}}</a>
+                </v-card-text>
+                <v-card-actions>
+                  <div class="pa-2">
+                    <v-btn
+                      min-width="140px"
+                      raised
+                      elevation="5"
+                      :disabled="gen.disabledToHandle"
+                      :color="gen.color"
+                      @click="onAction(gen)"
+                    >{{gen.action}}</v-btn>
+                  </div>
+                  <v-spacer v-if="!gen.disabledToHandle"></v-spacer>
+                </v-card-actions>
+                <v-progress-linear
+                  v-if="gen.disabledToHandle"
+                  class="ma-0 pa-0"
+                  indeterminate
+                  color="primary"
+                ></v-progress-linear>
+              </v-card>
+            </v-item>
+          </v-col>
+        </v-row>
+      </v-slide-x-transition>
+    </div>
+    <div v-else class="pa-2">
+      <v-row>
+        <v-icon class="ma-2" color="blue">mdi-information-outline</v-icon>
+        <v-col class="pa-2">
+          <v-text style="text-align:justify">{{messages.legal_note}}</v-text>
+        </v-col>
+      </v-row>
+      <v-col class="ml-6">
+        <v-btn @click="onAcceptLegalNote">{{messages.accept}}</v-btn>
+      </v-col>
+    </div>
   </v-app>
 </template>
-
 <script>
 const ALL_GENS = "all";
 
@@ -121,7 +142,8 @@ export default {
       query: "",
       recommended: ALL_GENS,
       messages,
-      isInTheia: false
+      isInTheia: false,
+      isLegalNoteAccepted: false
     };
   },
   computed: {
@@ -155,7 +177,7 @@ export default {
       return gen.installed ? this.messages.uninstall : this.messages.install;
     },
     actionColor(gen) {
-      return gen.installed ? "grey" : "primary";
+      return gen.installed ? "#585858" : "primary";
     },
     async onAction(gen) {
       gen.disabledToHandle = true;
@@ -199,6 +221,12 @@ export default {
     },
     async setIsInTheia() {
       this.isInTheia = await this.rpc.invoke("isInTheia");
+    },
+    async setIsLegalNoteAccepted() {
+      this.isLegalNoteAccepted = await this.rpc.invoke("isLegalNoteAccepted");
+    },
+    async onAcceptLegalNote() {
+      this.isLegalNoteAccepted = await this.rpc.invoke("acceptLegalNote");
     },
     async updateBeingHandledGenerator(genName, isBeingHandled) {
       const gen = _.find(this.gens, gen => {
@@ -244,10 +272,10 @@ export default {
   },
   async created() {
     await this.setupRpc();
+    await Promise.all([this.setIsLegalNoteAccepted(), this.setIsInTheia()]);
     await Promise.all([
       this.getRecommendedQuery(),
-      this.getFilteredGenerators(),
-      this.setIsInTheia()
+      this.getFilteredGenerators()
     ]);
   }
 };
