@@ -1,132 +1,132 @@
 <template>
-  <v-app id="exploregens" class="exploregens-main explore-generators">
-    <v-app-bar class="pa-0 elevation-0">
-      <v-toolbar-title>{{messages.title}}</v-toolbar-title>
-    </v-app-bar>
+  <v-app id="exploregens" class="exploregens-main  explore-generators">
+      <v-app-bar dense="true" class="pa-0 ma-0 elevation-0">
+        <v-toolbar-title>{{messages.title}}</v-toolbar-title>
+      </v-app-bar>
 
-    <div v-if="ready">
-    <v-expansion-panels v-if="isInTheia && isLegalNoteAccepted" flat>
-      <v-expansion-panel class="explore-generators-panel">
-        <v-expansion-panel-header disable-icon-rotate style="font-size:14px">
-          {{messages.description}}
-          <template v-slot:actions>
-            <v-icon color="primary">$expand</v-icon>
-          </template>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
-          <v-row>
-            <v-icon class="ma-2" color="blue">mdi-information-outline</v-icon>
-            <v-col class="pa-2">
-              <v-card-title style="text-align:justify">{{messages.legal_note}}</v-card-title>
-            </v-col>
-          </v-row>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </v-expansion-panels>
-    <v-card-title v-else class="pa-2" style="font-size:14px">{{messages.description}}</v-card-title>
-
-    <div v-if="isLegalNoteAccepted">
-      <v-row>
-        <v-col :cols="10">
-          <v-text-field
-            class="explore-generators-search-gens"
-            :label="messages.search"
-            v-model="query"
-            outlined
-            hide-details="auto"
-            @input="onQueryChange"
-            clearable
-            @click:clear="onQueryChange"
-          />
-        </v-col>
-        <v-col :cols="2">
-          <v-select
-            class="explore-generators-search-gens"
-            hide-details="auto"
-            outlined
-            :items="items"
-            v-model="recommended"
-            :label="messages.recommended"
-            @change="onQueryChange"
-          />
-        </v-col>
-      </v-row>
-
-      <v-row class="explore-generators-search pa-2">
-        <v-card-title>{{searchResults}}</v-card-title>
-        <v-icon v-if="refineSearch" color="blue">mdi-information-outline</v-icon>
-        <v-card-title class="pa-0 ml-2" v-if="refineSearch">{{messages.refine_search}}</v-card-title>
-      </v-row>
-
-      <v-slide-x-transition>
-        <v-row class="explore-generators-cards">
-          <v-col
-            v-for="(gen, i) in gens"
-            :key="i"
-            cols="12"
-            md="4"
-            sm="6"
-            class="pb-2 d-flex flex-column"
-          >
-            <v-card
-              width="500"
-              class="d-flex flex-column mx-auto"
-              height="250"
-              tile
-              hover
-              flat
-              dark
-              elevation="2"
-            >
-              <v-row class="ml-1">
-                <v-card-title>{{gen.package.name}}</v-card-title>
-                <v-col class="mt-1">
-                  <v-card-title style="font-size:12px">{{gen.package.version}}</v-card-title>
+      <div v-if="ready" class="explore-generators">
+        <v-expansion-panels v-if="isInTheia && isLegalNoteAccepted" flat>
+          <v-expansion-panel class="explore-generators-panel">
+            <v-expansion-panel-header disable-icon-rotate style="font-size:14px">
+              {{messages.description}}
+              <template v-slot:actions>
+                <v-icon color="primary">$expand</v-icon>
+              </template>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-row>
+                <v-icon class="ma-2" color="blue">mdi-information-outline</v-icon>
+                <v-col class="pa-2">
+                  <v-card-title style="text-align:justify;font-size:14px">{{messages.legal_note}}</v-card-title>
                 </v-col>
               </v-row>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+        <v-card-title v-else class="pa-2" style="font-size:14px">{{messages.description}}</v-card-title>
 
-              <v-card-text scrollable class="description">{{gen.package.description}}</v-card-text>
-              <v-spacer></v-spacer>
-              <v-card-text class="homepage">
-                <a :href="gen.package.links.npm">{{messages.more_info}}</a>
-              </v-card-text>
-              <v-card-actions>
-                <div class="pa-2">
-                  <v-btn
-                    min-width="140px"
-                    raised
-                    dark
-                    elevation="5"
-                    :disabled="gen.disabledToHandle"
-                    :color="gen.color"
-                    @click="onAction(gen)"
-                  >{{gen.action}}</v-btn>
-                </div>
-                <v-spacer v-if="!gen.disabledToHandle"></v-spacer>
-              </v-card-actions>
-              <v-progress-linear
-                v-if="gen.disabledToHandle"
-                class="ma-0 pa-0"
-                indeterminate
-                color="primary"
-              ></v-progress-linear>
-            </v-card>
+        <div v-if="isLegalNoteAccepted">
+          <v-row>
+            <v-col :cols="10">
+              <v-text-field
+                class="explore-generators-search-gens"
+                :label="messages.search"
+                v-model="query"
+                outlined
+                hide-details="auto"
+                @input="onQueryChange"
+                clearable
+                @click:clear="onQueryChange"
+              />
+            </v-col>
+            <v-col :cols="2">
+              <v-select
+                class="explore-generators-search-gens"
+                hide-details="auto"
+                outlined
+                :items="items"
+                v-model="recommended"
+                :label="messages.recommended"
+                @change="onQueryChange"
+              />
+            </v-col>
+          </v-row>
+
+          <v-row class="explore-generators-search pa-2">
+            <v-card-title>{{searchResults}}</v-card-title>
+            <v-icon v-if="refineSearch" color="blue">mdi-information-outline</v-icon>
+            <v-card-title class="pa-0 ml-2" v-if="refineSearch">{{messages.refine_search}}</v-card-title>
+          </v-row>
+
+          <v-slide-x-transition>
+            <v-row class="explore-generators-cards">
+              <v-col
+                v-for="(gen, i) in gens"
+                :key="i"
+                cols="12"
+                md="4"
+                sm="6"
+                class="pb-2 d-flex flex-column"
+              >
+                <v-card
+                  width="500"
+                  class="d-flex flex-column mx-auto"
+                  height="250"
+                  tile
+                  hover
+                  flat
+                  dark
+                  elevation="2"
+                >
+                  <v-row class="ml-1">
+                    <v-card-title>{{gen.package.name}}</v-card-title>
+                    <v-col class="mt-1">
+                      <v-card-title style="font-size:12px">{{gen.package.version}}</v-card-title>
+                    </v-col>
+                  </v-row>
+
+                  <v-card-text scrollable class="description">{{gen.package.description}}</v-card-text>
+                  <v-spacer></v-spacer>
+                  <v-card-text class="homepage">
+                    <a :href="gen.package.links.npm">{{messages.more_info}}</a>
+                  </v-card-text>
+                  <v-card-actions>
+                    <div class="pa-2">
+                      <v-btn
+                        min-width="140px"
+                        raised
+                        dark
+                        elevation="5"
+                        :disabled="gen.disabledToHandle"
+                        :color="gen.color"
+                        @click="onAction(gen)"
+                      >{{gen.action}}</v-btn>
+                    </div>
+                    <v-spacer v-if="!gen.disabledToHandle"></v-spacer>
+                  </v-card-actions>
+                  <v-progress-linear
+                    v-if="gen.disabledToHandle"
+                    class="ma-0 pa-0"
+                    indeterminate
+                    color="primary"
+                  ></v-progress-linear>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-slide-x-transition>
+        </div>
+        <div v-else class="pa-2">
+          <v-row class="pa-2">
+            <v-icon class="ma-2" color="blue">mdi-information-outline</v-icon>
+            <v-col class="pa-2">
+              <v-card-title style="text-align:justify;font-size:14px">{{messages.legal_note}}</v-card-title>
+            </v-col>
+          </v-row>
+          <v-col class="ml-8">
+            <v-btn @click="onAcceptLegalNote">{{messages.accept}}</v-btn>
           </v-col>
-        </v-row>
-      </v-slide-x-transition>
-    </div>
-    <div v-else class="pa-2">
-      <v-row class="pa-2">
-        <v-icon class="ma-2" color="blue">mdi-information-outline</v-icon>
-        <v-col class="pa-2">
-          <v-text style="text-align:justify">{{messages.legal_note}}</v-text>
-        </v-col>
-      </v-row>
-      <v-col class="ml-6">
-        <v-btn @click="onAcceptLegalNote">{{messages.accept}}</v-btn>
-      </v-col>
-    </div>
-    </div>
+        </div>
+      </div>
   </v-app>
 </template>
 <script>
@@ -327,6 +327,7 @@ export default {
 .explore-generators-cards {
   overflow-y: auto;
   margin: 0px;
+  /* height: calc(100% - 4rem); */
 }
 
 .v-card__title {
