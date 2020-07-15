@@ -73,9 +73,9 @@
 		},
 		"configuration": {
 			"type": "object",
-			"title": "Yeoman UI",
+			"title": "Application Wizard",
 			"properties": {
-				"Yeoman UI.loggingLevel": {
+				"loggingLevel": {
 					"type": "string",
 					"enum": [
 						"off",
@@ -90,22 +90,22 @@
 					"description": "The verbosity of logging according to the following order: trace > debug > info > warn > error > fatal > off.",
 					"scope": "resource"
 				},
-				"Yeoman UI.sourceLocationTracking": {
+				"sourceLocationTracking": {
 					"type": "boolean",
 					"default": false,
 					"description": "If chosen, the location of the source code is added to log entries. Warning – this action may slow your extension. We recommend you use it only for debugging.",
 					"scope": "resource"
 				},
-				"Explore Generators.installationLocation": {
+				"installationLocation": {
 					"type": "string",
 					"markdownDescription": "Install generators in a specified location. If not set, global location is used."
 				},
-				"Explore Generators.autoUpdate": {
+				"autoUpdate": {
 					"type": "boolean",
 					"default": true,
 					"description": "Auto update installed generators."
 				},
-				"Explore Generators.searchQuery": {
+				"searchQuery": {
 					"type": "array",
 					"default": [
 						"SAP",

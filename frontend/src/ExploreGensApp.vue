@@ -94,9 +94,6 @@
             <v-card-actions class="pa-4">
               <v-btn class="white--text"
                 min-width="130px"
-                raised
-                dark
-                elevation="5"
                 :text="gen.disabledToHandle"
                 :disabled="gen.disabledToHandle"
                 :color="gen.color"

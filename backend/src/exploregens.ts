@@ -14,7 +14,7 @@ export class ExploreGens {
         return _.trim(wsConfig.get(ExploreGens.INSTALLATION_LOCATION));
     }
 
-    private static readonly INSTALLATION_LOCATION = "Explore Generators.installationLocation";
+    private static readonly INSTALLATION_LOCATION = "installationLocation";
 
     private logger: IChildLogger;
     private rpc: IRpc;
@@ -26,9 +26,9 @@ export class ExploreGens {
 
     private readonly theiaCommands: string[] = ["theia.open", "preferences:open", "keymaps:open", "workspace:openRecent"];
     private readonly GLOBAL_ACCEPT_LEGAL_NOTE = "global.exploreGens.acceptlegalNote";
-    private readonly LAST_AUTO_UPDATE_DATE = "Explore Generators.lastAutoUpdateDate";
-    private readonly SEARCH_QUERY = "Explore Generators.searchQuery";
-    private readonly AUTO_UPDATE = "Explore Generators.autoUpdate"
+    private readonly LAST_AUTO_UPDATE_DATE = "lastAutoUpdateDate";
+    private readonly SEARCH_QUERY = "searchQuery";
+    private readonly AUTO_UPDATE = "autoUpdate"
     private readonly NPM = (process.platform === "win32" ? "npm.cmd" : "npm");
     private readonly EMPTY = "";
     private readonly NODE_MODULES = "node_modules";

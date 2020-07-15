@@ -15,7 +15,7 @@ import { ExploreGens } from '../exploregens';
 
 
 export class YeomanUIPanel extends AbstractWebviewPanel {
-	public static YEOMAN_UI = "Yeoman UI";
+	public static YEOMAN_UI = "Application Wizard";
 	private static channel: vscode.OutputChannel;
 
 	public toggleOutput() {

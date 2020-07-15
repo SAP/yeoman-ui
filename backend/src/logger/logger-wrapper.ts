@@ -6,7 +6,7 @@ import { getLoggingLevelSetting, getSourceLocationTrackingSetting} from "./setti
 
 // const PACKAGE_JSON = "package.json";
 const YEOMAN_UI_LOGGER_NAME = "yeomanui";
-const YEOMAN_UI = "Yeoman UI";
+const YEOMAN_UI = "Application Wizard";
 
 /**
  * A Simple Wrapper to hold the state of our "singleton" (per extension) IVSCodeExtLogger
