@@ -11,20 +11,16 @@
       flat
       class="explore-generators"
     >
-      <v-expansion-panel class="explore-generators-panel">
-        <v-expansion-panel-header disable-icon-rotate style="font-size:14px;font-style:bold">
-          {{messages.description}}
-          <template v-slot:actions>
-            <v-icon color="primary">$expand</v-icon>
-          </template>
-        </v-expansion-panel-header>
+      <v-expansion-panel>
+        <v-expansion-panel-header style="font-size:14px">{{messages.description}} View disclaimer ></v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-row>
-            <v-icon class="ma-2" color="blue">mdi-information-outline</v-icon>
-            <v-col class="pa-2">
-              <v-card-title
-                style="text-align:justify;font-size:14px;font-style:bold"
-              >{{messages.legal_note}}</v-card-title>
+            <!-- <v-col :cols="1"> -->
+
+            <!-- </v-col> -->
+            <v-col>
+              <v-icon class="pa-0 ma-0" color="blue">mdi-information-outline</v-icon>
+              <v-card-title style="font-size:14px">{{messages.legal_note}}</v-card-title>
             </v-col>
           </v-row>
         </v-expansion-panel-content>
@@ -86,16 +82,16 @@
           >
             <v-card-title>{{gen.package.name}}</v-card-title>
             <v-card-subtitle>{{gen.package.version}}</v-card-subtitle>
-            <v-card-text min-height="30" style="overflow-y:auto">{{gen.package.description}}</v-card-text>
+            <v-card-text min-height="70" style="overflow-y:auto">{{gen.package.description}}</v-card-text>
             <v-spacer></v-spacer>
             <v-card-text class="homepage">
               <a :href="gen.package.links.npm">{{messages.more_info}}</a>
             </v-card-text>
+            
             <v-card-actions class="pa-4">
-              <v-btn class="white--text"
+              <v-btn
                 min-width="130px"
                 :text="gen.disabledToHandle"
-                :disabled="gen.disabledToHandle"
                 :color="gen.color"
                 @click="onAction(gen)"
               >{{gen.action}}</v-btn>
@@ -107,12 +103,12 @@
     </v-slide-x-transition>
     <div v-if="!isLegalNoteAccepted && ready" class="pa-2">
       <v-row class="pa-2">
-        <v-icon class="ma-2" color="blue">mdi-information-outline</v-icon>
-        <v-col class="pa-2">
-          <v-card-title style="text-align:justify;font-size:14px">{{messages.legal_note}}</v-card-title>
+        <v-col>
+          <v-icon class="pa-0 ma-0" color="blue">mdi-information-outline</v-icon>
+          <v-card-title style="font-size:14px">{{messages.legal_note}}</v-card-title>
         </v-col>
       </v-row>
-      <v-col class="ml-8">
+      <v-col class="ml-4">
         <v-btn @click="onAcceptLegalNote">{{messages.accept}}</v-btn>
       </v-col>
     </div>
@@ -173,24 +169,30 @@ export default {
       return gen.installed ? this.messages.uninstall : this.messages.install;
     },
     actionColor(gen) {
+      if (gen.disabledToHandle) {
+        return "primary";
+      }
+
       return gen.installed ? "#585858" : "primary";
     },
     async onAction(gen) {
-      gen.disabledToHandle = true;
-      gen.action = this.actionName(gen);
-      const action = gen.installed ? "uninstall" : "install";
-      gen.color = this.actionColor(gen);
-      gen.installed = await this.rpc.invoke(action, [gen]);
+      if (!gen.disabledToHandle) {
+        gen.disabledToHandle = true;
+        gen.action = this.actionName(gen);
+        const action = gen.installed ? "uninstall" : "install";
+        gen.color = this.actionColor(gen);
+        gen.installed = await this.rpc.invoke(action, [gen]);
 
-      const currentGen = _.find(this.gens, currentGen => {
-        return gen.package.name === currentGen.package.name;
-      });
+        const currentGen = _.find(this.gens, currentGen => {
+          return gen.package.name === currentGen.package.name;
+        });
 
-      if (currentGen) {
-        currentGen.disabledToHandle = false;
-        currentGen.installed = gen.installed;
-        currentGen.action = this.actionName(currentGen);
-        currentGen.color = this.actionColor(currentGen);
+        if (currentGen) {
+          currentGen.disabledToHandle = false;
+          currentGen.installed = gen.installed;
+          currentGen.action = this.actionName(currentGen);
+          currentGen.color = this.actionColor(currentGen);
+        }
       }
     },
     onQueryChange() {
@@ -271,7 +273,7 @@ export default {
     await this.setupRpc();
     await Promise.all([
       await this.setIsLegalNoteAccepted(),
-      this.setIsInTheia()
+      await this.setIsInTheia()
     ]);
     await Promise.all([
       this.getRecommendedQuery(),
@@ -307,7 +309,7 @@ export default {
   background-color: var(--vscode-list-hoverBackground, #2a2d2e);
 }
 .explore-generators .theme--light.v-expansion-panels .v-expansion-panel,
-.explore-generators-cards
+explore-generators-cards
   .theme--light.v-card
   .v-card__subtitle.v-card__subtitle,
 .explore-generators-cards .v-icon.v-icon,
@@ -319,24 +321,16 @@ export default {
   margin: 0px;
   height: calc(100% - 4rem);
 }
-
 .v-card__title {
   word-wrap: break-word;
   word-break: normal;
 }
-
 .homepage.v-card__text {
   padding-bottom: 0;
 }
 a {
   font-size: 11px;
 }
-.explore-generators-panel {
-  background-color: var(--vscode-editor-background, #1e1e1e) !important;
-  box-shadow: none;
-  text-align: justify;
-}
-
 .explore-generators-search-gens {
   background-color: var(--vscode-editorWidget-background, #252526);
 }

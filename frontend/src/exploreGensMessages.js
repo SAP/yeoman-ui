@@ -18,5 +18,5 @@ export default {
     installing: "Installing...",
     uninstalling: "Uninstalling...",
     more_info: "More information",
-    accept: "I Accept"
+    accept: "OK"
 }; 
