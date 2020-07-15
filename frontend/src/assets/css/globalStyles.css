@@ -85,7 +85,7 @@ div.v-application .error--text {
 form.inquirer-gui .error-validation-text{
   font-size: 12px;
   padding-left: 0px;
-  color: var(--vscode-foreground, #cccccc);
+  color: #ff5252;
 }
 
 form.inquirer-gui i.theme--light.v-icon {
