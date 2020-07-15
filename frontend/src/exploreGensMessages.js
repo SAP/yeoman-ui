@@ -19,6 +19,6 @@ export default {
     uninstalling: "Uninstalling...",
     more_info: "More information",
     accept: "OK",
-    view_disclaimer: "View disclaimer",
-    hide_disclaimer: "Hide disclaimer"
+    view_disclaimer: "View Disclaimer",
+    hide_disclaimer: "Hide Disclaimer"
 }; 

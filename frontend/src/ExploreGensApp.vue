@@ -5,7 +5,7 @@
         <v-toolbar-title>{{messages.title}}</v-toolbar-title>
       </v-app-bar>
     </div>
-    <v-card-title class="pa-2" style="font-size:14px">{{messages.description}}</v-card-title>
+    <v-card-text class="pa-2" style="font-size:14px">{{messages.description}}</v-card-text>
     <v-expansion-panels
       v-if="isInTheia && isLegalNoteAccepted && ready"
       flat
