@@ -6,7 +6,11 @@
       </v-app-bar>
     </div>
 
-    <v-expansion-panels v-if="isInTheia && isLegalNoteAccepted && ready" flat class="explore-generators">
+    <v-expansion-panels
+      v-if="isInTheia && isLegalNoteAccepted && ready"
+      flat
+      class="explore-generators"
+    >
       <v-expansion-panel class="explore-generators-panel">
         <v-expansion-panel-header disable-icon-rotate style="font-size:14px;font-style:bold">
           {{messages.description}}
@@ -29,35 +33,35 @@
     <v-card-title v-else class="pa-2" style="font-size:14px">{{messages.description}}</v-card-title>
 
     <v-row v-if="isLegalNoteAccepted && ready">
-          <v-col :cols="10">
-            <v-text-field
-              class="explore-generators-search-gens"
-              :label="messages.search"
-              v-model="query"
-              outlined
-              hide-details="auto"
-              @input="onQueryChange"
-              clearable
-              @click:clear="onQueryChange"
-            />
-          </v-col>
-          <v-col :cols="2">
-            <v-select
-              class="explore-generators-search-gens"
-              hide-details="auto"
-              outlined
-              :items="items"
-              v-model="recommended"
-              :label="messages.recommended"
-              @change="onQueryChange"
-            />
-          </v-col>
+      <v-col :cols="10">
+        <v-text-field
+          class="explore-generators-search-gens"
+          :label="messages.search"
+          v-model="query"
+          outlined
+          hide-details="auto"
+          @input="onQueryChange"
+          clearable
+          @click:clear="onQueryChange"
+        />
+      </v-col>
+      <v-col :cols="2">
+        <v-select
+          class="explore-generators-search-gens"
+          hide-details="auto"
+          outlined
+          :items="items"
+          v-model="recommended"
+          :label="messages.recommended"
+          @change="onQueryChange"
+        />
+      </v-col>
     </v-row>
 
     <v-row class="explore-generators-search pa-2" v-if="isLegalNoteAccepted && ready">
-          <v-card-title>{{searchResults}}</v-card-title>
-          <v-icon v-if="refineSearch" color="blue">mdi-information-outline</v-icon>
-          <v-card-title class="pa-0 ml-2" v-if="refineSearch">{{messages.refine_search}}</v-card-title>
+      <v-card-title>{{searchResults}}</v-card-title>
+      <v-icon v-if="refineSearch" color="blue">mdi-information-outline</v-icon>
+      <v-card-title class="pa-0 ml-2" v-if="refineSearch">{{messages.refine_search}}</v-card-title>
     </v-row>
 
     <v-slide-x-transition v-if="isLegalNoteAccepted && ready">
@@ -73,59 +77,47 @@
           <v-card
             width="500"
             class="d-flex flex-column mx-auto"
-            height="250"
+            height="260"
             tile
             hover
             flat
             dark
             elevation="2"
           >
-            <v-row class="ml-1">
-              <v-card-title>{{gen.package.name}}</v-card-title>
-              <v-col class="mt-1">
-                <v-card-title style="font-size:12px">{{gen.package.version}}</v-card-title>
-              </v-col>
-            </v-row>
-
-            <v-card-text scrollable class="description">{{gen.package.description}}</v-card-text>
+            <v-card-title>{{gen.package.name}}</v-card-title>
+            <v-card-subtitle>{{gen.package.version}}</v-card-subtitle>
+            <v-card-text min-height="30" style="overflow-y:auto">{{gen.package.description}}</v-card-text>
             <v-spacer></v-spacer>
             <v-card-text class="homepage">
               <a :href="gen.package.links.npm">{{messages.more_info}}</a>
             </v-card-text>
-            <v-card-actions>
-              <div class="pa-2">
-                <v-btn
-                  min-width="140px"
-                  raised
-                  dark
-                  elevation="5"
-                  :disabled="gen.disabledToHandle"
-                  :color="gen.color"
-                  @click="onAction(gen)"
-                >{{gen.action}}</v-btn>
-              </div>
-              <v-spacer v-if="!gen.disabledToHandle"></v-spacer>
+            <v-card-actions class="pa-4">
+              <v-btn class="white--text"
+                min-width="130px"
+                raised
+                dark
+                elevation="5"
+                :text="gen.disabledToHandle"
+                :disabled="gen.disabledToHandle"
+                :color="gen.color"
+                @click="onAction(gen)"
+              >{{gen.action}}</v-btn>
             </v-card-actions>
-            <v-progress-linear
-              v-if="gen.disabledToHandle"
-              class="ma-0 pa-0"
-              indeterminate
-              color="primary"
-            ></v-progress-linear>
+            <v-progress-linear v-if="gen.disabledToHandle" indeterminate color="primary"></v-progress-linear>
           </v-card>
         </v-col>
       </v-row>
     </v-slide-x-transition>
     <div v-if="!isLegalNoteAccepted && ready" class="pa-2">
-        <v-row class="pa-2">
-          <v-icon class="ma-2" color="blue">mdi-information-outline</v-icon>
-          <v-col class="pa-2">
-            <v-card-title style="text-align:justify;font-size:14px">{{messages.legal_note}}</v-card-title>
-          </v-col>
-        </v-row>
-        <v-col class="ml-8">
-          <v-btn @click="onAcceptLegalNote">{{messages.accept}}</v-btn>
+      <v-row class="pa-2">
+        <v-icon class="ma-2" color="blue">mdi-information-outline</v-icon>
+        <v-col class="pa-2">
+          <v-card-title style="text-align:justify;font-size:14px">{{messages.legal_note}}</v-card-title>
         </v-col>
+      </v-row>
+      <v-col class="ml-8">
+        <v-btn @click="onAcceptLegalNote">{{messages.accept}}</v-btn>
+      </v-col>
     </div>
   </v-app>
 </template>
@@ -190,6 +182,7 @@ export default {
       gen.disabledToHandle = true;
       gen.action = this.actionName(gen);
       const action = gen.installed ? "uninstall" : "install";
+      gen.color = this.actionColor(gen);
       gen.installed = await this.rpc.invoke(action, [gen]);
 
       const currentGen = _.find(this.gens, currentGen => {
@@ -334,10 +327,7 @@ export default {
   word-wrap: break-word;
   word-break: normal;
 }
-.description.v-card__text {
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
+
 .homepage.v-card__text {
   padding-bottom: 0;
 }
