@@ -61,8 +61,7 @@ export class ExploreGens {
 
     private async isLegalNoteAccepted() {
         const isInTheia: boolean = await this.isInTheia();
-        // return isInTheia ? this.context.globalState.get(this.GLOBAL_ACCEPT_LEGAL_NOTE, false) : true;
-        return true;
+        return isInTheia ? this.context.globalState.get(this.GLOBAL_ACCEPT_LEGAL_NOTE, false) : true;
     }
 
     private async isInTheia() {
@@ -72,8 +71,7 @@ export class ExploreGens {
             this.isInTheiaCached = !_.isEmpty(foundCommands);
         }
 
-        // return this.isInTheiaCached;
-        return true;
+        return this.isInTheiaCached;
     }
 
     private async acceptLegalNote() {
