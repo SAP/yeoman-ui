@@ -168,6 +168,7 @@ form.inquirer-gui .v-card.selected {
   background-color: var(--vscode-list-hoverBackground,#2a2d2e) ;
 }
 .explore-generators-cards .v-card__title,
+.explore-generators-cards .v-card__subtitle,
 form.inquirer-gui .v-card__title {
   color: var(--vscode-foreground, #cccccc);
 }

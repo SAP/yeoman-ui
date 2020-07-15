@@ -1,35 +1,35 @@
 <template>
-  <v-app id="exploregens" class="exploregens-main">
-    <div class="explore-generators">
-      <v-app-bar class="pa-0 ma-0">
+  <v-app id="exploregens" class="exploregens-main explore-generators">
+    <div>
+      <v-app-bar dense class="pa-0 ma-0 elevation-0">
         <v-toolbar-title>{{messages.title}}</v-toolbar-title>
-        <v-spacer></v-spacer>
       </v-app-bar>
-      <v-expansion-panels v-if="isInTheia" flat>
-        <v-expansion-panel class="explore-generators-panel">
-          <v-expansion-panel-header disable-icon-rotate>
-            {{messages.description}}
-            <template v-slot:actions>
-              <v-icon color="primary">$expand</v-icon>
-            </template>
-          </v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <v-row>
-              <v-icon class="mr-3" color="blue">mdi-information-outline</v-icon>
-              <v-col class="pa-2">
-                <v-text>{{messages.legal_note}}</v-text>
-              </v-col>
-            </v-row>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels>
     </div>
-    <v-row class="mt-3">
+    <v-card-title class="pa-2" style="font-size:14px">{{messages.description}}</v-card-title>
+    <v-expansion-panels
+      v-if="isInTheia && isLegalNoteAccepted && ready"
+      flat
+      class="explore-generators"
+    >
+      <v-expansion-panel @click="onDisclaimer">
+        <v-expansion-panel-header class="homepage pa-2"><a style="text-decoration:underline">{{disclaimer}}</a></v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-row>
+            <v-col>
+              <v-card-text class="pa-0 ma-0" style="font-size:14px">{{messages.legal_note}}</v-card-text>
+            </v-col>
+          </v-row>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </v-expansion-panels>
+
+    <v-row v-if="isLegalNoteAccepted && ready">
       <v-col :cols="10">
         <v-text-field
-          class="explore-generators-search-gens pa-2"
+          class="explore-generators-search-gens"
           :label="messages.search"
           v-model="query"
+          outlined
           hide-details="auto"
           @input="onQueryChange"
           clearable
@@ -38,8 +38,9 @@
       </v-col>
       <v-col :cols="2">
         <v-select
-          class="explore-generators-search-gens pa-2"
+          class="explore-generators-search-gens"
           hide-details="auto"
+          outlined
           :items="items"
           v-model="recommended"
           :label="messages.recommended"
@@ -48,13 +49,13 @@
       </v-col>
     </v-row>
 
-    <v-row class="explore-generators-search">
+    <v-row class="explore-generators-search pa-2" v-if="isLegalNoteAccepted && ready">
       <v-card-title>{{searchResults}}</v-card-title>
       <v-icon v-if="refineSearch" color="blue">mdi-information-outline</v-icon>
       <v-card-title class="pa-0 ml-2" v-if="refineSearch">{{messages.refine_search}}</v-card-title>
     </v-row>
 
-    <v-slide-x-transition>
+    <v-slide-x-transition v-if="isLegalNoteAccepted && ready">
       <v-row class="explore-generators-cards">
         <v-col
           v-for="(gen, i) in gens"
@@ -64,46 +65,48 @@
           sm="6"
           class="pb-2 d-flex flex-column"
         >
-          <v-item>
-            <v-card
-              width="500"
-              class="d-flex flex-column mx-auto"
-              height="250"
-              tile
-              hover
-              flat
-              dark
-              elevation="2"
-            >
-              <v-card-title>{{genDisplayName(gen)}}</v-card-title>
-              <v-card-text scrollable class="description">{{gen.package.description}}</v-card-text>
-              <v-spacer></v-spacer>
-              <v-card-text class="homepage">
-                <a :href="gen.package.links.npm">{{messages.more_info}}</a>
-              </v-card-text>
-              <v-card-actions>
-                <div class="ma-2">
-                  <v-btn
-                    min-width="140px"
-                    raised
-                    elevation="5"
-                    :disabled="gen.disabledToHandle"
-                    :color="gen.color"
-                    @click="onAction(gen)"
-                  >{{gen.action}}</v-btn>
-                  <v-progress-linear v-if="gen.disabledToHandle" indeterminate color="primary"></v-progress-linear>
-                </div>
-              </v-card-actions>
-            </v-card>
-          </v-item>
+          <v-card
+            width="500"
+            class="d-flex flex-column mx-auto"
+            height="260"
+            tile
+            hover
+            flat
+            dark
+            elevation="2"
+          >
+            <v-card-title>{{gen.package.name}}</v-card-title>
+            <v-card-subtitle>{{gen.package.version}}</v-card-subtitle>
+            <v-card-text min-height="70" style="overflow-y:auto">{{gen.package.description}}</v-card-text>
+            <v-spacer></v-spacer>
+            <v-card-text class="homepage">
+              <a :href="gen.package.links.npm">{{messages.more_info}}</a>
+            </v-card-text>
+            <v-card-actions class="pa-4">
+              <v-btn
+                min-width="130px"
+                :text="gen.disabledToHandle"
+                :color="gen.color"
+                @click="onAction(gen)"
+              >{{gen.action}}</v-btn>
+            </v-card-actions>
+            <v-progress-linear v-if="gen.disabledToHandle" indeterminate color="primary"></v-progress-linear>
+          </v-card>
         </v-col>
       </v-row>
     </v-slide-x-transition>
+    <div v-if="!isLegalNoteAccepted && ready">
+      <v-row class="pa-2">
+        <v-col>
+          <v-card-text class="pa-0 ma-0" style="font-size:14px">{{messages.legal_note}}</v-card-text>
+          <v-btn class="mt-6" @click="onAcceptLegalNote">{{messages.accept}}</v-btn>
+        </v-col>
+      </v-row>
+    </div>
   </v-app>
 </template>
-
 <script>
-const ALL_GENS = "all";
+const ALL_GENS = "All";
 
 import * as _ from "lodash";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
@@ -121,10 +124,16 @@ export default {
       query: "",
       recommended: ALL_GENS,
       messages,
-      isInTheia: false
+      isInTheia: false,
+      isLegalNoteAccepted: true,
+      ready: false,
+      disclaimerOpened: false
     };
   },
   computed: {
+    disclaimer() {
+      return this.disclaimerOpened ? this.messages.hide_disclaimer: this.messages.view_disclaimer;
+    },
     refineSearch() {
       const gensQuantity = _.size(this.gens);
       return !(this.total === gensQuantity);
@@ -142,6 +151,9 @@ export default {
     }
   },
   methods: {
+    onDisclaimer() {
+      this.disclaimerOpened = !this.disclaimerOpened;
+    },
     genDisplayName(gen) {
       return `${gen.package.name} ${gen.package.version}`;
     },
@@ -155,23 +167,30 @@ export default {
       return gen.installed ? this.messages.uninstall : this.messages.install;
     },
     actionColor(gen) {
-      return gen.installed ? "grey" : "primary";
+      if (gen.disabledToHandle) {
+        return "primary";
+      }
+
+      return gen.installed ? "#585858" : "primary";
     },
     async onAction(gen) {
-      gen.disabledToHandle = true;
-      gen.action = this.actionName(gen);
-      const action = gen.installed ? "uninstall" : "install";
-      gen.installed = await this.rpc.invoke(action, [gen]);
+      if (!gen.disabledToHandle) {
+        gen.disabledToHandle = true;
+        gen.action = this.actionName(gen);
+        const action = gen.installed ? "uninstall" : "install";
+        gen.color = this.actionColor(gen);
+        gen.installed = await this.rpc.invoke(action, [gen]);
 
-      const currentGen = _.find(this.gens, currentGen => {
-        return gen.package.name === currentGen.package.name;
-      });
+        const currentGen = _.find(this.gens, currentGen => {
+          return gen.package.name === currentGen.package.name;
+        });
 
-      if (currentGen) {
-        currentGen.disabledToHandle = false;
-        currentGen.installed = gen.installed;
-        currentGen.action = this.actionName(currentGen);
-        currentGen.color = this.actionColor(currentGen);
+        if (currentGen) {
+          currentGen.disabledToHandle = false;
+          currentGen.installed = gen.installed;
+          currentGen.action = this.actionName(currentGen);
+          currentGen.color = this.actionColor(currentGen);
+        }
       }
     },
     onQueryChange() {
@@ -199,6 +218,12 @@ export default {
     },
     async setIsInTheia() {
       this.isInTheia = await this.rpc.invoke("isInTheia");
+    },
+    async setIsLegalNoteAccepted() {
+      this.isLegalNoteAccepted = await this.rpc.invoke("isLegalNoteAccepted");
+    },
+    async onAcceptLegalNote() {
+      this.isLegalNoteAccepted = await this.rpc.invoke("acceptLegalNote");
     },
     async updateBeingHandledGenerator(genName, isBeingHandled) {
       const gen = _.find(this.gens, gen => {
@@ -245,10 +270,14 @@ export default {
   async created() {
     await this.setupRpc();
     await Promise.all([
-      this.getRecommendedQuery(),
-      this.getFilteredGenerators(),
-      this.setIsInTheia()
+      await this.setIsLegalNoteAccepted(),
+      await this.setIsInTheia()
     ]);
+    await Promise.all([
+      this.getRecommendedQuery(),
+      this.getFilteredGenerators()
+    ]);
+    this.ready = true;
   }
 };
 </script>
@@ -278,9 +307,6 @@ export default {
   background-color: var(--vscode-list-hoverBackground, #2a2d2e);
 }
 .explore-generators .theme--light.v-expansion-panels .v-expansion-panel,
-.explore-generators-cards
-  .theme--light.v-card
-  .v-card__subtitle.v-card__subtitle,
 .explore-generators-cards .v-icon.v-icon,
 .explore-generators-cards .v-card > div.v-card__text {
   color: var(--vscode-editorCodeLens-foreground, #999999);
@@ -290,14 +316,9 @@ export default {
   margin: 0px;
   height: calc(100% - 4rem);
 }
-
 .v-card__title {
   word-wrap: break-word;
   word-break: normal;
-}
-.description.v-card__text {
-  text-overflow: ellipsis;
-  overflow: hidden;
 }
 .homepage.v-card__text {
   padding-bottom: 0;
@@ -305,16 +326,13 @@ export default {
 a {
   font-size: 11px;
 }
-.explore-generators-panel {
-  background-color: var(--vscode-editor-background, #1e1e1e) !important;
-  box-shadow: none;
-  text-align: justify;
-}
-
 .explore-generators-search-gens {
   background-color: var(--vscode-editorWidget-background, #252526);
 }
 .explore-generators-search .v-card__title {
   font-size: 14px;
+}
+.explore-generators-cards .v-card__subtitle {
+  color: var(--vscode-foreground, #cccccc) !important; 
 }
 </style>
