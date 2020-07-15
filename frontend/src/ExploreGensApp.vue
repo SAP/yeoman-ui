@@ -5,7 +5,6 @@
         <v-toolbar-title>{{messages.title}}</v-toolbar-title>
       </v-app-bar>
     </div>
-
     <v-expansion-panels
       v-if="isInTheia && isLegalNoteAccepted && ready"
       flat
@@ -15,12 +14,8 @@
         <v-expansion-panel-header style="font-size:14px">{{messages.description}} View disclaimer ></v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-row>
-            <!-- <v-col :cols="1"> -->
-
-            <!-- </v-col> -->
             <v-col>
-              <v-icon class="pa-0 ma-0" color="blue">mdi-information-outline</v-icon>
-              <v-card-title style="font-size:14px">{{messages.legal_note}}</v-card-title>
+              <v-card-title class="pa-0 ma-0" style="font-size:14px">{{messages.legal_note}}</v-card-title>
             </v-col>
           </v-row>
         </v-expansion-panel-content>
@@ -87,7 +82,6 @@
             <v-card-text class="homepage">
               <a :href="gen.package.links.npm">{{messages.more_info}}</a>
             </v-card-text>
-            
             <v-card-actions class="pa-4">
               <v-btn
                 min-width="130px"
@@ -101,16 +95,13 @@
         </v-col>
       </v-row>
     </v-slide-x-transition>
-    <div v-if="!isLegalNoteAccepted && ready" class="pa-2">
+    <div v-if="!isLegalNoteAccepted && ready">
       <v-row class="pa-2">
         <v-col>
-          <v-icon class="pa-0 ma-0" color="blue">mdi-information-outline</v-icon>
-          <v-card-title style="font-size:14px">{{messages.legal_note}}</v-card-title>
+          <v-card-title class="pa-0 ma-0" style="font-size:14px">{{messages.legal_note}}</v-card-title>
+          <v-btn class="mt-6" @click="onAcceptLegalNote">{{messages.accept}}</v-btn>
         </v-col>
       </v-row>
-      <v-col class="ml-4">
-        <v-btn @click="onAcceptLegalNote">{{messages.accept}}</v-btn>
-      </v-col>
     </div>
   </v-app>
 </template>
