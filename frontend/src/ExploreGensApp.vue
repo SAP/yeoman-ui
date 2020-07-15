@@ -1,7 +1,7 @@
 <template>
   <v-app id="exploregens" class="exploregens-main explore-generators">
     <div>
-      <v-app-bar dense="true" class="pa-0 ma-0 elevation-0">
+      <v-app-bar dense class="pa-0 ma-0 elevation-0">
         <v-toolbar-title>{{messages.title}}</v-toolbar-title>
       </v-app-bar>
     </div>
@@ -11,8 +11,8 @@
       flat
       class="explore-generators"
     >
-      <v-expansion-panel>
-        <v-expansion-panel-header class="homepage pa-2"><a style="text-decoration:underline">View Disclaimer</a></v-expansion-panel-header>
+      <v-expansion-panel @click="onDisclaimer">
+        <v-expansion-panel-header class="homepage pa-2"><a style="text-decoration:underline">{{disclaimer}}</a></v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-row>
             <v-col>
@@ -126,10 +126,14 @@ export default {
       messages,
       isInTheia: false,
       isLegalNoteAccepted: true,
-      ready: false
+      ready: false,
+      disclaimerOpened: false
     };
   },
   computed: {
+    disclaimer() {
+      return this.disclaimerOpened ? this.messages.hide_disclaimer: this.messages.view_disclaimer;
+    },
     refineSearch() {
       const gensQuantity = _.size(this.gens);
       return !(this.total === gensQuantity);
@@ -147,6 +151,9 @@ export default {
     }
   },
   methods: {
+    onDisclaimer() {
+      this.disclaimerOpened = !this.disclaimerOpened;
+    },
     genDisplayName(gen) {
       return `${gen.package.name} ${gen.package.version}`;
     },
@@ -300,9 +307,6 @@ export default {
   background-color: var(--vscode-list-hoverBackground, #2a2d2e);
 }
 .explore-generators .theme--light.v-expansion-panels .v-expansion-panel,
-.explore-generators-cards
-  .theme--light.v-card
-  .v-card__subtitle.v-card__subtitle,
 .explore-generators-cards .v-icon.v-icon,
 .explore-generators-cards .v-card > div.v-card__text {
   color: var(--vscode-editorCodeLens-foreground, #999999);
@@ -328,8 +332,7 @@ a {
 .explore-generators-search .v-card__title {
   font-size: 14px;
 }
-.v-card__subtitle {
-  color: var(--vscode-editorCodeLens-foreground, #999999);
-  white-space:pre-wrap;
+.explore-generators-cards .v-card__subtitle {
+  color: var(--vscode-foreground, #cccccc) !important; 
 }
 </style>
