@@ -300,7 +300,7 @@ export default {
   background-color: var(--vscode-list-hoverBackground, #2a2d2e);
 }
 .explore-generators .theme--light.v-expansion-panels .v-expansion-panel,
-explore-generators-cards
+.explore-generators-cards
   .theme--light.v-card
   .v-card__subtitle.v-card__subtitle,
 .explore-generators-cards .v-icon.v-icon,
