@@ -513,7 +513,7 @@ describe('yeomanui unit test', () => {
         it("setDefaults", () => {
             const questions = [
                 {name: "q1", default: "a"},
-                {name: "q2", default: () => { return "b";}},
+                {name: "q2", default: () => "b"},
                 {name: "q3"}
             ];
             const answers = {
@@ -521,7 +521,7 @@ describe('yeomanui unit test', () => {
                 q2: "y",
                 q3: "z"
             };
-            ReplayUtils.setDefaults(questions, answers);
+            ReplayUtils["setDefaults"](questions, answers);
             for (const index in questions) {
                 const question = questions[index];
                 switch (question.name) {

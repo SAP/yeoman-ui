@@ -14,7 +14,7 @@ export class ExploreGens {
         return _.trim(wsConfig.get(ExploreGens.INSTALLATION_LOCATION));
     }
 
-    private static readonly INSTALLATION_LOCATION = "Explore Generators.installationLocation";
+    private static readonly INSTALLATION_LOCATION = "installationLocation";
 
     private logger: IChildLogger;
     private rpc: IRpc;
@@ -25,9 +25,10 @@ export class ExploreGens {
     private isInTheiaCached: boolean;
 
     private readonly theiaCommands: string[] = ["theia.open", "preferences:open", "keymaps:open", "workspace:openRecent"];
-    private readonly LAST_AUTO_UPDATE_DATE = "Explore Generators.lastAutoUpdateDate";
-    private readonly SEARCH_QUERY = "Explore Generators.searchQuery";
-    private readonly AUTO_UPDATE = "Explore Generators.autoUpdate"
+    private readonly GLOBAL_ACCEPT_LEGAL_NOTE = "global.exploreGens.acceptlegalNote";
+    private readonly LAST_AUTO_UPDATE_DATE = "lastAutoUpdateDate";
+    private readonly SEARCH_QUERY = "searchQuery";
+    private readonly AUTO_UPDATE = "autoUpdate"
     private readonly NPM = (process.platform === "win32" ? "npm.cmd" : "npm");
     private readonly EMPTY = "";
     private readonly NODE_MODULES = "node_modules";
@@ -58,6 +59,26 @@ export class ExploreGens {
         this.cachedInstalledGeneratorsPromise = this.getAllInstalledGenerators();
     }
 
+    private async isLegalNoteAccepted() {
+        const isInTheia: boolean = await this.isInTheia();
+        return isInTheia ? this.context.globalState.get(this.GLOBAL_ACCEPT_LEGAL_NOTE, false) : true;
+    }
+
+    private async isInTheia() {
+        if (_.isNil(this.isInTheiaCached)) {
+            const commands = await this.vscode.commands.getCommands(true);
+            const foundCommands = _.intersection(commands, this.theiaCommands);
+            this.isInTheiaCached = !_.isEmpty(foundCommands);
+        }
+
+        return this.isInTheiaCached;
+    }
+
+    private async acceptLegalNote() {
+        await this.context.globalState.update(this.GLOBAL_ACCEPT_LEGAL_NOTE, true);
+        return true;
+    }
+
     private doGeneratorsUpdate() {
         const lastUpdateDate = this.context.globalState.get(this.LAST_AUTO_UPDATE_DATE, 0);
         const currentDate = Date.now();
@@ -83,6 +104,8 @@ export class ExploreGens {
         this.rpc.registerMethod({ func: this.isInstalled, thisArg: this });
         this.rpc.registerMethod({ func: this.getRecommendedQuery, thisArg: this });
         this.rpc.registerMethod({ func: this.isInTheia, thisArg: this });
+        this.rpc.registerMethod({ func: this.isLegalNoteAccepted, thisArg: this });
+        this.rpc.registerMethod({ func: this.acceptLegalNote, thisArg: this });
     }
 
     private async updateAllInstalledGenerators() {
@@ -260,15 +283,5 @@ export class ExploreGens {
             return packagePath.substring(nodeModulesIndex + this.NODE_MODULES.length + 1);
         })
         resolve(_.uniq(gensFullNames));
-    }
-
-    private async isInTheia() {
-        if (_.isNil(this.isInTheiaCached)) {
-            const commands = await this.vscode.commands.getCommands(true);
-            const foundCommands = _.intersection(commands, this.theiaCommands);
-            this.isInTheiaCached = !_.isEmpty(foundCommands);
-        }
-
-        return this.isInTheiaCached;
     }
 }

@@ -23,8 +23,8 @@ describe('vscode-youi-events unit test', () => {
                 fsPath: path
             };
         });
-        _.set(vscode, "window.showInformationMessage", () => {return Promise.resolve("");});
-        _.set(vscode, "window.showErrorMessage", () => {return Promise.resolve("");});
+        _.set(vscode, "window.showInformationMessage", () => Promise.resolve(""));
+        _.set(vscode, "window.showErrorMessage", () => Promise.resolve(""));
         _.set(vscode, "workspace.workspaceFolders", []);
         _.set(vscode, "workspace.updateWorkspaceFolders", (): any => undefined);
         _.set(vscode, "commands.executeCommand", (): any => undefined);
@@ -52,7 +52,7 @@ describe('vscode-youi-events unit test', () => {
 
     it("doGeneratorInstall", () => {
         const showInstallMessageSpy = sandbox.spy(events,"showInstallMessage");
-        _.set(vscode, "window.withProgress", () => {return Promise.resolve("");});
+        _.set(vscode, "window.withProgress", () => Promise.resolve(""));
         events.doGeneratorInstall();
         // tslint:disable-next-line: no-unused-expression
         expect(showInstallMessageSpy.called).to.be.true;
@@ -108,11 +108,11 @@ describe('vscode-youi-events unit test', () => {
 
         it("generator filter type is module", () => {
             const genFilter = GeneratorFilter.create({type: ["module"]});
-            const events = new VSCodeYouiEvents(undefined, undefined, genFilter);
-            eventsMock = sandbox.mock(events);
+            const testEvents = new VSCodeYouiEvents(undefined, undefined, genFilter);
+            eventsMock = sandbox.mock(testEvents);
             eventsMock.expects("doClose");
             windowMock.expects("showInformationMessage").withExactArgs('The project has been generated.').resolves();
-            return events.doGeneratorDone(true, "success message", "testDestinationRoot");
+            return testEvents.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
     });
 });

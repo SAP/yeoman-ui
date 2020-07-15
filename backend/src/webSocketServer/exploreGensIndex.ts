@@ -50,6 +50,11 @@ class ExploreGensWebSocketServer {
               get: () => true
             };
           }
+        },
+        commands: {
+          getCommands: async () => {
+            [];
+          }
         }
       };
       this.exploreGens = new ExploreGens(this.rpc, childLogger as IChildLogger, context, vscode);

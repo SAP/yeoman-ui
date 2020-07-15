@@ -151,6 +151,35 @@ describe('exploregens unit test', () => {
         vscodeCommandsMock.verify();
     });
 
+    it("acceptLegalNote", async () => {
+        globalStateMock.expects("update").withExactArgs(exploregens["GLOBAL_ACCEPT_LEGAL_NOTE"], true).resolves();
+        const res = await exploregens["acceptLegalNote"](); 
+        expect(res).to.be.true;
+    });
+
+    describe("isLegalNoteAccepted", () => {
+        it("is in theia, legal note is accepted", async () => {
+            exploregens["isInTheiaCached"] = true;
+            globalStateMock.expects("get").withExactArgs(exploregens["GLOBAL_ACCEPT_LEGAL_NOTE"], false).returns(true);
+            const res = await exploregens["isLegalNoteAccepted"](); 
+            expect(res).to.be.true;
+        });
+
+        it("is in theia, legal note is not accepted", async () => {
+            exploregens["isInTheiaCached"] = true;
+            globalStateMock.expects("get").withExactArgs(exploregens["GLOBAL_ACCEPT_LEGAL_NOTE"], false).returns(false);
+            const res = await exploregens["isLegalNoteAccepted"](); 
+            expect(res).to.be.false;
+        });
+
+        it("is not in theia", async () => {
+            exploregens["isInTheiaCached"] = false;
+            globalStateMock.expects("get").never();
+            const res = await exploregens["isLegalNoteAccepted"](); 
+            expect(res).to.be.true;
+        });
+    });
+
     describe("isInTheia", () => {
         it("use cached value", async () => {
             exploregens["isInTheiaCached"] = true;
@@ -200,6 +229,8 @@ describe('exploregens unit test', () => {
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInstalled"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInTheia"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isLegalNoteAccepted"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["acceptLegalNote"], thisArg: exploregens });
 
             const customLocation = path.join("home", "user", "projects");
             workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns(customLocation);
@@ -215,7 +246,9 @@ describe('exploregens unit test', () => {
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInstalled"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInTheia"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens });
-            
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isLegalNoteAccepted"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["acceptLegalNote"], thisArg: exploregens });
+
             workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns("");
             yoEnvMock.expects("createEnv").returns(testYoEnv);
             testYoEnvMock.expects("lookup").withArgs({npmPaths: []});

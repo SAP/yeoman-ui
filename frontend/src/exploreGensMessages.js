@@ -2,7 +2,7 @@ export default {
     title: "Explore and Install Generators",
     description: "This view enables the exploration and installation of external open source Yeoman generators.",
     legal_note: `SAP provides you with a mechanism to access third party sites to view and download open-source, 3rd party or its own tools, libraries, or software components (“Extensions”)  to dev spaces in SAP Business Application Studio.
-    Using this mechanism, you can view and install Yeoman Generators from the public npm registry at your own risk. 
+    Using this mechanism, you can view and install Yeoman Generators from the public npm registry at your own risk.
     SAP does not certify or endorse any of the third-party sites or Extensions, and they are not part of SAP Business Application Studio. 
     You must ensure that you have and maintain all the necessary rights to use these Extensions.
     You are responsible for all aspects of the Extensions, including maintenance, management, security, and support.  
@@ -17,5 +17,8 @@ export default {
     uninstall: "Uninstall",
     installing: "Installing...",
     uninstalling: "Uninstalling...",
-    more_info: "More information"
+    more_info: "More information",
+    accept: "OK",
+    view_disclaimer: "View Disclaimer",
+    hide_disclaimer: "Hide Disclaimer"
 }; 

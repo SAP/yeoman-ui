@@ -1,10 +1,10 @@
 {
   "name": "yeoman-ui-frontend",
-  "displayName": "Yeoman UI Frontend",
+  "displayName": "Application Wizard Frontend",
   "version": "0.4.5",
   "publisher": "SAP",
   "license": "Apache 2.0",
-  "description": "Frontend for the yeoman UI framework",
+  "description": "Frontend for the application wizard framework",
   "private": true,
   "scripts": {
     "serve-eg": "vue-cli-service serve --exploregens",
