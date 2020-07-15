@@ -5,23 +5,23 @@
         <v-toolbar-title>{{messages.title}}</v-toolbar-title>
       </v-app-bar>
     </div>
+    <v-card-title class="pa-2" style="font-size:14px">{{messages.description}}</v-card-title>
     <v-expansion-panels
       v-if="isInTheia && isLegalNoteAccepted && ready"
       flat
       class="explore-generators"
     >
       <v-expansion-panel>
-        <v-expansion-panel-header style="font-size:14px">{{messages.description}} View disclaimer ></v-expansion-panel-header>
+        <v-expansion-panel-header class="homepage pa-2"><a style="text-decoration:underline">View Disclaimer</a></v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-row>
             <v-col>
-              <v-card-title class="pa-0 ma-0" style="font-size:14px">{{messages.legal_note}}</v-card-title>
+              <v-card-text class="pa-0 ma-0" style="font-size:14px">{{messages.legal_note}}</v-card-text>
             </v-col>
           </v-row>
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
-    <v-card-title v-else class="pa-2" style="font-size:14px">{{messages.description}}</v-card-title>
 
     <v-row v-if="isLegalNoteAccepted && ready">
       <v-col :cols="10">
@@ -98,7 +98,7 @@
     <div v-if="!isLegalNoteAccepted && ready">
       <v-row class="pa-2">
         <v-col>
-          <v-card-title class="pa-0 ma-0" style="font-size:14px">{{messages.legal_note}}</v-card-title>
+          <v-card-text class="pa-0 ma-0" style="font-size:14px">{{messages.legal_note}}</v-card-text>
           <v-btn class="mt-6" @click="onAcceptLegalNote">{{messages.accept}}</v-btn>
         </v-col>
       </v-row>
@@ -327,5 +327,9 @@ a {
 }
 .explore-generators-search .v-card__title {
   font-size: 14px;
+}
+.v-card__subtitle {
+  color: var(--vscode-editorCodeLens-foreground, #999999);
+  white-space:pre-wrap;
 }
 </style>
