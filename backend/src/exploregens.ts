@@ -260,7 +260,7 @@ export class ExploreGens {
     }
 
     private async getNpmGlobalPath(): Promise<string> {
-        const res = await this.exec(`${this.NPM} config get prefix`);
+        const res = await this.exec(`${this.NPM} root -g`);
         const globalPath = _.trim(res.stdout);
         return _.endsWith(globalPath, this.NODE_MODULES) ? globalPath : path.join(globalPath, this.NODE_MODULES);
     }
@@ -285,10 +285,11 @@ export class ExploreGens {
     private onEnvLookup(env: Environment.Options, resolve: any) {
         const gensMeta: string[] = env.getGeneratorsMeta();
         const gensFullNames = _.map(gensMeta, (genMeta: any) => {
-            const packagePath = genMeta.packagePath;
-            const nodeModulesIndex = packagePath.indexOf(this.NODE_MODULES);
-            return packagePath.substring(nodeModulesIndex + this.NODE_MODULES.length + 1);
+            const packagePath = path.normalize(genMeta.packagePath);
+            const nodeModulesIndex = packagePath.indexOf(path.join(path.sep, this.NODE_MODULES));
+            return packagePath.substring(nodeModulesIndex + this.NODE_MODULES.length + 2);
         });
+        
         resolve(_.uniq(gensFullNames));
     }
 }
