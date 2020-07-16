@@ -251,7 +251,7 @@ describe('exploregens unit test', () => {
 
             workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns("");
             yoEnvMock.expects("createEnv").returns(testYoEnv);
-            testYoEnvMock.expects("lookup").withArgs({npmPaths: []});
+            testYoEnvMock.expects("lookup");
             exploregens["init"](rpc);
         });
     });

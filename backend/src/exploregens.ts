@@ -8,13 +8,12 @@ import * as path from "path";
 import messages from "./exploreGensMessages";
 import Environment = require("yeoman-environment");
 
-
 export class ExploreGens {
     public static getInstallationLocation(wsConfig: any) {
         return _.trim(wsConfig.get(ExploreGens.INSTALLATION_LOCATION));
     }
 
-    private static readonly INSTALLATION_LOCATION = "installationLocation";
+    private static readonly INSTALLATION_LOCATION = "ApplicationWizard.installationLocation";
 
     private logger: IChildLogger;
     private rpc: IRpc;
@@ -23,12 +22,13 @@ export class ExploreGens {
     private context: any;
     private vscode: any;
     private isInTheiaCached: boolean;
+    private npmGlobalPathPromise: Promise<string>;
 
     private readonly theiaCommands: string[] = ["theia.open", "preferences:open", "keymaps:open", "workspace:openRecent"];
     private readonly GLOBAL_ACCEPT_LEGAL_NOTE = "global.exploreGens.acceptlegalNote";
-    private readonly LAST_AUTO_UPDATE_DATE = "lastAutoUpdateDate";
-    private readonly SEARCH_QUERY = "searchQuery";
-    private readonly AUTO_UPDATE = "autoUpdate"
+    private readonly LAST_AUTO_UPDATE_DATE = "global.exploreGens.lastAutoUpdateDate";
+    private readonly SEARCH_QUERY = "ApplicationWizard.searchQuery";
+    private readonly AUTO_UPDATE = "ApplicationWizard.autoUpdate"
     private readonly NPM = (process.platform === "win32" ? "npm.cmd" : "npm");
     private readonly EMPTY = "";
     private readonly NODE_MODULES = "node_modules";
@@ -42,6 +42,7 @@ export class ExploreGens {
         this.vscode = vscode;
         this.logger = logger;
         this.gensBeingHandled = [];
+        this.npmGlobalPathPromise = this.getNpmGlobalPath();
         this.init(rpc);
         this.doGeneratorsUpdate();
     }
@@ -86,14 +87,6 @@ export class ExploreGens {
             this.context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
             this.updateAllInstalledGenerators();
         }
-    }
-
-    private async getAllInstalledGenerators(): Promise<string[]> {
-        return new Promise(resolve => {
-            const yoEnv: Environment.Options = Environment.createEnv();
-            const npmPaths = this.getNpmPaths(yoEnv);
-            yoEnv.lookup({ npmPaths }, async () => this.onEnvLookup(yoEnv, resolve));
-        });
     }
 
     private initRpc(rpc: IRpc) {
@@ -266,10 +259,24 @@ export class ExploreGens {
         return `${this.NPM} uninstall ${locationParams} ${genName}`;
     }
 
-    private getNpmPaths(env: Environment.Options) {
+    private async getNpmGlobalPath(): Promise<string> {
+        const res = await this.exec(`${this.NPM} config get prefix`);
+        const globalPath = _.trim(res.stdout);
+        return _.endsWith(globalPath, this.NODE_MODULES) ? globalPath : path.join(globalPath, this.NODE_MODULES);
+    }
+    
+    private async getAllInstalledGenerators(): Promise<string[]> {
+        const npmPaths = await this.getNpmPaths();
+        return new Promise(resolve => {
+            const yoEnv: Environment.Options = Environment.createEnv();
+            yoEnv.lookup({ npmPaths }, async () => this.onEnvLookup(yoEnv, resolve));
+        });
+    }
+
+    private async getNpmPaths() {
         const customLocation = ExploreGens.getInstallationLocation(this.getWsConfig());
         if (_.isEmpty(customLocation)) {
-            return env.getNpmPaths();
+            return [await this.npmGlobalPathPromise];
         }
 
         return [path.join(customLocation, this.NODE_MODULES)];
@@ -281,7 +288,7 @@ export class ExploreGens {
             const packagePath = genMeta.packagePath;
             const nodeModulesIndex = packagePath.indexOf(this.NODE_MODULES);
             return packagePath.substring(nodeModulesIndex + this.NODE_MODULES.length + 1);
-        })
+        });
         resolve(_.uniq(gensFullNames));
     }
 }
