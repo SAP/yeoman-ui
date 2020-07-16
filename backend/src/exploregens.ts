@@ -1,5 +1,6 @@
 import * as npmFetch from "npm-registry-fetch";
 import * as _ from "lodash";
+import * as os from "os";
 import * as cp from "child_process";
 import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
@@ -7,7 +8,7 @@ import * as util from "util";
 import * as path from "path";
 import messages from "./exploreGensMessages";
 import Environment = require("yeoman-environment");
-
+import {EnvironmentUtils} from "./envUtils";
 
 export class ExploreGens {
     public static getInstallationLocation(wsConfig: any) {
@@ -31,7 +32,6 @@ export class ExploreGens {
     private readonly AUTO_UPDATE = "ApplicationWizard.autoUpdate"
     private readonly NPM = (process.platform === "win32" ? "npm.cmd" : "npm");
     private readonly EMPTY = "";
-    private readonly NODE_MODULES = "node_modules";
     private readonly ONE_DAY = 1000 * 60 * 60 * 24;
     private readonly NPM_REGISTRY_HOST = _.get(process, "env.NPM_CFG_REGISTRY", "http://registry.npmjs.com/");
     private readonly SEARCH_QUERY_PREFIX = `${this.NPM_REGISTRY_HOST}-/v1/search?text=`;
@@ -86,15 +86,6 @@ export class ExploreGens {
             this.context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
             this.updateAllInstalledGenerators();
         }
-    }
-
-    private async getAllInstalledGenerators(): Promise<string[]> {
-        return new Promise(resolve => {
-            const yoEnv: Environment.Options = Environment.createEnv();
-            const npmPaths = this.getNpmPaths(yoEnv);
-            this.logger.debug("npmPaths", npmPaths);
-            yoEnv.lookup({ npmPaths }, async () => this.onEnvLookup(yoEnv, resolve));
-        });
     }
 
     private initRpc(rpc: IRpc) {
@@ -266,22 +257,30 @@ export class ExploreGens {
     private getNpmUninstallCommand(locationParams: string, genName: string) {
         return `${this.NPM} uninstall ${locationParams} ${genName}`;
     }
+    
+    private async getAllInstalledGenerators(): Promise<string[]> {
+        return new Promise(resolve => {
+            const yoEnv: Environment.Options = Environment.createEnv();
+            const npmPaths = this.getNpmPaths(yoEnv);
+            yoEnv.lookup({ npmPaths }, async () => this.onEnvLookup(yoEnv, resolve));
+        });
+    }
 
     private getNpmPaths(env: Environment.Options) {
         const customLocation = ExploreGens.getInstallationLocation(this.getWsConfig());
         if (_.isEmpty(customLocation)) {
-            return env.getNpmPaths();
+            return EnvironmentUtils.getNpmPaths(env);
         }
 
-        return [path.join(customLocation, this.NODE_MODULES)];
+        return [path.join(customLocation, EnvironmentUtils.NODE_MODULES)];
     }
 
     private onEnvLookup(env: Environment.Options, resolve: any) {
         const gensMeta: string[] = env.getGeneratorsMeta();
         const gensFullNames = _.map(gensMeta, (genMeta: any) => {
             const packagePath = genMeta.packagePath;
-            const nodeModulesIndex = packagePath.indexOf(this.NODE_MODULES);
-            return packagePath.substring(nodeModulesIndex + this.NODE_MODULES.length + 1);
+            const nodeModulesIndex = packagePath.indexOf(EnvironmentUtils.NODE_MODULES);
+            return packagePath.substring(nodeModulesIndex + EnvironmentUtils.NODE_MODULES.length + 1);
         });
         resolve(_.uniq(gensFullNames));
     }

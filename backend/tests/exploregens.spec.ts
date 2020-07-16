@@ -9,6 +9,7 @@ import * as npmFetch from 'npm-registry-fetch';
 import { mockVscode } from "./mockUtil";
 import messages from "../src/exploreGensMessages";
 import Environment = require("yeoman-environment");
+import {EnvironmentUtils} from "../src/envUtils";
 
 const testYoEnv = {
     lookup: () => true,
@@ -235,7 +236,7 @@ describe('exploregens unit test', () => {
             const customLocation = path.join("home", "user", "projects");
             workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns(customLocation);
             yoEnvMock.expects("createEnv").returns(testYoEnv);
-            testYoEnvMock.expects("lookup").withArgs({npmPaths: [path.join(customLocation, exploregens["NODE_MODULES"])]});
+            testYoEnvMock.expects("lookup").withArgs({npmPaths: [path.join(customLocation, EnvironmentUtils.NODE_MODULES)]});
             exploregens["init"](rpc);
         });
 
@@ -251,7 +252,7 @@ describe('exploregens unit test', () => {
 
             workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns("");
             yoEnvMock.expects("createEnv").returns(testYoEnv);
-            testYoEnvMock.expects("lookup").withArgs({npmPaths: []});
+            testYoEnvMock.expects("lookup");
             exploregens["init"](rpc);
         });
     });

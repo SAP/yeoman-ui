@@ -17,6 +17,7 @@ import Generator = require("yeoman-generator");
 import { GeneratorFilter, GeneratorType } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
+import {EnvironmentUtils} from "./envUtils";
 
 export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
@@ -26,10 +27,7 @@ export class YeomanUI {
   private static defaultMessage = 
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
   private static YEOMAN_PNG = "yeoman.png";
-  private static isWin32 = (process.platform === 'win32');
-  private static HOME_DIR = os.homedir();
-  private static readonly PROJECTS: string = path.join(YeomanUI.HOME_DIR, 'projects');
-  private static readonly NODE_MODULES = 'node_modules';
+  private static readonly PROJECTS: string = path.join(EnvironmentUtils.HOME_DIR, 'projects');
 
   private static funcReplacer(key: any, value: any) {
     return _.isFunction(value) ? "__Function" : value;
@@ -104,27 +102,14 @@ export class YeomanUI {
   }
 
   private async getGeneratorsPrompt(): Promise<IQuestionsPrompt> {
-    // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
-    // on the other hand, we never look for newly installed generators...
     const that = this;
     const promise: Promise<IQuestionsPrompt> = new Promise(resolve => {
       const env: Environment.Options = Environment.createEnv();
-      const npmPaths = this.getNpmPaths(env); 
+      const npmPaths = EnvironmentUtils.getNpmPaths(env, _.get(that.uiOptions, "defaultNpmPaths")); 
       env.lookup({npmPaths}, async () => this.onEnvLookup(env, resolve, that.uiOptions.genFilter));
     });
 
     return promise;
-  }
-
-  private getNpmPaths(env: Environment.Options) {
-    const parts: string[] = YeomanUI.HOME_DIR.split(path.sep);
-    const userPaths =  _.map(parts, (part, index) => {
-      const resPath = path.join(...parts.slice(0, index + 1), YeomanUI.NODE_MODULES);
-      return YeomanUI.isWin32 ? resPath : path.join(path.sep, resPath);
-    });
-     
-    const defaultPaths = _.get(this.uiOptions, "defaultNpmPaths", env.getNpmPaths());
-    return _.uniq(userPaths.concat(defaultPaths));
   }
 
   private async getChildDirectories(folderPath: string) {
