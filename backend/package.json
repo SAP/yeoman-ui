@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.3",
+	"version": "1.1.4",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -75,7 +75,7 @@
 			"type": "object",
 			"title": "Application Wizard",
 			"properties": {
-				"loggingLevel": {
+				"ApplicationWizard.loggingLevel": {
 					"type": "string",
 					"enum": [
 						"off",
@@ -90,22 +90,22 @@
 					"description": "The verbosity of logging according to the following order: trace > debug > info > warn > error > fatal > off.",
 					"scope": "resource"
 				},
-				"sourceLocationTracking": {
+				"ApplicationWizard.sourceLocationTracking": {
 					"type": "boolean",
 					"default": false,
 					"description": "If chosen, the location of the source code is added to log entries. Warning – this action may slow your extension. We recommend you use it only for debugging.",
 					"scope": "resource"
 				},
-				"installationLocation": {
+				"ApplicationWizard.installationLocation": {
 					"type": "string",
 					"markdownDescription": "Install generators in a specified location. If not set, global location is used."
 				},
-				"autoUpdate": {
+				"ApplicationWizard.autoUpdate": {
 					"type": "boolean",
 					"default": true,
-					"description": "Auto update installed generators."
+					"description": "Automatically update installed generators."
 				},
-				"searchQuery": {
+				"ApplicationWizard.searchQuery": {
 					"type": "array",
 					"default": [
 						"SAP",

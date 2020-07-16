@@ -14,7 +14,7 @@ export class ExploreGens {
         return _.trim(wsConfig.get(ExploreGens.INSTALLATION_LOCATION));
     }
 
-    private static readonly INSTALLATION_LOCATION = "installationLocation";
+    private static readonly INSTALLATION_LOCATION = "ApplicationWizard.installationLocation";
 
     private logger: IChildLogger;
     private rpc: IRpc;
@@ -26,9 +26,9 @@ export class ExploreGens {
 
     private readonly theiaCommands: string[] = ["theia.open", "preferences:open", "keymaps:open", "workspace:openRecent"];
     private readonly GLOBAL_ACCEPT_LEGAL_NOTE = "global.exploreGens.acceptlegalNote";
-    private readonly LAST_AUTO_UPDATE_DATE = "lastAutoUpdateDate";
-    private readonly SEARCH_QUERY = "searchQuery";
-    private readonly AUTO_UPDATE = "autoUpdate"
+    private readonly LAST_AUTO_UPDATE_DATE = "global.exploreGens.lastAutoUpdateDate";
+    private readonly SEARCH_QUERY = "ApplicationWizard.searchQuery";
+    private readonly AUTO_UPDATE = "ApplicationWizard.autoUpdate"
     private readonly NPM = (process.platform === "win32" ? "npm.cmd" : "npm");
     private readonly EMPTY = "";
     private readonly NODE_MODULES = "node_modules";
@@ -92,6 +92,7 @@ export class ExploreGens {
         return new Promise(resolve => {
             const yoEnv: Environment.Options = Environment.createEnv();
             const npmPaths = this.getNpmPaths(yoEnv);
+            this.logger.debug("npmPaths", npmPaths);
             yoEnv.lookup({ npmPaths }, async () => this.onEnvLookup(yoEnv, resolve));
         });
     }
@@ -281,7 +282,7 @@ export class ExploreGens {
             const packagePath = genMeta.packagePath;
             const nodeModulesIndex = packagePath.indexOf(this.NODE_MODULES);
             return packagePath.substring(nodeModulesIndex + this.NODE_MODULES.length + 1);
-        })
+        });
         resolve(_.uniq(gensFullNames));
     }
 }
