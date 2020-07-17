@@ -13,7 +13,7 @@ import Environment = require("yeoman-environment");
 const testYoEnv = {
     lookup: () => true,
     getNpmPaths: (): any[] => [],
-    getGeneratorsMeta: () => new Error("not implemented")
+    getGeneratorNames: () => new Error("not implemented")
 };
 const config = {
     get: () => new Error("not implemented"),
@@ -458,7 +458,7 @@ describe('exploregens unit test', () => {
 
     describe("onEnvLookup", () => {
         it("there are no installed generators", async () => {
-            testYoEnvMock.expects("getGeneratorsMeta").returns([]);
+            testYoEnvMock.expects("getGeneratorNames").returns([]);
             const res = await new Promise(resolve => {
                 exploregens["onEnvLookup"](testYoEnv, resolve);
             });
@@ -466,19 +466,14 @@ describe('exploregens unit test', () => {
         });
 
         it("there are installed generators", async () => {
-            testYoEnvMock.expects("getGeneratorsMeta").returns([{
-                packagePath: path.join("path1", "node_modules", "generator-aa")
-            }, {
-                packagePath: path.join("path2", "node_modules", "generator-bb")
-            }, {
-                packagePath: path.join("path3", "node_modules", "generator-aa")
-            }]);
+            testYoEnvMock.expects("getGeneratorNames").returns(["aa", "bb", `@sap/cc`]);
             const res = await new Promise(resolve => {
                 exploregens["onEnvLookup"](testYoEnv, resolve);
             });
-            expect(res).to.have.lengthOf(2);
+            expect(res).to.have.lengthOf(3);
             expect(res).includes("generator-bb");
             expect(res).includes("generator-aa");
+            expect(res).includes("@sap/generator-cc");
         });
     });
 

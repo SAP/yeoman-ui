@@ -31,7 +31,9 @@ export class ExploreGens {
     private readonly AUTO_UPDATE = "ApplicationWizard.autoUpdate"
     private readonly NPM = (process.platform === "win32" ? "npm.cmd" : "npm");
     private readonly EMPTY = "";
+    private readonly SLASH = "/";
     private readonly NODE_MODULES = "node_modules";
+    private readonly GENERATOR = "generator-";
     private readonly ONE_DAY = 1000 * 60 * 60 * 24;
     private readonly NPM_REGISTRY_HOST = _.get(process, "env.NPM_CFG_REGISTRY", "http://registry.npmjs.com/");
     private readonly SEARCH_QUERY_PREFIX = `${this.NPM_REGISTRY_HOST}-/v1/search?text=`;
@@ -261,8 +263,7 @@ export class ExploreGens {
 
     private async getNpmGlobalPath(): Promise<string> {
         const res = await this.exec(`${this.NPM} root -g`);
-        const globalPath = _.trim(res.stdout);
-        return _.endsWith(globalPath, this.NODE_MODULES) ? globalPath : path.join(globalPath, this.NODE_MODULES);
+        return _.trim(res.stdout);
     }
     
     private async getAllInstalledGenerators(): Promise<string[]> {
@@ -283,13 +284,12 @@ export class ExploreGens {
     }
 
     private onEnvLookup(env: Environment.Options, resolve: any) {
-        const gensMeta: string[] = env.getGeneratorsMeta();
-        const gensFullNames = _.map(gensMeta, (genMeta: any) => {
-            const packagePath = path.normalize(genMeta.packagePath);
-            const nodeModulesIndex = packagePath.indexOf(path.join(path.sep, this.NODE_MODULES));
-            return packagePath.substring(nodeModulesIndex + this.NODE_MODULES.length + 2);
+        const genNames = env.getGeneratorNames();
+        const gensFullNames = _.map(genNames, genName => {
+            const parts = _.split(genName, this.SLASH);
+            return _.size(parts) === 1 ? `${this.GENERATOR}${genName}` : `${parts[0]}${this.SLASH}${this.GENERATOR}${parts[1]}`;
         });
         
-        resolve(_.uniq(gensFullNames));
+        resolve(gensFullNames);
     }
 }
