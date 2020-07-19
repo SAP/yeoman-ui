@@ -8,7 +8,7 @@ import * as path from "path";
 import messages from "./exploreGensMessages";
 import Environment = require("yeoman-environment");
 
-enum GenState {
+export enum GenState {
     uninstalling = "uninstalling",
     updating = "updating",
     installing = "installing",
@@ -118,8 +118,9 @@ export class ExploreGens {
         if (!_.isEmpty(installedGenerators)) {
             this.logger.debug(messages.auto_update_started);
             const statusBarMessage = this.vscode.window.setStatusBarMessage(messages.auto_update_started);
+            const locationParams = this.getGeneratorsLocationParams();
             const promises = _.map(installedGenerators, genName => {
-                return this.updateGenerator(genName);
+                return this.update(locationParams, genName);
             });
 
             await Promise.all(promises);
@@ -192,7 +193,8 @@ export class ExploreGens {
         try {
             this.logger.debug(installingMessage);
             this.updateBeingHandledGenerator(genName, GenState.installing);
-            const installCommand = this.getNpmInstallCommand(genName);
+            const locationParams = this.getGeneratorsLocationParams();
+            const installCommand = this.getNpmInstallCommand(locationParams, genName);
             await this.exec(installCommand);
             const successMessage = messages.installed(genName);
             this.logger.debug(successMessage);
@@ -217,7 +219,8 @@ export class ExploreGens {
         try {
             this.logger.debug(uninstallingMessage);
             this.updateBeingHandledGenerator(genName, GenState.uninstalling);
-            const uninstallCommand = this.getNpmUninstallCommand(genName);
+            const locationParams = this.getGeneratorsLocationParams();
+            const uninstallCommand = this.getNpmUninstallCommand(locationParams, genName);
             await this.exec(uninstallCommand);
             const successMessage = messages.uninstalled(genName);
             this.logger.debug(successMessage);
@@ -233,13 +236,13 @@ export class ExploreGens {
         }
     }
 
-    private async updateGenerator(genName: string) {
+    private async update(locationParams: string, genName: string) {
         this.addToHandled(genName, GenState.updating);
 
         try {
             this.logger.debug(messages.updating(genName));
             this.updateBeingHandledGenerator(genName, GenState.updating);
-            const installCommand = this.getNpmInstallCommand(genName);
+            const installCommand = this.getNpmInstallCommand(locationParams, genName);
             await this.exec(installCommand);
             this.logger.debug(messages.updated(genName));
             this.updateBeingHandledGenerator(genName, GenState.installed);
@@ -278,13 +281,11 @@ export class ExploreGens {
         return _.includes(installedGens, gen.package.name);
     }
 
-    private getNpmInstallCommand(genName: string) {
-        const locationParams = this.getGeneratorsLocationParams();
+    private getNpmInstallCommand(locationParams: string, genName: string) {
         return `${this.NPM} install ${locationParams} ${genName}@latest`;
     }
 
-    private getNpmUninstallCommand(genName: string) {
-        const locationParams = this.getGeneratorsLocationParams();
+    private getNpmUninstallCommand(locationParams: string, genName: string) {
         return `${this.NPM} uninstall ${locationParams} ${genName}`;
     }
 
