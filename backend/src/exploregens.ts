@@ -89,14 +89,14 @@ export class ExploreGens {
         return true;
     }
 
-    private doGeneratorsUpdate() {
+    private async doGeneratorsUpdate() {
         const lastUpdateDate = this.context.globalState.get(this.LAST_AUTO_UPDATE_DATE, 0);
         const currentDate = Date.now();
         if ((currentDate - lastUpdateDate) > this.ONE_DAY) {
             this.context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
             const autoUpdateEnabled = this.getWsConfig().get(this.AUTO_UPDATE, true);
             if (autoUpdateEnabled) {
-                this.updateAllInstalledGenerators();
+                await this.updateAllInstalledGenerators();
             }
         }
     }
@@ -247,7 +247,7 @@ export class ExploreGens {
             this.logger.debug(messages.updated(genName));
             this.updateBeingHandledGenerator(genName, GenState.installed);
         } catch (error) {
-            this.showAndLogError(messages.failed_to_install(genName), error);
+            this.showAndLogError(messages.failed_to_update(genName), error);
             this.updateBeingHandledGenerator(genName, GenState.notInstalled);
         } finally {
             this.removeFromHandled(genName);
