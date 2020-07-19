@@ -47,7 +47,7 @@ class ExploreGensWebSocketServer {
         workspace: {
           getConfiguration: () => {
             return {
-              get: () => true
+              get: () => ""
             };
           }
         },
@@ -57,7 +57,8 @@ class ExploreGensWebSocketServer {
           }
         }
       };
-      this.exploreGens = new ExploreGens(this.rpc, childLogger as IChildLogger, context, vscode);
+      this.exploreGens = new ExploreGens(childLogger as IChildLogger, context, vscode);
+      this.exploreGens.init(this.rpc);
     });
   }
 }

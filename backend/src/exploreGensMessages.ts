@@ -7,5 +7,7 @@ export default {
     uninstalled: (genName: string) => `${genName} has been uninstalled.`,
     installing: (genName: string) => `Installing the latest version of ${genName}...`,
     installed: (genName: string) => `${genName} has been installed.`,
+    updating: (genName: string) => `Updating to the latest version of ${genName}...`,
+    updated: (genName: string) => `${genName} has been updated.`,
     failed_to_get: (gensQueryUrl: string) => `Could not get generators with the queryUrl ${gensQueryUrl}`
 }; 

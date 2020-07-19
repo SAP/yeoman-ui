@@ -154,43 +154,26 @@ export default {
     onDisclaimer() {
       this.disclaimerOpened = !this.disclaimerOpened;
     },
-    genDisplayName(gen) {
-      return `${gen.package.name} ${gen.package.version}`;
-    },
     actionName(gen) {
-      if (gen.disabledToHandle) {
-        return gen.installed
-          ? this.messages.uninstalling
-          : this.messages.installing;
+      if (gen.state === "installed") {
+        return messages.uninstall;
+      } else if (gen.state === "notInstalled") {
+        return messages.install;
+      } else { // installing, uninstalling, updating
+        return messages[gen.state];
       }
-
-      return gen.installed ? this.messages.uninstall : this.messages.install;
     },
     actionColor(gen) {
       if (gen.disabledToHandle) {
         return "primary";
       }
 
-      return gen.installed ? "#585858" : "primary";
+      return gen.state === "installed" ? "#585858" : "primary";
     },
-    async onAction(gen) {
+    onAction(gen) {
       if (!gen.disabledToHandle) {
-        gen.disabledToHandle = true;
-        gen.action = this.actionName(gen);
-        const action = gen.installed ? "uninstall" : "install";
-        gen.color = this.actionColor(gen);
-        gen.installed = await this.rpc.invoke(action, [gen]);
-
-        const currentGen = _.find(this.gens, currentGen => {
-          return gen.package.name === currentGen.package.name;
-        });
-
-        if (currentGen) {
-          currentGen.disabledToHandle = false;
-          currentGen.installed = gen.installed;
-          currentGen.action = this.actionName(currentGen);
-          currentGen.color = this.actionColor(currentGen);
-        }
+        const action = (gen.state === "installed" ? "uninstall" : "install");
+        this.rpc.invoke(action, [gen]);
       }
     },
     onQueryChange() {
@@ -225,13 +208,16 @@ export default {
     async onAcceptLegalNote() {
       this.isLegalNoteAccepted = await this.rpc.invoke("acceptLegalNote");
     },
-    async updateBeingHandledGenerator(genName, isBeingHandled) {
+    async updateBeingHandledGenerator(genName, genState) {
       const gen = _.find(this.gens, gen => {
         return gen.package.name === genName;
       });
 
       if (gen) {
-        gen.disabledToHandle = isBeingHandled;
+        gen.disabledToHandle = _.includes(["uninstalling", "installing", "updating"], genState);
+        gen.state = genState;
+        gen.action = this.actionName(gen);
+        gen.color = this.actionColor(gen);
       }
     },
     getVscodeApi() {
@@ -245,10 +231,15 @@ export default {
     },
     initRpc(rpc) {
       this.rpc = rpc;
-      rpc.registerMethod({
-        func: this.updateBeingHandledGenerator,
-        thisArg: this,
-        name: this.updateBeingHandledGenerator.name
+      const functions = [
+        "updateBeingHandledGenerator"
+      ];
+      _.forEach(functions, funcName => {
+        this.rpc.registerMethod({
+          func: this[funcName],
+          thisArg: this,
+          name: funcName
+        });
       });
     },
     async setupRpc() {
