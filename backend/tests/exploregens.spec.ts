@@ -316,20 +316,20 @@ describe('exploregens unit test', () => {
             expect(res[0][1].state).to.be.equal(GenState.installed);
         });
 
-        it.skip("query parameter is some words", async () => {
+        it("a generator is updating", async () => {
             const expectedResult = {
                 objects: [{ package: { name: "generator-aa" } }],
                 total: 1
             }
             const url = exploregens["getGensQueryURL"]("test of query", "");
             npmFetchMock.expects("json").withExactArgs(url).resolves(expectedResult);
-            exploregens["gensBeingHandled"] = ["generator-aa"];
+            exploregens["gensBeingHandled"] = [{name: "generator-aa", state: GenState.updating}];
             exploregens["cachedInstalledGeneratorsPromise"] = Promise.resolve(["generator-aa"]);
             const res = await exploregens["getFilteredGenerators"]("test of query");
             expect(res[0]).to.be.deep.equal(expectedResult.objects);
             expect(res[1]).to.be.equal(expectedResult.total);
             expect(res[0][0].disabledToHandle).to.be.true;
-            expect(res[0][0].installed).to.be.true;
+            expect(res[0][0].state).to.be.equal(GenState.updating);
         });
 
         it("npmFetch.json throws error", async () => {
