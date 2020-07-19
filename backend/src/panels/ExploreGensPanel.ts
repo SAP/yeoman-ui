@@ -9,7 +9,7 @@ import { RpcExtension } from "@sap-devx/webview-rpc/out.ext/rpc-extension";
 export class ExploreGensPanel extends AbstractWebviewPanel {
     public setWebviewPanel(webviewPanel: vscode.WebviewPanel) {
         super.setWebviewPanel(webviewPanel);
-        this.exploreGens = new ExploreGens(new RpcExtension(webviewPanel.webview), this.logger, this.context, vscode);
+        this.exploreGens.init(new RpcExtension(webviewPanel.webview));
         this.initWebviewPanel();
     }
 
@@ -20,6 +20,7 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
         this.viewTitle = "Explore and Install Generators";
         this.focusedKey = "exploreGens.Focused";
         this.htmlFileName = path.join("exploregens", "index.html");
+        this.exploreGens = new ExploreGens(this.logger, this.context, vscode);
     }
 
     public loadWebviewPanel() {
@@ -32,6 +33,5 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
 
     public disposeWebviewPanel() {
 		super.disposeWebviewPanel();
-		this.exploreGens = null;
     }
 }
