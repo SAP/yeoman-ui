@@ -165,10 +165,14 @@ export default {
     isNoGenerators() {
       const promptName = _.get(this.currentPrompt, "name");
       const message = _.get(this.messages, "select_generator_name", "");
-      const noChoices = _.isEmpty(
-        _.get(this.currentPrompt, "questions[0].choices")
-      );
-      return promptName === message && noChoices;
+      if (promptName && promptName === message) {
+        const questions = _.compact(_.get(this.currentPrompt, "questions"));
+        const generatorQuestion = _.find(questions, question => {
+          return _.get(question, "name") === "generator";
+        });
+        return _.isEmpty(_.get(generatorQuestion, "choices"));
+      }
+      return false;
     }
   },
   watch: {

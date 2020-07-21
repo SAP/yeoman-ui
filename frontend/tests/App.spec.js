@@ -43,9 +43,17 @@ describe('App.vue', () => {
     it('generators exist', () => {
       wrapper = initComponent(App, {}, true)
       wrapper.vm.promptIndex = 0 
-      wrapper.vm.prompts = [{name: "Select Generator", questions: [{choices: [{}]}]}]
+      wrapper.vm.prompts = [{name: "Select Generator", questions: [{}, {name: "generator", choices: [{}]}]}]
       wrapper.vm.$data.messages = {select_generator_name: "Select Generator"};
       expect(wrapper.vm.isNoGenerators).toBeFalsy();
+    })
+
+    it("generators exist question.name != 'generator'", () => {
+      wrapper = initComponent(App, {}, true)
+      wrapper.vm.promptIndex = 0 
+      wrapper.vm.prompts = [{name: "Select Generator", questions: [{}, {choices: [{}]}]}]
+      wrapper.vm.$data.messages = {select_generator_name: "Select Generator"};
+      expect(wrapper.vm.isNoGenerators).toBeTruthy();
     })
 
     it('prompt name != generators', () => {
