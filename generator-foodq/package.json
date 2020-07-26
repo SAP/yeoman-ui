@@ -25,7 +25,7 @@
     "chalk": "^4.0.0",
     "datauri": "^2.0.0",
     "inquirer": "^7.1.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.16",
     "@sap-devx/yeoman-ui-types": "0.0.1"
   },
   "generator-filter": {
