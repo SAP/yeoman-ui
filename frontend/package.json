@@ -22,7 +22,7 @@
     "@sap-devx/inquirer-gui-login-plugin": "0.0.4",
     "@sap-devx/inquirer-gui-tiles-plugin": "0.0.8",
     "core-js": "2.6.6",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.16",
     "material-design-icons-iconfont": "^5.0.1",
     "vue": "^2.6.10",
     "vue-loading-overlay": "^3.3.0",
