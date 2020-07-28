@@ -320,7 +320,7 @@ export class YeomanUI {
         }
     } 
 
-    const message = `The '${generatorName}' project has been generated.`;
+    const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
     this.logger.debug("done running yeomanui! " + message + ` You can find it at ${targetFolderPath}`);
     this.youiEvents.doGeneratorDone(true, message, targetFolderPath);
   }

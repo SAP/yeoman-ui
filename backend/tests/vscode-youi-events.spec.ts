@@ -4,6 +4,7 @@ import * as sinon from "sinon";
 import * as _ from "lodash";
 import * as vscode from "vscode";
 import { GeneratorFilter } from '../src/filter';
+import * as messages from '../src/messages';
 
 import { VSCodeYouiEvents } from "../src/vscode-youi-events";
 
@@ -36,7 +37,7 @@ describe('vscode-youi-events unit test', () => {
 
     beforeEach(() => {
         const webViewPanel: any = {dispose: () => true};
-        events = new VSCodeYouiEvents(undefined, webViewPanel, GeneratorFilter.create());
+        events = new VSCodeYouiEvents(undefined, webViewPanel, GeneratorFilter.create(), messages.default);
         windowMock = sandbox.mock(vscode.window);
         commandsMock = sandbox.mock(vscode.commands);
         workspaceMock = sandbox.mock(vscode.workspace);
@@ -65,7 +66,7 @@ describe('vscode-youi-events unit test', () => {
             const actionName2 = 'Open in New Workspace';
             _.set(vscode, "workspace.workspaceFolders", [{uri: {fsPath: "rootFolderPath"}}]);
             windowMock.expects("showInformationMessage").
-                withExactArgs('The project has been generated.\nWhat would you like to do with it?', actionName1, actionName2).resolves();
+                withExactArgs(`${messages.default.artifact_generated}\nWhat would you like to do with it?`, actionName1, actionName2).resolves();
             return events.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
 
@@ -74,7 +75,7 @@ describe('vscode-youi-events unit test', () => {
             _.set(vscode, "workspace.workspaceFolders", [{uri: {fsPath: "rootFolderPath"}}, {uri: {fsPath: "testDestinationRoot"}}]);
             const actionName = 'Open in New Workspace';
             windowMock.expects("showInformationMessage").
-                withExactArgs('The project has been generated.\nWhat would you like to do with it?', actionName).resolves(actionName);
+                withExactArgs(`${messages.default.artifact_generated}\nWhat would you like to do with it?`, actionName).resolves(actionName);
             commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
             return events.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
@@ -85,7 +86,7 @@ describe('vscode-youi-events unit test', () => {
             const actionName1 = 'Add to Workspace';
             const actionName2 = 'Open in New Workspace';
             windowMock.expects("showInformationMessage").
-                withExactArgs('The project has been generated.\nWhat would you like to do with it?', actionName1, actionName2).resolves(actionName1);
+                withExactArgs(`${messages.default.artifact_generated}\nWhat would you like to do with it?`, actionName1, actionName2).resolves(actionName1);
             workspaceMock.expects("updateWorkspaceFolders").withArgs(2, null).resolves();
             return events.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
@@ -96,7 +97,7 @@ describe('vscode-youi-events unit test', () => {
             const actionName1 = 'Add to Workspace';
             const actionName2 = 'Open in New Workspace';
             windowMock.expects("showInformationMessage").
-                withExactArgs('The project has been generated.').resolves();
+                withExactArgs(messages.default.artifact_generated).resolves();
             return events.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
 
@@ -108,10 +109,10 @@ describe('vscode-youi-events unit test', () => {
 
         it("generator filter type is module", () => {
             const genFilter = GeneratorFilter.create({type: ["module"]});
-            const testEvents = new VSCodeYouiEvents(undefined, undefined, genFilter);
+            const testEvents = new VSCodeYouiEvents(undefined, undefined, genFilter, messages.default);
             eventsMock = sandbox.mock(testEvents);
             eventsMock.expects("doClose");
-            windowMock.expects("showInformationMessage").withExactArgs('The project has been generated.').resolves();
+            windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated).resolves();
             return testEvents.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
     });
