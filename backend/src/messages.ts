@@ -12,5 +12,7 @@ export default {
     select_generator_not_found: "Could not find any generators.",
     select_target_folder_question_hint: selectTargetFolderQuestionHint,
     channel_name: "Generators",
-    select_generator_description: `${selectGeneratorQuestionHint}.\n${selectTargetFolderQuestionHint}.`
+    select_generator_description: `${selectGeneratorQuestionHint}.\n${selectTargetFolderQuestionHint}.`,
+    artifact_generated: `The project has been generated.`,
+    artifact_with_name_generated: (artifactName: string) => `The '${artifactName}' project has been generated.`
 }; 
