@@ -30,7 +30,6 @@
 		"generator"
 	],
 	"activationEvents": [
-		"*",
 		"onCommand:loadYeomanUI",
 		"onWebviewPanel:yeomanui",
 		"onCommand:exploreGenerators",
