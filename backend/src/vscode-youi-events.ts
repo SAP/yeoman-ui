@@ -7,11 +7,13 @@ import { GeneratorFilter, GeneratorType } from './filter';
 export class VSCodeYouiEvents implements YouiEvents {
     private webviewPanel: vscode.WebviewPanel;
     private genFilter: GeneratorFilter;
+    private messages: any;
     private resolveFunc: any;
 
-    constructor(rpc : IRpc, webviewPanel: vscode.WebviewPanel, genFilter: GeneratorFilter) {
+    constructor(rpc : IRpc, webviewPanel: vscode.WebviewPanel, genFilter: GeneratorFilter, messages: any) {
         this.webviewPanel = webviewPanel;   
-        this.genFilter = genFilter;    
+        this.genFilter = genFilter;
+        this.messages = messages;    
     }
 
     public doGeneratorDone(success: boolean, message: string, targetFolderPath?: string): void {
@@ -76,7 +78,7 @@ export class VSCodeYouiEvents implements YouiEvents {
                 }
             }
 
-            const successInfoMessage = "The project has been generated.";
+            const successInfoMessage = this.messages.artifact_generated;
             if (_.isEmpty(items)) {
                 return vscode.window.showInformationMessage(successInfoMessage);
             } 
