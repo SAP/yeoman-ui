@@ -315,15 +315,10 @@ export default {
     },
 
     async updateGeneratorsPrompt(questions) {
-		const generatorsPrompt = _.get(this.prompts, "[0]");
-		if (generatorsPrompt) {
-			generatorsPrompt.questions = questions;
-		}
-    //   const promptName = _.get(this.currentPrompt, "name");
-    //   const message = _.get(this.messages, "select_generator_name", "");
-    //   if (promptName && promptName === message) {
-	// 	  debugger;
-    //   }
+      const generatorsPrompt = _.get(this.prompts, "[0]");
+      if (generatorsPrompt) {
+        generatorsPrompt.questions = questions;
+      }
     },
     async showPrompt(questions, name) {
       this.prepQuestions(questions);
