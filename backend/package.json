@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.6",
+	"version": "1.1.7",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -39,6 +39,10 @@
 	"contributes": {
 		"commands": [
 			{
+				"command": "yeomanUI._notifyGeneratorsChange",
+				"title": "notify about generator change"
+			},
+			{
 				"command": "loadYeomanUI",
 				"title": "Yeoman UI Generators"
 			},
@@ -59,6 +63,10 @@
 			"commandPalette": [
 				{
 					"command": "yeomanUI.toggleOutput",
+					"when": "false"
+				},
+				{
+					"command": "yeomanUI._notifyGeneratorsChange",
 					"when": "false"
 				}
 			],

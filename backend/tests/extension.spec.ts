@@ -60,10 +60,10 @@ describe('extension unit test', () => {
             loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
             loggerWrapperMock.expects("getLogger").twice();
             extension.activate(testContext);
-            expect(_.size(_.keys(oRegisteredCommands))).to.be.equal(3);
             expect( _.get(oRegisteredCommands, "loadYeomanUI")).to.be.not.undefined;
             expect(_.get(oRegisteredCommands, "yeomanUI.toggleOutput")).to.be.not.undefined;
-            expect(_.get(oRegisteredCommands, "exploreGenerators")).to.be.not.undefined;
+			expect(_.get(oRegisteredCommands, "exploreGenerators")).to.be.not.undefined;
+			expect(_.get(oRegisteredCommands, "yeomanUI._notifyGeneratorsChange")).to.be.not.undefined;
         });
 
         it("logger failure on extenion activation", () => {

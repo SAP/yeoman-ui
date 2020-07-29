@@ -22,6 +22,13 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 		this.outputChannel.showOutput();
 	}
 
+	public notifyGeneratorsChange() {
+		const yeomanUi = _.get(this, "yeomanui");
+		if (yeomanUi) {
+			yeomanUi._notifyGeneratorsChange();
+		}
+	}
+
 	public setWebviewPanel(webViewPanel: vscode.WebviewPanel, uiOptions?: any) {
         super.setWebviewPanel(webViewPanel);
 

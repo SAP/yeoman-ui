@@ -128,7 +128,7 @@ function initialState() {
     promptsInfoToDisplay: [],
     isReplaying: false,
     numOfSteps: 1,
-    isGeneric: false
+    isGeneric: false,
   };
 }
 
@@ -140,7 +140,7 @@ export default {
     Done,
     Info,
     PromptInfo,
-    Loading
+    Loading,
   },
   data() {
     return initialState();
@@ -167,13 +167,13 @@ export default {
       const message = _.get(this.messages, "select_generator_name", "");
       if (promptName && promptName === message) {
         const questions = _.compact(_.get(this.currentPrompt, "questions"));
-        const generatorQuestion = _.find(questions, question => {
+        const generatorQuestion = _.find(questions, (question) => {
           return _.get(question, "name") === "generator";
         });
         return _.isEmpty(_.get(generatorQuestion, "choices"));
       }
       return false;
-    }
+    },
   },
   watch: {
     prompts: {
@@ -234,7 +234,7 @@ export default {
         const prompt = {
           questions: [],
           name: this.messages.step_is_pending,
-          status: PENDING
+          status: PENDING,
         };
         this.setPrompts([prompt]);
       }
@@ -314,6 +314,12 @@ export default {
       }
     },
 
+    async updateGeneratorsPrompt(questions) {
+      const generatorsPrompt = _.get(this.prompts, "[0]");
+      if (generatorsPrompt) {
+        generatorsPrompt.questions = questions;
+      }
+    },
     async showPrompt(questions, name) {
       this.prepQuestions(questions);
       if (this.isReplaying) {
@@ -409,9 +415,10 @@ export default {
         "setPromptList",
         "generatorInstall",
         "generatorDone",
-        "log"
+        "log",
+        "updateGeneratorsPrompt"
       ];
-      _.forEach(functions, funcName => {
+      _.forEach(functions, (funcName) => {
         this.rpc.registerMethod({
           func: this[funcName],
           thisArg: this,
