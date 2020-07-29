@@ -17,9 +17,16 @@ import { ExploreGens } from '../exploregens';
 export class YeomanUIPanel extends AbstractWebviewPanel {
 	public static YEOMAN_UI = "Application Wizard";
 	private static channel: vscode.OutputChannel;
+	private readonly NPM = (process.platform === "win32" ? "npm.cmd" : "npm");
 
 	public toggleOutput() {
 		this.outputChannel.showOutput();
+	}
+
+	public _notifyGeneratorsChange() {
+		if (this.yeomanui) {
+			this.yeomanui._notifyGeneratorsChange();
+		}
 	}
 
 	public setWebviewPanel(webViewPanel: vscode.WebviewPanel, uiOptions?: any) {

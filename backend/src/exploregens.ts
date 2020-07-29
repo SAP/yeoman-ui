@@ -199,7 +199,8 @@ export class ExploreGens {
             const successMessage = messages.installed(genName);
             this.logger.debug(successMessage);
             this.vscode.window.showInformationMessage(successMessage);
-            this.updateBeingHandledGenerator(genName, GenState.installed);
+			this.updateBeingHandledGenerator(genName, GenState.installed);
+			await this.vscode.commands.executeCommand("_notifyGeneratorsChange");
         } catch (error) {
             this.showAndLogError(messages.failed_to_install(genName), error);
             this.updateBeingHandledGenerator(genName, GenState.notInstalled);
@@ -225,7 +226,8 @@ export class ExploreGens {
             const successMessage = messages.uninstalled(genName);
             this.logger.debug(successMessage);
             this.vscode.window.showInformationMessage(successMessage);
-            this.updateBeingHandledGenerator(genName, GenState.notInstalled);
+			this.updateBeingHandledGenerator(genName, GenState.notInstalled);
+			await this.vscode.commands.executeCommand("_notifyGeneratorsChange");
         } catch (error) {
             this.showAndLogError(messages.failed_to_uninstall(genName), error);
             this.updateBeingHandledGenerator(genName, GenState.installed);

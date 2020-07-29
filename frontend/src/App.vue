@@ -128,7 +128,7 @@ function initialState() {
     promptsInfoToDisplay: [],
     isReplaying: false,
     numOfSteps: 1,
-    isGeneric: false
+    isGeneric: false,
   };
 }
 
@@ -140,7 +140,7 @@ export default {
     Done,
     Info,
     PromptInfo,
-    Loading
+    Loading,
   },
   data() {
     return initialState();
@@ -167,30 +167,30 @@ export default {
       const message = _.get(this.messages, "select_generator_name", "");
       if (promptName && promptName === message) {
         const questions = _.compact(_.get(this.currentPrompt, "questions"));
-        const generatorQuestion = _.find(questions, question => {
+        const generatorQuestion = _.find(questions, (question) => {
           return _.get(question, "name") === "generator";
         });
         return _.isEmpty(_.get(generatorQuestion, "choices"));
       }
       return false;
-    }
+    },
   },
   watch: {
     prompts: {
       handler() {
         this.setBusyIndicator();
-      }
+      },
     },
     "currentPrompt.status": {
       handler() {
         this.setBusyIndicator();
-      }
+      },
     },
     isDone: {
       handler() {
         this.setBusyIndicator();
-      }
-    }
+      },
+    },
   },
   methods: {
     setBusyIndicator() {
@@ -234,7 +234,7 @@ export default {
         const prompt = {
           questions: [],
           name: this.messages.step_is_pending,
-          status: PENDING
+          status: PENDING,
         };
         this.setPrompts([prompt]);
       }
@@ -298,7 +298,7 @@ export default {
                 return await that.rpc.invoke("evaluateMethod", [
                   args,
                   question.name,
-                  prop
+                  prop,
                 ]);
               } catch (e) {
                 that.showBusyIndicator = false;
@@ -314,6 +314,17 @@ export default {
       }
     },
 
+    async updateGeneratorsPrompt(questions) {
+		const generatorsPrompt = _.get(this.prompts, "[0]");
+		if (generatorsPrompt) {
+			generatorsPrompt.questions = questions;
+		}
+    //   const promptName = _.get(this.currentPrompt, "name");
+    //   const message = _.get(this.messages, "select_generator_name", "");
+    //   if (promptName && promptName === message) {
+	// 	  debugger;
+    //   }
+    },
     async showPrompt(questions, name) {
       this.prepQuestions(questions);
       if (this.isReplaying) {
@@ -351,7 +362,7 @@ export default {
         description: promptDescription,
         answers: {},
         active: true,
-        status: _.get(this.currentPrompt, "status")
+        status: _.get(this.currentPrompt, "status"),
       });
       return prompt;
     },
@@ -409,13 +420,14 @@ export default {
         "setPromptList",
         "generatorInstall",
         "generatorDone",
-        "log"
+        "log",
+        "updateGeneratorsPrompt",
       ];
-      _.forEach(functions, funcName => {
+      _.forEach(functions, (funcName) => {
         this.rpc.registerMethod({
           func: this[funcName],
           thisArg: this,
-          name: funcName
+          name: funcName,
         });
       });
 
@@ -463,14 +475,14 @@ export default {
       this.init();
 
       this.displayGeneratorsPrompt();
-    }
+    },
   },
   created() {
     this.setupRpc();
   },
   mounted() {
     this.init();
-  }
+  },
 };
 </script>
 <style scoped>
