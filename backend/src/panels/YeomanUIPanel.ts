@@ -23,8 +23,9 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 	}
 
 	public notifyGeneratorsChange() {
-		if (this.yeomanui) {
-			this.yeomanui._notifyGeneratorsChange();
+		const yeomanUi = _.get(this, "yeomanui");
+		if (yeomanUi) {
+			yeomanUi._notifyGeneratorsChange();
 		}
 	}
 
