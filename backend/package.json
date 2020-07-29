@@ -75,10 +75,6 @@
 					"command": "yeomanUI.toggleOutput",
 					"group": "navigation",
 					"when": "yeomanUI.Focused"
-				},
-				{
-					"command": "yeomanUI._notifyGeneratorsChange",
-					"when": "false"
 				}
 			]
 		},
