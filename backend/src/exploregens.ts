@@ -182,7 +182,15 @@ export class ExploreGens {
 
     private async exec(arg: string) {
         return util.promisify(cp.exec)(arg);
-    }
+	}
+	
+	private notifyGeneratorsChange() {
+		try {
+			return this.vscode.commands.executeCommand("yeomanUI._notifyGeneratorsChange");
+		} catch (error) {
+			this.showAndLogError(error.message, error);
+		}
+	}
 
     private async install(gen: any) {
         const genName = gen.package.name;
@@ -199,7 +207,8 @@ export class ExploreGens {
             const successMessage = messages.installed(genName);
             this.logger.debug(successMessage);
             this.vscode.window.showInformationMessage(successMessage);
-            this.updateBeingHandledGenerator(genName, GenState.installed);
+			this.updateBeingHandledGenerator(genName, GenState.installed);
+			await this.notifyGeneratorsChange();
         } catch (error) {
             this.showAndLogError(messages.failed_to_install(genName), error);
             this.updateBeingHandledGenerator(genName, GenState.notInstalled);
@@ -225,7 +234,8 @@ export class ExploreGens {
             const successMessage = messages.uninstalled(genName);
             this.logger.debug(successMessage);
             this.vscode.window.showInformationMessage(successMessage);
-            this.updateBeingHandledGenerator(genName, GenState.notInstalled);
+			this.updateBeingHandledGenerator(genName, GenState.notInstalled);
+			await this.notifyGeneratorsChange();
         } catch (error) {
             this.showAndLogError(messages.failed_to_uninstall(genName), error);
             this.updateBeingHandledGenerator(genName, GenState.installed);

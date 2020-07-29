@@ -84,6 +84,11 @@ export class YeomanUI {
     return this.uiOptions;
   }
 
+  public async _notifyGeneratorsChange() {
+	const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
+    await this.rpc.invoke("updateGeneratorsPrompt", [generators.questions]);
+  }
+
   public registerCustomQuestionEventHandler(questionType: string, methodName: string, handler: Function): void {
     let entry: Map<string, Function> = this.customQuestionEventHandlers.get(questionType);
     if (entry === undefined) {

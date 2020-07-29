@@ -270,7 +270,8 @@ describe('exploregens unit test', () => {
         it("successfully installed", async () => {
             workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns("");
             vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(messages.installing(genName)).returns(statusBarMessage);
-            vscodeWindowMock.expects("showInformationMessage").withExactArgs(messages.installed(genName));
+			vscodeWindowMock.expects("showInformationMessage").withExactArgs(messages.installed(genName));
+			vscodeCommandsMock.expects("executeCommand").withExactArgs("yeomanUI._notifyGeneratorsChange").resolves();
             loggerMock.expects("debug").withExactArgs(messages.installing(genName));
             loggerMock.expects("debug").withExactArgs(messages.installed(genName));
             rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, GenState.installing]);
@@ -531,7 +532,8 @@ describe('exploregens unit test', () => {
 
             workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns("");
             vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(uninstallingMessage).returns(statusBarMessage);
-            vscodeWindowMock.expects("showInformationMessage").withExactArgs(successMessage);
+			vscodeWindowMock.expects("showInformationMessage").withExactArgs(successMessage);
+			vscodeCommandsMock.expects("executeCommand").withExactArgs("yeomanUI._notifyGeneratorsChange").resolves();
             loggerMock.expects("debug").withExactArgs(uninstallingMessage);
             loggerMock.expects("debug").withExactArgs(successMessage);
             rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, GenState.uninstalling]);
