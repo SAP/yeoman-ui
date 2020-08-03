@@ -5,9 +5,9 @@ import * as _ from "lodash";
 import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
 import { ReplayUtils, ReplayState } from "./replayUtils";
-const datauri = require("datauri");
-const titleize = require('titleize');
-const humanizeString = require('humanize-string');
+const datauri = require("datauri"); // eslint-disable-line @typescript-eslint/no-var-requires
+const titleize = require('titleize'); // eslint-disable-line @typescript-eslint/no-var-requires
+const humanizeString = require('humanize-string'); // eslint-disable-line @typescript-eslint/no-var-requires
 import * as defaultImage from "./defaultImage";
 import { YouiAdapter } from "./youi-adapter";
 import { YouiLog } from "./youi-log";
@@ -23,11 +23,11 @@ export interface IQuestionsPrompt extends IPrompt{
 }
 
 export class YeomanUI {
-  private static defaultMessage = 
+  private static readonly defaultMessage = 
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
-  private static YEOMAN_PNG = "yeoman.png";
-  private static isWin32 = (process.platform === 'win32');
-  private static HOME_DIR = os.homedir();
+  private static readonly YEOMAN_PNG = "yeoman.png";
+  private static readonly isWin32 = (process.platform === 'win32');
+  private static readonly HOME_DIR = os.homedir();
   private static readonly PROJECTS: string = path.join(YeomanUI.HOME_DIR, 'projects');
   private static readonly NODE_MODULES = 'node_modules';
 
@@ -35,21 +35,21 @@ export class YeomanUI {
     return _.isFunction(value) ? "__Function" : value;
   }
 
-  private uiOptions: any;
+  private uiOptions: any; // eslint-disable-line @typescript-eslint/prefer-readonly
   private cwd: string;
-  private rpc: IRpc;
-  private youiEvents: YouiEvents;
-  private outputChannel: YouiLog;
-  private logger: IChildLogger;
+  private readonly rpc: IRpc;
+  private readonly youiEvents: YouiEvents;
+  private readonly outputChannel: YouiLog;
+  private readonly logger: IChildLogger;
   private genMeta: { [namespace: string]: Environment.GeneratorMeta };
-  private youiAdapter: YouiAdapter;
+  private readonly youiAdapter: YouiAdapter;
   private gen: Generator | undefined;
   private promptCount: number;
   private currentQuestions: Environment.Adapter.Questions<any>;
   private generatorName: string;
-  private replayUtils: ReplayUtils;
-  private customQuestionEventHandlers: Map<string, Map<string, Function>>;
-  private errorThrown: boolean = false;
+  private readonly replayUtils: ReplayUtils;
+  private readonly customQuestionEventHandlers: Map<string, Map<string, Function>>;
+  private errorThrown = false;
 
   constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
     this.rpc = rpc;
@@ -111,11 +111,10 @@ export class YeomanUI {
   private async getGeneratorsPrompt(): Promise<IQuestionsPrompt> {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
-    const that = this;
     const promise: Promise<IQuestionsPrompt> = new Promise(resolve => {
       const env: Environment.Options = Environment.createEnv();
       const npmPaths = this.getNpmPaths(env); 
-      env.lookup({npmPaths}, async () => this.onEnvLookup(env, resolve, that.uiOptions.genFilter));
+      env.lookup({npmPaths}, async () => this.onEnvLookup(env, resolve, this.uiOptions.genFilter));
     });
 
     return promise;
@@ -169,6 +168,7 @@ export class YeomanUI {
       const dirsBefore = await this.getChildDirectories(targetFolder);
       const env: Environment = Environment.createEnv(undefined, {sharedOptions: {forwardErrorToEnvironment: true}}, this.youiAdapter);
       const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
+       // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       env.register(meta.resolved, meta.namespace, meta.packagePath);
 
@@ -206,10 +206,11 @@ export class YeomanUI {
 
       // we cannot use new async method, "await this.gen.run()", because generators based on older versions 
       // (for example: 2.0.5) of "yeoman-generator" do not support it
-      this.gen.run(async (error) => {
+      this.gen.run( (error) => {
         if (!this.errorThrown && !error) {
-            const dirsAfter = await this.getChildDirectories(this.gen.destinationRoot());
+          this.getChildDirectories(this.gen.destinationRoot()).then( (dirsAfter) => {
             this.onGeneratorSuccess(generatorName, dirsBefore, dirsAfter);
+          });
         }
       });
     } catch (error) {
@@ -529,7 +530,7 @@ export class YeomanUI {
       const questionHandlers = this.customQuestionEventHandlers.get(guiType);
       if (questionHandlers) {
         questionHandlers.forEach((handler, methodName) => {
-          (question as any)[methodName] = handler;
+          (question)[methodName] = handler;
         });
       }
     }

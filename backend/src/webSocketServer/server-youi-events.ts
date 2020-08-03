@@ -2,9 +2,9 @@ import { YouiEvents } from "../youi-events";
 import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 
 export class ServerYouiEvents implements YouiEvents {
-    private rpc: RpcCommon;
+    private readonly rpc: RpcCommon;
 
-    constructor(rpc : RpcCommon) {
+    constructor(rpc: RpcCommon) {
         this.rpc = rpc;        
     }
     
@@ -12,7 +12,7 @@ export class ServerYouiEvents implements YouiEvents {
         this.rpc.invoke("selectOutputFolder");
     }
 
-    doGeneratorDone(suceeded: boolean, message: string, targetPath: string = ""): void {
+    doGeneratorDone(suceeded: boolean, message: string, targetPath = ""): void {
         this.rpc.invoke("generatorDone", [suceeded, message, targetPath]);
     }
 

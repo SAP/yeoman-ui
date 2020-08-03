@@ -55,7 +55,6 @@ describe('vscode-youi-events unit test', () => {
         const showInstallMessageSpy = sandbox.spy(events,"showInstallMessage");
         _.set(vscode, "window.withProgress", () => Promise.resolve(""));
         events.doGeneratorInstall();
-        // tslint:disable-next-line: no-unused-expression
         expect(showInstallMessageSpy.called).to.be.true;
     });
 

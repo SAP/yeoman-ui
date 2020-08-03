@@ -42,7 +42,7 @@ export class ReplayUtils {
   }
 
   public isReplaying: boolean;
-  private answersCache: Map<string, Environment.Adapter.Answers>;
+  private readonly answersCache: Map<string, Environment.Adapter.Answers>;
   private replayStack: Environment.Adapter.Answers[];
   private replayQueue: Environment.Adapter.Answers[];
   private numOfSteps: number;

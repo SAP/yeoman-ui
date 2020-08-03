@@ -1,6 +1,6 @@
 import * as path from "path";
 
-const Module = require("module");
+const Module = require("module"); // eslint-disable-line @typescript-eslint/no-var-requires
 const originalRequire = Module.prototype.require;
 
 export function mockVscode(oVscodeMock: any, testModulePath?: string) {

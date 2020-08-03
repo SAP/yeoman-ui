@@ -43,7 +43,7 @@ export class GeneratorFilter {
     }
 
     public static hasIntersection(array1: string[], array2: string[]) {
-        return (_.isEmpty(array1) || !_.isEmpty(_.intersection(array1, array2)))
+        return (_.isEmpty(array1) || !_.isEmpty(_.intersection(array1, array2)));
     }
 
     private constructor(public readonly types: string[], public readonly categories: string[]) {}

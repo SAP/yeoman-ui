@@ -27,7 +27,7 @@ class ExploreGensWebSocketServer {
 
       this.rpc = new RpcExtensionWebSockets(ws);
       //TODO: Use RPC to send it to the browser log (as a collapsed pannel in Vue)
-      const childLogger = { debug: () => { }, error: () => { }, fatal: () => { }, warn: () => { }, info: () => { }, trace: () => { }, getChildLogger: () => { return {} as IChildLogger; } };
+      const childLogger = { debug: () => {/* do nothing */}, error: () => {/* do nothing */}, fatal: () => {/* do nothing */}, warn: () => {/* do nothing */}, info: () => {/* do nothing */}, trace: () => {/* do nothing */}, getChildLogger: () => { return {} as IChildLogger; } };
       const context = {
         globalState: {
           get: () => true,
@@ -41,7 +41,7 @@ class ExploreGensWebSocketServer {
           setStatusBarMessage: () => {
             return {
               dispose: () => true
-            }
+            };
           }
         },
         workspace: {

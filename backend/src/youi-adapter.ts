@@ -3,15 +3,15 @@ import { YeomanUI } from "./yeomanui";
 import { YouiLog } from "./youi-log";
 import { YouiEvents } from "./youi-events";
 import * as _ from "lodash";
-const chalk = require('chalk');
+import chalk = require('chalk');
 
 /**
  * @constructor
  */
 export class YouiAdapter implements Adapter {
   private yeomanui: YeomanUI | undefined = undefined;
-  private youiLog: YouiLog;
-  private youiEvents: YouiEvents;
+  private readonly youiLog: YouiLog;
+  private readonly youiEvents: YouiEvents;
 
   constructor(logger: YouiLog, youiEvents: YouiEvents) {
     this.youiLog = logger;
@@ -29,13 +29,13 @@ export class YouiAdapter implements Adapter {
   }
 
   public log: {
-    (value: string): void,
-    writeln?: (str: string) => void,
-    conflict?: (str: string) => void,
-    create?: (str: string) => void,
-    force?: (str: string) => void,
-    identical?: (str: string) => void,
-    skip?: (str: string) => void
+    (value: string): void;
+    writeln?: (str: string) => void;
+    conflict?: (str: string) => void;
+    create?: (str: string) => void;
+    force?: (str: string) => void;
+    identical?: (str: string) => void;
+    skip?: (str: string) => void;
   } = (value: string) => {
     this.youiLog.log.call(this.youiLog, value);
   }
@@ -61,10 +61,10 @@ export class YouiAdapter implements Adapter {
     cb?: (res: T1) => T2
   ): Promise<T2> {
     if (this.yeomanui && questions) {
-      const result: any = await (<Promise<T2>>this.yeomanui.showPrompt(questions));
+      const result: any = await (this.yeomanui.showPrompt(questions) as Promise<T2>);
       if (!_.isEmpty(cb)) {
         try {
-          return await cb(result);
+          return await cb(result); // eslint-disable-line @typescript-eslint/await-thenable
         } catch (err) {
           this.youiEvents.doGeneratorDone(false, (_.get(err, "message", 'Yeoman UI detected an error')));
           return;

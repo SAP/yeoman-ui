@@ -1,6 +1,6 @@
 import * as mocha from "mocha";
 import * as sinon from "sinon";
-const datauri = require("datauri");
+const datauri = require("datauri"); // eslint-disable-line @typescript-eslint/no-var-requires
 import * as fsextra from "fs-extra";
 import { expect } from "chai";
 import * as _ from "lodash";
@@ -24,8 +24,8 @@ describe('yeomanui unit test', () => {
     let loggerMock: any;
     let rpcMock: any;
     let youiEventsMock: any;
-    const UTF8: string = "utf8";
-    const PACKAGE_JSON: string = "package.json";
+    const UTF8 = "utf8";
+    const PACKAGE_JSON = "package.json";
 
     const choiceMessage = 
         "Some quick example text of the generator description. This is a long text so that the example will look good.";
@@ -151,7 +151,6 @@ describe('yeomanui unit test', () => {
     describe("showPrompt", () => {
         it("prompt without questions", async () => {
             const answers = await yeomanUi.showPrompt([]);
-            // tslint:disable-next-line: no-unused-expression
             expect(answers).to.be.empty;
         });
     });
@@ -355,7 +354,6 @@ describe('yeomanui unit test', () => {
             yeomanUi["uiOptions"] = {genFilter: GeneratorFilter.create({type: "project"}), messages};
             const result = await yeomanUi["getGeneratorsPrompt"]();
 
-            // tslint:disable-next-line: no-unused-expression
             expect(result.questions[1].choices).to.be.empty;
         });
 
@@ -465,13 +463,11 @@ describe('yeomanui unit test', () => {
     describe("funcReplacer", () => {
         it("with function", () => {
             const res = YeomanUI["funcReplacer"]("key", () => { return; });
-            // tslint:disable-next-line: no-unused-expression
             expect(res).to.be.equal("__Function");
         });
 
         it("without function", () => {
             const res = YeomanUI["funcReplacer"]("key", "value");
-            // tslint:disable-next-line: no-unused-expression
             expect(res).to.be.equal("value");
         });
     });
@@ -479,7 +475,6 @@ describe('yeomanui unit test', () => {
     it("toggleOutput", () => {
         const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {genFilter: GeneratorFilter.create()});
         const res = yeomanUiInstance["toggleOutput"]();
-        // tslint:disable-next-line: no-unused-expression
         expect(res).to.be.false;
     });
 
@@ -501,9 +496,8 @@ describe('yeomanui unit test', () => {
 
     it("getErrorInfo", () => {
         const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, null);
-        const errorInfo: string = "Error Info";
+        const errorInfo = "Error Info";
         const res = yeomanUiInstance["getErrorInfo"](errorInfo);
-        // tslint:disable-next-line: no-unused-expression
         expect(res.message).to.be.equal(errorInfo);
     });
 
@@ -520,8 +514,7 @@ describe('yeomanui unit test', () => {
                 q3: "z"
             };
             ReplayUtils["setDefaults"](questions, answers);
-            for (const index in questions) {
-                const question = questions[index];
+            for (const question of questions) {
                 switch (question.name) {
                     case "a":
                         expect((question as any)["answer"]).to.equal("x");
@@ -542,7 +535,6 @@ describe('yeomanui unit test', () => {
             const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create());
             const gen: any = {};
             yeomanUiInstance["setGenInstall"](gen, "testgen");
-            // tslint:disable-next-line: no-unused-expression
             expect(gen.__proto__.install).to.be.undefined;
         });
 
@@ -554,19 +546,17 @@ describe('yeomanui unit test', () => {
                }
             }
             const gen: any = new GenTest();
-            // tslint:disable-next-line: no-unused-expression
             expect(gen.__proto__.install).to.be.not.undefined;
 
             const installSpy = sandbox.spy(youiEvents,"doGeneratorInstall");
             yeomanUiInstance["setGenInstall"](gen, "testgen");
             gen.install();
-            // tslint:disable-next-line: no-unused-expression
             expect(installSpy.called).to.be.true;
             installSpy.restore();
         });
     });
 
-    describe("showPrompt", async () => {
+    describe("showPrompt", () => {
         it("returns answers", async () => {
             const firstName = "john";
             rpc.invoke = async () => {
@@ -608,11 +598,9 @@ describe('yeomanui unit test', () => {
 
             response = await yeomanUiInstance.showPrompt(questions);        
             expect (response.country).to.equal(country);
-            // tslint:disable-next-line: no-unused-expression
             expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.false;
 
             yeomanUiInstance["back"](undefined,1);
-            // tslint:disable-next-line: no-unused-expression
             expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.true;
 
             questions = [{name: "q1"}];
@@ -636,7 +624,6 @@ describe('yeomanui unit test', () => {
             const beforeGen = {targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1"]};
             const afterGen = {targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1", "dirpath2"]};
             yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
-            // tslint:disable-next-line: no-unused-expression
             expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), "dirpath2")).to.be.true;
         });
 
@@ -644,18 +631,16 @@ describe('yeomanui unit test', () => {
             const beforeGen = {targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1"]};
             const afterGen = {targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1", "dirpath2", "dirpath3"]};
             yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
-            // tslint:disable-next-line: no-unused-expression
             expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), "testDestinationRoot")).to.be.true;
         });
 
         it("onGeneratorFailure", async () => {
             await yeomanUi["onGeneratorFailure"]("testGenName", "testError");
-            // tslint:disable-next-line: no-unused-expression
             expect(doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed - testError"}`)).to.be.true;
         });
     });
 
-    describe("Custom Question Event Handlers", async () => {
+    describe("Custom Question Event Handlers", () => {
         it("addCustomQuestionEventHandlers()", async () => {
             const testEventFunction = () => {
                 return true;
@@ -678,7 +663,7 @@ describe('yeomanui unit test', () => {
         });
     });
 
-    describe("evaluateMethod()", async () => {
+    describe("evaluateMethod()", () => {
         it("custom question events", async () => {
             const testEventFunction = () => {
                 return true;
@@ -687,7 +672,6 @@ describe('yeomanui unit test', () => {
             yeomanUiInstance.registerCustomQuestionEventHandler("questionType", "testEvent", testEventFunction);
             yeomanUiInstance["currentQuestions"] = [{name:"question1", guiType: "questionType"}];
             const response = await yeomanUiInstance["evaluateMethod"](null, "question1", "testEvent");
-            // tslint:disable-next-line: no-unused-expression
             expect(response).to.be.true;
         });
 
@@ -697,14 +681,12 @@ describe('yeomanui unit test', () => {
                 return true;
             }}];
             const response = await yeomanUiInstance["evaluateMethod"](null, "question1", "method1");
-            // tslint:disable-next-line: no-unused-expression
             expect(response).to.be.true;
         });
 
         it("no questions", async () => {
             const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create());
             const response = await yeomanUiInstance["evaluateMethod"](null, "question1", "method1");
-            // tslint:disable-next-line: no-unused-expression
             expect(response).to.be.undefined;
         });
 
