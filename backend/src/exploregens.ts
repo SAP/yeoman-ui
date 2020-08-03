@@ -14,7 +14,7 @@ export enum GenState {
     installing = "installing",
     notInstalled = "notInstalled",
     installed = "installed"
-};
+}
 
 export class ExploreGens {
     public static getInstallationLocation(wsConfig: any) {
@@ -23,14 +23,14 @@ export class ExploreGens {
 
     private static readonly INSTALLATION_LOCATION = "ApplicationWizard.installationLocation";
 
-    private logger: IChildLogger;
+    private readonly logger: IChildLogger;
     private rpc: IRpc;
-    private gensBeingHandled: any[];
+    private gensBeingHandled: any[]; // eslint-disable-line @typescript-eslint/prefer-readonly
     private cachedInstalledGeneratorsPromise: Promise<string[]>;
-    private context: any;
-    private vscode: any;
+    private readonly context: any;
+    private readonly vscode: any;
     private isInTheiaCached: boolean;
-    private npmGlobalPathPromise: Promise<string>;
+    private npmGlobalPathPromise: Promise<string>; // eslint-disable-line @typescript-eslint/prefer-readonly
 
     private readonly theiaCommands: string[] = ["theia.open", "preferences:open", "keymaps:open", "workspace:openRecent"];
     private readonly GLOBAL_ACCEPT_LEGAL_NOTE = "global.exploreGens.acceptlegalNote";

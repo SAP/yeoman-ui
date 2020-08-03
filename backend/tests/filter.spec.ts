@@ -17,21 +17,18 @@ describe('filter unit test', () => {
     it('type property is not equal to any declared type property', () => {
         const testCategories: string[] = ["test1", "test2"];
         const genFilter: GeneratorFilter = GeneratorFilter.create({type: "test123", categories: testCategories});
-        // tslint:disable-next-line: no-unused-expression
         expect(genFilter.types).to.contain("test123");
         expect(genFilter.categories).to.be.deep.equal(testCategories);
     });
 
     it('filter obj is undefined', () => {
         const genFilter: GeneratorFilter = GeneratorFilter.create(undefined);
-        // tslint:disable-next-line: no-unused-expression
         expect(genFilter.types).to.be.empty;
         expect(genFilter.categories).to.be.deep.equal([]);
     });
 
     it('filter type is neither array nor string', () => {
         const genFilter: GeneratorFilter = GeneratorFilter.create({types: {}});
-        // tslint:disable-next-line: no-unused-expression
         expect(genFilter.types).to.be.empty;
         expect(genFilter.categories).to.be.deep.equal([]);
     });

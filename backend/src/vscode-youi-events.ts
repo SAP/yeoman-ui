@@ -6,11 +6,11 @@ import { GeneratorFilter, GeneratorType } from './filter';
 
 export class VSCodeYouiEvents implements YouiEvents {
     private webviewPanel: vscode.WebviewPanel;
-    private genFilter: GeneratorFilter;
-    private messages: any;
+    private readonly genFilter: GeneratorFilter;
+    private readonly messages: any;
     private resolveFunc: any;
 
-    constructor(rpc : IRpc, webviewPanel: vscode.WebviewPanel, genFilter: GeneratorFilter, messages: any) {
+    constructor(rpc: IRpc, webviewPanel: vscode.WebviewPanel, genFilter: GeneratorFilter, messages: any) {
         this.webviewPanel = webviewPanel;   
         this.genFilter = genFilter;
         this.messages = messages;    
@@ -55,7 +55,7 @@ export class VSCodeYouiEvents implements YouiEvents {
         this.resolveInstallingProgress();
 
         if (success) {
-            const addToWorkspace: string = "Add to Workspace";
+            const addToWorkspace = "Add to Workspace";
             const openInNewWorkspace: any = "Open in New Workspace";
             const items: string[] = [];
             

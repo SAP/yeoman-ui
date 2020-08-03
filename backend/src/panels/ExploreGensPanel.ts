@@ -13,7 +13,7 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
         this.initWebviewPanel();
     }
 
-    private exploreGens: ExploreGens;
+    private readonly exploreGens: ExploreGens;
     public constructor(context: vscode.ExtensionContext) {
         super(context);
         this.viewType = "exploreGens";

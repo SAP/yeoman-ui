@@ -20,7 +20,7 @@ export const ERROR_LOGGER_NOT_INITIALIZED = 'Logger has not yet been initialized
  */
 let logger: any;
 
-function isInitialized() :boolean {
+function isInitialized(): boolean {
   return (logger !== undefined ) ? true : false;
 }
 
@@ -30,22 +30,22 @@ function isInitialized() :boolean {
  *
  * @returns { IVSCodeExtLogger }
  */
-export function getLogger() : IVSCodeExtLogger {
+export function getLogger(): IVSCodeExtLogger {
   if (isInitialized() === false) {
     throw Error(ERROR_LOGGER_NOT_INITIALIZED);
   }
   return logger;
 }
 
-export function getClassLogger(className: string) : IChildLogger {
+export function getClassLogger(className: string): IChildLogger {
 	return getLogger().getChildLogger({label:className});
 }
 
-export function getYeomanUILibraryLogger() : IChildLogger {
+export function getYeomanUILibraryLogger(): IChildLogger {
 	return getLibraryLogger(YEOMAN_UI_LOGGER_NAME);
 }
 
-function getLibraryLogger(libraryName: string) : IChildLogger {
+function getLibraryLogger(libraryName: string): IChildLogger {
 	return getLogger().getChildLogger({label:libraryName});
 }
 

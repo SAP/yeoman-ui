@@ -25,7 +25,7 @@ const statusBarMessage = {
 const globalState = {
     get: () => new Error("not implemented"),
     update: () => new Error("not implemented"),
-}
+};
 const testVscode = {
     workspace: {
         getConfiguration: () => config
@@ -300,12 +300,12 @@ describe('exploregens unit test', () => {
         });
     });
 
-    describe("getFilteredGenerators", async () => {
+    describe("getFilteredGenerators", () => {
         it("query and recommended parameters are empty strings", async () => {
             const expectedResult = {
                 objects: [{ package: { name: "generator-aa" } }, { package: { name: "generator-bb" } }],
                 total: 5
-            }
+            };
             const url = exploregens["getGensQueryURL"]("", "");
             npmFetchMock.expects("json").withExactArgs(url).resolves(expectedResult);
             exploregens["cachedInstalledGeneratorsPromise"] = Promise.resolve(["generator-bb"]);
@@ -321,7 +321,7 @@ describe('exploregens unit test', () => {
             const expectedResult = {
                 objects: [{ package: { name: "generator-aa" } }],
                 total: 1
-            }
+            };
             const url = exploregens["getGensQueryURL"]("test of query", "");
             npmFetchMock.expects("json").withExactArgs(url).resolves(expectedResult);
             exploregens["gensBeingHandled"] = [{name: "generator-aa", state: GenState.updating}];
@@ -348,7 +348,7 @@ describe('exploregens unit test', () => {
     });
 
     describe("getGeneratorsLocationParams", () => {
-        const TESTVALUE = "test location"
+        const TESTVALUE = "test location";
 
         it("location empty", () => {
             workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns("");
