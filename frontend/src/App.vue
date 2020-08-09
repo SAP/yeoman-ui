@@ -67,7 +67,7 @@
               <v-icon left>mdi-chevron-left</v-icon>Back
             </v-btn>
             <v-btn id="next" :disabled="!stepValidated" @click="next">
-              Next
+              {{buttonName}}
               <v-icon right>mdi-chevron-right</v-icon>
             </v-btn>
           </div>
@@ -128,7 +128,8 @@ function initialState() {
     promptsInfoToDisplay: [],
     isReplaying: false,
     numOfSteps: 1,
-    isGeneric: false,
+	isGeneric: false,
+	buttonName: "Next"
   };
 }
 
@@ -190,7 +191,18 @@ export default {
       handler() {
         this.setBusyIndicator();
       }
-    }
+	},
+	promptIndex: {
+		handler() {
+			if (!_.isEmpty(this.promptsInfoToDisplay)) {
+				if (this.promptIndex === _.size(this.promptsInfoToDisplay)) {
+					this.buttonName = "Finish";
+				} else {
+					this.buttonName = "Next";
+				}
+			}
+		}
+	}
   },
   methods: {
     setBusyIndicator() {
