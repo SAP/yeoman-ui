@@ -67,7 +67,7 @@
               <v-icon left>mdi-chevron-left</v-icon>Back
             </v-btn>
             <v-btn id="next" :disabled="!stepValidated" @click="next">
-              {{buttonName}}
+              {{rightButtonName}}
               <v-icon right>mdi-chevron-right</v-icon>
             </v-btn>
           </div>
@@ -128,8 +128,7 @@ function initialState() {
     promptsInfoToDisplay: [],
     isReplaying: false,
     numOfSteps: 1,
-	isGeneric: false,
-	buttonName: "Next"
+    isGeneric: false
   };
 }
 
@@ -147,6 +146,13 @@ export default {
     return initialState();
   },
   computed: {
+    rightButtonName() {
+		if (this.promptIndex > 0 && this.promptIndex === _.size(this.promptsInfoToDisplay)) {
+			return "Finish";
+		} 
+
+		return "Next";
+	},
     isLoadingColor() {
       return (
         getComputedStyle(document.documentElement).getPropertyValue(
@@ -180,29 +186,18 @@ export default {
     prompts: {
       handler() {
         this.setBusyIndicator();
-      }
+      },
     },
     "currentPrompt.status": {
       handler() {
         this.setBusyIndicator();
-      }
+      },
     },
     isDone: {
       handler() {
         this.setBusyIndicator();
       }
-	},
-	promptIndex: {
-		handler() {
-			if (!_.isEmpty(this.promptsInfoToDisplay)) {
-				if (this.promptIndex === _.size(this.promptsInfoToDisplay)) {
-					this.buttonName = "Finish";
-				} else {
-					this.buttonName = "Next";
-				}
-			}
-		}
-	}
+    }
   },
   methods: {
     setBusyIndicator() {
@@ -310,7 +305,7 @@ export default {
                 return await that.rpc.invoke("evaluateMethod", [
                   args,
                   question.name,
-                  prop
+                  prop,
                 ]);
               } catch (e) {
                 that.showBusyIndicator = false;
@@ -369,7 +364,7 @@ export default {
         description: promptDescription,
         answers: {},
         active: true,
-        status: _.get(this.currentPrompt, "status")
+        status: _.get(this.currentPrompt, "status"),
       });
       return prompt;
     },
@@ -428,13 +423,13 @@ export default {
         "generatorInstall",
         "generatorDone",
         "log",
-        "updateGeneratorsPrompt"
+        "updateGeneratorsPrompt",
       ];
       _.forEach(functions, (funcName) => {
         this.rpc.registerMethod({
           func: this[funcName],
           thisArg: this,
-          name: funcName
+          name: funcName,
         });
       });
 
@@ -482,14 +477,14 @@ export default {
       this.init();
 
       this.displayGeneratorsPrompt();
-    }
+    },
   },
   created() {
     this.setupRpc();
   },
   mounted() {
     this.init();
-  }
+  },
 };
 </script>
 <style scoped>

@@ -31,6 +31,29 @@ describe('App.vue', () => {
 		})
 	})
 
+	describe('rightButtonName - computed', () => {
+		it('promptIndex is 0', () => {
+			wrapper = initComponent(App, {})
+			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
+			wrapper.vm.promptIndex = 0
+			expect(wrapper.vm.rightButtonName).toEqual("Next");
+		})
+
+		it('promptIndex is 1', () => {
+			wrapper = initComponent(App, {})
+			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
+			wrapper.vm.promptIndex = 1
+			expect(wrapper.vm.rightButtonName).toEqual("Next");
+		})
+
+		it('promptIndex is 1', () => {
+			wrapper = initComponent(App, {})
+			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
+			wrapper.vm.promptIndex = 3
+			expect(wrapper.vm.rightButtonName).toEqual("Finish");
+		})
+	})
+
 	describe("updateGeneratorsPrompt - method", () => {
 		it('there are no prompts', () => {
 			wrapper = initComponent(App, {})
