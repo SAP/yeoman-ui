@@ -67,7 +67,7 @@
               <v-icon left>mdi-chevron-left</v-icon>Back
             </v-btn>
             <v-btn id="next" :disabled="!stepValidated" @click="next">
-              {{rightButtonName}}
+              {{nextButtonText}}
               <v-icon right>mdi-chevron-right</v-icon>
             </v-btn>
           </div>
@@ -140,13 +140,13 @@ export default {
     Done,
     Info,
     PromptInfo,
-    Loading,
+    Loading
   },
   data() {
     return initialState();
   },
   computed: {
-    rightButtonName() {
+    nextButtonText() {
 		if (this.promptIndex > 0 && this.promptIndex === _.size(this.promptsInfoToDisplay)) {
 			return "Finish";
 		} 
@@ -186,12 +186,12 @@ export default {
     prompts: {
       handler() {
         this.setBusyIndicator();
-      },
+      }
     },
     "currentPrompt.status": {
       handler() {
         this.setBusyIndicator();
-      },
+      }
     },
     isDone: {
       handler() {
@@ -305,7 +305,7 @@ export default {
                 return await that.rpc.invoke("evaluateMethod", [
                   args,
                   question.name,
-                  prop,
+                  prop
                 ]);
               } catch (e) {
                 that.showBusyIndicator = false;
@@ -364,7 +364,7 @@ export default {
         description: promptDescription,
         answers: {},
         active: true,
-        status: _.get(this.currentPrompt, "status"),
+        status: _.get(this.currentPrompt, "status")
       });
       return prompt;
     },
@@ -423,13 +423,13 @@ export default {
         "generatorInstall",
         "generatorDone",
         "log",
-        "updateGeneratorsPrompt",
+        "updateGeneratorsPrompt"
       ];
       _.forEach(functions, (funcName) => {
         this.rpc.registerMethod({
           func: this[funcName],
           thisArg: this,
-          name: funcName,
+          name: funcName
         });
       });
 
@@ -477,14 +477,14 @@ export default {
       this.init();
 
       this.displayGeneratorsPrompt();
-    },
+    }
   },
   created() {
     this.setupRpc();
   },
   mounted() {
     this.init();
-  },
+  }
 };
 </script>
 <style scoped>
