@@ -189,7 +189,16 @@ export class YeomanUI {
       this.promptCount = 0;
       this.gen = (gen as Generator);
       this.gen.destinationRoot(targetFolder);
-      
+	  
+	  const originalPrototype = Object.getPrototypeOf(gen);
+    	const originalGenWriting = _.get(originalPrototype, "writing");
+    if (!originalGenWriting) {
+		originalPrototype.writing = () => {}
+	}
+	  this.gen.on("method:writing", () => {
+        this.rpc.invoke("setInGeneratingStep", []);
+	  });
+	  
       env.on("error", error => {
         env.removeAllListeners("error");
         this.onGeneratorFailure(generatorName, error);

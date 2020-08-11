@@ -62,12 +62,12 @@
               id="back"
               :disabled="promptIndex<1 || isReplaying"
               @click="back"
-              v-show="promptIndex > 0"
+              v-show="promptIndex > 0 && !isGenerating"
             >
               <v-icon left>mdi-chevron-left</v-icon>Back
             </v-btn>
-            <v-btn id="next" :disabled="!stepValidated" @click="next">
-              Next
+            <v-btn id="next" v-if="!isGenerating" :disabled="!stepValidated" @click="next">
+              {{nextButtonText}}
               <v-icon right>mdi-chevron-right</v-icon>
             </v-btn>
           </div>
@@ -128,7 +128,8 @@ function initialState() {
     promptsInfoToDisplay: [],
     isReplaying: false,
     numOfSteps: 1,
-    isGeneric: false,
+	isGeneric: false,
+	isGenerating: false
   };
 }
 
@@ -140,12 +141,19 @@ export default {
     Done,
     Info,
     PromptInfo,
-    Loading,
+    Loading
   },
   data() {
     return initialState();
   },
   computed: {
+    nextButtonText() {
+		if (this.promptIndex > 0 && this.promptIndex === _.size(this.promptsInfoToDisplay)) {
+			return "Finish";
+		} 
+
+		return "Next";
+	},
     isLoadingColor() {
       return (
         getComputedStyle(document.documentElement).getPropertyValue(
@@ -219,6 +227,12 @@ export default {
         this.rpc.invoke("logError", [error]);
         this.reject(error);
       }
+    },
+    setInGeneratingStep() {
+		this.isGenerating = true;
+		if (this.currentPrompt) {
+			this.currentPrompt.name = this.messages.step_is_generating;
+		}
     },
     next() {
       if (this.resolve) {
@@ -416,7 +430,8 @@ export default {
         "generatorInstall",
         "generatorDone",
         "log",
-        "updateGeneratorsPrompt"
+        "updateGeneratorsPrompt",
+        "setInGeneratingStep"
       ];
       _.forEach(functions, (funcName) => {
         this.rpc.registerMethod({
@@ -430,7 +445,8 @@ export default {
     },
     async setMessagesAndSaveState() {
       const uiOptions = await this.rpc.invoke("getState");
-      this.messages = uiOptions.messages;
+		this.messages = uiOptions.messages;
+		this.inProgressMessage = this.messages.step_is_pending;
       this.isGeneric = _.get(this.messages, "panel_title") === "Yeoman UI";
       const vscodeApi = this.getVsCodeApi();
       if (vscodeApi) {

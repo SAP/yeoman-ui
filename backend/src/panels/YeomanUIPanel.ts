@@ -98,9 +98,9 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 
 		try {
 			const filePath = await vscode.window.showOpenDialog({
-				canSelectFiles,
-				canSelectFolders,
-				defaultUri: uri
+				canSelectFiles: false,
+				canSelectFolders: true,
+				defaultUri: vscode.Uri.file(path.join(os.homedir()))
 			});
 			return _.get(filePath, "[0].fsPath", currentPath);
 		} catch (error) {
