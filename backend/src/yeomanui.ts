@@ -193,10 +193,12 @@ export class YeomanUI {
 	  const originalPrototype = Object.getPrototypeOf(gen);
 	  const originalGenWriting = _.get(originalPrototype, "writing");
 	  if (!originalGenWriting) {
-		originalPrototype.writing = () => { }
+		originalPrototype.writing = () => { 
+		}
 	  }
+	  this.rpc.invoke("setInGeneratingStep", [false]);
 	  this.gen.on("method:writing", () => {
-		this.rpc.invoke("setInGeneratingStep", []);
+		this.rpc.invoke("setInGeneratingStep", [true]);
 	  });
 
       env.on("error", error => {

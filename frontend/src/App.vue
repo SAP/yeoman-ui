@@ -62,11 +62,11 @@
               id="back"
               :disabled="promptIndex<1 || isReplaying"
               @click="back"
-              v-show="promptIndex > 0 && !isGenerating"
+              v-show="promptIndex > 0 && showButtons"
             >
               <v-icon left>mdi-chevron-left</v-icon>Back
             </v-btn>
-            <v-btn id="next" v-if="!isGenerating" :disabled="!stepValidated" @click="next">
+            <v-btn id="next" v-if="showButtons" :disabled="!stepValidated" @click="next">
               {{nextButtonText}}
               <v-icon right>mdi-chevron-right</v-icon>
             </v-btn>
@@ -129,7 +129,8 @@ function initialState() {
     isReplaying: false,
     numOfSteps: 1,
 	isGeneric: false,
-	isGenerating: false
+	isGenerating: false,
+	showButtons: true
   };
 }
 
@@ -148,7 +149,7 @@ export default {
   },
   computed: {
     nextButtonText() {
-		if (this.promptIndex > 0 && this.promptIndex === _.size(this.promptsInfoToDisplay)) {
+		if (this.promptIndex > 0 && this.promptIndex === _.size(this.promptsInfoToDisplay) || this.isGenerating) {
 			return "Finish";
 		} 
 
@@ -228,12 +229,16 @@ export default {
         this.reject(error);
       }
     },
-    setInGeneratingStep() {
-		this.isGenerating = true;
+    setInGeneratingStep(value) {
+		this.isGenerating = value;
+		this.showButtons = !this.isGenerating;
 		if (this.currentPrompt) {
-			this.currentPrompt.name = _.get(this.messages, "step_is_generating");
+			this.currentPrompt.name = this.getInProgressStepName();
 		}
-    },
+	},
+	getInProgressStepName() {
+		return this.isGenerating ? _.get(this.messages, "step_is_generating") : _.get(this.messages, "step_is_pending");
+	},
     next() {
       if (this.resolve) {
         try {
@@ -247,7 +252,7 @@ export default {
       if (this.promptIndex >= _.size(this.prompts) - 1) {
         const prompt = {
           questions: [],
-          name: this.messages.step_is_pending,
+          name: this.getInProgressStepName(),
           status: PENDING,
         };
         this.setPrompts([prompt]);
@@ -341,12 +346,20 @@ export default {
         this.isReplaying = false;
       }
       const prompt = this.createPrompt(questions, name);
-      this.setPrompts([prompt]);
-
+	this.setPrompts([prompt]);
+	if (this.isGenerating) {
+		this.showButtons = true;
+	}
       const promise = new Promise((resolve, reject) => {
         this.resolve = resolve;
         this.reject = reject;
-      });
+	});
+	
+	promise.then(() => {
+		if (this.isGenerating) {
+			this.showButtons = false;
+		}
+	});
 
       return promise;
     },
@@ -446,7 +459,6 @@ export default {
     async setMessagesAndSaveState() {
 		const uiOptions = await this.rpc.invoke("getState");
 		this.messages = uiOptions.messages;
-		this.inProgressMessage = _.get(this.messages, "step_is_pending");
 		this.isGeneric = _.get(this.messages, "panel_title") === "Yeoman UI";
 		const vscodeApi = this.getVsCodeApi();
 		if (vscodeApi) {
