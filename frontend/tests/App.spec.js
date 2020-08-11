@@ -31,6 +31,29 @@ describe('App.vue', () => {
 		})
 	})
 
+	describe('nextButtonText - computed', () => {
+		it('promptIndex is 0', () => {
+			wrapper = initComponent(App, {})
+			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
+			wrapper.vm.promptIndex = 0
+			expect(wrapper.vm.nextButtonText).toEqual("Next");
+		})
+
+		it('promptIndex is 1', () => {
+			wrapper = initComponent(App, {})
+			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
+			wrapper.vm.promptIndex = 1
+			expect(wrapper.vm.nextButtonText).toEqual("Next");
+		})
+
+		it('promptIndex is 1', () => {
+			wrapper = initComponent(App, {})
+			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
+			wrapper.vm.promptIndex = 3
+			expect(wrapper.vm.nextButtonText).toEqual("Finish");
+		})
+	})
+
 	describe("updateGeneratorsPrompt - method", () => {
 		it('there are no prompts', () => {
 			wrapper = initComponent(App, {})
@@ -184,6 +207,7 @@ describe('App.vue', () => {
 
 			wrapper.vm.prompts = [{}, { name: "Loading..." }]
 			wrapper.vm.promptIndex = 1
+			wrapper.vm.messages = {step_is_pending: "Loading..."};
 
 			const questions = [
 				{ name: 'validateQ', validate: '__Function' }

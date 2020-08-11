@@ -231,7 +231,7 @@ export default {
     setInGeneratingStep() {
 		this.isGenerating = true;
 		if (this.currentPrompt) {
-			this.currentPrompt.name = this.messages.step_is_generating;
+			this.currentPrompt.name = _.get(this.messages, "step_is_generating");
 		}
     },
     next() {
@@ -444,14 +444,14 @@ export default {
       this.displayGeneratorsPrompt();
     },
     async setMessagesAndSaveState() {
-      const uiOptions = await this.rpc.invoke("getState");
+		const uiOptions = await this.rpc.invoke("getState");
 		this.messages = uiOptions.messages;
-		this.inProgressMessage = this.messages.step_is_pending;
-      this.isGeneric = _.get(this.messages, "panel_title") === "Yeoman UI";
-      const vscodeApi = this.getVsCodeApi();
-      if (vscodeApi) {
-        vscodeApi.setState(uiOptions);
-      }
+		this.inProgressMessage = _.get(this.messages, "step_is_pending");
+		this.isGeneric = _.get(this.messages, "panel_title") === "Yeoman UI";
+		const vscodeApi = this.getVsCodeApi();
+		if (vscodeApi) {
+			vscodeApi.setState(uiOptions);
+		}
     },
     async displayGeneratorsPrompt() {
       await this.setMessagesAndSaveState();
