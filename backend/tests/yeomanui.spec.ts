@@ -577,6 +577,24 @@ describe('yeomanui unit test', () => {
 		});
 	});
 
+	describe("exploreGenerators", () => {
+		it("vscode module is not available", () => {
+			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {});
+			yeomanUiInstance["getVscode"] = () => undefined;
+			yeomanUiInstance["exploreGenerators"]();
+		});
+
+		it("vscode module is available", () => {
+			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {});
+			const testVscode = {commands: {executeCommand: () => {}}}; 
+			yeomanUiInstance["getVscode"] = () => testVscode;
+			const commandsMock = sandbox.mock(testVscode.commands);
+			commandsMock.expects("executeCommand").withExactArgs("exploreGenerators");
+			yeomanUiInstance["exploreGenerators"]();
+			commandsMock.verify();
+		});
+	});
+
     describe("setGenInstall", () => {
         it("install method not exist", () => {
             const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create());
