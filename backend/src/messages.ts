@@ -3,8 +3,9 @@ const selectTargetFolderQuestionHint = "The project will contain the relevant fi
 
 export default {
     panel_title: "Yeoman UI",
-    generators_loading: "Loading the Yeoman generators...",
-    step_is_pending: "Loading...",
+	generators_loading: "Loading the Yeoman generators...",
+	step_is_pending: "Loading...",
+	step_is_generating: "Generating...",
     yeoman_ui_title: "Yeoman Generators",
     select_generator_name: "Select Generator",
     select_generator_question_message: "Generators",

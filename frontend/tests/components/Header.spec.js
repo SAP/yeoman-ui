@@ -33,10 +33,24 @@ describe('Header.vue', () => {
         wrapper = initComponent(Header, {
             rpc: {
                 invoke: rpcInvokeMockFunction
-            }
+			},
+			isGeneric: false
         }, true)
         
         wrapper.findAll("button").wrappers[0].trigger('click')
-        expect(rpcInvokeMockFunction).toHaveBeenCalled()
+        expect(rpcInvokeMockFunction).toHaveBeenCalledWith("toggleOutput", [{}])
+	})
+	
+	test('openExploreGenerators', async () => {
+        const rpcInvokeMockFunction = jest.fn()
+        wrapper = initComponent(Header, {
+            rpc: {
+                invoke: rpcInvokeMockFunction
+			},
+			isGeneric: true
+		}, true)
+		
+        wrapper.findAll("button").wrappers[0].trigger('click')
+        expect(rpcInvokeMockFunction).toHaveBeenCalledWith("exploreGenerators", [{}])
     })
 })
