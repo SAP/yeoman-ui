@@ -129,7 +129,7 @@ function initialState() {
     isReplaying: false,
     numOfSteps: 1,
 	isGeneric: false,
-	isGenerating: false,
+	isWriting: false,
 	showButtons: true
   };
 }
@@ -149,7 +149,7 @@ export default {
   },
   computed: {
     nextButtonText() {
-		if (this.promptIndex > 0 && this.promptIndex === _.size(this.promptsInfoToDisplay) || this.isGenerating) {
+		if (this.promptIndex > 0 && this.promptIndex === _.size(this.promptsInfoToDisplay) || this.isWriting) {
 			return "Finish";
 		} 
 
@@ -229,15 +229,15 @@ export default {
         this.reject(error);
       }
     },
-    setInGeneratingStep(value) {
-		this.isGenerating = value;
-		this.showButtons = !this.isGenerating;
+    setGenInWriting(value) {
+		this.isWriting = value;
+		this.showButtons = !this.isWriting;
 		if (this.currentPrompt) {
 			this.currentPrompt.name = this.getInProgressStepName();
 		}
 	},
 	getInProgressStepName() {
-		return this.isGenerating ? _.get(this.messages, "step_is_generating") : _.get(this.messages, "step_is_pending");
+		return this.isWriting ? _.get(this.messages, "step_is_generating") : _.get(this.messages, "step_is_pending");
 	},
     next() {
       if (this.resolve) {
@@ -340,28 +340,28 @@ export default {
       }
     },
     async showPrompt(questions, name) {
-      this.prepQuestions(questions);
-      if (this.isReplaying) {
-        this.promptIndex -= this.numOfSteps;
-        this.isReplaying = false;
-      }
-      const prompt = this.createPrompt(questions, name);
-	this.setPrompts([prompt]);
-	if (this.isGenerating) {
-		this.showButtons = true;
-	}
-      const promise = new Promise((resolve, reject) => {
-        this.resolve = resolve;
-        this.reject = reject;
-	});
-	
-	promise.then(() => {
-		if (this.isGenerating) {
-			this.showButtons = false;
+		this.prepQuestions(questions);
+		if (this.isReplaying) {
+			this.promptIndex -= this.numOfSteps;
+			this.isReplaying = false;
 		}
-	});
+		const prompt = this.createPrompt(questions, name);
+		this.setPrompts([prompt]);
+		if (this.isWriting) {
+			this.showButtons = true;
+		}
+		const promise = new Promise((resolve, reject) => {
+			this.resolve = resolve;
+			this.reject = reject;
+		});
 
-      return promise;
+		promise.then(() => {
+			if (this.isWriting) {
+				this.showButtons = false;
+			}
+		});
+
+		return promise;
     },
     createPrompt(questions, name) {
       let promptDescription = "";
@@ -444,7 +444,7 @@ export default {
         "generatorDone",
         "log",
         "updateGeneratorsPrompt",
-        "setInGeneratingStep"
+        "setGenInWriting"
       ];
       _.forEach(functions, (funcName) => {
         this.rpc.registerMethod({

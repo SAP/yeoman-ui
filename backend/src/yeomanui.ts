@@ -157,77 +157,87 @@ export class YeomanUI {
     }
   }
 
-  private async runGenerator(generatorName: string) {
-    this.generatorName = generatorName;
-    // TODO: should create and set target dir only after user has selected a generator;
-    // see issue: https://github.com/yeoman/environment/issues/55
-    // process.chdir() doesn't work after environment has been created
-    try {
-      const targetFolder = this.getCwd();
-      await fsextra.mkdirs(targetFolder);
-      const dirsBefore = await this.getChildDirectories(targetFolder);
-      const env: Environment = Environment.createEnv(undefined, {sharedOptions: {forwardErrorToEnvironment: true}}, this.youiAdapter);
-      const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
-       // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
-      env.register(meta.resolved, meta.namespace, meta.packagePath);
+	private async runGenerator(generatorName: string) {
+		this.generatorName = generatorName;
+		// TODO: should create and set target dir only after user has selected a generator;
+		// see issue: https://github.com/yeoman/environment/issues/55
+		// process.chdir() doesn't work after environment has been created
+		try {
+		const targetFolder = this.getCwd();
+		await fsextra.mkdirs(targetFolder);
+		const dirsBefore = await this.getChildDirectories(targetFolder);
+		const env: Environment = Environment.createEnv(undefined, {sharedOptions: {forwardErrorToEnvironment: true}}, this.youiAdapter);
+		const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
+		// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+		// @ts-ignore
+		env.register(meta.resolved, meta.namespace, meta.packagePath);
 
-      const genNamespace = this.getGenNamespace(generatorName);
-      const options = {
-        logger: this.logger.getChildLogger({label: generatorName}),
-        vscode: this.getVscode(), // TODO: remove this temporary workaround once a better solution is found,
-        data: this.uiOptions.data
-      };
-      const gen: any = env.create(genNamespace, {options});
-      // check if generator defined a helper function called setPromptsCallback()
-      const setPromptsCallback = _.get(gen, "setPromptsCallback");
-      if (setPromptsCallback) {
-        setPromptsCallback(this.setPromptList.bind(this));
-      }
-
-      this.setGenInstall(gen, generatorName);
-      this.promptCount = 0;
-      this.gen = (gen as Generator);
-      this.gen.destinationRoot(targetFolder);
-	  
-	  const originalPrototype = Object.getPrototypeOf(gen);
-	  const originalGenWriting = _.get(originalPrototype, "writing");
-	  if (!originalGenWriting) {
-		originalPrototype.writing = () => { 
+		const genNamespace = this.getGenNamespace(generatorName);
+		const options = {
+			logger: this.logger.getChildLogger({label: generatorName}),
+			vscode: this.getVscode(), // TODO: remove this temporary workaround once a better solution is found,
+			data: this.uiOptions.data
+		};
+		const gen: any = env.create(genNamespace, {options});
+		// check if generator defined a helper function called setPromptsCallback()
+		const setPromptsCallback = _.get(gen, "setPromptsCallback");
+		if (setPromptsCallback) {
+			setPromptsCallback(this.setPromptList.bind(this));
 		}
-	  }
-	  this.rpc.invoke("setInGeneratingStep", [false]);
-	  this.gen.on("method:writing", () => {
-		this.rpc.invoke("setInGeneratingStep", [true]);
-	  });
 
-      env.on("error", error => {
-        env.removeAllListeners("error");
-        this.onGeneratorFailure(generatorName, error);
-        env.emit("error", error);
-      });
+		this.setGenInstall(gen, generatorName);
+		this.promptCount = 0;
+		this.gen = (gen as Generator);
+		this.gen.destinationRoot(targetFolder);
+		// notifies ui wether generator is in writing state
+		this.setGenInWriting(this.gen);
+		// handles generator errors 
+		this.handleErrors(env, this.gen, generatorName);
 
-      this.gen.on("error", error => {
-        this.onGeneratorFailure(generatorName, error);
-      });
+		// we cannot use new async method, "await this.gen.run()", because generators based on older versions 
+		// (for example: 2.0.5) of "yeoman-generator" do not support it
+		this.gen.run( (error) => {
+			if (!this.errorThrown && !error) {
+				this.getChildDirectories(this.gen.destinationRoot()).then( (dirsAfter) => {
+					this.onGeneratorSuccess(generatorName, dirsBefore, dirsAfter);
+				});
+			}
+		});
+		} catch (error) {
+			this.onGeneratorFailure(generatorName, error);
+		}
+	}
 
-      process.on('uncaughtException', error => {
-        this.onGeneratorFailure(generatorName, error);
-      });
+	private setGenInWriting(gen: any) {
+		const genMethodName = "writing";
+		const originalPrototype = Object.getPrototypeOf(gen);
+		const originalGenWriting = _.get(originalPrototype, genMethodName);
+		if (!originalGenWriting) {
+			originalPrototype[genMethodName] = () => {}
+		}
+		const uiRpcMethodName = "setGenInWriting";
+		this.rpc.invoke(uiRpcMethodName, [false]);
+		gen.on(`method:${genMethodName}`, () => {
+			this.rpc.invoke(uiRpcMethodName, [true]);
+		});
+	}
 
-      // we cannot use new async method, "await this.gen.run()", because generators based on older versions 
-      // (for example: 2.0.5) of "yeoman-generator" do not support it
-      this.gen.run( (error) => {
-        if (!this.errorThrown && !error) {
-          this.getChildDirectories(this.gen.destinationRoot()).then( (dirsAfter) => {
-            this.onGeneratorSuccess(generatorName, dirsBefore, dirsAfter);
-          });
-        }
-      });
-    } catch (error) {
-      this.onGeneratorFailure(generatorName, error);
-    }
-  }
+	private handleErrors(env: Environment, gen: any, generatorName: string) {
+		const errorEventName = "error";
+		env.on(errorEventName, (error: any) => {
+			env.removeAllListeners(errorEventName);
+			this.onGeneratorFailure(generatorName, error);
+			env.emit(errorEventName, error);
+		});
+
+		gen.on(errorEventName, (error: any) => {
+			this.onGeneratorFailure(generatorName, error);
+		});
+
+		process.on("uncaughtException", (error: any) => {
+			this.onGeneratorFailure(generatorName, error);
+		});
+	}
 
   /**
    * 
