@@ -62,12 +62,12 @@
               id="back"
               :disabled="promptIndex<1 || isReplaying"
               @click="back"
-              v-show="promptIndex > 0"
+              v-show="promptIndex > 0 && showButtons"
             >
               <v-icon left>mdi-chevron-left</v-icon>Back
             </v-btn>
-            <v-btn id="next" :disabled="!stepValidated" @click="next">
-              Next
+            <v-btn id="next" v-if="showButtons" :disabled="!stepValidated" @click="next">
+              {{nextButtonText}}
               <v-icon right>mdi-chevron-right</v-icon>
             </v-btn>
           </div>
@@ -128,7 +128,9 @@ function initialState() {
     promptsInfoToDisplay: [],
     isReplaying: false,
     numOfSteps: 1,
-    isGeneric: false,
+	isGeneric: false,
+	isWriting: false,
+	showButtons: true
   };
 }
 
@@ -140,12 +142,19 @@ export default {
     Done,
     Info,
     PromptInfo,
-    Loading,
+    Loading
   },
   data() {
     return initialState();
   },
   computed: {
+    nextButtonText() {
+		if (this.promptIndex > 0 && this.promptIndex === _.size(this.promptsInfoToDisplay) || this.isWriting) {
+			return "Finish";
+		} 
+
+		return "Next";
+	},
     isLoadingColor() {
       return (
         getComputedStyle(document.documentElement).getPropertyValue(
@@ -220,6 +229,16 @@ export default {
         this.reject(error);
       }
     },
+    setGenInWriting(value) {
+		this.isWriting = value;
+		this.showButtons = !this.isWriting;
+		if (this.currentPrompt) {
+			this.currentPrompt.name = this.getInProgressStepName();
+		}
+	},
+	getInProgressStepName() {
+		return this.isWriting ? _.get(this.messages, "step_is_generating") : _.get(this.messages, "step_is_pending");
+	},
     next() {
       if (this.resolve) {
         try {
@@ -233,7 +252,7 @@ export default {
       if (this.promptIndex >= _.size(this.prompts) - 1) {
         const prompt = {
           questions: [],
-          name: this.messages.step_is_pending,
+          name: this.getInProgressStepName(),
           status: PENDING,
         };
         this.setPrompts([prompt]);
@@ -321,20 +340,28 @@ export default {
       }
     },
     async showPrompt(questions, name) {
-      this.prepQuestions(questions);
-      if (this.isReplaying) {
-        this.promptIndex -= this.numOfSteps;
-        this.isReplaying = false;
-      }
-      const prompt = this.createPrompt(questions, name);
-      this.setPrompts([prompt]);
+		this.prepQuestions(questions);
+		if (this.isReplaying) {
+			this.promptIndex -= this.numOfSteps;
+			this.isReplaying = false;
+		}
+		const prompt = this.createPrompt(questions, name);
+		this.setPrompts([prompt]);
+		if (this.isWriting) {
+			this.showButtons = true;
+		}
+		const promise = new Promise((resolve, reject) => {
+			this.resolve = resolve;
+			this.reject = reject;
+		});
 
-      const promise = new Promise((resolve, reject) => {
-        this.resolve = resolve;
-        this.reject = reject;
-      });
+		promise.then(() => {
+			if (this.isWriting) {
+				this.showButtons = false;
+			}
+		});
 
-      return promise;
+		return promise;
     },
     createPrompt(questions, name) {
       let promptDescription = "";
@@ -416,7 +443,8 @@ export default {
         "generatorInstall",
         "generatorDone",
         "log",
-        "updateGeneratorsPrompt"
+        "updateGeneratorsPrompt",
+        "setGenInWriting"
       ];
       _.forEach(functions, (funcName) => {
         this.rpc.registerMethod({
@@ -429,13 +457,13 @@ export default {
       this.displayGeneratorsPrompt();
     },
     async setMessagesAndSaveState() {
-      const uiOptions = await this.rpc.invoke("getState");
-      this.messages = uiOptions.messages;
-      this.isGeneric = _.get(this.messages, "panel_title") === "Yeoman UI";
-      const vscodeApi = this.getVsCodeApi();
-      if (vscodeApi) {
-        vscodeApi.setState(uiOptions);
-      }
+		const uiOptions = await this.rpc.invoke("getState");
+		this.messages = uiOptions.messages;
+		this.isGeneric = _.get(this.messages, "panel_title") === "Yeoman UI";
+		const vscodeApi = this.getVsCodeApi();
+		if (vscodeApi) {
+			vscodeApi.setState(uiOptions);
+		}
     },
     async displayGeneratorsPrompt() {
       await this.setMessagesAndSaveState();

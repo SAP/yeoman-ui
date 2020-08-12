@@ -15,6 +15,7 @@ import { GeneratorFilter } from "../src/filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import * as os from "os";
 import messages from "../src/messages";
+import Environment = require("yeoman-environment");
 
 describe('yeomanui unit test', () => {
     let sandbox: any;
@@ -528,7 +529,71 @@ describe('yeomanui unit test', () => {
                 }
             }
         });
-    });
+	});
+	
+	describe("handleErrors", () => {
+		it("check event names", () => {
+			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {});
+			const env: Environment =  Environment.createEnv();
+			const envMock = sandbox.mock(env);
+			const gen = {on: () => {}};
+			const genMock = sandbox.mock(gen);
+			const processMock = sandbox.mock(process);
+			envMock.expects("on").withArgs("error");
+			genMock.expects("on").withArgs("error");
+			processMock.expects("on").withArgs("uncaughtException");
+			yeomanUiInstance["handleErrors"](env, gen, "genName");
+			envMock.verify();
+			genMock.verify();
+			processMock.verify();
+		});
+	});
+
+	describe("setGenInWriting", () => {
+		let genMock: any;
+		let rpcMock: any;
+		const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {});
+		const gen: any = {on: () => {}};
+
+		beforeEach(() => {
+			genMock = sandbox.mock(gen);
+			rpcMock = sandbox.mock(rpc);
+			genMock.expects("on").withArgs("method:writing");
+			rpcMock.expects("invoke").withExactArgs("setGenInWriting", [false]);
+		});
+
+		afterEach(() => {
+			genMock.verify();
+			rpcMock.verify();
+		});
+
+		it("writing method does not exist on generator", () => {
+			yeomanUiInstance["setGenInWriting"](gen);
+		});
+
+		it("writing method exists on generator", () => {
+			gen.writing = () => {};
+			yeomanUiInstance["setGenInWriting"](gen);
+		});
+	});
+
+	describe("exploreGenerators", () => {
+		it("vscode module is not available", () => {
+			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {});
+			yeomanUiInstance["getVscode"] = () => undefined;
+			yeomanUiInstance["exploreGenerators"]();
+		});
+
+		it("vscode module is available", () => {
+			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {});
+			const testVscode = {commands: {executeCommand: () => {}}}; 
+			yeomanUiInstance["getVscode"] = () => testVscode;
+			const commandsMock = sandbox.mock(testVscode.commands);
+			commandsMock.expects("executeCommand").withExactArgs("exploreGenerators");
+			yeomanUiInstance["exploreGenerators"]();
+			commandsMock.verify();
+		});
+	});
 
     describe("setGenInstall", () => {
         it("install method not exist", () => {

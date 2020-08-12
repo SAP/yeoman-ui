@@ -31,6 +31,29 @@ describe('App.vue', () => {
 		})
 	})
 
+	describe('nextButtonText - computed', () => {
+		it('promptIndex is 0', () => {
+			wrapper = initComponent(App, {})
+			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
+			wrapper.vm.promptIndex = 0
+			expect(wrapper.vm.nextButtonText).toEqual("Next");
+		})
+
+		it('promptIndex is 1', () => {
+			wrapper = initComponent(App, {})
+			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
+			wrapper.vm.promptIndex = 1
+			expect(wrapper.vm.nextButtonText).toEqual("Next");
+		})
+
+		it('promptIndex is 1', () => {
+			wrapper = initComponent(App, {})
+			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
+			wrapper.vm.promptIndex = 3
+			expect(wrapper.vm.nextButtonText).toEqual("Finish");
+		})
+	})
+
 	describe("updateGeneratorsPrompt - method", () => {
 		it('there are no prompts', () => {
 			wrapper = initComponent(App, {})
@@ -83,46 +106,39 @@ describe('App.vue', () => {
 		})
 	})
 
-	describe('getVsCodeApi - method', () => {
-		it('not in vscode', () => {
-			wrapper = initComponent(App, {}, true)
-			wrapper.vm.isInVsCode = () => false;
-			const vscodeApi = wrapper.vm.getVsCodeApi();
-			expect(vscodeApi).toBeUndefined();
-		})
-	})
-
-	describe('setMessagesAndSaveState - method', () => {
-		it('vscode api exists', async () => {
-			wrapper = initComponent(App, {}, true)
-			wrapper.vm.rpc = {
-				invoke: jest.fn().mockImplementation(async () => { return { data: {} }; })
-			}
-			wrapper.vm.getVsCodeApi = () => {
-				return { setState: () => true };
-			};
-			wrapper.vm.setMessagesAndSaveState();
-		})
-
-		it('vscode api no exists', async () => {
-			wrapper = initComponent(App, {}, true)
-			wrapper.vm.rpc = {
-				invoke: () => new Promise({ data: {} })
-			}
-			wrapper.vm.rpc = {
-				invoke: jest.fn().mockImplementation(async () => { return { data: {} }; })
-			}
-			wrapper.vm.getVsCodeApi = () => undefined;
-			wrapper.vm.setMessagesAndSaveState();
-		})
-	})
-
 	describe('setQuestionProps - method', () => {
+		// the delay ensures we call the busy indicator
+		it('validate() with delay', async () => {
+			wrapper = initComponent(App, {}, true)
+			wrapper.vm.prompts = [{}, {}]
+			wrapper.vm.promptIndex = 1
+			wrapper.vm.rpc = {
+				invoke: jest.fn().mockImplementation((methodName, question) => {
+					return new Promise(resolve => {
+						setTimeout(() => {
+							resolve(question[1]);
+						},
+						1500);
+					});
+				})
+			}
+
+			const questions = [
+				{ name: 'validateQ', validate: '__Function' }
+			]
+			wrapper.vm.showPrompt(questions, 'promptName')
+			await Vue.nextTick()
+			
+			const response = await questions[0].validate({})
+			expect(response).toBe(questions[0].name)
+		})
+
 		it('set props', async () => {
 			wrapper = initComponent(App, {}, true)
 			wrapper.vm.rpc = {
-				invoke: jest.fn().mockImplementation((...args) => { return args[1][1] })
+				invoke: jest.fn().mockImplementation((methodName, question) => { return question[1] })
 			}
+		
 			const questions = [
 				{ name: 'defaultQ', default: '__Function' },
 				{ name: 'whenQ', when: '__Function' },
@@ -133,7 +149,7 @@ describe('App.vue', () => {
 				{ name: 'whenQ6', default: 'whenAnswer6', type: 'confirm' }
 			]
 			wrapper.vm.showPrompt(questions, 'promptName')
-			await Vue.nextTick()
+			
 			let response = await questions[0].default()
 			expect(response).toBe(questions[0].name)
 
@@ -167,32 +183,39 @@ describe('App.vue', () => {
 			wrapper.vm.prepQuestions(questions, 'promptName');
 			await expect(questions[0].validate()).rejects.toEqual("error");
 		})
+	})
 
-		// the delay ensures we call the busy indicator
-		it('validate() with delay', async () => {
+	describe('getVsCodeApi - method', () => {
+		it('not in vscode', () => {
+			wrapper = initComponent(App, {}, true)
+			wrapper.vm.isInVsCode = () => false;
+			const vscodeApi = wrapper.vm.getVsCodeApi();
+			expect(vscodeApi).toBeUndefined();
+		})
+	})
+
+	describe('setMessagesAndSaveState - method', () => {
+		it('vscode api exists', async () => {
 			wrapper = initComponent(App, {}, true)
 			wrapper.vm.rpc = {
-				invoke: jest.fn().mockImplementation(async (...args) => {
-					return new Promise((resolve) => {
-						setTimeout(() => {
-							resolve(args[1][1]);
-						},
-							1500);
-					});
-				})
+				invoke: jest.fn().mockImplementation(async () => { return { data: {} }; })
 			}
+			wrapper.vm.getVsCodeApi = () => {
+				return { setState: () => true };
+			};
+			wrapper.vm.setMessagesAndSaveState();
+		})
 
-			wrapper.vm.prompts = [{}, { name: "Loading..." }]
-			wrapper.vm.promptIndex = 1
-
-			const questions = [
-				{ name: 'validateQ', validate: '__Function' }
-			]
-			wrapper.vm.showPrompt(questions, 'promptName')
-			await Vue.nextTick()
-
-			const response = await questions[0].validate()
-			expect(response).toBe(questions[0].name)
+		it('vscode api no exists', async () => {
+			wrapper = initComponent(App, {}, true)
+			wrapper.vm.rpc = {
+				invoke: () => new Promise({ data: {} })
+			}
+			wrapper.vm.rpc = {
+				invoke: jest.fn().mockImplementation(async () => { return { data: {} }; })
+			}
+			wrapper.vm.getVsCodeApi = () => undefined;
+			wrapper.vm.setMessagesAndSaveState();
 		})
 	})
 
@@ -366,6 +389,7 @@ describe('App.vue', () => {
 			const questions = [{}, {}];
 			wrapper.vm.promptIndex = 1;
 			wrapper.vm.isReplaying = true;
+			wrapper.vm.isWriting = true;
 			wrapper.vm.showPrompt(questions, 'promptName');
 			await Vue.nextTick()
 			expect(wrapper.vm.promptIndex).toBe(0);
@@ -580,6 +604,35 @@ describe('App.vue', () => {
 			wrapper.vm.$data.generatorPrettyName = "testGeneratorPrettyName";
 			wrapper.vm.$data.messages = { yeoman_ui_title: "yeoman_ui_title" };
 			expect(wrapper.vm.headerTitle).toEqual("yeoman_ui_title - testGeneratorPrettyName")
+		})
+	})
+
+	describe("setGenInWriting", () => {
+		it('in writing state', () => {
+			wrapper = initComponent(App, {}, true)
+			wrapper.vm.prompts = [{}, {}]
+			wrapper.vm.promptIndex = 1
+			wrapper.vm.setGenInWriting(true);
+			expect(wrapper.vm.isWriting).toBe(true);
+			expect(wrapper.vm.showButtons).toBe(false);
+		})
+
+		it('not in writing state', () => {
+			wrapper = initComponent(App, {}, true)
+			wrapper.vm.prompts = [{}, {}]
+			wrapper.vm.promptIndex = 1
+			wrapper.vm.setGenInWriting(false);
+			expect(wrapper.vm.isWriting).toBe(false);
+			expect(wrapper.vm.showButtons).toBe(true);
+		})
+
+		it('not in writing state, currentprompt is undefined', () => {
+			wrapper = initComponent(App, {}, true)
+			wrapper.vm.prompts = [{}, {}]
+			wrapper.vm.promptIndex = 3
+			wrapper.vm.setGenInWriting(false);
+			expect(wrapper.vm.isWriting).toBe(false);
+			expect(wrapper.vm.showButtons).toBe(true);
 		})
 	})
 })
