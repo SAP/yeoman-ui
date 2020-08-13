@@ -66,7 +66,7 @@
             >
               <v-icon left>mdi-chevron-left</v-icon>Back
             </v-btn>
-            <v-btn id="next" :disabled="!stepValidated" @click="next">
+            <v-btn id="next" :disabled="!stepValidated" @click="next" style="min-width:100px;">
               {{nextButtonText}}
               <v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
             </v-btn>
