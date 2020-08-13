@@ -54,21 +54,21 @@
             />
           </v-col>
         </v-row>
-        <v-row v-if="prompts.length > 0 && !isDone" style="height: 4rem; margin: 0;" sm="auto">
-          <div class="bottom-right-col" style="flex:1;"></div>
+        <v-row v-if="prompts.length > 0 && !isDone && showButtons" style="height: 4rem; margin: 0;" sm="auto">
+		<div class="bottom-right-col" style="flex:1;"></div>
           <div class="diagonal"></div>
           <div class="bottom-buttons-col" style="display:flex;align-items: center;">
             <v-btn
               id="back"
               :disabled="promptIndex<1 || isReplaying"
               @click="back"
-              v-show="promptIndex > 0 && showButtons"
+              v-show="promptIndex > 0"
             >
               <v-icon left>mdi-chevron-left</v-icon>Back
             </v-btn>
-            <v-btn id="next" v-if="showButtons" :disabled="!stepValidated" @click="next">
+            <v-btn id="next" :disabled="!stepValidated" @click="next" style="min-width:100px;">
               {{nextButtonText}}
-              <v-icon right>mdi-chevron-right</v-icon>
+              <v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
             </v-btn>
           </div>
         </v-row>
