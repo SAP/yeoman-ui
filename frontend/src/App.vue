@@ -63,10 +63,11 @@
               :disabled="promptIndex<1 || isReplaying"
               @click="back"
               v-show="promptIndex > 0"
+				style="min-width:90px;"
             >
               <v-icon left>mdi-chevron-left</v-icon>Back
             </v-btn>
-            <v-btn id="next" :disabled="!stepValidated" @click="next" style="min-width:100px;">
+            <v-btn id="next" :disabled="!stepValidated" @click="next" style="min-width:90px;">
               {{nextButtonText}}
               <v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
             </v-btn>
