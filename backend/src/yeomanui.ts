@@ -185,12 +185,13 @@ export class YeomanUI {
 			setPromptsCallback(this.setPromptList.bind(this));
 		}
 
-		this.setGenInstall(gen, generatorName);
 		this.promptCount = 0;
 		this.gen = (gen as Generator);
 		this.gen.destinationRoot(targetFolder);
 		// notifies ui wether generator is in writing state
 		this.setGenInWriting(this.gen);
+		// handles generator install step if exists
+		this.onGenInstall(this.gen);
 		// handles generator errors 
 		this.handleErrors(env, this.gen, generatorName);
 
@@ -359,23 +360,10 @@ export class YeomanUI {
     this.youiEvents.doGeneratorDone(false, errorMessage);
   }
 
-  private setGenInstall(gen: any, generatorName: string) {
-    const originalPrototype = Object.getPrototypeOf(gen);
-    const originalGenInstall = _.get(originalPrototype, "install");
-    if (originalGenInstall && !originalPrototype._uiInstall) {
-      originalPrototype._uiInstall = true;
-      originalPrototype.install = async () => {
-        try {
-          this.youiEvents.doGeneratorInstall();
-          await originalGenInstall.call(gen);
-        } catch (error) {
-          this.onGeneratorFailure(generatorName, error);
-        } finally {
-          originalPrototype.install = originalGenInstall;
-          delete originalPrototype._uiInstall;
-        }
-      };
-    }
+  private onGenInstall(gen: any) {
+    gen.on("method:install", () => {
+		this.youiEvents.doGeneratorInstall();
+	});
   }
 
   private getErrorInfo(error: any = "") {

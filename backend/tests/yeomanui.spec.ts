@@ -595,31 +595,15 @@ describe('yeomanui unit test', () => {
 		});
 	});
 
-    describe("setGenInstall", () => {
-        it("install method not exist", () => {
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create());
-            const gen: any = {};
-            yeomanUiInstance["setGenInstall"](gen, "testgen");
-            expect(gen.__proto__.install).to.be.undefined;
-        });
-
-        it("install method exists", () => {
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create());
-            class GenTest {
-               public install(): any{
-                   return "original_install";
-               }
-            }
-            const gen: any = new GenTest();
-            expect(gen.__proto__.install).to.be.not.undefined;
-
-            const installSpy = sandbox.spy(youiEvents,"doGeneratorInstall");
-            yeomanUiInstance["setGenInstall"](gen, "testgen");
-            gen.install();
-            expect(installSpy.called).to.be.true;
-            installSpy.restore();
-        });
-    });
+	it("onGenInstall", () => {
+		const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create());
+		const gen: any = {on: () => {}};
+		const genMock = sandbox.mock(gen);
+		
+		genMock.expects("on").withArgs("method:install");
+		yeomanUiInstance["onGenInstall"](gen);
+		genMock.verify();
+	});
 
     describe("showPrompt", () => {
         it("returns answers", async () => {
