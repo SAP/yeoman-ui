@@ -16,7 +16,6 @@ describe('App.vue', () => {
 
 	it('createPrompt - method', () => {
 		wrapper = initComponent(App, {}, true)
-		expect(wrapper.vm.createPrompt().name).toBe()
 		expect(wrapper.vm.createPrompt([]).name).toBe()
 		expect(wrapper.vm.createPrompt([], 'name').name).toBe('name')
 		expect(wrapper.vm.createPrompt([], 'select_generator')).toBeDefined()

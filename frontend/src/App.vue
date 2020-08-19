@@ -378,7 +378,8 @@ export default {
         promptDescription = _.get(promptToDisplay, "description", "");
         promptName = _.get(promptToDisplay, "name", name);
       }
-
+		// fake input element to fix form issue with enter key press when only one input element exists
+		questions.push({type: "input"});
       const prompt = Vue.observable({
         questions: questions,
         name: promptName,
@@ -506,6 +507,13 @@ export default {
   },
   mounted() {
     this.init();
+  },
+  updated() {
+	// hide fake input element to fix form issue with enter key press when only one input element exists
+	const element = _.get(document.querySelectorAll("form > div:last-child"), "[0]");
+	if (element) {
+		element.style.display = "none";
+	}
   }
 };
 </script>
