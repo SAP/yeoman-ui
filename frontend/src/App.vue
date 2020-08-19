@@ -378,8 +378,10 @@ export default {
         promptDescription = _.get(promptToDisplay, "description", "");
         promptName = _.get(promptToDisplay, "name", name);
       }
-		// fake input element to fix form issue with enter key press when only one input element exists
-		questions.push({type: "input"});
+      // fake input element to fix form issue with enter key press when only one input element exists
+      // see: https://forum.vuejs.org/t/modal-form-submit-always-reloads-page/1279
+      // see: https://stackoverflow.com/questions/1370021/why-does-forms-with-single-input-field-submit-upon-pressing-enter-key-in-input
+      questions.push({type: "input"});
       const prompt = Vue.observable({
         questions: questions,
         name: promptName,
