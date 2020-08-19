@@ -511,9 +511,7 @@ export default {
   updated() {
 	// hide fake input element to fix form issue with enter key press when only one input element exists
 	const element = _.get(document.querySelectorAll("form > div:last-child"), "[0]");
-	if (element) {
-		element.style.display = "none";
-	}
+	_.set(element, "style.display", "none");
   }
 };
 </script>
