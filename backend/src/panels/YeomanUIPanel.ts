@@ -13,6 +13,7 @@ import { VSCodeYouiEvents } from '../vscode-youi-events';
 import { AbstractWebviewPanel } from './AbstractWebviewPanel';
 import { ExploreGens } from '../exploregens';
 import { getSWA } from '../swa-tracker/swa-tracker-wrapper';
+import { getLogger } from '../logger/logger-wrapper';
 
 
 export class YeomanUIPanel extends AbstractWebviewPanel {
@@ -118,5 +119,6 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 		super.initWebviewPanel();
 		this.webViewPanel.title = this.messages.panel_title;
 		getSWA().track(this.messages.panel_title);
+		getLogger().trace(`SAP Web Analytics tracker was called for ${this.messages.panel_title}`);
 	}
 }

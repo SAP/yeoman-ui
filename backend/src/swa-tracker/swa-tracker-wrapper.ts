@@ -1,9 +1,6 @@
-import * as vscode from "vscode"; // NOSONAR
 import { SWATracker } from "@sap/swa-for-sapbas-vsx";
 import { getLogger } from "../logger/logger-wrapper";
 
-// const PACKAGE_JSON = "package.json";
-const YEOMAN_UI_LOGGER_NAME = "yeomanui";
 const YEOMAN_UI = "Application Wizard";
 
 /**
@@ -41,8 +38,9 @@ export function createSWATracker() {
 		"SAPSE",
 		YEOMAN_UI,
 		(error: string | number) => {
-		  console.log(error);
-		  getLogger().error(`Failed to create SAP Web Analytics tracker for ${YEOMAN_UI}`, {error, errorMessage: error.toString});
+			// TODO: Dulberg - errorListener is always called with 204 (after each call to track).
+		  //console.log(error);
+		  //getLogger().error(`Failed to create SAP Web Analytics tracker for ${YEOMAN_UI}`, {error, errorMessage: error.toString});
 		}
 	  );
 

@@ -5,6 +5,7 @@ import { ExploreGens } from "../exploregens";
 import { AbstractWebviewPanel } from "./AbstractWebviewPanel";
 import { RpcExtension } from "@sap-devx/webview-rpc/out.ext/rpc-extension";
 import { getSWA } from "../swa-tracker/swa-tracker-wrapper";
+import { getLogger } from "../logger/logger-wrapper";
 
 
 export class ExploreGensPanel extends AbstractWebviewPanel {
@@ -28,7 +29,8 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
 
     public loadWebviewPanel() {
         getSWA().track(ExploreGensPanel.VIEW_TITLE);
-        
+        getLogger().trace(`SAP Web Analytics tracker was called for ${ExploreGensPanel.VIEW_TITLE}`);
+
 		if (this.webViewPanel) {
 			this.webViewPanel.reveal();
 		} else {
