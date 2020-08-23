@@ -28,14 +28,13 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
     }
 
     public loadWebviewPanel() {
-        getSWA().track(ExploreGensPanel.VIEW_TITLE);
-        getLogger().trace(`SAP Web Analytics tracker was called for ${ExploreGensPanel.VIEW_TITLE}`);
-
 		if (this.webViewPanel) {
 			this.webViewPanel.reveal();
 		} else {
             super.loadWebviewPanel();
-		}
+            getSWA().track(ExploreGensPanel.VIEW_TITLE);
+            getLogger().trace(`SAP Web Analytics tracker was called for ${ExploreGensPanel.VIEW_TITLE}`);
+        }
 	}
 
     public disposeWebviewPanel() {
