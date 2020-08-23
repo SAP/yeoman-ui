@@ -4,9 +4,12 @@ import * as path from "path";
 import { ExploreGens } from "../exploregens";
 import { AbstractWebviewPanel } from "./AbstractWebviewPanel";
 import { RpcExtension } from "@sap-devx/webview-rpc/out.ext/rpc-extension";
+import { getSWA } from "../swa-tracker/swa-tracker-wrapper";
 
 
 export class ExploreGensPanel extends AbstractWebviewPanel {
+    private static readonly VIEW_TITLE = "Explore and Install Generators";
+
     public setWebviewPanel(webviewPanel: vscode.WebviewPanel) {
         super.setWebviewPanel(webviewPanel);
         this.exploreGens.init(new RpcExtension(webviewPanel.webview));
@@ -17,13 +20,15 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
     public constructor(context: vscode.ExtensionContext) {
         super(context);
         this.viewType = "exploreGens";
-        this.viewTitle = "Explore and Install Generators";
+        this.viewTitle = ExploreGensPanel.VIEW_TITLE;
         this.focusedKey = "exploreGens.Focused";
         this.htmlFileName = path.join("exploregens", "index.html");
         this.exploreGens = new ExploreGens(this.logger, this.context, vscode);
     }
 
     public loadWebviewPanel() {
+        getSWA().track(ExploreGensPanel.VIEW_TITLE);
+        
 		if (this.webViewPanel) {
 			this.webViewPanel.reveal();
 		} else {

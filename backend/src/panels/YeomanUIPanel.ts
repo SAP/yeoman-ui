@@ -12,6 +12,7 @@ import { YouiEvents } from "../youi-events";
 import { VSCodeYouiEvents } from '../vscode-youi-events';
 import { AbstractWebviewPanel } from './AbstractWebviewPanel';
 import { ExploreGens } from '../exploregens';
+import { getSWA } from '../swa-tracker/swa-tracker-wrapper';
 
 
 export class YeomanUIPanel extends AbstractWebviewPanel {
@@ -116,5 +117,6 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 	public initWebviewPanel() {
 		super.initWebviewPanel();
 		this.webViewPanel.title = this.messages.panel_title;
+		getSWA().track(this.messages.panel_title);
 	}
 }

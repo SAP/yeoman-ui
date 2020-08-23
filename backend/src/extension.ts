@@ -3,6 +3,7 @@ import { createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/
 import { AbstractWebviewPanel } from "./panels/AbstractWebviewPanel";
 import { YeomanUIPanel } from "./panels/YeomanUIPanel";
 import { ExploreGensPanel } from "./panels/ExploreGensPanel";
+import { createSWATracker } from './swa-tracker/swa-tracker-wrapper';
 
 let extContext: vscode.ExtensionContext;
 let yeomanUIPanel: YeomanUIPanel;
@@ -18,6 +19,8 @@ export function activate(context: vscode.ExtensionContext) {
 		return;
 	}
 
+	createSWATracker();
+	
 	// YeomanUIPanel
 	yeomanUIPanel = new YeomanUIPanel(extContext);
 	registerAndSubscribeCommand("loadYeomanUI", yeomanUIPanel.loadWebviewPanel.bind(yeomanUIPanel));
