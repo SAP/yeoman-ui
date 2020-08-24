@@ -18,6 +18,7 @@ import { GeneratorFilter, GeneratorType } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
 import { getSWA } from "./swa-tracker/swa-tracker-wrapper";
+import { getLogger } from "./logger/logger-wrapper";
 
 export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
@@ -274,6 +275,10 @@ export class YeomanUI {
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 
       this.replayUtils.clear();
+      const eventType = "Project generation started";
+      getSWA().track(eventType, [response.generator]);
+      this.logger.trace("SAP Web Analytics tracker was called", {eventType, generatorName: response.generator});
+  
       await this.runGenerator(response.generator);
     } catch (error) {
       this.logError(error);
@@ -285,6 +290,10 @@ export class YeomanUI {
   }
 
   private exploreGenerators() {
+    const eventType = "Explore and Install Generators link";
+    getSWA().track(eventType);
+    getLogger().trace("SAP Web Analytics tracker was called", {eventType});
+
     const vscodeInstance = this.getVscode();
     if (vscodeInstance) {
       return vscodeInstance.commands.executeCommand("exploreGenerators");
@@ -324,6 +333,11 @@ export class YeomanUI {
   }
 
   private back(partialAnswers: Environment.Adapter.Answers, numOfSteps: number): void {
+    if (numOfSteps === 1) { // TODO: Avital: should I report the previous step or any of previous steps?
+      const eventType = "Previous step is clicked";
+      getSWA().track(eventType, [this.generatorName]);
+      this.logger.trace("SAP Web Analytics tracker was called", {eventType, generatorName: this.generatorName});  
+    }
     this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
     this.runGenerator(this.generatorName);
   }
