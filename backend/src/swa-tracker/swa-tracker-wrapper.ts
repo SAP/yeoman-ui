@@ -37,10 +37,17 @@ export function createSWATracker() {
 	const swaTracker = new SWATracker(
 		"SAPSE",
 		YEOMAN_UI,
+		// callback for error, one such callback for all the errors we receive via all the track methods err can be string (err.message) or number (response.statusCode)
 		(error: string | number) => {
-			// TODO: Dulberg - errorListener is always called with 204 (after each call to track).
-		  //console.log(error);
-		  //getLogger().error(`Failed to create SAP Web Analytics tracker for ${YEOMAN_UI}`, {error, errorMessage: error.toString});
+			if (typeof error === 'string') {
+				getLogger().error("SAP Web Analytics tracker failed to track", {errorMessage: error});
+			} else if (typeof error === 'number') {
+				if ((error >= 200) && (error <= 299) ) {
+					getLogger().trace("SAP Web Analytics tracker succeeded to track", {statusCode: error});
+				} else {
+					getLogger().error("SAP Web Analytics tracker failed to track", {statusCode: error});
+				}
+			}
 		}
 	  );
 
