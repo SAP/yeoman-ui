@@ -75,7 +75,8 @@ function createExtensionLogger(context: vscode.ExtensionContext) {
 		level: logLevelSetting,
 		logPath: contextLogPath,
 		logOutputChannel: logOutputChannel,
-		sourceLocationTracking: sourceLocationTrackingSettings
+		sourceLocationTracking: sourceLocationTrackingSettings,
+		logConsole: true
 	};
 
 	// The Logger must first be initialized before any logging commands may be invoked.
