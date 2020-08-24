@@ -44,7 +44,7 @@ export function createSWATracker() {
 			} else if (typeof error === 'number') {
 				// bug in matomo-tracker: they think that success is 200 or 30[12478], so we are rechecking here
 				if (((error >= 200) && (error <= 299)) || ((error >= 300) && (error <= 399))) {
-					getLogger().trace("SAP Web Analytics tracker succeeded to track", {statusCode: error});
+					//getLogger().trace("SAP Web Analytics tracker succeeded to track", {statusCode: error});
 				} else {
 					getLogger().error("SAP Web Analytics tracker failed to track", {statusCode: error});
 				}
