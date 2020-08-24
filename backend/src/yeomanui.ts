@@ -290,7 +290,9 @@ export class YeomanUI {
   }
 
   private exploreGenerators() {
-    const eventType = "Explore and Install Generators link";
+    // TODO: Avital: what do you prefer?
+    // Here will count the link only but including the second click when opened
+    const eventType = "Explore and Install Generators link link only";
     getSWA().track(eventType);
     getLogger().trace("SAP Web Analytics tracker was called", {eventType});
 

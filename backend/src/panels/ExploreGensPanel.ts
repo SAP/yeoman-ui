@@ -4,6 +4,8 @@ import * as path from "path";
 import { ExploreGens } from "../exploregens";
 import { AbstractWebviewPanel } from "./AbstractWebviewPanel";
 import { RpcExtension } from "@sap-devx/webview-rpc/out.ext/rpc-extension";
+import { getSWA } from "../swa-tracker/swa-tracker-wrapper";
+import { getLogger } from "../logger/logger-wrapper";
 
 
 export class ExploreGensPanel extends AbstractWebviewPanel {
@@ -30,6 +32,11 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
 			this.webViewPanel.reveal();
 		} else {
             super.loadWebviewPanel();
+            // TODO: Avital: what do you prefer?
+            // here will count both link and command, but will not count the second click on the same link when opened
+            const eventType = ExploreGensPanel.VIEW_TITLE;
+            getSWA().track(eventType);
+            getLogger().trace("SAP Web Analytics tracker was called", {eventType});
         }
 	}
 
