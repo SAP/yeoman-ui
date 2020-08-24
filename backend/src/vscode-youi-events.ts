@@ -82,9 +82,6 @@ export class VSCodeYouiEvents implements YouiEvents {
 
             const successInfoMessage = this.messages.artifact_generated;
             if (_.isEmpty(items)) {
-                const eventType = "Project generated";
-                getSWA().track(eventType);
-                getLogger().trace("SAP Web Analytics tracker was called", {eventType});
                 return vscode.window.showInformationMessage(successInfoMessage);
             } 
 

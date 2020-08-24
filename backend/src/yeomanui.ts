@@ -17,6 +17,7 @@ import Generator = require("yeoman-generator");
 import { GeneratorFilter, GeneratorType } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
+import { getSWA } from "./swa-tracker/swa-tracker-wrapper";
 
 export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
@@ -350,6 +351,9 @@ export class YeomanUI {
 
     const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
     this.logger.debug("done running yeomanui! " + message + ` You can find it at ${targetFolderPath}`);
+    const eventType = "Project generated";
+    getSWA().track(eventType, [generatorName]);
+    this.logger.trace("SAP Web Analytics tracker was called", {eventType, generatorName});
     this.youiEvents.doGeneratorDone(true, message, targetFolderPath);
   }
 
@@ -357,6 +361,9 @@ export class YeomanUI {
     this.errorThrown = true;
     const messagePrefix = `${generatorName} generator failed`;
     const errorMessage: string = await this.logError(error, messagePrefix);
+    const eventType = "Project generation failed";
+    getSWA().track(eventType, [generatorName]);
+    this.logger.trace("SAP Web Analytics tracker was called", {eventType, generatorName});
     this.youiEvents.doGeneratorDone(false, errorMessage);
   }
 
