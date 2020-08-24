@@ -4,6 +4,7 @@ import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorFilter, GeneratorType } from './filter';
 import { getSWA } from './swa-tracker/swa-tracker-wrapper';
+import { getLogger } from './logger/logger-wrapper';
 
 export class VSCodeYouiEvents implements YouiEvents {
     private webviewPanel: vscode.WebviewPanel;
@@ -81,7 +82,9 @@ export class VSCodeYouiEvents implements YouiEvents {
 
             const successInfoMessage = this.messages.artifact_generated;
             if (_.isEmpty(items)) {
-                getSWA().track("Project generated");
+                const eventType = "Project generated";
+                getSWA().track(eventType);
+                getLogger().trace("SAP Web Analytics tracker was called", {eventType});
                 return vscode.window.showInformationMessage(successInfoMessage);
             } 
 

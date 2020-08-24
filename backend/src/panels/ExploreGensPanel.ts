@@ -32,7 +32,9 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
 			this.webViewPanel.reveal();
 		} else {
             super.loadWebviewPanel();
-            getSWA().track(ExploreGensPanel.VIEW_TITLE);
+            const eventType = ExploreGensPanel.VIEW_TITLE;
+            getSWA().track(eventType);
+            getLogger().trace("SAP Web Analytics tracker was called", {eventType});
         }
 	}
 
