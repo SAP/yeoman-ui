@@ -118,7 +118,6 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 	public initWebviewPanel() {
 		super.initWebviewPanel();
 		this.webViewPanel.title = this.messages.panel_title;
-		getSWA().track(this.messages.panel_title);
-		getLogger().trace(`SAP Web Analytics tracker was called for ${this.messages.panel_title}`);
+		getSWA().track("Project generation started");
 	}
 }
