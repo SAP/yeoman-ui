@@ -304,7 +304,6 @@ export class YeomanUI {
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 
       this.replayUtils.clear();
-
       await this.runGenerator(response.generator);
     } catch (error) {
       this.logError(error);

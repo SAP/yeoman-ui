@@ -13,7 +13,7 @@ export const EVENT_TYPES = {
 }; 
 
 /**
- * A Simple Wrapper to hold the state of our "singleton" (per extension) IVSCodeExtLogger
+ * A Simple Wrapper to hold the state of our "singleton" (per extension) SWATracker
  * implementation.
  */
 
@@ -33,7 +33,7 @@ function initSWATracker(newSwaTracker: SWATracker) {
  * Note the use of a getter function so the value would be lazy resolved on each use.
  * This enables concise and simple consumption of the swaTracker throughout our Extension.
  *
- * @returns { IVSCodeExtLogger }
+ * @returns { SWATracker }
  */
 export function getSWA(): SWATracker {
   if (isInitialized() === false) {
@@ -46,7 +46,8 @@ export function createSWATracker() {
 	const swaTracker = new SWATracker(
 		"SAPSE",
 		YEOMAN_UI,
-		// callback for error, one such callback for all the errors we receive via all the track methods err can be string (err.message) or number (response.statusCode)
+		// callback for error, one such callback for all the errors we receive via all the track methods
+		// error can be string (err.message) or number (response.statusCode)
 		(error: string | number) => {
 			if (typeof error === 'string') {
 				getLogger().error("SAP Web Analytics tracker failed to track", {errorMessage: error});
