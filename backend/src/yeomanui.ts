@@ -172,7 +172,7 @@ export class YeomanUI {
       eventType, generatorName: this.generatorName, startTime: this.startTime});
   }
 
-  private updateGeneratorEnded(eventType: string) {
+  private updateGeneratorEnded(eventType: string, errorMessage?: string) {
     if (_.isNil(this.startTime)) {
       this.logger.error("Start generation time was not initialized");
       return;
@@ -181,9 +181,13 @@ export class YeomanUI {
     const endTime = Date.now();
     const generationTimeMilliSec = endTime - this.startTime;
     const generationTimeSec = Math.round(generationTimeMilliSec/1000);
-    getSWA().track(eventType, [this.generatorName, generationTimeSec.toString()]);
+    let customEvents = [this.generatorName, generationTimeSec.toString()];
+    if (!_.isNil(errorMessage)) {
+      customEvents.push(errorMessage);
+    }
+    getSWA().track(eventType, customEvents);
     this.logger.trace("SAP Web Analytics tracker was called", 
-      {eventType, generatorName: this.generatorName, generationTimeSec, generationTimeMilliSec, endTime, startTime: this.startTime});
+      {eventType, generatorName: this.generatorName, generationTimeSec, generationTimeMilliSec, endTime, startTime: this.startTime, customEvents, errorMessage});
   }
 
 	private async runGenerator(generatorName: string) {
@@ -396,7 +400,7 @@ export class YeomanUI {
     this.errorThrown = true;
     const messagePrefix = `${generatorName} generator failed`;
     const errorMessage: string = await this.logError(error, messagePrefix);
-    this.updateGeneratorEnded(EVENT_TYPES.PROJECT_GENERATION_FAILED);
+    this.updateGeneratorEnded(EVENT_TYPES.PROJECT_GENERATION_FAILED, error.message);
     this.youiEvents.doGeneratorDone(false, errorMessage);
   }
 
