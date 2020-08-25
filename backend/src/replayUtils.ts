@@ -36,7 +36,7 @@ export class ReplayUtils {
       //   the choices array for questions of type checkbox
       if (answer !== undefined) {
         question.__ForceDefault = true;
-        question.default = answer;
+        question.__origAnswer = answer;
       }
     }
   }

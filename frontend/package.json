@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@mdi/font": "^5.1.45",
-    "@sap-devx/inquirer-gui": "0.1.16",
+    "@sap-devx/inquirer-gui": "0.1.17",
     "@sap-devx/inquirer-gui-file-browser-plugin": "0.0.5",
     "@sap-devx/inquirer-gui-folder-browser-plugin": "0.0.3",
     "@sap-devx/inquirer-gui-login-plugin": "0.0.4",
