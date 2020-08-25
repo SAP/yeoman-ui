@@ -3,6 +3,16 @@ import { getLogger } from "../logger/logger-wrapper";
 
 const YEOMAN_UI = "Application Wizard";
 
+// Event types used by Application Wizard
+export const EVENT_TYPES = {
+	PROJECT_GENERATION_STARTED: "Project generation started",
+	PROJECT_GENERATED_SUCCESSFULLY: "Project generated successfully",
+	PROJECT_GENERATION_FAILED: "Project generation failed",
+	EXPLORE_AND_INSTALL_GENERATORS_LINK: "Explore and Install Generators link", //TODO: one of them!
+	EXPLORE_AND_INSTALL_GENERATORS: "Explore and Install Generators", //TODO: one of them!
+	PREVIOUS_STEP: "Previous step" //TODO: Where? only back or click on any step, back is the same as click on the previous step
+}; 
+
 /**
  * A Simple Wrapper to hold the state of our "singleton" (per extension) IVSCodeExtLogger
  * implementation.
@@ -43,9 +53,7 @@ export function createSWATracker() {
 				getLogger().error("SAP Web Analytics tracker failed to track", {errorMessage: error});
 			} else if (typeof error === 'number') {
 				// bug in matomo-tracker: they think that success is 200 or 30[12478], so we are rechecking here
-				if (((error >= 200) && (error <= 299)) || ((error >= 300) && (error <= 399))) {
-					//getLogger().trace("SAP Web Analytics tracker succeeded to track", {statusCode: error});
-				} else {
+				if (!((error >= 200) && (error <= 299)) && !((error >= 300) && (error <= 399))) {
 					getLogger().error("SAP Web Analytics tracker failed to track", {statusCode: error});
 				}
 			}

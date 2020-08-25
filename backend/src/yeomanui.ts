@@ -17,7 +17,7 @@ import Generator = require("yeoman-generator");
 import { GeneratorFilter, GeneratorType } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
-import { getSWA } from "./swa-tracker/swa-tracker-wrapper";
+import { getSWA, EVENT_TYPES } from "./swa-tracker/swa-tracker-wrapper";
 import { getLogger } from "./logger/logger-wrapper";
 
 export interface IQuestionsPrompt extends IPrompt{
@@ -160,8 +160,37 @@ export class YeomanUI {
     }
   }
 
+  private updateGeneratorStarted() {
+    if (!_.isNil(this.startTime)) {
+      this.logger.trace("Start time was already initialized", {startTime: this.startTime, generatorName: this.generatorName});
+      return;
+    }
+
+    this.startTime = Date.now();
+    const eventType = EVENT_TYPES.PROJECT_GENERATION_STARTED;
+    getSWA().track(eventType, [this.generatorName]);
+    this.logger.trace("SAP Web Analytics tracker was called and start time was initialized", {
+      eventType, generatorName: this.generatorName, startTime: this.startTime});
+  }
+
+  private updateGeneratorEnded(eventType:string) {
+    if (_.isNil(this.startTime)) {
+      this.logger.error("Start generation time was not initialized");
+      return;
+    }
+
+    const endTime = Date.now();
+    const generationTimeMilliSec = (endTime - this.startTime).toString();;
+    getSWA().track(eventType, [this.generatorName, generationTimeMilliSec]);
+    this.logger.trace("SAP Web Analytics tracker was called", 
+      {eventType, generatorName: this.generatorName, generationTimeMilliSec, endTime, startTime: this.startTime});
+
+  }
+
 	private async runGenerator(generatorName: string) {
-		this.generatorName = generatorName;
+    this.generatorName = generatorName;
+    this.updateGeneratorStarted();
+
 		// TODO: should create and set target dir only after user has selected a generator;
 		// see issue: https://github.com/yeoman/environment/issues/55
 		// process.chdir() doesn't work after environment has been created
@@ -276,11 +305,7 @@ export class YeomanUI {
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 
       this.replayUtils.clear();
-      const eventType = "Project generation started";
-      getSWA().track(eventType, [response.generator]);
-      this.logger.trace("SAP Web Analytics tracker was called", {eventType, generatorName: response.generator});
-      this.startTime = Date.now();
-  
+
       await this.runGenerator(response.generator);
     } catch (error) {
       this.logError(error);
@@ -294,7 +319,7 @@ export class YeomanUI {
   private exploreGenerators() {
     // TODO: Avital: what do you prefer?
     // Here will count the link only but including the second click when opened
-    const eventType = "Explore and Install Generators link link only";
+    const eventType = EVENT_TYPES.EXPLORE_AND_INSTALL_GENERATORS_LINK;
     getSWA().track(eventType);
     getLogger().trace("SAP Web Analytics tracker was called", {eventType});
 
@@ -338,7 +363,7 @@ export class YeomanUI {
 
   private back(partialAnswers: Environment.Adapter.Answers, numOfSteps: number): void {
     if (numOfSteps === 1) { // TODO: Avital: should I report the previous step or any of previous steps?
-      const eventType = "Previous step is clicked";
+      const eventType = EVENT_TYPES.PREVIOUS_STEP;
       getSWA().track(eventType, [this.generatorName]);
       this.logger.trace("SAP Web Analytics tracker was called", {eventType, generatorName: this.generatorName});  
     }
@@ -358,11 +383,6 @@ export class YeomanUI {
     return (firstQuestionName ? _.startCase(firstQuestionName) : `Step ${this.promptCount}`);
   }
 
-  private getGenerationTime() {
-    const generationTimeMilliSec = Date.now() - this.startTime;
-    return generationTimeMilliSec.toString();
-  }
-
   private onGeneratorSuccess(generatorName: string, reourcesBeforeGen?: any, resourcesAfterGen?: any) {
     let targetFolderPath: string = _.get(resourcesAfterGen, "targetFolderPath");
     if (_.get(reourcesBeforeGen, "targetFolderPath") === targetFolderPath) {
@@ -374,10 +394,7 @@ export class YeomanUI {
 
     const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
     this.logger.debug("done running yeomanui! " + message + ` You can find it at ${targetFolderPath}`);
-    const eventType = "Project generated";
-    const generationTimeMilliSec = this.getGenerationTime();
-    getSWA().track(eventType, [generatorName, generationTimeMilliSec]);
-    this.logger.trace("SAP Web Analytics tracker was called", {eventType, generatorName, generationTimeMilliSec});
+    this.updateGeneratorEnded(EVENT_TYPES.PROJECT_GENERATED_SUCCESSFULLY);
     this.youiEvents.doGeneratorDone(true, message, targetFolderPath);
   }
 
@@ -385,10 +402,7 @@ export class YeomanUI {
     this.errorThrown = true;
     const messagePrefix = `${generatorName} generator failed`;
     const errorMessage: string = await this.logError(error, messagePrefix);
-    const eventType = "Project generation failed";
-    const generationTimeMilliSec = this.getGenerationTime();
-    getSWA().track(eventType, [generatorName, generationTimeMilliSec]);
-    this.logger.trace("SAP Web Analytics tracker was called", {eventType, generatorName, generationTimeMilliSec});
+    this.updateGeneratorEnded(EVENT_TYPES.PROJECT_GENERATION_FAILED);
     this.youiEvents.doGeneratorDone(false, errorMessage);
   }
 
