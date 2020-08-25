@@ -167,9 +167,10 @@ export class YeomanUI {
 
     this.startTime = Date.now();
     const eventType = EVENT_TYPES.PROJECT_GENERATION_STARTED;
-    getSWA().track(eventType, [this.generatorName]);
+    let customEvents = [this.generatorName];
+    getSWA().track(eventType, customEvents);
     this.logger.trace("SAP Web Analytics tracker was called and start time was initialized", {
-      eventType, generatorName: this.generatorName, startTime: this.startTime});
+      eventType, generatorName: this.generatorName, startTime: this.startTime, customEvents});
   }
 
   private updateGeneratorEnded(eventType: string, errorMessage?: string) {
@@ -363,8 +364,9 @@ export class YeomanUI {
 
   private back(partialAnswers: Environment.Adapter.Answers, numOfSteps: number): void {
     const eventType = EVENT_TYPES.PREVIOUS_STEP;
-    getSWA().track(eventType, [this.generatorName]);
-    this.logger.trace("SAP Web Analytics tracker was called", {eventType, generatorName: this.generatorName});  
+    let customEvents = [this.generatorName];
+    getSWA().track(eventType, customEvents);
+    this.logger.trace("SAP Web Analytics tracker was called", {eventType, generatorName: this.generatorName, customEvents});  
     this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
     this.runGenerator(this.generatorName);
   }
