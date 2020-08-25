@@ -12,8 +12,6 @@ import { YouiEvents } from "../youi-events";
 import { VSCodeYouiEvents } from '../vscode-youi-events';
 import { AbstractWebviewPanel } from './AbstractWebviewPanel';
 import { ExploreGens } from '../exploregens';
-import { getSWA } from '../swa-tracker/swa-tracker-wrapper';
-import { getLogger } from '../logger/logger-wrapper';
 
 
 export class YeomanUIPanel extends AbstractWebviewPanel {

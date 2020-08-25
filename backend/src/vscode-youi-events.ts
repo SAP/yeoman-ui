@@ -3,8 +3,6 @@ import * as _ from 'lodash';
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorFilter, GeneratorType } from './filter';
-import { getSWA } from './swa-tracker/swa-tracker-wrapper';
-import { getLogger } from './logger/logger-wrapper';
 
 export class VSCodeYouiEvents implements YouiEvents {
     private webviewPanel: vscode.WebviewPanel;
