@@ -32,11 +32,6 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
 			this.webViewPanel.reveal();
 		} else {
             super.loadWebviewPanel();
-            // TODO: Avital: what do you prefer?
-            // here will count both link and command, but will not count the second click on the same link when opened
-            const eventType = EVENT_TYPES.EXPLORE_AND_INSTALL_GENERATORS;
-            getSWA().track(eventType);
-            getLogger().trace("SAP Web Analytics tracker was called", {eventType});
         }
 	}
 

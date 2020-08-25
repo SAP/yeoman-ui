@@ -18,7 +18,6 @@ import { GeneratorFilter, GeneratorType } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
 import { getSWA, EVENT_TYPES } from "./swa-tracker/swa-tracker-wrapper";
-import { getLogger } from "./logger/logger-wrapper";
 
 export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
@@ -173,18 +172,18 @@ export class YeomanUI {
       eventType, generatorName: this.generatorName, startTime: this.startTime});
   }
 
-  private updateGeneratorEnded(eventType:string) {
+  private updateGeneratorEnded(eventType: string) {
     if (_.isNil(this.startTime)) {
       this.logger.error("Start generation time was not initialized");
       return;
     }
 
     const endTime = Date.now();
-    const generationTimeMilliSec = (endTime - this.startTime).toString();;
-    getSWA().track(eventType, [this.generatorName, generationTimeMilliSec]);
+    const generationTimeMilliSec = endTime - this.startTime;
+    const generationTimeSec = Math.round(generationTimeMilliSec/1000);
+    getSWA().track(eventType, [this.generatorName, generationTimeSec.toString()]);
     this.logger.trace("SAP Web Analytics tracker was called", 
-      {eventType, generatorName: this.generatorName, generationTimeMilliSec, endTime, startTime: this.startTime});
-
+      {eventType, generatorName: this.generatorName, generationTimeSec, generationTimeMilliSec, endTime, startTime: this.startTime});
   }
 
 	private async runGenerator(generatorName: string) {
@@ -317,11 +316,9 @@ export class YeomanUI {
   }
 
   private exploreGenerators() {
-    // TODO: Avital: what do you prefer?
-    // Here will count the link only but including the second click when opened
     const eventType = EVENT_TYPES.EXPLORE_AND_INSTALL_GENERATORS_LINK;
     getSWA().track(eventType);
-    getLogger().trace("SAP Web Analytics tracker was called", {eventType});
+    this.logger.trace("SAP Web Analytics tracker was called", {eventType});
 
     const vscodeInstance = this.getVscode();
     if (vscodeInstance) {
@@ -362,11 +359,9 @@ export class YeomanUI {
   }
 
   private back(partialAnswers: Environment.Adapter.Answers, numOfSteps: number): void {
-    if (numOfSteps === 1) { // TODO: Avital: should I report the previous step or any of previous steps?
-      const eventType = EVENT_TYPES.PREVIOUS_STEP;
-      getSWA().track(eventType, [this.generatorName]);
-      this.logger.trace("SAP Web Analytics tracker was called", {eventType, generatorName: this.generatorName});  
-    }
+    const eventType = EVENT_TYPES.PREVIOUS_STEP;
+    getSWA().track(eventType, [this.generatorName]);
+    this.logger.trace("SAP Web Analytics tracker was called", {eventType, generatorName: this.generatorName});  
     this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
     this.runGenerator(this.generatorName);
   }

@@ -8,9 +8,8 @@ export const EVENT_TYPES = {
 	PROJECT_GENERATION_STARTED: "Project generation started",
 	PROJECT_GENERATED_SUCCESSFULLY: "Project generated successfully",
 	PROJECT_GENERATION_FAILED: "Project generation failed",
-	EXPLORE_AND_INSTALL_GENERATORS_LINK: "Explore and Install Generators link", //TODO: one of them!
-	EXPLORE_AND_INSTALL_GENERATORS: "Explore and Install Generators", //TODO: one of them!
-	PREVIOUS_STEP: "Previous step" //TODO: Where? only back or click on any step, back is the same as click on the previous step
+	EXPLORE_AND_INSTALL_GENERATORS_LINK: "Explore and Install Generators link",
+	PREVIOUS_STEP: "One of the previous steps is clicked"
 }; 
 
 /**
