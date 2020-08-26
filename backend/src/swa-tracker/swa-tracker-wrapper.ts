@@ -94,7 +94,7 @@ export function updateGeneratorEnded(generatorName: string, isSucceeded: boolean
 	}
 	getSWA().track(eventType, customEvents);
 	getLogger().trace("SAP Web Analytics tracker was called", 
-		{eventType, generatorName, generationTimeSec, generationTimeMilliSec, endTime, startTime, customEvents, errorMessag});
+		{eventType, generatorName, generationTimeSec, generationTimeMilliSec, endTime, startTime, customEvents, errorMessage});
 }
 
 export function updateExploreAndInstallGeneratorsLinkClicked() {
