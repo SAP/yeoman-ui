@@ -162,10 +162,10 @@ export class YeomanUI {
   private updateGeneratorStarted(generatorName: string) {
     this.startTime = Date.now();
     const eventType = EVENT_TYPES.PROJECT_GENERATION_STARTED;
-    let customEvents = [this.generatorName];
+    let customEvents = [generatorName];
     getSWA().track(eventType, customEvents);
     this.logger.trace("SAP Web Analytics tracker was called and start time was initialized", {
-      eventType, generatorName: this.generatorName, startTime: this.startTime, customEvents});
+      eventType, generatorName, startTime: this.startTime, customEvents});
   }
 
   private updateGeneratorEnded(eventType: string, errorMessage?: string) {
