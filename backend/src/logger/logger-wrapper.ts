@@ -85,11 +85,3 @@ function createExtensionLogger(context: vscode.ExtensionContext) {
 	initLoggerWrapper(extensionLogger);
 	logLoggerDetails(context, logLevelSetting);
 }
-
-module.exports = {
-  getLogger,
-  createExtensionLoggerAndSubscribeToLogSettingsChanges,
-  getClassLogger,
-  getYeomanUILibraryLogger,
-  ERROR_LOGGER_NOT_INITIALIZED
-}; 

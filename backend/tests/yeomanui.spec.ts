@@ -16,6 +16,7 @@ import { IChildLogger } from "@vscode-logging/logger";
 import * as os from "os";
 import messages from "../src/messages";
 import Environment = require("yeoman-environment");
+import * as swaTrackerWrapper from "../src/swa-tracker/swa-tracker-wrapper";
 
 describe('yeomanui unit test', () => {
     let sandbox: any;
@@ -23,6 +24,7 @@ describe('yeomanui unit test', () => {
     let fsExtraMock: any;
     let datauriMock: any;
     let loggerMock: any;
+    let swaTrackerWrapperMock: any;
     let rpcMock: any;
     let youiEventsMock: any;
     const UTF8 = "utf8";
@@ -123,6 +125,7 @@ describe('yeomanui unit test', () => {
         datauriMock = sandbox.mock(datauri);
         rpcMock = sandbox.mock(rpc);
         loggerMock = sandbox.mock(testLogger);
+        swaTrackerWrapperMock = sandbox.mock(swaTrackerWrapper);
         youiEventsMock = sandbox.mock(youiEvents);
     });
 
@@ -132,12 +135,15 @@ describe('yeomanui unit test', () => {
         datauriMock.verify();
         rpcMock.verify();
         loggerMock.verify();
+        swaTrackerWrapperMock.verify();
         youiEventsMock.verify();
     });
 
     describe("receiveIsWebviewReady", () => {
         it("flow is successfull", async () => {
             rpcMock.expects("invoke").withArgs("showPrompt").resolves({generator: "testGenerator"});
+            swaTrackerWrapperMock.expects("updateGeneratorStarted").withArgs("testGenerator");
+            swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenerator", false);
             youiEventsMock.expects("doGeneratorDone").withArgs(false);
             await yeomanUi["receiveIsWebviewReady"]();
         });
@@ -581,6 +587,7 @@ describe('yeomanui unit test', () => {
 		it("vscode module is not available", () => {
 			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {});
 			yeomanUiInstance["getVscode"] = () => undefined;
+			swaTrackerWrapperMock.expects("updateExploreAndInstallGeneratorsLinkClicked").withExactArgs();
 			yeomanUiInstance["exploreGenerators"]();
 		});
 
@@ -590,6 +597,7 @@ describe('yeomanui unit test', () => {
 			yeomanUiInstance["getVscode"] = () => testVscode;
 			const commandsMock = sandbox.mock(testVscode.commands);
 			commandsMock.expects("executeCommand").withExactArgs("exploreGenerators");
+			swaTrackerWrapperMock.expects("updateExploreAndInstallGeneratorsLinkClicked").withExactArgs();
 			yeomanUiInstance["exploreGenerators"]();
 			commandsMock.verify();
 		});
@@ -649,6 +657,8 @@ describe('yeomanui unit test', () => {
             expect (response.country).to.equal(country);
             expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.false;
 
+            swaTrackerWrapperMock.expects("updateOneOfPreviousStepsClicked").withArgs("");
+
             yeomanUiInstance["back"](undefined,1);
             expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.true;
 
@@ -672,6 +682,7 @@ describe('yeomanui unit test', () => {
         it("onGeneratorSuccess - one dir was created", () => {
             const beforeGen = {targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1"]};
             const afterGen = {targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1", "dirpath2"]};
+            swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenerator", true);
             yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
             expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), "dirpath2")).to.be.true;
         });
@@ -679,11 +690,13 @@ describe('yeomanui unit test', () => {
         it("onGeneratorSuccess - two dirs were created", () => {
             const beforeGen = {targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1"]};
             const afterGen = {targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1", "dirpath2", "dirpath3"]};
+            swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenerator", true);
             yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
             expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), "testDestinationRoot")).to.be.true;
         });
 
         it("onGeneratorFailure", async () => {
+            swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenerator", false);
             await yeomanUi["onGeneratorFailure"]("testGenName", "testError");
             expect(doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed - testError"}`)).to.be.true;
         });
@@ -746,6 +759,7 @@ describe('yeomanui unit test', () => {
             yeomanUiInstance["currentQuestions"] = [{name:"question1", method1:()=>{
                 throw new Error("Error");
             }}];
+            swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("", false);
             try {
                 await yeomanUiInstance["evaluateMethod"](null, "question1", "method1");
             } catch(e) {
