@@ -159,8 +159,8 @@ export class YeomanUI {
     }
   }
 
-  private updateGeneratorStarted() {
-    if (!_.isNil(this.startTime)) {
+  private updateGeneratorStarted(generatorName: string) {
+    if (!_.isNil(this.startTime) || (generatorName !== this.generatorName)) {
       this.logger.trace("Start time was already initialized", {startTime: this.startTime, generatorName: this.generatorName});
       return;
     }
@@ -192,8 +192,8 @@ export class YeomanUI {
   }
 
 	private async runGenerator(generatorName: string) {
+    this.updateGeneratorStarted(generatorName);
     this.generatorName = generatorName;
-    this.updateGeneratorStarted();
 
 		// TODO: should create and set target dir only after user has selected a generator;
 		// see issue: https://github.com/yeoman/environment/issues/55
