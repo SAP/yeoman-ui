@@ -17,7 +17,7 @@ import Generator = require("yeoman-generator");
 import { GeneratorFilter, GeneratorType } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
-import { updateGeneratorStarted, updateGeneratorEnded, updateExploreAndInstallGeneratorsLinkClicked, updateOneOfPreviousStepsClicked } from "./swa-tracker/swa-tracker-wrapper";
+import { SWA } from "./swa-tracker/swa-tracker-wrapper";
 
 export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
@@ -274,7 +274,7 @@ export class YeomanUI {
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 
       this.replayUtils.clear();
-      updateGeneratorStarted(response.generator);
+      SWA.updateGeneratorStarted(response.generator);
       await this.runGenerator(response.generator);
     } catch (error) {
       this.logError(error);
@@ -286,7 +286,7 @@ export class YeomanUI {
   }
 
   private exploreGenerators() {
-    updateExploreAndInstallGeneratorsLinkClicked();
+    SWA.updateExploreAndInstallGeneratorsLinkClicked();
     const vscodeInstance = this.getVscode();
     if (vscodeInstance) {
       return vscodeInstance.commands.executeCommand("exploreGenerators");
@@ -326,7 +326,7 @@ export class YeomanUI {
   }
 
   private back(partialAnswers: Environment.Adapter.Answers, numOfSteps: number): void {
-    updateOneOfPreviousStepsClicked(this.generatorName);
+    SWA.updateOneOfPreviousStepsClicked(this.generatorName);
     this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
     this.runGenerator(this.generatorName);
   }
@@ -354,7 +354,7 @@ export class YeomanUI {
 
     const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
     this.logger.debug("done running yeomanui! " + message + ` You can find it at ${targetFolderPath}`);
-    updateGeneratorEnded(this.generatorName, true);
+    SWA.updateGeneratorEnded(this.generatorName, true);
     this.youiEvents.doGeneratorDone(true, message, targetFolderPath);
   }
 
@@ -362,7 +362,7 @@ export class YeomanUI {
     this.errorThrown = true;
     const messagePrefix = `${generatorName} generator failed`;
     const errorMessage: string = await this.logError(error, messagePrefix);
-    updateGeneratorEnded(this.generatorName, false, errorMessage);
+    SWA.updateGeneratorEnded(this.generatorName, false, errorMessage);
     this.youiEvents.doGeneratorDone(false, errorMessage);
   }
 
