@@ -74,7 +74,7 @@ describe('extension unit test', () => {
         it("logger failure on extenion activation", () => {
             const consoleMock = sandbox.mock(console);
             loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges").throws(new Error("activation error"));
-            consoleMock.expects("error").withExactArgs('Extension activation failed due to Logger configuration failure:', "activation error");
+            consoleMock.expects("error").withExactArgs('Extension activation failed.', "activation error");
             extension.activate(null);
         });
     });

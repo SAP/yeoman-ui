@@ -17,7 +17,7 @@ import Generator = require("yeoman-generator");
 import { GeneratorFilter, GeneratorType } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
-import { getSWA, EVENT_TYPES } from "./swa-tracker/swa-tracker-wrapper";
+import { updateGeneratorStarted, updateGeneratorEnded, updateExploreAndInstallGeneratorsLinkClicked, updateOneOfPreviousStepsClicked } from "./swa-tracker/swa-tracker-wrapper";
 
 export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
@@ -159,33 +159,6 @@ export class YeomanUI {
     }
   }
 
-  private updateGeneratorStarted(generatorName: string) {
-    this.startTime = Date.now();
-    const eventType = EVENT_TYPES.PROJECT_GENERATION_STARTED;
-    let customEvents = [generatorName];
-    getSWA().track(eventType, customEvents);
-    this.logger.trace("SAP Web Analytics tracker was called and start time was initialized", {
-      eventType, generatorName, startTime: this.startTime, customEvents});
-  }
-
-  private updateGeneratorEnded(eventType: string, errorMessage?: string) {
-    if (_.isNil(this.startTime)) {
-      this.logger.error("Start generation time was not initialized");
-      return;
-    }
-
-    const endTime = Date.now();
-    const generationTimeMilliSec = endTime - this.startTime;
-    const generationTimeSec = Math.round(generationTimeMilliSec/1000);
-    let customEvents = [this.generatorName, generationTimeSec.toString()];
-    if (!_.isNil(errorMessage)) {
-      customEvents.push(errorMessage);
-    }
-    getSWA().track(eventType, customEvents);
-    this.logger.trace("SAP Web Analytics tracker was called", 
-      {eventType, generatorName: this.generatorName, generationTimeSec, generationTimeMilliSec, endTime, startTime: this.startTime, customEvents, errorMessage});
-  }
-
 	private async runGenerator(generatorName: string) {
     this.generatorName = generatorName;
 
@@ -303,7 +276,8 @@ export class YeomanUI {
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 
       this.replayUtils.clear();
-      this.updateGeneratorStarted(response.generator);
+      this.startTime = Date.now();
+      updateGeneratorStarted(response.generator, this.startTime);
       await this.runGenerator(response.generator);
     } catch (error) {
       this.logError(error);
@@ -315,10 +289,8 @@ export class YeomanUI {
   }
 
   private exploreGenerators() {
-    const eventType = EVENT_TYPES.EXPLORE_AND_INSTALL_GENERATORS_LINK;
-    getSWA().track(eventType);
-    this.logger.trace("SAP Web Analytics tracker was called", {eventType});
-
+    updateExploreAndInstallGeneratorsLinkClicked();
+    
     const vscodeInstance = this.getVscode();
     if (vscodeInstance) {
       return vscodeInstance.commands.executeCommand("exploreGenerators");
@@ -358,10 +330,7 @@ export class YeomanUI {
   }
 
   private back(partialAnswers: Environment.Adapter.Answers, numOfSteps: number): void {
-    const eventType = EVENT_TYPES.PREVIOUS_STEP;
-    let customEvents = [this.generatorName];
-    getSWA().track(eventType, customEvents);
-    this.logger.trace("SAP Web Analytics tracker was called", {eventType, generatorName: this.generatorName, customEvents});  
+    updateOneOfPreviousStepsClicked(this.generatorName);
     this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
     this.runGenerator(this.generatorName);
   }
@@ -389,7 +358,7 @@ export class YeomanUI {
 
     const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
     this.logger.debug("done running yeomanui! " + message + ` You can find it at ${targetFolderPath}`);
-    this.updateGeneratorEnded(EVENT_TYPES.PROJECT_GENERATED_SUCCESSFULLY);
+    updateGeneratorEnded(this.generatorName, true, this.startTime);
     this.youiEvents.doGeneratorDone(true, message, targetFolderPath);
   }
 
@@ -397,7 +366,7 @@ export class YeomanUI {
     this.errorThrown = true;
     const messagePrefix = `${generatorName} generator failed`;
     const errorMessage: string = await this.logError(error, messagePrefix);
-    this.updateGeneratorEnded(EVENT_TYPES.PROJECT_GENERATION_FAILED, error.message);
+    updateGeneratorEnded(this.generatorName, false, this.startTime, errorMessage);
     this.youiEvents.doGeneratorDone(false, errorMessage);
   }
 

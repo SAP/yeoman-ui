@@ -1,10 +1,11 @@
 import { SWATracker } from "@sap/swa-for-sapbas-vsx";
 import { getLogger } from "../logger/logger-wrapper";
+import _ = require("lodash");
 
 const YEOMAN_UI = "Application Wizard";
 
 // Event types used by Application Wizard
-export const EVENT_TYPES = {
+const EVENT_TYPES = {
 	PROJECT_GENERATION_STARTED: "Project generation started",
 	PROJECT_GENERATED_SUCCESSFULLY: "Project generated successfully",
 	PROJECT_GENERATION_FAILED: "Project generation failed",
@@ -64,3 +65,47 @@ export function createSWATracker() {
 	initSWATracker(swaTracker);
 	getLogger().info(`SAP Web Analytics tracker was created for ${YEOMAN_UI}`);
 }
+
+export function updateGeneratorStarted(generatorName: string, startTime: number) {
+    const eventType = EVENT_TYPES.PROJECT_GENERATION_STARTED;
+    let customEvents = [generatorName];
+    getSWA().track(eventType, customEvents);
+    getLogger().trace("SAP Web Analytics tracker was called and start time was initialized", {
+      eventType, generatorName, startTime, customEvents});
+  }
+
+  export function updateGeneratorEnded(generatorName: string, isSucceeded: boolean, startTime: number, errorMessage?: string) {
+    if (_.isNil(startTime)) {
+		getLogger().error("Start generation time was not initialized");
+		return;
+	}
+	
+	let eventType = EVENT_TYPES.PROJECT_GENERATED_SUCCESSFULLY;
+	if (!isSucceeded) {
+		eventType = EVENT_TYPES.PROJECT_GENERATION_FAILED;
+	}
+
+    const endTime = Date.now();
+    const generationTimeMilliSec = endTime - startTime;
+    const generationTimeSec = Math.round(generationTimeMilliSec/1000);
+    let customEvents = [generatorName, generationTimeSec.toString()];
+    if (!_.isNil(errorMessage)) {
+      customEvents.push(errorMessage);
+    }
+    getSWA().track(eventType, customEvents);
+    getLogger().trace("SAP Web Analytics tracker was called", 
+      {eventType, generatorName, generationTimeSec, generationTimeMilliSec, endTime, startTime, customEvents, errorMessage});
+  }
+
+  export function updateExploreAndInstallGeneratorsLinkClicked() {
+	const eventType = EVENT_TYPES.EXPLORE_AND_INSTALL_GENERATORS_LINK;
+	getSWA().track(eventType);
+	getLogger().trace("SAP Web Analytics tracker was called", {eventType});
+  }
+
+  export function updateOneOfPreviousStepsClicked(generatorName: string) {
+	const eventType = EVENT_TYPES.PREVIOUS_STEP;
+    let customEvents = [generatorName];
+    getSWA().track(eventType, customEvents);
+    getLogger().trace("SAP Web Analytics tracker was called", {eventType, generatorName, customEvents});  
+  }

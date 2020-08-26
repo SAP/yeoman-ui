@@ -14,13 +14,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 	try {
 		createExtensionLoggerAndSubscribeToLogSettingsChanges(extContext);
+		createSWATracker();
 	} catch (error) {
-		console.error("Extension activation failed due to Logger configuration failure:", error.message);
+		console.error("Extension activation failed.", error.message);
 		return;
 	}
 
-	createSWATracker();
-	
 	// YeomanUIPanel
 	yeomanUIPanel = new YeomanUIPanel(extContext);
 	registerAndSubscribeCommand("loadYeomanUI", yeomanUIPanel.loadWebviewPanel.bind(yeomanUIPanel));
