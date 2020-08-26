@@ -21,6 +21,7 @@ const EVENT_TYPES = {
 const ERROR_ANALYTICS_TRACKER_NOT_INITIALIZED = 'Analytics tracker has not yet been initialized!';
 
 let swaTracker: SWATracker;
+let startTime: number = Date.now();
 
 function isInitialized(): boolean {
 	return (swaTracker !== undefined ) ? true : false;
@@ -66,20 +67,16 @@ export function createSWATracker() {
 	getLogger().info(`SAP Web Analytics tracker was created for ${YEOMAN_UI}`);
 }
 
-export function updateGeneratorStarted(generatorName: string, startTime: number) {
+export function updateGeneratorStarted(generatorName: string) {
 	const eventType = EVENT_TYPES.PROJECT_GENERATION_STARTED;
 	let customEvents = [generatorName];
+	startTime = Date.now();
 	getSWA().track(eventType, customEvents);
 	getLogger().trace("SAP Web Analytics tracker was called and start time was initialized", {
 		eventType, generatorName, startTime, customEvents});
 }
 
-export function updateGeneratorEnded(generatorName: string, isSucceeded: boolean, startTime: number, errorMessage?: string) {
-	if (_.isNil(startTime)) {
-		getLogger().error("Start generation time was not initialized");
-		return;
-	}
-	
+export function updateGeneratorEnded(generatorName: string, isSucceeded: boolean, errorMessage?: string) {
 	let eventType = EVENT_TYPES.PROJECT_GENERATED_SUCCESSFULLY;
 	if (!isSucceeded) {
 		eventType = EVENT_TYPES.PROJECT_GENERATION_FAILED;

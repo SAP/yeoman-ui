@@ -51,7 +51,6 @@ export class YeomanUI {
   private readonly replayUtils: ReplayUtils;
   private readonly customQuestionEventHandlers: Map<string, Map<string, Function>>;
   private errorThrown = false;
-  private startTime: number;
 
   constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
     this.rpc = rpc;
@@ -275,8 +274,7 @@ export class YeomanUI {
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 
       this.replayUtils.clear();
-      this.startTime = Date.now();
-      updateGeneratorStarted(response.generator, this.startTime);
+      updateGeneratorStarted(response.generator);
       await this.runGenerator(response.generator);
     } catch (error) {
       this.logError(error);
@@ -356,7 +354,7 @@ export class YeomanUI {
 
     const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
     this.logger.debug("done running yeomanui! " + message + ` You can find it at ${targetFolderPath}`);
-    updateGeneratorEnded(this.generatorName, true, this.startTime);
+    updateGeneratorEnded(this.generatorName, true);
     this.youiEvents.doGeneratorDone(true, message, targetFolderPath);
   }
 
@@ -364,7 +362,7 @@ export class YeomanUI {
     this.errorThrown = true;
     const messagePrefix = `${generatorName} generator failed`;
     const errorMessage: string = await this.logError(error, messagePrefix);
-    updateGeneratorEnded(this.generatorName, false, this.startTime, errorMessage);
+    updateGeneratorEnded(this.generatorName, false, errorMessage);
     this.youiEvents.doGeneratorDone(false, errorMessage);
   }
 
