@@ -20,6 +20,7 @@ const testVscode = {
 mockVscode(testVscode, "src/extension.ts");
 import * as extension from "../src/extension";
 import * as loggerWrapper from "../src/logger/logger-wrapper";
+import * as swaTrackerWrapper from "../src/swa-tracker/swa-tracker-wrapper";
 
 describe('extension unit test', () => {
     let sandbox: any;
@@ -27,6 +28,7 @@ describe('extension unit test', () => {
     let windowMock: any;
     let workspaceMock: any;
     let loggerWrapperMock: any;
+    let swaTrackerWrapperMock: any;
     const testContext: any = { 
         subscriptions: [], 
         extensionPath: "testExtensionpath", 
@@ -43,6 +45,7 @@ describe('extension unit test', () => {
 
     beforeEach(() => {
         loggerWrapperMock = sandbox.mock(loggerWrapper);
+        swaTrackerWrapperMock = sandbox.mock(swaTrackerWrapper);
         commandsMock = sandbox.mock(testVscode.commands);
         windowMock = sandbox.mock(testVscode.window);
         workspaceMock = sandbox.mock(testVscode.workspace);
@@ -50,6 +53,7 @@ describe('extension unit test', () => {
 
     afterEach(() => {
         loggerWrapperMock.verify();
+        swaTrackerWrapperMock.verify();
         commandsMock.verify();
         windowMock.verify();
         workspaceMock.verify();
@@ -59,6 +63,7 @@ describe('extension unit test', () => {
         it("commands registration", () => {
             loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
             loggerWrapperMock.expects("getLogger").twice();
+            swaTrackerWrapperMock.expects("createSWATracker");
             extension.activate(testContext);
             expect( _.get(oRegisteredCommands, "loadYeomanUI")).to.be.not.undefined;
             expect(_.get(oRegisteredCommands, "yeomanUI.toggleOutput")).to.be.not.undefined;
@@ -69,7 +74,7 @@ describe('extension unit test', () => {
         it("logger failure on extenion activation", () => {
             const consoleMock = sandbox.mock(console);
             loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges").throws(new Error("activation error"));
-            consoleMock.expects("error").withExactArgs('Extension activation failed due to Logger configuration failure:', "activation error");
+            consoleMock.expects("error").withExactArgs('Extension activation failed.', "activation error");
             extension.activate(null);
         });
     });

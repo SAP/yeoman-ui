@@ -3,6 +3,7 @@ import { createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/
 import { AbstractWebviewPanel } from "./panels/AbstractWebviewPanel";
 import { YeomanUIPanel } from "./panels/YeomanUIPanel";
 import { ExploreGensPanel } from "./panels/ExploreGensPanel";
+import { createSWATracker } from './swa-tracker/swa-tracker-wrapper';
 
 let extContext: vscode.ExtensionContext;
 let yeomanUIPanel: YeomanUIPanel;
@@ -13,8 +14,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	try {
 		createExtensionLoggerAndSubscribeToLogSettingsChanges(extContext);
+		createSWATracker();
 	} catch (error) {
-		console.error("Extension activation failed due to Logger configuration failure:", error.message);
+		console.error("Extension activation failed.", error.message);
 		return;
 	}
 
