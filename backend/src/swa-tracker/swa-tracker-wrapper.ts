@@ -18,7 +18,7 @@ const EVENT_TYPES = {
  * implementation.
  */
 
-export const ERROR_ANALYTICS_TRACKER_NOT_INITIALIZED = 'Analytics tracker has not yet been initialized!';
+const ERROR_ANALYTICS_TRACKER_NOT_INITIALIZED = 'Analytics tracker has not yet been initialized!';
 
 let swaTracker: SWATracker;
 
