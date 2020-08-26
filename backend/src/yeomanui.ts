@@ -160,11 +160,6 @@ export class YeomanUI {
   }
 
   private updateGeneratorStarted(generatorName: string) {
-    if (!_.isNil(this.startTime) || (generatorName !== this.generatorName)) {
-      this.logger.trace("Start time was already initialized", {startTime: this.startTime, generatorName: this.generatorName});
-      return;
-    }
-
     this.startTime = Date.now();
     const eventType = EVENT_TYPES.PROJECT_GENERATION_STARTED;
     let customEvents = [this.generatorName];
@@ -192,7 +187,6 @@ export class YeomanUI {
   }
 
 	private async runGenerator(generatorName: string) {
-    this.updateGeneratorStarted(generatorName);
     this.generatorName = generatorName;
 
 		// TODO: should create and set target dir only after user has selected a generator;
@@ -309,6 +303,7 @@ export class YeomanUI {
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 
       this.replayUtils.clear();
+      this.updateGeneratorStarted(response.generator);
       await this.runGenerator(response.generator);
     } catch (error) {
       this.logError(error);
