@@ -16,7 +16,7 @@ import { IChildLogger } from "@vscode-logging/logger";
 import * as os from "os";
 import messages from "../src/messages";
 import Environment = require("yeoman-environment");
-import * as swaTrackerWrapper from "../src/swa-tracker/swa-tracker-wrapper";
+import { SWA } from "../src/swa-tracker/swa-tracker-wrapper";
 
 describe('yeomanui unit test', () => {
     let sandbox: any;
@@ -125,7 +125,7 @@ describe('yeomanui unit test', () => {
         datauriMock = sandbox.mock(datauri);
         rpcMock = sandbox.mock(rpc);
         loggerMock = sandbox.mock(testLogger);
-        swaTrackerWrapperMock = sandbox.mock(swaTrackerWrapper);
+        swaTrackerWrapperMock = sandbox.mock(SWA);
         youiEventsMock = sandbox.mock(youiEvents);
     });
 

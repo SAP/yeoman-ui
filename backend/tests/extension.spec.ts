@@ -20,7 +20,7 @@ const testVscode = {
 mockVscode(testVscode, "src/extension.ts");
 import * as extension from "../src/extension";
 import * as loggerWrapper from "../src/logger/logger-wrapper";
-import * as swaTrackerWrapper from "../src/swa-tracker/swa-tracker-wrapper";
+import { SWA } from "../src/swa-tracker/swa-tracker-wrapper";
 
 describe('extension unit test', () => {
     let sandbox: any;
@@ -45,7 +45,7 @@ describe('extension unit test', () => {
 
     beforeEach(() => {
         loggerWrapperMock = sandbox.mock(loggerWrapper);
-        swaTrackerWrapperMock = sandbox.mock(swaTrackerWrapper);
+        swaTrackerWrapperMock = sandbox.mock(SWA);
         commandsMock = sandbox.mock(testVscode.commands);
         windowMock = sandbox.mock(testVscode.window);
         workspaceMock = sandbox.mock(testVscode.workspace);
