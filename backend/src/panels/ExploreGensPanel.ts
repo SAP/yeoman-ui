@@ -20,7 +20,7 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
         this.viewTitle = "Explore and Install Generators";
         this.focusedKey = "exploreGens.Focused";
         this.htmlFileName = path.join("exploregens", "index.html");
-        this.exploreGens = new ExploreGens(this.logger, this.context, vscode);
+        this.exploreGens = new ExploreGens(this.logger, ExploreGensPanel.npmGlobalPaths, this.context, vscode);
     }
 
     public loadWebviewPanel() {
