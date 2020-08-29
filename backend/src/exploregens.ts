@@ -30,7 +30,7 @@ export class ExploreGens {
     private readonly context: any;
     private readonly vscode: any;
     private isInTheiaCached: boolean;
-    private npmGlobalPathPromise: Promise<string>; // eslint-disable-line @typescript-eslint/prefer-readonly
+    private npmGlobalPaths: string[]; 
 
     private readonly theiaCommands: string[] = ["theia.open", "preferences:open", "keymaps:open", "workspace:openRecent"];
     private readonly GLOBAL_ACCEPT_LEGAL_NOTE = "global.exploreGens.acceptlegalNote";
@@ -47,12 +47,12 @@ export class ExploreGens {
     private readonly SEARCH_QUERY_PREFIX = `${this.NPM_REGISTRY_HOST}-/v1/search?text=`;
     private readonly SEARCH_QUERY_SUFFIX = "keywords:yeoman-generator &size=25&ranking=popularity";
 
-    constructor(logger: IChildLogger, context?: any, vscode?: any) {
+    constructor(logger: IChildLogger, npmGlobalPaths: string[], context?: any, vscode?: any) {
         this.context = context;
         this.vscode = vscode;
         this.logger = logger;
         this.gensBeingHandled = [];
-        this.npmGlobalPathPromise = this.getNpmGlobalPath();
+        this.npmGlobalPaths = npmGlobalPaths;
         this.doGeneratorsUpdate();
     }
 
@@ -299,11 +299,6 @@ export class ExploreGens {
         return `${this.NPM} uninstall ${locationParams} ${genName}`;
     }
 
-    private async getNpmGlobalPath(): Promise<string> {
-        const res = await this.exec(`${this.NPM} root -g`);
-        return _.trim(res.stdout);
-    }
-
     private async getAllInstalledGenerators(): Promise<string[]> {
         const npmPaths = await this.getNpmPaths();
         return new Promise(resolve => {
@@ -315,7 +310,7 @@ export class ExploreGens {
     private async getNpmPaths() {
         const customLocation = ExploreGens.getInstallationLocation(this.getWsConfig());
         if (_.isEmpty(customLocation)) {
-            return [await this.npmGlobalPathPromise];
+            return this.npmGlobalPaths;
         }
 
         return [path.join(customLocation, this.NODE_MODULES)];

@@ -46,6 +46,7 @@ export class YeomanUI {
   private readonly youiAdapter: YouiAdapter;
   private gen: Generator | undefined;
   private promptCount: number;
+  private defaultNpmPaths: string[];
   private currentQuestions: Environment.Adapter.Questions<any>;
   private generatorName: string;
   private readonly replayUtils: ReplayUtils;
@@ -78,7 +79,10 @@ export class YeomanUI {
     this.currentQuestions = {};
     this.uiOptions = uiOptions;
     this.customQuestionEventHandlers = new Map();
-    this.setCwd(outputPath);
+	this.setCwd(outputPath);
+	
+	const env: Environment.Options = Environment.createEnv();
+	this.defaultNpmPaths = env.getNpmPaths();
   }
 
   private async getState() {
@@ -112,24 +116,23 @@ export class YeomanUI {
   private async getGeneratorsPrompt(): Promise<IQuestionsPrompt> {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
-    const promise: Promise<IQuestionsPrompt> = new Promise(resolve => {
-      const env: Environment.Options = Environment.createEnv();
-      const npmPaths = this.getNpmPaths(env); 
+    const promise: Promise<IQuestionsPrompt> = new Promise(async resolve => {
+	  const env: Environment.Options = Environment.createEnv();
+	  const npmPaths = this.getNpmPaths(); 
       env.lookup({npmPaths}, async () => this.onEnvLookup(env, resolve, this.uiOptions.genFilter));
     });
 
     return promise;
   }
 
-  private getNpmPaths(env: Environment.Options) {
+  private getNpmPaths() {
     const parts: string[] = YeomanUI.HOME_DIR.split(path.sep);
     const userPaths =  _.map(parts, (part, index) => {
       const resPath = path.join(...parts.slice(0, index + 1), YeomanUI.NODE_MODULES);
       return YeomanUI.isWin32 ? resPath : path.join(path.sep, resPath);
     });
-     
-    const defaultPaths = _.get(this.uiOptions, "defaultNpmPaths", env.getNpmPaths());
-    return _.uniq(userPaths.concat(defaultPaths));
+    
+    return _.uniq(userPaths.concat(this.defaultNpmPaths));
   }
 
   private async getChildDirectories(folderPath: string) {
@@ -269,10 +272,9 @@ export class YeomanUI {
 
   private async receiveIsWebviewReady() {
     try {
-      // TODO: loading generators takes a long time; consider prefetching list of generators
-      const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
+	  // TODO: loading generators takes a long time; consider prefetching list of generators
+	  const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
-
       this.replayUtils.clear();
       SWA.updateGeneratorStarted(response.generator);
       await this.runGenerator(response.generator);

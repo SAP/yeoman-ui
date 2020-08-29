@@ -72,10 +72,10 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 	private getDefaultPaths(): string[] {
 		const customGensLocation: string = ExploreGens.getInstallationLocation(vscode.workspace.getConfiguration());
 		if (!_.isEmpty(customGensLocation)) {
-			return _.concat(this.defaultNpmPaths, path.join(customGensLocation, "node_modules"));
+			return _.concat(YeomanUIPanel.defaultNpmPaths, path.join(customGensLocation, "node_modules"));
 		}
 
-		return this.defaultNpmPaths;
+		return YeomanUIPanel.defaultNpmPaths;
 	}
 
 	private async showOpenFileDialog(currentPath: string): Promise<string> {
