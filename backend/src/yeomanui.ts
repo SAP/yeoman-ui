@@ -46,7 +46,7 @@ export class YeomanUI {
   private readonly youiAdapter: YouiAdapter;
   private gen: Generator | undefined;
   private promptCount: number;
-  private defaultNpmPaths: string[];
+  private npmGlobalPaths: string[];
   private currentQuestions: Environment.Adapter.Questions<any>;
   private generatorName: string;
   private readonly replayUtils: ReplayUtils;
@@ -80,9 +80,7 @@ export class YeomanUI {
     this.uiOptions = uiOptions;
     this.customQuestionEventHandlers = new Map();
 	this.setCwd(outputPath);
-	
-	const env: Environment.Options = Environment.createEnv();
-	this.defaultNpmPaths = env.getNpmPaths();
+	this.npmGlobalPaths = _.get(uiOptions, "npmGlobalPaths", []);
   }
 
   private async getState() {
@@ -132,7 +130,7 @@ export class YeomanUI {
       return YeomanUI.isWin32 ? resPath : path.join(path.sep, resPath);
     });
     
-    return _.uniq(userPaths.concat(this.defaultNpmPaths));
+    return this.npmGlobalPaths.concat(userPaths);
   }
 
   private async getChildDirectories(folderPath: string) {

@@ -42,7 +42,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 			vscodeYouiEvents,
 			this.outputChannel,
 			this.logger,
-			{ genFilter: this.genFilter, messages: this.messages, data: _.get(uiOptions, "data"), defaultNpmPaths: this.getDefaultPaths() });
+			{ genFilter: this.genFilter, messages: this.messages, data: _.get(uiOptions, "data"), npmGlobalPaths: this.getDefaultPaths() });
 		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
 		this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
 
@@ -72,10 +72,10 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 	private getDefaultPaths(): string[] {
 		const customGensLocation: string = ExploreGens.getInstallationLocation(vscode.workspace.getConfiguration());
 		if (!_.isEmpty(customGensLocation)) {
-			return _.concat(YeomanUIPanel.defaultNpmPaths, path.join(customGensLocation, "node_modules"));
+			return _.concat(YeomanUIPanel.npmGlobalPaths, path.join(customGensLocation, "node_modules"));
 		}
 
-		return YeomanUIPanel.defaultNpmPaths;
+		return YeomanUIPanel.npmGlobalPaths;
 	}
 
 	private async showOpenFileDialog(currentPath: string): Promise<string> {

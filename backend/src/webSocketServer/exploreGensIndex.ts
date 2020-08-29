@@ -2,6 +2,7 @@ import * as WebSocket from 'ws';
 import { RpcExtensionWebSockets } from '@sap-devx/webview-rpc/out.ext/rpc-extension-ws';
 import { IChildLogger } from "@vscode-logging/logger";
 import { ExploreGens } from '../exploregens';
+import Environment = require('yeoman-environment');
 
 class ExploreGensWebSocketServer {
   private rpc: RpcExtensionWebSockets;
@@ -56,8 +57,9 @@ class ExploreGensWebSocketServer {
             [];
           }
         }
-      };
-      this.exploreGens = new ExploreGens(childLogger as IChildLogger, context, vscode);
+	  };
+	  
+      this.exploreGens = new ExploreGens(childLogger as IChildLogger, Environment.createEnv().getNpmPaths(), context, vscode);
       this.exploreGens.init(this.rpc);
     });
   }
