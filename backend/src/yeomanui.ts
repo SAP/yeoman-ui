@@ -114,7 +114,7 @@ export class YeomanUI {
   private async getGeneratorsPrompt(): Promise<IQuestionsPrompt> {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
-    const promise: Promise<IQuestionsPrompt> = new Promise(async resolve => {
+    const promise: Promise<IQuestionsPrompt> = new Promise(resolve => {
 	  const env: Environment.Options = Environment.createEnv();
 	  const npmPaths = this.getNpmPaths(); 
       env.lookup({npmPaths}, async () => this.onEnvLookup(env, resolve, this.uiOptions.genFilter));
