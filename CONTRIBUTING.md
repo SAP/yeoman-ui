@@ -17,5 +17,5 @@ An issue that is about a real bug is closed as soon as the fix is committed.
 ## Contribute Code
 You are welcome to contribute code. PRs will be examined and if it fits the quality requirements and the roadmap of the product they will be merged.
 
-## Contributors
-You must be aware of the Apache License (which describes contributions) and agree to the Contributors License Agreement. This is common practice in all major Open Source projects. To make this process as simple as possible, we are using [the standard DCO text of the Linux Foundation](https://developercertificate.org/).
+## Developer Certificate of Origin (DCO)
+Due to legal reasons, contributors will be asked to accept a DCO before they submit the first pull request to this projects, this happens in an automated fashion during the submission process. SAP uses [the standard DCO text of the Linux Foundation](https://developercertificate.org/).
