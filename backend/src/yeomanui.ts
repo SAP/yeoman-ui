@@ -410,7 +410,8 @@ export class YeomanUI {
         type: "input",
         guiOptions: {
           type: "folder-browser",
-          hint: this.uiOptions.messages.select_target_folder_question_hint
+          hint: this.uiOptions.messages.select_target_folder_question_hint,
+	  mandatory: true
         },
         name: "generator.target.folder",
         message: "Specify a target folder path",
