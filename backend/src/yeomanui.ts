@@ -17,7 +17,7 @@ import Generator = require("yeoman-generator");
 import { GeneratorFilter, GeneratorType } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
-import { updateGeneratorStarted, updateGeneratorEnded, updateExploreAndInstallGeneratorsLinkClicked, updateOneOfPreviousStepsClicked } from "./swa-tracker/swa-tracker-wrapper";
+import { SWA } from "./swa-tracker/swa-tracker-wrapper";
 
 export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
@@ -46,6 +46,7 @@ export class YeomanUI {
   private readonly youiAdapter: YouiAdapter;
   private gen: Generator | undefined;
   private promptCount: number;
+  private npmGlobalPaths: string[];
   private currentQuestions: Environment.Adapter.Questions<any>;
   private generatorName: string;
   private readonly replayUtils: ReplayUtils;
@@ -78,7 +79,8 @@ export class YeomanUI {
     this.currentQuestions = {};
     this.uiOptions = uiOptions;
     this.customQuestionEventHandlers = new Map();
-    this.setCwd(outputPath);
+	this.setCwd(outputPath);
+	this.npmGlobalPaths = _.get(uiOptions, "npmGlobalPaths", []);
   }
 
   private async getState() {
@@ -113,23 +115,22 @@ export class YeomanUI {
     // optimization: looking up generators takes a long time, so if generators are already loaded don't bother
     // on the other hand, we never look for newly installed generators...
     const promise: Promise<IQuestionsPrompt> = new Promise(resolve => {
-      const env: Environment.Options = Environment.createEnv();
-      const npmPaths = this.getNpmPaths(env); 
+	  const env: Environment.Options = Environment.createEnv();
+	  const npmPaths = this.getNpmPaths(); 
       env.lookup({npmPaths}, async () => this.onEnvLookup(env, resolve, this.uiOptions.genFilter));
     });
 
     return promise;
   }
 
-  private getNpmPaths(env: Environment.Options) {
+  private getNpmPaths() {
     const parts: string[] = YeomanUI.HOME_DIR.split(path.sep);
     const userPaths =  _.map(parts, (part, index) => {
       const resPath = path.join(...parts.slice(0, index + 1), YeomanUI.NODE_MODULES);
       return YeomanUI.isWin32 ? resPath : path.join(path.sep, resPath);
     });
-     
-    const defaultPaths = _.get(this.uiOptions, "defaultNpmPaths", env.getNpmPaths());
-    return _.uniq(userPaths.concat(defaultPaths));
+    
+    return this.npmGlobalPaths.concat(userPaths);
   }
 
   private async getChildDirectories(folderPath: string) {
@@ -269,12 +270,11 @@ export class YeomanUI {
 
   private async receiveIsWebviewReady() {
     try {
-      // TODO: loading generators takes a long time; consider prefetching list of generators
-      const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
+	  // TODO: loading generators takes a long time; consider prefetching list of generators
+	  const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
-
       this.replayUtils.clear();
-      updateGeneratorStarted(response.generator);
+      SWA.updateGeneratorStarted(response.generator);
       await this.runGenerator(response.generator);
     } catch (error) {
       this.logError(error);
@@ -286,7 +286,7 @@ export class YeomanUI {
   }
 
   private exploreGenerators() {
-    updateExploreAndInstallGeneratorsLinkClicked();
+    SWA.updateExploreAndInstallGeneratorsLinkClicked();
     const vscodeInstance = this.getVscode();
     if (vscodeInstance) {
       return vscodeInstance.commands.executeCommand("exploreGenerators");
@@ -326,7 +326,7 @@ export class YeomanUI {
   }
 
   private back(partialAnswers: Environment.Adapter.Answers, numOfSteps: number): void {
-    updateOneOfPreviousStepsClicked(this.generatorName);
+    SWA.updateOneOfPreviousStepsClicked(this.generatorName);
     this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
     this.runGenerator(this.generatorName);
   }
@@ -354,7 +354,7 @@ export class YeomanUI {
 
     const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
     this.logger.debug("done running yeomanui! " + message + ` You can find it at ${targetFolderPath}`);
-    updateGeneratorEnded(this.generatorName, true);
+    SWA.updateGeneratorEnded(this.generatorName, true);
     this.youiEvents.doGeneratorDone(true, message, targetFolderPath);
   }
 
@@ -362,7 +362,7 @@ export class YeomanUI {
     this.errorThrown = true;
     const messagePrefix = `${generatorName} generator failed`;
     const errorMessage: string = await this.logError(error, messagePrefix);
-    updateGeneratorEnded(this.generatorName, false, errorMessage);
+    SWA.updateGeneratorEnded(this.generatorName, false, errorMessage);
     this.youiEvents.doGeneratorDone(false, errorMessage);
   }
 

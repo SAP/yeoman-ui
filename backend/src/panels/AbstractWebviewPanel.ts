@@ -22,7 +22,7 @@ export abstract class AbstractWebviewPanel {
 	protected disposables: vscode.Disposable[];
 
 	// improves first time performance 
-	protected readonly defaultNpmPaths: string[] = Environment.createEnv().getNpmPaths();
+	protected static readonly npmGlobalPaths: string[] = Environment.createEnv().getNpmPaths();
 
 	public loadWebviewPanel(uiOptions?: any) {
 		this.disposeWebviewPanel();

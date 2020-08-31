@@ -109,7 +109,7 @@ describe('exploregens unit test', () => {
     }
     const rpc = new TestRpc();
     const childLogger = { debug: () => true, error: () => true, fatal: () => true, warn: () => true, info: () => true, trace: () => true, getChildLogger: () => { return {} as IChildLogger; } };
-    const exploregens = new ExploreGens(childLogger as IChildLogger, testVscode.context, testVscode);
+    const exploregens = new ExploreGens(childLogger as IChildLogger, ["testGlobalPath"], testVscode.context, testVscode);
     exploregens.init(rpc);
 
     before(() => {
@@ -207,7 +207,7 @@ describe('exploregens unit test', () => {
     describe("NPM", () => {
         it("win32 platform", () => {
             const stub = sinon.stub(process, 'platform').value("win32");
-            const exploregens1 = new ExploreGens(null, testVscode.context, testVscode);
+            const exploregens1 = new ExploreGens(null, ["testGlobalPath"], testVscode.context, testVscode);
             const res = exploregens1["NPM"];
             expect(res).to.be.equal("npm.cmd");
             stub.restore();
@@ -215,7 +215,7 @@ describe('exploregens unit test', () => {
 
         it("linux platfrom", () => {
             const stub = sinon.stub(process, 'platform').value("linux");
-            const exploregens2 = new ExploreGens(null, testVscode.context, testVscode);
+            const exploregens2 = new ExploreGens(null, ["testGlobalPath"], testVscode.context, testVscode);
             const res = exploregens2["NPM"];
             expect(res).to.be.equal("npm");
             stub.restore();
@@ -252,7 +252,6 @@ describe('exploregens unit test', () => {
 
             const globalLocation = "testGlobalPath";
             workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns();
-            exploregens["npmGlobalPathPromise"] = Promise.resolve(globalLocation);
             yoEnvMock.expects("createEnv").returns(testYoEnv);
             testYoEnvMock.expects("lookup").withArgs({ npmPaths: [globalLocation] });
             exploregens["init"](rpc);
