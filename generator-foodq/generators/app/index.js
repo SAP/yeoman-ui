@@ -96,7 +96,8 @@ module.exports = class extends Generator {
         message: "How many times have you been in this resturant?",
         guiOptions: {
           hint: "We hope you have been in our resturant many times",
-          applyDefaultWhenDirty: true
+		  applyDefaultWhenDirty: true,
+		  mandatory: true
         },
       },
       {
@@ -289,7 +290,8 @@ module.exports = class extends Generator {
       },
       {
         guiOptions: {
-          hint: "Enter your user name"
+		  hint: "Enter your user name",
+		  mandatory: true
         },
         name: "email",
         message: "GitHub user name",
@@ -302,7 +304,8 @@ module.exports = class extends Generator {
         type: "password",
         guiOptions: {
           type: "login",
-          hint: "Enter your password"
+		  hint: "Enter your password",
+		  mandatory: true
         },
         name: "password",
         message: "GitHub password",

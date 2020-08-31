@@ -8,6 +8,7 @@ import backendMessages from "../messages";
 import { IChildLogger } from "@vscode-logging/logger";
 import { YouiEvents } from '../youi-events';
 import { GeneratorFilter } from '../filter';
+import Environment = require('yeoman-environment');
 
 class YeomanUIWebSocketServer {
   private rpc: RpcExtensionWebSockets | undefined;
@@ -37,8 +38,9 @@ class YeomanUIWebSocketServer {
       //TODO: Use RPC to send it to the browser log (as a collapsed pannel in Vue)
       const logger: YouiLog = new ServerLog(this.rpc);
       const childLogger = {debug: () => {/* do nothing */}, error: () => {/* do nothing */}, fatal: () => {/* do nothing */}, warn: () => {/* do nothing */}, info: () => {/* do nothing */}, trace: () => {/* do nothing */}, getChildLogger: () => {return {} as IChildLogger;}};
-      const youiEvents: YouiEvents = new ServerYouiEvents(this.rpc);
-      this.yeomanui = new YeomanUI(this.rpc, youiEvents, logger, childLogger as IChildLogger, {genFilter: GeneratorFilter.create(), messages: backendMessages});
+	  const youiEvents: YouiEvents = new ServerYouiEvents(this.rpc);
+	  this.yeomanui = new YeomanUI(this.rpc, youiEvents, logger, childLogger as IChildLogger, 
+		{genFilter: GeneratorFilter.create(), messages: backendMessages, npmGlobalPaths: Environment.createEnv().getNpmPaths()});
       this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.mockFolderDialog.bind(this));
     });
   }

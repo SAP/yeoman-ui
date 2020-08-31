@@ -274,7 +274,7 @@ export class YeomanUI {
 	  const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
       const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
       this.replayUtils.clear();
-      SWA.updateGeneratorStarted(response.generator);
+      SWA.updateGeneratorStarted(response.generator, this.logger);
       await this.runGenerator(response.generator);
     } catch (error) {
       this.logError(error);
@@ -286,7 +286,7 @@ export class YeomanUI {
   }
 
   private exploreGenerators() {
-    SWA.updateExploreAndInstallGeneratorsLinkClicked();
+    SWA.updateExploreAndInstallGeneratorsLinkClicked(this.logger);
     const vscodeInstance = this.getVscode();
     if (vscodeInstance) {
       return vscodeInstance.commands.executeCommand("exploreGenerators");
@@ -326,7 +326,7 @@ export class YeomanUI {
   }
 
   private back(partialAnswers: Environment.Adapter.Answers, numOfSteps: number): void {
-    SWA.updateOneOfPreviousStepsClicked(this.generatorName);
+    SWA.updateOneOfPreviousStepsClicked(this.generatorName, this.logger);
     this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
     this.runGenerator(this.generatorName);
   }
@@ -354,7 +354,7 @@ export class YeomanUI {
 
     const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
     this.logger.debug("done running yeomanui! " + message + ` You can find it at ${targetFolderPath}`);
-    SWA.updateGeneratorEnded(this.generatorName, true);
+    SWA.updateGeneratorEnded(this.generatorName, true, this.logger);
     this.youiEvents.doGeneratorDone(true, message, targetFolderPath);
   }
 
@@ -362,7 +362,7 @@ export class YeomanUI {
     this.errorThrown = true;
     const messagePrefix = `${generatorName} generator failed`;
     const errorMessage: string = await this.logError(error, messagePrefix);
-    SWA.updateGeneratorEnded(this.generatorName, false, errorMessage);
+    SWA.updateGeneratorEnded(this.generatorName, false, this.logger, errorMessage);
     this.youiEvents.doGeneratorDone(false, errorMessage);
   }
 

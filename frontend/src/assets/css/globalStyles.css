@@ -93,7 +93,7 @@ form.inquirer-gui i.theme--light.v-icon {
   color: var(--vscode-foreground, #cccccc);
 }
 
-.error-validation-asterisk{
+.mandatory-asterisk{
   font-size: 14px;
   color: #ff5252;
 }
