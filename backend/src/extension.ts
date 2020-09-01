@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
+import { createExtensionLoggerAndSubscribeToLogSettingsChanges, getLogger } from "./logger/logger-wrapper";
 import { AbstractWebviewPanel } from "./panels/AbstractWebviewPanel";
 import { YeomanUIPanel } from "./panels/YeomanUIPanel";
 import { ExploreGensPanel } from "./panels/ExploreGensPanel";
@@ -14,7 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	try {
 		createExtensionLoggerAndSubscribeToLogSettingsChanges(extContext);
-		SWA.createSWATracker();
+		SWA.createSWATracker(getLogger());
 	} catch (error) {
 		console.error("Extension activation failed.", error.message);
 		return;

@@ -62,7 +62,7 @@ describe('extension unit test', () => {
     describe('activate', () => {
         it("commands registration", () => {
             loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
-            loggerWrapperMock.expects("getLogger").twice();
+            loggerWrapperMock.expects("getLogger").thrice();
             swaTrackerWrapperMock.expects("createSWATracker");
             extension.activate(testContext);
             expect( _.get(oRegisteredCommands, "loadYeomanUI")).to.be.not.undefined;

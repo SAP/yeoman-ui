@@ -587,7 +587,7 @@ describe('yeomanui unit test', () => {
 		it("vscode module is not available", () => {
 			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {});
 			yeomanUiInstance["getVscode"] = () => undefined;
-			swaTrackerWrapperMock.expects("updateExploreAndInstallGeneratorsLinkClicked").withExactArgs();
+			swaTrackerWrapperMock.expects("updateExploreAndInstallGeneratorsLinkClicked");
 			yeomanUiInstance["exploreGenerators"]();
 		});
 
@@ -597,7 +597,7 @@ describe('yeomanui unit test', () => {
 			yeomanUiInstance["getVscode"] = () => testVscode;
 			const commandsMock = sandbox.mock(testVscode.commands);
 			commandsMock.expects("executeCommand").withExactArgs("exploreGenerators");
-			swaTrackerWrapperMock.expects("updateExploreAndInstallGeneratorsLinkClicked").withExactArgs();
+			swaTrackerWrapperMock.expects("updateExploreAndInstallGeneratorsLinkClicked");
 			yeomanUiInstance["exploreGenerators"]();
 			commandsMock.verify();
 		});
