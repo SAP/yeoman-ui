@@ -4,7 +4,6 @@ import { AbstractWebviewPanel } from "./panels/AbstractWebviewPanel";
 import { YeomanUIPanel } from "./panels/YeomanUIPanel";
 import { ExploreGensPanel } from "./panels/ExploreGensPanel";
 import { SWA } from './swa-tracker/swa-tracker-wrapper';
-import * as _ from "lodash";
 
 let extContext: vscode.ExtensionContext;
 let yeomanUIPanel: YeomanUIPanel;
@@ -21,25 +20,17 @@ export async function activate(context: vscode.ExtensionContext) {
 		return;
 	}
 
-	const inTheia = await isInTheia();
-
 	// YeomanUIPanel
-	yeomanUIPanel = new YeomanUIPanel(extContext, inTheia);
+	yeomanUIPanel = new YeomanUIPanel(extContext);
 	registerAndSubscribeCommand("loadYeomanUI", yeomanUIPanel.loadWebviewPanel.bind(yeomanUIPanel));
 	registerAndSubscribeCommand("yeomanUI.toggleOutput", yeomanUIPanel.toggleOutput.bind(yeomanUIPanel));
 	registerAndSubscribeCommand("yeomanUI._notifyGeneratorsChange", yeomanUIPanel.notifyGeneratorsChange.bind(yeomanUIPanel));
 	registerWebviewPanelSerializer(yeomanUIPanel);
 
 	// ExploreGensPanel
-	exploreGensPanel = new ExploreGensPanel(extContext, inTheia);
+	exploreGensPanel = new ExploreGensPanel(extContext);
 	registerAndSubscribeCommand("exploreGenerators", exploreGensPanel.loadWebviewPanel.bind(exploreGensPanel));
 	registerWebviewPanelSerializer(exploreGensPanel);
-}
-
-async function isInTheia() {
-	const commands = await vscode.commands.getCommands(true);
-	const foundCommands = _.intersection(commands, ["theia.open", "preferences:open", "keymaps:open", "workspace:openRecent"]);
-	return !_.isEmpty(foundCommands);
 }
 
 function registerAndSubscribeCommand(cId: string, cAction: any) {

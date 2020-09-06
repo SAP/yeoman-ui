@@ -14,13 +14,13 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
     }
 
     private readonly exploreGens: ExploreGens;
-    public constructor(context: vscode.ExtensionContext, isInTheia: boolean) {
-        super(context, isInTheia);
+    public constructor(context: vscode.ExtensionContext) {
+        super(context);
         this.viewType = "exploreGens";
         this.viewTitle = "Explore and Install Generators";
         this.focusedKey = "exploreGens.Focused";
         this.htmlFileName = path.join("exploregens", "index.html");
-        this.exploreGens = new ExploreGens(this.logger, ExploreGensPanel.npmGlobalPaths, isInTheia, this.context, vscode);
+        this.exploreGens = new ExploreGens(this.logger, ExploreGensPanel.npmGlobalPaths, this.isInBAS, this.context, vscode);
     }
 
     public loadWebviewPanel() {

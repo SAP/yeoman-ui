@@ -7,7 +7,7 @@
     </div>
     <v-card-text class="pa-2" style="font-size:14px">{{messages.description}}</v-card-text>
     <v-expansion-panels
-      v-if="isInTheia && isLegalNoteAccepted && ready"
+      v-if="isInBAS && isLegalNoteAccepted && ready"
       flat
       class="explore-generators"
     >
@@ -124,7 +124,7 @@ export default {
       query: "",
       recommended: ALL_GENS,
       messages,
-      isInTheia: false,
+      isInBAS: false,
       isLegalNoteAccepted: true,
       ready: false,
       disclaimerOpened: false
@@ -199,8 +199,8 @@ export default {
       this.items = await this.rpc.invoke("getRecommendedQuery");
       this.items.unshift(ALL_GENS);
     },
-    async setIsInTheia() {
-      this.isInTheia = await this.rpc.invoke("isInTheia");
+    async setIsInBAS() {
+      this.isInBAS = await this.rpc.invoke("getInBAS");
     },
     async setIsLegalNoteAccepted() {
       this.isLegalNoteAccepted = await this.rpc.invoke("isLegalNoteAccepted");
@@ -262,7 +262,7 @@ export default {
     await this.setupRpc();
     await Promise.all([
       await this.setIsLegalNoteAccepted(),
-      await this.setIsInTheia()
+      await this.setIsInBAS()
     ]);
     await Promise.all([
       this.getRecommendedQuery(),

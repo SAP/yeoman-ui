@@ -29,7 +29,7 @@ export class ExploreGens {
     private cachedInstalledGeneratorsPromise: Promise<string[]>;
     private readonly context: any;
     private readonly vscode: any;
-    private inTheia: boolean;
+    private isInBAS: boolean;
     private npmGlobalPaths: string[]; 
 
     private readonly GLOBAL_ACCEPT_LEGAL_NOTE = "global.exploreGens.acceptlegalNote";
@@ -46,14 +46,14 @@ export class ExploreGens {
     private readonly SEARCH_QUERY_PREFIX = `${this.NPM_REGISTRY_HOST}-/v1/search?text=`;
     private readonly SEARCH_QUERY_SUFFIX = "keywords:yeoman-generator &size=25&ranking=popularity";
 
-    constructor(logger: IChildLogger, npmGlobalPaths: string[], inTheia: boolean, context?: any, vscode?: any) {
+    constructor(logger: IChildLogger, npmGlobalPaths: string[], isInBAS: boolean, context?: any, vscode?: any) {
         this.context = context;
         this.vscode = vscode;
         this.logger = logger;
         this.gensBeingHandled = [];
         this.npmGlobalPaths = npmGlobalPaths;
 		this.doGeneratorsUpdate();
-		this.inTheia = inTheia;
+		this.isInBAS = isInBAS;
     }
 
     public init(rpc: IRpc) {
@@ -70,7 +70,7 @@ export class ExploreGens {
     }
 
     private async isLegalNoteAccepted() {
-        return this.inTheia ? this.context.globalState.get(this.GLOBAL_ACCEPT_LEGAL_NOTE, false) : true;
+        return this.isInBAS ? this.context.globalState.get(this.GLOBAL_ACCEPT_LEGAL_NOTE, false) : true;
     }
 
     private async acceptLegalNote() {
@@ -90,8 +90,8 @@ export class ExploreGens {
         }
 	}
 	
-	private isInTheia(): boolean {
-		return this.inTheia;
+	private getInBAS(): boolean {
+		return this.isInBAS;
 	}
 
     private initRpc(rpc: IRpc) {
@@ -101,7 +101,7 @@ export class ExploreGens {
         this.rpc.registerMethod({ func: this.uninstall, thisArg: this });
         this.rpc.registerMethod({ func: this.isInstalled, thisArg: this });
         this.rpc.registerMethod({ func: this.getRecommendedQuery, thisArg: this });
-        this.rpc.registerMethod({ func: this.isInTheia, thisArg: this });
+        this.rpc.registerMethod({ func: this.getInBAS, thisArg: this });
         this.rpc.registerMethod({ func: this.isLegalNoteAccepted, thisArg: this });
         this.rpc.registerMethod({ func: this.acceptLegalNote, thisArg: this });
     }

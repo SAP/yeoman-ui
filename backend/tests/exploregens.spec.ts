@@ -159,23 +159,23 @@ describe('exploregens unit test', () => {
     });
 
     describe("isLegalNoteAccepted", () => {
-        it("is in theia, legal note is accepted", async () => {
-            exploregens["inTheia"] = true;
+        it("is in BAS, legal note is accepted", async () => {
+            exploregens["isInBAS"] = true;
             globalStateMock.expects("get").withExactArgs(exploregens["GLOBAL_ACCEPT_LEGAL_NOTE"], false).returns(true);
             const res = await exploregens["isLegalNoteAccepted"]();
             expect(res).to.be.true;
         });
 
-        it("is in theia, legal note is not accepted", async () => {
-            exploregens["inTheia"] = true;
+        it("is in BAS, legal note is not accepted", async () => {
+            exploregens["isInBAS"] = true;
 			globalStateMock.expects("get").withExactArgs(exploregens["GLOBAL_ACCEPT_LEGAL_NOTE"], false).returns(false);
-			expect(exploregens["isInTheia"]()).to.be.true;
+			expect(exploregens["getInBAS"]()).to.be.true;
             const res = await exploregens["isLegalNoteAccepted"]();
             expect(res).to.be.false;
         });
 
-        it("is not in theia", async () => {
-            exploregens["inTheia"] = false;
+        it("is not in BAS", async () => {
+            exploregens["isInBAS"] = false;
             globalStateMock.expects("get").never();
             const res = await exploregens["isLegalNoteAccepted"]();
             expect(res).to.be.true;
@@ -206,7 +206,7 @@ describe('exploregens unit test', () => {
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["install"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["uninstall"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInstalled"], thisArg: exploregens });
-            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInTheia"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getInBAS"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isLegalNoteAccepted"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["acceptLegalNote"], thisArg: exploregens });
@@ -223,7 +223,7 @@ describe('exploregens unit test', () => {
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["install"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["uninstall"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInstalled"], thisArg: exploregens });
-            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isInTheia"], thisArg: exploregens });
+            rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getInBAS"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["getRecommendedQuery"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isLegalNoteAccepted"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["acceptLegalNote"], thisArg: exploregens });
