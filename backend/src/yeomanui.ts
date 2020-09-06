@@ -77,7 +77,7 @@ export class YeomanUI {
     this.promptCount = 0;
     this.genMeta = {};
     this.currentQuestions = {};
-    this.uiOptions = uiOptions;
+	this.uiOptions = uiOptions;
     this.customQuestionEventHandlers = new Map();
 	this.setCwd(outputPath);
 	this.npmGlobalPaths = _.get(uiOptions, "npmGlobalPaths", []);

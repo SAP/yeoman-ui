@@ -20,6 +20,7 @@ export abstract class AbstractWebviewPanel {
 
 	protected logger: IChildLogger;
 	protected disposables: vscode.Disposable[];
+	protected inTheia: boolean;
 
 	// improves first time performance 
 	protected static readonly npmGlobalPaths: string[] = Environment.createEnv().getNpmPaths();
@@ -30,13 +31,14 @@ export abstract class AbstractWebviewPanel {
 		this.setWebviewPanel(webViewPanel, uiOptions);
 	}
 
-	protected constructor(context: vscode.ExtensionContext) {
+	protected constructor(context: vscode.ExtensionContext, inTheia: boolean) {
 		this.extensionPath = context.extensionPath;
 		this.mediaPath = path.join(context.extensionPath, "dist", "media");
 		this.htmlFileName = "index.html";
 		this.logger = getLogger();
 		this.disposables = [];
 		this.context = context;
+		this.inTheia = inTheia;
 	}
 
 	public setWebviewPanel(webviewPanel: vscode.WebviewPanel, state?: any) {

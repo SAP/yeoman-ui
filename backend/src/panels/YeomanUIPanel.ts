@@ -38,11 +38,12 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 		const rpc = new RpcExtension(this.webViewPanel.webview);
 		this.outputChannel = new OutputChannelLog(this.messages.channel_name);
 		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(rpc, this.webViewPanel, this.genFilter, this.messages);
+		const outputPath = this.inTheia ? undefined: _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath"); 
 		this.yeomanui = new YeomanUI(rpc,
 			vscodeYouiEvents,
 			this.outputChannel,
 			this.logger,
-			{ genFilter: this.genFilter, messages: this.messages, data: _.get(uiOptions, "data"), npmGlobalPaths: this.getDefaultPaths() });
+			{ genFilter: this.genFilter, messages: this.messages, data: _.get(uiOptions, "data"), npmGlobalPaths: this.getDefaultPaths() }, outputPath);
 		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
 		this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
 
@@ -62,8 +63,8 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 	private messages: any;
 	private outputChannel: YouiLog;
 
-	public constructor(context: vscode.ExtensionContext) {
-		super(context);
+	public constructor(context: vscode.ExtensionContext, inTheia: boolean) {
+		super(context, inTheia);
 		this.viewType = "yeomanui";
 		this.viewTitle = YeomanUIPanel.YEOMAN_UI;
 		this.focusedKey = "yeomanUI.Focused";

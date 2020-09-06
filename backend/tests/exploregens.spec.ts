@@ -109,7 +109,7 @@ describe('exploregens unit test', () => {
     }
     const rpc = new TestRpc();
     const childLogger = { debug: () => true, error: () => true, fatal: () => true, warn: () => true, info: () => true, trace: () => true, getChildLogger: () => { return {} as IChildLogger; } };
-    const exploregens = new ExploreGens(childLogger as IChildLogger, ["testGlobalPath"], testVscode.context, testVscode);
+    const exploregens = new ExploreGens(childLogger as IChildLogger, ["testGlobalPath"], false, testVscode.context, testVscode);
     exploregens.init(rpc);
 
     before(() => {
@@ -160,54 +160,55 @@ describe('exploregens unit test', () => {
 
     describe("isLegalNoteAccepted", () => {
         it("is in theia, legal note is accepted", async () => {
-            exploregens["isInTheiaCached"] = true;
+            exploregens["inTheia"] = true;
             globalStateMock.expects("get").withExactArgs(exploregens["GLOBAL_ACCEPT_LEGAL_NOTE"], false).returns(true);
             const res = await exploregens["isLegalNoteAccepted"]();
             expect(res).to.be.true;
         });
 
         it("is in theia, legal note is not accepted", async () => {
-            exploregens["isInTheiaCached"] = true;
-            globalStateMock.expects("get").withExactArgs(exploregens["GLOBAL_ACCEPT_LEGAL_NOTE"], false).returns(false);
+            exploregens["inTheia"] = true;
+			globalStateMock.expects("get").withExactArgs(exploregens["GLOBAL_ACCEPT_LEGAL_NOTE"], false).returns(false);
+			expect(exploregens["isInTheia"]()).to.be.true;
             const res = await exploregens["isLegalNoteAccepted"]();
             expect(res).to.be.false;
         });
 
         it("is not in theia", async () => {
-            exploregens["isInTheiaCached"] = false;
+            exploregens["inTheia"] = false;
             globalStateMock.expects("get").never();
             const res = await exploregens["isLegalNoteAccepted"]();
             expect(res).to.be.true;
         });
     });
 
-    describe("isInTheia", () => {
-        it("use cached value", async () => {
-            exploregens["isInTheiaCached"] = true;
-            vscodeCommandsMock.expects("getCommands").never();
-            const res = await exploregens["isInTheia"]();
-            expect(res).to.be.true;
-        });
+    // describe("isInTheia", () => {
+    //     it("use cached value", async () => {
+    //         exploregens["inTheia"] = true;
+    //         vscodeCommandsMock.expects("getCommands").never();
+    //         const res = await exploregens["isInTheia"]();
+    //         expect(res).to.be.true;
+    //     });
 
-        it("returns true", async () => {
-            exploregens["isInTheiaCached"] = undefined;
-            vscodeCommandsMock.expects("getCommands").withExactArgs(true).resolves(["theia.open", "preferences:open"]);
-            const res = await exploregens["isInTheia"]();
-            expect(res).to.be.true;
-        });
+    //     it("returns true", async () => {
+    //         exploregens["isInTheiaCached"] = undefined;
+    //         vscodeCommandsMock.expects("getCommands").withExactArgs(true).resolves(["theia.open", "preferences:open"]);
+    //         const res = await exploregens["isInTheia"]();
+    //         expect(res).to.be.true;
+    //     });
 
-        it("returns false", async () => {
-            exploregens["isInTheiaCached"] = undefined;
-            vscodeCommandsMock.expects("getCommands").withExactArgs(true).resolves(["workbench.action.openGlobalKeybindings"]);
-            const res = await exploregens["isInTheia"]();
-            expect(res).to.be.false;
-        });
-    });
+    //     it("returns false", async () => {
+    //         exploregens["isInTheiaCached"] = undefined;
+    //         vscodeCommandsMock.expects("getCommands").withExactArgs(true).resolves(["workbench.action.openGlobalKeybindings"]);
+    //         const res = await exploregens["isInTheia"]();
+    //         expect(res).to.be.false;
+    //     });
+    // });
 
     describe("NPM", () => {
         it("win32 platform", () => {
             const stub = sinon.stub(process, 'platform').value("win32");
-            const exploregens1 = new ExploreGens(null, ["testGlobalPath"], testVscode.context, testVscode);
+            const exploregens1 = new ExploreGens(null, ["testGlobalPath"], false,testVscode.context, testVscode);
             const res = exploregens1["NPM"];
             expect(res).to.be.equal("npm.cmd");
             stub.restore();
@@ -215,7 +216,7 @@ describe('exploregens unit test', () => {
 
         it("linux platfrom", () => {
             const stub = sinon.stub(process, 'platform').value("linux");
-            const exploregens2 = new ExploreGens(null, ["testGlobalPath"], testVscode.context, testVscode);
+            const exploregens2 = new ExploreGens(null, ["testGlobalPath"], false, testVscode.context, testVscode);
             const res = exploregens2["NPM"];
             expect(res).to.be.equal("npm");
             stub.restore();
