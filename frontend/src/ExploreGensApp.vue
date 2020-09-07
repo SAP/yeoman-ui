@@ -199,8 +199,8 @@ export default {
       this.items = await this.rpc.invoke("getRecommendedQuery");
       this.items.unshift(ALL_GENS);
     },
-    async getIsInBAS() {
-      this.isInBAS = await this.rpc.invoke("getInBAS");
+    async setIsInBAS() {
+      this.isInBAS = await this.rpc.invoke("getIsInBAS");
     },
     async setIsLegalNoteAccepted() {
       this.isLegalNoteAccepted = await this.rpc.invoke("isLegalNoteAccepted");
@@ -262,7 +262,7 @@ export default {
     await this.setupRpc();
     await Promise.all([
       await this.setIsLegalNoteAccepted(),
-      await this.getIsInBAS()
+      await this.setIsInBAS()
     ]);
     await Promise.all([
       this.getRecommendedQuery(),

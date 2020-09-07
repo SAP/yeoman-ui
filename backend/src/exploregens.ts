@@ -90,7 +90,7 @@ export class ExploreGens {
         }
 	}
 	
-	private getInBAS(): boolean {
+	private getIsInBAS(): boolean {
 		return this.isInBAS;
 	}
 
@@ -101,7 +101,7 @@ export class ExploreGens {
         this.rpc.registerMethod({ func: this.uninstall, thisArg: this });
         this.rpc.registerMethod({ func: this.isInstalled, thisArg: this });
         this.rpc.registerMethod({ func: this.getRecommendedQuery, thisArg: this });
-        this.rpc.registerMethod({ func: this.getInBAS, thisArg: this });
+        this.rpc.registerMethod({ func: this.getIsInBAS, thisArg: this });
         this.rpc.registerMethod({ func: this.isLegalNoteAccepted, thisArg: this });
         this.rpc.registerMethod({ func: this.acceptLegalNote, thisArg: this });
     }
