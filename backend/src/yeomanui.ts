@@ -18,6 +18,7 @@ import { GeneratorFilter, GeneratorType } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
 import { SWA } from "./swa-tracker/swa-tracker-wrapper";
+import TerminalAdapter = require("yeoman-environment/lib/adapter");
 
 export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
@@ -47,7 +48,7 @@ export class YeomanUI {
   private gen: Generator | undefined;
   private promptCount: number;
   private npmGlobalPaths: string[];
-  private currentQuestions: Environment.Adapter.Questions<any>;
+  private currentQuestions: TerminalAdapter.Questions<any>;
   private generatorName: string;
   private readonly replayUtils: ReplayUtils;
   private readonly customQuestionEventHandlers: Map<string, Map<string, Function>>;
@@ -301,7 +302,7 @@ export class YeomanUI {
     return this.cwd;
   }
 
-  public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
+  public async showPrompt(questions: TerminalAdapter.Questions<any>): Promise<inquirer.Answers> {
     this.promptCount++;
     const promptName = this.getPromptName(questions);
 
@@ -315,7 +316,7 @@ export class YeomanUI {
     this.replayUtils.recall(questions);
 
     this.currentQuestions = questions;
-    const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
+    const mappedQuestions: TerminalAdapter.Questions<any> = this.normalizeFunctions(questions);
     if (_.isEmpty(mappedQuestions)) {
       return {};
     }
@@ -325,7 +326,7 @@ export class YeomanUI {
     return answers;
   }
 
-  private back(partialAnswers: Environment.Adapter.Answers, numOfSteps: number): void {
+  private back(partialAnswers: Environment.Answers, numOfSteps: number): void {
     SWA.updateOneOfPreviousStepsClicked(this.generatorName, this.logger);
     this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
     this.runGenerator(this.generatorName);
@@ -338,7 +339,7 @@ export class YeomanUI {
     }
   }
 
-  private getPromptName(questions: Environment.Adapter.Questions<any>): string {
+  private getPromptName(questions: TerminalAdapter.Questions<any>): string {
     const firstQuestionName = _.get(questions, "[0].name");
     return (firstQuestionName ? _.startCase(firstQuestionName) : `Step ${this.promptCount}`);
   }
@@ -523,7 +524,7 @@ export class YeomanUI {
    * Functions are lost when being passed to client (using JSON.Stringify)
    * Also functions cannot be evaluated on client)
    */
-  private normalizeFunctions(questions: Environment.Adapter.Questions<any>): Environment.Adapter.Questions<any> {
+  private normalizeFunctions(questions: TerminalAdapter.Questions<any>): TerminalAdapter.Questions<any> {
     this.addCustomQuestionEventHandlers(questions);
     return JSON.parse(JSON.stringify(questions, YeomanUI.funcReplacer));
   }
@@ -540,7 +541,7 @@ export class YeomanUI {
     }
   }
   
-  private addCustomQuestionEventHandlers(questions: Environment.Adapter.Questions<any>): void {
+  private addCustomQuestionEventHandlers(questions: TerminalAdapter.Questions<any>): void {
     for (const question of (questions as any[])) {
       const guiType = _.get(question, "guiOptions.type", question.guiType);
       const questionHandlers = this.customQuestionEventHandlers.get(guiType);

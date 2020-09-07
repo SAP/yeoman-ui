@@ -4,6 +4,7 @@ import { YouiLog } from "./youi-log";
 import { YouiEvents } from "./youi-events";
 import * as _ from "lodash";
 import chalk = require('chalk');
+import TerminalAdapter = require("yeoman-environment/lib/adapter");
 
 /**
  * @constructor
@@ -57,7 +58,7 @@ export class YouiAdapter implements Adapter {
    * @param {Function} callback
    */
   public async prompt<T1, T2>(
-    questions: Adapter.Questions<T1>,
+    questions: TerminalAdapter.Questions<T1>,
     cb?: (res: T1) => T2
   ): Promise<T2> {
     if (this.yeomanui && questions) {
