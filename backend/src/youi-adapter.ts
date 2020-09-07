@@ -9,37 +9,38 @@ import TerminalAdapter = require("yeoman-environment/lib/adapter");
 /**
  * @constructor
  */
-export class YouiAdapter implements Adapter {
+export class YouiAdapter extends TerminalAdapter {
   private yeomanui: YeomanUI | undefined = undefined;
   private readonly youiLog: YouiLog;
   private readonly youiEvents: YouiEvents;
 
   constructor(logger: YouiLog, youiEvents: YouiEvents) {
+	super({});
     this.youiLog = logger;
     this.youiEvents = youiEvents;
-    this.log.writeln = logger.writeln.bind(this.youiLog);
-    this.log.conflict = logger.conflict.bind(this.youiLog);
-    this.log.create = logger.create.bind(this.youiLog);
-    this.log.force = logger.force.bind(this.youiLog);
-    this.log.identical = logger.identical.bind(this.youiLog);
-    this.log.skip = logger.skip.bind(this.youiLog);
+    // this.log.writeln = logger.writeln.bind(this.youiLog);
+    // this.log.conflict = logger.conflict.bind(this.youiLog);
+    // this.log.create = logger.create.bind(this.youiLog);
+    // this.log.force = logger.force.bind(this.youiLog);
+    // this.log.identical = logger.identical.bind(this.youiLog);
+    // this.log.skip = logger.skip.bind(this.youiLog);
   }
 
   public setYeomanUI(yeomanui: YeomanUI) {
     this.yeomanui = yeomanui;
   }
 
-  public log: {
-    (value: string): void;
-    writeln?: (str: string) => void;
-    conflict?: (str: string) => void;
-    create?: (str: string) => void;
-    force?: (str: string) => void;
-    identical?: (str: string) => void;
-    skip?: (str: string) => void;
-  } = (value: string) => {
-    this.youiLog.log.call(this.youiLog, value);
-  }
+//   public log: {
+//     (value: string): void;
+//     writeln?: (str: string) => void;
+//     conflict?: (str: string) => void;
+//     create?: (str: string) => void;
+//     force?: (str: string) => void;
+//     identical?: (str: string) => void;
+//     skip?: (str: string) => void;
+//   } = (value: string) => {
+//     this.youiLog.log.call(this.youiLog, value);
+//   }
 
   get colorDiffAdded() {
     return chalk.black.bgGreen;

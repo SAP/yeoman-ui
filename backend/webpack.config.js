@@ -40,7 +40,97 @@ const config = {
             loader: 'ts-loader'
           }
         ]
-      }
+	  },
+	  {
+        test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require.resolve[(]([^\'"])',
+          replace: '__non_webpack_require__.resolve($1',
+          flags: 'g'
+        }
+	  },
+	  {
+        test: /yeoman-environment[/|\\]lib[/|\\]store.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require[(]([^\'"])',
+          replace: '__non_webpack_require__($1',
+          flags: 'g'
+        }
+	  },
+	  {
+        test: /yeoman-environment[/|\\]lib[/|\\]resolver.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require[(]([^\'"])',
+          replace: '__non_webpack_require__($1',
+          flags: 'g'
+        }
+	  },
+	  {
+        test: /ejs[/|\\]lib[/|\\]ejs.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require.extensions',
+          replace: '__non_webpack_require__.extensions',
+          flags: 'g'
+        }
+	  },
+	  {
+        test: /ejs[/|\\]lib[/|\\]ejs.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require.extensions[[]([^\'"])',
+          replace: '__non_webpack_require__.extensions[$1',
+          flags: 'g'
+        }
+	  },
+	  {
+        test: /download-stats[/|\\]lib[/|\\]utils.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require[(]([^\'"])',
+          replace: '__non_webpack_require__($1',
+          flags: 'g'
+        }
+	  },
+	  {
+        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]repository.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require[(]([^\'"])',
+          replace: '__non_webpack_require__($1',
+          flags: 'g'
+        }
+	  },
+	  {
+        test: /yeoman-generator[/|\\]lib[/|\\]index.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require.resolve[(]([^\'"])',
+          replace: '__non_webpack_require__.resolve($1',
+          flags: 'g'
+        }
+	  },
+	  {
+        test: /yeoman-generator[/|\\]lib[/|\\]index.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require[(]([^\'"])',
+          replace: '__non_webpack_require__($1',
+          flags: 'g'
+        }
+	  },
+	  {
+        test: /istextorbinary[/|\\]index.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require[(]([^\'"])',
+          replace: '__non_webpack_require__($1',
+          flags: 'g'
+        }
+	  }
     ]
   },
   plugins: [
