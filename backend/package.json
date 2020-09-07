@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.15",
+	"version": "1.1.16",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -147,19 +147,19 @@
 		"lint:fix": "eslint . --ext .ts,.tsx --cache --fix"
 	},
 	"dependencies": {
-		"@sap-devx/webview-rpc": "^0.2.2",
+		"@sap-devx/webview-rpc": "0.2.2",
 		"@sap-devx/yeoman-ui-types": "0.0.1",
 		"@vscode-logging/logger": "1.2.0",
-		"chalk": "^4.0.0",
-		"datauri": "^2.0.0",
-		"fs-extra": "^8.1.0",
-		"humanize-string": "^1.0.2",
-		"lodash": "^4.17.16",
+		"chalk": "4.1.0",
+		"datauri": "3.0.0",
+		"fs-extra": "9.0.1",
+		"humanize-string": "2.1.0",
+		"lodash": "4.17.20",
 		"npm-registry-fetch": "8.1.1",
-		"object-hash": "^2.0.3",
-		"strip-ansi": "^6.0.0",
-		"titleize": "^1.0.1",
-		"ws": "^7.2.5",
+		"object-hash": "2.0.3",
+		"strip-ansi": "6.0.0",
+		"titleize": "2.1.0",
+		"ws": "7.3.1",
 		"yeoman-environment": "2.8.0",
 		"@sap/swa-for-sapbas-vsx": "1.0.4"
 	},
