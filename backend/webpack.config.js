@@ -28,7 +28,7 @@ const config = {
       'node_modules'
     ],
     // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
-    extensions: ['.ts', '.js', '.json']
+    extensions: ['.ts', '.js']
   },
   module: {
     rules: [
@@ -45,116 +45,17 @@ const config = {
         test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
         loader: 'string-replace-loader',
         options: {
-          search: 'require.resolve[(]([^\'"])',
+          search: 'require.resolve[(]',
           replace: '__non_webpack_require__.resolve($1',
           flags: 'g'
         }
 	  },
 	  {
-        test: /yeoman-environment[/|\\]lib[/|\\]store.js/,
+        test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
         loader: 'string-replace-loader',
         options: {
-          search: 'require[(]([^\'"])',
-          replace: '__non_webpack_require__($1',
-          flags: 'g'
-        }
-	  },
-	  {
-        test: /yeoman-environment[/|\\]lib[/|\\]resolver.js/,
-        loader: 'string-replace-loader',
-        options: {
-          search: 'require[(]([^\'"])',
-          replace: '__non_webpack_require__($1',
-          flags: 'g'
-        }
-	  },
-	  {
-        test: /ejs[/|\\]lib[/|\\]ejs.js/,
-        loader: 'string-replace-loader',
-        options: {
-          search: 'require.extensions',
-          replace: '__non_webpack_require__.extensions',
-          flags: 'g'
-        }
-	  },
-	  {
-        test: /ejs[/|\\]lib[/|\\]ejs.js/,
-        loader: 'string-replace-loader',
-        options: {
-          search: 'require.extensions[[]([^\'"])',
-          replace: '__non_webpack_require__.extensions[$1',
-          flags: 'g'
-        }
-	  },
-	  {
-        test: /download-stats[/|\\]lib[/|\\]utils.js/,
-        loader: 'string-replace-loader',
-        options: {
-          search: 'require[(]([^\'"])',
-          replace: '__non_webpack_require__($1',
-          flags: 'g'
-        }
-	  },
-	  {
-        test: /download-stats[/|\\]lib[/|\\]utils.js/,
-        loader: 'string-replace-loader',
-        options: {
-          search: 'require',
-          replace: '__non_webpack_require__',
-          flags: 'g'
-        }
-	  },
-	  {
-        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]repository.js/,
-        loader: 'string-replace-loader',
-        options: {
-          search: 'require[(]([^\'"])',
-          replace: '__non_webpack_require__($1',
-          flags: 'g'
-        }
-	  },
-	  {
-        test: /yeoman-generator[/|\\]lib[/|\\]index.js/,
-        loader: 'string-replace-loader',
-        options: {
-          search: 'require.resolve[(]([^\'"])',
-          replace: '__non_webpack_require__.resolve($1',
-          flags: 'g'
-        }
-	  },
-	  {
-        test: /yeoman-generator[/|\\]lib[/|\\]index.js/,
-        loader: 'string-replace-loader',
-        options: {
-          search: 'require[(]([^\'"])',
-          replace: '__non_webpack_require__($1',
-          flags: 'g'
-        }
-	  },
-	  {
-        test: /istextorbinary[/|\\]index.js/,
-        loader: 'string-replace-loader',
-        options: {
-          search: 'require[(]([^\'"])',
-          replace: '__non_webpack_require__($1',
-          flags: 'g'
-        }
-	  },
-	  {
-        test: /istextorbinary[/|\\]index.js/,
-        loader: 'string-replace-loader',
-        options: {
-          search: 'require',
-          replace: '__non_webpack_require__',
-          flags: 'g'
-        }
-	  },
-	  {
-        test: /cli-table[/|\\]node_modules[/|\\]colors[/|\\]lib[/|\\]colors.js/,
-        loader: 'string-replace-loader',
-        options: {
-		  search: 'require[(]([^\'"])',
-		  replace: '__non_webpack_require__($1',
+          search: 'require[(][`]',
+          replace: '__non_webpack_require__(\`',
           flags: 'g'
         }
 	  }
