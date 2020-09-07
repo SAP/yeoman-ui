@@ -96,6 +96,15 @@ const config = {
         }
 	  },
 	  {
+        test: /download-stats[/|\\]lib[/|\\]utils.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require',
+          replace: '__non_webpack_require__',
+          flags: 'g'
+        }
+	  },
+	  {
         test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]repository.js/,
         loader: 'string-replace-loader',
         options: {
@@ -128,6 +137,24 @@ const config = {
         options: {
           search: 'require[(]([^\'"])',
           replace: '__non_webpack_require__($1',
+          flags: 'g'
+        }
+	  },
+	  {
+        test: /istextorbinary[/|\\]index.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require',
+          replace: '__non_webpack_require__',
+          flags: 'g'
+        }
+	  },
+	  {
+        test: /cli-table[/|\\]node_modules[/|\\]colors[/|\\]lib[/|\\]colors.js/,
+        loader: 'string-replace-loader',
+        options: {
+		  search: 'require[(]([^\'"])',
+		  replace: '__non_webpack_require__($1',
           flags: 'g'
         }
 	  }
