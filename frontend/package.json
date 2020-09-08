@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.9.5",
-    "@sap-devx/webview-rpc": "^0.2.2",
+    "@sap-devx/webview-rpc": "0.2.3",
     "@vue/cli-plugin-babel": "4.5.4",
     "@vue/cli-plugin-eslint": "4.5.4",
     "@vue/cli-plugin-unit-jest": "4.5.4",
@@ -54,7 +54,8 @@
     "vue-jest": "3.0.6",
     "vue-template-compiler": "2.6.12",
     "vuetify-loader": "1.6.0",
-    "webpack": "^4.42.1"
+    "webpack": "4.44.1",
+    "webpack-cli": "3.3.12"
   },
   "eslintConfig": {
     "root": true,
