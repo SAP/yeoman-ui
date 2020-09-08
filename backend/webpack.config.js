@@ -45,21 +45,84 @@ const config = {
         test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
         loader: 'string-replace-loader',
         options: {
-          search: 'require.resolve[(]',
-          replace: '__non_webpack_require__.resolve($1',
-          flags: 'g'
-        }
+          search: 'require[\(](?=`)',
+          replace: '__non_webpack_require__(',
+		  flags: 'g'
+		}
+	  },
+	  {
+        test: /yeoman-environment[/|\\]lib[/|\\]resolver.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require[(](?=[^\'])',
+          replace: '__non_webpack_require__(',
+		  flags: 'g'
+		}
+	  },
+	  {
+        test: /yeoman-environment[/|\\]lib[/|\\]store.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require[(](?=[^\'])',
+          replace: '__non_webpack_require__(',
+		  flags: 'g'
+		}
 	  },
 	  {
         test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
         loader: 'string-replace-loader',
         options: {
-          search: 'require[(][`]',
-          replace: '__non_webpack_require__(\`',
+          search: 'require[\(](?=\'\.\/namespace)',
+          replace: '__non_webpack_require__(',
+		  flags: 'g'
+		}
+	  },
+	  {
+        test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require(?=\.resolve)',
+          replace: '__non_webpack_require__',
           flags: 'g'
         }
-	  }
-    ]
+	  },
+	  {
+        test: /yeoman-environment[/|\\]lib[/|\\]composability.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require[\(](?=\'yeoman)',
+          replace: '__non_webpack_require__(',
+          flags: 'g'
+        }
+	  },
+	  {
+        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]repository.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require(?=\.cache)',
+          replace: '__non_webpack_require__',
+          flags: 'g'
+        }
+	  },
+	  {
+        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]repository.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require[(](?=[^\'])',
+          replace: '__non_webpack_require__(',
+          flags: 'g'
+        }
+	  },
+	  {
+        test: /ejs[/|\\]lib[/|\\]ejs.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require(?=\.extensions)',
+          replace: '__non_webpack_require__',
+          flags: 'g'
+        }
+	  },  
+	]
   },
   plugins: [
 		new CopyPlugin({
