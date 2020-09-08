@@ -9,7 +9,7 @@ let extContext: vscode.ExtensionContext;
 let yeomanUIPanel: YeomanUIPanel;
 let exploreGensPanel: ExploreGensPanel;
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 	extContext = context;
 
 	try {

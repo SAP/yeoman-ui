@@ -20,6 +20,7 @@ export abstract class AbstractWebviewPanel {
 
 	protected logger: IChildLogger;
 	protected disposables: vscode.Disposable[];
+	protected isInBAS: boolean;
 
 	// improves first time performance 
 	protected static readonly npmGlobalPaths: string[] = Environment.createEnv().getNpmPaths();
@@ -37,6 +38,7 @@ export abstract class AbstractWebviewPanel {
 		this.logger = getLogger();
 		this.disposables = [];
 		this.context = context;
+		this.isInBAS = !_.isEmpty(_.get(process, "env.WS_BASE_URL"));
 	}
 
 	public setWebviewPanel(webviewPanel: vscode.WebviewPanel, state?: any) {

@@ -11,7 +11,7 @@ const testVscode = {
     },
     commands: {
         registerCommand: (id: string, cmd: any) => { _.set(oRegisteredCommands, id, cmd); return Promise.resolve(oRegisteredCommands); },
-        executeCommand: () => Promise.resolve()
+		executeCommand: () => Promise.resolve()
     },
     window: {
         registerWebviewPanelSerializer: () => true
@@ -60,11 +60,11 @@ describe('extension unit test', () => {
     });
 
     describe('activate', () => {
-        it("commands registration", () => {
+        it("commands registration", async () => {
             loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
             loggerWrapperMock.expects("getLogger").thrice();
-            swaTrackerWrapperMock.expects("createSWATracker");
-            extension.activate(testContext);
+			swaTrackerWrapperMock.expects("createSWATracker");
+            await extension.activate(testContext);
             expect( _.get(oRegisteredCommands, "loadYeomanUI")).to.be.not.undefined;
             expect(_.get(oRegisteredCommands, "yeomanUI.toggleOutput")).to.be.not.undefined;
 			expect(_.get(oRegisteredCommands, "exploreGenerators")).to.be.not.undefined;
