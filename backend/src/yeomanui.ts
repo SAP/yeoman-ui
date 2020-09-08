@@ -166,47 +166,47 @@ export class YeomanUI {
 		// see issue: https://github.com/yeoman/environment/issues/55
 		// process.chdir() doesn't work after environment has been created
 		try {
-		const targetFolder = this.getCwd();
-		await fsextra.mkdirs(targetFolder);
-		const dirsBefore = await this.getChildDirectories(targetFolder);
-		const env: Environment = Environment.createEnv(undefined, {sharedOptions: {forwardErrorToEnvironment: true}}, this.youiAdapter);
-		const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
-		// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-		// @ts-ignore
-		env.register(meta.resolved, meta.namespace, meta.packagePath);
+			const targetFolder = this.getCwd();
+			await fsextra.mkdirs(targetFolder);
+			const dirsBefore = await this.getChildDirectories(targetFolder);
+			const env: Environment = Environment.createEnv(undefined, {sharedOptions: {forwardErrorToEnvironment: true}}, this.youiAdapter);
+			const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
+			// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+			// @ts-ignore
+			env.register(meta.resolved, meta.namespace, meta.packagePath);
 
-		const genNamespace = this.getGenNamespace(generatorName);
-		const options = {
-			logger: this.logger.getChildLogger({label: generatorName}),
-			vscode: this.getVscode(), // TODO: remove this temporary workaround once a better solution is found,
-			data: this.uiOptions.data
-		};
-		const gen: any = env.create(genNamespace, {options});
-		// check if generator defined a helper function called setPromptsCallback()
-		const setPromptsCallback = _.get(gen, "setPromptsCallback");
-		if (setPromptsCallback) {
-			setPromptsCallback(this.setPromptList.bind(this));
-		}
+			const genNamespace = this.getGenNamespace(generatorName);
+			const options = {
+				logger: this.logger.getChildLogger({label: generatorName}),
+				vscode: this.getVscode(), // TODO: remove this temporary workaround once a better solution is found,
+				data: this.uiOptions.data
+			};
+			const gen: any = env.create(genNamespace, {options});
+			// check if generator defined a helper function called setPromptsCallback()
+			const setPromptsCallback = _.get(gen, "setPromptsCallback");
+			if (setPromptsCallback) {
+				setPromptsCallback(this.setPromptList.bind(this));
+			}
 
-		this.promptCount = 0;
-		this.gen = (gen as Generator);
-		this.gen.destinationRoot(targetFolder);
-		// notifies ui wether generator is in writing state
-		this.setGenInWriting(this.gen);
-		// handles generator install step if exists
-		this.onGenInstall(this.gen);
-		// handles generator errors 
-		this.handleErrors(env, this.gen, generatorName);
+			this.promptCount = 0;
+			this.gen = (gen as Generator);
+			this.gen.destinationRoot(targetFolder);
+			// notifies ui wether generator is in writing state
+			this.setGenInWriting(this.gen);
+			// handles generator install step if exists
+			this.onGenInstall(this.gen);
+			// handles generator errors 
+			this.handleErrors(env, this.gen, generatorName);
 
-		// we cannot use new async method, "await this.gen.run()", because generators based on older versions 
-		// (for example: 2.0.5) of "yeoman-generator" do not support it
-		this.gen.run( (error) => {
-			if (!this.errorThrown && !error) {
+			// we cannot use new async method, "await this.gen.run()", because generators based on older versions 
+			// (for example: 2.0.5) of "yeoman-generator" do not support it
+			const res = await this.gen.run();
+			if (!this.errorThrown) {
 				this.getChildDirectories(this.gen.destinationRoot()).then( (dirsAfter) => {
 					this.onGeneratorSuccess(generatorName, dirsBefore, dirsAfter);
 				});
 			}
-		});
+		// });
 		} catch (error) {
 			this.onGeneratorFailure(generatorName, error);
 		}
