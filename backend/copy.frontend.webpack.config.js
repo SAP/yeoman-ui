@@ -10,9 +10,11 @@ const config = {
   entry: "./src/dummy.js",
   output: {path: path.resolve(__dirname, 'dummy')},
   plugins: [
-    new CopyPlugin([
-      { from: '../frontend/dist/', to: '../dist/media/', force: true }
-    ]),
+    new CopyPlugin({
+		patterns: [
+      		{ from: '../frontend/dist/', to: '../dist/media/', force: true }
+		]
+	})
   ]
 };
 module.exports = config;
