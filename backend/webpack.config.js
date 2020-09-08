@@ -75,8 +75,8 @@ const config = {
         options: {
           search: 'require[\(](?=\'\.\/namespace)',
           replace: '__non_webpack_require__(',
-		  flags: 'g'
-		}
+		    flags: 'g'
+        }
 	  },
 	  {
         test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
