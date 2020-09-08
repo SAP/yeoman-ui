@@ -1,7 +1,7 @@
 var Generator = require('yeoman-generator');
 var _ = require('lodash');
 var path = require('path');
-const datauri = require("datauri");
+const Datauri = require('datauri/sync');
 const DEFAULT_IMAGE = require("./images/defaultImage");
 
 module.exports = class extends Generator {
@@ -95,7 +95,7 @@ module.exports = class extends Generator {
   _getImage(imagePath) {
     let image;
     try {
-      image = datauri.sync(imagePath);
+      image = Datauri(imagePath).content;
     } catch (error) {
       image = DEFAULT_IMAGE;
       this.log("Error", error);
