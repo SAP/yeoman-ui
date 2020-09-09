@@ -18,6 +18,7 @@ import { GeneratorFilter, GeneratorType } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
 import { SWA } from "./swa-tracker/swa-tracker-wrapper";
+import TerminalAdapter = require("yeoman-environment/lib/adapter");
 
 export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
@@ -47,7 +48,7 @@ export class YeomanUI {
   private gen: Generator | undefined;
   private promptCount: number;
   private npmGlobalPaths: string[];
-  private currentQuestions: Environment.Adapter.Questions<any>;
+  private currentQuestions: TerminalAdapter.Questions<any>;
   private generatorName: string;
   private readonly replayUtils: ReplayUtils;
   private readonly customQuestionEventHandlers: Map<string, Map<string, Function>>;
@@ -165,47 +166,47 @@ export class YeomanUI {
 		// see issue: https://github.com/yeoman/environment/issues/55
 		// process.chdir() doesn't work after environment has been created
 		try {
-		const targetFolder = this.getCwd();
-		await fsextra.mkdirs(targetFolder);
-		const dirsBefore = await this.getChildDirectories(targetFolder);
-		const env: Environment = Environment.createEnv(undefined, {sharedOptions: {forwardErrorToEnvironment: true}}, this.youiAdapter);
-		const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
-		// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-		// @ts-ignore
-		env.register(meta.resolved, meta.namespace, meta.packagePath);
+			const targetFolder = this.getCwd();
+			await fsextra.mkdirs(targetFolder);
+			const dirsBefore = await this.getChildDirectories(targetFolder);
+			const env: Environment = Environment.createEnv(undefined, {sharedOptions: {forwardErrorToEnvironment: true}}, this.youiAdapter);
+			const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
+			// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+			// @ts-ignore
+			env.register(meta.resolved, meta.namespace, meta.packagePath);
 
-		const genNamespace = this.getGenNamespace(generatorName);
-		const options = {
-			logger: this.logger.getChildLogger({label: generatorName}),
-			vscode: this.getVscode(), // TODO: remove this temporary workaround once a better solution is found,
-			data: this.uiOptions.data
-		};
-		const gen: any = env.create(genNamespace, {options});
-		// check if generator defined a helper function called setPromptsCallback()
-		const setPromptsCallback = _.get(gen, "setPromptsCallback");
-		if (setPromptsCallback) {
-			setPromptsCallback(this.setPromptList.bind(this));
-		}
+			const genNamespace = this.getGenNamespace(generatorName);
+			const options = {
+				logger: this.logger.getChildLogger({label: generatorName}),
+				vscode: this.getVscode(), // TODO: remove this temporary workaround once a better solution is found,
+				data: this.uiOptions.data
+			};
+			const gen: any = env.create(genNamespace, {options});
+			// check if generator defined a helper function called setPromptsCallback()
+			const setPromptsCallback = _.get(gen, "setPromptsCallback");
+			if (setPromptsCallback) {
+				setPromptsCallback(this.setPromptList.bind(this));
+			}
 
-		this.promptCount = 0;
-		this.gen = (gen as Generator);
-		this.gen.destinationRoot(targetFolder);
-		// notifies ui wether generator is in writing state
-		this.setGenInWriting(this.gen);
-		// handles generator install step if exists
-		this.onGenInstall(this.gen);
-		// handles generator errors 
-		this.handleErrors(env, this.gen, generatorName);
+			this.promptCount = 0;
+			this.gen = (gen as Generator);
+			this.gen.destinationRoot(targetFolder);
+			// notifies ui wether generator is in writing state
+			this.setGenInWriting(this.gen);
+			// handles generator install step if exists
+			this.onGenInstall(this.gen);
+			// handles generator errors 
+			this.handleErrors(env, this.gen, generatorName);
 
-		// we cannot use new async method, "await this.gen.run()", because generators based on older versions 
-		// (for example: 2.0.5) of "yeoman-generator" do not support it
-		this.gen.run( (error) => {
-			if (!this.errorThrown && !error) {
+			// we cannot use new async method, "await this.gen.run()", because generators based on older versions 
+			// (for example: 2.0.5) of "yeoman-generator" do not support it
+			const res = await this.gen.run();
+			if (!this.errorThrown) {
 				this.getChildDirectories(this.gen.destinationRoot()).then( (dirsAfter) => {
 					this.onGeneratorSuccess(generatorName, dirsBefore, dirsAfter);
 				});
 			}
-		});
+		// });
 		} catch (error) {
 			this.onGeneratorFailure(generatorName, error);
 		}
@@ -301,7 +302,7 @@ export class YeomanUI {
     return this.cwd;
   }
 
-  public async showPrompt(questions: Environment.Adapter.Questions<any>): Promise<inquirer.Answers> {
+  public async showPrompt(questions: TerminalAdapter.Questions<any>): Promise<inquirer.Answers> {
     this.promptCount++;
     const promptName = this.getPromptName(questions);
 
@@ -315,7 +316,7 @@ export class YeomanUI {
     this.replayUtils.recall(questions);
 
     this.currentQuestions = questions;
-    const mappedQuestions: Environment.Adapter.Questions<any> = this.normalizeFunctions(questions);
+    const mappedQuestions: TerminalAdapter.Questions<any> = this.normalizeFunctions(questions);
     if (_.isEmpty(mappedQuestions)) {
       return {};
     }
@@ -325,7 +326,7 @@ export class YeomanUI {
     return answers;
   }
 
-  private back(partialAnswers: Environment.Adapter.Answers, numOfSteps: number): void {
+  private back(partialAnswers: Environment.Answers, numOfSteps: number): void {
     SWA.updateOneOfPreviousStepsClicked(this.generatorName, this.logger);
     this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
     this.runGenerator(this.generatorName);
@@ -338,7 +339,7 @@ export class YeomanUI {
     }
   }
 
-  private getPromptName(questions: Environment.Adapter.Questions<any>): string {
+  private getPromptName(questions: TerminalAdapter.Questions<any>): string {
     const firstQuestionName = _.get(questions, "[0].name");
     return (firstQuestionName ? _.startCase(firstQuestionName) : `Step ${this.promptCount}`);
   }
@@ -523,7 +524,7 @@ export class YeomanUI {
    * Functions are lost when being passed to client (using JSON.Stringify)
    * Also functions cannot be evaluated on client)
    */
-  private normalizeFunctions(questions: Environment.Adapter.Questions<any>): Environment.Adapter.Questions<any> {
+  private normalizeFunctions(questions: TerminalAdapter.Questions<any>): TerminalAdapter.Questions<any> {
     this.addCustomQuestionEventHandlers(questions);
     return JSON.parse(JSON.stringify(questions, YeomanUI.funcReplacer));
   }
@@ -540,7 +541,7 @@ export class YeomanUI {
     }
   }
   
-  private addCustomQuestionEventHandlers(questions: Environment.Adapter.Questions<any>): void {
+  private addCustomQuestionEventHandlers(questions: TerminalAdapter.Questions<any>): void {
     for (const question of (questions as any[])) {
       const guiType = _.get(question, "guiOptions.type", question.guiType);
       const questionHandlers = this.customQuestionEventHandlers.get(guiType);
