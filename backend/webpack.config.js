@@ -70,11 +70,20 @@ const config = {
         }
 	  },
 	  {
+        test: /yeoman-environment[/|\\]lib[/|\\]resolver_ignore.js/,
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require[(](?=path)',
+          replace: '__non_webpack_require__(',
+		  flags: 'g'
+		}
+	  },
+	  {
         test: /yeoman-environment[/|\\]lib[/|\\]resolver.js/,
         loader: 'string-replace-loader',
         options: {
-          search: 'require[(](?=[^\'])',
-          replace: '__non_webpack_require__(',
+          search: 'require[(](?=path).*',
+          replace: '\"yeoman-environment\"\;',
 		  flags: 'g'
 		}
 	  },
@@ -86,15 +95,6 @@ const config = {
           replace: '__non_webpack_require__(',
 		  flags: 'g'
 		}
-	  },
-	  {
-        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]repository.js/,
-        loader: 'string-replace-loader',
-        options: {
-          search: 'require(?=\.cache)',
-          replace: '__non_webpack_require__',
-          flags: 'g'
-        }
 	  },
 	  {
         test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]repository.js/,
