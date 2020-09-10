@@ -69,7 +69,7 @@ module.exports = class extends Generator {
           hint: "Our recommendation is green"
         },
         when: (response) => {
-          this.log(response.hungry);
+		  this.log.writeln(response.hungry);
           return response.hungry;
         },
         validate: (value, answers) => {
@@ -105,7 +105,7 @@ module.exports = class extends Generator {
           this.log(response.hungry);
           const that = this;
           return new Promise((resolve) => {
-            that.log(`Purposely delaying response for 2 seconds...`);
+            that.log.write(`Purposely delaying response for 2 seconds...`);
             setTimeout(() => {
               resolve(response.hungry);
             }, 2000);
