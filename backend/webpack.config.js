@@ -46,31 +46,13 @@ const config = {
         test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
         loader: 'string-replace-loader',
         options: {
-          search: 'require[\(](?=`)',
-          replace: '__non_webpack_require__(',
-		  flags: 'g'
-		}
-	  },
-	  {
-        test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
-        loader: 'string-replace-loader',
-        options: {
-          search: 'require[\(](?=\'\.\/namespace)',
-          replace: '__non_webpack_require__(',
+          search: 'require(?=[(]`|([(]\'\.\/namespace)|(\.resolve))',
+          replace: '__non_webpack_require__',
 		    flags: 'g'
         }
 	  },
 	  {
-        test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
-        loader: 'string-replace-loader',
-        options: {
-          search: 'require(?=\.resolve)',
-          replace: '__non_webpack_require__',
-          flags: 'g'
-        }
-	  },
-	  {
-        test: /yeoman-environment[/|\\]lib[/|\\]resolver_ignore.js/,
+        test: /yeoman-environment[/|\\]lib[/|\\]resolver_ignore.js/, // do not delete, does not work for version 2.10.3
         loader: 'string-replace-loader',
         options: {
           search: 'require[(](?=path)',
@@ -79,7 +61,7 @@ const config = {
 		}
 	  },
 	  {
-        test: /yeoman-environment[/|\\]lib[/|\\]resolver.js/,
+        test: /yeoman-environment[/|\\]lib[/|\\]resolver.js/, // workaround, works for version 2.10.3 
         loader: 'string-replace-loader',
         options: {
           search: 'require[(](?=path).*',
