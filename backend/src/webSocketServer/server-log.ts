@@ -1,38 +1,54 @@
 import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import stripAnsi = require("strip-ansi");
 
-export class ServerLog {
-    private readonly rpc: RpcCommon;
-    private isOutputVisible = false;
-    /**
-     *
-     */
-    constructor(rpc: RpcCommon) {
-        this.rpc = rpc;        
-    }
-    public log(str: string): void {
-        this.rpc.invoke("log", [stripAnsi(str) + '\n']);
-    }
-    public writeln(str: string): void {
-        this.rpc.invoke("log", [stripAnsi(str) + '\n']);
-    }
-    public create(str: string): void {
-        this.rpc.invoke("log", [stripAnsi(str) + '\n']);
-    }
-    public force(str: string): void {
-        this.rpc.invoke("log", [stripAnsi(str) + '\n']);
-    }
-    public conflict(str: string): void {
-        this.rpc.invoke("log", [stripAnsi(str) + '\n']);
-    }
-    public identical(str: string): void {
-        this.rpc.invoke("log", [stripAnsi(str) + '\n']);
-    }
-    public skip(str: string): void {
-        this.rpc.invoke("log", [stripAnsi(str) + '\n']);
-    }
-    public showOutput(): boolean {
-        this.isOutputVisible = !this.isOutputVisible;
-        return !this.isOutputVisible;
-    }
+
+module.exports = (rpc: RpcCommon, isOutputVisible: boolean) => {
+	let isVisible = isOutputVisible;
+
+	function log(value: string) {
+		rpc.invoke("log", [stripAnsi(value) + '\n']);
+		return log;
+	}
+
+	log.write = (value: string) => {
+		rpc.invoke("log", [stripAnsi(value) + '\n']);
+		return log;
+	}
+
+	log.writeln = (value: string) => {
+		rpc.invoke("log", [stripAnsi(value) + '\n']);
+		return log;
+	}
+
+	log.create = (value: string) => {
+		rpc.invoke("log", [stripAnsi(value) + '\n']);
+		return log;
+	}
+
+	log.force = (value: string) => {
+		rpc.invoke("log", [stripAnsi(value) + '\n']);
+		return log;
+	}
+
+	log.conflict = (value: string) => {
+		rpc.invoke("log", [stripAnsi(value) + '\n']);
+		return log;
+	}
+
+	log.identical = (value: string) => {
+		rpc.invoke("log", [stripAnsi(value) + '\n']);
+		return log;
+	}
+
+	log.skip = (value: string) => {
+		rpc.invoke("log", [stripAnsi(value) + '\n']);
+		return log;
+	}
+
+	log.showOutput = (): boolean => {
+		isVisible = !isVisible;
+        return !isVisible;
+	}
+
+	return log;
 }
