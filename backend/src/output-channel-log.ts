@@ -1,43 +1,55 @@
-import { YouiLog } from "./youi-log";
 import { YeomanUIPanel } from "./panels/YeomanUIPanel";
 import stripAnsi = require("strip-ansi");
 
-export class OutputChannelLog implements YouiLog {
-    public constructor(private readonly channelName: string) {}
+function appendLine(value: string, channelName: string) {
+	YeomanUIPanel.getOutputChannel(channelName).appendLine(stripAnsi(value));
+}
 
-    public log(value: string): void {
-        this.appendLine(value);
-    }
+module.exports = (channelName: string) => {
 
-    public writeln(value: string): void {
-        this.appendLine(value);
-    }
+	function log(value: string) {
+		appendLine(value, channelName);
+		return log;
+	}
 
-    public create(value: string): void {
-        this.appendLine(value);
-    }
+	log.write = (value: string) => {
+		appendLine(value, channelName);
+		return log;
+	}
 
-    public force(value: string): void {
-        this.appendLine(value);
-    }
+	log.writeln = (value: string) => {
+		appendLine(value, channelName);
+		return log;
+	}
 
-    public conflict(value: string): void {
-        this.appendLine(value);
-    }
+	log.create = (value: string) => {
+		appendLine(value, channelName);
+		return log;
+	}
 
-    public identical(value: string): void {
-        this.appendLine(value);
-    }
-    
-    public skip(value: string): void {
-        this.appendLine(value);
-    }
-    public showOutput(): boolean {
-        YeomanUIPanel.getOutputChannel(this.channelName).show();
-        return true;
-    }
+	log.force = (value: string) => {
+		appendLine(value, channelName);
+	}
 
-    private appendLine(value: string) {
-        YeomanUIPanel.getOutputChannel(this.channelName).appendLine(stripAnsi(value));
-    }
+	log.conflict = (value: string) => {
+		appendLine(value, channelName);
+		return log;
+	}
+
+	log.identical = (value: string) => {
+		appendLine(value, channelName);
+		return log;
+	}
+
+	log.skip = (value: string) => {
+		appendLine(value, channelName);
+		return log;
+	}
+
+	log.showOutput = (): boolean => {
+		YeomanUIPanel.getOutputChannel(channelName).show();
+		return true;
+	}
+
+	return log;
 }

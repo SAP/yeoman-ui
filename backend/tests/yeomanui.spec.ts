@@ -8,7 +8,6 @@ import * as path from "path";
 import {YeomanUI} from "../src/yeomanui";
 import {ReplayUtils} from "../src/replayUtils";
 import * as yeomanEnv from "yeoman-environment";
-import { YouiLog } from "../src/youi-log";
 import { YouiEvents } from '../src/youi-events';
 import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorFilter } from "../src/filter";
@@ -75,7 +74,7 @@ describe('yeomanui unit test', () => {
             return Promise.resolve();
         }
     }
-    class TestOutputChannel implements YouiLog {
+    class TestOutputChannel {
         public log(): void {
             return;
         }            

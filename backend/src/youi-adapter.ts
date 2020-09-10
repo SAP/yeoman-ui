@@ -1,6 +1,4 @@
-import { Adapter } from "yeoman-environment";
 import { YeomanUI } from "./yeomanui";
-import { YouiLog } from "./youi-log";
 import { YouiEvents } from "./youi-events";
 import * as _ from "lodash";
 import chalk = require('chalk');
@@ -11,36 +9,17 @@ import TerminalAdapter = require("yeoman-environment/lib/adapter");
  */
 export class YouiAdapter extends TerminalAdapter {
   private yeomanui: YeomanUI | undefined = undefined;
-  private readonly youiLog: YouiLog;
   private readonly youiEvents: YouiEvents;
 
-  constructor(logger: YouiLog, youiEvents: YouiEvents) {
+  constructor(youiLog: any, youiEvents: YouiEvents) {
 	super({});
-    this.youiLog = logger;
-    this.youiEvents = youiEvents;
-    // this.log.writeln = logger.writeln.bind(this.youiLog);
-    // this.log.conflict = logger.conflict.bind(this.youiLog);
-    // this.log.create = logger.create.bind(this.youiLog);
-    // this.log.force = logger.force.bind(this.youiLog);
-    // this.log.identical = logger.identical.bind(this.youiLog);
-    // this.log.skip = logger.skip.bind(this.youiLog);
+	this.youiEvents = youiEvents;
+	this.log = youiLog;
   }
 
   public setYeomanUI(yeomanui: YeomanUI) {
     this.yeomanui = yeomanui;
   }
-
-//   public log: {
-//     (value: string): void;
-//     writeln?: (str: string) => void;
-//     conflict?: (str: string) => void;
-//     create?: (str: string) => void;
-//     force?: (str: string) => void;
-//     identical?: (str: string) => void;
-//     skip?: (str: string) => void;
-//   } = (value: string) => {
-//     this.youiLog.log.call(this.youiLog, value);
-//   }
 
   get colorDiffAdded() {
     return chalk.black.bgGreen;

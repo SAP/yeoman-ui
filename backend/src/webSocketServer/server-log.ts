@@ -1,8 +1,7 @@
-import { YouiLog } from "../youi-log";
 import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import stripAnsi = require("strip-ansi");
 
-export class ServerLog implements YouiLog {
+export class ServerLog {
     private readonly rpc: RpcCommon;
     private isOutputVisible = false;
     /**

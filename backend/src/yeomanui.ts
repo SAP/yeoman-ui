@@ -10,7 +10,6 @@ const titleize = require('titleize'); // eslint-disable-line @typescript-eslint/
 const humanizeString = require('humanize-string'); // eslint-disable-line @typescript-eslint/no-var-requires
 import * as defaultImage from "./defaultImage";
 import { YouiAdapter } from "./youi-adapter";
-import { YouiLog } from "./youi-log";
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
@@ -19,6 +18,7 @@ import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
 import { SWA } from "./swa-tracker/swa-tracker-wrapper";
 import TerminalAdapter = require("yeoman-environment/lib/adapter");
+const YoUiLog = require("./output-channel-log"); 
 
 export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
@@ -41,7 +41,7 @@ export class YeomanUI {
   private cwd: string;
   private readonly rpc: IRpc;
   private readonly youiEvents: YouiEvents;
-  private readonly outputChannel: YouiLog;
+  private readonly youiLogger: any;
   private readonly logger: IChildLogger;
   private genMeta: { [namespace: string]: Environment.GeneratorMeta };
   private readonly youiAdapter: YouiAdapter;
@@ -54,13 +54,13 @@ export class YeomanUI {
   private readonly customQuestionEventHandlers: Map<string, Map<string, Function>>;
   private errorThrown = false;
 
-  constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: YouiLog, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
+  constructor(rpc: IRpc, youiEvents: YouiEvents, youiLogger: any, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
     this.rpc = rpc;
     
     this.generatorName = "";
     this.replayUtils = new ReplayUtils();
     this.youiEvents = youiEvents;
-    this.outputChannel = outputChannel;
+    this.youiLogger = youiLogger;
     this.logger = logger;
     this.rpc.setResponseTimeout(3600000);
     this.rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
@@ -73,7 +73,7 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.setCwd, thisArg: this });
     this.rpc.registerMethod({ func: this.getState, thisArg: this });
 
-    this.youiAdapter = new YouiAdapter(outputChannel, youiEvents);
+    this.youiAdapter = new YouiAdapter(youiLogger, youiEvents);
     this.youiAdapter.setYeomanUI(this);
     this.promptCount = 0;
     this.genMeta = {};
@@ -283,7 +283,7 @@ export class YeomanUI {
   }
 
   private toggleOutput(): boolean {
-    return this.outputChannel.showOutput();
+    return this.youiLogger.showOutput();
   }
 
   private exploreGenerators() {

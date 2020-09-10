@@ -4,10 +4,9 @@ import * as os from "os";
 import * as vscode from 'vscode';
 import { YeomanUI } from "../yeomanui";
 import { RpcExtension } from '@sap-devx/webview-rpc/out.ext/rpc-extension';
-import { YouiLog } from "../youi-log";
 import { GeneratorFilter } from '../filter';
 import backendMessages from "../messages";
-import { OutputChannelLog } from '../output-channel-log';
+const YoUILogger = require('../output-channel-log');
 import { YouiEvents } from "../youi-events";
 import { VSCodeYouiEvents } from '../vscode-youi-events';
 import { AbstractWebviewPanel } from './AbstractWebviewPanel';
@@ -19,7 +18,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 	private static channel: vscode.OutputChannel;
 
 	public toggleOutput() {
-		this.outputChannel.showOutput();
+		this.yoUiLogger.showOutput();
 	}
 
 	public notifyGeneratorsChange() {
@@ -36,12 +35,12 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 		this.genFilter = GeneratorFilter.create(_.get(uiOptions, "filter"));
 
 		const rpc = new RpcExtension(this.webViewPanel.webview);
-		this.outputChannel = new OutputChannelLog(this.messages.channel_name);
+		this.yoUiLogger = YoUILogger(this.messages.channel_name);
 		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(rpc, this.webViewPanel, this.genFilter, this.messages);
 		const outputPath = this.isInBAS ? undefined: _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath"); 
 		this.yeomanui = new YeomanUI(rpc,
 			vscodeYouiEvents,
-			this.outputChannel,
+			this.yoUiLogger,
 			this.logger,
 			{ genFilter: this.genFilter, messages: this.messages, data: _.get(uiOptions, "data"), npmGlobalPaths: this.getDefaultPaths() }, outputPath);
 		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
@@ -61,7 +60,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 	private yeomanui: YeomanUI;
 	private genFilter: any;
 	private messages: any;
-	private outputChannel: YouiLog;
+	private yoUiLogger: any;
 
 	public constructor(context: vscode.ExtensionContext) {
 		super(context);
