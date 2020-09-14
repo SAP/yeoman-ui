@@ -1,7 +1,7 @@
 {
     "require": ["ts-node/register/transpile-only"],
     "include": ["src/**/*.ts"],
-    "exclude": ["src/logger/*.ts", "src/swa-tracker/*.ts", "src/panels/*.ts", "src/webSocketServer/*.ts", "src/output-channel-log.ts", "src/youi-adapter.ts"],
+    "exclude": ["src/logger/*.ts", "src/swa-tracker/*.ts", "src/panels/*.ts", "src/webSocketServer/*.ts", "src/logUtil.ts", "src/youi-adapter.ts"],
     "reporter": ["lcov", "text"],
     "extension": [".ts"],
     "all": true,

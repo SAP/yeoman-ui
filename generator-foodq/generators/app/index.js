@@ -69,6 +69,7 @@ module.exports = class extends Generator {
           hint: "Our recommendation is green"
         },
         when: (response) => {
+			this.log(response.hungry, [], {type: "error", location: "output"});
 		  this.log.writeln(response.hungry);
           return response.hungry;
         },

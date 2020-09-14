@@ -6,19 +6,18 @@ import { YeomanUI } from "../yeomanui";
 import { RpcExtension } from '@sap-devx/webview-rpc/out.ext/rpc-extension';
 import { GeneratorFilter } from '../filter';
 import backendMessages from "../messages";
-const YoUILogger = require('../output-channel-log');
 import { YouiEvents } from "../youi-events";
 import { VSCodeYouiEvents } from '../vscode-youi-events';
 import { AbstractWebviewPanel } from './AbstractWebviewPanel';
 import { ExploreGens } from '../exploregens';
+import { OutputChannel } from '../outputUtil';
 
 
 export class YeomanUIPanel extends AbstractWebviewPanel {
 	public static YEOMAN_UI = "Application Wizard";
-	private static channel: vscode.OutputChannel;
 
 	public toggleOutput() {
-		this.yoUiLogger.showOutput();
+		this.outputChannel.show();
 	}
 
 	public notifyGeneratorsChange() {
@@ -34,13 +33,14 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 		this.messages = _.assign({}, backendMessages, _.get(uiOptions, "messages", {}));
 		this.genFilter = GeneratorFilter.create(_.get(uiOptions, "filter"));
 
+		this.outputChannel = new OutputChannel(`${YeomanUIPanel.YEOMAN_UI}.${this.messages.channel_name}`);
+
 		const rpc = new RpcExtension(this.webViewPanel.webview);
-		this.yoUiLogger = YoUILogger(this.messages.channel_name);
 		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(rpc, this.webViewPanel, this.genFilter, this.messages);
 		const outputPath = this.isInBAS ? undefined: _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath"); 
 		this.yeomanui = new YeomanUI(rpc,
 			vscodeYouiEvents,
-			this.yoUiLogger,
+			this.outputChannel,
 			this.logger,
 			{ genFilter: this.genFilter, messages: this.messages, data: _.get(uiOptions, "data"), npmGlobalPaths: this.getDefaultPaths() }, outputPath);
 		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
@@ -49,18 +49,11 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 		this.initWebviewPanel();
 	}
 
-	public static getOutputChannel(channelName: string): vscode.OutputChannel {
-		if (!this.channel) {
-			this.channel = vscode.window.createOutputChannel(`${YeomanUIPanel.YEOMAN_UI}.${channelName}`);
-		}
-
-		return this.channel;
-	}
-
 	private yeomanui: YeomanUI;
 	private genFilter: any;
 	private messages: any;
 	private yoUiLogger: any;
+	private outputChannel: OutputChannel;
 
 	public constructor(context: vscode.ExtensionContext) {
 		super(context);

@@ -1,8 +1,10 @@
 import { YeomanUI } from "./yeomanui";
 import { YouiEvents } from "./youi-events";
+const yoUiLog = require("./logUtil");
 import * as _ from "lodash";
 import chalk = require('chalk');
 import TerminalAdapter = require("yeoman-environment/lib/adapter");
+import { OutputChannel } from "./outputUtil";
 
 /**
  * @constructor
@@ -11,10 +13,10 @@ export class YouiAdapter extends TerminalAdapter {
   private yeomanui: YeomanUI | undefined = undefined;
   private readonly youiEvents: YouiEvents;
 
-  constructor(youiLog: any, youiEvents: YouiEvents) {
+  constructor(youiEvents: YouiEvents, outputChannel: OutputChannel) {
 	super({});
 	this.youiEvents = youiEvents;
-	this.log = youiLog;
+	this.log = yoUiLog(this.log, outputChannel);
   }
 
   public setYeomanUI(yeomanui: YeomanUI) {
