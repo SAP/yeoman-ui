@@ -18,7 +18,7 @@ import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
 import { SWA } from "./swa-tracker/swa-tracker-wrapper";
 import TerminalAdapter = require("yeoman-environment/lib/adapter"); 
-import { OutputChannel } from "./outputUtil";
+import { OutputChannel } from "./outputUtils";
 
 export interface IQuestionsPrompt extends IPrompt{
   questions: any[];

@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
 import stripAnsi = require("strip-ansi");
-import { YeomanUIPanel } from "./panels/YeomanUIPanel";
 
 
 export class OutputChannel {

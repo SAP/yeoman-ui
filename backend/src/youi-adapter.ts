@@ -4,7 +4,7 @@ const yoUiLog = require("./logUtil");
 import * as _ from "lodash";
 import chalk = require('chalk');
 import TerminalAdapter = require("yeoman-environment/lib/adapter");
-import { OutputChannel } from "./outputUtil";
+import { OutputChannel } from "./outputUtils";
 
 /**
  * @constructor

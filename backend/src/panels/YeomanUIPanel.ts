@@ -10,7 +10,7 @@ import { YouiEvents } from "../youi-events";
 import { VSCodeYouiEvents } from '../vscode-youi-events';
 import { AbstractWebviewPanel } from './AbstractWebviewPanel';
 import { ExploreGens } from '../exploregens';
-import { OutputChannel } from '../outputUtil';
+import { OutputChannel } from '../outputUtils';
 
 
 export class YeomanUIPanel extends AbstractWebviewPanel {
