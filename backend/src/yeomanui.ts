@@ -87,6 +87,10 @@ export class YeomanUI {
     return this.uiOptions;
   }
 
+  public async showPromptMessage(message: string, messageType: string) {
+    await this.rpc.invoke("showPromptMessage", [message, messageType]);
+  }
+
   public async _notifyGeneratorsChange() {
 	const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
     await this.rpc.invoke("updateGeneratorsPrompt", [generators.questions]);

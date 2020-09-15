@@ -2,9 +2,10 @@ import * as vscode from "vscode";
 import stripAnsi = require("strip-ansi");
 import * as _  from "lodash";
 import { OutputChannel } from "./outputUtils";
+import { YeomanUI } from "./yeomanui";
 
 
-module.exports = (origLog: any, outputChannel: OutputChannel) => {
+module.exports = (origLog: any, outputChannel: OutputChannel, yeomanUi: YeomanUI) => {
 	function getMessage(args: any) {
 		const message = stripAnsi(_.get(args, "[0]", ""));
 		return `${message}`;
@@ -19,26 +20,32 @@ module.exports = (origLog: any, outputChannel: OutputChannel) => {
 		} 
 	}
 
+	function showNotificationMessage(message: string, messageType: string) {
+		if (messageType === "error") {
+			vscode.window.showErrorMessage(message);
+		} else if (messageType === "warn") {
+			vscode.window.showWarningMessage(message);
+		} else if (messageType === "info") {
+			vscode.window.showInformationMessage(message);
+		} 
+	}
+
+	function showMessage(args: any, withNewLine = true, forceType?: string) {
+		const message = getMessage(args);
+		const metadata = getMetadata(args);
+		const messageLocation = _.get(metadata, "location");
+		const messageType = forceType || _.get(metadata, "type");
+		if (messageLocation === "message") {
+			showNotificationMessage(message, messageType);
+		} else if (messageLocation === "prompt") {
+			yeomanUi.showPromptMessage(message, messageType);
+		}
+		withNewLine ? outputChannel.appendLine(message) : outputChannel.append(message);
+	}
+
 	function log() {
 		origLog.apply(origLog, arguments);
-		const message = getMessage(arguments);
-		outputChannel.appendLine(message);
-		const metadata = getMetadata(arguments);
-		if (metadata) {
-			if (metadata.type === "error" && metadata.location === "message") {
-				vscode.window.showErrorMessage(message);
-			} else if (metadata.type === "warn" && metadata.location === "message") {
-				vscode.window.showWarningMessage(message);
-			} else if (metadata.type === "info" && metadata.location === "message") {
-				vscode.window.showInformationMessage(message);
-			} else if (metadata.type === "error" && metadata.location === "prompt") {
-				vscode.window.showErrorMessage(message);
-			} else if (metadata.type === "warn" && metadata.location === "prompt") {
-				vscode.window.showWarningMessage(message);
-			} else if (metadata.type === "info" && metadata.location === "prompt") {
-				vscode.window.showInformationMessage(message);
-			}
-		}
+		showMessage(arguments);
 
 		return origLog;
 	}
@@ -46,56 +53,56 @@ module.exports = (origLog: any, outputChannel: OutputChannel) => {
 	const origLogWrite = origLog.write;
 	log.write = function() {
 		origLogWrite.apply(origLog, arguments);
-		const message = getMessage(arguments);
-		outputChannel.append(message);
+		showMessage(arguments, false);
 		return origLog;
 	}
 
 	const origLogWriteln = origLog.writeln;
 	log.writeln = function() {
 		origLogWriteln.apply(origLog, arguments);
-		const message = getMessage(arguments);
-		outputChannel.appendLine(message);
+		showMessage(arguments);
+		return origLog;
+	}
+
+	const origLoError = origLog.error;
+	log.writeln = function() {
+		origLoError.apply(origLog, arguments);
+		showMessage(arguments, true, "error");
 		return origLog;
 	}
 
 	const origLogCreate = origLog.create;
 	log.create = function() {
 		origLogCreate.apply(origLog, arguments);
-		const message = getMessage(arguments);
-		outputChannel.appendLine(message);
+		showMessage(arguments);
 		return origLog;
 	}
 
 	const origLogForce = origLog.force;
 	log.force = function() {
 		origLogForce.apply(origLog, arguments);
-		const message = getMessage(arguments);
-		outputChannel.appendLine(message);
+		showMessage(arguments);
 		return origLog;
 	}
 
 	const origLogConflict = origLog.conflict;
 	log.conflict = function() {
 		origLogConflict.apply(origLog, arguments);
-		const message = getMessage(arguments);
-		outputChannel.appendLine(message);
+		showMessage(arguments);
 		return origLog;
 	}
 
 	const origLogIdentical = origLog.identical;
 	log.identical = function() {
 		origLogIdentical.apply(origLog, arguments);
-		const message = getMessage(arguments);
-		outputChannel.appendLine(message);
+		showMessage(arguments);
 		return origLog;
 	}
 
 	const origLogSkip = origLog.skip;
 	log.skip = function() {
 		origLogSkip.apply(origLog, arguments);
-		const message = getMessage(arguments);
-		outputChannel.appendLine(message);
+		showMessage(arguments);
 		return origLog;
 	}
 
