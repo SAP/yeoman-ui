@@ -59,7 +59,7 @@ class ExploreGensWebSocketServer {
         }
 	  };
 	  
-      this.exploreGens = new ExploreGens(childLogger as IChildLogger, Environment.createEnv().getNpmPaths(), false, context, vscode);
+      this.exploreGens = new ExploreGens(childLogger as IChildLogger, false, context, vscode);
       this.exploreGens.init(this.rpc);
     });
   }
