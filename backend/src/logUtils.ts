@@ -1,4 +1,3 @@
-import * as vscode from "vscode";
 import stripAnsi = require("strip-ansi");
 import * as _  from "lodash";
 import { OutputChannel } from "./outputUtils";
@@ -20,23 +19,13 @@ module.exports = (origLog: any, outputChannel: OutputChannel, yeomanUi: YeomanUI
 		} 
 	}
 
-	function showNotificationMessage(message: string, messageType: string) {
-		if (messageType === "error") {
-			vscode.window.showErrorMessage(message);
-		} else if (messageType === "warn") {
-			vscode.window.showWarningMessage(message);
-		} else if (messageType === "info") {
-			vscode.window.showInformationMessage(message);
-		} 
-	}
-
 	function showMessage(args: any, withNewLine = true, forceType?: string) {
 		const message = getMessage(args);
 		const metadata = getMetadata(args);
 		const messageLocation = _.get(metadata, "location");
 		const messageType = forceType || _.get(metadata, "type");
 		if (messageLocation === "message") {
-			showNotificationMessage(message, messageType);
+			yeomanUi.showNotificationMessage(message, messageType);
 		} else if (messageLocation === "prompt") {
 			yeomanUi.showPromptMessage(message, messageType);
 		}

@@ -31,7 +31,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
         super.setWebviewPanel(webViewPanel);
 
 		this.messages = _.assign({}, backendMessages, _.get(uiOptions, "messages", {}));
-		this.genFilter = GeneratorFilter.create(_.get(uiOptions, "filter"));
+		this.genFilter = GeneratorFilter.create(_.get(uiOptions, "filter", _.get(uiOptions, "genFilter")));
 
 		this.outputChannel = new OutputChannel(`${YeomanUIPanel.YEOMAN_UI}.${this.messages.channel_name}`);
 

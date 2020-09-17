@@ -87,6 +87,21 @@ export class YeomanUI {
     return this.uiOptions;
   }
 
+  public async showNotificationMessage(message: string, messageType: string) {
+	const vscode = this.getVscode();
+	if (vscode) {
+		if (messageType === "error") {
+			vscode.window.showErrorMessage(message);
+		}
+		else if (messageType === "warn") {
+			vscode.window.showWarningMessage(message);
+		}
+		else if (messageType === "info") {
+			vscode.window.showInformationMessage(message);
+		}
+	}
+  }
+
   public async showPromptMessage(message: string, messageType: string) {
     await this.rpc.invoke("showPromptMessage", [message, messageType]);
   }
