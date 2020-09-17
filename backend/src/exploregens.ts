@@ -30,7 +30,7 @@ export class ExploreGens {
     private readonly context: any;
     private readonly vscode: any;
     private isInBAS: boolean;
-    private npmGlobalPaths: string[]; 
+    private npmGlobalPathsPromise: Promise<any>; 
 
     private readonly GLOBAL_ACCEPT_LEGAL_NOTE = "global.exploreGens.acceptlegalNote";
     private readonly LAST_AUTO_UPDATE_DATE = "global.exploreGens.lastAutoUpdateDate";
@@ -46,12 +46,12 @@ export class ExploreGens {
     private readonly SEARCH_QUERY_PREFIX = `${this.NPM_REGISTRY_HOST}-/v1/search?text=`;
     private readonly SEARCH_QUERY_SUFFIX = "keywords:yeoman-generator &size=25&ranking=popularity";
 
-    constructor(logger: IChildLogger, npmGlobalPaths: string[], isInBAS: boolean, context?: any, vscode?: any) {
+    constructor(logger: IChildLogger, isInBAS: boolean, context?: any, vscode?: any) {
         this.context = context;
         this.vscode = vscode;
         this.logger = logger;
         this.gensBeingHandled = [];
-        this.npmGlobalPaths = npmGlobalPaths;
+        this.npmGlobalPathsPromise = this.exec(`${this.NPM} root -g`);
 		this.doGeneratorsUpdate();
 		this.isInBAS = isInBAS;
     }
@@ -59,6 +59,11 @@ export class ExploreGens {
     public init(rpc: IRpc) {
         this.initRpc(rpc);
         this.setInstalledGens();
+	}
+	
+	private async getNpmGlobalPath(): Promise<string> {
+        const res = await this.npmGlobalPathsPromise;
+        return _.trim(res.stdout);
     }
 
     private async getInstalledGens() {
@@ -303,7 +308,7 @@ export class ExploreGens {
     private async getNpmPaths() {
         const customLocation = ExploreGens.getInstallationLocation(this.getWsConfig());
         if (_.isEmpty(customLocation)) {
-            return this.npmGlobalPaths;
+            return this.getNpmGlobalPath();
         }
 
         return [path.join(customLocation, this.NODE_MODULES)];
