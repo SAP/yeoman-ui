@@ -58,7 +58,6 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 	}
 
 	private yeomanui: YeomanUI;
-	//private filter: any;
 	private messages: any;
 	private yoUiLogger: any;
 
