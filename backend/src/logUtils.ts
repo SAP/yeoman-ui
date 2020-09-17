@@ -26,9 +26,9 @@ module.exports = (origLog: any, outputChannel: OutputChannel, yeomanUi: YeomanUI
 		const messageType = forceType || _.get(metadata, "type");
 		if (messageLocation === "message") {
 			yeomanUi.showNotificationMessage(message, messageType);
-		} else if (messageLocation === "prompt") {
-			yeomanUi.showPromptMessage(message, messageType);
-		}
+		} //else if (messageLocation === "prompt") {
+			//yeomanUi.showPromptMessage(message, messageType);
+		//}
 		withNewLine ? outputChannel.appendLine(message) : outputChannel.append(message);
 	}
 

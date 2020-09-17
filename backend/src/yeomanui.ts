@@ -32,7 +32,6 @@ export class YeomanUI {
   private static readonly HOME_DIR = os.homedir();
   private static readonly PROJECTS: string = path.join(YeomanUI.HOME_DIR, 'projects');
   private static readonly NODE_MODULES = 'node_modules';
-  private outputChannel: any;
 
   private static funcReplacer(key: any, value: any) {
     return _.isFunction(value) ? "__Function" : value;
@@ -53,6 +52,7 @@ export class YeomanUI {
   private readonly replayUtils: ReplayUtils;
   private readonly customQuestionEventHandlers: Map<string, Map<string, Function>>;
   private errorThrown = false;
+  private outputChannel: OutputChannel;
 
   constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: OutputChannel, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
     this.rpc = rpc;
@@ -60,7 +60,8 @@ export class YeomanUI {
     this.generatorName = "";
     this.replayUtils = new ReplayUtils();
     this.youiEvents = youiEvents;
-    this.logger = logger;
+	this.logger = logger;
+	this.outputChannel = outputChannel;
     this.rpc.setResponseTimeout(3600000);
     this.rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
     this.rpc.registerMethod({ func: this.runGenerator, thisArg: this });
@@ -87,23 +88,21 @@ export class YeomanUI {
     return this.uiOptions;
   }
 
-  public async showNotificationMessage(message: string, messageType: string) {
+  public showNotificationMessage(message: string, messageType: string) {
 	const vscode = this.getVscode();
 	if (vscode) {
-		if (messageType === "error") {
-			vscode.window.showErrorMessage(message);
-		}
-		else if (messageType === "warn") {
-			vscode.window.showWarningMessage(message);
-		}
-		else if (messageType === "info") {
-			vscode.window.showInformationMessage(message);
-		}
-	}
-  }
+		// if (messageType === "error") {
+		// 	vscode.window.showErrorMessage(message);
+		// }
+		// else if (messageType === "warn") {
+		// 	vscode.window.showWarningMessage(message);
+		// }
+		// else if (messageType === "info") {
+		// 	vscode.window.showInformationMessage(message);
+		// }
 
-  public async showPromptMessage(message: string, messageType: string) {
-    await this.rpc.invoke("showPromptMessage", [message, messageType]);
+		const disposable = vscode.window.setStatusBarMessage(message);
+	}
   }
 
   public async _notifyGeneratorsChange() {

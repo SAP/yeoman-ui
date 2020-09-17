@@ -86,18 +86,6 @@ describe('yeomanui unit test', () => {
     const youiEvents = new TestEvents();
     const yeomanUi: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, 
         {genFilter: GeneratorFilter.create(), messages});
-	// yeomanUi["getVscode"] = () => {
-	// 	return {
-	// 		window: {
-	// 			showErrorMessage: () => {},
-	// 			showInformationMessage: () => {},
-	// 			showWarningMessage: () => {},
-	// 			createOutputChannel: () => {
-	// 				return outputChannel;
-	// 			}
-	// 		}
-	// 	};
-	// }
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -468,9 +456,8 @@ describe('yeomanui unit test', () => {
     });
 
     it("toggleOutput", () => {
-        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {genFilter: GeneratorFilter.create()});
-        const res = yeomanUiInstance["toggleOutput"]();
-        expect(res).to.be.false;
+        //const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {genFilter: GeneratorFilter.create()});
+        yeomanUi["toggleOutput"]();
     });
 
     it("setCwd", () => {

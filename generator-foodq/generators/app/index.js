@@ -69,7 +69,7 @@ module.exports = class extends Generator {
           hint: "Our recommendation is green"
         },
         when: (response) => {
-		      this.log(response.hungry, null, {type: "error", location: "message"});
+		  this.log(response.hungry, {type: "error", location: "message"});
           return response.hungry;
         },
         validate: (value, answers) => {

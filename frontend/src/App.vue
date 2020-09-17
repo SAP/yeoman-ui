@@ -341,10 +341,6 @@ export default {
         generatorsPrompt.questions = questions;
       }
 	},
-	
-	async showPromptMessage(message, messageType) {
-		
-	},
 
     async showPrompt(questions, name) {
 		this.prepQuestions(questions);
