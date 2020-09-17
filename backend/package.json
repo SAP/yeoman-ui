@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.21",
+	"version": "1.1.22",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -30,7 +30,7 @@
 		"generator"
 	],
 	"activationEvents": [
-		"onStartupFinished",
+		"*",
 		"onCommand:loadYeomanUI",
 		"onWebviewPanel:yeomanui",
 		"onCommand:exploreGenerators",
