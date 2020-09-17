@@ -16,7 +16,6 @@ import * as os from "os";
 import messages from "../src/messages";
 import Environment = require("yeoman-environment");
 import { SWA } from "../src/swa-tracker/swa-tracker-wrapper";
-import { OutputChannel } from "../src/outputUtils";
 
 describe('yeomanui unit test', () => {
     let sandbox: any;
@@ -87,18 +86,18 @@ describe('yeomanui unit test', () => {
     const youiEvents = new TestEvents();
     const yeomanUi: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, 
         {genFilter: GeneratorFilter.create(), messages});
-	yeomanUi["getVscode"] = () => {
-		return {
-			window: {
-				showErrorMessage: () => {},
-				showInformationMessage: () => {},
-				showWarningMessage: () => {},
-				createOutputChannel: () => {
-					return outputChannel;
-				}
-			}
-		};
-	}
+	// yeomanUi["getVscode"] = () => {
+	// 	return {
+	// 		window: {
+	// 			showErrorMessage: () => {},
+	// 			showInformationMessage: () => {},
+	// 			showWarningMessage: () => {},
+	// 			createOutputChannel: () => {
+	// 				return outputChannel;
+	// 			}
+	// 		}
+	// 	};
+	// }
 
     before(() => {
         sandbox = sinon.createSandbox();
