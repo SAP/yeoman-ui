@@ -102,10 +102,10 @@ module.exports = class extends Generator {
       },
       {
         when: async response => {
-          this.log(response.hungry);
+          this.log(response.hungry, {type: "info", location: "prompt"});
           const that = this;
           return new Promise((resolve) => {
-            that.log(`Purposely delaying response for 2 seconds...`);
+            that.log(`Purposely delaying response for 2 seconds...`, {type: "error", location: "prompt"});
             setTimeout(() => {
               resolve(response.hungry);
             }, 2000);

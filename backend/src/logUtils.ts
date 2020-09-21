@@ -13,7 +13,7 @@ module.exports = (origLog: any, output: Output, yeomanUi: YeomanUI) => {
 	function getMetadata(args: any) {
 		const metadata = _.get(args, "[2]", _.get(args, "[1]", {}));
 		const type = ["error", "info", "warn"].includes(metadata.type);
-		const location = ["inline", "message"].includes(metadata.location);
+		const location = ["prompt", "message"].includes(metadata.location);
 		if (type && location) {
 			return metadata;
 		} 

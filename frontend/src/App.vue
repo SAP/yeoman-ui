@@ -55,7 +55,7 @@
           </v-col>
         </v-row>
         <v-row v-if="prompts.length > 0 && !isDone && showButtons" style="height: 4rem; margin: 0;" sm="auto">
-			<img src="img/dots.51827ddf.svg"><p>Slavik</p>
+			<img src="img/dots.51827ddf.svg"><p>{{messageToDisplay}}</p>
 		<div class="bottom-right-col" style="flex:1;"></div>
           <div class="diagonal"></div>
           <div class="bottom-buttons-col" style="display:flex;align-items: center;">
@@ -132,7 +132,8 @@ function initialState() {
     numOfSteps: 1,
 	isGeneric: false,
 	isWriting: false,
-	showButtons: true
+	showButtons: true,
+	messageToDisplay: ""
   };
 }
 
@@ -205,8 +206,7 @@ export default {
   },
   methods: {
 	showPromptMessage(message, type) {
-		// eslint-disable-next-line no-console
-		console.error(message);
+		this.messageToDisplay = message;
 		// eslint-disable-next-line no-console
 		console.error(type);
 	},
@@ -453,7 +453,8 @@ export default {
         "generatorDone",
         "log",
         "updateGeneratorsPrompt",
-        "setGenInWriting"
+		"setGenInWriting",
+		"showPromptMessage"
       ];
       _.forEach(functions, (funcName) => {
         this.rpc.registerMethod({
