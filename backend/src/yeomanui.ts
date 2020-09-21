@@ -135,7 +135,7 @@ export class YeomanUI {
     const promise: Promise<IQuestionsPrompt> = new Promise(resolve => {
 	  const env: Environment.Options = Environment.createEnv();
 	  const npmPaths = this.getNpmPaths(); 
-      env.lookup({npmPaths}, async () => this.onEnvLookup(env, resolve, this.uiOptions.genFilter));
+      env.lookup({npmPaths}, async () => this.onEnvLookup(env, resolve, this.uiOptions.filter));
     });
 
     return promise;
