@@ -55,24 +55,24 @@
           </v-col>
         </v-row>
         <v-row v-if="prompts.length > 0 && !isDone && showButtons" style="height: 4rem; margin: 0;" sm="auto">
-			<img src="img/dots.51827ddf.svg"><p>{{messageToDisplay}}</p>
-		<div class="bottom-right-col" style="flex:1;"></div>
-          <div class="diagonal"></div>
-          <div class="bottom-buttons-col" style="display:flex;align-items: center;">
-            <v-btn
-              id="back"
-              :disabled="promptIndex<1 || isReplaying"
-              @click="back"
-              v-show="promptIndex > 0"
-				style="min-width:90px;"
-            >
-              <v-icon left>mdi-chevron-left</v-icon>Back
-            </v-btn>
-            <v-btn id="next" :disabled="!stepValidated" @click="next" style="min-width:90px;">
-              {{nextButtonText}}
-              <v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
-            </v-btn>
-          </div>
+			<div v-if="toShowPromptMessage" :style="promptMessageStyle">{{promptMessageToDisplay}}</div>
+			<div class="bottom-right-col" style="flex:1;"></div>
+				<div class="diagonal"></div>
+				<div class="bottom-buttons-col" style="display:flex;align-items: center;">
+					<v-btn
+						id="back"
+						:disabled="promptIndex<1 || isReplaying"
+						@click="back"
+						v-show="promptIndex > 0"
+							style="min-width:90px;"
+						>
+						<v-icon left>mdi-chevron-left</v-icon>Back
+					</v-btn>
+					<v-btn id="next" :disabled="!stepValidated" @click="next" style="min-width:90px;">
+						{{nextButtonText}}
+						<v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
+					</v-btn>
+			</div>
         </v-row>
       </v-col>
     </v-row>
@@ -133,7 +133,9 @@ function initialState() {
 	isGeneric: false,
 	isWriting: false,
 	showButtons: true,
-	messageToDisplay: ""
+	promptMessageToDisplay: "",
+	toShowPromptMessage: false,
+	promptMessageStyle: ""
   };
 }
 
@@ -206,7 +208,17 @@ export default {
   },
   methods: {
 	showPromptMessage(message, type) {
-		this.messageToDisplay = message;
+		this.promptMessageToDisplay = message;
+		this.toShowPromptMessage = true;
+		let promptMessageColor = "red";
+		if (type === "error") {
+			promptMessageColor = "red";
+		} else if (type === "info") {
+			promptMessageColor = "green";
+		} else if (type === "warn") {
+			promptMessageColor = "orange";
+		}
+		this.promptMessageStyle = `font-size: 12px;padding-left: 12px;color: ${promptMessageColor};`;
 		// eslint-disable-next-line no-console
 		console.error(type);
 	},

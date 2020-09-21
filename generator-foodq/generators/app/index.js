@@ -102,7 +102,7 @@ module.exports = class extends Generator {
       },
       {
         when: async response => {
-          this.log(response.hungry, {type: "info", location: "prompt"});
+          this.log(response.hungry);
           const that = this;
           return new Promise((resolve) => {
             that.log(`Purposely delaying response for 2 seconds...`, {type: "error", location: "prompt"});
@@ -246,7 +246,7 @@ module.exports = class extends Generator {
     const answers = await this.prompt(prompts);
 
     this.answers = Object.assign({}, this.answers, answers);
-    this.log("Hunger level", this.answers.hungerLevel);
+    this.log("Hunger level", this.answers.hungerLevel, {type: "info", location: "prompt"});
 
     prompts = [
       {
