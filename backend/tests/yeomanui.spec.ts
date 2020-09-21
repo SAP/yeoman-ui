@@ -108,7 +108,7 @@ describe('yeomanui unit test', () => {
     const outputChannel = new TestOutputChannel();
     const youiEvents = new TestEvents();
     const yeomanUi: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, 
-        {genFilter: GeneratorFilter.create(), messages});
+        {filter: GeneratorFilter.create(), messages});
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -230,7 +230,7 @@ describe('yeomanui unit test', () => {
             fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
 
             const genFilter: GeneratorFilter = GeneratorFilter.create({type: "project"});
-            yeomanUi["uiOptions"] = {genFilter, messages};
+            yeomanUi["uiOptions"] = {filter: genFilter, messages};
             const result = await yeomanUi["getGeneratorsPrompt"]();
 
             const question = result.questions[1];
@@ -270,7 +270,7 @@ describe('yeomanui unit test', () => {
             fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
 
             const genFilter = GeneratorFilter.create({type: "module"});
-            yeomanUi["uiOptions"] = {genFilter, messages};
+            yeomanUi["uiOptions"] = {filter: genFilter, messages};
             const result = await yeomanUi["getGeneratorsPrompt"]();
 
             expect(result.questions[0].choices).to.have.lengthOf(1);
@@ -309,7 +309,7 @@ describe('yeomanui unit test', () => {
             fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test6Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "all"}}`);
 
-            yeomanUi["uiOptions"] = {genFilter: GeneratorFilter.create({type: []}), messages};
+            yeomanUi["uiOptions"] = {filter: GeneratorFilter.create({type: []}), messages};
             const result = await yeomanUi["getGeneratorsPrompt"]();
 
             expect(result.questions[0].choices).to.have.lengthOf(6);
@@ -341,7 +341,7 @@ describe('yeomanui unit test', () => {
             fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
 
-            yeomanUi["uiOptions"] = {genFilter: GeneratorFilter.create({type: []}), messages};
+            yeomanUi["uiOptions"] = {filter: GeneratorFilter.create({type: []}), messages};
             const result = await yeomanUi["getGeneratorsPrompt"]();
 
             expect(result.questions[0].choices).to.have.lengthOf(3);
@@ -357,7 +357,7 @@ describe('yeomanui unit test', () => {
 
             fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project123"}, "description": "test4Description"}`);
 
-            yeomanUi["uiOptions"] = {genFilter: GeneratorFilter.create({type: "project"}), messages};
+            yeomanUi["uiOptions"] = {filter: GeneratorFilter.create({type: "project"}), messages};
             const result = await yeomanUi["getGeneratorsPrompt"]();
 
             expect(result.questions[1].choices).to.be.empty;
@@ -390,7 +390,7 @@ describe('yeomanui unit test', () => {
             fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
 
             const genFilter: GeneratorFilter = GeneratorFilter.create({type: ["project"], categories: ["cat1", "cat2"]});
-            yeomanUi["uiOptions"].genFilter = genFilter;
+            yeomanUi["uiOptions"].filter = genFilter;
             const result = await yeomanUi["getGeneratorsPrompt"]();
 
             const question = result.questions[1];
@@ -421,7 +421,7 @@ describe('yeomanui unit test', () => {
             fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test3Description", "displayName": "3rd - Test"}`);
 
-            yeomanUi["uiOptions"] = {genFilter: GeneratorFilter.create({type: undefined}), messages};
+            yeomanUi["uiOptions"] = {filter: GeneratorFilter.create({type: undefined}), messages};
             const result = await yeomanUi["getGeneratorsPrompt"]();
 
             const choices = result.questions[0].choices;
@@ -452,7 +452,7 @@ describe('yeomanui unit test', () => {
             fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}, "homepage": "https://myhomepage.com/ANY/generator-test2-module#readme"}`);
             fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test3Description"}`);
 
-            yeomanUi["uiOptions"] = {genFilter: GeneratorFilter.create(), messages};
+            yeomanUi["uiOptions"] = {filter: GeneratorFilter.create(), messages};
             const result = await yeomanUi["getGeneratorsPrompt"]();
 
             const choices = result.questions[0].choices;
@@ -479,7 +479,7 @@ describe('yeomanui unit test', () => {
     });
 
     it("toggleOutput", () => {
-        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {genFilter: GeneratorFilter.create()});
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {filter: GeneratorFilter.create()});
         const res = yeomanUiInstance["toggleOutput"]();
         expect(res).to.be.false;
     });
