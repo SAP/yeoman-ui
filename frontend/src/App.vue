@@ -58,6 +58,7 @@
 		<div class="bottom-right-col" style="flex:1;"></div>
           <div class="diagonal"></div>
           <div class="bottom-buttons-col" style="display:flex;align-items: center;">
+			<v-alert type="info">Info test</v-alert>
             <v-btn
               id="back"
               :disabled="promptIndex<1 || isReplaying"
@@ -339,7 +340,8 @@ export default {
       if (generatorsPrompt) {
         generatorsPrompt.questions = questions;
       }
-    },
+	},
+
     async showPrompt(questions, name) {
 		this.prepQuestions(questions);
 		if (this.isReplaying) {
