@@ -10,14 +10,14 @@ import { YouiEvents } from "../youi-events";
 import { VSCodeYouiEvents } from '../vscode-youi-events';
 import { AbstractWebviewPanel } from './AbstractWebviewPanel';
 import { ExploreGens } from '../exploregens';
-import { OutputChannel } from '../outputUtils';
+import { OutputChannel } from '../vscode-output';
 
 
 export class YeomanUIPanel extends AbstractWebviewPanel {
 	public static YEOMAN_UI = "Application Wizard";
 
 	public toggleOutput() {
-		this.outputChannel.show();
+		this.output.show();
 	}
 
 	public notifyGeneratorsChange() {
@@ -34,13 +34,13 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 		const filter = GeneratorFilter.create(_.get(uiOptions, "filter"));
 
 		const rpc = new RpcExtension(this.webViewPanel.webview);
-		this.yoUiLogger = YoUILogger(this.messages.channel_name);
 		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(rpc, this.webViewPanel, filter, this.messages);
+		this.output.setChannelName(`${YeomanUIPanel.YEOMAN_UI}.${this.messages.channel_name}`);
 
 		const outputPath = this.isInBAS ? undefined: _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath"); 
 		this.yeomanui = new YeomanUI(rpc,
 			vscodeYouiEvents,
-			this.outputChannel,
+			this.output,
 			this.logger,
 			{ filter, messages: this.messages, data: _.get(uiOptions, "data"), npmGlobalPaths: this.getDefaultPaths() }, outputPath);
 		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
@@ -51,14 +51,14 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 
 	private yeomanui: YeomanUI;
 	private messages: any;
-	private yoUiLogger: any;
-	private outputChannel: OutputChannel;
+	private output: OutputChannel;
 
 	public constructor(context: vscode.ExtensionContext) {
 		super(context);
 		this.viewType = "yeomanui";
 		this.viewTitle = YeomanUIPanel.YEOMAN_UI;
 		this.focusedKey = "yeomanUI.Focused";
+		this.output = new OutputChannel();
 	}
 
 	private getDefaultPaths(): string[] {

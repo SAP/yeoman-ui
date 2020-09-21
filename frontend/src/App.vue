@@ -204,6 +204,12 @@ export default {
     }
   },
   methods: {
+	showPromptMessage(message, type) {
+		// eslint-disable-next-line no-console
+		console.error(message);
+		// eslint-disable-next-line no-console
+		console.error(type);
+	},
     setBusyIndicator() {
       this.showBusyIndicator =
         _.isEmpty(this.prompts) ||

@@ -1,10 +1,10 @@
 import stripAnsi = require("strip-ansi");
 import * as _  from "lodash";
-import { OutputChannel } from "./outputUtils";
+import { Output } from "./output";
 import { YeomanUI } from "./yeomanui";
 
 
-module.exports = (origLog: any, outputChannel: OutputChannel, yeomanUi: YeomanUI) => {
+module.exports = (origLog: any, output: Output, yeomanUi: YeomanUI) => {
 	function getMessage(args: any) {
 		const message = stripAnsi(_.get(args, "[0]", ""));
 		return `${message}`;
@@ -22,77 +22,57 @@ module.exports = (origLog: any, outputChannel: OutputChannel, yeomanUi: YeomanUI
 	function showMessage(args: any, withNewLine = true, forceType?: string) {
 		const message = getMessage(args);
 		const metadata = getMetadata(args);
-		const messageLocation = _.get(metadata, "location");
-		const messageType = forceType || _.get(metadata, "type");
-		if (messageLocation === "message") {
-			yeomanUi.showNotificationMessage(message, messageType);
-		} //else if (messageLocation === "prompt") {
-			//yeomanUi.showPromptMessage(message, messageType);
-		//}
-		withNewLine ? outputChannel.appendLine(message) : outputChannel.append(message);
+		if (metadata) {
+			const location = _.get(metadata, "location");
+			const type = forceType || _.get(metadata, "type");
+			yeomanUi.showLogMessage({location, value: message, type});
+		}
+		withNewLine ? output.appendLine(message) : output.append(message);
 	}
 
 	function log() {
-		origLog.apply(origLog, arguments);
 		showMessage(arguments);
-
-		return origLog;
+		return log;
 	}
 
-	const origLogWrite = origLog.write;
 	log.write = function() {
-		origLogWrite.apply(origLog, arguments);
 		showMessage(arguments, false);
-		return origLog;
+		return log;
 	}
 
-	const origLogWriteln = origLog.writeln;
 	log.writeln = function() {
-		origLogWriteln.apply(origLog, arguments);
 		showMessage(arguments);
 		return origLog;
 	}
 
-	const origLoError = origLog.error;
-	log.writeln = function() {
-		origLoError.apply(origLog, arguments);
+	log.error = function() {
 		showMessage(arguments, true, "error");
-		return origLog;
+		return log;
 	}
 
-	const origLogCreate = origLog.create;
 	log.create = function() {
-		origLogCreate.apply(origLog, arguments);
 		showMessage(arguments);
-		return origLog;
+		return log;
 	}
 
-	const origLogForce = origLog.force;
 	log.force = function() {
-		origLogForce.apply(origLog, arguments);
 		showMessage(arguments);
-		return origLog;
+		return log;
 	}
 
-	const origLogConflict = origLog.conflict;
 	log.conflict = function() {
-		origLogConflict.apply(origLog, arguments);
 		showMessage(arguments);
-		return origLog;
+		return log;
 	}
 
-	const origLogIdentical = origLog.identical;
 	log.identical = function() {
-		origLogIdentical.apply(origLog, arguments);
 		showMessage(arguments);
-		return origLog;
+		return log;
 	}
 
-	const origLogSkip = origLog.skip;
 	log.skip = function() {
-		origLogSkip.apply(origLog, arguments);
 		showMessage(arguments);
-		return origLog;
+		return log;
 	}
 
 	return log;

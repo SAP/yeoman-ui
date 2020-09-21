@@ -18,7 +18,7 @@ import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
 import { SWA } from "./swa-tracker/swa-tracker-wrapper";
 import TerminalAdapter = require("yeoman-environment/lib/adapter"); 
-import { OutputChannel } from "./outputUtils";
+import { Output } from "./output";
 
 export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
@@ -52,16 +52,16 @@ export class YeomanUI {
   private readonly replayUtils: ReplayUtils;
   private readonly customQuestionEventHandlers: Map<string, Map<string, Function>>;
   private errorThrown = false;
-  private outputChannel: OutputChannel;
+  private output: Output;
 
-  constructor(rpc: IRpc, youiEvents: YouiEvents, outputChannel: OutputChannel, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
+  constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
     this.rpc = rpc;
     
     this.generatorName = "";
     this.replayUtils = new ReplayUtils();
     this.youiEvents = youiEvents;
 	this.logger = logger;
-	this.outputChannel = outputChannel;
+	this.output = output;
     this.rpc.setResponseTimeout(3600000);
     this.rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
     this.rpc.registerMethod({ func: this.runGenerator, thisArg: this });
@@ -74,7 +74,7 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.getState, thisArg: this });
 
 	this.uiOptions = uiOptions;
-    this.youiAdapter = new YouiAdapter(youiEvents, outputChannel);
+    this.youiAdapter = new YouiAdapter(youiEvents, output);
     this.youiAdapter.setYeomanUI(this);
     this.promptCount = 0;
     this.genMeta = {};
@@ -88,21 +88,31 @@ export class YeomanUI {
     return this.uiOptions;
   }
 
-  public showNotificationMessage(message: string, messageType: string) {
+  public showLogMessage(message: any) {
+	if (message.location === "message") {
+		this.showNotificationMessage(message.value, message.type);
+	} else if (message.location === "prompt") {
+		this.showPromptMessage(message.value, message.type);
+	}
+  }
+
+  private showNotificationMessage(message: string, type: string) {
 	const vscode = this.getVscode();
 	if (vscode) {
-		// if (messageType === "error") {
-		// 	vscode.window.showErrorMessage(message);
-		// }
-		// else if (messageType === "warn") {
-		// 	vscode.window.showWarningMessage(message);
-		// }
-		// else if (messageType === "info") {
-		// 	vscode.window.showInformationMessage(message);
-		// }
-
-		const disposable = vscode.window.setStatusBarMessage(message);
+		if (type === "error") {
+			vscode.window.showErrorMessage(message);
+		}
+		else if (type === "warn") {
+			vscode.window.showWarningMessage(message);
+		}
+		else if (type === "info") {
+			vscode.window.showInformationMessage(message);
+		}
 	}
+  }
+
+  private showPromptMessage(message: string, type: string) {
+	this.rpc.invoke("showPromptMessage", [message, type]);
   }
 
   public async _notifyGeneratorsChange() {
@@ -300,7 +310,7 @@ export class YeomanUI {
   }
 
   private toggleOutput() {
-	this.outputChannel.show();
+	this.output.show();
   }
 
   private exploreGenerators() {

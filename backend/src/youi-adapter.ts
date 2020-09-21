@@ -4,23 +4,23 @@ const yoUiLog = require("./logUtils");
 import * as _ from "lodash";
 import chalk = require('chalk');
 import TerminalAdapter = require("yeoman-environment/lib/adapter");
-import { OutputChannel } from "./outputUtils";
+import { Output } from "./output";
 
 
 export class YouiAdapter extends TerminalAdapter {
   private yeomanui: YeomanUI | undefined = undefined;
   private readonly youiEvents: YouiEvents;
-  private readonly outputChannel: OutputChannel;
+  private readonly output: Output;
 
-  constructor(youiEvents: YouiEvents, outputChannel: OutputChannel) {
+  constructor(youiEvents: YouiEvents, output: Output) {
 	super({});
 	this.youiEvents = youiEvents;
-	this.outputChannel = outputChannel;
+	this.output = output;
   }
 
   public setYeomanUI(yeomanui: YeomanUI) {
 	this.yeomanui = yeomanui;
-	this.log = yoUiLog(this.log, this.outputChannel, this.yeomanui);
+	this.log = yoUiLog(this.log, this.output, this.yeomanui);
   }
 
   get colorDiffAdded() {
