@@ -178,7 +178,8 @@ export class YeomanUI {
 			const options = {
 				logger: this.logger.getChildLogger({label: generatorName}),
 				vscode: this.getVscode(), // TODO: remove this temporary workaround once a better solution is found,
-				data: this.uiOptions.data
+				data: this.uiOptions.data,
+				swaTracker: SWA.getSWATracker()
 			};
 			const gen: any = env.create(genNamespace, {options});
 			// check if generator defined a helper function called setPromptsCallback()
