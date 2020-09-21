@@ -55,10 +55,10 @@
           </v-col>
         </v-row>
         <v-row v-if="prompts.length > 0 && !isDone && showButtons" style="height: 4rem; margin: 0;" sm="auto">
+			<img src="img/dots.51827ddf.svg"><p>Slavik</p>
 		<div class="bottom-right-col" style="flex:1;"></div>
           <div class="diagonal"></div>
           <div class="bottom-buttons-col" style="display:flex;align-items: center;">
-			<v-alert type="info">Info test</v-alert>
             <v-btn
               id="back"
               :disabled="promptIndex<1 || isReplaying"
