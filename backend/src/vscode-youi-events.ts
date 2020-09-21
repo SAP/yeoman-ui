@@ -6,13 +6,13 @@ import { GeneratorFilter, GeneratorType } from './filter';
 
 export class VSCodeYouiEvents implements YouiEvents {
     private webviewPanel: vscode.WebviewPanel;
-    private readonly genFilter: GeneratorFilter;
+    private readonly filter: GeneratorFilter;
     private readonly messages: any;
     private resolveFunc: any;
 
-    constructor(rpc: IRpc, webviewPanel: vscode.WebviewPanel, genFilter: GeneratorFilter, messages: any) {
+    constructor(rpc: IRpc, webviewPanel: vscode.WebviewPanel, filter: GeneratorFilter, messages: any) {
         this.webviewPanel = webviewPanel;   
-        this.genFilter = genFilter;
+        this.filter = filter;
         this.messages = messages;    
     }
 
@@ -61,7 +61,7 @@ export class VSCodeYouiEvents implements YouiEvents {
             
             const targetFolderUri: vscode.Uri = vscode.Uri.file(targetFolderPath);
 
-            if (!_.includes(this.genFilter.types, GeneratorType.module)) {
+            if (!_.includes(this.filter.types, GeneratorType.module)) {
                 const workspacePath = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
                 // 1. target workspace folder should not already contain target generator folder
                 const foundInWorkspace = _.find(vscode.workspace.workspaceFolders, (wsFolder: vscode.WorkspaceFolder) => {

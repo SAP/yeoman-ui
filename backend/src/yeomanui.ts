@@ -397,14 +397,14 @@ export class YeomanUI {
     resolve({ name: "Select Generator", questions: normalizedQuestions });
   }
 
-  private async createGeneratorPromptQuestions(generatorNames: string[], genFilter: GeneratorFilter): Promise<any[]> {
+  private async createGeneratorPromptQuestions(generatorNames: string[], filter: GeneratorFilter): Promise<any[]> {
     const generatorChoicePromises = _.map(generatorNames, genName => {
-      return this.getGeneratorChoice(genName, genFilter);
+      return this.getGeneratorChoice(genName, filter);
     });
 
     const questions: any[] = [];
 
-    if (_.includes(genFilter.types, GeneratorType.project)) {
+    if (_.includes(filter.types, GeneratorType.project)) {
       const defaultPath = this.getCwd();
       const targetFolderQuestion: any = {
         type: "input",

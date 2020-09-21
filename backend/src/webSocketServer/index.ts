@@ -39,7 +39,7 @@ class YeomanUIWebSocketServer {
       const childLogger = {debug: () => {/* do nothing */}, error: () => {/* do nothing */}, fatal: () => {/* do nothing */}, warn: () => {/* do nothing */}, info: () => {/* do nothing */}, trace: () => {/* do nothing */}, getChildLogger: () => {return {} as IChildLogger;}};
 	  const youiEvents: YouiEvents = new ServerYouiEvents(this.rpc);
 	  this.yeomanui = new YeomanUI(this.rpc, youiEvents, logger, childLogger as IChildLogger, 
-		{genFilter: GeneratorFilter.create(), messages: backendMessages, npmGlobalPaths: Environment.createEnv().getNpmPaths()});
+		{filter: GeneratorFilter.create(), messages: backendMessages, npmGlobalPaths: Environment.createEnv().getNpmPaths()});
       this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.mockFolderDialog.bind(this));
     });
   }
