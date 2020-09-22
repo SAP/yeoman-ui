@@ -70,7 +70,7 @@ export class VSCodeYouiEvents implements YouiEvents {
      */
     private isPredecessorOf(probablePredecessorPath: string, currentPath: string) {
         const relativePath = relative(probablePredecessorPath, currentPath);
-        return relativePath && !_.startsWith(relativePath, '..') && !isAbsolute(relativePath);
+        return !_.isEmpty(relativePath) && !_.startsWith(relativePath, '..') && !isAbsolute(relativePath);
     }
 
     private showDoneMessage(success: boolean, errorMmessage: string, targetFolderPath?: string): Thenable<any> {
