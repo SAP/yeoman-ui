@@ -455,12 +455,6 @@ describe('yeomanui unit test', () => {
         });
     });
 
-    // it("toggleOutput", () => {
-    //     //const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {filter: GeneratorFilter.create()});
-    //     const res = yeomanUiInstance["toggleOutput"]();
-    //     //expect(res).to.be.false;
-    // });
-
     it("setCwd", () => {
         const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {},  "testpathbefore");
         expect(yeomanUiInstance["getCwd"]()).equal("testpathbefore");

@@ -4,7 +4,7 @@ import stripAnsi = require("strip-ansi");
 import { Output } from "./output";
 
 
-export class OutputChannel implements Output {
+export class GeneratorOutput implements Output {
 	private outputChannel: vscode.OutputChannel;
 	private outputChannels: any;
 

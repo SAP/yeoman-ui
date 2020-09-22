@@ -4,7 +4,7 @@ import { Output } from "./output";
 import { YeomanUI } from "./yeomanui";
 
 
-module.exports = (origLog: any, output: Output, yeomanUi: YeomanUI) => {
+module.exports = (output: Output, yeomanUi: YeomanUI) => {
 	function getMessage(args: any) {
 		const message = stripAnsi(_.get(args, "[0]", ""));
 		return `${message}`;
@@ -27,6 +27,7 @@ module.exports = (origLog: any, output: Output, yeomanUi: YeomanUI) => {
 			const type = forceType || _.get(metadata, "type");
 			yeomanUi.showLogMessage({location, value: message, type});
 		}
+    
 		withNewLine ? output.appendLine(message) : output.append(message);
 	}
 
@@ -42,7 +43,7 @@ module.exports = (origLog: any, output: Output, yeomanUi: YeomanUI) => {
 
 	log.writeln = function() {
 		showMessage(arguments);
-		return origLog;
+		return log;
 	}
 
 	log.error = function() {

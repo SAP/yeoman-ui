@@ -41,6 +41,7 @@ export class YeomanUI {
   private cwd: string;
   private readonly rpc: IRpc;
   private readonly youiEvents: YouiEvents;
+  private output: Output;
   private readonly logger: IChildLogger;
   private genMeta: { [namespace: string]: Environment.GeneratorMeta };
   private readonly youiAdapter: YouiAdapter;
@@ -60,8 +61,8 @@ export class YeomanUI {
     this.generatorName = "";
     this.replayUtils = new ReplayUtils();
     this.youiEvents = youiEvents;
-	this.logger = logger;
-	this.output = output;
+    this.logger = logger;
+	  this.output = output;
     this.rpc.setResponseTimeout(3600000);
     this.rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
     this.rpc.registerMethod({ func: this.runGenerator, thisArg: this });
@@ -73,7 +74,7 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.setCwd, thisArg: this });
     this.rpc.registerMethod({ func: this.getState, thisArg: this });
 
-	this.uiOptions = uiOptions;
+    this.uiOptions = uiOptions;
     this.youiAdapter = new YouiAdapter(youiEvents, output);
     this.youiAdapter.setYeomanUI(this);
     this.promptCount = 0;
@@ -206,7 +207,8 @@ export class YeomanUI {
 			const options = {
 				logger: this.logger.getChildLogger({label: generatorName}),
 				vscode: this.getVscode(), // TODO: remove this temporary workaround once a better solution is found,
-				data: this.uiOptions.data
+				data: this.uiOptions.data,
+				swaTracker: SWA.getSWATracker()
 			};
 			const gen: any = env.create(genNamespace, {options});
 			// check if generator defined a helper function called setPromptsCallback()
