@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.24",
+	"version": "1.1.25",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -161,7 +161,7 @@
 		"titleize": "2.1.0",
 		"ws": "7.3.1",
 		"yeoman-environment": "2.10.3",
-		"@sap/swa-for-sapbas-vsx": "1.1.0"
+		"@sap/swa-for-sapbas-vsx": "1.1.1"
 	},
 	"devDependencies": {
 		"@types/npm-registry-fetch": "8.0.0",
