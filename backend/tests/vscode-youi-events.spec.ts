@@ -58,6 +58,20 @@ describe('vscode-youi-events unit test', () => {
         expect(showInstallMessageSpy.called).to.be.true;
     });
 
+    it("isPredecessorOf", () => {
+        expect(events["isPredecessorOf"]('/foo', '/foo')).to.be.false;
+        expect(events["isPredecessorOf"]('/foo', '/bar')).to.be.false;
+        expect(events["isPredecessorOf"]('/foo', '/foobar')).to.be.false;
+        expect(events["isPredecessorOf"]('/foo', '/foo/bar')).to.be.true;
+        expect(events["isPredecessorOf"]('/foo', '/foo/../bar')).to.be.false;
+        expect(events["isPredecessorOf"]('/foo', '/foo/./bar')).to.be.true;
+        expect(events["isPredecessorOf"]('/bar/../foo', '/foo/bar')).to.be.true;
+        expect(events["isPredecessorOf"]('/foo', './bar')).to.be.false;
+        //expect(events["isPredecessorOf"]('C:\\Foo', 'C:\\Foo\\Bar')).to.be.true;
+        expect(events["isPredecessorOf"]('C:\\Foo', 'C:\\Bar')).to.be.false;
+        expect(events["isPredecessorOf"]('C:\\Foo', 'D:\\Foo\\Bar')).to.be.false;
+    });
+
     describe("doGeneratorDone", () => {
         it("on success, add to workspace button and open in new workspace button are visible", () => {
             eventsMock.expects("doClose");
