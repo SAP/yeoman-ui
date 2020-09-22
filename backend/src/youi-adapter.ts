@@ -1,24 +1,26 @@
 import { YeomanUI } from "./yeomanui";
 import { YouiEvents } from "./youi-events";
+const yoUiLog = require("./logUtils");
 import * as _ from "lodash";
 import chalk = require('chalk');
 import TerminalAdapter = require("yeoman-environment/lib/adapter");
+import { Output } from "./output";
 
-/**
- * @constructor
- */
+
 export class YouiAdapter extends TerminalAdapter {
   private yeomanui: YeomanUI | undefined = undefined;
   private readonly youiEvents: YouiEvents;
+  private readonly output: Output;
 
-  constructor(youiLog: any, youiEvents: YouiEvents) {
+  constructor(youiEvents: YouiEvents, output: Output) {
 	super({});
 	this.youiEvents = youiEvents;
-	this.log = youiLog;
+	this.output = output;
   }
 
   public setYeomanUI(yeomanui: YeomanUI) {
-    this.yeomanui = yeomanui;
+	this.yeomanui = yeomanui;
+	this.log = yoUiLog(this.output, this.yeomanui);
   }
 
   get colorDiffAdded() {

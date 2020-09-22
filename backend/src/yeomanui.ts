@@ -18,6 +18,8 @@ import { IChildLogger } from "@vscode-logging/logger";
 import {IPrompt} from "@sap-devx/yeoman-ui-types";
 import { SWA } from "./swa-tracker/swa-tracker-wrapper";
 import TerminalAdapter = require("yeoman-environment/lib/adapter"); 
+import { Output } from "./output";
+
 
 export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
@@ -40,7 +42,7 @@ export class YeomanUI {
   private cwd: string;
   private readonly rpc: IRpc;
   private readonly youiEvents: YouiEvents;
-  private readonly youiLogger: any;
+  private output: Output;
   private readonly logger: IChildLogger;
   private genMeta: { [namespace: string]: Environment.GeneratorMeta };
   private readonly youiAdapter: YouiAdapter;
@@ -53,14 +55,14 @@ export class YeomanUI {
   private readonly customQuestionEventHandlers: Map<string, Map<string, Function>>;
   private errorThrown = false;
 
-  constructor(rpc: IRpc, youiEvents: YouiEvents, youiLogger: any, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
+  constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
     this.rpc = rpc;
     
     this.generatorName = "";
     this.replayUtils = new ReplayUtils();
     this.youiEvents = youiEvents;
-    this.youiLogger = youiLogger;
     this.logger = logger;
+	this.output = output;
     this.rpc.setResponseTimeout(3600000);
     this.rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
     this.rpc.registerMethod({ func: this.runGenerator, thisArg: this });
@@ -72,12 +74,12 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.setCwd, thisArg: this });
     this.rpc.registerMethod({ func: this.getState, thisArg: this });
 
-    this.youiAdapter = new YouiAdapter(youiLogger, youiEvents);
+    this.uiOptions = uiOptions;
+    this.youiAdapter = new YouiAdapter(youiEvents, output);
     this.youiAdapter.setYeomanUI(this);
     this.promptCount = 0;
     this.genMeta = {};
     this.currentQuestions = {};
-	this.uiOptions = uiOptions;
     this.customQuestionEventHandlers = new Map();
 	this.setCwd(outputPath);
 	this.npmGlobalPaths = _.get(uiOptions, "npmGlobalPaths", []);
@@ -282,8 +284,8 @@ export class YeomanUI {
     }
   }
 
-  private toggleOutput(): boolean {
-    return this.youiLogger.showOutput();
+  private toggleOutput() {
+	this.output.show();
   }
 
   private exploreGenerators() {

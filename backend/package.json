@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.25",
+	"version": "1.1.26",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -161,7 +161,7 @@
 		"titleize": "2.1.0",
 		"ws": "7.3.1",
 		"yeoman-environment": "2.10.3",
-		"@sap/swa-for-sapbas-vsx": "1.1.1"
+		"@sap/swa-for-sapbas-vsx": "1.1.2"
 	},
 	"devDependencies": {
 		"@types/npm-registry-fetch": "8.0.0",
@@ -175,9 +175,9 @@
 		"@types/sinon": "9.0.5",
 		"@types/ws": "7.2.6",
 		"@types/yeoman-environment": "2.10.1",
-		"@typescript-eslint/parser": "4.1.0",
-		"@typescript-eslint/eslint-plugin": "4.1.0",
-		"eslint": "7.8.1",
+		"@typescript-eslint/parser": "^2.30.0",
+		"@typescript-eslint/eslint-plugin": "^2.30.0",
+		"eslint": "^6.8.0",
 		"eslint-config-prettier": "6.11.0",
 		"prettier": "2.1.1",
 		"typescript": "4.0.2",
