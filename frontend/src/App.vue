@@ -236,6 +236,7 @@ export default {
     gotoStep(numOfSteps) {
       // go numOfSteps step back
       try {
+		this.toShowPromptMessage = false;
         this.isReplaying = true;
         this.numOfSteps = numOfSteps;
         const answers = this.currentPrompt.answers;
@@ -260,6 +261,7 @@ export default {
 		return this.isWriting ? _.get(this.messages, "step_is_generating") : _.get(this.messages, "step_is_pending");
 	},
     next() {
+		this.toShowPromptMessage = false;
       if (this.resolve) {
         try {
           this.resolve(this.currentPrompt.answers);
