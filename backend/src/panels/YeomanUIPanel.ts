@@ -10,7 +10,7 @@ import { YouiEvents } from "../youi-events";
 import { VSCodeYouiEvents } from '../vscode-youi-events';
 import { AbstractWebviewPanel } from './AbstractWebviewPanel';
 import { ExploreGens } from '../exploregens';
-import { GeneratorOutput } from '../vscode-output';
+import { OutputChannel } from '../vscode-output';
 
 
 export class YeomanUIPanel extends AbstractWebviewPanel {
@@ -51,14 +51,14 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 
 	private yeomanui: YeomanUI;
 	private messages: any;
-	private output: GeneratorOutput;
+	private output: OutputChannel;
 
 	public constructor(context: vscode.ExtensionContext) {
 		super(context);
 		this.viewType = "yeomanui";
 		this.viewTitle = YeomanUIPanel.YEOMAN_UI;
 		this.focusedKey = "yeomanUI.Focused";
-		this.output = new GeneratorOutput();
+		this.output = new OutputChannel();
 	}
 
 	private getDefaultPaths(): string[] {

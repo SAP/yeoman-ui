@@ -55,23 +55,24 @@
           </v-col>
         </v-row>
         <v-row v-if="prompts.length > 0 && !isDone && showButtons" style="height: 4rem; margin: 0;" sm="auto">
-		<div class="bottom-right-col" style="flex:1;"></div>
-          <div class="diagonal"></div>
-          <div class="bottom-buttons-col" style="display:flex;align-items: center;">
-            <v-btn
-              id="back"
-              :disabled="promptIndex<1 || isReplaying"
-              @click="back"
-              v-show="promptIndex > 0"
-				style="min-width:90px;"
-            >
-              <v-icon left>mdi-chevron-left</v-icon>Back
-            </v-btn>
-            <v-btn id="next" :disabled="!stepValidated" @click="next" style="min-width:90px;">
-              {{nextButtonText}}
-              <v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
-            </v-btn>
-          </div>
+			<div v-if="toShowPromptMessage" :style="promptMessageStyle">{{promptMessageToDisplay}}</div>
+			<div class="bottom-right-col" style="flex:1;"></div>
+				<div class="diagonal"></div>
+				<div class="bottom-buttons-col" style="display:flex;align-items: center;">
+					<v-btn
+						id="back"
+						:disabled="promptIndex<1 || isReplaying"
+						@click="back"
+						v-show="promptIndex > 0"
+							style="min-width:90px;"
+						>
+						<v-icon left>mdi-chevron-left</v-icon>Back
+					</v-btn>
+					<v-btn id="next" :disabled="!stepValidated" @click="next" style="min-width:90px;">
+						{{nextButtonText}}
+						<v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
+					</v-btn>
+			</div>
         </v-row>
       </v-col>
     </v-row>
@@ -131,7 +132,10 @@ function initialState() {
     numOfSteps: 1,
 	isGeneric: false,
 	isWriting: false,
-	showButtons: true
+	showButtons: true,
+	promptMessageToDisplay: "",
+	toShowPromptMessage: false,
+	promptMessageStyle: ""
   };
 }
 
@@ -203,6 +207,21 @@ export default {
     }
   },
   methods: {
+	showPromptMessage(message, type) {
+		this.promptMessageToDisplay = message;
+		this.toShowPromptMessage = true;
+		let promptMessageColor = "red";
+		if (type === "error") {
+			promptMessageColor = "red";
+		} else if (type === "info") {
+			promptMessageColor = "green";
+		} else if (type === "warn") {
+			promptMessageColor = "orange";
+		}
+		this.promptMessageStyle = `font-size: 12px;padding-left: 12px;color: ${promptMessageColor};`;
+		// eslint-disable-next-line no-console
+		console.error(type);
+	},
     setBusyIndicator() {
       this.showBusyIndicator =
         _.isEmpty(this.prompts) ||
@@ -217,6 +236,7 @@ export default {
     gotoStep(numOfSteps) {
       // go numOfSteps step back
       try {
+		this.toShowPromptMessage = false;
         this.isReplaying = true;
         this.numOfSteps = numOfSteps;
         const answers = this.currentPrompt.answers;
@@ -241,6 +261,7 @@ export default {
 		return this.isWriting ? _.get(this.messages, "step_is_generating") : _.get(this.messages, "step_is_pending");
 	},
     next() {
+		this.toShowPromptMessage = false;
       if (this.resolve) {
         try {
           this.resolve(this.currentPrompt.answers);
@@ -339,7 +360,8 @@ export default {
       if (generatorsPrompt) {
         generatorsPrompt.questions = questions;
       }
-    },
+	},
+
     async showPrompt(questions, name) {
 		this.prepQuestions(questions);
 		if (this.isReplaying) {
@@ -445,7 +467,8 @@ export default {
         "generatorDone",
         "log",
         "updateGeneratorsPrompt",
-        "setGenInWriting"
+		"setGenInWriting",
+		"showPromptMessage"
       ];
       _.forEach(functions, (funcName) => {
         this.rpc.registerMethod({

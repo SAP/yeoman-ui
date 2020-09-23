@@ -1,9 +1,10 @@
 import * as vscode from "vscode";
+import * as _ from "lodash";
 import stripAnsi = require("strip-ansi");
 import { Output } from "./output";
 
 
-export class GeneratorOutput implements Output {
+export class OutputChannel implements Output {
 	private outputChannel: vscode.OutputChannel;
 	private outputChannels: any;
 
@@ -12,10 +13,10 @@ export class GeneratorOutput implements Output {
 	}
 
 	public setChannelName(channelName: string) {
-		this.outputChannel = this.outputChannels[channelName];
-		if (!this.outputChannel) {
+		const outputChannel = _.get(this.outputChannels, channelName);
+		if (!outputChannel) {
 			this.outputChannel = vscode.window.createOutputChannel(channelName);
-			this.outputChannels[channelName] = this.outputChannel;
+			_.set(this.outputChannels, channelName, this.outputChannel);
 		}
 
 		return this.outputChannel;

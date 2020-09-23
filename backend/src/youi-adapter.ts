@@ -20,7 +20,7 @@ export class YouiAdapter extends TerminalAdapter {
 
   public setYeomanUI(yeomanui: YeomanUI) {
 	this.yeomanui = yeomanui;
-	this.log = yoUiLog(this.output, this.yeomanui);
+	this.log = yoUiLog(this.log, this.output, this.yeomanui);
   }
 
   get colorDiffAdded() {

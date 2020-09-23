@@ -36,7 +36,7 @@ export class SWA {
 	 *
 	 * @returns { SWATracker }
 	 */
-	public static getSWATracker(): SWATracker {
+	private static getSWA(): SWATracker {
 		if (SWA.isInitialized() === false) {
 			return;
 		}
@@ -81,7 +81,7 @@ export class SWA {
 				const eventType = SWA.EVENT_TYPES.PROJECT_GENERATION_STARTED;
 				const customEvents = [generatorName];
 				SWA.startTime = Date.now();
-				SWA.getSWATracker().track(eventType, customEvents);
+				SWA.getSWA().track(eventType, customEvents);
 				if (logger) {
 					logger.trace("SAP Web Analytics tracker was called and start time was initialized", {
 						eventType, generatorName, startTime: SWA.startTime, customEvents});
@@ -106,7 +106,7 @@ export class SWA {
 				if (!_.isNil(errorMessage)) {
 					customEvents.push(errorMessage);
 				}
-				SWA.getSWATracker().track(eventType, customEvents);
+				SWA.getSWA().track(eventType, customEvents);
 				if (logger) {
 					logger.trace("SAP Web Analytics tracker was called", 
 						{eventType, generatorName, generationTimeSec, generationTimeMilliSec, endTime, startTime: SWA.startTime, customEvents, errorMessage});
@@ -122,7 +122,7 @@ export class SWA {
 		try {
 			if (SWA.isInitialized()) {
 				const eventType = SWA.EVENT_TYPES.EXPLORE_AND_INSTALL_GENERATORS_LINK;
-				SWA.getSWATracker().track(eventType);
+				SWA.getSWA().track(eventType);
 				if (logger) {
 					logger.trace("SAP Web Analytics tracker was called", {eventType});
 				}
@@ -137,7 +137,7 @@ export class SWA {
 			if (SWA.isInitialized()) {
 				const eventType = SWA.EVENT_TYPES.PREVIOUS_STEP;
 				const customEvents = [generatorName];
-				SWA.getSWATracker().track(eventType, customEvents);
+				SWA.getSWA().track(eventType, customEvents);
 				if (logger) {
 					logger.trace("SAP Web Analytics tracker was called", {eventType, generatorName, customEvents});  
 				}

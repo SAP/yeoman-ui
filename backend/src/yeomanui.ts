@@ -20,7 +20,6 @@ import { SWA } from "./swa-tracker/swa-tracker-wrapper";
 import TerminalAdapter = require("yeoman-environment/lib/adapter"); 
 import { Output } from "./output";
 
-
 export interface IQuestionsPrompt extends IPrompt{
   questions: any[];
 }
@@ -42,7 +41,6 @@ export class YeomanUI {
   private cwd: string;
   private readonly rpc: IRpc;
   private readonly youiEvents: YouiEvents;
-  private output: Output;
   private readonly logger: IChildLogger;
   private genMeta: { [namespace: string]: Environment.GeneratorMeta };
   private readonly youiAdapter: YouiAdapter;
@@ -54,6 +52,7 @@ export class YeomanUI {
   private readonly replayUtils: ReplayUtils;
   private readonly customQuestionEventHandlers: Map<string, Map<string, Function>>;
   private errorThrown = false;
+  private output: Output;
 
   constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
     this.rpc = rpc;
@@ -61,7 +60,7 @@ export class YeomanUI {
     this.generatorName = "";
     this.replayUtils = new ReplayUtils();
     this.youiEvents = youiEvents;
-    this.logger = logger;
+	this.logger = logger;
 	this.output = output;
     this.rpc.setResponseTimeout(3600000);
     this.rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
@@ -74,7 +73,7 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.setCwd, thisArg: this });
     this.rpc.registerMethod({ func: this.getState, thisArg: this });
 
-    this.uiOptions = uiOptions;
+	this.uiOptions = uiOptions;
     this.youiAdapter = new YouiAdapter(youiEvents, output);
     this.youiAdapter.setYeomanUI(this);
     this.promptCount = 0;
@@ -87,6 +86,33 @@ export class YeomanUI {
 
   private async getState() {
     return this.uiOptions;
+  }
+
+  public showLogMessage(message: any) {
+	if (message.location === "message") {
+		this.showNotificationMessage(message.value, message.type);
+	} else if (message.location === "prompt") {
+		this.showPromptMessage(message.value, message.type);
+	}
+  }
+
+  private showNotificationMessage(message: string, type: string) {
+	const vscode = this.getVscode();
+	if (vscode) {
+		if (type === "error") {
+			vscode.window.showErrorMessage(message);
+		}
+		else if (type === "warn") {
+			vscode.window.showWarningMessage(message);
+		}
+		else if (type === "info") {
+			vscode.window.showInformationMessage(message);
+		}
+	}
+  }
+
+  private showPromptMessage(message: string, type: string) {
+	this.rpc.invoke("showPromptMessage", [message, type]);
   }
 
   public async _notifyGeneratorsChange() {
@@ -180,8 +206,7 @@ export class YeomanUI {
 			const options = {
 				logger: this.logger.getChildLogger({label: generatorName}),
 				vscode: this.getVscode(), // TODO: remove this temporary workaround once a better solution is found,
-				data: this.uiOptions.data,
-				swaTracker: SWA.getSWATracker()
+				data: this.uiOptions.data
 			};
 			const gen: any = env.create(genNamespace, {options});
 			// check if generator defined a helper function called setPromptsCallback()
@@ -400,14 +425,14 @@ export class YeomanUI {
     resolve({ name: "Select Generator", questions: normalizedQuestions });
   }
 
-  private async createGeneratorPromptQuestions(generatorNames: string[], genFilter: GeneratorFilter): Promise<any[]> {
+  private async createGeneratorPromptQuestions(generatorNames: string[], filter: GeneratorFilter): Promise<any[]> {
     const generatorChoicePromises = _.map(generatorNames, genName => {
-      return this.getGeneratorChoice(genName, genFilter);
+      return this.getGeneratorChoice(genName, filter);
     });
 
     const questions: any[] = [];
 
-    if (_.includes(genFilter.types, GeneratorType.project)) {
+    if (_.includes(filter.types, GeneratorType.project)) {
       const defaultPath = this.getCwd();
       const targetFolderQuestion: any = {
         type: "input",
