@@ -89,6 +89,33 @@ export class YeomanUI {
     return this.uiOptions;
   }
 
+  public showLogMessage(message: any) {
+	if (message.location === "message") {
+		this.showNotificationMessage(message.value, message.type);
+	} else if (message.location === "prompt") {
+		this.showPromptMessage(message.value, message.type);
+	}
+  }
+
+  private showNotificationMessage(message: string, type: string) {
+	const vscode = this.getVscode();
+	if (vscode) {
+		if (type === "error") {
+			vscode.window.showErrorMessage(message);
+		}
+		else if (type === "warn") {
+			vscode.window.showWarningMessage(message);
+		}
+		else if (type === "info") {
+			vscode.window.showInformationMessage(message);
+		}
+	}
+  }
+
+  private showPromptMessage(message: string, type: string) {
+	this.rpc.invoke("showPromptMessage", [message, type]);
+  }
+
   public async _notifyGeneratorsChange() {
 	const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
     await this.rpc.invoke("updateGeneratorsPrompt", [generators.questions]);
