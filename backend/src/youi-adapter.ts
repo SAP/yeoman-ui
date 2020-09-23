@@ -13,14 +13,14 @@ export class YouiAdapter extends TerminalAdapter {
   private readonly output: Output;
 
   constructor(youiEvents: YouiEvents, output: Output) {
-	super({});
-	this.youiEvents = youiEvents;
-	this.output = output;
+	  super({});
+	  this.youiEvents = youiEvents;
+	  this.output = output;
   }
 
   public setYeomanUI(yeomanui: YeomanUI) {
-	this.yeomanui = yeomanui;
-	this.log = yoUiLog(this.log, this.output, this.yeomanui);
+	  this.yeomanui = yeomanui;
+	  this.log = yoUiLog(this.output, this.yeomanui);
   }
 
   get colorDiffAdded() {

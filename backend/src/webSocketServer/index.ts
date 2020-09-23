@@ -9,6 +9,7 @@ import { YouiEvents } from '../youi-events';
 import { GeneratorFilter } from '../filter';
 import Environment = require('yeoman-environment');
 
+
 class YeomanUIWebSocketServer {
   private rpc: RpcExtensionWebSockets | undefined;
   private yeomanui: YeomanUI | undefined;
