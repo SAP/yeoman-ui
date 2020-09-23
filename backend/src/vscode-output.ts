@@ -13,10 +13,10 @@ export class GeneratorOutput implements Output {
 	}
 
 	public setChannelName(channelName: string) {
-		const outputChannel = _.get(this.outputChannels, channelName);
-		if (!outputChannel) {
+		this.outputChannel = this.outputChannels[channelName];
+		if (!this.outputChannel) {
 			this.outputChannel = vscode.window.createOutputChannel(channelName);
-			_.set(this.outputChannels, channelName, this.outputChannel);
+			this.outputChannels[channelName] = this.outputChannel;
 		}
 
 		return this.outputChannel;
