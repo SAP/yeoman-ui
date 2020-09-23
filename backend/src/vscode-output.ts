@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import * as _ from "lodash";
 import stripAnsi = require("strip-ansi");
 import { Output } from "./output";
 
