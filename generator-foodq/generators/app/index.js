@@ -69,7 +69,7 @@ module.exports = class extends Generator {
           hint: "Our recommendation is green"
         },
         when: (response) => {
-		  this.log(response.hungry);
+		      this.log(response.hungry);
           return response.hungry;
         },
         validate: (value, answers) => {
@@ -348,6 +348,7 @@ module.exports = class extends Generator {
   }
 
   writing() {
+    this.log.showProgress("FoodQ is generating.");
     this.log('in writing');
     this.fs.copyTpl(this.templatePath('index.html'),
       this.destinationPath('public/index.html'), {

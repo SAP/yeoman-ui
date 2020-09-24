@@ -15,5 +15,7 @@ export default {
     channel_name: "Generators",
     select_generator_description: `${selectGeneratorQuestionHint}.\n${selectTargetFolderQuestionHint}.`,
     artifact_generated: `The project has been generated.`,
-    artifact_with_name_generated: (artifactName: string) => `The '${artifactName}' project has been generated.`
+    artifact_with_name_generated: (artifactName: string) => `The '${artifactName}' project has been generated.`,
+    show_progress_button: "Check progress",
+    show_progress_message: "Generating..."
 }; 

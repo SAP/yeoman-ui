@@ -103,6 +103,11 @@ export class YeomanUI {
     entry.set(methodName, handler);
   }
 
+  public async showProgress(message?: string) {
+    this.youiEvents.showProgress(message);
+  }
+  
+
   private async logError(error: any, prefixMessage?: string) {
     const errorObj: any = this.getErrorInfo(error);
     if (prefixMessage) {
