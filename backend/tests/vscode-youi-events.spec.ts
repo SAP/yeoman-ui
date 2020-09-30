@@ -206,7 +206,7 @@ describe('vscode-youi-events unit test', () => {
             return events.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
 
-        it("on success, no buttons are displayed", () => {
+        it("on success with the project already opened in the workspace, no buttons are displayed", () => {
             eventsMock.expects("doClose");
             _.set(vscode, "workspace.workspaceFolders", [{uri: {fsPath: "testDestinationRoot"}}]);
             windowMock.expects("showInformationMessage").
@@ -214,20 +214,18 @@ describe('vscode-youi-events unit test', () => {
             return events.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
 
+        it("on success with null targetFolderPath, no buttons are displayed", () => {
+            eventsMock.expects("doClose");
+            _.set(vscode, "workspace.workspaceFolders", [{uri: {fsPath: "rootFolderPath"}}]);
+            windowMock.expects("showInformationMessage").
+                withExactArgs(messages.default.artifact_generated).resolves();
+            return events.doGeneratorDone(true, "success message", null);
+        });
+
         it("on failure", () => {
             eventsMock.expects("doClose");
             windowMock.expects("showErrorMessage").withExactArgs("error message");
             return events.doGeneratorDone(false, "error message");
-        });
-
-        it("generator filter type is module", () => {
-            const genFilter = GeneratorFilter.create({type: ["module"]});
-            loggerWrapperMock.expects("getClassLogger");
-            const testEvents = new VSCodeYouiEvents(undefined, undefined, genFilter, messages.default, undefined);
-            eventsMock = sandbox.mock(testEvents);
-            eventsMock.expects("doClose");
-            windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated).resolves();
-            return testEvents.doGeneratorDone(true, "success message", "testDestinationRoot");
         });
     });
 });
