@@ -54,25 +54,25 @@
             />
           </v-col>
         </v-row>
+		<v-divider></v-divider>
         <v-row v-if="prompts.length > 0 && !isDone && showButtons" style="height: 4rem; margin: 0;" sm="auto">
-			<div v-if="toShowPromptMessage" :style="promptMessageStyle">{{promptMessageToDisplay}}</div>
-			<div class="bottom-right-col" style="flex:1;"></div>
-				<div class="diagonal"></div>
-				<div class="bottom-buttons-col" style="display:flex;align-items: center;">
-					<v-btn
-						id="back"
-						:disabled="promptIndex<1 || isReplaying"
-						@click="back"
-						v-show="promptIndex > 0"
-							style="min-width:90px;"
-						>
-						<v-icon left>mdi-chevron-left</v-icon>Back
-					</v-btn>
-					<v-btn id="next" :disabled="!stepValidated" @click="next" style="min-width:90px;">
-						{{nextButtonText}}
-						<v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
-					</v-btn>
-			</div>
+			<v-col class="bottom-buttons-col" style="display:flex;align-items: center;">
+				<v-btn id="back"
+					:disabled="promptIndex<1 || isReplaying"
+					@click="back" v-show="promptIndex > 0" style="min-width:90px;">
+					<v-icon left>mdi-chevron-left</v-icon>Back
+				</v-btn>
+				<v-btn id="next" :disabled="!stepValidated" @click="next" style="min-width:90px;">
+					{{nextButtonText}}
+					<v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
+				</v-btn>
+			</v-col>
+			<v-col>
+				<v-icon v-if="toShowPromptMessage">mdi-information-outline</v-icon>
+			</v-col>
+			<v-col cols="10">
+				<div v-if="toShowPromptMessage" :style="promptMessageStyle">{{promptMessageToDisplay}}</div>
+			</v-col>
         </v-row>
       </v-col>
     </v-row>
@@ -572,26 +572,16 @@ div.consoleClassVisible .v-footer {
 .right-col {
   padding: 0 !important;
 }
-.diagonal {
-  width: 80px;
-  background: linear-gradient(
-    120deg,
-    var(--vscode-editor-background, #1e1e1e) 0%,
-    var(--vscode-editor-background, #1e1e1e) 50%,
-    transparent 50%
-  );
-  background-color: var(--vscode-editorWidget-background, #252526);
-}
-.bottom-right-col {
+.bottom-left-col {
   background: var(--vscode-editor-background, #1e1e1e);
   overflow: hidden;
   margin: 0px;
 }
 .bottom-buttons-col {
-  background-color: var(--vscode-editorWidget-background, #252526);
+  border-top: 2px solid  var(--vscode-editorWidget-background, #252526);
   padding-right: 25px;
 }
 .bottom-buttons-col > .v-btn:not(:last-child) {
-  margin-right: 10px !important;
+    margin-right: 10px !important;
 }
 </style>
