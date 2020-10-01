@@ -56,7 +56,7 @@
         </v-row>
 		<v-divider></v-divider>
         <v-row v-if="prompts.length > 0 && !isDone && showButtons" style="height: 4rem; margin: 0;" sm="auto">
-			<v-col class="bottom-buttons-col" style="display:flex;align-items: center;">
+			<v-col cols="4" class="bottom-buttons-col" style="display:flex;align-items: center;">
 				<v-btn id="back"
 					:disabled="promptIndex<1 || isReplaying"
 					@click="back" v-show="promptIndex > 0" style="min-width:90px;">
@@ -67,10 +67,11 @@
 					<v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
 				</v-btn>
 			</v-col>
-			<v-col>
-				<v-icon v-if="toShowPromptMessage">mdi-information-outline</v-icon>
+			<v-col cols="1">
+				<!-- <img v-if="toShowPromptMessage" src="./assets/infoMessage.svg"/> -->
+				<img v-if="toShowPromptMessage" :src="promptMessageIcon">
 			</v-col>
-			<v-col cols="10">
+			<v-col cols="7">
 				<div v-if="toShowPromptMessage" :style="promptMessageStyle">{{promptMessageToDisplay}}</div>
 			</v-col>
         </v-row>
@@ -103,6 +104,9 @@ import FileBrowserPlugin from "@sap-devx/inquirer-gui-file-browser-plugin";
 import FolderBrowserPlugin from "@sap-devx/inquirer-gui-folder-browser-plugin";
 import LoginPlugin from "@sap-devx/inquirer-gui-login-plugin";
 import TilesPlugin from "@sap-devx/inquirer-gui-tiles-plugin";
+import errorSvg from './assets/errorMessage.svg';
+import infoSvg from './assets/infoMessage.svg';
+import warnSvg from './assets/warningMessage.svg';
 
 const FUNCTION = "__Function";
 const PENDING = "pending";
@@ -135,7 +139,8 @@ function initialState() {
 	showButtons: true,
 	promptMessageToDisplay: "",
 	toShowPromptMessage: false,
-	promptMessageStyle: ""
+	promptMessageStyle: "",
+	promptMessageIcon: null
   };
 }
 
@@ -210,14 +215,20 @@ export default {
 	showPromptMessage(message, type) {
 		this.promptMessageToDisplay = message;
 		this.toShowPromptMessage = true;
-		let promptMessageColor = "red";
+		
+		let promptMessageColor = "";
+		
 		if (type === "error") {
+			this.promptMessageIcon = errorSvg;
 			promptMessageColor = "red";
 		} else if (type === "info") {
+			this.promptMessageIcon = infoSvg;
 			promptMessageColor = "green";
 		} else if (type === "warn") {
+			this.promptMessageIcon = warnSvg;
 			promptMessageColor = "orange";
 		}
+		
 		this.promptMessageStyle = `font-size: 12px;padding-left: 12px;color: ${promptMessageColor};`;
 		// eslint-disable-next-line no-console
 		console.error(type);
@@ -490,8 +501,8 @@ export default {
 		}
     },
     async displayGeneratorsPrompt() {
-      await this.setMessagesAndSaveState();
-      await this.rpc.invoke("receiveIsWebviewReady", []);
+		await this.setMessagesAndSaveState();
+		await this.rpc.invoke("receiveIsWebviewReady", []);
     },
     toggleConsole() {
       this.showConsole = !this.showConsole;
@@ -583,5 +594,9 @@ div.consoleClassVisible .v-footer {
 }
 .bottom-buttons-col > .v-btn:not(:last-child) {
     margin-right: 10px !important;
+}
+.testicon {
+	background-image: url("./assets/errorMessage.svg");
+	/* mask-image: url("./assets/warningMessage.svg"); */
 }
 </style>
