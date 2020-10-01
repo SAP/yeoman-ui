@@ -56,7 +56,7 @@
         </v-row>
 		<v-divider></v-divider>
         <v-row v-if="prompts.length > 0 && !isDone && showButtons" style="height: 4rem; margin: 0;" sm="auto">
-			<v-col cols="4" class="bottom-buttons-col" style="display:flex;align-items: center;">
+			<v-col cols class="bottom-buttons-col" style="display:flex;align-items: center;">
 				<v-btn id="back"
 					:disabled="promptIndex<1 || isReplaying"
 					@click="back" v-show="promptIndex > 0" style="min-width:90px;">
@@ -67,13 +67,11 @@
 					<v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
 				</v-btn>
 			</v-col>
-			<v-col cols="1">
-				<!-- <img v-if="toShowPromptMessage" src="./assets/infoMessage.svg"/> -->
-				<img v-if="toShowPromptMessage" :src="promptMessageIcon">
+			<v-col v-if="toShowPromptMessage" style="text-align: center">
+				<img style="vertical-align:middle;" :src="promptMessageIcon" alt=""/>
+				<span :class="promptMessageClass" >{{promptMessageToDisplay}}</span>
 			</v-col>
-			<v-col cols="7">
-				<div v-if="toShowPromptMessage" :style="promptMessageStyle">{{promptMessageToDisplay}}</div>
-			</v-col>
+			<v-spacer/>
         </v-row>
       </v-col>
     </v-row>
@@ -139,7 +137,7 @@ function initialState() {
 	showButtons: true,
 	promptMessageToDisplay: "",
 	toShowPromptMessage: false,
-	promptMessageStyle: "",
+	promptMessageClass: "",
 	promptMessageIcon: null
   };
 }
@@ -216,22 +214,16 @@ export default {
 		this.promptMessageToDisplay = message;
 		this.toShowPromptMessage = true;
 		
-		let promptMessageColor = "";
-		
 		if (type === "error") {
 			this.promptMessageIcon = errorSvg;
-			promptMessageColor = "red";
+			this.promptMessageClass = "error-prompt-message";
 		} else if (type === "info") {
 			this.promptMessageIcon = infoSvg;
-			promptMessageColor = "green";
+			this.promptMessageClass = "info-warn-prompt-message";
 		} else if (type === "warn") {
 			this.promptMessageIcon = warnSvg;
-			promptMessageColor = "orange";
+			this.promptMessageClass = "info-warn-prompt-message";
 		}
-		
-		this.promptMessageStyle = `font-size: 12px;padding-left: 12px;color: ${promptMessageColor};`;
-		// eslint-disable-next-line no-console
-		console.error(type);
 	},
     setBusyIndicator() {
       this.showBusyIndicator =
@@ -595,8 +587,16 @@ div.consoleClassVisible .v-footer {
 .bottom-buttons-col > .v-btn:not(:last-child) {
     margin-right: 10px !important;
 }
-.testicon {
-	background-image: url("./assets/errorMessage.svg");
-	/* mask-image: url("./assets/warningMessage.svg"); */
+/* Error prompt message*/
+.error-prompt-message {
+  font-size: 15px;
+  padding-left: 12px;
+  color: #ff5252;
+}
+/* Info and Warning prompt message*/
+.info-warn-prompt-message {
+  color: var(--vscode-editorCodeLens-foreground, #999999);
+  padding-left: 12px;
+  font-size: 15px;
 }
 </style>
