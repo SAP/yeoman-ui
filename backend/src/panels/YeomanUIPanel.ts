@@ -83,9 +83,15 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 
 		let uri;
 		try {
+			if (_.isEmpty(currentPath)) {
+				throw new Error('Empty path');
+			}
 			uri = vscode.Uri.file(currentPath);
 		} catch (e) {
-			uri = vscode.Uri.file(path.join(os.homedir()));
+			uri = _.get(vscode, "workspace.workspaceFolders[0].uri")
+			if (_.isNil(uri)) {
+				uri = vscode.Uri.file(path.join(os.homedir()));
+			}
 		}
 
 		try {

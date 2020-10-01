@@ -208,8 +208,7 @@ module.exports = class extends Generator {
           type: "folder-browser",
         },
         name: "dump",
-        message: "Choose dump folder",
-        default: "/"
+        message: "Choose dump folder"
       },
       {
         type: 'list',
