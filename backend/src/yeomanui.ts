@@ -8,7 +8,10 @@ import { ReplayUtils, ReplayState } from "./replayUtils";
 const datauri = require("datauri"); // eslint-disable-line @typescript-eslint/no-var-requires
 const titleize = require('titleize'); // eslint-disable-line @typescript-eslint/no-var-requires
 const humanizeString = require('humanize-string'); // eslint-disable-line @typescript-eslint/no-var-requires
-import * as defaultImage from "./defaultImage";
+import * as defaultImage from "./images/defaultImage";
+import * as errorSvg from "./images/errorMessage";
+import * as infoSvg from "./images/infoMessage";
+import * as warnSvg from "./images/warnMessage";
 import { YouiAdapter } from "./youi-adapter";
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
@@ -72,7 +75,7 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.logError, thisArg: this });
     this.rpc.registerMethod({ func: this.back, thisArg: this });
     this.rpc.registerMethod({ func: this.setCwd, thisArg: this });
-    this.rpc.registerMethod({ func: this.getState, thisArg: this });
+	this.rpc.registerMethod({ func: this.getState, thisArg: this });
 
     this.uiOptions = uiOptions;
     this.youiAdapter = new YouiAdapter(youiEvents, output);
@@ -89,11 +92,21 @@ export class YeomanUI {
     return this.uiOptions;
   }
 
+  private getMessageImage(type: string) {
+	  if (type === "error") {
+		return errorSvg.default;
+	  } else if (type === "info") {
+		return infoSvg.default;
+	  } else if (type === "warn") {
+		return warnSvg.default;
+	  }
+  }
+
   public showLogMessage(message: any) {
 	if (message.location === "message") {
 		this.showNotificationMessage(message.value, message.type);
 	} else if (message.location === "prompt") {
-		this.showPromptMessage(message.value, message.type);
+		this.showPromptMessage(message.value, message.type, this.getMessageImage(message.type));
 	}
   }
 
@@ -112,8 +125,8 @@ export class YeomanUI {
 	}
   }
 
-  private showPromptMessage(message: string, type: string) {
-	this.rpc.invoke("showPromptMessage", [message, type]);
+  private showPromptMessage(message: string, type: string, image: any) {
+	this.rpc.invoke("showPromptMessage", [message, type, image]);
   }
 
   public async _notifyGeneratorsChange() {
@@ -238,6 +251,8 @@ export class YeomanUI {
 			});
 		} catch (error) {
 			this.onGeneratorFailure(generatorName, error);
+		} finally {
+			this.gen = undefined;
 		}
 	}
 

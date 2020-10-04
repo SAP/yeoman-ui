@@ -67,9 +67,9 @@
 					<v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
 				</v-btn>
 			</v-col>
-			<v-col cols="4" v-if="toShowPromptMessage" style="text-align: center">
-				<img style="vertical-align:middle;" :src="promptMessageIcon" alt=""/>
-				<span :class="promptMessageClass" >{{promptMessageToDisplay}}</span>
+			<v-col cols="4" v-if="toShowPromptMessage" >
+				<img style="vertical-align:middle;" :src="promptMessageIcon" alt="" />
+				<span :class="promptMessageClass">{{promptMessageToDisplay}}</span>
 			</v-col>
 			<v-spacer/>
         </v-row>
@@ -102,9 +102,6 @@ import FileBrowserPlugin from "@sap-devx/inquirer-gui-file-browser-plugin";
 import FolderBrowserPlugin from "@sap-devx/inquirer-gui-folder-browser-plugin";
 import LoginPlugin from "@sap-devx/inquirer-gui-login-plugin";
 import TilesPlugin from "@sap-devx/inquirer-gui-tiles-plugin";
-import errorSvg from './assets/errorMessage.svg';
-import infoSvg from './assets/infoMessage.svg';
-import warnSvg from './assets/warningMessage.svg';
 
 const FUNCTION = "__Function";
 const PENDING = "pending";
@@ -210,18 +207,16 @@ export default {
     }
   },
   methods: {
-	showPromptMessage(message, type) {
+	showPromptMessage(message, type, image) {
 		this.promptMessageToDisplay = message;
 		this.toShowPromptMessage = true;
+		this.promptMessageIcon = image;
 		
 		if (type === "error") {
-			this.promptMessageIcon = errorSvg;
 			this.promptMessageClass = "error-prompt-message";
 		} else if (type === "info") {
-			this.promptMessageIcon = infoSvg;
 			this.promptMessageClass = "info-warn-prompt-message";
 		} else if (type === "warn") {
-			this.promptMessageIcon = warnSvg;
 			this.promptMessageClass = "info-warn-prompt-message";
 		}
 	},
@@ -592,11 +587,13 @@ div.consoleClassVisible .v-footer {
   font-size: 14px;
   padding-left: 12px;
   color: #ff5252;
+  vertical-align: middle;
 }
 /* Info and Warning prompt message*/
 .info-warn-prompt-message {
   color: var(--vscode-editorCodeLens-foreground, #999999);
   padding-left: 12px;
   font-size: 14px;
+  vertical-align: middle;
 }
 </style>
