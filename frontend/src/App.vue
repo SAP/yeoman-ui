@@ -55,8 +55,8 @@
           </v-col>
         </v-row>
 		<v-divider></v-divider>
-        <v-row v-if="prompts.length > 0 && !isDone && showButtons" style="height: 4rem; margin: 0;" sm="auto">
-			<v-col cols class="bottom-buttons-col" style="display:flex;align-items: center;">
+        <v-row v-if="prompts.length > 0 && !isDone && showButtons" style="height: 4rem; margin: 0; align-items: center;" sm="auto">
+			<v-col cols="3" class="bottom-buttons-col" style="display:flex;">
 				<v-btn id="back"
 					:disabled="promptIndex<1 || isReplaying"
 					@click="back" v-show="promptIndex > 0" style="min-width:90px;">
@@ -67,7 +67,7 @@
 					<v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
 				</v-btn>
 			</v-col>
-			<v-col v-if="toShowPromptMessage" style="text-align: center">
+			<v-col cols="4" v-if="toShowPromptMessage" style="text-align: center">
 				<img style="vertical-align:middle;" :src="promptMessageIcon" alt=""/>
 				<span :class="promptMessageClass" >{{promptMessageToDisplay}}</span>
 			</v-col>
@@ -589,7 +589,7 @@ div.consoleClassVisible .v-footer {
 }
 /* Error prompt message*/
 .error-prompt-message {
-  font-size: 15px;
+  font-size: 14px;
   padding-left: 12px;
   color: #ff5252;
 }
@@ -597,6 +597,6 @@ div.consoleClassVisible .v-footer {
 .info-warn-prompt-message {
   color: var(--vscode-editorCodeLens-foreground, #999999);
   padding-left: 12px;
-  font-size: 15px;
+  font-size: 14px;
 }
 </style>

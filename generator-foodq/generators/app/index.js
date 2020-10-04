@@ -69,7 +69,6 @@ module.exports = class extends Generator {
           hint: "Our recommendation is green"
         },
         when: (response) => {
-		  this.log(response.hungry, {type: "error", location: "message"});
           return response.hungry;
         },
         validate: (value, answers) => {
@@ -105,7 +104,8 @@ module.exports = class extends Generator {
           this.log(response.hungry);
           const that = this;
           return new Promise((resolve) => {
-            that.log(`Purposely delaying response for 2 seconds...`, {type: "error", location: "prompt"});
+			that.log(`Purposely delaying response for 2 seconds.`, {type: "error", location: "prompt"});
+			that.log(`Purposely delaying response for 2 seconds.`, {type: "error", location: "message"});
             setTimeout(() => {
               resolve(response.hungry);
             }, 2000);
@@ -158,6 +158,8 @@ module.exports = class extends Generator {
     prompts = [
       {
         when: () => {
+			this.log(this.answers.confirmHungry, this.answers.hungerLevel, {type: "warn", location: "prompt"});
+    		this.log(this.answers.confirmHungry, this.answers.hungerLevel, {type: "warn", location: "message"});
           return this.answers.confirmHungry;
         },
         type: "list",
@@ -245,8 +247,9 @@ module.exports = class extends Generator {
 
     const answers = await this.prompt(prompts);
 
-    this.answers = Object.assign({}, this.answers, answers);
-    this.log("Hunger level", this.answers.hungerLevel, {type: "info", location: "prompt"});
+	this.answers = Object.assign({}, this.answers, answers);
+	this.log("Hunger level", this.answers.hungerLevel, {type: "info", location: "prompt"});
+    this.log("Hunger level", this.answers.hungerLevel, {type: "info", location: "message"});
 
     prompts = [
       {
