@@ -38,6 +38,9 @@ describe('yeomanui unit test', () => {
         public doGeneratorInstall(): void {
             return;
         }
+        public showProgress(message?: string): void {
+            return;
+        }
     }
     class TestRpc implements IRpc {
         public  timeout: number;
@@ -76,7 +79,7 @@ describe('yeomanui unit test', () => {
     }
     
     const testLogger = {debug: () => true, error: () => true, 
-        fatal: () => true, warn: () => true, info: () => true, trace: () => true, getChildLogger: () => (null as IChildLogger)};
+        fatal: () => true, warn: () => true, info: () => true, trace: () => true, getChildLogger: () => {return testLogger;}};
 
     const rpc = new TestRpc();
     const outputChannel: any = {
@@ -135,6 +138,20 @@ describe('yeomanui unit test', () => {
         it("prompt without questions", async () => {
             const answers = await yeomanUi.showPrompt([]);
             expect(answers).to.be.empty;
+        });
+    });
+
+    describe("showProgress", () => {
+        it("called with message parameter ---> call showProgress event with the parameter", async () => {
+            const message: string = "Project Test is generating"
+            youiEventsMock.expects("showProgress").withExactArgs(message);
+            await yeomanUi.showProgress(message);
+        });
+
+        it("called without message parameter ---> call showProgress event with no parameter", async () => {
+            const message: string = "Project Test is generating"
+            youiEventsMock.expects("showProgress").withExactArgs(undefined);
+            await yeomanUi.showProgress();
         });
     });
 

@@ -4,17 +4,29 @@ import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorFilter, GeneratorType } from './filter';
 import { relative, isAbsolute } from 'path';
+import { GeneratorOutput } from './vscode-output';
+import { IChildLogger } from '@vscode-logging/logger';
+import { getClassLogger } from './logger/logger-wrapper';
 
 export class VSCodeYouiEvents implements YouiEvents {
     private webviewPanel: vscode.WebviewPanel;
     private readonly genFilter: GeneratorFilter;
     private readonly messages: any;
     private resolveFunc: any;
+    private output: GeneratorOutput;
+    private readonly logger: IChildLogger;
 
-    constructor(rpc: IRpc, webviewPanel: vscode.WebviewPanel, genFilter: GeneratorFilter, messages: any) {
+    constructor(
+        rpc: IRpc, 
+        webviewPanel: vscode.WebviewPanel, 
+        genFilter: GeneratorFilter, 
+        messages: any, 
+        output: GeneratorOutput) {
         this.webviewPanel = webviewPanel;   
         this.genFilter = genFilter;
         this.messages = messages;    
+        this.output = output;
+        this.logger = getClassLogger("VSCodeYouiEvents");
     }
 
     public doGeneratorDone(success: boolean, message: string, targetFolderPath?: string): void {
@@ -27,6 +39,28 @@ export class VSCodeYouiEvents implements YouiEvents {
         this.showInstallMessage();
     }
 
+    public showProgress(message?: string): void {
+        const openOutput: any = this.messages.show_progress_button;
+        const buttons: string[] = [];
+        buttons.push(openOutput);
+        if (_.isEmpty(message)) {
+            message = this.messages.show_progress_message;
+        }
+        this.logger.debug("Showing Progress.", {
+            notificationMessage: message,
+        });
+        vscode.window.showInformationMessage(message, ...buttons).then(selection => {
+            if (selection === openOutput) {
+                return this.toggleOutput();
+            }
+        });
+    }
+
+    private toggleOutput() {
+        this.output.show();
+        this.logger.trace("Output was shown.");
+    }
+    
     private doClose(): void {
         if (this.webviewPanel) {
             this.webviewPanel.dispose();
