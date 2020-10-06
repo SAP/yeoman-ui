@@ -348,7 +348,9 @@ module.exports = class extends Generator {
   }
 
   writing() {
-    this.log.showProgress("FoodQ is generating.");
+    if (_.get(this.log, "showProgress")) {
+        this.log.showProgress("FoodQ is generating.");
+    }
     this.log('in writing');
     this.fs.copyTpl(this.templatePath('index.html'),
       this.destinationPath('public/index.html'), {
