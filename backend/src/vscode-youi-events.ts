@@ -114,10 +114,14 @@ export class VSCodeYouiEvents implements YouiEvents {
             const addToWorkspace = "Add to Workspace";
             const openInNewWorkspace: any = "Open in New Workspace";
             const items: string[] = [];
-            
-            const targetFolderUri: vscode.Uri = vscode.Uri.file(targetFolderPath);
+            let targetFolderUri: vscode.Uri = null;
 
-            if (!_.includes(this.genFilter.types, GeneratorType.module)) {
+            // The correct targetFolderPath is unknown ---> no buttons should be shown
+            if (!_.isNil(targetFolderPath)) {
+                // Target folder is visible in workpace ---> addToWorkspace only
+                // Target folder is not visible in workpace ---> addToWorkspace and openInNewWorkspace
+
+                targetFolderUri = vscode.Uri.file(targetFolderPath);
                 const workspacePath = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
                 // 1. target workspace folder should not already contain target generator folder
                 const foundInWorkspace = _.find(vscode.workspace.workspaceFolders, (wsFolder: vscode.WorkspaceFolder) => {
