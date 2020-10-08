@@ -31,10 +31,10 @@ module.exports = class extends Generator {
   }
 
   paths() {
-    this.log(this.destinationRoot());
+    this.log("Destination = " + this.destinationRoot());
     // returns '~/projects'
 
-    this.log(this.destinationPath('index.js'));
+    this.log("Destination path = " + this.destinationPath('index.js'));
     // returns '~/projects/index.js'
   }
 
@@ -69,7 +69,7 @@ module.exports = class extends Generator {
           hint: "Our recommendation is green"
         },
         when: (response) => {
-		      this.log(response.hungry);
+		      this.log("Response for hungry = " + response.hungry);
           return response.hungry;
         },
         validate: (value, answers) => {
@@ -93,9 +93,9 @@ module.exports = class extends Generator {
         },
         type: "number",
         name: "number",
-        message: "How many times have you been in this resturant?",
+        message: "How many times have you been in this restaurant?",
         guiOptions: {
-          hint: "We hope you have been in our resturant many times",
+          hint: "We hope you have been in our restaurant many times",
 		  applyDefaultWhenDirty: true,
 		  mandatory: true
         },
@@ -246,7 +246,7 @@ module.exports = class extends Generator {
     const answers = await this.prompt(prompts);
 
     this.answers = Object.assign({}, this.answers, answers);
-    this.log("Hunger level", this.answers.hungerLevel);
+    this.log("Hunger level = " + this.answers.hungerLevel);
 
     prompts = [
       {
@@ -319,7 +319,7 @@ module.exports = class extends Generator {
 
     const answers_login = await this.prompt(prompts);
     this.answers = Object.assign({}, this.answers, answers_login);
-    this.log("Email", this.answers.email);
+    this.log("Email = " + this.answers.email);
   }
 
   _requireLetterAndNumber(value) {
@@ -336,22 +336,30 @@ module.exports = class extends Generator {
       image = Datauri(imagePath).content;
     } catch (error) {
       image = DEFAULT_IMAGE;
-      this.log("Error", error);
+      this.log("Error = " + error);
     }
     return image;
   }
 
   configuring() {
-    this.log('in configuring');
+    this.log('FoodQ is in configuring stage.');
     this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "answers_main_dish.food", "")));
-    this.log('destinationRoot: ' + this.destinationRoot());
+    this.log('Destination Root = ' + this.destinationRoot());
   }
 
   writing() {
+    this.log('FoodQ is in writing stage.');
     if (_.get(this.log, "showProgress")) {
-        this.log.showProgress("FoodQ is generating.");
+        this.log.showProgress("Generating the FoodQ project.");
     }
-    this.log('in writing');
+    this.log('The following choices were chosen:');
+    !_.isNil(this.answers.hungry) && this.log('Hungry = ' + this.answers.hungry);
+    !_.isNil(this.answers.confirmHungry) && this.log('Confirm Hungry = ' + this.answers.confirmHungry);
+    !_.isNil(this.answers_main_dish.food) && this.log('Main dish = ' + this.answers_main_dish.food);
+    !_.isNil(this.answers.beers) && this.log('Beers = ' + this.answers.beers);
+    !_.isNil(this.answers.fav_color) && this.log('Favorite napkin color = ' + this.answers.fav_color);
+    !_.isNil(this.answers.number) && this.log('Times you have been in this restaurant = ' + this.answers.number);
+
     this.fs.copyTpl(this.templatePath('index.html'),
       this.destinationPath('public/index.html'), {
       title: 'Templating with Yeoman',
@@ -391,11 +399,13 @@ module.exports = class extends Generator {
   }
 
   install() {
+    this.log('FoodQ is installing dependencies.');
     this.npmInstall(['lodash'], { 'save-dev': true });
   }
 
   end() {
-    this.log('in end');
+    this.log('FoodQ completed to install dependencies.');
+    this.log('FoodQ generation completed.');
     const showInformationMessage = _.get(this.vscode, "window.showInformationMessage");
     if (showInformationMessage) {
       showInformationMessage("FoodQ ended");
