@@ -9,9 +9,12 @@ const datauri = require("datauri"); // eslint-disable-line @typescript-eslint/no
 const titleize = require('titleize'); // eslint-disable-line @typescript-eslint/no-var-requires
 const humanizeString = require('humanize-string'); // eslint-disable-line @typescript-eslint/no-var-requires
 import * as defaultImage from "./images/defaultImage";
-import * as errorSvg from "./images/errorMessage";
-import * as infoSvg from "./images/infoMessage";
-import * as warnSvg from "./images/warnMessage";
+import * as errorVSCode from "./images/vscode/errorMessage";
+import * as infoVSCode from "./images/vscode/infoMessage";
+import * as warnVSCode from "./images/vscode/warnMessage";
+import * as errorTheia from "./images/theia/errorMessage";
+import * as infoTheia from "./images/theia/infoMessage";
+import * as warnTheia from "./images/theia/warnMessage";
 import { YouiAdapter } from "./youi-adapter";
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
@@ -57,8 +60,9 @@ export class YeomanUI {
   private readonly replayUtils: ReplayUtils;
   private readonly customQuestionEventHandlers: Map<string, Map<string, Function>>;
   private errorThrown = false;
+  private isInBAS: boolean;
 
-  constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
+  constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS, isInBAS: boolean) {
     this.rpc = rpc;
     
     this.generatorName = "";
@@ -84,8 +88,9 @@ export class YeomanUI {
     this.genMeta = {};
     this.currentQuestions = {};
     this.customQuestionEventHandlers = new Map();
-	this.setCwd(outputPath);
-	this.npmGlobalPaths = _.get(uiOptions, "npmGlobalPaths", []);
+    this.setCwd(outputPath);
+    this.isInBAS = isInBAS;
+	  this.npmGlobalPaths = _.get(uiOptions, "npmGlobalPaths", []);
   }
 
   private async getState() {
@@ -94,11 +99,23 @@ export class YeomanUI {
 
   private getMessageImage(type: string) {
 	  if (type === "error") {
-		return errorSvg.default;
+      if (this.isInBAS) {
+        return errorTheia.default;
+      } else {
+        return errorVSCode.default;
+      }
 	  } else if (type === "info") {
-		return infoSvg.default;
+      if (this.isInBAS) {
+        return infoTheia.default;
+      } else {
+        return infoVSCode.default;
+      }
 	  } else if (type === "warn") {
-		return warnSvg.default;
+      if (this.isInBAS) {
+        return warnTheia.default;
+      } else {
+        return warnVSCode.default;
+      }
 	  }
   }
 
