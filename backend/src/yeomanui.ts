@@ -12,7 +12,6 @@ import * as defaultImage from "./defaultImage";
 import { YouiAdapter } from "./youi-adapter";
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-import Generator = require("yeoman-generator");
 import { GeneratorFilter, GeneratorType } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import { IPrompt } from "@sap-devx/yeoman-ui-types";
@@ -54,8 +53,11 @@ export class YeomanUI {
 	private readonly customQuestionEventHandlers: Map<string, Map<string, Function>>;
 	private errorThrown = false;
 	private outputPath: string;
-	private gen: Generator;
+	private gen: any;
 	private gensMeta: any;
+	private env: Environment;
+	private onBack: boolean;
+
 
 	constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
 		this.rpc = rpc;
@@ -120,10 +122,10 @@ export class YeomanUI {
 	}
 
 	private async getGeneratorsPrompt() {
-		const env = Environment.createEnv();
+		this.env = Environment.createEnv(undefined, { sharedOptions: { forwardErrorToEnvironment: true } }, this.youiAdapter);
 		const npmPaths = this.getNpmPaths();
-		this.gensMeta = env.lookup({ npmPaths });
-		const questions: any[] = await this.createGeneratorPromptQuestions(env.getGeneratorNames(), this.uiOptions.filter);
+		this.gensMeta = this.env.lookup({ npmPaths });
+		const questions: any[] = await this.createGeneratorPromptQuestions(this.env.getGeneratorNames(), this.uiOptions.filter);
 
 		this.currentQuestions = questions;
 		const normalizedQuestions = this.normalizeFunctions(questions);
@@ -161,7 +163,7 @@ export class YeomanUI {
 
 	private getVscode() {
 		try {
-			return require("vscode");
+			return require('vscode');
 		} catch (error) {
 			return undefined;
 		}
@@ -177,14 +179,10 @@ export class YeomanUI {
 			await fsextra.mkdirs(targetFolder);
 			const dirsBefore = await this.getChildDirectories(targetFolder);
 
-			const env = Environment.createEnv(undefined, { sharedOptions: { forwardErrorToEnvironment: true } }, this.youiAdapter);
-
 			// remove previously installed generator version
 			_.forEach(this.gensMeta, (genMeta: any) => {
-				if (_.startsWith(genMeta.namespace, `${generatorName}:`)) {
-					const resolvedPath: string = path.resolve(genMeta.generatorPath);
-					env.register(genMeta.generatorPath, genMeta.namespace, genMeta.packagePath);
-					delete require.cache[resolvedPath];
+				if (_.startsWith(genMeta.namespace, generatorName)) {
+					delete require.cache[require.resolve(genMeta.generatorPath)]; 
 				}
 			});
 
@@ -196,24 +194,29 @@ export class YeomanUI {
 				swaTracker: SWA.getSWATracker()
 			};
 
-			this.gen = env.create(genNamespace, { options }) as Generator;
+			this.gen = this.env.create(genNamespace, { options });
 			// check if generator defined a helper function called setPromptsCallback()
 			const setPromptsCallback = _.get(this.gen, "setPromptsCallback");
 			if (setPromptsCallback) {
 				setPromptsCallback(this.setPromptList.bind(this));
 			}
 
-			this.promptCount = 0;
-			
 			this.gen.destinationRoot(targetFolder);
 			// notifies ui wether generator is in writing state
 			this.setGenInWriting(this.gen);
 			// handles generator install step if exists
 			this.onGenInstall(this.gen);
 			// handles generator errors 
-			this.handleErrors(env, this.gen, generatorName);
+			this.handleErrors(this.env, this.gen, generatorName);
 
-			env.runGenerator(this.gen, error => {
+			this.promptCount = 0;
+
+			this.env.runGenerator(this.gen, error => {
+				if (this.onBack) {
+					this.onBack = false;
+					return;
+				}
+
 				if (!this.errorThrown && !error) {
 					// Without resolve this code worked only for absolute paths without / at the end.
 					// Generator can put a relative path, path including . and .. and / at the end.
@@ -224,7 +227,7 @@ export class YeomanUI {
 			});
 		} catch (error) {
 			this.onGeneratorFailure(generatorName, error);
-		}
+		} 
 	}
 
 	private setGenInWriting(gen: any) {
@@ -344,6 +347,11 @@ export class YeomanUI {
 	private back(partialAnswers: Environment.Answers, numOfSteps: number) {
 		SWA.updateOneOfPreviousStepsClicked(this.generatorName, this.logger);
 		this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
+
+		const runLoop = _.get(this.env, "runLoop");
+		this.onBack = true;
+		runLoop.running = false;
+		runLoop.emit("end");
 		this.runGenerator(this.generatorName);
 	}
 
