@@ -55,22 +55,23 @@
           </v-col>
         </v-row>
 		<v-divider></v-divider>
-        <v-row v-if="prompts.length > 0 && !isDone && showButtons" style="height: 4rem; margin: 0; align-items: center;" sm="auto">
-			<v-col cols="3" class="bottom-buttons-col" style="display:flex;">
-				<v-btn id="back"
-					:disabled="promptIndex<1 || isReplaying"
-					@click="back" v-show="promptIndex > 0" style="min-width:90px;">
-					<v-icon left>mdi-chevron-left</v-icon>Back
-				</v-btn>
-				<v-btn id="next" :disabled="!stepValidated" @click="next" style="min-width:90px;">
-					{{nextButtonText}}
-					<v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
-				</v-btn>
-			</v-col>
-			<v-col cols="4" v-if="toShowPromptMessage" >
-				<img style="vertical-align:middle;" :src="promptMessageIcon" alt="" />
+        <v-row v-if="prompts.length > 0 && !isDone && showButtons" style="height: 4rem; margin: 0; align-items: left;" sm="auto">
+				<div class="diagonal"></div>
+        <div class="bottom-buttons-col" style="display:flex;">
+          <v-btn id="back"
+            :disabled="promptIndex<1 || isReplaying"
+            @click="back" v-show="promptIndex > 0" style="min-width:90px;">
+            <v-icon left>mdi-chevron-left</v-icon>Back
+          </v-btn>
+          <v-btn id="next" :disabled="!stepValidated" @click="next" style="min-width:90px;">
+            {{nextButtonText}}
+            <v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
+          </v-btn>
+        </div>
+			<div class="prompt-message" v-if="toShowPromptMessage"  >
+				<img style="vertical-align:middle; padding-left:12px;" :src="promptMessageIcon" alt="" />
 				<span :class="promptMessageClass">{{promptMessageToDisplay}}</span>
-			</v-col>
+			</div>
 			<v-spacer/>
         </v-row>
       </v-col>
@@ -577,11 +578,17 @@ div.consoleClassVisible .v-footer {
 }
 .bottom-buttons-col {
   border-top: 2px solid  var(--vscode-editorWidget-background, #252526);
-  padding-right: 25px;
+  padding: 12px;
+  padding-left: 0px;
+  background-color: var(--vscode-editorWidget-background,#252526);
 }
 .bottom-buttons-col > .v-btn:not(:last-child) {
     margin-right: 10px !important;
 }
+ .prompt-message {
+  border-top: 2px solid  var(--vscode-editorWidget-background, #252526);
+  padding: 12px;
+} 
 /* Error prompt message*/
 .error-prompt-message {
   font-size: 14px;
@@ -596,4 +603,15 @@ div.consoleClassVisible .v-footer {
   font-size: 14px;
   vertical-align: middle;
 }
+.diagonal {	
+  width: 80px;	
+  background: linear-gradient(	
+    120deg,	
+    var(--vscode-editor-background, #1e1e1e) 0%,	
+    var(--vscode-editor-background, #1e1e1e) 50%,	
+    transparent 50%	
+  );	
+  background-color: var(--vscode-editorWidget-background, #252526);	
+}
+
 </style>
