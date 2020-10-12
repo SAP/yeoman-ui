@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.29",
+	"version": "1.1.30",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -17,7 +17,7 @@
 	},
 	"icon": "Wizard_logo.png",
 	"engines": {
-		"vscode": "^1.39.2"
+		"vscode": "^1.49.0"
 	},
 	"categories": [
 		"Other"
@@ -171,6 +171,7 @@
 		"@types/lodash": "4.14.161",
 		"@types/mocha": "^5.2.7",
 		"@types/node": "14.6.4",
+		"@types/vscode": "^1.49.0",
 		"@types/object-hash": "1.3.3",
 		"@types/sinon": "9.0.5",
 		"@types/ws": "7.2.6",
@@ -180,19 +181,19 @@
 		"eslint": "^6.8.0",
 		"eslint-config-prettier": "6.11.0",
 		"prettier": "2.1.1",
-		"typescript": "4.0.2",
+		"typescript": "3.4.3",
 		"bufferutil": "4.0.1",
 		"chai": "4.2.0",
 		"copy-webpack-plugin": "6.1.0",
 		"mocha": "^6.2.2",
 		"nyc": "15.1.0",
 		"sinon": "9.0.3",
-		"ts-loader": "8.0.3",
+		"ts-loader": "8.0.4",
 		"ts-node": "9.0.0",
 		"utf-8-validate": "5.0.2",
 		"string-replace-loader": "2.3.0",
-		"vsce": "1.79.5",
-		"webpack": "4.44.1",
+		"vsce": "1.80.0",
+		"webpack": "4.44.2",
 		"webpack-cli": "3.3.12"
 	}
 }

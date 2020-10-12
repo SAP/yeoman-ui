@@ -70,15 +70,6 @@ const config = {
 		}
 	  },
 	  {
-        test: /yeoman-environment[/|\\]lib[/|\\]store.js/,
-        loader: 'string-replace-loader',
-        options: {
-          search: 'require[(](?=[^\'])',
-          replace: '__non_webpack_require__(',
-		  flags: 'g'
-		}
-	  },
-	  {
         test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]repository.js/,
         loader: 'string-replace-loader',
         options: {
