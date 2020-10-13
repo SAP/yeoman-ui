@@ -51,8 +51,7 @@ export class YeomanUI {
 	private outputPath: string;
 	private gen: any;
 	private gensMeta: any;
-	private env: Environment;
-	private onBack: boolean;
+	//private env: Environment;
 
 
 	constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
@@ -118,10 +117,10 @@ export class YeomanUI {
 	}
 
 	private async getGeneratorsPrompt() {
-		this.env = Environment.createEnv(undefined, { sharedOptions: { forwardErrorToEnvironment: true } }, this.youiAdapter);
+		const env = Environment.createEnv();
 		const npmPaths = this.getNpmPaths();
-		this.gensMeta = this.env.lookup({ npmPaths });
-		const questions: any[] = await this.createGeneratorPromptQuestions(this.env.getGeneratorNames(), this.uiOptions.filter);
+		this.gensMeta = env.lookup({ npmPaths });
+		const questions: any[] = await this.createGeneratorPromptQuestions(env.getGeneratorNames(), this.uiOptions.filter);
 
 		this.currentQuestions = questions;
 		const normalizedQuestions = this.normalizeFunctions(questions);
@@ -176,14 +175,17 @@ export class YeomanUI {
 			await fsextra.mkdirs(targetFolder);
 			const dirsBefore = await this.getChildDirectories(targetFolder);
 			const genNamespace = this.getGenNamespace(generatorName);
-
+			this.promptCount = 0;
+			// get generator metadata, saved on lookup
+			const genMeta = this.getGeneratorMeta(genNamespace);
 			// remove previously installed generator modules
-			this.clearRequireCache(genNamespace);
-
+			this.clearRequireCache(genMeta);
+			// create new environment and register generator
+			const env = Environment.createEnv(undefined, { sharedOptions: { forwardErrorToEnvironment: true } }, this.youiAdapter);
+			env.register(genMeta.generatorPath, genMeta.namespace, genMeta.packagePath);
 			// create generator instance
 			const options = this.getGeneratorOptions(generatorName);
-			this.gen = this.env.create(genNamespace, { options });
-
+			this.gen = env.create(genNamespace, { options });
 			// check if generator defined a helper function called setPromptsCallback()
 			const setPromptsCallback = _.get(this.gen, "setPromptsCallback");
 			if (setPromptsCallback) {
@@ -196,16 +198,9 @@ export class YeomanUI {
 			// handles generator install step if exists
 			this.onGenInstall(this.gen);
 			// handles generator errors 
-			this.handleErrors(this.env, this.gen, generatorName);
-
-			this.promptCount = 0;
-
-			this.env.runGenerator(this.gen, error => {
-				if (this.onBack) {
-					this.onBack = false;
-					return; // on back no need to close wizard
-				}
-
+			this.handleErrors(env, this.gen, generatorName);
+			// run generator
+			env.runGenerator(this.gen, error => {
 				if (!this.errorThrown && !error) {
 					// Without resolve this code worked only for absolute paths without / at the end.
 					// Generator can put a relative path, path including . and .. and / at the end.
@@ -219,6 +214,21 @@ export class YeomanUI {
 		}
 	}
 
+	private getGeneratorMeta(genNamespace: string) {
+		const genMeta = _.find(this.gensMeta, (genMeta: any) => {
+			return genMeta.namespace === genNamespace;
+		});
+		if (genMeta) {
+			return {
+				namespace: genMeta.namespace,
+				packagePath: path.resolve(genMeta.packagePath),
+				generatorPath: path.resolve(genMeta.generatorPath)
+			}
+		}
+
+		this.onGeneratorFailure(genNamespace, new Error(`${genNamespace} metadata was not found`));
+	}
+
 	private getGeneratorOptions(generatorName: string) {
 		return {
 			logger: this.logger.getChildLogger({ label: generatorName }),
@@ -228,27 +238,21 @@ export class YeomanUI {
 		};
 	}
 
-	private clearRequireCache(genNamespace: string) {
-		const genMeta = _.find(this.gensMeta, (genMeta: any) => {
-			return genMeta.namespace === genNamespace;
-		});
-
-		if (genMeta) {
-			try {
-				const resolvedPackagePath = path.resolve(genMeta.packagePath);
+	private clearRequireCache(genMeta: any) {
+		try {
+			// @ts-ignorem
+			const modulePaths = Object.keys(require.cache);
+			const pathsToDelete = _.map(modulePaths, (modulePath: string) => {
+				return _.startsWith(modulePath, genMeta.packagePath);
+			});
+			const size = _.size(pathsToDelete);
+			for (let i = 0; i < size; i++) {
+				const modulePath = pathsToDelete[i];
 				// @ts-ignore
-				const pathsToDelete = _.remove(Object.keys(require.cache), (path: string) => {
-					return _.startsWith(path, resolvedPackagePath);
-				});
-				const size = _.size(pathsToDelete);
-				for (let i = 0; i < size; i++) {
-					const modulePath = pathsToDelete[i];
-					// @ts-ignore
-					delete require.cache[modulePath];
-				}
-			} catch (error) {
-				this.logger.error(error);
+				delete require.cache[modulePath];
 			}
+		} catch (error) {
+			this.logger.error(error);
 		}
 	}
 
@@ -369,19 +373,8 @@ export class YeomanUI {
 	private back(partialAnswers: Environment.Answers, numOfSteps: number) {
 		SWA.updateOneOfPreviousStepsClicked(this.generatorName, this.logger);
 		this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
-		// stop running generator
-		this.stopRunningGenerator();
 		// run the generator again
 		this.runGenerator(this.generatorName);
-	}
-
-	private stopRunningGenerator() {
-		const runLoop = _.get(this.env, "runLoop");
-		if (runLoop) { // runLoop exists in yeoman-environment 2.10.3
-			this.onBack = true;
-			runLoop.running = false;
-			runLoop.emit("end");
-		}
 	}
 
 	private getCustomQuestionEventHandler(questionType: string, methodName: string): Function {
