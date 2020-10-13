@@ -257,9 +257,7 @@ export class YeomanUI {
 			// handles generator errors 
 			this.handleErrors(env, this.gen, generatorName);
 
-			// we cannot use new async method, "await this.gen.run()", because generators based on older versions 
-			// (for example: 2.0.5) of "yeoman-generator" do not support it
-			this.gen.run(error => {;
+			env.runGenerator(this.gen, error => {
 				if (!this.errorThrown && !error) {
 					this.getChildDirectories(this.gen.destinationRoot()).then(dirsAfter => {
 						this.onGeneratorSuccess(generatorName, dirsBefore, dirsAfter);
@@ -268,9 +266,7 @@ export class YeomanUI {
 			});
 		} catch (error) {
 			this.onGeneratorFailure(generatorName, error);
-		} finally {
-			this.gen = undefined;
-		}
+		} 
 	}
 
 	private setGenInWriting(gen: any) {
