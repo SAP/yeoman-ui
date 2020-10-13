@@ -109,15 +109,6 @@ const config = {
         test: /backend[/|\\]src[/|\\]yeomanui.ts/,
         loader: 'string-replace-loader',
         options: {
-          search: 'require(?=\.resolve)',
-          replace: '__non_webpack_require__',
-          flags: 'g'
-        }
-	  },
-	  {
-        test: /backend[/|\\]src[/|\\]yeomanui.ts/,
-        loader: 'string-replace-loader',
-        options: {
           search: 'require(?=\.cache)',
           replace: '__non_webpack_require__',
           flags: 'g'

@@ -21,10 +21,6 @@ import { Output } from "./output";
 import { resolve } from "path";
 
 
-export interface IQuestionsPrompt extends IPrompt {
-	questions: any[];
-}
-
 export class YeomanUI {
 	private static readonly defaultMessage =
 		"Some quick example text of the generator description. This is a long text so that the example will look good.";
@@ -163,6 +159,7 @@ export class YeomanUI {
 
 	private getVscode() {
 		try {
+			// @ts-ignore
 			return require('vscode');
 		} catch (error) {
 			return undefined;
@@ -178,29 +175,21 @@ export class YeomanUI {
 			const targetFolder = this.getCwd();
 			await fsextra.mkdirs(targetFolder);
 			const dirsBefore = await this.getChildDirectories(targetFolder);
-
-			// remove previously installed generator version
-			_.forEach(this.gensMeta, (genMeta: any) => {
-				if (_.startsWith(genMeta.namespace, generatorName)) {
-					delete require.cache[require.resolve(genMeta.generatorPath)]; 
-				}
-			});
-
 			const genNamespace = this.getGenNamespace(generatorName);
-			const options = {
-				logger: this.logger.getChildLogger({ label: generatorName }),
-				vscode: this.getVscode(), // TODO: remove this temporary workaround once a better solution is found,
-				data: this.uiOptions.data,
-				swaTracker: SWA.getSWATracker()
-			};
 
+			// remove previously installed generator modules
+			this.clearRequireCache(genNamespace);
+
+			// create generator instance
+			const options = this.getGeneratorOptions(generatorName);
 			this.gen = this.env.create(genNamespace, { options });
+
 			// check if generator defined a helper function called setPromptsCallback()
 			const setPromptsCallback = _.get(this.gen, "setPromptsCallback");
 			if (setPromptsCallback) {
 				setPromptsCallback(this.setPromptList.bind(this));
 			}
-
+			// set generator output destination 
 			this.gen.destinationRoot(targetFolder);
 			// notifies ui wether generator is in writing state
 			this.setGenInWriting(this.gen);
@@ -214,7 +203,7 @@ export class YeomanUI {
 			this.env.runGenerator(this.gen, error => {
 				if (this.onBack) {
 					this.onBack = false;
-					return;
+					return; // on back no need to close wizard
 				}
 
 				if (!this.errorThrown && !error) {
@@ -227,7 +216,40 @@ export class YeomanUI {
 			});
 		} catch (error) {
 			this.onGeneratorFailure(generatorName, error);
-		} 
+		}
+	}
+
+	private getGeneratorOptions(generatorName: string) {
+		return {
+			logger: this.logger.getChildLogger({ label: generatorName }),
+			vscode: this.getVscode(), // TODO: remove this temporary workaround once a better solution is found,
+			data: this.uiOptions.data,
+			swaTracker: SWA.getSWATracker()
+		};
+	}
+
+	private clearRequireCache(genNamespace: string) {
+		const genMeta = _.find(this.gensMeta, (genMeta: any) => {
+			return genMeta.namespace === genNamespace;
+		});
+
+		if (genMeta) {
+			try {
+				const resolvedPackagePath = path.resolve(genMeta.packagePath);
+				// @ts-ignore
+				const pathsToDelete = _.remove(Object.keys(require.cache), (path: string) => {
+					return _.startsWith(path, resolvedPackagePath);
+				});
+				const size = _.size(pathsToDelete);
+				for (let i = 0; i < size; i++) {
+					const modulePath = pathsToDelete[i];
+					// @ts-ignore
+					delete require.cache[modulePath];
+				}
+			} catch (error) {
+				this.logger.error(error);
+			}
+		}
 	}
 
 	private setGenInWriting(gen: any) {
@@ -347,12 +369,19 @@ export class YeomanUI {
 	private back(partialAnswers: Environment.Answers, numOfSteps: number) {
 		SWA.updateOneOfPreviousStepsClicked(this.generatorName, this.logger);
 		this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
-
-		const runLoop = _.get(this.env, "runLoop");
-		this.onBack = true;
-		runLoop.running = false;
-		runLoop.emit("end");
+		// stop running generator
+		this.stopRunningGenerator();
+		// run the generator again
 		this.runGenerator(this.generatorName);
+	}
+
+	private stopRunningGenerator() {
+		const runLoop = _.get(this.env, "runLoop");
+		if (runLoop) { // runLoop exists in yeoman-environment 2.10.3
+			this.onBack = true;
+			runLoop.running = false;
+			runLoop.emit("end");
+		}
 	}
 
 	private getCustomQuestionEventHandler(questionType: string, methodName: string): Function {
@@ -527,16 +556,6 @@ export class YeomanUI {
 	private async getGenPackageJson(genPackagePath: string): Promise<any> {
 		const packageJsonString: string = await fsextra.readFile(path.join(genPackagePath, "package.json"), "utf8");
 		return JSON.parse(packageJsonString);
-	}
-
-	private getGenMetadata(genName: string): Environment.GeneratorMeta {
-		const genNamespace = this.getGenNamespace(genName);
-		const genMetadata = _.get(this, ["genMeta", genNamespace]);
-		if (_.isNil(genMetadata)) {
-			const debugMessage = `${genNamespace} generator metadata was not found.`;
-			this.logger.debug(debugMessage);
-		}
-		return genMetadata;
 	}
 
 	private getGenNamespace(genName: string): string {
