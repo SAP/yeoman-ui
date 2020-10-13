@@ -586,7 +586,6 @@ div.consoleClassVisible .v-footer {
     margin-right: 10px !important;
 }
  .prompt-message {
-  border-top: 2px solid  var(--vscode-editorWidget-background, #252526);
   padding: 12px;
   margin: auto;
 } 
