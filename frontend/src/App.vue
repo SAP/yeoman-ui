@@ -56,7 +56,6 @@
         </v-row>
 		<v-divider></v-divider>
         <v-row v-if="prompts.length > 0 && !isDone && showButtons" style="height: 4rem; margin: 0; align-items: left;" sm="auto">
-				<div class="diagonal"></div>
         <div class="bottom-buttons-col" style="display:flex;">
           <v-btn id="back"
             :disabled="promptIndex<1 || isReplaying"
@@ -68,6 +67,7 @@
             <v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
           </v-btn>
         </div>
+        <div class="diagonal"></div>
 			<div class="prompt-message" v-if="toShowPromptMessage"  >
 				<img style="vertical-align:middle; padding-left:12px;" :src="promptMessageIcon" alt="" />
 				<span :class="promptMessageClass">{{promptMessageToDisplay}}</span>
@@ -579,7 +579,7 @@ div.consoleClassVisible .v-footer {
 .bottom-buttons-col {
   border-top: 2px solid  var(--vscode-editorWidget-background, #252526);
   padding: 12px;
-  padding-left: 0px;
+  padding-right: 0px;
   background-color: var(--vscode-editorWidget-background,#252526);
 }
 .bottom-buttons-col > .v-btn:not(:last-child) {
@@ -588,6 +588,7 @@ div.consoleClassVisible .v-footer {
  .prompt-message {
   border-top: 2px solid  var(--vscode-editorWidget-background, #252526);
   padding: 12px;
+  margin: auto;
 } 
 /* Error prompt message*/
 .error-prompt-message {
@@ -606,7 +607,7 @@ div.consoleClassVisible .v-footer {
 .diagonal {	
   width: 80px;	
   background: linear-gradient(	
-    120deg,	
+    240deg,	
     var(--vscode-editor-background, #1e1e1e) 0%,	
     var(--vscode-editor-background, #1e1e1e) 50%,	
     transparent 50%	
