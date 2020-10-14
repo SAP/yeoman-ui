@@ -54,7 +54,7 @@
             />
           </v-col>
         </v-row>
-		<v-divider></v-divider>
+		<v-divider bold></v-divider>
         <v-row v-if="prompts.length > 0 && !isDone && showButtons" style="height: 4rem; margin: 0; align-items: left;" sm="auto">
         <div class="bottom-buttons-col" style="display:flex;">
           <v-btn id="back"
@@ -67,7 +67,6 @@
             <v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
           </v-btn>
         </div>
-        <div class="diagonal"></div>
 			<div class="prompt-message" v-if="toShowPromptMessage"  >
 				<img style="vertical-align:middle; padding-left:12px;" :src="promptMessageIcon" alt="" />
 				<span :class="promptMessageClass">{{promptMessageToDisplay}}</span>
@@ -577,10 +576,8 @@ div.consoleClassVisible .v-footer {
   margin: 0px;
 }
 .bottom-buttons-col {
-  border-top: 2px solid  var(--vscode-editorWidget-background, #252526);
   padding: 12px;
   padding-right: 0px;
-  background-color: var(--vscode-editorWidget-background,#252526);
 }
 .bottom-buttons-col > .v-btn:not(:last-child) {
     margin-right: 10px !important;
@@ -603,15 +600,8 @@ div.consoleClassVisible .v-footer {
   font-size: 14px;
   vertical-align: middle;
 }
-.diagonal {	
-  width: 80px;	
-  background: linear-gradient(	
-    240deg,	
-    var(--vscode-editor-background, #1e1e1e) 0%,	
-    var(--vscode-editor-background, #1e1e1e) 50%,	
-    transparent 50%	
-  );	
-  background-color: var(--vscode-editorWidget-background, #252526);	
+.v-divider {
+  border-top: 2px solid  var(--vscode-editorWidget-background, #252526) !important;
 }
 
 </style>

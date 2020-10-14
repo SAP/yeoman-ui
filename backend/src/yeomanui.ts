@@ -5,16 +5,12 @@ import * as _ from "lodash";
 import * as Environment from "yeoman-environment";
 import * as inquirer from "inquirer";
 import { ReplayUtils, ReplayState } from "./replayUtils";
+import * as vscode from 'vscode';
 const datauri = require("datauri"); // eslint-disable-line @typescript-eslint/no-var-requires
 const titleize = require('titleize'); // eslint-disable-line @typescript-eslint/no-var-requires
 const humanizeString = require('humanize-string'); // eslint-disable-line @typescript-eslint/no-var-requires
 import * as defaultImage from "./images/defaultImage";
-import * as errorVSCode from "./images/vscode/errorMessage";
-import * as infoVSCode from "./images/vscode/infoMessage";
-import * as warnVSCode from "./images/vscode/warnMessage";
-import * as errorTheia from "./images/theia/errorMessage";
-import * as infoTheia from "./images/theia/infoMessage";
-import * as warnTheia from "./images/theia/warnMessage";
+import {infoVSCode, infoTheia, warnVSCode, warnTheia, errorVSCodeDark, errorTheiaDark, errorVSCodeLight, errorTheiaLight} from "./images/imageMessage"
 import { YouiAdapter } from "./youi-adapter";
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
@@ -98,23 +94,32 @@ export class YeomanUI {
   }
 
   private getMessageImage(type: string) {
+
 	  if (type === "error") {
       if (this.isInBAS) {
-        return errorTheia.default;
+        if (vscode.window.activeColorTheme.kind == vscode.ColorThemeKind.Light) {
+          return errorTheiaLight;
+        } else {
+          return errorTheiaDark;
+        }
       } else {
-        return errorVSCode.default;
+        if (vscode.window.activeColorTheme.kind == vscode.ColorThemeKind.Light) {
+          return errorVSCodeLight;
+        } else {
+          return errorVSCodeDark;
+        }
       }
 	  } else if (type === "info") {
       if (this.isInBAS) {
-        return infoTheia.default;
+        return infoTheia;
       } else {
-        return infoVSCode.default;
+        return infoVSCode;
       }
 	  } else if (type === "warn") {
       if (this.isInBAS) {
-        return warnTheia.default;
+        return warnTheia;
       } else {
-        return warnVSCode.default;
+        return warnVSCode;
       }
 	  }
   }
