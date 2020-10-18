@@ -69,7 +69,12 @@
         </div>
 			<div class="prompt-message" v-if="toShowPromptMessage"  >
 				<img style="vertical-align:middle; padding-left:12px;" :src="promptMessageIcon" alt="" />
-				<span :class="promptMessageClass">{{promptMessageToDisplay}}</span>
+				<v-tooltip right :disabled="promptMessageToDisplay.length < 20">
+          <template v-slot:activator="{on}">
+            <span :class="promptMessageClass" v-on="on">{{showPrompt}}</span>
+          </template>
+          <span :class="promptMessageClass">{{promptMessageToDisplay}}</span>
+        </v-tooltip>
 			</div>
 			<v-spacer/>
         </v-row>
@@ -132,7 +137,8 @@ function initialState() {
 	isGeneric: false,
 	isWriting: false,
 	showButtons: true,
-	promptMessageToDisplay: "",
+  promptMessageToDisplay: "",
+  shortPrompt:"",
 	toShowPromptMessage: false,
 	promptMessageClass: "",
 	promptMessageIcon: null
@@ -159,7 +165,7 @@ export default {
 		} 
 
 		return "Next";
-	},
+  },
     isLoadingColor() {
       return (
         getComputedStyle(document.documentElement).getPropertyValue(
@@ -208,7 +214,8 @@ export default {
   },
   methods: {
 	showPromptMessage(message, type, image) {
-		this.promptMessageToDisplay = message;
+    this.promptMessageToDisplay = message;
+    this.showPrompt = message.substr(0,20) + '...';
 		this.toShowPromptMessage = true;
 		this.promptMessageIcon = image;
 		

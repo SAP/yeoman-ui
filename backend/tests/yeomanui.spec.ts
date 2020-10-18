@@ -85,7 +85,7 @@ describe('yeomanui unit test', () => {
 	};
     const youiEvents = new TestEvents();
     const yeomanUi: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, 
-        {filter: GeneratorFilter.create(), messages});
+        {filter: GeneratorFilter.create(), messages}, undefined, true);
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -456,7 +456,7 @@ describe('yeomanui unit test', () => {
     });
 
     it("setCwd", () => {
-        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {},  "testpathbefore");
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {},  "testpathbefore", true);
         expect(yeomanUiInstance["getCwd"]()).equal("testpathbefore");
         yeomanUiInstance["setCwd"]("testpathafter");
         expect(yeomanUiInstance["getCwd"]()).equal("testpathafter");
@@ -466,13 +466,13 @@ describe('yeomanui unit test', () => {
     });
 
     it("defaultOutputPath", () => {
-        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {});
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, undefined, true);
         const projectsPath = path.join(os.homedir(), 'projects');
         expect(yeomanUiInstance["getCwd"]()).equal(projectsPath);
     });
 
     it("getErrorInfo", () => {
-        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, null);
+        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, null, undefined, true);
         const errorInfo = "Error Info";
         const res = yeomanUiInstance["getErrorInfo"](errorInfo);
         expect(res.message).to.be.equal(errorInfo);
@@ -509,7 +509,7 @@ describe('yeomanui unit test', () => {
 	
 	describe("handleErrors", () => {
 		it("check event names", () => {
-			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {});
+			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, undefined, true);
 			const env: Environment =  Environment.createEnv();
 			const envMock = sandbox.mock(env);
 			const gen = {on: () => {}};
@@ -528,7 +528,7 @@ describe('yeomanui unit test', () => {
 	describe("setGenInWriting", () => {
 		let genMock: any;
 		let rpcMock: any;
-		const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {});
+		const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, undefined, true);
 		const gen: any = {on: () => {}};
 
 		beforeEach(() => {
@@ -555,14 +555,14 @@ describe('yeomanui unit test', () => {
 
 	describe("exploreGenerators", () => {
 		it("vscode module is not available", () => {
-			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {});
+			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, undefined, true);
 			yeomanUiInstance["getVscode"] = () => undefined;
 			swaTrackerWrapperMock.expects("updateExploreAndInstallGeneratorsLinkClicked");
 			yeomanUiInstance["exploreGenerators"]();
 		});
 
 		it("vscode module is available", () => {
-			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {});
+			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, undefined, true);
 			const testVscode = {commands: {executeCommand: () => {}}}; 
 			yeomanUiInstance["getVscode"] = () => testVscode;
 			const commandsMock = sandbox.mock(testVscode.commands);
@@ -574,7 +574,7 @@ describe('yeomanui unit test', () => {
 	});
 
 	it("onGenInstall", () => {
-		const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create());
+		const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
 		const gen: any = {on: () => {}};
 		const genMock = sandbox.mock(gen);
 		
@@ -592,7 +592,7 @@ describe('yeomanui unit test', () => {
                     lastName: "doe"
                 };
             };
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create());
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
             const questions = [{name: "q1"}];
             const response = await yeomanUiInstance.showPrompt(questions);
             expect (response.firstName).to.equal(firstName);
@@ -615,7 +615,7 @@ describe('yeomanui unit test', () => {
                     };
                 }
             };
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create());
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
             yeomanUiInstance["runGenerator"] = async (): Promise<any> => { return; };
             let questions = [{name: "q1"}];
             let response = await yeomanUiInstance.showPrompt(questions);
@@ -683,7 +683,7 @@ describe('yeomanui unit test', () => {
                     guiType: "questionType"
                 }
             ];
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create());
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
 
             yeomanUiInstance["addCustomQuestionEventHandlers"](questions);
             expect(questions[0]).to.not.have.property("testEvent");
@@ -700,7 +700,7 @@ describe('yeomanui unit test', () => {
             const testEventFunction = () => {
                 return true;
             };
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create());
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
             yeomanUiInstance.registerCustomQuestionEventHandler("questionType", "testEvent", testEventFunction);
             yeomanUiInstance["currentQuestions"] = [{name:"question1", guiType: "questionType"}];
             const response = await yeomanUiInstance["evaluateMethod"](null, "question1", "testEvent");
@@ -708,7 +708,7 @@ describe('yeomanui unit test', () => {
         });
 
         it("question method is called", async () => {
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create());
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
             yeomanUiInstance["currentQuestions"] = [{name:"question1", method1:()=>{
                 return true;
             }}];
@@ -717,13 +717,13 @@ describe('yeomanui unit test', () => {
         });
 
         it("no questions", async () => {
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create());
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
             const response = await yeomanUiInstance["evaluateMethod"](null, "question1", "method1");
             expect(response).to.be.undefined;
         });
 
         it("method throws exception", async () => {
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create());
+            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
             yeomanUiInstance["gen"] = Object.create({});
             yeomanUiInstance["gen"].options = {};
             yeomanUiInstance["currentQuestions"] = [{name:"question1", method1:()=>{

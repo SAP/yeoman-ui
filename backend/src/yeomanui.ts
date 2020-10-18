@@ -94,14 +94,13 @@ export class YeomanUI {
   }
 
   private getMessageImage(type: string) {
-
-	  if (type === "error") {
+    if (type === "error") {
       if (this.isInBAS) {
-        if (vscode.window.activeColorTheme.kind == vscode.ColorThemeKind.Light) {
-          return errorTheiaLight;
-        } else {
+        // if (vscode.window.activeColorTheme.kind == vscode.ColorThemeKind.Light) {
+        //   return errorTheiaLight;
+        // } else {
           return errorTheiaDark;
-        }
+        // }
       } else {
         if (vscode.window.activeColorTheme.kind == vscode.ColorThemeKind.Light) {
           return errorVSCodeLight;
