@@ -180,9 +180,7 @@ export class YeomanUI {
 			const dirsBefore = await this.getChildDirectories(targetFolder);
 			const env: Environment = Environment.createEnv(undefined, {sharedOptions: {forwardErrorToEnvironment: true}}, this.youiAdapter);
 			const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
-			// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-			// @ts-ignore
-			env.register(meta.resolved, meta.namespace, meta.packagePath);
+			env.lookup({packagePaths: [meta.packagePath]});
 
 			const genNamespace = this.getGenNamespace(generatorName);
 			const options = {
@@ -208,9 +206,7 @@ export class YeomanUI {
 			// handles generator errors 
 			this.handleErrors(env, this.gen, generatorName);
 
-			// we cannot use new async method, "await this.gen.run()", because generators based on older versions 
-			// (for example: 2.0.5) of "yeoman-generator" do not support it
-			this.gen.run(error => {;
+			env.runGenerator(gen, error => {;
 				if (!this.errorThrown && !error) {
 					// Without resolve this code worked only for absolute paths without / at the end.
 					// Generator can put a relative path, path including . and .. and / at the end.
