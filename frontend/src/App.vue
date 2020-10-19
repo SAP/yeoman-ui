@@ -69,11 +69,11 @@
         </div>
 			<div class="prompt-message" v-if="toShowPromptMessage"  >
 				<img style="vertical-align:middle; padding-left:12px;" :src="promptMessageIcon" alt="" />
-				<v-tooltip right :disabled="promptMessageToDisplay.length < 20">
+				<v-tooltip right :disabled="promptMessageToDisplay.length < this.messageMaxLength">
           <template v-slot:activator="{on}">
             <span :class="promptMessageClass" v-on="on">{{showPrompt}}</span>
           </template>
-          <span :class="promptMessageClass">{{promptMessageToDisplay}}</span>
+          <span>{{promptMessageToDisplay}}</span>
         </v-tooltip>
 			</div>
 			<v-spacer/>
@@ -141,7 +141,8 @@ function initialState() {
   shortPrompt:"",
 	toShowPromptMessage: false,
 	promptMessageClass: "",
-	promptMessageIcon: null
+  promptMessageIcon: null,
+  messageMaxLength: 100
   };
 }
 
@@ -215,7 +216,7 @@ export default {
   methods: {
 	showPromptMessage(message, type, image) {
     this.promptMessageToDisplay = message;
-    this.showPrompt = message.substr(0,20) + '...';
+    this.showPrompt = message.length < this.messageMaxLength ? message : message.substr(0,this.messageMaxLength) + '...';
 		this.toShowPromptMessage = true;
 		this.promptMessageIcon = image;
 		
@@ -585,6 +586,7 @@ div.consoleClassVisible .v-footer {
 .bottom-buttons-col {
   padding: 12px;
   padding-right: 0px;
+  margin: auto !important;
 }
 .bottom-buttons-col > .v-btn:not(:last-child) {
     margin-right: 10px !important;
@@ -609,6 +611,9 @@ div.consoleClassVisible .v-footer {
 }
 .v-divider {
   border-top: 2px solid  var(--vscode-editorWidget-background, #252526) !important;
+}
+.theme--light.v-btn.v-btn--disabled:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
+  background-color: var(--vscode-input-background,#3c3c3c) !important;
 }
 
 </style>
