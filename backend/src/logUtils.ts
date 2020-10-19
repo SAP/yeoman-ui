@@ -4,7 +4,7 @@ import { Output } from "./output";
 import { YeomanUI } from "./yeomanui";
 
 
-module.exports = (output: Output, yeomanUi: YeomanUI) => {
+module.exports = ( output: Output, yeomanUi: YeomanUI) => {
 	function getMessage(args: any) {
 		const message = stripAnsi(_.get(args, "[0]", ""));
 		return `${message}`;
@@ -52,6 +52,12 @@ module.exports = (output: Output, yeomanUi: YeomanUI) => {
 
 	log.create = function() {
 		showMessage(arguments);
+		return log;
+	}
+
+	log.showProgress = function() {
+		const message = getMessage(arguments);
+		yeomanUi.showProgress(message);
 		return log;
 	}
 
