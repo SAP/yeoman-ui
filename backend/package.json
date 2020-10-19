@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.28",
+	"version": "1.1.30",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -17,7 +17,7 @@
 	},
 	"icon": "Wizard_logo.png",
 	"engines": {
-		"vscode": "^1.39.2"
+		"vscode": "^1.49.0"
 	},
 	"categories": [
 		"Other"
@@ -174,6 +174,7 @@
 		"@types/object-hash": "1.3.3",
 		"@types/sinon": "9.0.5",
 		"@types/ws": "7.2.6",
+		"@types/vscode": "^1.49.0",
 		"@types/yeoman-environment": "2.10.1",
 		"@typescript-eslint/parser": "^2.30.0",
 		"@typescript-eslint/eslint-plugin": "^2.30.0",

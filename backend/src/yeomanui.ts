@@ -21,6 +21,7 @@ import {IPrompt} from "@sap-devx/yeoman-ui-types";
 import { SWA } from "./swa-tracker/swa-tracker-wrapper";
 import TerminalAdapter = require("yeoman-environment/lib/adapter"); 
 import { Output } from "./output";
+import { resolve } from "path";
 
 
 export interface IQuestionsPrompt extends IPrompt{
@@ -57,6 +58,7 @@ export class YeomanUI {
   private readonly customQuestionEventHandlers: Map<string, Map<string, Function>>;
   private errorThrown = false;
   private isInBAS: boolean;
+  private outputPath: string;
 
   constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS, isInBAS: boolean) {
     this.rpc = rpc;
@@ -65,7 +67,8 @@ export class YeomanUI {
     this.replayUtils = new ReplayUtils();
     this.youiEvents = youiEvents;
     this.logger = logger;
-	this.output = output;
+    this.output = output;
+    this.outputPath = outputPath;
     this.rpc.setResponseTimeout(3600000);
     this.rpc.registerMethod({ func: this.receiveIsWebviewReady, thisArg: this });
     this.rpc.registerMethod({ func: this.runGenerator, thisArg: this });
@@ -164,6 +167,11 @@ export class YeomanUI {
     entry.set(methodName, handler);
   }
 
+  public async showProgress(message?: string) {
+    this.youiEvents.showProgress(message);
+  }
+  
+
   private async logError(error: any, prefixMessage?: string) {
     const errorObj: any = this.getErrorInfo(error);
     if (prefixMessage) {
@@ -233,9 +241,7 @@ export class YeomanUI {
 			const dirsBefore = await this.getChildDirectories(targetFolder);
 			const env: Environment = Environment.createEnv(undefined, {sharedOptions: {forwardErrorToEnvironment: true}}, this.youiAdapter);
 			const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
-			// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-			// @ts-ignore
-			env.register(meta.resolved, meta.namespace, meta.packagePath);
+			env.lookup({packagePaths: [meta.packagePath]});
 
 			const genNamespace = this.getGenNamespace(generatorName);
 			const options = {
@@ -261,9 +267,11 @@ export class YeomanUI {
 			// handles generator errors 
 			this.handleErrors(env, this.gen, generatorName);
 
-			env.runGenerator(this.gen, error => {
+			env.runGenerator(gen, error => {;
 				if (!this.errorThrown && !error) {
-					this.getChildDirectories(this.gen.destinationRoot()).then(dirsAfter => {
+					// Without resolve this code worked only for absolute paths without / at the end.
+					// Generator can put a relative path, path including . and .. and / at the end.
+					this.getChildDirectories(resolve(this.getCwd(), this.gen.destinationRoot())).then(dirsAfter => {
 						this.onGeneratorSuccess(generatorName, dirsBefore, dirsAfter);
 					});
 				}
@@ -405,18 +413,32 @@ export class YeomanUI {
     return (firstQuestionName ? _.startCase(firstQuestionName) : `Step ${this.promptCount}`);
   }
 
-  private onGeneratorSuccess(generatorName: string, reourcesBeforeGen?: any, resourcesAfterGen?: any) {
-    let targetFolderPath: string = _.get(resourcesAfterGen, "targetFolderPath");
-    if (_.get(reourcesBeforeGen, "targetFolderPath") === targetFolderPath) {
-        const newDirs: string[] = _.difference(_.get(resourcesAfterGen, "childDirs"), _.get(reourcesBeforeGen, "childDirs"));
+  private onGeneratorSuccess(generatorName: string, resourcesBeforeGen?: any, resourcesAfterGen?: any) {
+    let targetFolderPath: string = null;
+    // All the paths here absolute normilized paths.
+    const targetFolderPathBeforeGen: string = _.get(resourcesBeforeGen, "targetFolderPath");
+    const targetFolderPathAfterGen: string = _.get(resourcesAfterGen, "targetFolderPath");
+    if (targetFolderPathBeforeGen === targetFolderPathAfterGen) {
+        const newDirs: string[] = _.difference(_.get(resourcesAfterGen, "childDirs"), _.get(resourcesBeforeGen, "childDirs"));
         if (_.size(newDirs) === 1) {
-            targetFolderPath = newDirs[0];
-        }
-    } 
+          // One folder added by generator and targetFolderPath/destinationRoot was not changed by generator.
+          // ---> Fiori project generator flow.
+          targetFolderPath = newDirs[0];
+        } //else { //_.size(newDirs) = 0 (0 folders) or _.size(newDirs) > 1 (5 folders)
+            // We don't know what is the correct targetFolderPath ---> no buttons should be shown.
+            // No folder added by generator ---> Fiori module generator flow.
+            // Many folders added by generator --->
+        // }
+    } else { //(targetFolderPathBeforeGen !== targetFolderPathAfterGen)
+        // Generator changed targetFolderPath/destinationRoot.
+        // ---> FoodQ generator flow.
+        targetFolderPath = targetFolderPathAfterGen;
+    }
 
     const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
-    this.logger.debug("done running yeomanui! " + message + ` You can find it at ${targetFolderPath}`);
-    SWA.updateGeneratorEnded(this.generatorName, true, this.logger);
+    const generatedTemplatePath = targetFolderPath ? targetFolderPath : targetFolderPathBeforeGen;
+    this.logger.debug("done running yeomanui! " + message + ` You can find it at ${generatedTemplatePath}`);
+    SWA.updateGeneratorEnded(generatorName, true, this.logger);
     this.youiEvents.doGeneratorDone(true, message, targetFolderPath);
   }
 
@@ -424,7 +446,7 @@ export class YeomanUI {
     this.errorThrown = true;
     const messagePrefix = `${generatorName} generator failed`;
     const errorMessage: string = await this.logError(error, messagePrefix);
-    SWA.updateGeneratorEnded(this.generatorName, false, this.logger, errorMessage);
+    SWA.updateGeneratorEnded(generatorName, false, this.logger, errorMessage);
     this.youiEvents.doGeneratorDone(false, errorMessage);
   }
 
@@ -481,6 +503,10 @@ export class YeomanUI {
         getPath: async (path: string) => path,
         validate: async (path: string) => {
           try {
+            // Without resolve this code worked only for absolute paths without / at the end.
+            // The user can put a relative path, path including . and .. and / at the end.
+            // In this case many project generation failed or opened invalid folders instead of project at the end (after clicking on the button 'Open project in workspace').
+            path = resolve(this.outputPath, path);
             await fsextra.access(path, fsextra.constants.W_OK);
             this.setCwd(path);
             return true;

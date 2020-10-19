@@ -12,6 +12,7 @@ module.exports = class extends Generator {
     super(args, opts);
 
     this.vscode = opts.vscode;
+    this.data = opts.data;
 
     this.setPromptsCallback = fn => {
       if (this.prompts) {
@@ -69,6 +70,7 @@ module.exports = class extends Generator {
           hint: "Our recommendation is green"
         },
         when: (response) => {
+		      this.log(response.hungry);
           return response.hungry;
         },
         validate: (value, answers) => {
@@ -202,7 +204,7 @@ module.exports = class extends Generator {
         },
         name: "uploadMenu",
         message: "Upload menu",
-        default: "/"
+        default: _.get(this.data, "folder", "/")
       },
       {
         type: "input",
@@ -211,7 +213,7 @@ module.exports = class extends Generator {
         },
         name: "dump",
         message: "Choose dump folder",
-        default: "/"
+        default: _.get(this.data, "folder", "/")
       },
       {
         type: 'list',
@@ -351,6 +353,9 @@ module.exports = class extends Generator {
   }
 
   writing() {
+    if (_.get(this.log, "showProgress")) {
+        this.log.showProgress("FoodQ is generating.");
+    }
     this.log('in writing');
     this.fs.copyTpl(this.templatePath('index.html'),
       this.destinationPath('public/index.html'), {

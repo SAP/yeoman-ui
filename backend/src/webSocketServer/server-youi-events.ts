@@ -19,4 +19,8 @@ export class ServerYouiEvents implements YouiEvents {
     public doGeneratorInstall(): void {
         this.rpc.invoke("generatorInstall");
     }
+    
+    public showProgress(message?: string): void {
+        this.rpc.invoke("showProgress");
+    }
 }
