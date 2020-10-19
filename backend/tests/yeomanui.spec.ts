@@ -16,6 +16,7 @@ import * as os from "os";
 import messages from "../src/messages";
 import Environment = require("yeoman-environment");
 import { SWA } from "../src/swa-tracker/swa-tracker-wrapper";
+import * as vscode from "vscode";
 
 describe('yeomanui unit test', () => {
     let sandbox: any;
@@ -26,6 +27,7 @@ describe('yeomanui unit test', () => {
     let swaTrackerWrapperMock: any;
     let rpcMock: any;
     let youiEventsMock: any;
+    let windowMock: any;
     const UTF8 = "utf8";
     const PACKAGE_JSON = "package.json";
 
@@ -92,6 +94,10 @@ describe('yeomanui unit test', () => {
 
     before(() => {
         sandbox = sinon.createSandbox();
+        _.set(vscode, "window.showErrorMessage", () => Promise.resolve(""));
+        _.set(vscode, "window.showWarningMessage", () => Promise.resolve(""));
+        _.set(vscode, "window.showInformationMessage", () => Promise.resolve(""));
+        _.set(vscode, "window..activeColorTheme.kind", () => Promise.resolve(""));
     });
 
     after(() => {
@@ -106,6 +112,7 @@ describe('yeomanui unit test', () => {
         loggerMock = sandbox.mock(testLogger);
         swaTrackerWrapperMock = sandbox.mock(SWA);
         youiEventsMock = sandbox.mock(youiEvents);
+        windowMock = sandbox.mock(vscode.window);
     });
 
     afterEach(() => {
@@ -116,6 +123,7 @@ describe('yeomanui unit test', () => {
         loggerMock.verify();
         swaTrackerWrapperMock.verify();
         youiEventsMock.verify();
+        windowMock.verify();
     });
 
     describe("receiveIsWebviewReady", () => {
@@ -768,6 +776,38 @@ describe('yeomanui unit test', () => {
             } catch(e) {
                 expect(e.toString()).to.contain("method1");
             }
+        });
+    });
+
+    describe("showLogMessage", () => {
+        it("error message with location message", async () => {
+            const message = {
+                location: "message",
+                value: "value message",
+                type: "error"
+            }
+            windowMock.expects("showErrorMessage").withExactArgs(message.value).resolves();
+            await yeomanUi.showLogMessage(message);
+        });
+
+        it("warning message with location message", async () => {
+            const message = {
+                location: "message",
+                value: "value message",
+                type: "warn"
+            }
+            windowMock.expects("showWarningMessage").withExactArgs(message.value).resolves();
+            await yeomanUi.showLogMessage(message);
+        });
+
+        it("info message with location message", async () => {
+            const message = {
+                location: "message",
+                value: "value message",
+                type: "info"
+            }
+            windowMock.expects("showInformationMessage").withExactArgs(message.value).resolves();
+            await yeomanUi.showLogMessage(message);
         });
     });
 });

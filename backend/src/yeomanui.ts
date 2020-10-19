@@ -98,31 +98,11 @@ export class YeomanUI {
 
   private getMessageImage(type: string) {
     if (type === "error") {
-      if (this.isInBAS) {
-        // if (vscode.window.activeColorTheme.kind == vscode.ColorThemeKind.Light) {
-        //   return errorTheiaLight;
-        // } else {
-          return errorTheiaDark;
-        // }
-      } else {
-        if (vscode.window.activeColorTheme.kind == vscode.ColorThemeKind.Light) {
-          return errorVSCodeLight;
-        } else {
-          return errorVSCodeDark;
-        }
-      }
+      return this.isInBAS ? errorTheiaDark : (vscode.window.activeColorTheme.kind == vscode.ColorThemeKind.Light) ? errorVSCodeLight : errorVSCodeDark;
 	  } else if (type === "info") {
-      if (this.isInBAS) {
-        return infoTheia;
-      } else {
-        return infoVSCode;
-      }
+      return this.isInBAS ? infoTheia : infoVSCode;
 	  } else if (type === "warn") {
-      if (this.isInBAS) {
-        return warnTheia;
-      } else {
-        return warnVSCode;
-      }
+      return this.isInBAS ? warnTheia : warnVSCode;
 	  }
   }
 

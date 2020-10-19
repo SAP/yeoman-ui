@@ -613,7 +613,7 @@ div.consoleClassVisible .v-footer {
   border-top: 2px solid  var(--vscode-editorWidget-background, #252526) !important;
 }
 .theme--light.v-btn.v-btn--disabled:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
-  background-color: var(--vscode-input-background,#3c3c3c) !important;
+  background-color: var(--vscode-descriptionForeground,#717171) !important;
 }
 
 </style>
