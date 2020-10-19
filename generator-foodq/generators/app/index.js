@@ -201,7 +201,7 @@ module.exports = class extends Generator {
         },
         name: "uploadMenu",
         message: "Upload menu",
-        default: (this.data && this.data.folder) ? this.data.folder : "/"
+        default: _.get(this.data, "folder", "/")
       },
       {
         type: "input",
@@ -210,7 +210,7 @@ module.exports = class extends Generator {
         },
         name: "dump",
         message: "Choose dump folder",
-        default: (this.data && this.data.folder) ? this.data.folder : "/"
+        default: _.get(this.data, "folder", "/")
       },
       {
         type: 'list',
