@@ -635,4 +635,52 @@ describe('App.vue', () => {
 			expect(wrapper.vm.showButtons).toBe(true);
 		})
 	})
+
+	describe("showPromptMessage", () => {
+		it('error message', () => {
+			wrapper = initComponent(App)
+			wrapper.vm.showPromptMessage("errorMessage", "error", "image");
+			expect(wrapper.vm.promptMessageToDisplay).toEqual("errorMessage");
+			expect(wrapper.vm.showPrompt).toEqual("errorMessage");
+			expect(wrapper.vm.promptMessageIcon).toEqual("image");
+			expect(wrapper.vm.promptMessageClass).toEqual("error-prompt-message");
+		})
+
+		it('warning message', () => {
+			wrapper = initComponent(App)
+			wrapper.vm.showPromptMessage("warnMessage", "warn", "image");
+			expect(wrapper.vm.promptMessageToDisplay).toEqual("warnMessage");
+			expect(wrapper.vm.showPrompt).toEqual("warnMessage");
+			expect(wrapper.vm.promptMessageIcon).toEqual("image");
+			expect(wrapper.vm.promptMessageClass).toEqual("info-warn-prompt-message");
+		})
+
+		it('info message', () => {
+			wrapper = initComponent(App)
+			wrapper.vm.showPromptMessage("infoMessage", "info", "image");
+			expect(wrapper.vm.promptMessageToDisplay).toEqual("infoMessage");
+			expect(wrapper.vm.showPrompt).toEqual("infoMessage");
+			expect(wrapper.vm.promptMessageIcon).toEqual("image");
+			expect(wrapper.vm.promptMessageClass).toEqual("info-warn-prompt-message");
+		})
+
+		it('no valid message', () => {
+			wrapper = initComponent(App)
+			wrapper.vm.showPromptMessage("infoMessage", "neta", "image");
+			expect(wrapper.vm.promptMessageToDisplay).toEqual("infoMessage");
+			expect(wrapper.vm.showPrompt).toEqual("infoMessage");
+			expect(wrapper.vm.promptMessageIcon).toEqual("image");
+			// expect(wrapper.vm.promptMessageClass).toEqual("info-warn-prompt-message");
+		})
+
+		it('long message', () => {
+			wrapper = initComponent(App) 
+			wrapper.vm.messageMaxLength = 3
+			wrapper.vm.showPromptMessage("infoMessage", "info", "image");
+			expect(wrapper.vm.promptMessageToDisplay).toEqual("infoMessage");
+			expect(wrapper.vm.showPrompt).toEqual("inf...");
+			expect(wrapper.vm.promptMessageIcon).toEqual("image");
+			expect(wrapper.vm.promptMessageClass).toEqual("info-warn-prompt-message");
+		})
+	})
 })

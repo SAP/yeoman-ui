@@ -178,7 +178,7 @@ export default {
       const titleSuffix = _.isEmpty(this.generatorPrettyName)
         ? ""
         : ` - ${this.generatorPrettyName}`;
-      return `${this.messages.yeoman_ui_title}${titleSuffix}`;
+      return `${_.get(this.messages, "yeoman_ui_title")}${titleSuffix}`;
     },
     currentPrompt() {
       return _.get(this.prompts, "[" + this.promptIndex + "]");
@@ -396,8 +396,8 @@ export default {
       let promptDescription = "";
       let promptName = name;
       if (name === "select_generator") {
-        promptDescription = this.messages.select_generator_description;
-        promptName = this.messages.select_generator_name;
+        promptDescription = _.get(this.messages, "select_generator_description");
+        promptName = _.get(this.messages, "select_generator_name");
       } else {
         const promptToDisplay = _.get(
           this.promptsInfoToDisplay,
@@ -488,7 +488,7 @@ export default {
     },
     async setMessagesAndSaveState() {
 		const uiOptions = await this.rpc.invoke("getState");
-		this.messages = uiOptions.messages;
+		this.messages = _.get(uiOptions, "messages");
 		this.isGeneric = _.get(this.messages, "panel_title") === "Yeoman UI";
 		const vscodeApi = this.getVsCodeApi();
 		if (vscodeApi) {
