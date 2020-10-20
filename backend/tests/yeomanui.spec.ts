@@ -5,544 +5,536 @@ import * as fsextra from "fs-extra";
 import { expect } from "chai";
 import * as _ from "lodash";
 import * as path from "path";
-import {YeomanUI} from "../src/yeomanui";
-import {ReplayUtils} from "../src/replayUtils";
+import { YeomanUI } from "../src/yeomanui";
+import { ReplayUtils } from "../src/replayUtils";
 import * as yeomanEnv from "yeoman-environment";
 import { YouiEvents } from '../src/youi-events';
 import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorFilter } from "../src/filter";
-import { IChildLogger } from "@vscode-logging/logger";
 import * as os from "os";
 import messages from "../src/messages";
+import * as images from "../src/images/messageImages";
 import Environment = require("yeoman-environment");
 import { SWA } from "../src/swa-tracker/swa-tracker-wrapper";
-import * as vscode from "vscode";
-import {infoVSCode, infoTheia, warnVSCode, warnTheia, errorVSCodeDark, errorTheiaDark, errorVSCodeLight, errorTheiaLight} from "../src/images/imageMessage"
+
 
 describe('yeomanui unit test', () => {
-    let sandbox: any;
-    let yeomanEnvMock: any;
-    let fsExtraMock: any;
-    let datauriMock: any;
-    let loggerMock: any;
-    let swaTrackerWrapperMock: any;
-    let rpcMock: any;
-    let youiEventsMock: any;
-    let windowMock: any;
-    let colorThemeKindMock: any;
-    const UTF8 = "utf8";
-    const PACKAGE_JSON = "package.json";
+	let sandbox: any;
+	let yeomanEnvMock: any;
+	let fsExtraMock: any;
+	let datauriMock: any;
+	let loggerMock: any;
+	let swaTrackerWrapperMock: any;
+	let rpcMock: any;
+	let youiEventsMock: any;
+	const UTF8 = "utf8";
+	const PACKAGE_JSON = "package.json";
 
-    const choiceMessage = 
-        "Some quick example text of the generator description. This is a long text so that the example will look good.";
-    class TestEvents implements YouiEvents {
-        public doGeneratorDone(success: boolean, message: string, targetPath?: string): void {
-            return;
-        }
-        public doGeneratorInstall(): void {
-            return;
-        }
-        public showProgress(message?: string): void {
-            return;
-        }
-    }
-    class TestRpc implements IRpc {
-        public  timeout: number;
-        public promiseCallbacks: Map<number, IPromiseCallbacks>;
-        public methods: Map<string, IMethod>;
-        public sendRequest(): void {
-            return;
-        }            
-        public sendResponse(): void {
-            return;
-        } 
-        public setResponseTimeout(): void {
-            return;
-        }
-        public registerMethod(): void {
-            return;
-        } 
-        public unregisterMethod(): void {
-            return;
-        } 
-        public listLocalMethods(): string[] {
-            return [];
-        }
-        public handleResponse(): void {
-            return;
-        } 
-        public listRemoteMethods(): Promise<string[]> {
-            return Promise.resolve([]);
-        }
-        public invoke(): Promise<any> {
-            return Promise.resolve();
-        }
-        public handleRequest(): Promise<void> {
-            return Promise.resolve();
-        }
-    }
-    
-    const testLogger = {debug: () => true, error: () => true, 
-        fatal: () => true, warn: () => true, info: () => true, trace: () => true, getChildLogger: () => {return testLogger;}};
+	const choiceMessage =
+		"Some quick example text of the generator description. This is a long text so that the example will look good.";
+	class TestEvents implements YouiEvents {
+		public doGeneratorDone(success: boolean, message: string, targetPath?: string): void {
+			return;
+		}
+		public doGeneratorInstall(): void {
+			return;
+		}
+		public showProgress(message?: string): void {
+			return;
+		}
+	}
+	class TestRpc implements IRpc {
+		public timeout: number;
+		public promiseCallbacks: Map<number, IPromiseCallbacks>;
+		public methods: Map<string, IMethod>;
+		public sendRequest(): void {
+			return;
+		}
+		public sendResponse(): void {
+			return;
+		}
+		public setResponseTimeout(): void {
+			return;
+		}
+		public registerMethod(): void {
+			return;
+		}
+		public unregisterMethod(): void {
+			return;
+		}
+		public listLocalMethods(): string[] {
+			return [];
+		}
+		public handleResponse(): void {
+			return;
+		}
+		public listRemoteMethods(): Promise<string[]> {
+			return Promise.resolve([]);
+		}
+		public invoke(): Promise<any> {
+			return Promise.resolve();
+		}
+		public handleRequest(): Promise<void> {
+			return Promise.resolve();
+		}
+	}
 
-    const rpc = new TestRpc();
-    const outputChannel: any = {
-		appendLine: () => {},
-		show: () => {}
+	const testLogger = {
+		debug: () => true, error: () => true,
+		fatal: () => true, warn: () => true, info: () => true, trace: () => true, getChildLogger: () => { return testLogger; }
 	};
-    const youiEvents = new TestEvents();
-    const yeomanUi: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, 
-        {filter: GeneratorFilter.create(), messages}, undefined, true);
 
-    before(() => {
-        sandbox = sinon.createSandbox();
-        _.set(vscode, "window.showErrorMessage", () => Promise.resolve(""));
-        _.set(vscode, "window.showWarningMessage", () => Promise.resolve(""));
-        _.set(vscode, "window.showInformationMessage", () => Promise.resolve(""));
-        _.set(vscode, "window.activeColorTheme", () => Promise.resolve(""));
-        _.set(vscode, "ColorThemeKind.Light", () => Promise.resolve(false));
-    });
+	const rpc = new TestRpc();
+	const outputChannel: any = {
+		appendLine: () => { },
+		show: () => { }
+	};
+	const youiEvents = new TestEvents();
+	const yeomanUi: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger,
+		{ filter: GeneratorFilter.create(), messages }, undefined, true);
 
-    after(() => {
-        sandbox.restore();
-    });
-
-    beforeEach(() => {
-        yeomanEnvMock = sandbox.mock(yeomanEnv);
-        fsExtraMock = sandbox.mock(fsextra);
-        datauriMock = sandbox.mock(datauri);
-        rpcMock = sandbox.mock(rpc);
-        loggerMock = sandbox.mock(testLogger);
-        swaTrackerWrapperMock = sandbox.mock(SWA);
-        youiEventsMock = sandbox.mock(youiEvents);
-        windowMock = sandbox.mock(vscode.window);
-        colorThemeKindMock = sandbox.mock(vscode.ColorThemeKind);
-    });
-
-    afterEach(() => {
-        yeomanEnvMock.verify();
-        fsExtraMock.verify();
-        datauriMock.verify();
-        rpcMock.verify();
-        loggerMock.verify();
-        swaTrackerWrapperMock.verify();
-        youiEventsMock.verify();
-        windowMock.verify();
-        colorThemeKindMock.verify();
-    });
-
-    describe("receiveIsWebviewReady", () => {
-        it("flow is successfull", async () => {
-            rpcMock.expects("invoke").withArgs("showPrompt").resolves({generator: "testGenerator"});
-            swaTrackerWrapperMock.expects("updateGeneratorStarted").withArgs("testGenerator");
-            swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenerator", false);
-            youiEventsMock.expects("doGeneratorDone").withArgs(false);
-            await yeomanUi["receiveIsWebviewReady"]();
-        });
-
-        it("an error is thrown", async () => {
-            loggerMock.expects("error");
-            youiEventsMock.expects("doGeneratorDone").never();
-            await yeomanUi["receiveIsWebviewReady"]();
-        });
-    });
-
-    describe("showPrompt", () => {
-        it("prompt without questions", async () => {
-            const answers = await yeomanUi.showPrompt([]);
-            expect(answers).to.be.empty;
-        });
-    });
-
-    describe("showProgress", () => {
-        it("called with message parameter ---> call showProgress event with the parameter", async () => {
-            const message: string = "Project Test is generating"
-            youiEventsMock.expects("showProgress").withExactArgs(message);
-            await yeomanUi.showProgress(message);
-        });
-
-        it("called without message parameter ---> call showProgress event with no parameter", async () => {
-            const message: string = "Project Test is generating"
-            youiEventsMock.expects("showProgress").withExactArgs(undefined);
-            await yeomanUi.showProgress();
-        });
-    });
-
-    describe("getGenerators", () => {
-        let envMock: any;
-
-        const environment = {
-            lookup: async (options: any, cb: any) => {
-                return cb.call();
-            },
-            getGeneratorsMeta: (): any => {
-                return {};
-            },
-            getGeneratorNames: (): string[] => {
-                return [];
-            },
-            getNpmPaths: (): string[] => {
-                return [];
-            }
-        };
-
-        beforeEach(() => {
-            envMock = sandbox.mock(environment);
-            yeomanEnvMock.expects("createEnv").returns(environment);
-        });
-
-        afterEach(() => {
-            envMock.verify();
-        });
-
-        it("there are no generators", async () => {
-            const result = await yeomanUi["getGeneratorsPrompt"]();
-            const generatorQuestion: any = {
-                type: "list",
-                guiType: "tiles",
-                guiOptions: {
-                    hint: yeomanUi["uiOptions"].messages.select_generator_question_hint
-                },
-                name: "generator",
-                message: yeomanUi["uiOptions"].messages.channel_name,
-                choices: []
-            };
-            expect(result).to.be.deep.equal({ name: "Select Generator", questions: [generatorQuestion] });
-        });
-
-        it("get generators with type project", async () => {
-            envMock.expects("getGeneratorsMeta").returns({
-                "test1:app": {
-                    packagePath: "test1Path"
-                },
-                "test2:app": {
-                    packagePath: "test2Path"
-                },
-                "test3:app": {
-                    packagePath: "test3Path"
-                },
-                "test4:app": {
-                    packagePath: "test4Path"
-                },
-                "test5:app": {
-                    packagePath: "test5Path"
-                }
-            });
-            envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5"]);
-
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project_test"}}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
-
-            const genFilter: GeneratorFilter = GeneratorFilter.create({type: "project"});
-            yeomanUi["uiOptions"] = {filter: genFilter, messages};
-            const result = await yeomanUi["getGeneratorsPrompt"]();
-
-            const question = result.questions[1];
-            expect(question.choices).to.have.lengthOf(2);
-            const test1Choice = question.choices[0];
-            const test2Choice = question.choices[1];
-            expect(test1Choice.name).to.be.equal("Test1");
-            expect(test1Choice.description).to.be.equal("test1Description");
-            expect(test2Choice.name).to.be.equal("Test4");
-            expect(test2Choice.description).to.be.equal("test4Description");
-        });
-
-        it("get generators with type module", async () => {
-            envMock.expects("getGeneratorsMeta").returns({
-                "test1:app": {
-                    packagePath: "test1Path"
-                },
-                "test2:app": {
-                    packagePath: "test2Path"
-                },
-                "test3:app": {
-                    packagePath: "test3Path"
-                },
-                "test4:app": {
-                    packagePath: "test4Path"
-                },
-                "test5:app": {
-                    packagePath: "test5Path"
-                }
-            });
-            envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5"]);
-
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project_test"}}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
-
-            const genFilter = GeneratorFilter.create({type: "module"});
-            yeomanUi["uiOptions"] = {filter: genFilter, messages};
-            const result = await yeomanUi["getGeneratorsPrompt"]();
-
-            expect(result.questions[0].choices).to.have.lengthOf(1);
-            const test1Choice = result.questions[0].choices[0];
-            expect(test1Choice.name).to.be.equal("Test3");
-            expect(test1Choice.description).to.be.equal(choiceMessage);
-        });
-
-        it("get generators all generators", async () => {
-            envMock.expects("getGeneratorsMeta").returns({
-                "test1:app": {
-                    packagePath: "test1Path"
-                },
-                "test2:app": {
-                    packagePath: "test2Path"
-                },
-                "test3:app": {
-                    packagePath: "test3Path"
-                },
-                "test4:app": {
-                    packagePath: "test4Path"
-                },
-                "test5:app": {
-                    packagePath: "test5Path"
-                },
-                "test6:app": {
-                    packagePath: "test6Path"
-                }
-            });
-            envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5", "test6"]);
-
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project_test"}}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test6Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "all"}}`);
-
-            yeomanUi["uiOptions"] = {filter: GeneratorFilter.create({type: []}), messages};
-            const result = await yeomanUi["getGeneratorsPrompt"]();
-
-            expect(result.questions[0].choices).to.have.lengthOf(6);
-        });
-
-        it("get generators with accessible package.json", async () => {
-            envMock.expects("getGeneratorsMeta").returns({
-                "test1:app": {
-                    packagePath: "test1Path"
-                },
-                "test2:app": {
-                    packagePath: "test2Path"
-                },
-                "test3:app": {
-                    packagePath: "test3Path"
-                },
-                "test4:app": {
-                    packagePath: "test4Path"
-                },
-                "test5:app": {
-                    packagePath: "test5Path"
-                }
-            });
-            envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5"]);
-
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).throws(new Error("test1Error"));
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).throws(new Error("test2Error"));
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
-
-            yeomanUi["uiOptions"] = {filter: GeneratorFilter.create({type: []}), messages};
-            const result = await yeomanUi["getGeneratorsPrompt"]();
-
-            expect(result.questions[0].choices).to.have.lengthOf(3);
-        });
-
-        it("wrong generators filter type is provided", async () => {
-            envMock.expects("getGeneratorsMeta").returns({
-                "test1:app": {
-                    packagePath: "test1Path"
-                }
-            });
-            envMock.expects("getGeneratorNames").returns(["test1"]);
-
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project123"}, "description": "test4Description"}`);
-
-            yeomanUi["uiOptions"] = {filter: GeneratorFilter.create({type: "project"}), messages};
-            const result = await yeomanUi["getGeneratorsPrompt"]();
-
-            expect(result.questions[1].choices).to.be.empty;
-        });
-
-        it("get generators with type project and categories cat1 and cat2", async () => {
-            envMock.expects("getGeneratorsMeta").returns({
-                "test1:app": {
-                    packagePath: "test1Path"
-                },
-                "test2:app": {
-                    packagePath: "test2Path"
-                },
-                "test3:app": {
-                    packagePath: "test3Path"
-                },
-                "test4:app": {
-                    packagePath: "test4Path"
-                },
-                "test5:app": {
-                    packagePath: "test5Path"
-                }
-            });
-            envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5"]);
-
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": ["project"], "categories": ["cat2"]}, "description": "test1Description"}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project", "categories": ["cat2", "cat1"]}}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": ["module"]}}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project", "categories": ["cat1"]}, "description": "test4Description"}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
-
-            const genFilter: GeneratorFilter = GeneratorFilter.create({type: ["project"], categories: ["cat1", "cat2"]});
-            yeomanUi["uiOptions"].filter = genFilter;
-            const result = await yeomanUi["getGeneratorsPrompt"]();
-
-            const question = result.questions[1];
-            expect(question.choices).to.have.lengthOf(3);
-            const test1Choice = question.choices[0];
-            const test2Choice = question.choices[1];
-            const test3Choice = question.choices[2];
-            expect(test1Choice.name).to.be.equal("Test1");
-            expect(test2Choice.name).to.be.equal("Test2");
-            expect(test3Choice.name).to.be.equal("Test4");
-        });
-
-        it("get generators with displayName", async () => {
-            envMock.expects("getGeneratorsMeta").returns({
-                "test1-project:app": {
-                    packagePath: "test1Path"
-                },
-                "test2-module:app": {
-                    packagePath: "test2Path"
-                },
-                "test3:app": {
-                    packagePath: "test3Path"
-                }
-            });
-            envMock.expects("getGeneratorNames").returns(["test1-project", "test2-module", "test3"]);
-
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test3Description", "displayName": "3rd - Test"}`);
-
-            yeomanUi["uiOptions"] = {filter: GeneratorFilter.create({type: undefined}), messages};
-            const result = await yeomanUi["getGeneratorsPrompt"]();
-
-            const choices = result.questions[0].choices;
-            expect(choices).to.have.lengthOf(3);
-            const test1Choice = choices[0];
-            const test2Choice = choices[1];
-            const test3Choice = choices[2];
-            expect(test1Choice.name).to.be.equal("Test1 Project");
-            expect(test2Choice.name).to.be.equal("Test2 Module");
-            expect(test3Choice.name).to.be.equal("3rd - Test");
-        });
-
-        it("get generators with homepage", async () => {
-            envMock.expects("getGeneratorsMeta").returns({
-                "test1-project:app": {
-                    packagePath: "test1Path"
-                },
-                "test2-module:app": {
-                    packagePath: "test2Path"
-                },
-                "test3:app": {
-                    packagePath: "test3Path"
-                }
-            });
-            envMock.expects("getGeneratorNames").returns(["test1-project", "test2-module", "test3"]);
-
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description", "homepage": "https://myhomepage.com/ANY/generator-test1-project#readme"}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}, "homepage": "https://myhomepage.com/ANY/generator-test2-module#readme"}`);
-            fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test3Description"}`);
-
-            yeomanUi["uiOptions"] = {filter: GeneratorFilter.create(), messages};
-            const result = await yeomanUi["getGeneratorsPrompt"]();
-
-            const choices = result.questions[0].choices;
-            expect(choices).to.have.lengthOf(3);
-            const test1Choice = choices[0];
-            const test2Choice = choices[1];
-            const test3Choice = choices[2];
-            expect(test1Choice.homepage).to.be.equal("https://myhomepage.com/ANY/generator-test1-project#readme");
-            expect(test2Choice.homepage).to.be.equal("https://myhomepage.com/ANY/generator-test2-module#readme");
-            expect(test3Choice.homepage).to.be.equal("");
-        });
-    });
-
-    describe("funcReplacer", () => {
-        it("with function", () => {
-            const res = YeomanUI["funcReplacer"]("key", () => { return; });
-            expect(res).to.be.equal("__Function");
-        });
-
-        it("without function", () => {
-            const res = YeomanUI["funcReplacer"]("key", "value");
-            expect(res).to.be.equal("value");
-        });
-    });
-
-    it("setCwd", () => {
-        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {},  "testpathbefore", true);
-        expect(yeomanUiInstance["getCwd"]()).equal("testpathbefore");
-        yeomanUiInstance["setCwd"]("testpathafter");
-        expect(yeomanUiInstance["getCwd"]()).equal("testpathafter");
-
-        yeomanUiInstance["setCwd"](undefined);
-        expect(yeomanUiInstance["getCwd"]()).equal(YeomanUI["PROJECTS"]);
-    });
-
-    it("defaultOutputPath", () => {
-        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, undefined, true);
-        const projectsPath = path.join(os.homedir(), 'projects');
-        expect(yeomanUiInstance["getCwd"]()).equal(projectsPath);
-    });
-
-    it("getErrorInfo", () => {
-        const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, null, undefined, true);
-        const errorInfo = "Error Info";
-        const res = yeomanUiInstance["getErrorInfo"](errorInfo);
-        expect(res.message).to.be.equal(errorInfo);
-    });
-
-    describe("answersUtils", () => {
-        it("setDefaults", () => {
-            const questions = [
-                {name: "q1", default: "a"},
-                {name: "q2", default: () => "b"},
-                {name: "q3"}
-            ];
-            const answers = {
-                q1: "x",
-                q2: "y",
-                q3: "z"
-            };
-            ReplayUtils["setDefaults"](questions, answers);
-            for (const question of questions) {
-                switch (question.name) {
-                    case "a":
-                        expect((question as any)["answer"]).to.equal("x");
-                        break;
-                    case "b":
-                        expect((question as any)["answer"]).to.equal("y");
-                        break;
-                    case "c":
-                        expect((question as any)["answer"]).to.equal("z");
-                        break;
-                }
-            }
-        });
+	before(() => {
+		sandbox = sinon.createSandbox();
 	});
-	
+
+	after(() => {
+		sandbox.restore();
+	});
+
+	beforeEach(() => {
+		yeomanEnvMock = sandbox.mock(yeomanEnv);
+		fsExtraMock = sandbox.mock(fsextra);
+		datauriMock = sandbox.mock(datauri);
+		rpcMock = sandbox.mock(rpc);
+		loggerMock = sandbox.mock(testLogger);
+		swaTrackerWrapperMock = sandbox.mock(SWA);
+		youiEventsMock = sandbox.mock(youiEvents);
+	});
+
+	afterEach(() => {
+		yeomanEnvMock.verify();
+		fsExtraMock.verify();
+		datauriMock.verify();
+		rpcMock.verify();
+		loggerMock.verify();
+		swaTrackerWrapperMock.verify();
+		youiEventsMock.verify();
+		// windowMock.verify();
+		// colorThemeKindMock.verify();
+	});
+
+	describe("receiveIsWebviewReady", () => {
+		it("flow is successfull", async () => {
+			rpcMock.expects("invoke").withArgs("showPrompt").resolves({ generator: "testGenerator" });
+			swaTrackerWrapperMock.expects("updateGeneratorStarted").withArgs("testGenerator");
+			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenerator", false);
+			youiEventsMock.expects("doGeneratorDone").withArgs(false);
+			await yeomanUi["receiveIsWebviewReady"]();
+		});
+
+		it("an error is thrown", async () => {
+			loggerMock.expects("error");
+			youiEventsMock.expects("doGeneratorDone").never();
+			await yeomanUi["receiveIsWebviewReady"]();
+		});
+	});
+
+	describe("showPrompt", () => {
+		it("prompt without questions", async () => {
+			const answers = await yeomanUi.showPrompt([]);
+			expect(answers).to.be.empty;
+		});
+	});
+
+	describe("showProgress", () => {
+		it("called with message parameter ---> call showProgress event with the parameter", async () => {
+			const message: string = "Project Test is generating"
+			youiEventsMock.expects("showProgress").withExactArgs(message);
+			await yeomanUi.showProgress(message);
+		});
+
+		it("called without message parameter ---> call showProgress event with no parameter", async () => {
+			const message: string = "Project Test is generating"
+			youiEventsMock.expects("showProgress").withExactArgs(undefined);
+			await yeomanUi.showProgress();
+		});
+	});
+
+	describe("getGenerators", () => {
+		let envMock: any;
+
+		const environment = {
+			lookup: async (options: any, cb: any) => {
+				return cb.call();
+			},
+			getGeneratorsMeta: (): any => {
+				return {};
+			},
+			getGeneratorNames: (): string[] => {
+				return [];
+			},
+			getNpmPaths: (): string[] => {
+				return [];
+			}
+		};
+
+		beforeEach(() => {
+			envMock = sandbox.mock(environment);
+			yeomanEnvMock.expects("createEnv").returns(environment);
+		});
+
+		afterEach(() => {
+			envMock.verify();
+		});
+
+		it("there are no generators", async () => {
+			const result = await yeomanUi["getGeneratorsPrompt"]();
+			const generatorQuestion: any = {
+				type: "list",
+				guiType: "tiles",
+				guiOptions: {
+					hint: yeomanUi["uiOptions"].messages.select_generator_question_hint
+				},
+				name: "generator",
+				message: yeomanUi["uiOptions"].messages.channel_name,
+				choices: []
+			};
+			expect(result).to.be.deep.equal({ name: "Select Generator", questions: [generatorQuestion] });
+		});
+
+		it("get generators with type project", async () => {
+			envMock.expects("getGeneratorsMeta").returns({
+				"test1:app": {
+					packagePath: "test1Path"
+				},
+				"test2:app": {
+					packagePath: "test2Path"
+				},
+				"test3:app": {
+					packagePath: "test3Path"
+				},
+				"test4:app": {
+					packagePath: "test4Path"
+				},
+				"test5:app": {
+					packagePath: "test5Path"
+				}
+			});
+			envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5"]);
+
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project_test"}}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
+
+			const genFilter: GeneratorFilter = GeneratorFilter.create({ type: "project" });
+			yeomanUi["uiOptions"] = { filter: genFilter, messages };
+			const result = await yeomanUi["getGeneratorsPrompt"]();
+
+			const question = result.questions[1];
+			expect(question.choices).to.have.lengthOf(2);
+			const test1Choice = question.choices[0];
+			const test2Choice = question.choices[1];
+			expect(test1Choice.name).to.be.equal("Test1");
+			expect(test1Choice.description).to.be.equal("test1Description");
+			expect(test2Choice.name).to.be.equal("Test4");
+			expect(test2Choice.description).to.be.equal("test4Description");
+		});
+
+		it("get generators with type module", async () => {
+			envMock.expects("getGeneratorsMeta").returns({
+				"test1:app": {
+					packagePath: "test1Path"
+				},
+				"test2:app": {
+					packagePath: "test2Path"
+				},
+				"test3:app": {
+					packagePath: "test3Path"
+				},
+				"test4:app": {
+					packagePath: "test4Path"
+				},
+				"test5:app": {
+					packagePath: "test5Path"
+				}
+			});
+			envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5"]);
+
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project_test"}}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
+
+			const genFilter = GeneratorFilter.create({ type: "module" });
+			yeomanUi["uiOptions"] = { filter: genFilter, messages };
+			const result = await yeomanUi["getGeneratorsPrompt"]();
+
+			expect(result.questions[0].choices).to.have.lengthOf(1);
+			const test1Choice = result.questions[0].choices[0];
+			expect(test1Choice.name).to.be.equal("Test3");
+			expect(test1Choice.description).to.be.equal(choiceMessage);
+		});
+
+		it("get generators all generators", async () => {
+			envMock.expects("getGeneratorsMeta").returns({
+				"test1:app": {
+					packagePath: "test1Path"
+				},
+				"test2:app": {
+					packagePath: "test2Path"
+				},
+				"test3:app": {
+					packagePath: "test3Path"
+				},
+				"test4:app": {
+					packagePath: "test4Path"
+				},
+				"test5:app": {
+					packagePath: "test5Path"
+				},
+				"test6:app": {
+					packagePath: "test6Path"
+				}
+			});
+			envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5", "test6"]);
+
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project_test"}}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test6Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "all"}}`);
+
+			yeomanUi["uiOptions"] = { filter: GeneratorFilter.create({ type: [] }), messages };
+			const result = await yeomanUi["getGeneratorsPrompt"]();
+
+			expect(result.questions[0].choices).to.have.lengthOf(6);
+		});
+
+		it("get generators with accessible package.json", async () => {
+			envMock.expects("getGeneratorsMeta").returns({
+				"test1:app": {
+					packagePath: "test1Path"
+				},
+				"test2:app": {
+					packagePath: "test2Path"
+				},
+				"test3:app": {
+					packagePath: "test3Path"
+				},
+				"test4:app": {
+					packagePath: "test4Path"
+				},
+				"test5:app": {
+					packagePath: "test5Path"
+				}
+			});
+			envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5"]);
+
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).throws(new Error("test1Error"));
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).throws(new Error("test2Error"));
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test4Description"}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
+
+			yeomanUi["uiOptions"] = { filter: GeneratorFilter.create({ type: [] }), messages };
+			const result = await yeomanUi["getGeneratorsPrompt"]();
+
+			expect(result.questions[0].choices).to.have.lengthOf(3);
+		});
+
+		it("wrong generators filter type is provided", async () => {
+			envMock.expects("getGeneratorsMeta").returns({
+				"test1:app": {
+					packagePath: "test1Path"
+				}
+			});
+			envMock.expects("getGeneratorNames").returns(["test1"]);
+
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project123"}, "description": "test4Description"}`);
+
+			yeomanUi["uiOptions"] = { filter: GeneratorFilter.create({ type: "project" }), messages };
+			const result = await yeomanUi["getGeneratorsPrompt"]();
+
+			expect(result.questions[1].choices).to.be.empty;
+		});
+
+		it("get generators with type project and categories cat1 and cat2", async () => {
+			envMock.expects("getGeneratorsMeta").returns({
+				"test1:app": {
+					packagePath: "test1Path"
+				},
+				"test2:app": {
+					packagePath: "test2Path"
+				},
+				"test3:app": {
+					packagePath: "test3Path"
+				},
+				"test4:app": {
+					packagePath: "test4Path"
+				},
+				"test5:app": {
+					packagePath: "test5Path"
+				}
+			});
+			envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5"]);
+
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": ["project"], "categories": ["cat2"]}, "description": "test1Description"}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project", "categories": ["cat2", "cat1"]}}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": ["module"]}}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test4Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project", "categories": ["cat1"]}, "description": "test4Description"}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test5Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test5Description"}`);
+
+			const genFilter: GeneratorFilter = GeneratorFilter.create({ type: ["project"], categories: ["cat1", "cat2"] });
+			yeomanUi["uiOptions"].filter = genFilter;
+			const result = await yeomanUi["getGeneratorsPrompt"]();
+
+			const question = result.questions[1];
+			expect(question.choices).to.have.lengthOf(3);
+			const test1Choice = question.choices[0];
+			const test2Choice = question.choices[1];
+			const test3Choice = question.choices[2];
+			expect(test1Choice.name).to.be.equal("Test1");
+			expect(test2Choice.name).to.be.equal("Test2");
+			expect(test3Choice.name).to.be.equal("Test4");
+		});
+
+		it("get generators with displayName", async () => {
+			envMock.expects("getGeneratorsMeta").returns({
+				"test1-project:app": {
+					packagePath: "test1Path"
+				},
+				"test2-module:app": {
+					packagePath: "test2Path"
+				},
+				"test3:app": {
+					packagePath: "test3Path"
+				}
+			});
+			envMock.expects("getGeneratorNames").returns(["test1-project", "test2-module", "test3"]);
+
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test3Description", "displayName": "3rd - Test"}`);
+
+			yeomanUi["uiOptions"] = { filter: GeneratorFilter.create({ type: undefined }), messages };
+			const result = await yeomanUi["getGeneratorsPrompt"]();
+
+			const choices = result.questions[0].choices;
+			expect(choices).to.have.lengthOf(3);
+			const test1Choice = choices[0];
+			const test2Choice = choices[1];
+			const test3Choice = choices[2];
+			expect(test1Choice.name).to.be.equal("Test1 Project");
+			expect(test2Choice.name).to.be.equal("Test2 Module");
+			expect(test3Choice.name).to.be.equal("3rd - Test");
+		});
+
+		it("get generators with homepage", async () => {
+			envMock.expects("getGeneratorsMeta").returns({
+				"test1-project:app": {
+					packagePath: "test1Path"
+				},
+				"test2-module:app": {
+					packagePath: "test2Path"
+				},
+				"test3:app": {
+					packagePath: "test3Path"
+				}
+			});
+			envMock.expects("getGeneratorNames").returns(["test1-project", "test2-module", "test3"]);
+
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description", "homepage": "https://myhomepage.com/ANY/generator-test1-project#readme"}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}, "homepage": "https://myhomepage.com/ANY/generator-test2-module#readme"}`);
+			fsExtraMock.expects("readFile").withExactArgs(path.join("test3Path", PACKAGE_JSON), UTF8).resolves(`{"description": "test3Description"}`);
+
+			yeomanUi["uiOptions"] = { filter: GeneratorFilter.create(), messages };
+			const result = await yeomanUi["getGeneratorsPrompt"]();
+
+			const choices = result.questions[0].choices;
+			expect(choices).to.have.lengthOf(3);
+			const test1Choice = choices[0];
+			const test2Choice = choices[1];
+			const test3Choice = choices[2];
+			expect(test1Choice.homepage).to.be.equal("https://myhomepage.com/ANY/generator-test1-project#readme");
+			expect(test2Choice.homepage).to.be.equal("https://myhomepage.com/ANY/generator-test2-module#readme");
+			expect(test3Choice.homepage).to.be.equal("");
+		});
+	});
+
+	describe("funcReplacer", () => {
+		it("with function", () => {
+			const res = YeomanUI["funcReplacer"]("key", () => { return; });
+			expect(res).to.be.equal("__Function");
+		});
+
+		it("without function", () => {
+			const res = YeomanUI["funcReplacer"]("key", "value");
+			expect(res).to.be.equal("value");
+		});
+	});
+
+	it("setCwd", () => {
+		const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, "testpathbefore", true);
+		expect(yeomanUiInstance["getCwd"]()).equal("testpathbefore");
+		yeomanUiInstance["setCwd"]("testpathafter");
+		expect(yeomanUiInstance["getCwd"]()).equal("testpathafter");
+
+		yeomanUiInstance["setCwd"](undefined);
+		expect(yeomanUiInstance["getCwd"]()).equal(YeomanUI["PROJECTS"]);
+	});
+
+	it("defaultOutputPath", () => {
+		const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, undefined, true);
+		const projectsPath = path.join(os.homedir(), 'projects');
+		expect(yeomanUiInstance["getCwd"]()).equal(projectsPath);
+	});
+
+	it("getErrorInfo", () => {
+		const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, null, undefined, true);
+		const errorInfo = "Error Info";
+		const res = yeomanUiInstance["getErrorInfo"](errorInfo);
+		expect(res.message).to.be.equal(errorInfo);
+	});
+
+	describe("answersUtils", () => {
+		it("setDefaults", () => {
+			const questions = [
+				{ name: "q1", default: "a" },
+				{ name: "q2", default: () => "b" },
+				{ name: "q3" }
+			];
+			const answers = {
+				q1: "x",
+				q2: "y",
+				q3: "z"
+			};
+			ReplayUtils["setDefaults"](questions, answers);
+			for (const question of questions) {
+				switch (question.name) {
+					case "a":
+						expect((question as any)["answer"]).to.equal("x");
+						break;
+					case "b":
+						expect((question as any)["answer"]).to.equal("y");
+						break;
+					case "c":
+						expect((question as any)["answer"]).to.equal("z");
+						break;
+				}
+			}
+		});
+	});
+
 	describe("handleErrors", () => {
 		it("check event names", () => {
 			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, undefined, true);
-			const env: Environment =  Environment.createEnv();
+			const env: Environment = Environment.createEnv();
 			const envMock = sandbox.mock(env);
-			const gen = {on: () => {}};
+			const gen = { on: () => { } };
 			const genMock = sandbox.mock(gen);
 			const processMock = sandbox.mock(process);
 			envMock.expects("on").withArgs("error");
@@ -559,7 +551,7 @@ describe('yeomanui unit test', () => {
 		let genMock: any;
 		let rpcMock: any;
 		const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, undefined, true);
-		const gen: any = {on: () => {}};
+		const gen: any = { on: () => { } };
 
 		beforeEach(() => {
 			genMock = sandbox.mock(gen);
@@ -578,7 +570,7 @@ describe('yeomanui unit test', () => {
 		});
 
 		it("writing method exists on generator", () => {
-			gen.writing = () => {};
+			gen.writing = () => { };
 			yeomanUiInstance["setGenInWriting"](gen);
 		});
 	});
@@ -593,7 +585,7 @@ describe('yeomanui unit test', () => {
 
 		it("vscode module is available", () => {
 			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, undefined, true);
-			const testVscode = {commands: {executeCommand: () => {}}}; 
+			const testVscode = { commands: { executeCommand: () => { } } };
 			yeomanUiInstance["getVscode"] = () => testVscode;
 			const commandsMock = sandbox.mock(testVscode.commands);
 			commandsMock.expects("executeCommand").withExactArgs("exploreGenerators");
@@ -605,297 +597,332 @@ describe('yeomanui unit test', () => {
 
 	it("onGenInstall", () => {
 		const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
-		const gen: any = {on: () => {}};
+		const gen: any = { on: () => { } };
 		const genMock = sandbox.mock(gen);
-		
+
 		genMock.expects("on").withArgs("method:install");
 		yeomanUiInstance["onGenInstall"](gen);
 		genMock.verify();
 	});
 
-    describe("showPrompt", () => {
-        it("returns answers", async () => {
-            const firstName = "john";
-            rpc.invoke = async () => {
-                return {
-                    firstName,
-                    lastName: "doe"
-                };
-            };
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
-            const questions = [{name: "q1"}];
-            const response = await yeomanUiInstance.showPrompt(questions);
-            expect (response.firstName).to.equal(firstName);
-        });
+	describe("showPrompt", () => {
+		it("returns answers", async () => {
+			const firstName = "john";
+			rpc.invoke = async () => {
+				return {
+					firstName,
+					lastName: "doe"
+				};
+			};
+			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
+			const questions = [{ name: "q1" }];
+			const response = await yeomanUiInstance.showPrompt(questions);
+			expect(response.firstName).to.equal(firstName);
+		});
 
-        it("with back", async () => {
-            const firstName = "john";
-            const country = "denmark";
+		it("with back", async () => {
+			const firstName = "john";
+			const country = "denmark";
 
-            (rpc.invoke as (methodName: string, params: any[]) => Promise<any>) = async (methodName: string, params: any[]) => {
-                const questionName: string = params[0][0].name;
-                if (questionName === "q1") {
-                    return {
-                        firstName,
-                        lastName: "doe"
-                    };
-                } else if (questionName === "q2") {
-                    return {
-                        country
-                    };
-                }
-            };
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
-            yeomanUiInstance["runGenerator"] = async (): Promise<any> => { return; };
-            let questions = [{name: "q1"}];
-            let response = await yeomanUiInstance.showPrompt(questions);
-            expect (response.firstName).to.equal(firstName);
+			(rpc.invoke as (methodName: string, params: any[]) => Promise<any>) = async (methodName: string, params: any[]) => {
+				const questionName: string = params[0][0].name;
+				if (questionName === "q1") {
+					return {
+						firstName,
+						lastName: "doe"
+					};
+				} else if (questionName === "q2") {
+					return {
+						country
+					};
+				}
+			};
+			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
+			yeomanUiInstance["runGenerator"] = async (): Promise<any> => { return; };
+			let questions = [{ name: "q1" }];
+			let response = await yeomanUiInstance.showPrompt(questions);
+			expect(response.firstName).to.equal(firstName);
 
-            questions = [{name: "q2"}];
+			questions = [{ name: "q2" }];
 
-            response = await yeomanUiInstance.showPrompt(questions);        
-            expect (response.country).to.equal(country);
-            expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.false;
+			response = await yeomanUiInstance.showPrompt(questions);
+			expect(response.country).to.equal(country);
+			expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.false;
 
-            swaTrackerWrapperMock.expects("updateOneOfPreviousStepsClicked").withArgs("");
+			swaTrackerWrapperMock.expects("updateOneOfPreviousStepsClicked").withArgs("");
 
-            yeomanUiInstance["back"](undefined,1);
-            expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.true;
+			yeomanUiInstance["back"](undefined, 1);
+			expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.true;
 
-            questions = [{name: "q1"}];
-            response = await yeomanUiInstance.showPrompt(questions);
-            expect (response.firstName).to.equal(firstName);
-        });
-    });
+			questions = [{ name: "q1" }];
+			response = await yeomanUiInstance.showPrompt(questions);
+			expect(response.firstName).to.equal(firstName);
+		});
+	});
 
-    describe("onGeneratorSuccess - onGeneratorFailure", () => {
-        let doGeneratorDoneSpy: any;
+	describe("onGeneratorSuccess - onGeneratorFailure", () => {
+		let doGeneratorDoneSpy: any;
 
-        beforeEach(() => {
-            doGeneratorDoneSpy = sandbox.spy(youiEvents, "doGeneratorDone");
-        });
+		beforeEach(() => {
+			doGeneratorDoneSpy = sandbox.spy(youiEvents, "doGeneratorDone");
+		});
 
-        afterEach(() => {
-            doGeneratorDoneSpy.restore();
-        });
+		afterEach(() => {
+			doGeneratorDoneSpy.restore();
+		});
 
-        it("onGeneratorSuccess - one dir was created", () => {
-            const beforeGen = {targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1"]};
-            const afterGen = {targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1", "dirpath2"]};
-            swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
-            yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
-            expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), "dirpath2")).to.be.true;
-        });
+		it("onGeneratorSuccess - one dir was created", () => {
+			const beforeGen = { targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1"] };
+			const afterGen = { targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1", "dirpath2"] };
+			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
+			yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
+			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), "dirpath2")).to.be.true;
+		});
 
-        it("onGeneratorSuccess - two dirs were created", () => {
-            const beforeGen = {targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1"]};
-            const afterGen = {targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1", "dirpath2", "dirpath3"]};
-            swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
-            yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
-            expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), null)).to.be.true;
-        });
+		it("onGeneratorSuccess - two dirs were created", () => {
+			const beforeGen = { targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1"] };
+			const afterGen = { targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1", "dirpath2", "dirpath3"] };
+			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
+			yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
+			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), null)).to.be.true;
+		});
 
-        it("onGeneratorSuccess - zero dirs were created", () => {
-            const beforeGen = {targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1"]};
-            const afterGen = {targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1"]};
-            swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
-            yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
-            expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), null)).to.be.true;
-        });
+		it("onGeneratorSuccess - zero dirs were created", () => {
+			const beforeGen = { targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1"] };
+			const afterGen = { targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1"] };
+			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
+			yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
+			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), null)).to.be.true;
+		});
 
-        it("onGeneratorSuccess - targetFolderPath was changed by generator", () => {
-            const beforeGen = {targetFolderPath: "testDestinationRoot"};
-            const afterGen = {targetFolderPath: "testDestinationRoot/generatedProject"};
-            swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
-            yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
-            expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), "testDestinationRoot/generatedProject")).to.be.true;
-        });
+		it("onGeneratorSuccess - targetFolderPath was changed by generator", () => {
+			const beforeGen = { targetFolderPath: "testDestinationRoot" };
+			const afterGen = { targetFolderPath: "testDestinationRoot/generatedProject" };
+			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
+			yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
+			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), "testDestinationRoot/generatedProject")).to.be.true;
+		});
 
-        it("onGeneratorFailure", async () => {
-            swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", false, testLogger);
-            await yeomanUi["onGeneratorFailure"]("testGenName", "testError");
-            expect(doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed - testError"}`)).to.be.true;
-        });
-    });
+		it("onGeneratorFailure", async () => {
+			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", false, testLogger);
+			await yeomanUi["onGeneratorFailure"]("testGenName", "testError");
+			expect(doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed - testError"}`)).to.be.true;
+		});
+	});
 
-    describe("Custom Question Event Handlers", () => {
-        it("addCustomQuestionEventHandlers()", async () => {
-            const testEventFunction = () => {
-                return true;
-            };
-            const questions = [
-                {
-                    name:"q1",
-                    guiType: "questionType"
-                }
-            ];
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
+	describe("Custom Question Event Handlers", () => {
+		it("addCustomQuestionEventHandlers()", async () => {
+			const testEventFunction = () => {
+				return true;
+			};
+			const questions = [
+				{
+					name: "q1",
+					guiType: "questionType"
+				}
+			];
+			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
 
-            yeomanUiInstance["addCustomQuestionEventHandlers"](questions);
-            expect(questions[0]).to.not.have.property("testEvent");
+			yeomanUiInstance["addCustomQuestionEventHandlers"](questions);
+			expect(questions[0]).to.not.have.property("testEvent");
 
-            yeomanUiInstance.registerCustomQuestionEventHandler("questionType", "testEvent", testEventFunction);
-            yeomanUiInstance["addCustomQuestionEventHandlers"](questions);
-            expect(questions[0]).to.have.property("testEvent");
-            expect((questions[0] as any)["testEvent"]).to.equal(testEventFunction);
-        });
-    });
+			yeomanUiInstance.registerCustomQuestionEventHandler("questionType", "testEvent", testEventFunction);
+			yeomanUiInstance["addCustomQuestionEventHandlers"](questions);
+			expect(questions[0]).to.have.property("testEvent");
+			expect((questions[0] as any)["testEvent"]).to.equal(testEventFunction);
+		});
+	});
 
-    describe("evaluateMethod()", () => {
-        it("custom question events", async () => {
-            const testEventFunction = () => {
-                return true;
-            };
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
-            yeomanUiInstance.registerCustomQuestionEventHandler("questionType", "testEvent", testEventFunction);
-            yeomanUiInstance["currentQuestions"] = [{name:"question1", guiType: "questionType"}];
-            const response = await yeomanUiInstance["evaluateMethod"](null, "question1", "testEvent");
-            expect(response).to.be.true;
-        });
+	describe("evaluateMethod()", () => {
+		it("custom question events", async () => {
+			const testEventFunction = () => {
+				return true;
+			};
+			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
+			yeomanUiInstance.registerCustomQuestionEventHandler("questionType", "testEvent", testEventFunction);
+			yeomanUiInstance["currentQuestions"] = [{ name: "question1", guiType: "questionType" }];
+			const response = await yeomanUiInstance["evaluateMethod"](null, "question1", "testEvent");
+			expect(response).to.be.true;
+		});
 
-        it("question method is called", async () => {
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
-            yeomanUiInstance["currentQuestions"] = [{name:"question1", method1:()=>{
-                return true;
-            }}];
-            const response = await yeomanUiInstance["evaluateMethod"](null, "question1", "method1");
-            expect(response).to.be.true;
-        });
+		it("question method is called", async () => {
+			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
+			yeomanUiInstance["currentQuestions"] = [{
+				name: "question1", method1: () => {
+					return true;
+				}
+			}];
+			const response = await yeomanUiInstance["evaluateMethod"](null, "question1", "method1");
+			expect(response).to.be.true;
+		});
 
-        it("no questions", async () => {
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
-            const response = await yeomanUiInstance["evaluateMethod"](null, "question1", "method1");
-            expect(response).to.be.undefined;
-        });
+		it("no questions", async () => {
+			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
+			const response = await yeomanUiInstance["evaluateMethod"](null, "question1", "method1");
+			expect(response).to.be.undefined;
+		});
 
-        it("method throws exception", async () => {
-            const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
-            yeomanUiInstance["gen"] = Object.create({});
-            yeomanUiInstance["gen"].options = {};
-            yeomanUiInstance["currentQuestions"] = [{name:"question1", method1:()=>{
-                throw new Error("Error");
-            }}];
-            swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("", false);
-            try {
-                await yeomanUiInstance["evaluateMethod"](null, "question1", "method1");
-            } catch(e) {
-                expect(e.toString()).to.contain("method1");
-            }
-        });
-    });
+		it("method throws exception", async () => {
+			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined, true);
+			yeomanUiInstance["gen"] = Object.create({});
+			yeomanUiInstance["gen"].options = {};
+			yeomanUiInstance["currentQuestions"] = [{
+				name: "question1", method1: () => {
+					throw new Error("Error");
+				}
+			}];
+			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("", false);
+			try {
+				await yeomanUiInstance["evaluateMethod"](null, "question1", "method1");
+			} catch (e) {
+				expect(e.toString()).to.contain("method1");
+			}
+		});
+	});
 
-    describe("showLogMessage", () => {
-        it("error message with location message on theia", async () => {
-            const message = {
-                location: "message",
-                value: "value message",
-                type: "error"
-            }
-            windowMock.expects("showErrorMessage").withExactArgs(message.value).resolves();
-            await yeomanUi.showLogMessage(message);
-        });
+	describe("showLogMessage", () => {
+		let yeomanUiInstance: YeomanUI;
+		let windowMock: any;
+		
+		before(() => {
+			yeomanUiInstance = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, undefined, true);
+			const testVscode = { window: {} };
+			_.set(testVscode, "window.showErrorMessage", () => Promise.resolve(""));
+			_.set(testVscode, "window.showWarningMessage", () => Promise.resolve(""));
+			_.set(testVscode, "window.showInformationMessage", () => Promise.resolve(""));
+			_.set(testVscode, "window.activeColorTheme", () => Promise.resolve(""));
+			_.set(testVscode, "ColorThemeKind.Light", () => Promise.resolve(false));
+			yeomanUiInstance["getVscode"] = () => testVscode;
+			windowMock = sandbox.mock(testVscode.window);
+		});
 
-        it("warning message with location message on theia", async () => {
-            const message = {
-                location: "message",
-                value: "value message",
-                type: "warn"
-            }
-            windowMock.expects("showWarningMessage").withExactArgs(message.value).resolves();
-            await yeomanUi.showLogMessage(message);
-        });
+		afterEach(() => {
+			windowMock.verify();
+		});
 
-        it("info message with location message on theia", async () => {
-            const message = {
-                location: "message",
-                value: "value message",
-                type: "info"
-            }
-            windowMock.expects("showInformationMessage").withExactArgs(message.value).resolves();
-            await yeomanUi.showLogMessage(message);
-        });
+		it("error message with location message on theia", async () => {
+			const message = {
+				location: "message",
+				value: "value message",
+				type: "error"
+			}
+			yeomanUiInstance["isInBAS"] = true;
+			windowMock.expects("showErrorMessage").withExactArgs(message.value).resolves();
+			await yeomanUiInstance.showLogMessage(message);
+		});
 
-        it("error message with location prompt on theia", async () => {
-            const message = {
-                location: "prompt",
-                value: "value message",
-                type: "error"
-            }
-            rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.value, message.type, errorTheiaDark]);
-            await yeomanUi.showLogMessage(message);
-        });
+		it("warning message with location message on theia", async () => {
+			const message = {
+				location: "message",
+				value: "value message",
+				type: "warn"
+			}
+			yeomanUiInstance["isInBAS"] = true;
+			windowMock.expects("showWarningMessage").withExactArgs(message.value).resolves();
+			await yeomanUiInstance.showLogMessage(message);
+		});
 
-        it("warning message with location prompt on theia", async () => {
-            const message = {
-                location: "prompt",
-                value: "value message",
-                type: "warn"
-            }
-            rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.value, message.type, warnTheia]);
-            await yeomanUi.showLogMessage(message);
-        });
+		it("info message with location message on theia", async () => {
+			const message = {
+				location: "message",
+				value: "value message",
+				type: "info"
+			}
+			yeomanUiInstance["isInBAS"] = true;
+			windowMock.expects("showInformationMessage").withExactArgs(message.value).resolves();
+			await yeomanUiInstance.showLogMessage(message);
+		});
 
-        it("info message with location prompt on theia", async () => {
-            const message = {
-                location: "prompt",
-                value: "value message",
-                type: "info"
-            }
-            rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.value, message.type, infoTheia]);
-            await yeomanUi.showLogMessage(message);
-        });
+		it("error message with location prompt on theia", async () => {
+			const message = {
+				location: "prompt",
+				value: "value message",
+				type: "error"
+			}
+			yeomanUiInstance["isInBAS"] = true;
+			yeomanUiInstance["getMessageImage"] = () => "errorTheiaDark";
+			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.value, message.type, "errorTheiaDark"]);
+			await yeomanUiInstance.showLogMessage(message);
+		});
 
-        it("error message with location prompt on vscode", async () => {
-            const message = {
-                location: "prompt",
-                value: "value message",
-                type: "error"
-            }
-            yeomanUi["isInBAS"] = false;
-            rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.value, message.type, errorVSCodeDark]);
-            await yeomanUi.showLogMessage(message);
-        });
+		it("warning message with location prompt on theia", async () => {
+			const message = {
+				location: "prompt",
+				value: "value message",
+				type: "warn"
+			}
+			yeomanUiInstance["isInBAS"] = true;
+			yeomanUiInstance["getMessageImage"] = () => "warnTheia";
+			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.value, message.type, "warnTheia"]);
+			await yeomanUiInstance.showLogMessage(message);
+		});
 
-        it("warning message with location prompt on vscode", async () => {
-            const message = {
-                location: "prompt",
-                value: "value message",
-                type: "warn"
-            }
-            yeomanUi["isInBAS"] = false;
-            rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.value, message.type, warnVSCode]);
-            await yeomanUi.showLogMessage(message);
-        });
+		it("info message with location prompt on theia", async () => {
+			const message = {
+				location: "prompt",
+				value: "value message",
+				type: "info"
+			}
+			yeomanUiInstance["isInBAS"] = true;
+			yeomanUiInstance["getMessageImage"] = () => "infoTheia";
+			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.value, message.type, "infoTheia"]);
+			await yeomanUiInstance.showLogMessage(message);
+		});
 
-        it("info message with location prompt on vscode", async () => {
-            const message = {
-                location: "prompt",
-                value: "value message",
-                type: "info"
-            }
-            yeomanUi["isInBAS"] = false;
-            rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.value, message.type, infoVSCode]);
-            await yeomanUi.showLogMessage(message);
-        });
-    });
+		it("error message with location prompt on vscode", async () => {
+			const message = {
+				location: "prompt",
+				value: "value message",
+				type: "error"
+			}
+			yeomanUiInstance["isInBAS"] = false;
+			yeomanUiInstance["getMessageImage"] = () => "errorVSCodeDark";
+			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.value, message.type, "errorVSCodeDark"]);
+			await yeomanUiInstance.showLogMessage(message);
+		});
 
-    describe("_notifyGeneratorsChange", () => {
-        it("there are no generators", async () => {
-            const result = await yeomanUi["getGeneratorsPrompt"]();
-            const generatorQuestion: any = {
-                type: "list",
-                guiType: "tiles",
-                guiOptions: {
-                    hint: yeomanUi["uiOptions"].messages.select_generator_question_hint
-                },
-                name: "generator",
-                message: yeomanUi["uiOptions"].messages.channel_name,
-                choices: []
-            };
-            expect(result).to.be.deep.equal({ name: "Select Generator", questions: [generatorQuestion] });
-            rpcMock.expects("invoke").withExactArgs("updateGeneratorsPrompt", [result.questions]);
-            await yeomanUi._notifyGeneratorsChange();
+		it("warning message with location prompt on vscode", async () => {
+			const message = {
+				location: "prompt",
+				value: "value message",
+				type: "warn"
+			}
+			yeomanUiInstance["isInBAS"] = false;
+			yeomanUiInstance["getMessageImage"] = () => "warnVSCode";
+			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.value, message.type, "warnVSCode"]);
+			await yeomanUiInstance.showLogMessage(message);
+		});
 
-        });
-    });
+		it("info message with location prompt on vscode", async () => {
+			const message = {
+				location: "prompt",
+				value: "value message",
+				type: "info"
+			}
+			yeomanUiInstance["isInBAS"] = false;
+			yeomanUiInstance["getMessageImage"] = () => "infoVSCode";
+			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.value, message.type, "infoVSCode"]);
+			await yeomanUiInstance.showLogMessage(message);
+		});
+	});
+
+	describe("_notifyGeneratorsChange", () => {
+		it("there are no generators", async () => {
+			const result = await yeomanUi["getGeneratorsPrompt"]();
+			const generatorQuestion: any = {
+				type: "list",
+				guiType: "tiles",
+				guiOptions: {
+					hint: yeomanUi["uiOptions"].messages.select_generator_question_hint
+				},
+				name: "generator",
+				message: yeomanUi["uiOptions"].messages.channel_name,
+				choices: []
+			};
+			expect(result).to.be.deep.equal({ name: "Select Generator", questions: [generatorQuestion] });
+			rpcMock.expects("invoke").withExactArgs("updateGeneratorsPrompt", [result.questions]);
+			await yeomanUi._notifyGeneratorsChange();
+
+		});
+	});
 });
