@@ -362,6 +362,7 @@ describe('App.vue', () => {
 			expect(invokeSpy).toHaveBeenCalledWith("getState");
 		});
 
+		// TODO - check the error
 		test('promptIndex is updated', () => {
 			wrapper = initComponent(App, {}, true);
 			wrapper.vm.rpc = {
@@ -417,6 +418,7 @@ describe('App.vue', () => {
 			expect(invokeSpy).toHaveBeenCalledWith("getState");
 		});
 
+		// TODO - check the error
 		test('promptIndex is 3, goto 2 step back', async () => {
 			wrapper = initComponent(App, {}, true);
 			wrapper.vm.rpc = {
@@ -608,6 +610,7 @@ describe('App.vue', () => {
 	})
 
 	describe("setGenInWriting", () => {
+		// TODO - check the error
 		it('in writing state', () => {
 			wrapper = initComponent(App, {}, true)
 			wrapper.vm.prompts = [{}, {}]
@@ -617,6 +620,7 @@ describe('App.vue', () => {
 			expect(wrapper.vm.showButtons).toBe(false);
 		})
 
+		// TODO - check the error
 		it('not in writing state', () => {
 			wrapper = initComponent(App, {}, true)
 			wrapper.vm.prompts = [{}, {}]
@@ -670,7 +674,6 @@ describe('App.vue', () => {
 			expect(wrapper.vm.promptMessageToDisplay).toEqual("infoMessage");
 			expect(wrapper.vm.showPrompt).toEqual("infoMessage");
 			expect(wrapper.vm.promptMessageIcon).toEqual("image");
-			// expect(wrapper.vm.promptMessageClass).toEqual("info-warn-prompt-message");
 		})
 
 		it('long message', () => {
