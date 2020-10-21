@@ -15,8 +15,8 @@ class YoUiMessages extends AppWizard.Messages {
 		super();
 	}
 
-	public show(): void {
-
+	public show(message: Message): void {
+		this.events.showMessage(message);
 	}
 
 	public showProgress(message?: string): void {
@@ -72,7 +72,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 		return getImage(type, this.isInBAS);
 	}
 
-	public showLogMessage(message: Message) {
+	public showMessage(message: Message) {
 		if (message.location === Message.Location.notification) {
 			this.showNotificationMessage(message.text, message.type);
 		} else if (message.location === Message.Location.prompt) {

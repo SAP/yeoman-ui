@@ -6,7 +6,7 @@ export class AppWizard {
 	}
 
 	public static create(genOptions?: any): AppWizard {
-		if (genOptions.appWizard && (genOptions.appWizard instanceof AppWizard)) {
+		if (genOptions.appWizard) {
 			return genOptions.appWizard;
 		}
 
