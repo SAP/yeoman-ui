@@ -13,7 +13,6 @@ import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/
 import { GeneratorFilter } from "../src/filter";
 import * as os from "os";
 import messages from "../src/messages";
-import * as images from "../src/images/messageImages";
 import Environment = require("yeoman-environment");
 import { SWA } from "../src/swa-tracker/swa-tracker-wrapper";
 import { AppWizard } from "@sap-devx/yeoman-ui-types";
@@ -123,8 +122,6 @@ describe('yeomanui unit test', () => {
 		loggerMock.verify();
 		swaTrackerWrapperMock.verify();
 		youiEventsMock.verify();
-		// windowMock.verify();
-		// colorThemeKindMock.verify();
 	});
 
 	describe("receiveIsWebviewReady", () => {
@@ -158,7 +155,6 @@ describe('yeomanui unit test', () => {
 		});
 
 		it("called without message parameter ---> call showProgress event with no parameter", async () => {
-			const message: string = "Project Test is generating"
 			youiEventsMock.expects("showProgress").withExactArgs(undefined);
 			await yeomanUi.showProgress();
 		});
@@ -784,132 +780,6 @@ describe('yeomanui unit test', () => {
 		});
 	});
 
-	// describe("showLogMessage", () => {
-	// 	let yeomanUiInstance: YeomanUI;
-	// 	let windowMock: any;
-		
-	// 	before(() => {
-	// 		yeomanUiInstance = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, undefined);
-	// 		const testVscode = { window: {} };
-	// 		_.set(testVscode, "window.showErrorMessage", () => Promise.resolve(""));
-	// 		_.set(testVscode, "window.showWarningMessage", () => Promise.resolve(""));
-	// 		_.set(testVscode, "window.showInformationMessage", () => Promise.resolve(""));
-	// 		_.set(testVscode, "window.activeColorTheme", () => Promise.resolve(""));
-	// 		_.set(testVscode, "ColorThemeKind.Light", () => Promise.resolve(false));
-	// 		yeomanUiInstance["getVscode"] = () => testVscode;
-	// 		windowMock = sandbox.mock(testVscode.window);
-	// 	});
-
-	// 	afterEach(() => {
-	// 		windowMock.verify();
-	// 	});
-
-	// 	it("error message with location message on theia", async () => {
-	// 		const message = {
-	// 			location: "message",
-	// 			value: "value message",
-	// 			type: "error"
-	// 		}
-	// 		yeomanUiInstance["isInBAS"] = true;
-	// 		windowMock.expects("showErrorMessage").withExactArgs(message.value).resolves();
-	// 		await yeomanUiInstance.showLogMessage(message);
-	// 	});
-
-	// 	it("warning message with location message on theia", async () => {
-	// 		const message = {
-	// 			location: "message",
-	// 			value: "value message",
-	// 			type: "warn"
-	// 		}
-	// 		yeomanUiInstance["isInBAS"] = true;
-	// 		windowMock.expects("showWarningMessage").withExactArgs(message.value).resolves();
-	// 		await yeomanUiInstance.showLogMessage(message);
-	// 	});
-
-	// 	it("info message with location message on theia", async () => {
-	// 		const message = {
-	// 			location: "message",
-	// 			value: "value message",
-	// 			type: "info"
-	// 		}
-	// 		yeomanUiInstance["isInBAS"] = true;
-	// 		windowMock.expects("showInformationMessage").withExactArgs(message.value).resolves();
-	// 		await yeomanUiInstance.showLogMessage(message);
-	// 	});
-
-	// 	it("error message with location prompt on theia", async () => {
-	// 		const message = {
-	// 			location: "prompt",
-	// 			value: "value message",
-	// 			type: "error"
-	// 		}
-	// 		yeomanUiInstance["isInBAS"] = true;
-	// 		yeomanUiInstance["getMessageImage"] = () => "errorTheiaDark";
-	// 		rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.value, message.type, "errorTheiaDark"]);
-	// 		await yeomanUiInstance.showLogMessage(message);
-	// 	});
-
-	// 	it("warning message with location prompt on theia", async () => {
-	// 		const message = {
-	// 			location: "prompt",
-	// 			value: "value message",
-	// 			type: "warn"
-	// 		}
-	// 		yeomanUiInstance["isInBAS"] = true;
-	// 		yeomanUiInstance["getMessageImage"] = () => "warnTheia";
-	// 		rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.value, message.type, "warnTheia"]);
-	// 		await yeomanUiInstance.showLogMessage(message);
-	// 	});
-
-	// 	it("info message with location prompt on theia", async () => {
-	// 		const message = {
-	// 			location: "prompt",
-	// 			value: "value message",
-	// 			type: "info"
-	// 		}
-	// 		yeomanUiInstance["isInBAS"] = true;
-	// 		yeomanUiInstance["getMessageImage"] = () => "infoTheia";
-	// 		rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.value, message.type, "infoTheia"]);
-	// 		await yeomanUiInstance.showLogMessage(message);
-	// 	});
-
-	// 	it("error message with location prompt on vscode", async () => {
-	// 		const message = {
-	// 			location: "prompt",
-	// 			value: "value message",
-	// 			type: "error"
-	// 		}
-	// 		yeomanUiInstance["isInBAS"] = false;
-	// 		yeomanUiInstance["getMessageImage"] = () => "errorVSCodeDark";
-	// 		rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.value, message.type, "errorVSCodeDark"]);
-	// 		await yeomanUiInstance.showLogMessage(message);
-	// 	});
-
-	// 	it("warning message with location prompt on vscode", async () => {
-	// 		const message = {
-	// 			location: "prompt",
-	// 			value: "value message",
-	// 			type: "warn"
-	// 		}
-	// 		yeomanUiInstance["isInBAS"] = false;
-	// 		yeomanUiInstance["getMessageImage"] = () => "warnVSCode";
-	// 		rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.value, message.type, "warnVSCode"]);
-	// 		await yeomanUiInstance.showLogMessage(message);
-	// 	});
-
-	// 	it("info message with location prompt on vscode", async () => {
-	// 		const message = {
-	// 			location: "prompt",
-	// 			value: "value message",
-	// 			type: "info"
-	// 		}
-	// 		yeomanUiInstance["isInBAS"] = false;
-	// 		yeomanUiInstance["getMessageImage"] = () => "infoVSCode";
-	// 		rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.value, message.type, "infoVSCode"]);
-	// 		await yeomanUiInstance.showLogMessage(message);
-	// 	});
-	// });
-
 	describe("_notifyGeneratorsChange", () => {
 		it("there are no generators", async () => {
 			const result = await yeomanUi["getGeneratorsPrompt"]();
@@ -926,7 +796,6 @@ describe('yeomanui unit test', () => {
 			expect(result).to.be.deep.equal({ name: "Select Generator", questions: [generatorQuestion] });
 			rpcMock.expects("invoke").withExactArgs("updateGeneratorsPrompt", [result.questions]);
 			await yeomanUi._notifyGeneratorsChange();
-
 		});
 	});
 });

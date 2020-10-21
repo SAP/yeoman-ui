@@ -36,7 +36,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 	private resolveFunc: any;
 	private output: GeneratorOutput;
 	private readonly logger: IChildLogger;
-	private readonly isInBAS: boolean;
+	private isInBAS: boolean;
 	private appWizard: AppWizard;
 
 	constructor(
@@ -75,7 +75,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 	public showMessage(message: Message) {
 		if (message.location === Message.Location.notification) {
 			this.showNotificationMessage(message.text, message.type);
-		} else if (message.location === Message.Location.prompt) {
+		} else { // if (message.location === Message.Location.prompt) {
 			this.showPromptMessage(message.text, message.type, this.getMessageImage(message.type));
 		}
 	}
@@ -85,7 +85,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 			vscode.window.showErrorMessage(message);
 		} else if (type === Message.Type.warn) {
 			vscode.window.showWarningMessage(message);
-		} else if (type === Message.Type.info) {
+		} else { // if (type === Message.Type.info) {
 			vscode.window.showInformationMessage(message);
 		}
 	}
