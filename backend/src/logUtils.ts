@@ -10,9 +10,23 @@ module.exports = ( output: Output, yeomanUi: YeomanUI) => {
 		return `${message}`;
 	}
 
+	function getMetadata(args: any) {
+		const metadata = _.get(args, "[2]", _.get(args, "[1]", {}));
+		const type = ["error", "info", "warn"].includes(metadata.type);
+		const location = ["prompt", "message"].includes(metadata.location);
+		if (type && location) {
+			return metadata;
+		} 
+	}
 
 	function showMessage(args: any, withNewLine = true, forceType?: string) {
 		const message = getMessage(args);
+		const metadata = getMetadata(args);
+		if (metadata) {
+			const location = _.get(metadata, "location");
+			const type = forceType || _.get(metadata, "type");
+			yeomanUi.showLogMessage({location, value: message, type});
+		}
 		withNewLine ? output.appendLine(message) : output.append(message);
 	}
 

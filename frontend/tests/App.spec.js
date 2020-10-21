@@ -362,6 +362,7 @@ describe('App.vue', () => {
 			expect(invokeSpy).toHaveBeenCalledWith("getState");
 		});
 
+		// TODO - check the error
 		test('promptIndex is updated', () => {
 			wrapper = initComponent(App, {}, true);
 			wrapper.vm.rpc = {
@@ -417,6 +418,7 @@ describe('App.vue', () => {
 			expect(invokeSpy).toHaveBeenCalledWith("getState");
 		});
 
+		// TODO - check the error
 		test('promptIndex is 3, goto 2 step back', async () => {
 			wrapper = initComponent(App, {}, true);
 			wrapper.vm.rpc = {
@@ -608,6 +610,7 @@ describe('App.vue', () => {
 	})
 
 	describe("setGenInWriting", () => {
+		// TODO - check the error
 		it('in writing state', () => {
 			wrapper = initComponent(App, {}, true)
 			wrapper.vm.prompts = [{}, {}]
@@ -617,6 +620,7 @@ describe('App.vue', () => {
 			expect(wrapper.vm.showButtons).toBe(false);
 		})
 
+		// TODO - check the error
 		it('not in writing state', () => {
 			wrapper = initComponent(App, {}, true)
 			wrapper.vm.prompts = [{}, {}]
@@ -633,6 +637,53 @@ describe('App.vue', () => {
 			wrapper.vm.setGenInWriting(false);
 			expect(wrapper.vm.isWriting).toBe(false);
 			expect(wrapper.vm.showButtons).toBe(true);
+		})
+	})
+
+	describe("showPromptMessage", () => {
+		it('error message', () => {
+			wrapper = initComponent(App)
+			wrapper.vm.showPromptMessage("errorMessage", "error", "image");
+			expect(wrapper.vm.promptMessageToDisplay).toEqual("errorMessage");
+			expect(wrapper.vm.showPrompt).toEqual("errorMessage");
+			expect(wrapper.vm.promptMessageIcon).toEqual("image");
+			expect(wrapper.vm.promptMessageClass).toEqual("error-prompt-message");
+		})
+
+		it('warning message', () => {
+			wrapper = initComponent(App)
+			wrapper.vm.showPromptMessage("warnMessage", "warn", "image");
+			expect(wrapper.vm.promptMessageToDisplay).toEqual("warnMessage");
+			expect(wrapper.vm.showPrompt).toEqual("warnMessage");
+			expect(wrapper.vm.promptMessageIcon).toEqual("image");
+			expect(wrapper.vm.promptMessageClass).toEqual("info-warn-prompt-message");
+		})
+
+		it('info message', () => {
+			wrapper = initComponent(App)
+			wrapper.vm.showPromptMessage("infoMessage", "info", "image");
+			expect(wrapper.vm.promptMessageToDisplay).toEqual("infoMessage");
+			expect(wrapper.vm.showPrompt).toEqual("infoMessage");
+			expect(wrapper.vm.promptMessageIcon).toEqual("image");
+			expect(wrapper.vm.promptMessageClass).toEqual("info-warn-prompt-message");
+		})
+
+		it('no valid message', () => {
+			wrapper = initComponent(App)
+			wrapper.vm.showPromptMessage("infoMessage", "neta", "image");
+			expect(wrapper.vm.promptMessageToDisplay).toEqual("infoMessage");
+			expect(wrapper.vm.showPrompt).toEqual("infoMessage");
+			expect(wrapper.vm.promptMessageIcon).toEqual("image");
+		})
+
+		it('long message', () => {
+			wrapper = initComponent(App) 
+			wrapper.vm.messageMaxLength = 3
+			wrapper.vm.showPromptMessage("infoMessage", "info", "image");
+			expect(wrapper.vm.promptMessageToDisplay).toEqual("infoMessage");
+			expect(wrapper.vm.showPrompt).toEqual("inf...");
+			expect(wrapper.vm.promptMessageIcon).toEqual("image");
+			expect(wrapper.vm.promptMessageClass).toEqual("info-warn-prompt-message");
 		})
 	})
 })

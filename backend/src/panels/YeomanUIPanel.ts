@@ -42,7 +42,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 			vscodeYouiEvents,
 			this.output,
 			this.logger,
-			{ filter, messages: this.messages, data: _.get(uiOptions, "data"), npmGlobalPaths: this.getDefaultPaths() }, outputPath);
+			{ filter, messages: this.messages, data: _.get(uiOptions, "data"), npmGlobalPaths: this.getDefaultPaths() }, outputPath, this.isInBAS);
 		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
 		this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
 
