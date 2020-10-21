@@ -9,7 +9,6 @@ const datauri = require("datauri"); // eslint-disable-line @typescript-eslint/no
 const titleize = require('titleize'); // eslint-disable-line @typescript-eslint/no-var-requires
 const humanizeString = require('humanize-string'); // eslint-disable-line @typescript-eslint/no-var-requires
 import * as defaultImage from "./images/defaultImage";
-import { getImage } from "./images/messageImages"
 import { YouiAdapter } from "./youi-adapter";
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
@@ -56,10 +55,9 @@ export class YeomanUI {
 	private readonly replayUtils: ReplayUtils;
 	private readonly customQuestionEventHandlers: Map<string, Map<string, Function>>;
 	private errorThrown = false;
-	private isInBAS: boolean;
 	private outputPath: string;
 
-	constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS, isInBAS: boolean) {
+	constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
 		this.rpc = rpc;
 
 		this.generatorName = "";
@@ -87,43 +85,11 @@ export class YeomanUI {
 		this.currentQuestions = {};
 		this.customQuestionEventHandlers = new Map();
 		this.setCwd(outputPath);
-		this.isInBAS = isInBAS;
 		this.npmGlobalPaths = _.get(uiOptions, "npmGlobalPaths", []);
 	}
 
 	private async getState() {
 		return this.uiOptions;
-	}
-
-	private getMessageImage(type: string): any {
-		return getImage(type, this.isInBAS);
-	}
-
-	public showLogMessage(message: any) {
-		if (message.location === "message") {
-			this.showNotificationMessage(message.value, message.type);
-		} else if (message.location === "prompt") {
-			this.showPromptMessage(message.value, message.type, this.getMessageImage(message.type));
-		}
-	}
-
-	private showNotificationMessage(message: string, type: string) {
-		const vscode = this.getVscode();
-		if (vscode) {
-			if (type === "error") {
-				vscode.window.showErrorMessage(message);
-			}
-			else if (type === "warn") {
-				vscode.window.showWarningMessage(message);
-			}
-			else if (type === "info") {
-				vscode.window.showInformationMessage(message);
-			}
-		}
-	}
-
-	private showPromptMessage(message: string, type: string, image: any) {
-		this.rpc.invoke("showPromptMessage", [message, type, image]);
 	}
 
 	public async _notifyGeneratorsChange() {

@@ -48,7 +48,7 @@ describe('vscode-youi-events unit test', () => {
         loggerWrapperMock = sandbox.mock(loggerWrapper);
         loggerWrapperMock.expects("getClassLogger").returns(testLogger);
         const generatorOutput = new GeneratorOutput();
-        events = new VSCodeYouiEvents(undefined, webViewPanel, GeneratorFilter.create(), messages.default, generatorOutput);
+        events = new VSCodeYouiEvents(undefined, webViewPanel, messages.default, generatorOutput, true);
         windowMock = sandbox.mock(vscode.window);
         commandsMock = sandbox.mock(vscode.commands);
         workspaceMock = sandbox.mock(vscode.workspace);
