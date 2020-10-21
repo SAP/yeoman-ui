@@ -187,7 +187,8 @@ export class YeomanUI {
 				logger: this.logger.getChildLogger({ label: generatorName }),
 				vscode: this.getVscode(), // TODO: remove this temporary workaround once a better solution is found,
 				data: this.uiOptions.data,
-				swaTracker: SWA.getSWATracker()
+				swaTracker: SWA.getSWATracker(),
+				appWizard: this.youiEvents.getAppWizard()
 			};
 			const gen: any = env.create(genNamespace, { options });
 			// check if generator defined a helper function called setPromptsCallback()
@@ -207,7 +208,6 @@ export class YeomanUI {
 			this.handleErrors(env, this.gen, generatorName);
 
 			env.runGenerator(gen, error => {
-				;
 				if (!this.errorThrown && !error) {
 					// Without resolve this code worked only for absolute paths without / at the end.
 					// Generator can put a relative path, path including . and .. and / at the end.

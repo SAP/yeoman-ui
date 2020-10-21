@@ -7,7 +7,27 @@ import { GeneratorOutput } from './vscode-output';
 import { IChildLogger } from '@vscode-logging/logger';
 import { getClassLogger } from './logger/logger-wrapper';
 import { getImage } from "./images/messageImages"
+import { AppWizard, Message } from '@sap-devx/yeoman-ui-types';
 
+
+class YoUiMessages extends AppWizard.Messages {
+	constructor(private events: VSCodeYouiEvents) {
+		super();
+	}
+
+	public show(): void {
+
+	}
+
+	public showProgress(message?: string): void {
+		this.events.showProgress(message);
+	}
+}
+class YoUiAppWizard extends AppWizard {
+	constructor(messages: AppWizard.Messages) {
+		super(messages);
+	}
+}
 
 export class VSCodeYouiEvents implements YouiEvents {
 	private rpc: IRpc;
@@ -17,6 +37,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 	private output: GeneratorOutput;
 	private readonly logger: IChildLogger;
 	private readonly isInBAS: boolean;
+	private appWizard: AppWizard;
 
 	constructor(
 		rpc: IRpc,
@@ -30,6 +51,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 		this.output = output;
 		this.logger = getClassLogger("VSCodeYouiEvents");
 		this.isInBAS = isInBAS;
+		this.appWizard = new YoUiAppWizard(new YoUiMessages(this));
 	}
 
 	public doGeneratorDone(success: boolean, message: string, targetFolderPath?: string): void {
@@ -42,33 +64,33 @@ export class VSCodeYouiEvents implements YouiEvents {
 		this.showInstallMessage();
 	}
 
-	public createAppWizard(): any {
-
+	public getAppWizard(): AppWizard {
+		return this.appWizard;
 	}
 
-	private getMessageImage(type: string): any {
+	private getMessageImage(type: Message.Type): any {
 		return getImage(type, this.isInBAS);
 	}
 
-	public showLogMessage(message: any) {
-		if (message.location === "message") {
-			this.showNotificationMessage(message.value, message.type);
-		} else if (message.location === "prompt") {
-			this.showPromptMessage(message.value, message.type, this.getMessageImage(message.type));
+	public showLogMessage(message: Message) {
+		if (message.location === Message.Location.notification) {
+			this.showNotificationMessage(message.text, message.type);
+		} else if (message.location === Message.Location.prompt) {
+			this.showPromptMessage(message.text, message.type, this.getMessageImage(message.type));
 		}
 	}
 
-	private showNotificationMessage(message: string, type: string) {
-		if (type === "error") {
+	private showNotificationMessage(message: string, type: Message.Type) {
+		if (type === Message.Type.error) {
 			vscode.window.showErrorMessage(message);
-		} else if (type === "warn") {
+		} else if (type === Message.Type.warn) {
 			vscode.window.showWarningMessage(message);
-		} else if (type === "info") {
+		} else if (type === Message.Type.info) {
 			vscode.window.showInformationMessage(message);
 		}
 	}
 
-	private showPromptMessage(message: string, type: string, image: any) {
+	private showPromptMessage(message: string, type: Message.Type, image: any) {
 		this.rpc.invoke("showPromptMessage", [message, type, image]);
 	}
 

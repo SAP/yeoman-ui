@@ -107,8 +107,8 @@ module.exports = class extends Generator {
 					this.log(response.hungry);
 					const that = this;
 					return new Promise((resolve) => {
-						this.appWizard.messages.show(new types.Message(`Purposely delaying response for 2 seconds.`, types.Message.Type.error, types.Message.Location.prompt));
-						this.appWizard.messages.show(new types.Message(`Purposely delaying response for 2 seconds.`, types.Message.Type.error, types.Message.Location.notification));
+						that.appWizard.messages.show(new types.Message(`Purposely delaying response for 2 seconds.`, types.Message.Type.error, types.Message.Location.prompt));
+						that.appWizard.messages.show(new types.Message(`Purposely delaying response for 2 seconds.`, types.Message.Type.error, types.Message.Location.notification));
 						setTimeout(() => {
 							resolve(response.hungry);
 						}, 2000);
