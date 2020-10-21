@@ -91,7 +91,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 	}
 
 	private showPromptMessage(message: string, type: Message.Type, image: any) {
-		this.rpc.invoke("showPromptMessage", [message, type, image]);
+		this.rpc.invoke("showPromptMessage", [`${message}`, type, image]);
 	}
 
 	public showProgress(message?: string): void {

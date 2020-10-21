@@ -16,6 +16,7 @@ import messages from "../src/messages";
 import * as images from "../src/images/messageImages";
 import Environment = require("yeoman-environment");
 import { SWA } from "../src/swa-tracker/swa-tracker-wrapper";
+import { AppWizard } from "@sap-devx/yeoman-ui-types";
 
 
 describe('yeomanui unit test', () => {
@@ -40,6 +41,9 @@ describe('yeomanui unit test', () => {
 			return;
 		}
 		public showProgress(message?: string): void {
+			return;
+		}
+		public getAppWizard(): AppWizard {
 			return;
 		}
 	}
