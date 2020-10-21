@@ -25,7 +25,7 @@
     "datauri": "^3.0.0",
     "inquirer": "^7.3.3",
     "lodash": "^4.17.20",
-    "@sap-devx/yeoman-ui-types": "0.0.2"
+    "@sap-devx/yeoman-ui-types": "1.0.0"
   },
   "generator-filter": {
     "types": [

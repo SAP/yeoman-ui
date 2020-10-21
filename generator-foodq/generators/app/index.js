@@ -1,9 +1,9 @@
-var Generator = require('yeoman-generator');
-var chalkPipe = require('chalk-pipe');
-var Inquirer = require('inquirer');
-var path = require('path');
-var _ = require('lodash');
-var types = require('@sap-devx/yeoman-ui-types');
+const Generator = require('yeoman-generator');
+const chalkPipe = require('chalk-pipe');
+const Inquirer = require('inquirer');
+const path = require('path');
+const _ = require('lodash');
+const types = require('@sap-devx/yeoman-ui-types');
 const Datauri = require('datauri/sync');
 const DEFAULT_IMAGE = require("./images/defaultImage");
 
@@ -355,7 +355,7 @@ module.exports = class extends Generator {
 
 	writing() {
 		this.appWizard.messages.showProgress("FoodQ is generating.");
-		
+
 		this.log('in writing');
 		this.fs.copyTpl(this.templatePath('index.html'),
 			this.destinationPath('public/index.html'), {

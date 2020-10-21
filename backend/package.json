@@ -148,7 +148,7 @@
 	},
 	"dependencies": {
 		"@sap-devx/webview-rpc": "0.2.3",
-		"@sap-devx/yeoman-ui-types": "0.0.1",
+		"@sap-devx/yeoman-ui-types": "1.0.0",
 		"@vscode-logging/logger": "1.2.0",
 		"chalk": "4.1.0",
 		"datauri": "3.0.0",
