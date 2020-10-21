@@ -13,7 +13,7 @@
     <Header
       v-if="prompts.length"
       :headerTitle="headerTitle"
-      :stepName="(promptIndex < prompts.length ? prompts[promptIndex].name : '')"
+      :stepName="promptIndex < prompts.length ? prompts[promptIndex].name : ''"
       :rpc="rpc"
       :isInVsCode="isInVsCode()"
       :isGeneric="isGeneric"
@@ -39,7 +39,10 @@
               :donePath="donePath"
             />
 
-            <PromptInfo v-if="currentPrompt && !isDone" :currentPrompt="currentPrompt" />
+            <PromptInfo
+              v-if="currentPrompt && !isDone"
+              :currentPrompt="currentPrompt"
+            />
             <v-slide-x-transition>
               <Form
                 ref="form"
@@ -54,38 +57,66 @@
             />
           </v-col>
         </v-row>
-		<v-divider bold></v-divider>
-        <v-row v-if="prompts.length > 0 && !isDone && showButtons" style="height: 4rem; margin: 0; align-items: left;" sm="auto">
-        <div class="bottom-buttons-col" style="display:flex;">
-          <v-btn id="back"
-            :disabled="promptIndex<1 || isReplaying"
-            @click="back" v-show="promptIndex > 0" style="min-width:90px;">
-            <v-icon left>mdi-chevron-left</v-icon>Back
-          </v-btn>
-          <v-btn id="next" :disabled="!stepValidated" @click="next" style="min-width:90px;">
-            {{nextButtonText}}
-            <v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
-          </v-btn>
-        </div>
-			<div class="prompt-message" v-if="toShowPromptMessage"  >
-				<img style="vertical-align:middle; padding-left:12px;" :src="promptMessageIcon" alt="" />
-				<v-tooltip right :disabled="promptMessageToDisplay.length < this.messageMaxLength">
-          <template v-slot:activator="{on}">
-            <span :class="promptMessageClass" v-on="on">{{showPrompt}}</span>
-          </template>
-          <span>{{promptMessageToDisplay}}</span>
-        </v-tooltip>
-			</div>
-			<v-spacer/>
+        <v-divider bold></v-divider>
+        <v-row
+          v-if="prompts.length > 0 && !isDone && showButtons"
+          style="height: 4rem; margin: 0; align-items: left"
+          sm="auto"
+        >
+          <div class="bottom-buttons-col" style="display: flex">
+            <v-btn
+              id="back"
+              :disabled="promptIndex < 1 || isReplaying"
+              @click="back"
+              v-show="promptIndex > 0"
+              style="min-width: 90px"
+            >
+              <v-icon left>mdi-chevron-left</v-icon>Back
+            </v-btn>
+            <v-btn
+              id="next"
+              :disabled="!stepValidated"
+              @click="next"
+              style="min-width: 90px"
+            >
+              {{ nextButtonText }}
+              <v-icon right v-if="nextButtonText !== `Finish`"
+                >mdi-chevron-right</v-icon
+              >
+            </v-btn>
+          </div>
+          <div class="prompt-message" v-if="toShowPromptMessage">
+            <img
+              style="vertical-align: middle; padding-left: 12px"
+              :src="promptMessageIcon"
+              alt=""
+            />
+            <v-tooltip
+              right
+              :disabled="promptMessageToDisplay.length < this.messageMaxLength"
+            >
+              <template v-slot:activator="{ on }">
+                <span :class="promptMessageClass" v-on="on">{{
+                  showPrompt
+                }}</span>
+              </template>
+              <span>{{ promptMessageToDisplay }}</span>
+            </v-tooltip>
+          </div>
+          <v-spacer />
         </v-row>
       </v-col>
     </v-row>
 
     <!-- TODO Handle scroll of above content when console is visible. low priority because it is for localhost console only -->
     <v-card :class="consoleClass" v-show="showConsole">
-      <v-footer absolute class="font-weight-medium" style="max-height: 300px; overflow-y: auto;">
+      <v-footer
+        absolute
+        class="font-weight-medium"
+        style="max-height: 300px; overflow-y: auto"
+      >
         <v-col class cols="12">
-          <div id="logArea" placeholder="No log entry">{{logText}}</div>
+          <div id="logArea" placeholder="No log entry">{{ logText }}</div>
         </v-col>
       </v-footer>
     </v-card>
@@ -134,15 +165,15 @@ function initialState() {
     promptsInfoToDisplay: [],
     isReplaying: false,
     numOfSteps: 1,
-	isGeneric: false,
-	isWriting: false,
-	showButtons: true,
-  promptMessageToDisplay: "",
-  shortPrompt:"",
-	toShowPromptMessage: false,
-	promptMessageClass: "",
-  promptMessageIcon: null,
-  messageMaxLength: 100
+    isGeneric: false,
+    isWriting: false,
+    showButtons: true,
+    promptMessageToDisplay: "",
+    shortPrompt: "",
+    toShowPromptMessage: false,
+    promptMessageClass: "",
+    promptMessageIcon: null,
+    messageMaxLength: 100,
   };
 }
 
@@ -154,19 +185,23 @@ export default {
     Done,
     Info,
     PromptInfo,
-    Loading
+    Loading,
   },
   data() {
     return initialState();
   },
   computed: {
     nextButtonText() {
-		if (this.promptIndex > 0 && this.promptIndex === _.size(this.promptsInfoToDisplay) || this.isWriting) {
-			return "Finish";
-		} 
+      if (
+        (this.promptIndex > 0 &&
+          this.promptIndex === _.size(this.promptsInfoToDisplay)) ||
+        this.isWriting
+      ) {
+        return "Finish";
+      }
 
-		return "Next";
-  },
+      return "Next";
+    },
     isLoadingColor() {
       return (
         getComputedStyle(document.documentElement).getPropertyValue(
@@ -200,34 +235,37 @@ export default {
     prompts: {
       handler() {
         this.setBusyIndicator();
-      }
+      },
     },
     "currentPrompt.status": {
       handler() {
         this.setBusyIndicator();
-      }
+      },
     },
     isDone: {
       handler() {
         this.setBusyIndicator();
-      }
-    }
+      },
+    },
   },
   methods: {
-	showPromptMessage(message, type, image) {
-    this.promptMessageToDisplay = message;
-    this.showPrompt = message.length < this.messageMaxLength ? message : message.substr(0,this.messageMaxLength) + '...';
-		this.toShowPromptMessage = true;
-		this.promptMessageIcon = image;
-		
-		if (type === "error") {
-			this.promptMessageClass = "error-prompt-message";
-		} else if (type === "info") {
-			this.promptMessageClass = "info-warn-prompt-message";
-		} else if (type === "warn") {
-			this.promptMessageClass = "info-warn-prompt-message";
-		}
-	},
+    showPromptMessage(message, type, image) {
+      this.promptMessageToDisplay = message;
+      this.showPrompt =
+        message.length < this.messageMaxLength
+          ? message
+          : message.substr(0, this.messageMaxLength) + "...";
+      this.toShowPromptMessage = true;
+      this.promptMessageIcon = image;
+
+      if (type === "error") {
+        this.promptMessageClass = "error-prompt-message";
+      } else if (type === "info") {
+        this.promptMessageClass = "info-warn-prompt-message";
+      } else if (type === "warn") {
+        this.promptMessageClass = "info-warn-prompt-message";
+      }
+    },
     setBusyIndicator() {
       this.showBusyIndicator =
         _.isEmpty(this.prompts) ||
@@ -242,7 +280,7 @@ export default {
     gotoStep(numOfSteps) {
       // go numOfSteps step back
       try {
-		this.toShowPromptMessage = false;
+        this.toShowPromptMessage = false;
         this.isReplaying = true;
         this.numOfSteps = numOfSteps;
         const answers = this.currentPrompt.answers;
@@ -257,17 +295,19 @@ export default {
       }
     },
     setGenInWriting(value) {
-		this.isWriting = value;
-		this.showButtons = !this.isWriting;
-		if (this.currentPrompt) {
-			this.currentPrompt.name = this.getInProgressStepName();
-		}
-	},
-	getInProgressStepName() {
-		return this.isWriting ? _.get(this.messages, "step_is_generating") : _.get(this.messages, "step_is_pending");
-	},
+      this.isWriting = value;
+      this.showButtons = !this.isWriting;
+      if (this.currentPrompt) {
+        this.currentPrompt.name = this.getInProgressStepName();
+      }
+    },
+    getInProgressStepName() {
+      return this.isWriting
+        ? _.get(this.messages, "step_is_generating")
+        : _.get(this.messages, "step_is_pending");
+    },
     next() {
-		this.toShowPromptMessage = false;
+      this.toShowPromptMessage = false;
       if (this.resolve) {
         try {
           this.resolve(this.currentPrompt.answers);
@@ -345,7 +385,7 @@ export default {
                 return await that.rpc.invoke("evaluateMethod", [
                   args,
                   question.name,
-                  prop
+                  prop,
                 ]);
               } catch (e) {
                 that.showBusyIndicator = false;
@@ -366,37 +406,40 @@ export default {
       if (generatorsPrompt) {
         generatorsPrompt.questions = questions;
       }
-	},
+    },
 
     async showPrompt(questions, name) {
-		this.prepQuestions(questions);
-		if (this.isReplaying) {
-			this.promptIndex -= this.numOfSteps;
-			this.isReplaying = false;
-		}
-		const prompt = this.createPrompt(questions, name);
-		this.setPrompts([prompt]);
-		if (this.isWriting) {
-			this.showButtons = true;
-		}
-		const promise = new Promise((resolve, reject) => {
-			this.resolve = resolve;
-			this.reject = reject;
-		});
+      this.prepQuestions(questions);
+      if (this.isReplaying) {
+        this.promptIndex -= this.numOfSteps;
+        this.isReplaying = false;
+      }
+      const prompt = this.createPrompt(questions, name);
+      this.setPrompts([prompt]);
+      if (this.isWriting) {
+        this.showButtons = true;
+      }
+      const promise = new Promise((resolve, reject) => {
+        this.resolve = resolve;
+        this.reject = reject;
+      });
 
-		promise.then(() => {
-			if (this.isWriting) {
-				this.showButtons = false;
-			}
-		});
+      promise.then(() => {
+        if (this.isWriting) {
+          this.showButtons = false;
+        }
+      });
 
-		return promise;
+      return promise;
     },
     createPrompt(questions, name) {
       let promptDescription = "";
       let promptName = name;
       if (name === "select_generator") {
-        promptDescription = _.get(this.messages, "select_generator_description");
+        promptDescription = _.get(
+          this.messages,
+          "select_generator_description"
+        );
         promptName = _.get(this.messages, "select_generator_name");
       } else {
         const promptToDisplay = _.get(
@@ -413,7 +456,7 @@ export default {
         description: promptDescription,
         answers: {},
         active: true,
-        status: _.get(this.currentPrompt, "status")
+        status: _.get(this.currentPrompt, "status"),
       });
       return prompt;
     },
@@ -473,31 +516,31 @@ export default {
         "generatorDone",
         "log",
         "updateGeneratorsPrompt",
-		"setGenInWriting",
-		"showPromptMessage"
+        "setGenInWriting",
+        "showPromptMessage",
       ];
       _.forEach(functions, (funcName) => {
         this.rpc.registerMethod({
           func: this[funcName],
           thisArg: this,
-          name: funcName
+          name: funcName,
         });
       });
 
       this.displayGeneratorsPrompt();
     },
     async setMessagesAndSaveState() {
-		const uiOptions = await this.rpc.invoke("getState");
-		this.messages = _.get(uiOptions, "messages");
-		this.isGeneric = _.get(this.messages, "panel_title") === "Yeoman UI";
-		const vscodeApi = this.getVsCodeApi();
-		if (vscodeApi) {
-			vscodeApi.setState(uiOptions);
-		}
+      const uiOptions = await this.rpc.invoke("getState");
+      this.messages = _.get(uiOptions, "messages");
+      this.isGeneric = _.get(this.messages, "panel_title") === "Yeoman UI";
+      const vscodeApi = this.getVsCodeApi();
+      if (vscodeApi) {
+        vscodeApi.setState(uiOptions);
+      }
     },
     async displayGeneratorsPrompt() {
-		await this.setMessagesAndSaveState();
-		await this.rpc.invoke("receiveIsWebviewReady", []);
+      await this.setMessagesAndSaveState();
+      await this.rpc.invoke("receiveIsWebviewReady", []);
     },
     toggleConsole() {
       this.showConsole = !this.showConsole;
@@ -528,14 +571,14 @@ export default {
       this.init();
 
       this.displayGeneratorsPrompt();
-    }
+    },
   },
   created() {
     this.setupRpc();
   },
   mounted() {
     this.init();
-  }
+  },
 };
 </script>
 <style scoped>
@@ -589,12 +632,12 @@ div.consoleClassVisible .v-footer {
   margin: auto !important;
 }
 .bottom-buttons-col > .v-btn:not(:last-child) {
-    margin-right: 10px !important;
+  margin-right: 10px !important;
 }
- .prompt-message {
+.prompt-message {
   padding: 12px;
   margin: auto;
-} 
+}
 /* Error prompt message*/
 .error-prompt-message {
   font-size: 14px;
@@ -610,10 +653,9 @@ div.consoleClassVisible .v-footer {
   vertical-align: middle;
 }
 .v-divider {
-  border-top: 2px solid  var(--vscode-editorWidget-background, #252526) !important;
+  border-top: 2px solid var(--vscode-editorWidget-background, #252526) !important;
 }
 .theme--light.v-btn.v-btn--disabled:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
-  background-color: var(--vscode-descriptionForeground,#717171) !important;
+  background-color: var(--vscode-descriptionForeground, #717171) !important;
 }
-
 </style>
