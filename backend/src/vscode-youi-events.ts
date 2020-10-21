@@ -73,6 +73,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 	}
 
 	public showMessage(message: Message) {
+		this.output.appendLine(message.text);
 		if (message.location === Message.Location.notification) {
 			this.showNotificationMessage(message.text, message.type);
 		} else { // if (message.location === Message.Location.prompt) {
@@ -101,6 +102,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 		if (_.isEmpty(message)) {
 			message = this.messages.show_progress_message;
 		}
+		this.output.appendLine(message);
 		this.logger.debug("Showing Progress.", {
 			notificationMessage: message,
 		});

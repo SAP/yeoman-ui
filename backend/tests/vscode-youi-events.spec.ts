@@ -64,7 +64,7 @@ describe('vscode-youi-events unit test', () => {
 		}
 	}
 	const rpc = new TestRpc();
-	
+	const generatorOutput = new GeneratorOutput();
 
 	before(() => {
 		sandbox = sinon.createSandbox();
@@ -80,6 +80,13 @@ describe('vscode-youi-events unit test', () => {
 		_.set(vscode, "workspace.workspaceFolders", []);
 		_.set(vscode, "workspace.updateWorkspaceFolders", (): any => undefined);
 		_.set(vscode, "commands.executeCommand", (): any => undefined);
+		_.set(vscode, "window.createOutputChannel", () => {
+			return {
+				append: () => "",
+				appendLine: () => "",
+				show: () => ""
+			};
+		});
 	});
 
 	after(() => {
@@ -90,7 +97,6 @@ describe('vscode-youi-events unit test', () => {
 		const webViewPanel: any = { dispose: () => true };
 		loggerWrapperMock = sandbox.mock(loggerWrapper);
 		loggerWrapperMock.expects("getClassLogger").returns(testLogger);
-		const generatorOutput = new GeneratorOutput();
 		events = new VSCodeYouiEvents(rpc, webViewPanel, messages.default, generatorOutput, true);
 		windowMock = sandbox.mock(vscode.window);
 		commandsMock = sandbox.mock(vscode.commands);
@@ -117,6 +123,7 @@ describe('vscode-youi-events unit test', () => {
 			const message = new Message("value message", Message.Type.error, Message.Location.notification);
 			events["isInBAS"] = true;
 			const appWizard = events.getAppWizard();
+			generatorOutputMock.expects("appendLine").withExactArgs(message.text);
 			windowMock.expects("showErrorMessage").withExactArgs(message.text);
 			appWizard.messages.show(message);
 		});
@@ -125,6 +132,7 @@ describe('vscode-youi-events unit test', () => {
 			const message = new Message("value message", Message.Type.warn, Message.Location.notification);
 			events["isInBAS"] = true;
 			const appWizard = events.getAppWizard();
+			generatorOutputMock.expects("appendLine").withExactArgs(message.text);
 			windowMock.expects("showWarningMessage").withExactArgs(message.text);
 			appWizard.messages.show(message);
 		});
@@ -133,6 +141,7 @@ describe('vscode-youi-events unit test', () => {
 			const message = new Message("value message", Message.Type.info, Message.Location.notification);
 			events["isInBAS"] = true;
 			const appWizard = events.getAppWizard();
+			generatorOutputMock.expects("appendLine").withExactArgs(message.text);
 			windowMock.expects("showInformationMessage").withExactArgs(message.text);
 			appWizard.messages.show(message);
 		});
@@ -142,6 +151,7 @@ describe('vscode-youi-events unit test', () => {
 			events["isInBAS"] = true;
 			const appWizard = events.getAppWizard();
 			events["getMessageImage"] = () => "errorTheiaDark";
+			generatorOutputMock.expects("appendLine").withExactArgs(message.text);
 			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.text, message.type, "errorTheiaDark"]);
 			appWizard.messages.show(message);
 		});
@@ -151,6 +161,7 @@ describe('vscode-youi-events unit test', () => {
 			events["isInBAS"] = true;
 			const appWizard = events.getAppWizard();
 			events["getMessageImage"] = () => "warnTheia";
+			generatorOutputMock.expects("appendLine").withExactArgs(message.text);
 			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.text, message.type, "warnTheia"]);
 			appWizard.messages.show(message);
 		});
@@ -160,6 +171,7 @@ describe('vscode-youi-events unit test', () => {
 			events["isInBAS"] = true;
 			const appWizard = events.getAppWizard();
 			events["getMessageImage"] = () => "infoTheia";
+			generatorOutputMock.expects("appendLine").withExactArgs(message.text);
 			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.text, message.type, "infoTheia"]);
 			appWizard.messages.show(message);
 		});
@@ -169,6 +181,7 @@ describe('vscode-youi-events unit test', () => {
 			events["isInBAS"] = false;
 			const appWizard = events.getAppWizard();
 			events["getMessageImage"] = () => "errorVSCodeDark";
+			generatorOutputMock.expects("appendLine").withExactArgs(message.text);
 			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.text, message.type, "errorVSCodeDark"]);
 			appWizard.messages.show(message);
 		});
@@ -178,6 +191,7 @@ describe('vscode-youi-events unit test', () => {
 			events["isInBAS"] = false;
 			const appWizard = events.getAppWizard();
 			events["getMessageImage"] = () => "warnVSCode";
+			generatorOutputMock.expects("appendLine").withExactArgs(message.text);
 			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.text, message.type, "warnVSCode"]);
 			appWizard.messages.show(message);
 		});
@@ -187,6 +201,7 @@ describe('vscode-youi-events unit test', () => {
 			events["isInBAS"] = false;
 			const appWizard = events.getAppWizard();
 			events["getMessageImage"] = () => "infoVSCode";
+			generatorOutputMock.expects("appendLine").withExactArgs(message.text);
 			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.text, message.type, "infoVSCode"]);
 			appWizard.messages.show(message);
 		});
@@ -217,6 +232,7 @@ describe('vscode-youi-events unit test', () => {
 		it("getAppWizard - no message received ---> show default Information message with Progress button", async () => {
 			const appWizard = events.getAppWizard();
 			loggerMock.expects("debug");
+			generatorOutputMock.expects("appendLine");
 			windowMock.expects("showInformationMessage").
 				withExactArgs(messages.default.show_progress_message, messages.default.show_progress_button).resolves();
 			await appWizard.messages.showProgress();
@@ -224,6 +240,7 @@ describe('vscode-youi-events unit test', () => {
 
 		it("no message received ---> show default Information message with Progress button", async () => {
 			loggerMock.expects("debug");
+			generatorOutputMock.expects("appendLine");
 			windowMock.expects("showInformationMessage").
 				withExactArgs(messages.default.show_progress_message, messages.default.show_progress_button).resolves();
 			await events.showProgress();
@@ -232,6 +249,7 @@ describe('vscode-youi-events unit test', () => {
 		it("message received ---> show Information message with received message and Progress button", async () => {
 			const message: string = "Generating generator";
 			loggerMock.expects("debug");
+			generatorOutputMock.expects("appendLine");
 			windowMock.expects("showInformationMessage").
 				withExactArgs(message, messages.default.show_progress_button).resolves();
 			await events.showProgress(message);
@@ -240,6 +258,7 @@ describe('vscode-youi-events unit test', () => {
 		it("Progress button pressed ---> show Output", async () => {
 			loggerMock.expects("debug");
 			loggerMock.expects("trace");
+			generatorOutputMock.expects("appendLine");
 			windowMock.expects("showInformationMessage").
 				withExactArgs(messages.default.show_progress_message, messages.default.show_progress_button).resolves(messages.default.show_progress_button);
 			generatorOutputMock.expects("show");
@@ -362,3 +381,4 @@ describe('vscode-youi-events unit test', () => {
 		});
 	});
 });
+
