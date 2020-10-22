@@ -1,25 +1,20 @@
 {
-    "compilerOptions": {
-      "allowJs": false,
-      "lib": ["es6"],
-      "listEmittedFiles": false,
-      "listFiles": false,
-      "module": "commonjs",
-      "noFallthroughCasesInSwitch": true,
-      "noImplicitAny": true,
-      "noImplicitThis": true,
-      "outDir": "./out",
-      "removeComments": true,
-      "experimentalDecorators": true,
-      "rootDir": ".",
-      "rootDirs": ["./src"],
-      "skipLibCheck": true,
-      "sourceMap": true,
-      "target": "es6",
-      "traceResolution": false,
-      "declaration": true,
-      "alwaysStrict": true,
-      "esModuleInterop": true
-    },
-    "include": ["./src/**/*"]
-  }
+	"compilerOptions": {
+		"lib": [
+			"es2017",
+			"es7",
+			"es6",
+			"dom"
+		],
+		"module": "commonjs",
+		"outDir": "dist",
+		"target": "es5",
+		"declaration": true,
+		"esModuleInterop": true,
+		"strict": true
+	},
+	"exclude": [
+		"node_modules",
+		"dist"
+	]
+}
