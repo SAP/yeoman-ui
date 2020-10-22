@@ -4,8 +4,8 @@ export abstract class AppWizard {
 	abstract showError(message: string, type: MessageType): void;
 	abstract showInformation(message: string, type: MessageType): void;
 
-	public static create(genOptions?: any): AppWizard {
-		return genOptions && genOptions.appWizard ? genOptions.appWizard: new EmptyAppWizard();
+	public static create(genOptions: any = {}): AppWizard {
+		return genOptions.appWizard ? genOptions.appWizard: new EmptyAppWizard();
 	}
 }
 
