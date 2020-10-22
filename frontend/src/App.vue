@@ -138,6 +138,8 @@ import FileBrowserPlugin from "@sap-devx/inquirer-gui-file-browser-plugin";
 import FolderBrowserPlugin from "@sap-devx/inquirer-gui-folder-browser-plugin";
 import LoginPlugin from "@sap-devx/inquirer-gui-login-plugin";
 import TilesPlugin from "@sap-devx/inquirer-gui-tiles-plugin";
+import { Severity } from "@sap-devx/yeoman-ui-types";
+
 
 const FUNCTION = "__Function";
 const PENDING = "pending";
@@ -258,11 +260,11 @@ export default {
       this.toShowPromptMessage = true;
       this.promptMessageIcon = image;
 
-      if (type === "error") {
+      if (type === Severity.error) {
         this.promptMessageClass = "error-prompt-message";
-      } else if (type === "info") {
+      } else if (type === Severity.information) {
         this.promptMessageClass = "info-warn-prompt-message";
-      } else if (type === "warn") {
+      } else if (type === Severity.warning) {
         this.promptMessageClass = "info-warn-prompt-message";
       }
     },

@@ -33,3 +33,4 @@ export class GeneratorOutput implements Output {
 		this.outputChannel.appendLine(stripAnsi(value));
 	}
 }
+ 

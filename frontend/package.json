@@ -1,7 +1,7 @@
 {
   "name": "yeoman-ui-frontend",
   "displayName": "Application Wizard Frontend",
-  "version": "1.1.31",
+  "version": "1.1.32",
   "publisher": "SAP",
   "license": "Apache 2.0",
   "description": "Frontend for the application wizard framework",
@@ -15,6 +15,7 @@
     "test": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "@sap-devx/yeoman-ui-types": "1.0.2",
     "@mdi/font": "5.5.55",
     "@sap-devx/inquirer-gui": "0.1.19",
     "@sap-devx/inquirer-gui-file-browser-plugin": "0.0.5",

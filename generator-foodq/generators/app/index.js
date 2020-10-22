@@ -1,9 +1,9 @@
-var Generator = require('yeoman-generator');
-var chalkPipe = require('chalk-pipe');
-var Inquirer = require('inquirer');
-var path = require('path');
-var _ = require('lodash');
-var types = require('@sap-devx/yeoman-ui-types');
+const Generator = require('yeoman-generator');
+const chalkPipe = require('chalk-pipe');
+const Inquirer = require('inquirer');
+const path = require('path');
+const _ = require('lodash');
+const types = require('@sap-devx/yeoman-ui-types');
 const Datauri = require('datauri/sync');
 const DEFAULT_IMAGE = require("./images/defaultImage");
 
@@ -11,8 +11,9 @@ module.exports = class extends Generator {
 	constructor(args, opts) {
 		super(args, opts);
 
-		//this.vscode = opts.vscode;
 		this.data = opts.data;
+
+		this.appWizard = types.AppWizard.create(opts);
 
 		this.setPromptsCallback = fn => {
 			if (this.prompts) {
@@ -106,8 +107,8 @@ module.exports = class extends Generator {
 					this.log(response.hungry);
 					const that = this;
 					return new Promise((resolve) => {
-						that.log(`Purposely delaying response for 2 seconds.`, { type: "error", location: "prompt" });
-						that.log(`Purposely delaying response for 2 seconds.`, { type: "error", location: "message" });
+						that.appWizard.showError(`Purposely delaying response for 2 seconds.`, types.MessageType.prompt);
+						that.appWizard.showError(`Purposely delaying response for 2 seconds.`, types.MessageType.notification);
 						setTimeout(() => {
 							resolve(response.hungry);
 						}, 2000);
@@ -160,8 +161,8 @@ module.exports = class extends Generator {
 		prompts = [
 			{
 				when: () => {
-					this.log(this.answers.confirmHungry, this.answers.hungerLevel, { type: "warn", location: "prompt" });
-					this.log(this.answers.confirmHungry, this.answers.hungerLevel, { type: "warn", location: "message" });
+					this.appWizard.showWarning(this.answers.confirmHungry, types.MessageType.prompt);
+					this.appWizard.showWarning(this.answers.confirmHungry, types.MessageType.notification);
 					return this.answers.confirmHungry;
 				},
 				type: "list",
@@ -250,8 +251,8 @@ module.exports = class extends Generator {
 		const answers = await this.prompt(prompts);
 
 		this.answers = Object.assign({}, this.answers, answers);
-		this.log("Hunger level", this.answers.hungerLevel, { type: "info", location: "prompt" });
-		this.log("Hunger level", this.answers.hungerLevel, { type: "info", location: "message" });
+		this.appWizard.showInformation(this.answers.hungerLevel, types.MessageType.prompt);
+		this.appWizard.showInformation(this.answers.hungerLevel, types.MessageType.notification);
 
 		prompts = [
 			{
@@ -353,9 +354,8 @@ module.exports = class extends Generator {
 	}
 
 	writing() {
-		if (_.get(this.log, "showProgress")) {
-			this.log.showProgress("FoodQ is generating.");
-		}
+		this.appWizard.showProgress("FoodQ is generating.");
+
 		this.log('in writing');
 		this.fs.copyTpl(this.templatePath('index.html'),
 			this.destinationPath('public/index.html'), {
@@ -400,6 +400,6 @@ module.exports = class extends Generator {
 	}
 
 	end() {
-		this.log('FoodQ ended', { type: "info", location: "message" });
+		this.appWizard.showInformation('FoodQ ended', types.MessageType.notification);
 	}
 };
