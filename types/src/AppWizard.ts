@@ -1,8 +1,11 @@
+import * as _ from "lodash";
+
+
 export class AppWizard {
 	public messages: AppWizard.Messages;
 
-	constructor(messages: AppWizard.Messages) {
-		this.messages = messages;
+	constructor(initData?: any) {
+		this.messages = _.get(initData, "messages", new EmptyMessages());
 	}
 
 	public static create(genOptions?: any): AppWizard {
@@ -10,25 +13,29 @@ export class AppWizard {
 			return genOptions.appWizard;
 		}
 
-		class EmptyMessages extends AppWizard.Messages {
-			showProgress(message?: string): void { }
-			show(message: Message): void { }
-		}
-		return new AppWizard(new EmptyMessages());
+		return new AppWizard({messages: new EmptyMessages()});
 	}
 }
 
 export namespace AppWizard {
 	export abstract class Messages {
 		abstract showProgress(message?: string): void;
-		abstract show(message: Message): void;
+		abstract showWarning(message: Message): void;
+		abstract showError(message: Message): void;
+		abstract showInformation(message: Message): void;
 	}
+}
+
+class EmptyMessages extends AppWizard.Messages {
+	showProgress(message?: string): void { }
+	showWarning(message: Message): void { }
+	showError(message: Message): void { }
+	showInformation(message: Message): void { }
 }
 
 export class Message {
 	constructor(
 		public text: string,
-		public type = Message.Type.info,
 		public location = Message.Location.notification,
 	) { }
 }
@@ -37,10 +44,6 @@ export namespace Message {
 	export enum Location {
 		prompt,
 		notification
-	}
-
-	export enum Type {
-		error, warn, info
 	}
 }
 
@@ -75,10 +78,3 @@ export interface IPrompt {
 	name: string;
 	description: string;
 }
-
-
-
-
-
-
-
