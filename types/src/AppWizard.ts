@@ -1,50 +1,26 @@
 import * as _ from "lodash";
 
-
-export class AppWizard {
-	public messages: AppWizard.Messages;
-
-	constructor(initData?: any) {
-		this.messages = _.get(initData, "messages", new EmptyMessages());
-	}
+export abstract class AppWizard {
+	abstract showProgress(message?: string): void;
+	abstract showWarning(message: string, type: MessageType): void;
+	abstract showError(message: string, type: MessageType): void;
+	abstract showInformation(message: string, type: MessageType): void;
 
 	public static create(genOptions?: any): AppWizard {
-		if (genOptions.appWizard) {
-			return genOptions.appWizard;
-		}
-
-		return new AppWizard({messages: new EmptyMessages()});
+		return _.get(genOptions, "appWizard", new EmptyAppWizard());
 	}
 }
 
-export namespace AppWizard {
-	export abstract class Messages {
-		abstract showProgress(message?: string): void;
-		abstract showWarning(message: Message): void;
-		abstract showError(message: Message): void;
-		abstract showInformation(message: Message): void;
-	}
-}
-
-class EmptyMessages extends AppWizard.Messages {
+class EmptyAppWizard extends AppWizard {
 	showProgress(message?: string): void { }
-	showWarning(message: Message): void { }
-	showError(message: Message): void { }
-	showInformation(message: Message): void { }
+	showWarning(message: string, type: MessageType): void { }
+	showError(message: string, type: MessageType): void { }
+	showInformation(message: string, type: MessageType): void { }
 }
 
-export class Message {
-	constructor(
-		public text: string,
-		public location = Message.Location.notification,
-	) { }
-}
-
-export namespace Message {
-	export enum Location {
-		prompt,
-		notification
-	}
+export enum MessageType {
+	prompt,
+	notification
 }
 
 export class Prompts {
@@ -59,6 +35,7 @@ export class Prompts {
 		} else {
 			this.items.splice(start, deleteCount);
 		}
+
 		if (this.callback) {
 			this.callback(this.items);
 		}
@@ -70,7 +47,7 @@ export class Prompts {
 	}
 
 	public size() {
-		return this.items.length;
+		return _.size(this.items);
 	}
 }
 
