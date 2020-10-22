@@ -643,7 +643,7 @@ describe('App.vue', () => {
 	describe("showPromptMessage", () => {
 		it('error message', () => {
 			wrapper = initComponent(App)
-			wrapper.vm.showPromptMessage("errorMessage", "error", "image");
+			wrapper.vm.showPromptMessage("errorMessage", 0, "image");
 			expect(wrapper.vm.promptMessageToDisplay).toEqual("errorMessage");
 			expect(wrapper.vm.showPrompt).toEqual("errorMessage");
 			expect(wrapper.vm.promptMessageIcon).toEqual("image");
@@ -652,7 +652,7 @@ describe('App.vue', () => {
 
 		it('warning message', () => {
 			wrapper = initComponent(App)
-			wrapper.vm.showPromptMessage("warnMessage", "warn", "image");
+			wrapper.vm.showPromptMessage("warnMessage", 1, "image");
 			expect(wrapper.vm.promptMessageToDisplay).toEqual("warnMessage");
 			expect(wrapper.vm.showPrompt).toEqual("warnMessage");
 			expect(wrapper.vm.promptMessageIcon).toEqual("image");
@@ -661,7 +661,7 @@ describe('App.vue', () => {
 
 		it('info message', () => {
 			wrapper = initComponent(App)
-			wrapper.vm.showPromptMessage("infoMessage", "info", "image");
+			wrapper.vm.showPromptMessage("infoMessage", 2, "image");
 			expect(wrapper.vm.promptMessageToDisplay).toEqual("infoMessage");
 			expect(wrapper.vm.showPrompt).toEqual("infoMessage");
 			expect(wrapper.vm.promptMessageIcon).toEqual("image");
@@ -679,7 +679,7 @@ describe('App.vue', () => {
 		it('long message', () => {
 			wrapper = initComponent(App) 
 			wrapper.vm.messageMaxLength = 3
-			wrapper.vm.showPromptMessage("infoMessage", "info", "image");
+			wrapper.vm.showPromptMessage("infoMessage", 2, "image");
 			expect(wrapper.vm.promptMessageToDisplay).toEqual("infoMessage");
 			expect(wrapper.vm.showPrompt).toEqual("inf...");
 			expect(wrapper.vm.promptMessageIcon).toEqual("image");

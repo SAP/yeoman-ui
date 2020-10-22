@@ -139,6 +139,7 @@ import FolderBrowserPlugin from "@sap-devx/inquirer-gui-folder-browser-plugin";
 import LoginPlugin from "@sap-devx/inquirer-gui-login-plugin";
 import TilesPlugin from "@sap-devx/inquirer-gui-tiles-plugin";
 
+
 const FUNCTION = "__Function";
 const PENDING = "pending";
 const EVALUATING = "evaluating";
@@ -258,11 +259,11 @@ export default {
       this.toShowPromptMessage = true;
       this.promptMessageIcon = image;
 
-      if (type === "error") {
+      if (type === 0) {
         this.promptMessageClass = "error-prompt-message";
-      } else if (type === "info") {
+      } else if (type === 2) {
         this.promptMessageClass = "info-warn-prompt-message";
-      } else if (type === "warn") {
+      } else if (type === 1) {
         this.promptMessageClass = "info-warn-prompt-message";
       }
     },
