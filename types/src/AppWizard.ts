@@ -9,11 +9,8 @@ export class AppWizard {
 	}
 
 	public static create(genOptions?: any): AppWizard {
-		if (genOptions.appWizard) {
-			return genOptions.appWizard;
-		}
-
-		return new AppWizard({messages: new EmptyMessages()});
+		return _.get(genOptions, "appWizard", 
+			new AppWizard({messages: new EmptyMessages()}));
 	}
 }
 
@@ -36,12 +33,12 @@ class EmptyMessages extends AppWizard.Messages {
 export class Message {
 	constructor(
 		public text: string,
-		public location = Message.Location.notification,
+		public location = Message.Type.notification,
 	) { }
 }
 
 export namespace Message {
-	export enum Location {
+	export enum Type {
 		prompt,
 		notification
 	}
@@ -59,6 +56,7 @@ export class Prompts {
 		} else {
 			this.items.splice(start, deleteCount);
 		}
+
 		if (this.callback) {
 			this.callback(this.items);
 		}
@@ -70,7 +68,7 @@ export class Prompts {
 	}
 
 	public size() {
-		return this.items.length;
+		return _.size(this.items);
 	}
 }
 
