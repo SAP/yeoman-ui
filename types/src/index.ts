@@ -5,7 +5,7 @@ export abstract class AppWizard {
 	abstract showInformation(message: string, type: MessageType): void;
 
 	public static create(genOptions: any = {}): AppWizard {
-		return genOptions.appWizard ? genOptions.appWizard: new EmptyAppWizard();
+		return genOptions.appWizard ? genOptions.appWizard : new EmptyAppWizard();
 	}
 }
 
