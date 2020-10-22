@@ -80,13 +80,6 @@ describe('vscode-youi-events unit test', () => {
 		_.set(vscode, "workspace.workspaceFolders", []);
 		_.set(vscode, "workspace.updateWorkspaceFolders", (): any => undefined);
 		_.set(vscode, "commands.executeCommand", (): any => undefined);
-		_.set(vscode, "window.createOutputChannel", () => {
-			return {
-				append: () => "",
-				appendLine: () => "",
-				show: () => ""
-			};
-		});
 	});
 
 	after(() => {
@@ -118,7 +111,7 @@ describe('vscode-youi-events unit test', () => {
 		rpcMock.verify();
 	});
 
-	describe.only("getAppWizard", () => {
+	describe("getAppWizard", () => {
 		it("error notification message on BAS", () => {
 			const message = "error notification message";
 			events["isInBAS"] = true;
@@ -128,83 +121,83 @@ describe('vscode-youi-events unit test', () => {
 			appWizard.showError(message, MessageType.notification);
 		});
 
-		// it("warning message with location notification on BAS", () => {
-		// 	const message = new Message("value message", Message.Type.warn, Message.Location.notification);
-		// 	events["isInBAS"] = true;
-		// 	const appWizard = events.getAppWizard();
-		// 	generatorOutputMock.expects("appendLine").withExactArgs(message.text);
-		// 	windowMock.expects("showWarningMessage").withExactArgs(message.text);
-		// 	appWizard.show(message);
-		// });
+		it("warning notification message on BAS", () => {
+			const message = "warning notification message";
+			events["isInBAS"] = true;
+			const appWizard = events.getAppWizard();
+			generatorOutputMock.expects("appendLine").withExactArgs(message);
+			windowMock.expects("showWarningMessage").withExactArgs(message);
+			appWizard.showWarning(message, MessageType.notification);
+		});
 
-		// it("info message with location notification on BAS", () => {
-		// 	const message = new Message("value message", Message.Type.info, Message.Location.notification);
-		// 	events["isInBAS"] = true;
-		// 	const appWizard = events.getAppWizard();
-		// 	generatorOutputMock.expects("appendLine").withExactArgs(message.text);
-		// 	windowMock.expects("showInformationMessage").withExactArgs(message.text);
-		// 	appWizard.show(message);
-		// });
+		it("information notification message on BAS", () => {
+			const message = "information notification message";
+			events["isInBAS"] = true;
+			const appWizard = events.getAppWizard();
+			generatorOutputMock.expects("appendLine").withExactArgs(message);
+			windowMock.expects("showInformationMessage").withExactArgs(message);
+			appWizard.showInformation(message, MessageType.notification);
+		});
 
-		// it("error message with location prompt on BAS", () => {
-		// 	const message = new Message("value message", Message.Type.error, Message.Location.prompt);
-		// 	events["isInBAS"] = true;
-		// 	const appWizard = events.getAppWizard();
-		// 	events["getMessageImage"] = () => "errorTheiaDark";
-		// 	generatorOutputMock.expects("appendLine").withExactArgs(message.text);
-		// 	rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.text, message.type, "errorTheiaDark"]);
-		// 	appWizard.show(message);
-		// });
+		it("error prompt message on BAS", () => {
+			const message = "error prompt message";
+			events["isInBAS"] = true;
+			const appWizard = events.getAppWizard();
+			generatorOutputMock.expects("appendLine").withExactArgs(message);
+			events["getMessageImage"] = () => "errorTheia";
+			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, 0, "errorTheia"]);
+			appWizard.showError(message, MessageType.prompt);
+		});
 
-		// it("warning message with location prompt on BAS", () => {
-		// 	const message = new Message("value message", Message.Type.warn, Message.Location.prompt);
-		// 	events["isInBAS"] = true;
-		// 	const appWizard = events.getAppWizard();
-		// 	events["getMessageImage"] = () => "warnTheia";
-		// 	generatorOutputMock.expects("appendLine").withExactArgs(message.text);
-		// 	rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.text, message.type, "warnTheia"]);
-		// 	appWizard.show(message);
-		// });
+		it("warning prompt message on BAS", () => {
+			const message = "warning prompt message";
+			events["isInBAS"] = true;
+			const appWizard = events.getAppWizard();
+			generatorOutputMock.expects("appendLine").withExactArgs(message);
+			events["getMessageImage"] = () => "warnTheia";
+			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, 1, "warnTheia"]);
+			appWizard.showWarning(message, MessageType.prompt);
+		});
 
-		// it("info message with location prompt on BAS", () => {
-		// 	const message = new Message("value message", Message.Type.info, Message.Location.prompt);
-		// 	events["isInBAS"] = true;
-		// 	const appWizard = events.getAppWizard();
-		// 	events["getMessageImage"] = () => "infoTheia";
-		// 	generatorOutputMock.expects("appendLine").withExactArgs(message.text);
-		// 	rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.text, message.type, "infoTheia"]);
-		// 	appWizard.show(message);
-		// });
+		it("information prompt message on BAS", () => {
+			const message = "information prompt message";
+			events["isInBAS"] = true;
+			const appWizard = events.getAppWizard();
+			generatorOutputMock.expects("appendLine").withExactArgs(message);
+			events["getMessageImage"] = () => "infoTheia";
+			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, 2, "infoTheia"]);
+			appWizard.showInformation(message, MessageType.prompt);
+		});
 
-		// it("error message with location prompt on vscode", () => {
-		// 	const message = new Message("value message", Message.Type.error, Message.Location.prompt);
-		// 	events["isInBAS"] = false;
-		// 	const appWizard = events.getAppWizard();
-		// 	events["getMessageImage"] = () => "errorVSCodeDark";
-		// 	generatorOutputMock.expects("appendLine").withExactArgs(message.text);
-		// 	rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.text, message.type, "errorVSCodeDark"]);
-		// 	appWizard.showError(message, MessageType.prompt);
-		// });
+		it("error message with location prompt on vscode", () => {
+			const message = "error prompt message";
+			events["isInBAS"] = false;
+			const appWizard = events.getAppWizard();
+			events["getMessageImage"] = () => "errorVSCodeDark";
+			generatorOutputMock.expects("appendLine").withExactArgs(message);
+			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, 0, "errorVSCodeDark"]);
+			appWizard.showError(message, MessageType.prompt);
+		});
 
-		// it("warning message with location prompt on vscode", () => {
-		// 	const message = new Message("value message", Message.Type.warn, Message.Location.prompt);
-		// 	events["isInBAS"] = false;
-		// 	const appWizard = events.getAppWizard();
-		// 	events["getMessageImage"] = () => "warnVSCode";
-		// 	generatorOutputMock.expects("appendLine").withExactArgs(message.text);
-		// 	rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message.text, message.type, "warnVSCode"]);
-		// 	appWizard.showWarning(message, MessageType.prompt);
-		// });
+		it("warning message with location prompt on vscode", () => {
+			const message = "warning prompt message";
+			events["isInBAS"] = false;
+			const appWizard = events.getAppWizard();
+			events["getMessageImage"] = () => "warnVSCode";
+			generatorOutputMock.expects("appendLine").withExactArgs(message);
+			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, 1, "warnVSCode"]);
+			appWizard.showWarning(message, MessageType.prompt);
+		});
 
-		// it("info message with location prompt on vscode", () => {
-		// 	const message = "info prompt message";
-		// 	events["isInBAS"] = false;
-		// 	const appWizard = events.getAppWizard();
-		// 	events["getMessageImage"] = () => "infoVSCode";
-		// 	generatorOutputMock.expects("appendLine").withExactArgs(message);
-		// 	rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, MessageType.prompt, "infoVSCode"]);
-		// 	appWizard.showInformation(message, MessageType.prompt);
-		// });
+		it("info message with location prompt on vscode", () => {
+			const message = "information prompt message";
+			events["isInBAS"] = false;
+			const appWizard = events.getAppWizard();
+			events["getMessageImage"] = () => "infoVSCode";
+			generatorOutputMock.expects("appendLine").withExactArgs(message);
+			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, 2, "infoVSCode"]);
+			appWizard.showInformation(message, MessageType.prompt);
+		});
 	});
 
 

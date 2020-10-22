@@ -251,8 +251,8 @@ module.exports = class extends Generator {
 		const answers = await this.prompt(prompts);
 
 		this.answers = Object.assign({}, this.answers, answers);
-		this.appWizard.show(this.answers.hungerLevel, types.MessageType.prompt);
-		this.appWizard.show(this.answers.hungerLevel, types.MessageType.notification);
+		this.appWizard.showInformation(this.answers.hungerLevel, types.MessageType.prompt);
+		this.appWizard.showInformation(this.answers.hungerLevel, types.MessageType.notification);
 
 		prompts = [
 			{
