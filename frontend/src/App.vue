@@ -138,6 +138,7 @@ import FileBrowserPlugin from "@sap-devx/inquirer-gui-file-browser-plugin";
 import FolderBrowserPlugin from "@sap-devx/inquirer-gui-folder-browser-plugin";
 import LoginPlugin from "@sap-devx/inquirer-gui-login-plugin";
 import TilesPlugin from "@sap-devx/inquirer-gui-tiles-plugin";
+import { Severity } from "@sap-devx/yeoman-ui-types";
 
 
 const FUNCTION = "__Function";
@@ -259,11 +260,11 @@ export default {
       this.toShowPromptMessage = true;
       this.promptMessageIcon = image;
 
-      if (type === 0) {
+      if (type === Severity.error) {
         this.promptMessageClass = "error-prompt-message";
-      } else if (type === 2) {
+      } else if (type === Severity.information) {
         this.promptMessageClass = "info-warn-prompt-message";
-      } else if (type === 1) {
+      } else if (type === Severity.warning) {
         this.promptMessageClass = "info-warn-prompt-message";
       }
     },

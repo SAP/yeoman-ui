@@ -8,7 +8,7 @@ import * as messages from '../src/messages';
 import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { GeneratorOutput } from '../src/vscode-output';
 import { VSCodeYouiEvents } from "../src/vscode-youi-events";
-import { MessageType } from "@sap-devx/yeoman-ui-types";
+import { MessageType, Severity } from "@sap-devx/yeoman-ui-types";
 
 
 describe('vscode-youi-events unit test', () => {
@@ -145,7 +145,7 @@ describe('vscode-youi-events unit test', () => {
 			const appWizard = events.getAppWizard();
 			generatorOutputMock.expects("appendLine").withExactArgs(message);
 			events["getMessageImage"] = () => "errorTheia";
-			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, 0, "errorTheia"]);
+			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.error, "errorTheia"]);
 			appWizard.showError(message, MessageType.prompt);
 		});
 
@@ -155,7 +155,7 @@ describe('vscode-youi-events unit test', () => {
 			const appWizard = events.getAppWizard();
 			generatorOutputMock.expects("appendLine").withExactArgs(message);
 			events["getMessageImage"] = () => "warnTheia";
-			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, 1, "warnTheia"]);
+			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.warning, "warnTheia"]);
 			appWizard.showWarning(message, MessageType.prompt);
 		});
 
@@ -165,7 +165,7 @@ describe('vscode-youi-events unit test', () => {
 			const appWizard = events.getAppWizard();
 			generatorOutputMock.expects("appendLine").withExactArgs(message);
 			events["getMessageImage"] = () => "infoTheia";
-			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, 2, "infoTheia"]);
+			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.information, "infoTheia"]);
 			appWizard.showInformation(message, MessageType.prompt);
 		});
 
@@ -175,7 +175,7 @@ describe('vscode-youi-events unit test', () => {
 			const appWizard = events.getAppWizard();
 			events["getMessageImage"] = () => "errorVSCodeDark";
 			generatorOutputMock.expects("appendLine").withExactArgs(message);
-			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, 0, "errorVSCodeDark"]);
+			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.error, "errorVSCodeDark"]);
 			appWizard.showError(message, MessageType.prompt);
 		});
 
@@ -185,7 +185,7 @@ describe('vscode-youi-events unit test', () => {
 			const appWizard = events.getAppWizard();
 			events["getMessageImage"] = () => "warnVSCode";
 			generatorOutputMock.expects("appendLine").withExactArgs(message);
-			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, 1, "warnVSCode"]);
+			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.warning, "warnVSCode"]);
 			appWizard.showWarning(message, MessageType.prompt);
 		});
 
@@ -195,7 +195,7 @@ describe('vscode-youi-events unit test', () => {
 			const appWizard = events.getAppWizard();
 			events["getMessageImage"] = () => "infoVSCode";
 			generatorOutputMock.expects("appendLine").withExactArgs(message);
-			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, 2, "infoVSCode"]);
+			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.information, "infoVSCode"]);
 			appWizard.showInformation(message, MessageType.prompt);
 		});
 	});

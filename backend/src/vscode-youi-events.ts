@@ -7,7 +7,7 @@ import { GeneratorOutput } from './vscode-output';
 import { IChildLogger } from '@vscode-logging/logger';
 import { getClassLogger } from './logger/logger-wrapper';
 import { getImage } from "./images/messageImages"
-import { AppWizard, MessageType } from '@sap-devx/yeoman-ui-types';
+import { AppWizard, MessageType, Severity } from '@sap-devx/yeoman-ui-types';
 
 
 class YoUiAppWizard extends AppWizard {
@@ -16,15 +16,15 @@ class YoUiAppWizard extends AppWizard {
 	}
 
 	public showError(message: string, type: MessageType): void {
-		this.events.showMessage(message, 0, type);
+		this.events.showMessage(message, Severity.error, type);
 	}
 
 	public showWarning(message: string, type: MessageType): void {
-		this.events.showMessage(message, 1, type);
+		this.events.showMessage(message, Severity.warning, type);
 	}
 
 	public showInformation(message: string, type: MessageType): void {
-		this.events.showMessage(message, 2, type);
+		this.events.showMessage(message, Severity.information, type);
 	}
 
 	public showProgress(message?: string): void {
@@ -71,24 +71,24 @@ export class VSCodeYouiEvents implements YouiEvents {
 		return this.appWizard;
 	}
 
-	private getMessageImage(state: number): any {
+	private getMessageImage(state: Severity): any {
 		return getImage(state, this.isInBAS);
 	}
 
-	private showPromptMessage(message: string, state: number) {
+	private showPromptMessage(message: string, state: Severity) {
 		const image = this.getMessageImage(state);
 		this.rpc.invoke("showPromptMessage", [`${message}`, state, image]);
 	}
 
-	private showNotificationMessage(message: string, state: number) {
+	private showNotificationMessage(message: string, state: Severity) {
 		switch (state) {
-			case 0: vscode.window.showErrorMessage(message); break;
-			case 1: vscode.window.showWarningMessage(message); break;
-			default: vscode.window.showInformationMessage(message);
+			case Severity.error: vscode.window.showErrorMessage(message); break;
+			case Severity.warning: vscode.window.showWarningMessage(message); break;
+			default: vscode.window.showInformationMessage(message); // Severity.information
 		}
 	}
 
-	public showMessage(message = "", state: number, type: MessageType) {
+	public showMessage(message = "", state: Severity, type: MessageType) {
 		message = `${message}`;
 		this.output.appendLine(message);
 		if (type === MessageType.notification) {
