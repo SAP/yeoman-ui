@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 export abstract class AppWizard {
 	abstract showProgress(message?: string): void;
 	abstract showWarning(message: string, type: MessageType): void;
@@ -7,7 +5,7 @@ export abstract class AppWizard {
 	abstract showInformation(message: string, type: MessageType): void;
 
 	public static create(genOptions?: any): AppWizard {
-		return _.get(genOptions, "appWizard", new EmptyAppWizard());
+		return genOptions && genOptions.appWizard ? genOptions.appWizard: new EmptyAppWizard();
 	}
 }
 
@@ -47,7 +45,7 @@ export class Prompts {
 	}
 
 	public size() {
-		return _.size(this.items);
+		return this.items.length;
 	}
 }
 
