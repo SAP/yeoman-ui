@@ -2,7 +2,7 @@
 	"name": "@sap-devx/yeoman-ui-types",
 	"displayName": "yeoman-ui-types",
 	"description": "Yeoman-UI prompt types",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"author": "SAP SE",
 	"publisher": "SAP",
 	"license": "Apache-2.0",

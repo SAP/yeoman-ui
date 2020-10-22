@@ -16,6 +16,12 @@ class EmptyAppWizard extends AppWizard {
 	showInformation(message: string, type: MessageType): void { }
 }
 
+export enum Severity {
+	error,
+	warning,
+	information
+}
+
 export enum MessageType {
 	prompt,
 	notification
