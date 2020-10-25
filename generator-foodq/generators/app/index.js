@@ -415,6 +415,5 @@ module.exports = class extends Generator {
 	end() {
 		this.log('FoodQ completed to install dependencies.');
 		this.log('FoodQ generation completed.');
-		this.appWizard.showInformation('FoodQ ended', types.MessageType.notification);
 	}
 };
