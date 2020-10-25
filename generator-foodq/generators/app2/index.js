@@ -43,6 +43,14 @@ module.exports = class extends Generator {
 					{ value: "car", name: "Car", image: this._getImage(path.join(this.sourceRoot(), "../images/car.png")) },
 					{ value: "drone", name: "Drone", image: this._getImage(path.join(this.sourceRoot(), "../images/drone.png")) }
 				],
+				validate: (value) => {
+					if (value === "car") {
+						this.appWizard.showWarning("Car delivery is not reliable.", types.MessageType.prompt);
+					} else {
+						this.appWizard.showInformation("Drone is very fast.", types.MessageType.prompt);
+					}
+					return true;
+				},
 				when: answers => {
 					const indexOfAddress = _.findIndex(this.prompts.items, prompt => {
 						return prompt.name === this.dynamicAddressPrompt.name;
