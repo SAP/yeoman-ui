@@ -50,7 +50,7 @@ module.exports = class extends Generator {
 				type: "confirm",
 				name: "hungry",
 				message: "Are you hungry?",
-				store: true
+				default: true
 			},
 			{
 				type: "confirm",
@@ -60,7 +60,12 @@ module.exports = class extends Generator {
 				},
 				store: true,
 				validate: (value, answers) => {
-					return (value === true ? true : "You must be hungry");
+					if (value) {
+						this.appWizard.showInformation("Good news !! You are hungry !!!", types.MessageType.prompt);
+						return true;
+					}
+					this.appWizard.showError("You must be hungry", types.MessageType.prompt);
+					return "You must be hungry";
 				},
 			},
 			{
@@ -71,6 +76,9 @@ module.exports = class extends Generator {
 					hint: "Our recommendation is green"
 				},
 				when: (response) => {
+					if (response.hungry) {
+						this.appWizard.showInformation("Our recommendation for color is green", types.MessageType.notification);
+					}
 					this.log(`Response for hungry = ${response.hungry}`);
 					return response.hungry;
 				},
@@ -105,10 +113,7 @@ module.exports = class extends Generator {
 			{
 				when: async response => {
 					this.log(response.hungry);
-					const that = this;
-					return new Promise((resolve) => {
-						that.appWizard.showError(`Purposely delaying response for 2 seconds.`, types.MessageType.prompt);
-						that.appWizard.showError(`Purposely delaying response for 2 seconds.`, types.MessageType.notification);
+					return new Promise(resolve => {
 						setTimeout(() => {
 							resolve(response.hungry);
 						}, 2000);
@@ -147,7 +152,17 @@ module.exports = class extends Generator {
 					{ value: "steak", name: "Rib Eye Steak", description: "Super traditional big rib eye with baked potatos.", image: this._getImage(path.join(this.sourceRoot(), "../images/steak.jpg")) },
 					{ value: "spaghetti", name: "Spaghetti Carbonara", description: "Classic spaghetti alla carbonara, made with pancetta and Italian-style bacon.", homepage: "https://www.allrecipes.com/recipe/11973/spaghetti-carbonara-ii/", image: DEFAULT_IMAGE },
 				],
-				default: "junk-food"
+				default: "junk-food",
+				validate: (value) => {
+					if (_.includes(["jerk-chicken", "steak"], value)) {
+						this.appWizard.showWarning("You are a vegan, aren't you ?");
+					} else if (value === "junk-food") {
+						this.appWizard.showError("Think twice !!");
+					} else {
+						this.appWizard.showInformation("Good choice.");
+					}
+					return true;
+				}
 			}
 		];
 
@@ -158,11 +173,8 @@ module.exports = class extends Generator {
 
 		ui.updateBottomBar("This is written to the bottom bar");
 
-		prompts = [
-			{
+		prompts = [{
 				when: () => {
-					this.appWizard.showWarning(this.answers.confirmHungry, types.MessageType.prompt);
-					this.appWizard.showWarning(this.answers.confirmHungry, types.MessageType.notification);
 					return this.answers.confirmHungry;
 				},
 				type: "list",
@@ -251,8 +263,6 @@ module.exports = class extends Generator {
 		const answers = await this.prompt(prompts);
 
 		this.answers = Object.assign({}, this.answers, answers);
-		this.appWizard.showInformation(this.answers.hungerLevel, types.MessageType.prompt);
-		this.appWizard.showInformation(this.answers.hungerLevel, types.MessageType.notification);
 
 		this.log(`Hunger level = ${this.answers.hungerLevel}`);
 
@@ -293,8 +303,11 @@ module.exports = class extends Generator {
 					}
 				],
 				validate: (value, answers) => {
+					if (value === "private") {
+						this.appWizard.showError("Private repository is not supported", types.MessageType.notification);
+					}
 					return (value !== 'private' ? true : "private repository is not supported");
-				},
+				}
 			},
 			{
 				guiOptions: {
@@ -334,7 +347,7 @@ module.exports = class extends Generator {
 		if (/\w/.test(value) && /\d/.test(value)) {
 			return true;
 		}
-
+		this.appWizard.showWarning('The password must contain at least a letter and a number', types.MessageType.notification);
 		return 'The password must contain at least a letter and a number';
 	}
 
@@ -346,6 +359,7 @@ module.exports = class extends Generator {
 			image = DEFAULT_IMAGE;
 			this.log(`Error = ${error}`);
 		}
+
 		return image;
 	}
 

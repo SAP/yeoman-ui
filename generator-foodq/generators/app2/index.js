@@ -12,7 +12,7 @@ module.exports = class extends Generator {
 		this.appWizard = opts.appWizard;
 		this.parentPromptsQuantity = this.prompts.size();
 
-		this.appWizard.showInformation("Initializing sub generator...", types.MessageType.prompt);
+		//this.appWizard.showInformation("Initializing sub generator...", types.MessageType.prompt);
 
 		this.dynamicAddressPrompt = { name: "Address", description: "Provide the address for delivery." };
 
