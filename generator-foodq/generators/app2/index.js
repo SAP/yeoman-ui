@@ -3,12 +3,16 @@ var _ = require('lodash');
 var path = require('path');
 const Datauri = require('datauri/sync');
 const DEFAULT_IMAGE = require("./images/defaultImage");
+const types = require('@sap-devx/yeoman-ui-types');
 
 module.exports = class extends Generator {
 	constructor(args, opts) {
 		super(args, opts);
 		this.prompts = opts.prompts;
+		this.appWizard = opts.appWizard;
 		this.parentPromptsQuantity = this.prompts.size();
+
+		this.appWizard.showInformation("Initializing sub generator...", types.MessageType.prompt);
 
 		this.dynamicAddressPrompt = { name: "Address", description: "Provide the address for delivery." };
 
@@ -93,14 +97,11 @@ module.exports = class extends Generator {
 	}
 
 	_getImage(imagePath) {
-		let image;
 		try {
-			image = Datauri(imagePath).content;
+			return Datauri(imagePath).content;
 		} catch (error) {
-			image = DEFAULT_IMAGE;
 			this.log("Error", error);
+			return DEFAULT_IMAGE;
 		}
-		return image;
 	}
-
 };
