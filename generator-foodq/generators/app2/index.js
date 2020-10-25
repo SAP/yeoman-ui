@@ -3,11 +3,13 @@ var _ = require('lodash');
 var path = require('path');
 const Datauri = require('datauri/sync');
 const DEFAULT_IMAGE = require("./images/defaultImage");
+const types = require('@sap-devx/yeoman-ui-types');
 
 module.exports = class extends Generator {
 	constructor(args, opts) {
 		super(args, opts);
 		this.prompts = opts.prompts;
+		this.appWizard = opts.appWizard;
 		this.parentPromptsQuantity = this.prompts.size();
 
 		this.dynamicAddressPrompt = { name: "Address", description: "Provide the address for delivery." };
@@ -26,7 +28,8 @@ module.exports = class extends Generator {
 			{
 				type: "confirm",
 				name: "isDelivery",
-				message: "Do you want the food delivered to your home?"
+				message: "Do you want the food delivered to your home?",
+				default: true
 			},
 			{
 				type: "list",
@@ -40,6 +43,14 @@ module.exports = class extends Generator {
 					{ value: "car", name: "Car", image: this._getImage(path.join(this.sourceRoot(), "../images/car.png")) },
 					{ value: "drone", name: "Drone", image: this._getImage(path.join(this.sourceRoot(), "../images/drone.png")) }
 				],
+				validate: (value) => {
+					if (value === "car") {
+						this.appWizard.showWarning("Car delivery is not reliable.", types.MessageType.prompt);
+					} else {
+						this.appWizard.showInformation("Drone is very fast.", types.MessageType.prompt);
+					}
+					return true;
+				},
 				when: answers => {
 					const indexOfAddress = _.findIndex(this.prompts.items, prompt => {
 						return prompt.name === this.dynamicAddressPrompt.name;
@@ -77,7 +88,8 @@ module.exports = class extends Generator {
 					}
 				}
 			];
-			this.answers = await this.prompt(addressPrompt);
+			const answersDelivery = await this.prompt(addressPrompt);
+			this.answers = Object.assign({}, this.answers, answersDelivery);
 		}
 
 		const tipPrompt = [
@@ -89,18 +101,22 @@ module.exports = class extends Generator {
 			}
 		];
 
-		this.answers = await this.prompt(tipPrompt);
+		const answersTip = await this.prompt(tipPrompt);
+		this.answers = Object.assign({}, this.answers, answersTip);
+	}
+
+	writing() {
+		!_.isNil(this.answers.tip) && this.log(`Tip = ${this.answers.tip}`);
+		!_.isNil(this.answers.address) && this.log(`Address = ${this.answers.address}`);
+		!_.isNil(this.answers.deliveryMethod) && this.log(`Delivery method = ${this.answers.deliveryMethod}`);
 	}
 
 	_getImage(imagePath) {
-		let image;
 		try {
-			image = Datauri(imagePath).content;
+			return Datauri(imagePath).content;
 		} catch (error) {
-			image = DEFAULT_IMAGE;
 			this.log("Error", error);
+			return DEFAULT_IMAGE;
 		}
-		return image;
 	}
-
 };

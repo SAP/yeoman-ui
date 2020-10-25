@@ -32,16 +32,8 @@ module.exports = class extends Generator {
 		this.option('babel');
 	}
 
-	paths() {
-		this.log(this.destinationRoot());
-		// returns '~/projects'
-
-		this.log(this.destinationPath('index.js'));
-		// returns '~/projects/index.js'
-	}
-
 	async initializing() {
-		this.composeWith(require.resolve("../app2"), { prompts: this.prompts });
+		this.composeWith(require.resolve("../app2"), { prompts: this.prompts, appWizard: this.appWizard });
 	}
 
 	async prompting() {
@@ -50,7 +42,7 @@ module.exports = class extends Generator {
 				type: "confirm",
 				name: "hungry",
 				message: "Are you hungry?",
-				store: true
+				default: true
 			},
 			{
 				type: "confirm",
@@ -60,7 +52,12 @@ module.exports = class extends Generator {
 				},
 				store: true,
 				validate: (value, answers) => {
-					return (value === true ? true : "You must be hungry");
+					if (value) {
+						this.appWizard.showInformation("Good news !! You are hungry !!!", types.MessageType.prompt);
+						return true;
+					}
+					this.appWizard.showError("You must be hungry", types.MessageType.prompt);
+					return "You must be hungry";
 				},
 			},
 			{
@@ -71,7 +68,10 @@ module.exports = class extends Generator {
 					hint: "Our recommendation is green"
 				},
 				when: (response) => {
-					this.log(response.hungry);
+					if (response.hungry) {
+						this.appWizard.showInformation("Our recommendation for color is green", types.MessageType.notification);
+					}
+				
 					return response.hungry;
 				},
 				validate: (value, answers) => {
@@ -81,7 +81,7 @@ module.exports = class extends Generator {
 				transformer: function (color, answers, flags) {
 					const text = chalkPipe(color)(color);
 					if (flags.isFinal) {
-						return text + '!';
+						return `${text}!`;
 					}
 					return text;
 				}
@@ -95,20 +95,16 @@ module.exports = class extends Generator {
 				},
 				type: "number",
 				name: "number",
-				message: "How many times have you been in this resturant?",
+				message: "How many times have you been in this restaurant?",
 				guiOptions: {
-					hint: "We hope you have been in our resturant many times",
+					hint: "We hope you have been in our restaurant many times",
 					applyDefaultWhenDirty: true,
 					mandatory: true
 				},
 			},
 			{
 				when: async response => {
-					this.log(response.hungry);
-					const that = this;
-					return new Promise((resolve) => {
-						that.appWizard.showError(`Purposely delaying response for 2 seconds.`, types.MessageType.prompt);
-						that.appWizard.showError(`Purposely delaying response for 2 seconds.`, types.MessageType.notification);
+					return new Promise(resolve => {
 						setTimeout(() => {
 							resolve(response.hungry);
 						}, 2000);
@@ -147,7 +143,17 @@ module.exports = class extends Generator {
 					{ value: "steak", name: "Rib Eye Steak", description: "Super traditional big rib eye with baked potatos.", image: this._getImage(path.join(this.sourceRoot(), "../images/steak.jpg")) },
 					{ value: "spaghetti", name: "Spaghetti Carbonara", description: "Classic spaghetti alla carbonara, made with pancetta and Italian-style bacon.", homepage: "https://www.allrecipes.com/recipe/11973/spaghetti-carbonara-ii/", image: DEFAULT_IMAGE },
 				],
-				default: "junk-food"
+				default: "junk-food",
+				validate: (value) => {
+					if (_.includes(["jerk-chicken", "steak"], value)) {
+						this.appWizard.showWarning("You are a vegan, aren't you ?");
+					} else if (value === "junk-food") {
+						this.appWizard.showError("Think twice !!");
+					} else {
+						this.appWizard.showInformation("Good choice.");
+					}
+					return true;
+				}
 			}
 		];
 
@@ -158,11 +164,8 @@ module.exports = class extends Generator {
 
 		ui.updateBottomBar("This is written to the bottom bar");
 
-		prompts = [
-			{
+		prompts = [{
 				when: () => {
-					this.appWizard.showWarning(this.answers.confirmHungry, types.MessageType.prompt);
-					this.appWizard.showWarning(this.answers.confirmHungry, types.MessageType.notification);
 					return this.answers.confirmHungry;
 				},
 				type: "list",
@@ -251,8 +254,6 @@ module.exports = class extends Generator {
 		const answers = await this.prompt(prompts);
 
 		this.answers = Object.assign({}, this.answers, answers);
-		this.appWizard.showInformation(this.answers.hungerLevel, types.MessageType.prompt);
-		this.appWizard.showInformation(this.answers.hungerLevel, types.MessageType.notification);
 
 		prompts = [
 			{
@@ -291,8 +292,11 @@ module.exports = class extends Generator {
 					}
 				],
 				validate: (value, answers) => {
+					if (value === "private") {
+						this.appWizard.showError("Private repository is not supported", types.MessageType.notification);
+					}
 					return (value !== 'private' ? true : "private repository is not supported");
-				},
+				}
 			},
 			{
 				guiOptions: {
@@ -325,14 +329,13 @@ module.exports = class extends Generator {
 
 		const answers_login = await this.prompt(prompts);
 		this.answers = Object.assign({}, this.answers, answers_login);
-		this.log("Email", this.answers.email);
 	}
 
 	_requireLetterAndNumber(value) {
 		if (/\w/.test(value) && /\d/.test(value)) {
 			return true;
 		}
-
+		this.appWizard.showWarning('The password must contain at least a letter and a number', types.MessageType.notification);
 		return 'The password must contain at least a letter and a number';
 	}
 
@@ -342,21 +345,30 @@ module.exports = class extends Generator {
 			image = Datauri(imagePath).content;
 		} catch (error) {
 			image = DEFAULT_IMAGE;
-			this.log("Error", error);
+			this.log(`Error = ${error}`);
 		}
+
 		return image;
 	}
 
 	configuring() {
-		this.log('in configuring');
+		this.log('FoodQ is in configuring stage.');
 		this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "answers_main_dish.food", "")));
-		this.log('destinationRoot: ' + this.destinationRoot());
+		this.log(`Destination Root = ${this.destinationRoot()}`);
 	}
 
 	writing() {
-		this.appWizard.showProgress("FoodQ is generating.");
+		this.log('FoodQ is in writing stage.');
+		this.appWizard.showProgress("Generating the FoodQ project.");
 
-		this.log('in writing');
+		this.log('The following choices were chosen:');
+		!_.isNil(this.answers.hungry) && this.log(`Hungry = ${this.answers.hungry}`);
+		!_.isNil(this.answers.confirmHungry) && this.log(`Confirm Hungry = ${this.answers.confirmHungry}`);
+		!_.isNil(this.answers_main_dish.food) && this.log(`Main dish = ${this.answers_main_dish.food}`);
+		!_.isEmpty(this.answers.beers) && this.log(`Beers = ${this.answers.beers}`);
+		!_.isNil(this.answers.fav_color) && this.log(`Favorite napkin color = ${this.answers.fav_color}`);
+		!_.isNil(this.answers.number) && this.log(`Times you have been in this restaurant = ${this.answers.number}`);
+
 		this.fs.copyTpl(this.templatePath('index.html'),
 			this.destinationPath('public/index.html'), {
 			title: 'Templating with Yeoman',
@@ -396,10 +408,12 @@ module.exports = class extends Generator {
 	}
 
 	install() {
+		this.log('FoodQ is installing dependencies.');
 		this.npmInstall(['lodash'], { 'save-dev': true });
 	}
 
 	end() {
-		this.appWizard.showInformation('FoodQ ended', types.MessageType.notification);
+		this.log('FoodQ completed to install dependencies.');
+		this.log('FoodQ generation completed.');
 	}
 };
