@@ -32,14 +32,6 @@ module.exports = class extends Generator {
 		this.option('babel');
 	}
 
-	paths() {
-		this.log(`Destination = ${this.destinationRoot()}`);
-		// returns '~/projects'
-
-		this.log(`Destination path = ${this.destinationPath('index.js')}`);
-		// returns '~/projects/index.js'
-	}
-
 	async initializing() {
 		this.composeWith(require.resolve("../app2"), { prompts: this.prompts, appWizard: this.appWizard });
 	}
@@ -79,7 +71,7 @@ module.exports = class extends Generator {
 					if (response.hungry) {
 						this.appWizard.showInformation("Our recommendation for color is green", types.MessageType.notification);
 					}
-					this.log(`Response for hungry = ${response.hungry}`);
+				
 					return response.hungry;
 				},
 				validate: (value, answers) => {
@@ -112,7 +104,6 @@ module.exports = class extends Generator {
 			},
 			{
 				when: async response => {
-					this.log(response.hungry);
 					return new Promise(resolve => {
 						setTimeout(() => {
 							resolve(response.hungry);
@@ -264,8 +255,6 @@ module.exports = class extends Generator {
 
 		this.answers = Object.assign({}, this.answers, answers);
 
-		this.log(`Hunger level = ${this.answers.hungerLevel}`);
-
 		prompts = [
 			{
 				type: 'rawlist',
@@ -340,7 +329,6 @@ module.exports = class extends Generator {
 
 		const answers_login = await this.prompt(prompts);
 		this.answers = Object.assign({}, this.answers, answers_login);
-		this.log(`Email = ${this.answers.email}`);
 	}
 
 	_requireLetterAndNumber(value) {
@@ -377,7 +365,7 @@ module.exports = class extends Generator {
 		!_.isNil(this.answers.hungry) && this.log(`Hungry = ${this.answers.hungry}`);
 		!_.isNil(this.answers.confirmHungry) && this.log(`Confirm Hungry = ${this.answers.confirmHungry}`);
 		!_.isNil(this.answers_main_dish.food) && this.log(`Main dish = ${this.answers_main_dish.food}`);
-		!_.isNil(this.answers.beers) && this.log(`Beers = ${this.answers.beers}`);
+		!_.isEmpty(this.answers.beers) && this.log(`Beers = ${this.answers.beers}`);
 		!_.isNil(this.answers.fav_color) && this.log(`Favorite napkin color = ${this.answers.fav_color}`);
 		!_.isNil(this.answers.number) && this.log(`Times you have been in this restaurant = ${this.answers.number}`);
 
