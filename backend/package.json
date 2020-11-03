@@ -140,8 +140,7 @@
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"package": "vsce package .",
-		"test": "nyc mocha -p tsconfig.json --opts ./mocha.opts coverage:merge",
-		"coverage:merge": "node ./scripts/merge-coverage",
+		"test": "nyc mocha -p tsconfig.json --opts ./mocha.opts",
 		"ws:run": "node ./out/src/webSocketServer/index.js",
 		"ws:egRun": "node ./out/src/webSocketServer/exploreGensIndex.js",
 		"lint": "eslint . --ext .ts,.tsx --cache",
@@ -196,6 +195,7 @@
 		"vsce": "1.79.5",
 		"webpack": "4.44.1",
 		"webpack-cli": "3.3.12",
+		"lcov-result-merger": "3.1.0",
                 "coveralls": "3.1.0"
 	}
 }
