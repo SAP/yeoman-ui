@@ -140,7 +140,7 @@
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"package": "vsce package .",
-		"test": "nyc mocha -p tsconfig.json --opts ./mocha.opts",
+		"test": "nyc mocha -p tsconfig.json --opts ./mocha.opts coverage:merge",
 		"coverage:merge": "node ./scripts/merge-coverage",
 		"ws:run": "node ./out/src/webSocketServer/index.js",
 		"ws:egRun": "node ./out/src/webSocketServer/exploreGensIndex.js",
