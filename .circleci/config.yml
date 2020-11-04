@@ -67,9 +67,6 @@ jobs: # a collection of steps
           name: copy frontend coverage
           command: cp ./frontend/coverage/lcov.info ./backend/reports/coverage/lcov_frontend.info  
       - run:
-          name: ls backend coverage
-          command: ls ./backend/reports/coverage
-      - run:
           name: merge frontend and backend coverage
           command: ./backend/node_modules/.bin/lcov-result-merger './backend/reports/coverage/lco*.info' './backend/reports/coverage/lcov_merged.info'
       - run:
