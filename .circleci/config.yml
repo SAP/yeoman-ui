@@ -81,7 +81,8 @@ jobs: # a collection of steps
             source $BASH_ENV
       - run:
           name: Lint commit message
-          command: echo "$COMMIT_MESSAGE" | npx ./backend/node_modules/.bin/commitlint     
+          working_directory: backend
+          command: echo "$COMMIT_MESSAGE" | npx commitlint     
       - save_cache:
           paths:
             - backend/node_modules
