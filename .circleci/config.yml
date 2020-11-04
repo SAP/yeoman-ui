@@ -64,6 +64,12 @@ jobs: # a collection of steps
           path: backend/reports/coverage/lcov-report
           destination: backend-coverage
       - run:
+          name: ls frontend coverage
+          command: ls ./frontend/coverage
+      - run:
+          name: ls backend coverage
+          command: ls ./backend/reports/coverage
+      - run:
           name: copy frontend coverage
           command: cp ./frontend/coverage/lcov.info ./coverage/lcov_frontend.info  
       - run:
