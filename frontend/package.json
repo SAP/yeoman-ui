@@ -17,7 +17,7 @@
   "dependencies": {
     "@sap-devx/yeoman-ui-types": "1.0.2",
     "@mdi/font": "5.5.55",
-    "@sap-devx/inquirer-gui": "0.1.19",
+    "@sap-devx/inquirer-gui": "0.1.20",
     "@sap-devx/inquirer-gui-file-browser-plugin": "0.0.5",
     "@sap-devx/inquirer-gui-folder-browser-plugin": "0.0.3",
     "@sap-devx/inquirer-gui-login-plugin": "0.0.4",
