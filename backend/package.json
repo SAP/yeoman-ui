@@ -82,6 +82,12 @@
 		"configuration": {
 			"type": "object",
 			"title": "Application Wizard",
+			"yeoman-ui.enableSapWebAnalytics": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable collecting usage analytics data for Application Wizard.  If enabled, non-personally identifiable information is used to help understand the product usage and improve the tool.",
+					"scope": "resource"
+				},
 			"properties": {
 				"ApplicationWizard.loggingLevel": {
 					"type": "string",
