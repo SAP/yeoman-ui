@@ -6,3 +6,5 @@ updates:
     interval: daily
     time: "10:00"
     timezone: Etc/UCT
+  commit-message:
+      prefix: "chore:"
