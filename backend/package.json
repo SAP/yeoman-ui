@@ -166,7 +166,7 @@
 	"devDependencies": {
 		"@types/npm-registry-fetch": "8.0.0",
 		"@types/chai": "4.2.12",
-		"@types/fs-extra": "9.0.1",
+		"@types/fs-extra": "9.0.3",
 		"@types/inquirer": "7.3.1",
 		"@types/lodash": "4.14.161",
 		"@types/mocha": "^5.2.7",
