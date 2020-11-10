@@ -52,6 +52,9 @@ To run it do the following:
 * Start VSCode on your local machine, and click on open workspace. Select this repo folder.
 * On the debug panel choose "Run Extension", and click on the "Run" button.
 
+#### Enable usage analytics reporting from VS Code
+The tool collects non-personally identifiable information about your usage of the tool to improve its services. If you do not want the tool to collect your usage data, you can set the "Enable Sap Web Analytics" setting to "false". Go to File > Preferences > Settings (macOS: Code > Preferences > Settings) > Extensions > <Tool Name>, and deselect the "Enable Sap Web Analytics" checkbox.
+
 #### Advanced scenarios
 To develop and contribute you can build and install each package separately. Instruction on each package in the dedicated readme.md file.
 * [Build & install the client](frontend/README.md)
@@ -63,6 +66,3 @@ To get more help, support, and information please open a github [issue](https://
 
 ## Contributing
 Contributing information can be found in the [CONTRIBUTING.md](CONTRIBUTING.md) file.
-
-## Enable usage analytics reporting from VS Code
-The tool collects non-personally identifiable information about your usage of the tool to improve its services. If you do not want the tool to collect your usage data, you can set the "Enable Sap Web Analytics" setting to "false". Go to File > Preferences > Settings (macOS: Code > Preferences > Settings) > Extensions > <Tool Name>, and deselect the "Enable Sap Web Analytics" checkbox.
