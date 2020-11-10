@@ -1,0 +1,10 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/backend"
+  schedule:
+    interval: daily
+    time: "10:00"
+    timezone: Etc/UCT
+  commit-message:
+      prefix: "chore:"
