@@ -53,7 +53,7 @@ To run it do the following:
 * On the debug panel choose "Run Extension", and click on the "Run" button.
 
 #### Enable usage analytics reporting from VS Code
-The tool collects non-personally identifiable information about your usage of the tool to improve its services. If you do not want the tool to collect your usage data, you can set the "Enable Sap Web Analytics" setting to "false". Go to File > Preferences > Settings (macOS: Code > Preferences > Settings) > Extensions > <Tool Name>, and deselect the "Enable Sap Web Analytics" checkbox.
+The tool collects non-personally identifiable information about your usage of the tool to improve its services. If you do not want the tool to collect your usage data, you can set the "Enable Sap Web Analytics" setting to "false". Go to File > Preferences > Settings (macOS: Code > Preferences > Settings) > Extensions > Application Wizard, and deselect the "Enable Sap Web Analytics" checkbox.
 
 #### Advanced scenarios
 To develop and contribute you can build and install each package separately. Instruction on each package in the dedicated readme.md file.
