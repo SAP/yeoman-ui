@@ -8,7 +8,7 @@ import _ = require("lodash");
  */
 
 export class SWA {
-	private static readonly YEOMAN_UI = "Application Wizard";
+	private static readonly YEOMAN_UI = "ApplicationWizard";
 
 	// Event types used by Application Wizard
 	private static readonly EVENT_TYPES = {
