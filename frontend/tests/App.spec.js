@@ -31,12 +31,28 @@ describe('App.vue', () => {
 		})
 	})
 
+	describe('backButtonText - computed', () => {
+		it('promptIndex is 1', () => {
+			wrapper = initComponent(App, {})
+			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
+			wrapper.vm.promptIndex = 1
+			expect(wrapper.vm.backButtonText).toEqual("Start Over");
+		})
+
+		it('promptIndex is 3', () => {
+			wrapper = initComponent(App, {})
+			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
+			wrapper.vm.promptIndex = 3
+			expect(wrapper.vm.backButtonText).toEqual("Back");
+		})
+	})
+
 	describe('nextButtonText - computed', () => {
 		it('promptIndex is 0', () => {
 			wrapper = initComponent(App, {})
 			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
 			wrapper.vm.promptIndex = 0
-			expect(wrapper.vm.nextButtonText).toEqual("Next");
+			expect(wrapper.vm.nextButtonText).toEqual("Start");
 		})
 
 		it('promptIndex is 1', () => {
