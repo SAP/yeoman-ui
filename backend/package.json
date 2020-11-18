@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.37",
+	"version": "1.1.38",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -203,25 +203,24 @@
 		"webpack-cli": "3.3.12",
 		"lcov-result-merger": "3.1.0",
 		"coveralls": "2.11.16",
-    		"cz-conventional-changelog": "3.3.0",
- 		"@commitlint/cli": "11.0.0",
-  		"@commitlint/config-conventional": "11.0.0",
-  		"husky": "4.3.0"
+		"cz-conventional-changelog": "3.3.0",
+		"@commitlint/cli": "11.0.0",
+		"@commitlint/config-conventional": "11.0.0",
+		"husky": "4.3.0"
 	},
 	"husky": {
-           "hooks": {
-               "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-           }
-        },
-        "config": {
-           "commitizen": {
-               "path": "cz-conventional-changelog"
-           }
-        },
-        "commitlint": {
-           "extends": [
-               "@commitlint/config-conventional"
-           ]
-        }
+		"hooks": {
+			"commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+		}
+	},
+	"config": {
+		"commitizen": {
+			"path": "cz-conventional-changelog"
+		}
+	},
+	"commitlint": {
+		"extends": [
+			"@commitlint/config-conventional"
+		]
+	}
 }
-

@@ -71,7 +71,7 @@
               v-show="promptIndex > 0"
               style="min-width: 90px"
             >
-              <v-icon left>mdi-chevron-left</v-icon>Back
+              <v-icon left>mdi-chevron-left</v-icon>{{ backButtonText }}
             </v-btn>
             <v-btn
               id="next"
@@ -193,6 +193,12 @@ export default {
     return initialState();
   },
   computed: {
+    backButtonText() {
+      if (this.promptIndex === 1) {
+        return "Start Over";
+      }
+      return "Back";
+    },
     nextButtonText() {
       if (
         (this.promptIndex > 0 &&
@@ -200,6 +206,8 @@ export default {
         this.isWriting
       ) {
         return "Finish";
+      } else if (this.promptIndex === 0) {
+        return "Start";
       }
 
       return "Next";
