@@ -128,7 +128,7 @@ describe('yeomanui unit test', () => {
 		it("flow is successfull", async () => {
 			rpcMock.expects("invoke").withArgs("showPrompt").resolves({ generator: "testGenerator" });
 			swaTrackerWrapperMock.expects("updateGeneratorStarted").withArgs("testGenerator");
-			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenerator", false);
+			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenerator:app", false);
 			youiEventsMock.expects("doGeneratorDone").withArgs(false);
 			await yeomanUi["receiveIsWebviewReady"]();
 		});

@@ -48,6 +48,14 @@
 				"title": "Yeoman UI Generators"
 			},
 			{
+				"command": "runFiori",
+				"title": "Run Fiori Elements Generator"
+			},
+			{
+				"command": "runFoodq",
+				"title": "Run Foodq Sub Generator"
+			},
+			{
 				"command": "yeomanUI.toggleOutput",
 				"title": "Show Output",
 				"icon": {

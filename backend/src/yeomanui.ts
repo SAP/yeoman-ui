@@ -169,8 +169,8 @@ export class YeomanUI {
 		}
 	}
 
-	private async runGenerator(generatorName: string) {
-		this.generatorName = generatorName;
+	private async runGenerator(generatorNamespace: string) {
+		this.generatorName = generatorNamespace;
 		// TODO: should create and set target dir only after user has selected a generator;
 		// see issue: https://github.com/yeoman/environment/issues/55
 		// process.chdir() doesn't work after environment has been created
@@ -179,18 +179,17 @@ export class YeomanUI {
 			await fsextra.mkdirs(targetFolder);
 			const dirsBefore = await this.getChildDirectories(targetFolder);
 			const env: Environment = Environment.createEnv(undefined, { sharedOptions: { forwardErrorToEnvironment: true } }, this.youiAdapter);
-			const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorName);
-			const genNamespace = this.getGenNamespace(generatorName);
-			env.register(meta.resolved, genNamespace, meta.packagePath);
+			const meta: Environment.GeneratorMeta = this.getGenMetadata(generatorNamespace);
+			env.register(meta.resolved, generatorNamespace, meta.packagePath);
 
 			const options = {
-				logger: this.logger.getChildLogger({ label: generatorName }),
+				logger: this.logger.getChildLogger({ label: generatorNamespace }),
 				vscode: this.getVscode(), // TODO: remove this temporary workaround once a better solution is found,
 				data: this.uiOptions.data,
 				swaTracker: SWA.getSWATracker(),
 				appWizard: this.youiEvents.getAppWizard()
 			};
-			const gen: any = env.create(genNamespace, { options });
+			const gen: any = env.create(generatorNamespace, { options });
 			// check if generator defined a helper function called setPromptsCallback()
 			const setPromptsCallback = _.get(gen, "setPromptsCallback");
 			if (setPromptsCallback) {
@@ -205,19 +204,19 @@ export class YeomanUI {
 			// handles generator install step if exists
 			this.onGenInstall(this.gen);
 			// handles generator errors 
-			this.handleErrors(env, this.gen, generatorName);
+			this.handleErrors(env, this.gen, generatorNamespace);
 
 			env.runGenerator(gen, error => {
 				if (!this.errorThrown && !error) {
 					// Without resolve this code worked only for absolute paths without / at the end.
 					// Generator can put a relative path, path including . and .. and / at the end.
 					this.getChildDirectories(resolve(this.getCwd(), this.gen.destinationRoot())).then(dirsAfter => {
-						this.onGeneratorSuccess(generatorName, dirsBefore, dirsAfter);
+						this.onGeneratorSuccess(generatorNamespace, dirsBefore, dirsAfter);
 					});
 				}
 			});
 		} catch (error) {
-			this.onGeneratorFailure(generatorName, error);
+			this.onGeneratorFailure(generatorNamespace, error);
 		}
 	}
 
@@ -281,11 +280,18 @@ export class YeomanUI {
 	private async receiveIsWebviewReady() {
 		try {
 			// TODO: loading generators takes a long time; consider prefetching list of generators
+			let generatorId: string = this.uiOptions.generator;
 			const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
-			const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
+			if (!generatorId){
+				const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
+				generatorId = response.generator;
+			}
 			this.replayUtils.clear();
-			SWA.updateGeneratorStarted(response.generator, this.logger);
-			await this.runGenerator(response.generator);
+			SWA.updateGeneratorStarted(generatorId, this.logger);
+			if (!_.includes(generatorId, ":")) {
+				generatorId = this.getGenNamespace(generatorId);
+			}
+			await this.runGenerator(generatorId);
 		} catch (error) {
 			this.logError(error);
 		}
@@ -530,7 +536,7 @@ export class YeomanUI {
 	}
 
 	private getGenMetadata(genName: string): Environment.GeneratorMeta {
-		const genNamespace = this.getGenNamespace(genName);
+		let genNamespace = (_.includes(genName, ":")) ? genName : this.getGenNamespace(genName);
 		const genMetadata = _.get(this, ["genMeta", genNamespace]);
 		if (_.isNil(genMetadata)) {
 			const debugMessage = `${genNamespace} generator metadata was not found.`;
