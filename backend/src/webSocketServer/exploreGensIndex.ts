@@ -52,9 +52,7 @@ class ExploreGensWebSocketServer {
           }
         },
         commands: {
-          getCommands: async () => {
-	    return [];
-	  }
+	  getCommands: async (): any[] => []
         }
       };
 	  
