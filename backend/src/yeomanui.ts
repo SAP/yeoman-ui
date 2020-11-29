@@ -56,7 +56,6 @@ export class YeomanUI {
 	private readonly customQuestionEventHandlers: Map<string, Map<string, Function>>;
 	private errorThrown = false;
 	private outputPath: string;
-	private initialDestinationRoot: string;
 
 	constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
 		this.rpc = rpc;
@@ -200,8 +199,7 @@ export class YeomanUI {
 
 			this.promptCount = 0;
 			this.gen = (gen as Generator);
-			this.initialDestinationRoot = this.gen.destinationRoot();
-			this.gen.destinationRoot(targetFolder);
+			this.gen.destinationRoot(targetFolder, true);
 			// notifies ui wether generator is in writing state
 			this.setGenInWriting(this.gen);
 			// handles generator install step if exists
@@ -220,16 +218,7 @@ export class YeomanUI {
 			});
 		} catch (error) {
 			this.onGeneratorFailure(generatorName, error);
-		} 
-	}
-
-	private setInitialDestinationRoot() {
-		const destRoonFunc = _.get(this, "gen.destinationRoot");
-		const initialDestinationRoot = _.get(this, "initialDestinationRoot");
-		if (destRoonFunc && initialDestinationRoot) {
-			destRoonFunc(initialDestinationRoot);
 		}
-		_.set(this, "initialDestinationRoot", undefined);
 	}
 
 	private setGenInWriting(gen: any) {
@@ -391,7 +380,7 @@ export class YeomanUI {
 		this.logger.debug("done running yeomanui! " + message + ` You can find it at ${generatedTemplatePath}`);
 		SWA.updateGeneratorEnded(generatorName, true, this.logger);
 		this.youiEvents.doGeneratorDone(true, message, targetFolderPath);
-		this.setInitialDestinationRoot();
+		//this.setInitialDestinationRoot();
 	}
 
 	private async onGeneratorFailure(generatorName: string, error: any) {
@@ -400,7 +389,7 @@ export class YeomanUI {
 		const errorMessage: string = await this.logError(error, messagePrefix);
 		SWA.updateGeneratorEnded(generatorName, false, this.logger, errorMessage);
 		this.youiEvents.doGeneratorDone(false, errorMessage);
-		this.setInitialDestinationRoot();
+		//this.setInitialDestinationRoot();
 	}
 
 	private onGenInstall(gen: any) {
