@@ -25,12 +25,6 @@ export async function activate(context: vscode.ExtensionContext) {
 	registerAndSubscribeCommand("loadYeomanUI", yeomanUIPanel.loadWebviewPanel.bind(yeomanUIPanel));
 	registerAndSubscribeCommand("yeomanUI.toggleOutput", yeomanUIPanel.toggleOutput.bind(yeomanUIPanel));
 	registerAndSubscribeCommand("yeomanUI._notifyGeneratorsChange", yeomanUIPanel.notifyGeneratorsChange.bind(yeomanUIPanel));
-	registerAndSubscribeCommand("runFoodq", () => {
-		vscode.commands.executeCommand("loadYeomanUI", { filter: { type: "project" }, generator: "foodq" });
-	});
-	registerAndSubscribeCommand("runFiori", () => {
-		vscode.commands.executeCommand("loadYeomanUI", { filter: { type: "project" }, generator: "@sap/fiori-elements:app" });
-	});
 	registerWebviewPanelSerializer(yeomanUIPanel);
 
 	// ExploreGensPanel
