@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.38",
+	"version": "1.1.39",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -46,14 +46,6 @@
 			{
 				"command": "loadYeomanUI",
 				"title": "Yeoman UI Generators"
-			},
-			{
-				"command": "runFiori",
-				"title": "Run Fiori Elements Generator"
-			},
-			{
-				"command": "runFoodq",
-				"title": "Run Foodq Sub Generator"
 			},
 			{
 				"command": "yeomanUI.toggleOutput",
