@@ -176,6 +176,7 @@ function initialState() {
     promptMessageClass: "",
     promptMessageIcon: null,
     messageMaxLength: 100,
+    isSingleGen: false
   };
 }
 
@@ -194,7 +195,7 @@ export default {
   },
   computed: {
     backButtonText() {
-      if (this.promptIndex === 1) {
+      if (this.promptIndex === 1 && !this.isSingleGen) {
         return "Start Over";
       }
       return "Back";
@@ -206,10 +207,9 @@ export default {
         this.isWriting
       ) {
         return "Finish";
-      } else if (this.promptIndex === 0) {
+      } else if (this.promptIndex === 0 && !this.isSingleGen) {
         return "Start";
       }
-
       return "Next";
     },
     isLoadingColor() {
@@ -542,6 +542,7 @@ export default {
     async setMessagesAndSaveState() {
       const uiOptions = await this.rpc.invoke("getState");
       this.messages = _.get(uiOptions, "messages");
+      this.isSingleGen = (_.get(uiOptions, "generator")) ? true : false;
       this.isGeneric = _.get(this.messages, "panel_title") === "Yeoman UI";
       const vscodeApi = this.getVsCodeApi();
       if (vscodeApi) {
