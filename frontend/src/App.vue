@@ -444,7 +444,7 @@ export default {
     },
     createPrompt(questions, name) {
       let promptDescription = "";
-      let promptName = name;
+      let promptName = "";
       if (name === "select_generator") {
         promptDescription = _.get(
           this.messages,
