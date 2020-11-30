@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.39",
+	"version": "1.1.40",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -155,7 +155,7 @@
 	"dependencies": {
 		"@sap-devx/webview-rpc": "0.2.3",
 		"@sap-devx/yeoman-ui-types": "1.0.2",
-		"@vscode-logging/logger": "1.2.0",
+		"@vscode-logging/logger": "1.2.1",
 		"chalk": "4.1.0",
 		"datauri": "3.0.0",
 		"fs-extra": "9.0.1",
