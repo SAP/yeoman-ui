@@ -165,7 +165,7 @@
 		"object-hash": "2.0.3",
 		"strip-ansi": "6.0.0",
 		"titleize": "2.1.0",
-		"ws": "7.3.1",
+		"ws": "7.4.0",
 		"yeoman-environment": "2.10.3",
 		"@sap/swa-for-sapbas-vsx": "1.1.2"
 	},
