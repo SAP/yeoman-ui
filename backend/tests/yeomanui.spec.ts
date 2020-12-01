@@ -703,9 +703,9 @@ describe('yeomanui unit test', () => {
 			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), "testDestinationRoot/generatedProject")).to.be.true;
 		});
 
-		it("onGeneratorFailure", async () => {
+		it("onGeneratorFailure", () => {
 			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", false, testLogger);
-			await yeomanUi["onGeneratorFailure"]("testGenName", "testError");
+			yeomanUi["onGeneratorFailure"]("testGenName", "testError");
 			expect(doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed - testError"}`)).to.be.true;
 		});
 	});

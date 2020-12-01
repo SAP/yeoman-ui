@@ -217,7 +217,7 @@ export class YeomanUI {
 				}
 			});
 		} catch (error) {
-			this.onGeneratorFailure(generatorNamespace, error);
+			this.onGeneratorFailure(generatorNamespace, this.getErrorWithAdditionalInfo(error, "runGenerator()"));
 		}
 	}
 
@@ -245,17 +245,22 @@ export class YeomanUI {
 		const errorEventName = "error";
 		env.on(errorEventName, error => {
 			env.removeAllListeners(errorEventName);
-			this.onGeneratorFailure(generatorName, error);
+			this.onGeneratorFailure(generatorName, this.getErrorWithAdditionalInfo(error, `env.on(${errorEventName})`));
 			env.emit(errorEventName, error);
 		});
 
 		gen.on(errorEventName, (error: any) => {
-			this.onGeneratorFailure(generatorName, error);
+			this.onGeneratorFailure(generatorName, this.getErrorWithAdditionalInfo(error, `gen.on(${errorEventName})`));
 		});
 
 		process.on("uncaughtException", error => {
-			this.onGeneratorFailure(generatorName, error);
+			this.onGeneratorFailure(generatorName, this.getErrorWithAdditionalInfo(error, "process.on(uncaughtException)"));
 		});
+	}
+
+	private getErrorWithAdditionalInfo(error: any, additionalInfo: string) {
+		_.set(error, "message", `${additionalInfo} ${_.get(error, "message", "")}`);
+		return error;
 	}
 
 	/**
@@ -279,7 +284,7 @@ export class YeomanUI {
 			}
 		} catch (error) {
 			const questionInfo = `Could not update method '${methodName}' in '${questionName}' question in generator '${this.gen.options.namespace}'`;
-			const errorMessage = this.logError(error, questionInfo);
+			const errorMessage = this.logError(this.getErrorWithAdditionalInfo(error, "evaluateMethod()"), questionInfo);
 			this.onGeneratorFailure(this.generatorName, errorMessage);
 		}
 	}
@@ -299,7 +304,7 @@ export class YeomanUI {
 			}
 			await this.runGenerator(generatorId);
 		} catch (error) {
-			this.logError(error);
+			this.logError(error, "receiveIsWebviewReady");
 		}
 	}
 
