@@ -111,8 +111,7 @@ export class YeomanUI {
 		this.youiEvents.showProgress(message);
 	}
 
-
-	private async logError(error: any, prefixMessage?: string) {
+	private logError(error: any, prefixMessage?: string) {
 		const errorObj: any = this.getErrorInfo(error);
 		if (prefixMessage) {
 			errorObj.message = `${prefixMessage} - ${errorObj.message}`;
@@ -218,7 +217,7 @@ export class YeomanUI {
 				}
 			});
 		} catch (error) {
-			this.onGeneratorFailure(generatorNamespace, error);
+			this.onGeneratorFailure(generatorNamespace, this.getErrorWithAdditionalInfo(error, "runGenerator()"));
 		}
 	}
 
@@ -244,19 +243,24 @@ export class YeomanUI {
 
 	private handleErrors(env: Environment, gen: any, generatorName: string) {
 		const errorEventName = "error";
-		env.on(errorEventName, (error: any) => {
+		env.on(errorEventName, error => {
 			env.removeAllListeners(errorEventName);
-			this.onGeneratorFailure(generatorName, error);
+			this.onGeneratorFailure(generatorName, this.getErrorWithAdditionalInfo(error, `env.on(${errorEventName})`));
 			env.emit(errorEventName, error);
 		});
 
 		gen.on(errorEventName, (error: any) => {
-			this.onGeneratorFailure(generatorName, error);
+			this.onGeneratorFailure(generatorName, this.getErrorWithAdditionalInfo(error, `gen.on(${errorEventName})`));
 		});
 
-		process.on("uncaughtException", (error: any) => {
-			this.onGeneratorFailure(generatorName, error);
+		process.on("uncaughtException", error => {
+			this.onGeneratorFailure(generatorName, this.getErrorWithAdditionalInfo(error, "process.on(uncaughtException)"));
 		});
+	}
+
+	private getErrorWithAdditionalInfo(error: any, additionalInfo: string) {
+		_.set(error, "message", `${additionalInfo} ${_.get(error, "message", "")}`);
+		return error;
 	}
 
 	/**
@@ -280,14 +284,13 @@ export class YeomanUI {
 			}
 		} catch (error) {
 			const questionInfo = `Could not update method '${methodName}' in '${questionName}' question in generator '${this.gen.options.namespace}'`;
-			const errorMessage = await this.logError(error, questionInfo);
+			const errorMessage = this.logError(this.getErrorWithAdditionalInfo(error, "evaluateMethod()"), questionInfo);
 			this.onGeneratorFailure(this.generatorName, errorMessage);
 		}
 	}
 
 	private async receiveIsWebviewReady() {
 		try {
-			// TODO: loading generators takes a long time; consider prefetching list of generators
 			let generatorId: string = this.uiOptions.generator;
 			const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
 			if (!generatorId){
@@ -301,7 +304,7 @@ export class YeomanUI {
 			}
 			await this.runGenerator(generatorId);
 		} catch (error) {
-			this.logError(error);
+			this.logError(error, "receiveIsWebviewReady");
 		}
 	}
 
@@ -397,10 +400,10 @@ export class YeomanUI {
 		this.setInitialProcessDir();
 	}
 
-	private async onGeneratorFailure(generatorName: string, error: any) {
+	private onGeneratorFailure(generatorName: string, error: any) {
 		this.errorThrown = true;
 		const messagePrefix = `${generatorName} generator failed`;
-		const errorMessage: string = await this.logError(error, messagePrefix);
+		const errorMessage: string = this.logError(error, messagePrefix);
 		SWA.updateGeneratorEnded(generatorName, false, this.logger, errorMessage);
 		this.youiEvents.doGeneratorDone(false, errorMessage);
 		this.setInitialProcessDir();
@@ -491,7 +494,7 @@ export class YeomanUI {
 		return questions;
 	}
 
-	private async getGeneratorChoice(genName: string, filter: GeneratorFilter): Promise<any> {
+	private async getGeneratorChoice(genName: string, filter: GeneratorFilter) {
 		let packageJson: any;
 		const genPackagePath: string = this.getGenMetaPackagePath(genName);
 
@@ -499,7 +502,7 @@ export class YeomanUI {
 			packageJson = await this.getGenPackageJson(genPackagePath);
 		} catch (error) {
 			this.logError(error);
-			return Promise.resolve(undefined);
+			return;
 		}
 
 		const genFilter: GeneratorFilter = GeneratorFilter.create(_.get(packageJson, ["generator-filter"]));
@@ -508,8 +511,6 @@ export class YeomanUI {
 		if (typesHasIntersection && categoriesHasIntersection) {
 			return this.createGeneratorChoice(genName, genPackagePath, packageJson);
 		}
-
-		return Promise.resolve(undefined);
 	}
 
 	private async createGeneratorChoice(genName: string, genPackagePath: string, packageJson: any): Promise<any> {

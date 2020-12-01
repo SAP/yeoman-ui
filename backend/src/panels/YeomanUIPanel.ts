@@ -34,12 +34,12 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 		const filter = GeneratorFilter.create(_.get(uiOptions, "filter"));
 		const generator = _.get(uiOptions, "generator");
 
-		const rpc = new RpcExtension(this.webViewPanel.webview);
+		this.rpc = new RpcExtension(this.webViewPanel.webview);
 		this.output.setChannelName(`${YeomanUIPanel.YEOMAN_UI}.${this.messages.channel_name}`);
-		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(rpc, this.webViewPanel, this.messages, this.output, this.isInBAS);
+		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.webViewPanel, this.messages, this.output, this.isInBAS);
 
 		const outputPath = this.isInBAS ? undefined: _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath"); 
-		this.yeomanui = new YeomanUI(rpc,
+		this.yeomanui = new YeomanUI(this.rpc,
 			vscodeYouiEvents,
 			this.output,
 			this.logger,
