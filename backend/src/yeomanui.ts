@@ -56,7 +56,7 @@ export class YeomanUI {
 	private readonly customQuestionEventHandlers: Map<string, Map<string, Function>>;
 	private errorThrown = false;
 	private outputPath: string;
-	private initialDestinationRoot: string;
+	private initialCwd: string;
 
 	constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
 		this.rpc = rpc;
@@ -198,8 +198,11 @@ export class YeomanUI {
 
 			this.promptCount = 0;
 			this.gen = (gen as Generator);
-			this.initialDestinationRoot = this.gen.destinationRoot();
-			this.gen.destinationRoot(targetFolder, true);
+			this.initialCwd = process.cwd();
+			// do not add second parameter with value true
+			// some generators rely on fact that this.env.cwd and 
+			// the current working directory is changed.
+			this.gen.destinationRoot(targetFolder);
 			// notifies ui wether generator is in writing state
 			this.setGenInWriting(this.gen);
 			// handles generator install step if exists
@@ -222,8 +225,8 @@ export class YeomanUI {
 	}
 
 	private setInitialProcessDir() {
-		if (this.initialDestinationRoot) {
-			process.chdir(this.initialDestinationRoot);
+		if (this.initialCwd) {
+			process.chdir(this.initialCwd);
 		}
 	}
 
