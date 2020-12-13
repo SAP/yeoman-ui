@@ -201,15 +201,13 @@ export default {
       return "Back";
     },
     nextButtonText() {
-      if (
-        (this.promptIndex > 0 &&
-          this.promptIndex === _.size(this.promptsInfoToDisplay)) ||
-        this.isWriting
-      ) {
+      if ((this.promptIndex > 0 && this.promptIndex === _.size(this.promptsInfoToDisplay)) || 
+          this.isWriting || 
+          (this.isSingleGen && this.promptIndex >= 0 && this.promptIndex === _.size(this.promptsInfoToDisplay) - 1)) {
         return "Finish";
       } else if (this.promptIndex === 0 && !this.isSingleGen) {
         return "Start";
-      }
+      } 
       return "Next";
     },
     isLoadingColor() {
@@ -360,7 +358,11 @@ export default {
       prompts = prompts || [];
       this.promptsInfoToDisplay = _.cloneDeep(prompts);
       // replace all existing prompts except 1st (generator selction) and current prompt
-      const startIndex = promptIndex + 1;
+      let startIndex = promptIndex;
+      if (!this.isSingleGen) {
+        startIndex = promptIndex + 1
+      }
+      
       const deleteCount = _.size(this.prompts) - promptIndex;
       const itemsToInsert = prompts.splice(promptIndex, _.size(prompts));
       this.prompts.splice(startIndex, deleteCount, ...itemsToInsert);
@@ -451,6 +453,13 @@ export default {
           "select_generator_description"
         );
         promptName = _.get(this.messages, "select_generator_name");
+      } else if (this.isSingleGen) {
+        const promptToDisplay = _.get(
+          this.promptsInfoToDisplay,
+          "[" + (this.promptIndex) + "]"
+        );
+        promptDescription = _.get(promptToDisplay, "description", "");
+        promptName = _.get(promptToDisplay, "name", name);
       } else {
         const promptToDisplay = _.get(
           this.promptsInfoToDisplay,

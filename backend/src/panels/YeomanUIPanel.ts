@@ -32,7 +32,9 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 
 		this.messages = _.assign({}, backendMessages, _.get(uiOptions, "messages", {}));
 		const filter = GeneratorFilter.create(_.get(uiOptions, "filter"));
-		const generator = _.get(uiOptions, "generator");
+		//const generator = _.get(uiOptions, "generator");
+		//const generator = _.get(uiOptions, "generator", "bas-up:app");
+		const generator = _.get(uiOptions, "generator", "foodq:app");
 
 		this.rpc = new RpcExtension(this.webViewPanel.webview);
 		this.output.setChannelName(`${YeomanUIPanel.YEOMAN_UI}.${this.messages.channel_name}`);
