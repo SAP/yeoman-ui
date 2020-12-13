@@ -360,7 +360,7 @@ export default {
       // replace all existing prompts except 1st (generator selction) and current prompt
       let startIndex = promptIndex;
       if (!this.isSingleGen) {
-        startIndex = promptIndex + 1
+        startIndex = promptIndex + 1;
       }
       
       const deleteCount = _.size(this.prompts) - promptIndex;
