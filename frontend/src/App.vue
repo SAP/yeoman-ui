@@ -175,8 +175,7 @@ function initialState() {
     toShowPromptMessage: false,
     promptMessageClass: "",
     promptMessageIcon: null,
-    messageMaxLength: 100,
-    isSingleGen: false
+    messageMaxLength: 100
   };
 }
 
@@ -195,19 +194,18 @@ export default {
   },
   computed: {
     backButtonText() {
-      if (this.promptIndex === 1 && !this.isSingleGen) {
+      if (this.promptIndex === 1 && this.selectGeneratorPromptExists()) {
         return "Start Over";
       }
       return "Back";
     },
     nextButtonText() {
-      if (
-        (this.promptIndex > 0 &&
-          this.promptIndex === _.size(this.promptsInfoToDisplay)) ||
+      if ((!this.selectGeneratorPromptExists() && this.promptIndex === (_.size(this.promptsInfoToDisplay) - 1)) || 
+        (this.selectGeneratorPromptExists() && this.promptIndex === _.size(this.promptsInfoToDisplay)) ||
         this.isWriting
       ) {
         return "Finish";
-      } else if (this.promptIndex === 0 && !this.isSingleGen) {
+      } else if (this.promptIndex === 0 && this.selectGeneratorPromptExists()) {
         return "Start";
       }
       return "Next";
@@ -350,6 +348,9 @@ export default {
         }
       }
     },
+    selectGeneratorPromptExists() {
+      return _.get(this.prompts, "[0].name") === "select_generator";
+    },
     setPromptList(prompts) {
       let promptIndex = this.promptIndex;
       if (this.isReplaying) {
@@ -360,9 +361,13 @@ export default {
       prompts = prompts || [];
       this.promptsInfoToDisplay = _.cloneDeep(prompts);
       // replace all existing prompts except 1st (generator selction) and current prompt
-      const startIndex = promptIndex + 1;
+      let startIndex = promptIndex;
+      if (this.selectGeneratorPromptExists()) {
+        startIndex = promptIndex + 1;
+      }
       const deleteCount = _.size(this.prompts) - promptIndex;
       const itemsToInsert = prompts.splice(promptIndex, _.size(prompts));
+      
       this.prompts.splice(startIndex, deleteCount, ...itemsToInsert);
     },
     setPrompts(prompts) {
@@ -452,10 +457,8 @@ export default {
         );
         promptName = _.get(this.messages, "select_generator_name");
       } else {
-        const promptToDisplay = _.get(
-          this.promptsInfoToDisplay,
-          "[" + (this.promptIndex - 1) + "]"
-        );
+        const promptIndex = this.selectGeneratorPromptExists() ? (this.promptIndex - 1) : this.promptIndex;
+        const promptToDisplay = _.get(this.promptsInfoToDisplay, `[${promptIndex}]`);
         promptDescription = _.get(promptToDisplay, "description", "");
         promptName = _.get(promptToDisplay, "name", name);
       }
@@ -542,7 +545,6 @@ export default {
     async setMessagesAndSaveState() {
       const uiOptions = await this.rpc.invoke("getState");
       this.messages = _.get(uiOptions, "messages");
-      this.isSingleGen = (_.get(uiOptions, "generator")) ? true : false;
       this.isGeneric = _.get(this.messages, "panel_title") === "Yeoman UI";
       const vscodeApi = this.getVsCodeApi();
       if (vscodeApi) {

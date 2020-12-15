@@ -79,6 +79,7 @@ export class YeomanUI {
 		this.rpc.registerMethod({ func: this.getState, thisArg: this });
 
 		this.uiOptions = uiOptions;
+		this.uiOptions.generator = "foodq:app";
 		this.youiAdapter = new YouiAdapter(youiEvents, output);
 		this.youiAdapter.setYeomanUI(this);
 		this.promptCount = 0;
@@ -296,10 +297,10 @@ export class YeomanUI {
 		try {
 			let generatorId: string = this.uiOptions.generator;
 			const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
-			if (!generatorId){
+			if (!generatorId) {
 				const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 				generatorId = response.generator;
-			}
+			} 
 			this.replayUtils.clear();
 			SWA.updateGeneratorStarted(generatorId, this.logger);
 			if (!_.includes(generatorId, ":")) {
