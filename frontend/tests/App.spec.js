@@ -34,14 +34,22 @@ describe('App.vue', () => {
 	describe('backButtonText - computed', () => {
 		it('promptIndex is 1', () => {
 			wrapper = initComponent(App, {})
-			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
+			wrapper.vm.prompts = [{
+				questions: [{
+					name: "generator", type: "list"
+				}]
+			}, {}, {}]
 			wrapper.vm.promptIndex = 1
 			expect(wrapper.vm.backButtonText).toEqual("Start Over");
 		})
 
 		it('promptIndex is 3', () => {
 			wrapper = initComponent(App, {})
-			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
+			wrapper.vm.prompts = [{
+				questions: [{
+					name: "generator", type: "list"
+				}]
+			}, {}, {}]
 			wrapper.vm.promptIndex = 3
 			expect(wrapper.vm.backButtonText).toEqual("Back");
 		})
@@ -50,7 +58,11 @@ describe('App.vue', () => {
 	describe('nextButtonText - computed', () => {
 		it('promptIndex is 0', () => {
 			wrapper = initComponent(App, {})
-			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
+			wrapper.vm.prompts = [{
+				questions: [{
+					name: "generator", type: "list"
+				}]
+			}, {}, {}]
 			wrapper.vm.promptIndex = 0
 			expect(wrapper.vm.nextButtonText).toEqual("Start");
 		})
@@ -62,10 +74,10 @@ describe('App.vue', () => {
 			expect(wrapper.vm.nextButtonText).toEqual("Next");
 		})
 
-		it('promptIndex is 1', () => {
+		it('promptIndex is 2', () => {
 			wrapper = initComponent(App, {})
 			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
-			wrapper.vm.promptIndex = 3
+			wrapper.vm.promptIndex = 2
 			expect(wrapper.vm.nextButtonText).toEqual("Finish");
 		})
 	})
@@ -483,7 +495,11 @@ describe('App.vue', () => {
 		it('while replaying', () => {
 			wrapper = initComponent(App);
 
-			wrapper.vm.prompts = [{}, {}];
+			wrapper.vm.prompts = [{
+				questions: [{
+					name: "generator", type: "list"
+				}]
+			}, {}]
 			wrapper.vm.promptIndex = 1;
 			wrapper.vm.isReplaying = true;
 			wrapper.vm.currentPrompt.status = 'pending';

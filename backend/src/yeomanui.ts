@@ -296,7 +296,7 @@ export class YeomanUI {
 		try {
 			let generatorId: string = this.uiOptions.generator;
 			const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
-			if (!generatorId){
+			if (!generatorId) {
 				const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 				generatorId = response.generator;
 			}

@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.42",
+	"version": "1.1.43",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -166,7 +166,7 @@
 		"object-hash": "2.0.3",
 		"strip-ansi": "6.0.0",
 		"titleize": "2.1.0",
-		"ws": "7.4.0",
+		"ws": "7.4.1",
 		"yeoman-environment": "2.10.3"
 	},
 	"devDependencies": {
