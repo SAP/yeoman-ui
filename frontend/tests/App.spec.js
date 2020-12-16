@@ -36,7 +36,7 @@ describe('App.vue', () => {
 			wrapper = initComponent(App, {})
 			wrapper.vm.prompts = [{
 				questions: [{
-					name: "generator", type: "list"
+					name: "generator", type: "list", guiType: "tiles"
 				}]
 			}, {}, {}]
 			wrapper.vm.promptIndex = 1
@@ -47,7 +47,7 @@ describe('App.vue', () => {
 			wrapper = initComponent(App, {})
 			wrapper.vm.prompts = [{
 				questions: [{
-					name: "generator", type: "list"
+					name: "generator", type: "list", guiType: "tiles"
 				}]
 			}, {}, {}]
 			wrapper.vm.promptIndex = 3
@@ -60,7 +60,9 @@ describe('App.vue', () => {
 			wrapper = initComponent(App, {})
 			wrapper.vm.prompts = [{
 				questions: [{
-					name: "generator", type: "list"
+					name: "generator-other", type: "list", guiType: "tiles"
+				}, {
+					name: "generator", type: "list", guiType: "tiles"
 				}]
 			}, {}, {}]
 			wrapper.vm.promptIndex = 0
@@ -497,7 +499,7 @@ describe('App.vue', () => {
 
 			wrapper.vm.prompts = [{
 				questions: [{
-					name: "generator", type: "list"
+					name: "generator", type: "list", guiType: "tiles"
 				}]
 			}, {}]
 			wrapper.vm.promptIndex = 1;
