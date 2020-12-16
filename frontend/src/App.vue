@@ -201,7 +201,7 @@ export default {
     },
     nextButtonText() {
       if ((!this.selectGeneratorPromptExists() && this.promptIndex === (_.size(this.promptsInfoToDisplay) - 1)) || 
-        (this.selectGeneratorPromptExists() && this.promptIndex === _.size(this.promptsInfoToDisplay)) ||
+        (this.selectGeneratorPromptExists() && this.promptIndex > 0 && this.promptIndex === _.size(this.promptsInfoToDisplay)) ||
         this.isWriting
       ) {
         return "Finish";
@@ -349,7 +349,8 @@ export default {
       }
     },
     selectGeneratorPromptExists() {
-      return _.get(this.prompts, "[0].name") === "select_generator";
+      return _.get(this.prompts, "[0].questions[0].name") === "generator" && 
+      _.get(this.prompts, "[0].questions[0].type") === "list";
     },
     setPromptList(prompts) {
       let promptIndex = this.promptIndex;
@@ -360,14 +361,25 @@ export default {
       }
       prompts = prompts || [];
       this.promptsInfoToDisplay = _.cloneDeep(prompts);
-      // replace all existing prompts except 1st (generator selction) and current prompt
-      let startIndex = promptIndex;
+
+      // replace all existing prompts except 1st (generator selection) and current prompt
+      // The index at which to start changing the array.
+      let startIndex = promptIndex; 
       if (this.selectGeneratorPromptExists()) {
         startIndex = promptIndex + 1;
       }
-      const deleteCount = _.size(this.prompts) - promptIndex;
-      const itemsToInsert = prompts.splice(promptIndex, _.size(prompts));
       
+      // The number of elements in the array to remove from startIndex
+      const deleteCount = _.size(this.prompts) - promptIndex; 
+
+      let itemsToInsert; 
+      if (this.selectGeneratorPromptExists() || promptIndex === 0) {
+        itemsToInsert = prompts.splice(promptIndex, _.size(prompts));       
+      } else {
+        startIndex = promptIndex + 1;
+        itemsToInsert = prompts.splice(startIndex, _.size(prompts));
+      }
+
       this.prompts.splice(startIndex, deleteCount, ...itemsToInsert);
     },
     setPrompts(prompts) {
