@@ -349,8 +349,12 @@ export default {
       }
     },
     selectGeneratorPromptExists() {
-      return _.get(this.prompts, "[0].questions[0].name") === "generator" && 
-      _.get(this.prompts, "[0].questions[0].type") === "list";
+      const firstPromptQuestions = _.get(this, "prompts[0].questions", []);
+      return !_.isNil(_.find(firstPromptQuestions, question => {
+        return _.get(question, "name") === "generator" && 
+              _.get(question, "type") === "list" && 
+              _.get(question, "guiType") === "tiles";
+      }));
     },
     setPromptList(prompts) {
       let promptIndex = this.promptIndex;
