@@ -708,6 +708,17 @@ describe('yeomanui unit test', () => {
 			yeomanUi["onGeneratorFailure"]("testGenName", "testError");
 			expect(doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed - testError"}`, false)).to.be.true;
 		});
+
+		it("onGeneratorSuccess - generator type is project", async () => {
+			let isTypeProjectMap = new Map();
+			isTypeProjectMap.set("foodq", true);
+			yeomanUi["isTypeProjectMap"] = isTypeProjectMap;
+			const beforeGen = { targetFolderPath: "testDestinationRoot" };
+			const afterGen = { targetFolderPath: "testDestinationRoot/generatedProject" };
+			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("foodq:app", true, testLogger);
+			yeomanUi["onGeneratorSuccess"]("foodq:app", beforeGen, afterGen);
+			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("foodq:app"), true, "testDestinationRoot/generatedProject")).to.be.true;
+		});
 	});
 
 	describe("Custom Question Event Handlers", () => {
