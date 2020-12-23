@@ -402,7 +402,7 @@ export class YeomanUI {
 		this.logger.debug("done running yeomanui! " + message + ` You can find it at ${generatedTemplatePath}`);
 		SWA.updateGeneratorEnded(generatorName, true, this.logger);
 		let mainGenerator = generatorName.substring(0, generatorName.indexOf(":"))
-		let isProject: boolean = this.isTypeProjectMap.get(mainGenerator);
+		let isProject: boolean = (mainGenerator && this.isTypeProjectMap.has(mainGenerator)) ? this.isTypeProjectMap.get(mainGenerator) : false;
 		this.youiEvents.doGeneratorDone(true, message, isProject, targetFolderPath);
 		this.setInitialProcessDir();
 	}
