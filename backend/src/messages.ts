@@ -2,11 +2,11 @@ const selectGeneratorQuestionHint = "Select the generator that best fits the typ
 const selectTargetFolderQuestionHint = "The project will contain the relevant files and configurations required to create your application";
 
 export default {
-    panel_title: "Yeoman UI",
+    panel_title: "Application Wizard",
 	generators_loading: "Loading the Yeoman generators...",
 	step_is_pending: "Loading...",
 	step_is_generating: "Generating...",
-    yeoman_ui_title: "Yeoman Generators",
+    yeoman_ui_title: "Application Wizard",
     select_generator_name: "Select Generator",
     select_generator_question_message: "Generators",
     select_generator_question_hint: selectGeneratorQuestionHint,

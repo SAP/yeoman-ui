@@ -45,7 +45,7 @@
 			},
 			{
 				"command": "loadYeomanUI",
-				"title": "Yeoman UI Generators"
+				"title": "Open Application Wizard"
 			},
 			{
 				"command": "yeomanUI.toggleOutput",

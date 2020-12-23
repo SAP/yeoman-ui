@@ -9,7 +9,6 @@ import { getClassLogger } from './logger/logger-wrapper';
 import { getImage } from "./images/messageImages"
 import { AppWizard, MessageType, Severity } from '@sap-devx/yeoman-ui-types';
 
-
 class YoUiAppWizard extends AppWizard {
 	constructor(private events: VSCodeYouiEvents) {
 		super();
@@ -57,9 +56,9 @@ export class VSCodeYouiEvents implements YouiEvents {
 		this.appWizard = new YoUiAppWizard(this);
 	}
 
-	public doGeneratorDone(success: boolean, message: string, targetFolderPath?: string): void {
+	public doGeneratorDone(success: boolean, message: string, isTypeProject: boolean, targetFolderPath?: string): void {
 		this.doClose();
-		this.showDoneMessage(success, message, targetFolderPath);
+		this.showDoneMessage(success, message, isTypeProject, targetFolderPath);
 	}
 
 	public doGeneratorInstall(): void {
@@ -167,7 +166,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 		return !_.isEmpty(relativePath) && !_.startsWith(relativePath, '..') && !isAbsolute(relativePath);
 	}
 
-	private showDoneMessage(success: boolean, errorMmessage: string, targetFolderPath?: string): Thenable<any> {
+	private showDoneMessage(success: boolean, errorMmessage: string, isTypeProject: boolean, targetFolderPath?: string): Thenable<any> {
 		this.resolveInstallingProgress();
 
 		if (success) {
@@ -194,7 +193,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 				}
 
 				// target workspace path should not be equal to target generator folder path
-				if (workspacePath !== targetFolderUri.fsPath) {
+				if (workspacePath !== targetFolderUri.fsPath && isTypeProject) {
 					items.push(openInNewWorkspace);
 				}
 			}

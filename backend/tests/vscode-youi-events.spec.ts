@@ -10,7 +10,6 @@ import { GeneratorOutput } from '../src/vscode-output';
 import { VSCodeYouiEvents } from "../src/vscode-youi-events";
 import { MessageType, Severity } from "@sap-devx/yeoman-ui-types";
 
-
 describe('vscode-youi-events unit test', () => {
 	let events: VSCodeYouiEvents;
 	let sandbox: any;
@@ -264,80 +263,88 @@ describe('vscode-youi-events unit test', () => {
 			eventsMock.expects("doClose");
 			const actionName1 = 'Add to Workspace';
 			const actionName2 = 'Open in New Workspace';
+			const isTypeProject = true;
 			_.set(vscode, "workspace.workspaceFolders", [{ uri: { fsPath: "rootFolderPath" } }]);
 			windowMock.expects("showInformationMessage").
 				withExactArgs(`${messages.default.artifact_generated}\nWhat would you like to do with it?`, actionName1, actionName2).resolves();
-			return events.doGeneratorDone(true, "success message", "testDestinationRoot");
+			return events.doGeneratorDone(true, "success message", isTypeProject, "testDestinationRoot");
 		});
 
 		it("on success, project path and workspace folder are Windows style ---> add to workspace button and open in new workspace button are visible", () => {
 			eventsMock.expects("doClose");
 			const actionName1 = 'Add to Workspace';
 			const actionName2 = 'Open in New Workspace';
+			const isTypeProject = true;
 			_.set(vscode, "workspace.workspaceFolders", [{ uri: { fsPath: "C:\\Windows" } }]);
 			windowMock.expects("showInformationMessage").
 				withExactArgs(`${messages.default.artifact_generated}\nWhat would you like to do with it?`, actionName1, actionName2).resolves();
-			return events.doGeneratorDone(true, "success message", "D:\\Program Files");
+			return events.doGeneratorDone(true, "success message", isTypeProject, "D:\\Program Files");
 		});
 
 		it("on success, project path is already openned in workspace ---> only open in new workspace button is visible", () => {
 			eventsMock.expects("doClose");
 			_.set(vscode, "workspace.workspaceFolders", [{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
 			const actionName = 'Open in New Workspace';
+			const isTypeProject = true;
 			windowMock.expects("showInformationMessage").
 				withExactArgs(`${messages.default.artifact_generated}\nWhat would you like to do with it?`, actionName).resolves(actionName);
 			commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
-			return events.doGeneratorDone(true, "success message", "testDestinationRoot");
+			return events.doGeneratorDone(true, "success message", isTypeProject, "testDestinationRoot");
 		});
 
 		it("on success, project path parent folder is already openned in workspace ---> only open in new workspace button is visible", () => {
 			eventsMock.expects("doClose");
 			_.set(vscode, "workspace.workspaceFolders", [{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
 			const actionName = 'Open in New Workspace';
+			const isTypeProject = true;
 			windowMock.expects("showInformationMessage").
 				withExactArgs(`${messages.default.artifact_generated}\nWhat would you like to do with it?`, actionName).resolves(actionName);
 			commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
-			return events.doGeneratorDone(true, "success message", "testDestinationRoot/projectName");
+			return events.doGeneratorDone(true, "success message", isTypeProject, "testDestinationRoot/projectName");
 		});
 
 		it("on success, project path parent folder is already openned in workspace, path with '.' ---> only open in new workspace button is visible", () => {
 			eventsMock.expects("doClose");
 			_.set(vscode, "workspace.workspaceFolders", [{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
 			const actionName = 'Open in New Workspace';
+			const isTypeProject = true;
 			windowMock.expects("showInformationMessage").
 				withExactArgs(`${messages.default.artifact_generated}\nWhat would you like to do with it?`, actionName).resolves(actionName);
 			commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
-			return events.doGeneratorDone(true, "success message", "testDestinationRoot/./projectName");
+			return events.doGeneratorDone(true, "success message", isTypeProject, "testDestinationRoot/./projectName");
 		});
 
 		it("on success, project path parent folder is already openned in workspace, path with '..' ---> only open in new workspace button is visible", () => {
 			eventsMock.expects("doClose");
 			_.set(vscode, "workspace.workspaceFolders", [{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
 			const actionName = 'Open in New Workspace';
+			const isTypeProject = true;
 			windowMock.expects("showInformationMessage").
 				withExactArgs(`${messages.default.artifact_generated}\nWhat would you like to do with it?`, actionName).resolves(actionName);
 			commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
-			return events.doGeneratorDone(true, "success message", "testDestinationRoot/projectName/../projectName");
+			return events.doGeneratorDone(true, "success message", isTypeProject, "testDestinationRoot/projectName/../projectName");
 		});
 
 		it("on success, project path parent folder is already openned in workspace, workspaceFolders with '..' ---> only open in new workspace button is visible", () => {
 			eventsMock.expects("doClose");
 			_.set(vscode, "workspace.workspaceFolders", [{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot/../testDestinationRoot" } }]);
 			const actionName = 'Open in New Workspace';
+			const isTypeProject = true;
 			windowMock.expects("showInformationMessage").
 				withExactArgs(`${messages.default.artifact_generated}\nWhat would you like to do with it?`, actionName).resolves(actionName);
 			commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
-			return events.doGeneratorDone(true, "success message", "testDestinationRoot/projectName/../projectName");
+			return events.doGeneratorDone(true, "success message", isTypeProject, "testDestinationRoot/projectName/../projectName");
 		});
 
 		it("on success, project path grand parent folder is already openned in workspace ---> only open in new workspace button is visible", () => {
 			eventsMock.expects("doClose");
 			_.set(vscode, "workspace.workspaceFolders", [{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
 			const actionName = 'Open in New Workspace';
+			const isTypeProject = true;
 			windowMock.expects("showInformationMessage").
 				withExactArgs(`${messages.default.artifact_generated}\nWhat would you like to do with it?`, actionName).resolves(actionName);
 			commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
-			return events.doGeneratorDone(true, "success message", "testDestinationRoot/projectName/moduleName");
+			return events.doGeneratorDone(true, "success message", isTypeProject, "testDestinationRoot/projectName/moduleName");
 		});
 
 		it("on success, add to workspace button is pressed", () => {
@@ -345,32 +352,36 @@ describe('vscode-youi-events unit test', () => {
 			_.set(vscode, "workspace.workspaceFolders", [{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testRoot" } }]);
 			const actionName1 = 'Add to Workspace';
 			const actionName2 = 'Open in New Workspace';
+			const isTypeProject = true;
 			windowMock.expects("showInformationMessage").
 				withExactArgs(`${messages.default.artifact_generated}\nWhat would you like to do with it?`, actionName1, actionName2).resolves(actionName1);
 			workspaceMock.expects("updateWorkspaceFolders").withArgs(2, null).resolves();
-			return events.doGeneratorDone(true, "success message", "testDestinationRoot");
+			return events.doGeneratorDone(true, "success message", isTypeProject, "testDestinationRoot");
 		});
 
 		it("on success with the project already opened in the workspace, no buttons are displayed", () => {
 			eventsMock.expects("doClose");
+			const isTypeProject = false;
 			_.set(vscode, "workspace.workspaceFolders", [{ uri: { fsPath: "testDestinationRoot" } }]);
 			windowMock.expects("showInformationMessage").
 				withExactArgs(messages.default.artifact_generated).resolves();
-			return events.doGeneratorDone(true, "success message", "testDestinationRoot");
+			return events.doGeneratorDone(true, "success message", isTypeProject, "testDestinationRoot");
 		});
 
 		it("on success with null targetFolderPath, no buttons are displayed", () => {
 			eventsMock.expects("doClose");
+			const isTypeProject = false;
 			_.set(vscode, "workspace.workspaceFolders", [{ uri: { fsPath: "rootFolderPath" } }]);
 			windowMock.expects("showInformationMessage").
 				withExactArgs(messages.default.artifact_generated).resolves();
-			return events.doGeneratorDone(true, "success message", null);
+			return events.doGeneratorDone(true, "success message", isTypeProject, null);
 		});
 
 		it("on failure", () => {
 			eventsMock.expects("doClose");
+			const isTypeProject = false;
 			windowMock.expects("showErrorMessage").withExactArgs("error message");
-			return events.doGeneratorDone(false, "error message");
+			return events.doGeneratorDone(false, "error message", isTypeProject);
 		});
 	});
 });
