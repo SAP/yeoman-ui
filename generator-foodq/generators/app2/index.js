@@ -10,7 +10,7 @@ module.exports = class extends Generator {
 		super(args, opts);
 		this.prompts = opts.prompts;
 		this.appWizard = opts.appWizard;
-		this.parentPromptsQuantity = this.prompts.size();
+		this.parentPromptsQuantity = _.size(this.prompts);
 
 		this.dynamicAddressPrompt = { name: "Address", description: "Provide the address for delivery." };
 
@@ -19,7 +19,9 @@ module.exports = class extends Generator {
 			this.dynamicAddressPrompt,
 			{ name: "Tip", description: "You can include a tip for the delivery person." }];
 
-		this.prompts.splice(this.parentPromptsQuantity, 0, prompts);
+		if (this.prompts){
+			this.prompts.splice(this.parentPromptsQuantity, 0, prompts);
+		}
 	}
 
 	async prompting() {
@@ -52,20 +54,20 @@ module.exports = class extends Generator {
 					return true;
 				},
 				when: answers => {
-					const indexOfAddress = _.findIndex(this.prompts.items, prompt => {
+					const indexOfAddress = _.findIndex(_.get(this.prompts, "items"), prompt => {
 						return prompt.name === this.dynamicAddressPrompt.name;
 					});
 
 					let bWhen = false;
 					if (answers.isDelivery) {
 						// add address prompt if doesn't exist
-						if (indexOfAddress === -1) {
+						if (indexOfAddress === -1 && this.prompts) {
 							this.prompts.splice(this.parentPromptsQuantity + 1, 0, this.dynamicAddressPrompt);
 						}
 						bWhen = true;
 					} else {
 						// remove address prompt if exists
-						if (indexOfAddress > -1) {
+						if (indexOfAddress > -1 && this.prompts) {
 							this.prompts.splice(indexOfAddress, 1);
 						}
 					}

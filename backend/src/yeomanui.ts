@@ -401,8 +401,7 @@ export class YeomanUI {
 		const generatedTemplatePath = targetFolderPath ? targetFolderPath : targetFolderPathBeforeGen;
 		this.logger.debug("done running yeomanui! " + message + ` You can find it at ${generatedTemplatePath}`);
 		SWA.updateGeneratorEnded(generatorName, true, this.logger);
-		let mainGenerator = generatorName.substring(0, generatorName.indexOf(":"))
-		let isProject: boolean = (mainGenerator && this.isTypeProjectMap.has(mainGenerator)) ? this.isTypeProjectMap.get(mainGenerator) : false;
+		let isProject: boolean = (this.isTypeProjectMap.has(generatorName)) ? this.isTypeProjectMap.get(generatorName) : false;
 		this.youiEvents.doGeneratorDone(true, message, isProject, targetFolderPath);
 		this.setInitialProcessDir();
 	}
@@ -437,9 +436,12 @@ export class YeomanUI {
 
 	private async onEnvLookup(env: Environment.Options, resolve: any, filter: GeneratorFilter) {
 		this.genMeta = env.getGeneratorsMeta();
-		const generatorNames: string[] = env.getGeneratorNames();
+		let generatorNameSpaces: string[] = _.keys(this.genMeta);
+		generatorNameSpaces = _.filter(generatorNameSpaces, genNamespace => {
+			return genNamespace.endsWith(":app");
+		});
 
-		const questions: any[] = await this.createGeneratorPromptQuestions(generatorNames, filter);
+		const questions: any[] = await this.createGeneratorPromptQuestions(generatorNameSpaces, filter);
 
 		this.currentQuestions = questions;
 		const normalizedQuestions = this.normalizeFunctions(questions);
@@ -447,8 +449,8 @@ export class YeomanUI {
 		resolve({ name: "Select Generator", questions: normalizedQuestions });
 	}
 
-	private async createGeneratorPromptQuestions(generatorNames: string[], genFilter: GeneratorFilter): Promise<any[]> {
-		const generatorChoicePromises = _.map(generatorNames, genName => {
+	private async createGeneratorPromptQuestions(generatorNameSpace: string[], genFilter: GeneratorFilter): Promise<any[]> {
+		const generatorChoicePromises = _.map(generatorNameSpace, genName => {
 			return this.getGeneratorChoice(genName, genFilter);
 		});
 
@@ -503,7 +505,8 @@ export class YeomanUI {
 
 	private async getGeneratorChoice(genName: string, filter: GeneratorFilter) {
 		let packageJson: any;
-		const genPackagePath: string = this.getGenMetaPackagePath(genName);
+		let mainGeneratorName = genName.substring(0, genName.indexOf(":"))
+		const genPackagePath: string = this.getGenMetaPackagePath(mainGeneratorName);
 
 		try {
 			packageJson = await this.getGenPackageJson(genPackagePath);
@@ -518,7 +521,7 @@ export class YeomanUI {
 		this.isTypeProjectMap.set(genName, (_.includes(genFilter.types, GeneratorType.project)));	
 		
 		if (typesHasIntersection && categoriesHasIntersection) {
-			return this.createGeneratorChoice(genName, genPackagePath, packageJson);
+			return this.createGeneratorChoice(mainGeneratorName, genPackagePath, packageJson);
 		}
 	}
 	private async createGeneratorChoice(genName: string, genPackagePath: string, packageJson: any): Promise<any> {
