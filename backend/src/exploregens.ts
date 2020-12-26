@@ -59,7 +59,15 @@ export class ExploreGens {
     public init(rpc: IRpc) {
         this.initRpc(rpc);
         this.setInstalledGens();
-	}
+    }
+
+    public async getAllInstalledGenerators(withNamespace = false): Promise<string[]> {
+        const npmPaths = await this.getNpmPaths();
+        return new Promise(resolve => {
+            const yoEnv: Environment.Options = Environment.createEnv();
+            yoEnv.lookup({ npmPaths }, async () => this.onEnvLookup(yoEnv, resolve, withNamespace));
+        });
+    }
 	
 	private async getNpmGlobalPath(): Promise<string> {
         const res = await this.npmGlobalPathsPromise;
@@ -297,14 +305,6 @@ export class ExploreGens {
         return `${this.NPM} uninstall ${locationParams} ${genName}`;
     }
 
-    private async getAllInstalledGenerators(): Promise<string[]> {
-        const npmPaths = await this.getNpmPaths();
-        return new Promise(resolve => {
-            const yoEnv: Environment.Options = Environment.createEnv();
-            yoEnv.lookup({ npmPaths }, async () => this.onEnvLookup(yoEnv, resolve));
-        });
-    }
-
     private async getNpmPaths() {
         const customLocation = ExploreGens.getInstallationLocation(this.getWsConfig());
         if (_.isEmpty(customLocation)) {
@@ -314,13 +314,17 @@ export class ExploreGens {
         return [path.join(customLocation, this.NODE_MODULES)];
     }
 
-    private onEnvLookup(env: Environment.Options, resolve: any) {
-        const genNames = env.getGeneratorNames();
-        const gensFullNames = _.map(genNames, genName => {
-            const parts = _.split(genName, this.SLASH);
-            return _.size(parts) === 1 ? `${this.GENERATOR}${genName}` : `${parts[0]}${this.SLASH}${this.GENERATOR}${parts[1]}`;
-        });
+    private onEnvLookup(env: Environment.Options, resolve: any, withNamespace = false) {
+        let genFullNames;
+        if (withNamespace) {
+            genFullNames = _.keys(env.getGeneratorsMeta());
+        } else {
+            genFullNames = _.map(env.getGeneratorNames(), genName => {
+                const parts = _.split(genName, this.SLASH);
+                return _.size(parts) === 1 ? `${this.GENERATOR}${genName}` : `${parts[0]}${this.SLASH}${this.GENERATOR}${parts[1]}`;
+            });
+        }
 
-        resolve(gensFullNames);
+        resolve(genFullNames);
     }
 }

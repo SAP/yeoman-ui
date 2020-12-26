@@ -4,6 +4,7 @@ import { AbstractWebviewPanel } from "./panels/AbstractWebviewPanel";
 import { YeomanUIPanel } from "./panels/YeomanUIPanel";
 import { ExploreGensPanel } from "./panels/ExploreGensPanel";
 import { SWA } from './swa-tracker/swa-tracker-wrapper';
+import Environment = require('yeoman-environment');
 
 let extContext: vscode.ExtensionContext;
 let yeomanUIPanel: YeomanUIPanel;
@@ -30,6 +31,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	// ExploreGensPanel
 	exploreGensPanel = new ExploreGensPanel(extContext);
 	registerAndSubscribeCommand("exploreGenerators", exploreGensPanel.loadWebviewPanel.bind(exploreGensPanel));
+	registerAndSubscribeCommand("runAnyGenerator", exploreGensPanel.runAnyGenerator.bind(exploreGensPanel));
 	registerWebviewPanelSerializer(exploreGensPanel);
 }
 

@@ -58,6 +58,10 @@
 			{
 				"command": "exploreGenerators",
 				"title": "Explore and Install Generators"
+			},
+			{
+				"command": "runAnyGenerator",
+				"title": "Run Generator"
 			}
 		],
 		"menus": {
