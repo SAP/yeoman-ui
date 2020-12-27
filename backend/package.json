@@ -34,7 +34,8 @@
 		"onCommand:loadYeomanUI",
 		"onWebviewPanel:yeomanui",
 		"onCommand:exploreGenerators",
-		"onWebviewPanel:exploreGens"
+		"onWebviewPanel:exploreGens",
+		"onWebviewPanel:runGenerator"
 	],
 	"main": "./dist/extension",
 	"contributes": {
@@ -60,7 +61,7 @@
 				"title": "Explore and Install Generators"
 			},
 			{
-				"command": "runAnyGenerator",
+				"command": "runGenerator",
 				"title": "Run Generator"
 			}
 		],
