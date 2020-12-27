@@ -30,7 +30,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	// ExploreGensPanel
 	exploreGensPanel = new ExploreGensPanel(extContext);
 	registerAndSubscribeCommand("exploreGenerators", exploreGensPanel.loadWebviewPanel.bind(exploreGensPanel));
-	registerAndSubscribeCommand("runAnyGenerator", exploreGensPanel.runAnyGenerator.bind(exploreGensPanel));
+	registerAndSubscribeCommand("runGenerator", exploreGensPanel.runGenerator.bind(exploreGensPanel));
 	registerWebviewPanelSerializer(exploreGensPanel);
 }
 
