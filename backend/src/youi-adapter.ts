@@ -49,7 +49,7 @@ export class YouiAdapter extends TerminalAdapter {
         try {
           return await cb(result); // eslint-disable-line @typescript-eslint/await-thenable
         } catch (err) {
-          this.youiEvents.doGeneratorDone(false, (_.get(err, "message", 'Yeoman UI detected an error')));
+          this.youiEvents.doGeneratorDone(false, (_.get(err, "message", 'Application Wizard detected an error')), false);
           return;
         }
       }

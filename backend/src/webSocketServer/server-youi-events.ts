@@ -17,8 +17,8 @@ export class ServerYouiEvents implements YouiEvents {
         this.rpc.invoke("selectOutputFolder");
     }
 
-    doGeneratorDone(suceeded: boolean, message: string, targetPath = ""): void {
-        this.rpc.invoke("generatorDone", [suceeded, message, targetPath]);
+    doGeneratorDone(suceeded: boolean, message: string, isTypeProject: boolean, targetPath = ""): void {
+        this.rpc.invoke("generatorDone", [suceeded, message, isTypeProject, targetPath]);
     }
 
     public doGeneratorInstall(): void {

@@ -57,6 +57,7 @@ export class YeomanUI {
 	private errorThrown = false;
 	private outputPath: string;
 	private initialCwd: string;
+	private isTypeProjectMap: Map<string, boolean>;
 
 	constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
 		this.rpc = rpc;
@@ -87,6 +88,7 @@ export class YeomanUI {
 		this.customQuestionEventHandlers = new Map();
 		this.setCwd(outputPath);
 		this.npmGlobalPaths = _.get(uiOptions, "npmGlobalPaths", []);
+		this.isTypeProjectMap = new Map();
 	}
 
 	private async getState() {
@@ -399,7 +401,8 @@ export class YeomanUI {
 		const generatedTemplatePath = targetFolderPath ? targetFolderPath : targetFolderPathBeforeGen;
 		this.logger.debug("done running yeomanui! " + message + ` You can find it at ${generatedTemplatePath}`);
 		SWA.updateGeneratorEnded(generatorName, true, this.logger);
-		this.youiEvents.doGeneratorDone(true, message, targetFolderPath);
+		let isProject: boolean = (this.isTypeProjectMap.has(generatorName)) ? this.isTypeProjectMap.get(generatorName) : false;
+		this.youiEvents.doGeneratorDone(true, message, isProject, targetFolderPath);
 		this.setInitialProcessDir();
 	}
 
@@ -408,7 +411,7 @@ export class YeomanUI {
 		const messagePrefix = `${generatorName} generator failed`;
 		const errorMessage: string = this.logError(error, messagePrefix);
 		SWA.updateGeneratorEnded(generatorName, false, this.logger, errorMessage);
-		this.youiEvents.doGeneratorDone(false, errorMessage);
+		this.youiEvents.doGeneratorDone(false, errorMessage, false);
 		this.setInitialProcessDir();
 	}
 
@@ -433,9 +436,12 @@ export class YeomanUI {
 
 	private async onEnvLookup(env: Environment.Options, resolve: any, filter: GeneratorFilter) {
 		this.genMeta = env.getGeneratorsMeta();
-		const generatorNames: string[] = env.getGeneratorNames();
+		let generatorNameSpaces: string[] = _.keys(this.genMeta);
+		generatorNameSpaces = _.filter(generatorNameSpaces, genNamespace => {
+			return genNamespace.endsWith(":app");
+		});
 
-		const questions: any[] = await this.createGeneratorPromptQuestions(generatorNames, filter);
+		const questions: any[] = await this.createGeneratorPromptQuestions(generatorNameSpaces, filter);
 
 		this.currentQuestions = questions;
 		const normalizedQuestions = this.normalizeFunctions(questions);
@@ -443,8 +449,8 @@ export class YeomanUI {
 		resolve({ name: "Select Generator", questions: normalizedQuestions });
 	}
 
-	private async createGeneratorPromptQuestions(generatorNames: string[], genFilter: GeneratorFilter): Promise<any[]> {
-		const generatorChoicePromises = _.map(generatorNames, genName => {
+	private async createGeneratorPromptQuestions(generatorNameSpace: string[], genFilter: GeneratorFilter): Promise<any[]> {
+		const generatorChoicePromises = _.map(generatorNameSpace, genName => {
 			return this.getGeneratorChoice(genName, genFilter);
 		});
 
@@ -499,7 +505,8 @@ export class YeomanUI {
 
 	private async getGeneratorChoice(genName: string, filter: GeneratorFilter) {
 		let packageJson: any;
-		const genPackagePath: string = this.getGenMetaPackagePath(genName);
+		let mainGeneratorName = genName.substring(0, genName.indexOf(":"))
+		const genPackagePath: string = this.getGenMetaPackagePath(mainGeneratorName);
 
 		try {
 			packageJson = await this.getGenPackageJson(genPackagePath);
@@ -511,11 +518,12 @@ export class YeomanUI {
 		const genFilter: GeneratorFilter = GeneratorFilter.create(_.get(packageJson, ["generator-filter"]));
 		const typesHasIntersection: boolean = GeneratorFilter.hasIntersection(filter.types, genFilter.types);
 		const categoriesHasIntersection: boolean = GeneratorFilter.hasIntersection(filter.categories, genFilter.categories);
+		this.isTypeProjectMap.set(genName, (_.includes(genFilter.types, GeneratorType.project)));	
+		
 		if (typesHasIntersection && categoriesHasIntersection) {
-			return this.createGeneratorChoice(genName, genPackagePath, packageJson);
+			return this.createGeneratorChoice(mainGeneratorName, genPackagePath, packageJson);
 		}
 	}
-
 	private async createGeneratorChoice(genName: string, genPackagePath: string, packageJson: any): Promise<any> {
 		let genImageUrl;
 

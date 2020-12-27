@@ -33,7 +33,7 @@ describe('yeomanui unit test', () => {
 	const choiceMessage =
 		"Some quick example text of the generator description. This is a long text so that the example will look good.";
 	class TestEvents implements YouiEvents {
-		public doGeneratorDone(success: boolean, message: string, targetPath?: string): void {
+		public doGeneratorDone(success: boolean, message: string, isTypeProject: boolean, targetPath?: string): void {
 			return;
 		}
 		public doGeneratorInstall(): void {
@@ -170,9 +170,6 @@ describe('yeomanui unit test', () => {
 			getGeneratorsMeta: (): any => {
 				return {};
 			},
-			getGeneratorNames: (): string[] => {
-				return [];
-			},
 			getNpmPaths: (): string[] => {
 				return [];
 			}
@@ -220,7 +217,6 @@ describe('yeomanui unit test', () => {
 					packagePath: "test5Path"
 				}
 			});
-			envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5"]);
 
 			fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
 			fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project_test"}}`);
@@ -260,7 +256,6 @@ describe('yeomanui unit test', () => {
 					packagePath: "test5Path"
 				}
 			});
-			envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5"]);
 
 			fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
 			fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project_test"}}`);
@@ -299,7 +294,6 @@ describe('yeomanui unit test', () => {
 					packagePath: "test6Path"
 				}
 			});
-			envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5", "test6"]);
 
 			fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
 			fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project_test"}}`);
@@ -332,7 +326,6 @@ describe('yeomanui unit test', () => {
 					packagePath: "test5Path"
 				}
 			});
-			envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5"]);
 
 			fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).throws(new Error("test1Error"));
 			fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).throws(new Error("test2Error"));
@@ -352,7 +345,6 @@ describe('yeomanui unit test', () => {
 					packagePath: "test1Path"
 				}
 			});
-			envMock.expects("getGeneratorNames").returns(["test1"]);
 
 			fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project123"}, "description": "test4Description"}`);
 
@@ -380,7 +372,6 @@ describe('yeomanui unit test', () => {
 					packagePath: "test5Path"
 				}
 			});
-			envMock.expects("getGeneratorNames").returns(["test1", "test2", "test3", "test4", "test5"]);
 
 			fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": ["project"], "categories": ["cat2"]}, "description": "test1Description"}`);
 			fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project", "categories": ["cat2", "cat1"]}}`);
@@ -414,7 +405,6 @@ describe('yeomanui unit test', () => {
 					packagePath: "test3Path"
 				}
 			});
-			envMock.expects("getGeneratorNames").returns(["test1-project", "test2-module", "test3"]);
 
 			fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description"}`);
 			fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}}`);
@@ -445,7 +435,6 @@ describe('yeomanui unit test', () => {
 					packagePath: "test3Path"
 				}
 			});
-			envMock.expects("getGeneratorNames").returns(["test1-project", "test2-module", "test3"]);
 
 			fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description", "homepage": "https://myhomepage.com/ANY/generator-test1-project#readme"}`);
 			fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}, "homepage": "https://myhomepage.com/ANY/generator-test2-module#readme"}`);
@@ -676,7 +665,7 @@ describe('yeomanui unit test', () => {
 			const afterGen = { targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1", "dirpath2"] };
 			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
 			yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
-			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), "dirpath2")).to.be.true;
+			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), false, "dirpath2")).to.be.true;
 		});
 
 		it("onGeneratorSuccess - two dirs were created", () => {
@@ -684,7 +673,7 @@ describe('yeomanui unit test', () => {
 			const afterGen = { targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1", "dirpath2", "dirpath3"] };
 			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
 			yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
-			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), null)).to.be.true;
+			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), false, null)).to.be.true;
 		});
 
 		it("onGeneratorSuccess - zero dirs were created", () => {
@@ -692,7 +681,7 @@ describe('yeomanui unit test', () => {
 			const afterGen = { targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1"] };
 			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
 			yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
-			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), null)).to.be.true;
+			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), false, null)).to.be.true;
 		});
 
 		it("onGeneratorSuccess - targetFolderPath was changed by generator", () => {
@@ -700,13 +689,24 @@ describe('yeomanui unit test', () => {
 			const afterGen = { targetFolderPath: "testDestinationRoot/generatedProject" };
 			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
 			yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
-			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), "testDestinationRoot/generatedProject")).to.be.true;
+			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), false, "testDestinationRoot/generatedProject")).to.be.true;
 		});
 
 		it("onGeneratorFailure", () => {
 			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", false, testLogger);
 			yeomanUi["onGeneratorFailure"]("testGenName", "testError");
-			expect(doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed - testError"}`)).to.be.true;
+			expect(doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed - testError"}`, false)).to.be.true;
+		});
+
+		it("onGeneratorSuccess - generator type is project", async () => {
+			let isTypeProjectMap = new Map();
+			isTypeProjectMap.set("foodq:app", true);
+			yeomanUi["isTypeProjectMap"] = isTypeProjectMap;
+			const beforeGen = { targetFolderPath: "testDestinationRoot" };
+			const afterGen = { targetFolderPath: "testDestinationRoot/generatedProject" };
+			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("foodq:app", true, testLogger);
+			yeomanUi["onGeneratorSuccess"]("foodq:app", beforeGen, afterGen);
+			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("foodq:app"), true, "testDestinationRoot/generatedProject")).to.be.true;
 		});
 	});
 
