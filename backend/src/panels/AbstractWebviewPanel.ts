@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as os from "os";
 import * as _ from 'lodash';
 import * as fsextra from 'fs-extra';
 import { IChildLogger } from '@vscode-logging/logger';
@@ -24,7 +25,8 @@ export abstract class AbstractWebviewPanel {
 	protected isInBAS: boolean;
 	protected rpc: RpcExtension;
 
-	// improves first time performance 
+	protected static readonly isWin32 = (process.platform === 'win32');
+	protected static readonly HOME_DIR = os.homedir(); 
 	protected static readonly npmGlobalPaths: string[] = Environment.createEnv().getNpmPaths();
 
 	public loadWebviewPanel(uiOptions?: any) {

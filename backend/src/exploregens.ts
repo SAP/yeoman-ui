@@ -61,7 +61,7 @@ export class ExploreGens {
         this.setInstalledGens();
     }
 
-    public async getAllInstalledGenerators(withNamespace = false): Promise<string[]> {
+    private async getAllInstalledGenerators(withNamespace = false): Promise<string[]> {
         const npmPaths = await this.getNpmPaths();
         return new Promise(resolve => {
             const yoEnv: Environment.Options = Environment.createEnv();

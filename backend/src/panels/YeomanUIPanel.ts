@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
 import * as path from 'path';
-import * as os from "os";
 import * as vscode from 'vscode';
 import { YeomanUI } from "../yeomanui";
 import { RpcExtension } from '@sap-devx/webview-rpc/out.ext/rpc-extension';
@@ -11,11 +10,33 @@ import { VSCodeYouiEvents } from '../vscode-youi-events';
 import { AbstractWebviewPanel } from './AbstractWebviewPanel';
 import { ExploreGens } from '../exploregens';
 import { GeneratorOutput } from '../vscode-output';
+import Environment = require('yeoman-environment');
 
 
 export class YeomanUIPanel extends AbstractWebviewPanel {
 	public static YEOMAN_UI = "Application Wizard";
+	private static readonly NODE_MODULES = 'node_modules';
 
+	private static getGensMeta(): Promise<any> {
+		return new Promise(resolve => {
+			const env: Environment.Options = Environment.createEnv();
+			const npmPaths = YeomanUIPanel.getNpmPaths();
+			env.lookup({ npmPaths }, () => {
+				resolve(env.getGeneratorsMeta());
+			});
+		});
+	}
+
+	private static getNpmPaths() {
+		const parts: string[] = YeomanUIPanel.HOME_DIR.split(path.sep);
+		const userPaths = _.map(parts, (part, index) => {
+			const resPath = path.join(...parts.slice(0, index + 1), YeomanUIPanel.NODE_MODULES);
+			return YeomanUIPanel.isWin32 ? resPath : path.join(path.sep, resPath);
+		});
+
+		return YeomanUIPanel.getDefaultPaths().concat(userPaths);
+	}
+	
 	public toggleOutput() {
 		this.output.show();
 	}
@@ -23,7 +44,16 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 	public notifyGeneratorsChange() {
 		const yeomanUi = _.get(this, "yeomanui");
 		if (yeomanUi) {
-			yeomanUi._notifyGeneratorsChange();
+			yeomanUi._notifyGeneratorsChange(YeomanUIPanel.getGensMeta());
+		}
+	}
+
+	public async runGenerator() {
+		const gensMetaPromise = YeomanUIPanel.getGensMeta();
+		const gensMeta: string[] = await gensMetaPromise;
+		const generator = await vscode.window.showQuickPick(_.keys(gensMeta));
+		if (generator) {
+			this.loadWebviewPanel({generator});
 		}
 	}
 
@@ -33,6 +63,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 		this.messages = _.assign({}, backendMessages, _.get(uiOptions, "messages", {}));
 		const filter = GeneratorFilter.create(_.get(uiOptions, "filter"));
 		const generator = _.get(uiOptions, "generator");
+		const gensMetaPromise = _.get(uiOptions, "gensMetaPromise", YeomanUIPanel.getGensMeta());
 
 		this.rpc = new RpcExtension(this.webViewPanel.webview);
 		this.output.setChannelName(`${YeomanUIPanel.YEOMAN_UI}.${this.messages.channel_name}`);
@@ -43,7 +74,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 			vscodeYouiEvents,
 			this.output,
 			this.logger,
-			{generator, filter, messages: this.messages, data: _.get(uiOptions, "data"), npmGlobalPaths: this.getDefaultPaths() }, outputPath);
+			{ generator, filter, messages: this.messages, data: _.get(uiOptions, "data"), gensMetaPromise }, outputPath);
 		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
 		this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
 
@@ -62,10 +93,10 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 		this.output = new GeneratorOutput();
 	}
 
-	private getDefaultPaths(): string[] {
+	private static getDefaultPaths(): string[] {
 		const customGensLocation: string = ExploreGens.getInstallationLocation(vscode.workspace.getConfiguration());
 		if (!_.isEmpty(customGensLocation)) {
-			return _.concat(YeomanUIPanel.npmGlobalPaths, path.join(customGensLocation, "node_modules"));
+			return _.concat(YeomanUIPanel.npmGlobalPaths, path.join(customGensLocation, YeomanUIPanel.NODE_MODULES));
 		}
 
 		return YeomanUIPanel.npmGlobalPaths;
@@ -86,7 +117,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 		try {
 			uri = vscode.Uri.file(currentPath);
 		} catch (e) {
-			uri = vscode.Uri.file(path.join(os.homedir()));
+			uri = vscode.Uri.file(path.join(YeomanUIPanel.HOME_DIR));
 		}
 
 		try {
