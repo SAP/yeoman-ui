@@ -29,8 +29,8 @@ export class ExploreGens {
     private cachedInstalledGeneratorsPromise: Promise<string[]>;
     private readonly context: any;
     private readonly vscode: any;
-    private isInBAS: boolean;
-    private npmGlobalPathsPromise: Promise<any>; 
+    private isInBAS: boolean; // eslint-disable-line @typescript-eslint/prefer-readonly
+    private readonly npmGlobalPathsPromise: Promise<any>; 
 
     private readonly GLOBAL_ACCEPT_LEGAL_NOTE = "global.exploreGens.acceptlegalNote";
     private readonly LAST_AUTO_UPDATE_DATE = "global.exploreGens.lastAutoUpdateDate";
@@ -61,7 +61,7 @@ export class ExploreGens {
         this.setInstalledGens();
     }
 
-    public async getAllInstalledGenerators(withNamespace = false): Promise<string[]> {
+    private async getAllInstalledGenerators(withNamespace = false): Promise<string[]> {
         const npmPaths = await this.getNpmPaths();
         return new Promise(resolve => {
             const yoEnv: Environment.Options = Environment.createEnv();

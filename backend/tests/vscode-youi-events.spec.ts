@@ -221,40 +221,40 @@ describe('vscode-youi-events unit test', () => {
 	});
 
 	describe("showProgress", () => {
-		it("getAppWizard - no message received ---> show default Information message with Progress button", async () => {
+		it("getAppWizard - no message received ---> show default Information message with Progress button", () => {
 			const appWizard = events.getAppWizard();
 			loggerMock.expects("debug");
 			generatorOutputMock.expects("appendLine");
 			windowMock.expects("showInformationMessage").
-				withExactArgs(messages.default.show_progress_message, messages.default.show_progress_button).resolves();
-			await appWizard.showProgress();
+			withExactArgs(messages.default.show_progress_message, messages.default.show_progress_button).resolves();
+			appWizard.showProgress();
 		});
 
-		it("no message received ---> show default Information message with Progress button", async () => {
+		it("no message received ---> show default Information message with Progress button", () => {
 			loggerMock.expects("debug");
 			generatorOutputMock.expects("appendLine");
 			windowMock.expects("showInformationMessage").
-				withExactArgs(messages.default.show_progress_message, messages.default.show_progress_button).resolves();
-			await events.showProgress();
+			withExactArgs(messages.default.show_progress_message, messages.default.show_progress_button).resolves();
+			events.showProgress();
 		});
 
-		it("message received ---> show Information message with received message and Progress button", async () => {
-			const message: string = "Generating generator";
+		it("message received ---> show Information message with received message and Progress button", () => {
+			const message = "Generating generator";
 			loggerMock.expects("debug");
 			generatorOutputMock.expects("appendLine");
 			windowMock.expects("showInformationMessage").
-				withExactArgs(message, messages.default.show_progress_button).resolves();
-			await events.showProgress(message);
+			withExactArgs(message, messages.default.show_progress_button).resolves();
+			events.showProgress(message);
 		});
 
-		it("Progress button pressed ---> show Output", async () => {
+		it("Progress button pressed ---> show Output", () => {
 			loggerMock.expects("debug");
 			loggerMock.expects("trace");
 			generatorOutputMock.expects("appendLine");
 			windowMock.expects("showInformationMessage").
-				withExactArgs(messages.default.show_progress_message, messages.default.show_progress_button).resolves(messages.default.show_progress_button);
+			withExactArgs(messages.default.show_progress_message, messages.default.show_progress_button).resolves(messages.default.show_progress_button);
 			generatorOutputMock.expects("show");
-			await events.showProgress();
+			events.showProgress();
 		});
 	});
 

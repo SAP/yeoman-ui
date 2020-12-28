@@ -1,6 +1,6 @@
 import { YeomanUI } from "./yeomanui";
 import { YouiEvents } from "./youi-events";
-const yoUiLog = require("./logUtils");
+const yoUiLog = require("./logUtils"); // eslint-disable-line @typescript-eslint/no-var-requires
 import * as _ from "lodash";
 import chalk = require('chalk');
 import TerminalAdapter = require("yeoman-environment/lib/adapter");

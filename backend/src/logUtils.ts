@@ -23,48 +23,48 @@ module.exports = ( output: Output, yeomanUi: YeomanUI) => {
 	log.write = function() {
 		showMessage(arguments);
 		return log;
-	}
+	};
 
 	log.writeln = function() {
 		showMessage(arguments);
 		return log;
-	}
+	};
 
 	log.error = function() {
 		showMessage(arguments);
 		return log;
-	}
+	};
 
 	log.create = function() {
 		showMessage(arguments);
 		return log;
-	}
+	};
 
 	log.showProgress = function() {
 		const message = getMessage(arguments);
 		yeomanUi.showProgress(message);
 		return log;
-	}
+	};
 
 	log.force = function() {
 		showMessage(arguments);
 		return log;
-	}
+	};
 
 	log.conflict = function() {
 		showMessage(arguments);
 		return log;
-	}
+	};
 
 	log.identical = function() {
 		showMessage(arguments);
 		return log;
-	}
+	};
 
 	log.skip = function() {
 		showMessage(arguments);
 		return log;
-	}
+	};
 
 	return log;
-}
+};
