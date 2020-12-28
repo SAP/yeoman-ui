@@ -89,8 +89,8 @@ describe('yeomanui unit test', () => {
 
 	const rpc = new TestRpc();
 	const outputChannel: any = {
-		appendLine: () => { },
-		show: () => { }
+		appendLine: () => "",
+		show: () => ""
 	};
 	const youiEvents = new TestEvents();
 	const yeomanUi: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger,
@@ -149,7 +149,7 @@ describe('yeomanui unit test', () => {
 
 	describe("showProgress", () => {
 		it("called with message parameter ---> call showProgress event with the parameter", async () => {
-			const message: string = "Project Test is generating"
+			const message = "Project Test is generating";
 			youiEventsMock.expects("showProgress").withExactArgs(message);
 			await yeomanUi.showProgress(message);
 		});
@@ -523,7 +523,7 @@ describe('yeomanui unit test', () => {
 			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, undefined);
 			const env: Environment = Environment.createEnv();
 			const envMock = sandbox.mock(env);
-			const gen = { on: () => { } };
+			const gen = { on: () => "" };
 			const genMock = sandbox.mock(gen);
 			const processMock = sandbox.mock(process);
 			envMock.expects("on").withArgs("error");
@@ -540,7 +540,7 @@ describe('yeomanui unit test', () => {
 		let genMock: any;
 		let rpcMock: any;
 		const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, undefined);
-		const gen: any = { on: () => { } };
+		const gen: any = { on: () => "" };
 
 		beforeEach(() => {
 			genMock = sandbox.mock(gen);
@@ -559,7 +559,7 @@ describe('yeomanui unit test', () => {
 		});
 
 		it("writing method exists on generator", () => {
-			gen.writing = () => { };
+			gen.writing = () => "";
 			yeomanUiInstance["setGenInWriting"](gen);
 		});
 	});
@@ -574,7 +574,7 @@ describe('yeomanui unit test', () => {
 
 		it("vscode module is available", () => {
 			const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, undefined);
-			const testVscode = { commands: { executeCommand: () => { } } };
+			const testVscode = { commands: { executeCommand: () => "" } };
 			yeomanUiInstance["getVscode"] = () => testVscode;
 			const commandsMock = sandbox.mock(testVscode.commands);
 			commandsMock.expects("executeCommand").withExactArgs("exploreGenerators");
@@ -586,7 +586,7 @@ describe('yeomanui unit test', () => {
 
 	it("onGenInstall", () => {
 		const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, GeneratorFilter.create(), undefined);
-		const gen: any = { on: () => { } };
+		const gen: any = { on: () => "" };
 		const genMock = sandbox.mock(gen);
 
 		genMock.expects("on").withArgs("method:install");
@@ -699,9 +699,8 @@ describe('yeomanui unit test', () => {
 		});
 
 		it("onGeneratorSuccess - generator type is project", async () => {
-			let isTypeProjectMap = new Map();
-			isTypeProjectMap.set("foodq:app", true);
-			yeomanUi["isTypeProjectMap"] = isTypeProjectMap;
+			yeomanUi["isTypeProjectMap"].clear();
+			yeomanUi["isTypeProjectMap"].set("foodq:app", true);
 			const beforeGen = { targetFolderPath: "testDestinationRoot" };
 			const afterGen = { targetFolderPath: "testDestinationRoot/generatedProject" };
 			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("foodq:app", true, testLogger);

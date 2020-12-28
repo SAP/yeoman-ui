@@ -52,7 +52,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 
 	private yeomanui: YeomanUI;
 	private messages: any;
-	private output: GeneratorOutput;
+	private readonly output: GeneratorOutput;
 
 	public constructor(context: vscode.ExtensionContext) {
 		super(context);

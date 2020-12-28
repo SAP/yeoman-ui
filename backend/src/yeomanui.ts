@@ -43,21 +43,21 @@ export class YeomanUI {
 	private cwd: string;
 	private readonly rpc: IRpc;
 	private readonly youiEvents: YouiEvents;
-	private output: Output;
+	private readonly output: Output;
 	private readonly logger: IChildLogger;
 	private genMeta: { [namespace: string]: Environment.GeneratorMeta };
 	private readonly youiAdapter: YouiAdapter;
 	private gen: Generator | undefined;
 	private promptCount: number;
-	private npmGlobalPaths: string[];
+	private readonly npmGlobalPaths: string[];
 	private currentQuestions: TerminalAdapter.Questions<any>;
 	private generatorName: string;
 	private readonly replayUtils: ReplayUtils;
 	private readonly customQuestionEventHandlers: Map<string, Map<string, Function>>;
 	private errorThrown = false;
-	private outputPath: string;
+	private readonly outputPath: string;
 	private initialCwd: string;
-	private isTypeProjectMap: Map<string, boolean>;
+	private readonly isTypeProjectMap: Map<string, boolean>;
 
 	constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
 		this.rpc = rpc;
@@ -237,7 +237,7 @@ export class YeomanUI {
 		const originalPrototype = Object.getPrototypeOf(gen);
 		const originalGenWriting = _.get(originalPrototype, genMethodName);
 		if (!originalGenWriting) {
-			originalPrototype[genMethodName] = () => { }
+			originalPrototype[genMethodName] = () => "";
 		}
 		const uiRpcMethodName = "setGenInWriting";
 		this.rpc.invoke(uiRpcMethodName, [false]);
@@ -401,7 +401,7 @@ export class YeomanUI {
 		const generatedTemplatePath = targetFolderPath ? targetFolderPath : targetFolderPathBeforeGen;
 		this.logger.debug("done running yeomanui! " + message + ` You can find it at ${generatedTemplatePath}`);
 		SWA.updateGeneratorEnded(generatorName, true, this.logger);
-		let isProject: boolean = (this.isTypeProjectMap.has(generatorName)) ? this.isTypeProjectMap.get(generatorName) : false;
+		const isProject: boolean = (this.isTypeProjectMap.has(generatorName)) ? this.isTypeProjectMap.get(generatorName) : false;
 		this.youiEvents.doGeneratorDone(true, message, isProject, targetFolderPath);
 		this.setInitialProcessDir();
 	}
@@ -505,7 +505,7 @@ export class YeomanUI {
 
 	private async getGeneratorChoice(genName: string, filter: GeneratorFilter) {
 		let packageJson: any;
-		let mainGeneratorName = genName.substring(0, genName.indexOf(":"))
+		const mainGeneratorName = genName.substring(0, genName.indexOf(":"));
 		const genPackagePath: string = this.getGenMetaPackagePath(mainGeneratorName);
 
 		try {
@@ -558,7 +558,7 @@ export class YeomanUI {
 	}
 
 	private getGenMetadata(genName: string): Environment.GeneratorMeta {
-		let genNamespace = (_.includes(genName, ":")) ? genName : this.getGenNamespace(genName);
+		const genNamespace = (_.includes(genName, ":")) ? genName : this.getGenNamespace(genName);
 		const genMetadata = _.get(this, ["genMeta", genNamespace]);
 		if (_.isNil(genMetadata)) {
 			const debugMessage = `${genNamespace} generator metadata was not found.`;

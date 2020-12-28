@@ -36,9 +36,11 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
     public async runGenerator() {
         const generators: string[] = await this.exploreGens.getAllInstalledGenerators(true);
         const generator = await vscode.window.showQuickPick(generators);
-        vscode.commands.executeCommand("loadYeomanUI", {
-            generator
-        });
+        if (generator) {
+            vscode.commands.executeCommand("loadYeomanUI", {
+                generator
+            });
+        }
     }
 
     public disposeWebviewPanel() {

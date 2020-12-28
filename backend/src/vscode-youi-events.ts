@@ -6,11 +6,11 @@ import { relative, isAbsolute } from 'path';
 import { GeneratorOutput } from './vscode-output';
 import { IChildLogger } from '@vscode-logging/logger';
 import { getClassLogger } from './logger/logger-wrapper';
-import { getImage } from "./images/messageImages"
+import { getImage } from "./images/messageImages";
 import { AppWizard, MessageType, Severity } from '@sap-devx/yeoman-ui-types';
 
 class YoUiAppWizard extends AppWizard {
-	constructor(private events: VSCodeYouiEvents) {
+	constructor(private readonly events: VSCodeYouiEvents) {
 		super();
 	}
 
@@ -32,21 +32,17 @@ class YoUiAppWizard extends AppWizard {
 }
 
 export class VSCodeYouiEvents implements YouiEvents {
-	private rpc: IRpc;
+	private readonly rpc: IRpc;
 	private webviewPanel: vscode.WebviewPanel;
 	private readonly messages: any;
 	private resolveFunc: any;
 	public output: GeneratorOutput;
 	private readonly logger: IChildLogger;
+	// tslint:disable-next-line
 	private isInBAS: boolean;
-	private appWizard: AppWizard;
+	private readonly appWizard: AppWizard;
 
-	constructor(
-		rpc: IRpc,
-		webviewPanel: vscode.WebviewPanel,
-		messages: any,
-		output: GeneratorOutput,
-		isInBAS: boolean) {
+	constructor(rpc: IRpc, webviewPanel: vscode.WebviewPanel, messages: any, output: GeneratorOutput, isInBAS: boolean) {
 		this.rpc = rpc;
 		this.webviewPanel = webviewPanel;
 		this.messages = messages;
@@ -91,7 +87,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 		message = `${message}`;
 		this.output.appendLine(message);
 		if (type === MessageType.notification) {
-			this.showNotificationMessage(message, state)
+			this.showNotificationMessage(message, state);
 		} else { // prompt
 			this.showPromptMessage(message, state);
 		}

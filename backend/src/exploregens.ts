@@ -29,8 +29,8 @@ export class ExploreGens {
     private cachedInstalledGeneratorsPromise: Promise<string[]>;
     private readonly context: any;
     private readonly vscode: any;
-    private isInBAS: boolean;
-    private npmGlobalPathsPromise: Promise<any>; 
+    private readonly isInBAS: boolean;
+    private readonly npmGlobalPathsPromise: Promise<any>; 
 
     private readonly GLOBAL_ACCEPT_LEGAL_NOTE = "global.exploreGens.acceptlegalNote";
     private readonly LAST_AUTO_UPDATE_DATE = "global.exploreGens.lastAutoUpdateDate";
