@@ -38,8 +38,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 	private resolveFunc: any;
 	public output: GeneratorOutput;
 	private readonly logger: IChildLogger;
-	// tslint:disable-next-line
-	private isInBAS: boolean;
+	private isInBAS: boolean; // eslint-disable-line @typescript-eslint/prefer-readonly
 	private readonly appWizard: AppWizard;
 
 	constructor(rpc: IRpc, webviewPanel: vscode.WebviewPanel, messages: any, output: GeneratorOutput, isInBAS: boolean) {

@@ -29,7 +29,7 @@ export class ExploreGens {
     private cachedInstalledGeneratorsPromise: Promise<string[]>;
     private readonly context: any;
     private readonly vscode: any;
-    private readonly isInBAS: boolean;
+    private isInBAS: boolean; // eslint-disable-line @typescript-eslint/prefer-readonly
     private readonly npmGlobalPathsPromise: Promise<any>; 
 
     private readonly GLOBAL_ACCEPT_LEGAL_NOTE = "global.exploreGens.acceptlegalNote";
