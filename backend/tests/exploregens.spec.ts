@@ -72,6 +72,7 @@ describe('exploregens unit test', () => {
     let processMock: any;
     let yoEnvMock: any;
     let testYoEnvMock: any;
+    let envUtilsMock: any;
 
     class TestRpc implements IRpc {
         public timeout: number;
@@ -135,6 +136,7 @@ describe('exploregens unit test', () => {
         yoEnvMock = sandbox.mock(Environment);
         testYoEnvMock = sandbox.mock(testYoEnv);
         vscodeCommandsMock = sandbox.mock(testVscode.commands);
+        envUtilsMock = sandbox.mock(envutils);
     });
 
     afterEach(() => {
@@ -151,6 +153,7 @@ describe('exploregens unit test', () => {
         yoEnvMock.verify();
         testYoEnvMock.verify();
         vscodeCommandsMock.verify();
+        envUtilsMock.verify();
     });
 
     it("acceptLegalNote", async () => {
@@ -169,8 +172,8 @@ describe('exploregens unit test', () => {
 
         it("is in BAS, legal note is not accepted", async () => {
             exploregens["isInBAS"] = true;
-			globalStateMock.expects("get").withExactArgs(exploregens["GLOBAL_ACCEPT_LEGAL_NOTE"], false).returns(false);
-			expect(exploregens["getIsInBAS"]()).to.be.true;
+            globalStateMock.expects("get").withExactArgs(exploregens["GLOBAL_ACCEPT_LEGAL_NOTE"], false).returns(false);
+            expect(exploregens["getIsInBAS"]()).to.be.true;
             const res = await exploregens["isLegalNoteAccepted"]();
             expect(res).to.be.false;
         });
@@ -180,24 +183,6 @@ describe('exploregens unit test', () => {
             globalStateMock.expects("get").never();
             const res = await exploregens["isLegalNoteAccepted"]();
             expect(res).to.be.true;
-        });
-    });
-
-    describe.skip("NPM", () => {
-        it("win32 platform", () => {
-            const stub = sinon.stub(process, 'platform').value("win32");
-            const exploregens1 = new ExploreGens(null, false,testVscode.context, testVscode);
-            const res = exploregens1["NPM"];
-            expect(res).to.be.equal("npm.cmd");
-            stub.restore();
-        });
-
-        it("linux platfrom", () => {
-            const stub = sinon.stub(process, 'platform').value("linux");
-            const exploregens2 = new ExploreGens(null, false, testVscode.context, testVscode);
-            const res = exploregens2["NPM"];
-            expect(res).to.be.equal("npm");
-            stub.restore();
         });
     });
 
@@ -246,8 +231,8 @@ describe('exploregens unit test', () => {
         it("successfully installed", async () => {
             workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns("");
             vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(messages.installing(genName)).returns(statusBarMessage);
-			vscodeWindowMock.expects("showInformationMessage").withExactArgs(messages.installed(genName));
-			vscodeCommandsMock.expects("executeCommand").withExactArgs("yeomanUI._notifyGeneratorsChange").resolves();
+            vscodeWindowMock.expects("showInformationMessage").withExactArgs(messages.installed(genName));
+            vscodeCommandsMock.expects("executeCommand").withExactArgs("yeomanUI._notifyGeneratorsChange").resolves();
             loggerMock.expects("debug").withExactArgs(messages.installing(genName));
             loggerMock.expects("debug").withExactArgs(messages.installed(genName));
             rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, GenState.installing]);
@@ -300,7 +285,7 @@ describe('exploregens unit test', () => {
             };
             const url = exploregens["getGensQueryURL"]("test of query", "");
             npmFetchMock.expects("json").withExactArgs(url).resolves(expectedResult);
-            exploregens["gensBeingHandled"] = [{name: "generator-aa", state: GenState.updating}];
+            exploregens["gensBeingHandled"] = [{ name: "generator-aa", state: GenState.updating }];
             exploregens["cachedInstalledGeneratorsPromise"] = Promise.resolve(["generator-aa"]);
             const res = await exploregens["getFilteredGenerators"]("test of query");
             expect(res[0]).to.be.deep.equal(expectedResult.objects);
@@ -452,26 +437,25 @@ describe('exploregens unit test', () => {
         });
     });
 
-    // describe("onEnvLookup", () => {
-    //     it("there are no installed generators", async () => {
-    //         testYoEnvMock.expects("getGeneratorNames").returns([]);
-    //         // const res = await new Promise(resolve => {
-    //         //     exploregens["onEnvLookup"](testYoEnv, resolve);
-    //         // });
-    //         //expect(res).to.have.lengthOf(0);
-    //     });
+    describe("getAllInstalledGenerators", () => {
+        it("there are no installed generators", async () => {
+            envUtilsMock.expects("getGeneratorsMeta").resolves({});
+            const gens = await exploregens["getAllInstalledGenerators"]();
+            expect(gens).to.have.lengthOf(0);
+        });
 
-    //     it("there are installed generators", async () => {
-    //         testYoEnvMock.expects("getGeneratorNames").returns(["aa", "bb", "@sap/cc"]);
-    //         const res = await new Promise(resolve => {
-    //             exploregens["onEnvLookup"](testYoEnv, resolve);
-    //         });
-    //         expect(res).to.have.lengthOf(3);
-    //         expect(res).includes("generator-bb");
-    //         expect(res).includes("generator-aa");
-    //         expect(res).includes("@sap/generator-cc");
-    //     });
-    // });
+        it("there are installed generators", async () => {
+            envUtilsMock.expects("getGeneratorsMeta").resolves({ 
+                "aa:app": { namespace: "aa:app" }, 
+                "bb:app": { namespace: "bb:app"}, 
+                "@sap/cc:test": { namespace: "@sap/cc:test"} });
+            const gens = await exploregens["getAllInstalledGenerators"]();
+            expect(gens).to.have.lengthOf(3);
+            expect(gens).includes("generator-bb");
+            expect(gens).includes("generator-aa");
+            expect(gens).includes("@sap/generator-cc");
+        });
+    });
 
     it("updateBeingHandledGenerator", () => {
         rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["generator-aa", GenState.installed]);
@@ -508,8 +492,8 @@ describe('exploregens unit test', () => {
 
             workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns("");
             vscodeWindowMock.expects("setStatusBarMessage").withExactArgs(uninstallingMessage).returns(statusBarMessage);
-			vscodeWindowMock.expects("showInformationMessage").withExactArgs(successMessage);
-			vscodeCommandsMock.expects("executeCommand").withExactArgs("yeomanUI._notifyGeneratorsChange").resolves();
+            vscodeWindowMock.expects("showInformationMessage").withExactArgs(successMessage);
+            vscodeCommandsMock.expects("executeCommand").withExactArgs("yeomanUI._notifyGeneratorsChange").resolves();
             loggerMock.expects("debug").withExactArgs(uninstallingMessage);
             loggerMock.expects("debug").withExactArgs(successMessage);
             rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, GenState.uninstalling]);

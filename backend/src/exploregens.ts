@@ -60,15 +60,11 @@ export class ExploreGens {
         this.setInstalledGens();
     }
 
-    private async getAllInstalledGenerators(withNamespace = false): Promise<string[]> {
+    private async getAllInstalledGenerators(): Promise<string[]> {
         const npmPaths = await this.getNpmPaths();
         const gensMeta = await envUtils.getGeneratorsMeta(npmPaths);
-        const namespaces = _.keys(gensMeta);
-        if (withNamespace) {
-            return namespaces;
-        } 
 
-        return _.map(namespaces, (namepsace: string) => {
+        return _.map(_.keys(gensMeta), (namepsace: string) => {
             const genName = _.split(namepsace, ":")[0];
             const parts = _.split(genName, this.SLASH);
             return _.size(parts) === 1 ? `${this.GENERATOR}${genName}` : `${parts[0]}${this.SLASH}${this.GENERATOR}${parts[1]}`;
