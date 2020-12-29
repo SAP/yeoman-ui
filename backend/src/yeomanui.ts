@@ -1,4 +1,3 @@
-import * as os from "os";
 import * as path from "path";
 import * as fsextra from "fs-extra";
 import * as _ from "lodash";
@@ -20,6 +19,7 @@ import { SWA } from "./swa-tracker/swa-tracker-wrapper";
 import TerminalAdapter = require("yeoman-environment/lib/adapter");
 import { Output } from "./output";
 import { resolve } from "path";
+import * as envUtils from "./env/utils";
 
 
 export interface IQuestionsPrompt extends IPrompt {
@@ -30,9 +30,7 @@ export class YeomanUI {
 	private static readonly defaultMessage =
 		"Some quick example text of the generator description. This is a long text so that the example will look good.";
 	private static readonly YEOMAN_PNG = "yeoman.png";
-	private static readonly HOME_DIR = os.homedir();
-	private static readonly PROJECTS: string = path.join(YeomanUI.HOME_DIR, 'projects');
-	private static readonly APP = ":app";
+	private static readonly PROJECTS: string = path.join(envUtils.HOME_DIR, 'projects');
 
 	private static funcReplacer(key: any, value: any) {
 		return _.isFunction(value) ? "__Function" : value;
@@ -95,7 +93,7 @@ export class YeomanUI {
 		}
 
 		return _.filter(gensMeta, genMeta => {
-			return _.endsWith(_.get(genMeta, "namespace"), YeomanUI.APP);
+			return _.endsWith(_.get(genMeta, "namespace"), envUtils.APP);
 		});
 	}
 
@@ -517,7 +515,7 @@ export class YeomanUI {
 			this.logger.debug(error);
 		}
 
-		const genName = genNamespace.replace(YeomanUI.APP, "");
+		const genName = genNamespace.replace(envUtils.APP, "");
 		const genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
 		const genDisplayName = _.get(packageJson, "displayName", '');
 		const genPrettyName = _.isEmpty(genDisplayName) ? titleize(humanizeString(genName)) : genDisplayName;
@@ -548,7 +546,7 @@ export class YeomanUI {
 	}
 
 	private getGenNamespace(genName: string): string {
-		return `${genName}${YeomanUI.APP}`;
+		return `${genName}${envUtils.APP}`;
 	}
 
 	/**

@@ -7,7 +7,7 @@ import backendMessages from "../messages";
 import { IChildLogger } from "@vscode-logging/logger";
 import { YouiEvents } from '../youi-events';
 import { GeneratorFilter } from '../filter';
-import Environment = require('yeoman-environment');
+import * as envUtils from "../env/utils";
 
 class YeomanUIWebSocketServer {
   private rpc: RpcExtensionWebSockets | undefined;
@@ -36,10 +36,11 @@ class YeomanUIWebSocketServer {
       this.rpc = new RpcExtensionWebSockets(ws);
       //TODO: Use RPC to send it to the browser log (as a collapsed pannel in Vue)
       const serverOutput = new ServerOutput(this.rpc, true);
-      const childLogger = {debug: () => {/* do nothing */}, error: () => {/* do nothing */}, fatal: () => {/* do nothing */}, warn: () => {/* do nothing */}, info: () => {/* do nothing */}, trace: () => {/* do nothing */}, getChildLogger: () => {return {} as IChildLogger;}};
-    const youiEvents: YouiEvents = new ServerYouiEvents(this.rpc);
-	  this.yeomanui = new YeomanUI(this.rpc, youiEvents, serverOutput, childLogger as IChildLogger, 
-		{filter: GeneratorFilter.create(), messages: backendMessages, npmGlobalPaths: Environment.createEnv().getNpmPaths()}, undefined);
+      const childLogger = { debug: () => {/* do nothing */ }, error: () => {/* do nothing */ }, fatal: () => {/* do nothing */ }, warn: () => {/* do nothing */ }, info: () => {/* do nothing */ }, trace: () => {/* do nothing */ }, getChildLogger: () => { return {} as IChildLogger; } };
+      const youiEvents: YouiEvents = new ServerYouiEvents(this.rpc);
+      const gensMetaPromise = envUtils.getGeneratorsMeta();
+      this.yeomanui = new YeomanUI(this.rpc, youiEvents, serverOutput, childLogger as IChildLogger,
+        { filter: GeneratorFilter.create(), messages: backendMessages, gensMetaPromise }, undefined);
       this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.mockFolderDialog.bind(this));
     });
   }

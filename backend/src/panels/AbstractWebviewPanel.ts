@@ -25,8 +25,6 @@ export abstract class AbstractWebviewPanel {
 	protected isInBAS: boolean;
 	protected rpc: RpcExtension;
 
-	protected static readonly isWin32 = (process.platform === 'win32');
-	protected static readonly HOME_DIR = os.homedir(); 
 	protected static readonly npmGlobalPaths: string[] = Environment.createEnv().getNpmPaths();
 
 	public loadWebviewPanel(uiOptions?: any) {
