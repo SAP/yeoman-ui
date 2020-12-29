@@ -9,13 +9,9 @@ export const APP = ":app";
 
 export function getGeneratorsMeta(npmPaths?: any): Promise<any> {
     return new Promise(resolve => {
-        const env: Environment.Options = createEnv();
+        const env: Environment.Options = Environment.createEnv();
         env.lookup({ npmPaths }, () => {
             resolve(env.getGeneratorsMeta());
         });
     });
-}
-
-function createEnv(): Environment.Options {
-    return Environment.createEnv();
 }
