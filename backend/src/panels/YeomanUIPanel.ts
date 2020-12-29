@@ -10,27 +10,21 @@ import { VSCodeYouiEvents } from '../vscode-youi-events';
 import { AbstractWebviewPanel } from './AbstractWebviewPanel';
 import { ExploreGens } from '../exploregens';
 import { GeneratorOutput } from '../vscode-output';
-import Environment = require('yeoman-environment');
+import * as envUtils from "../env/utils";
 
 
 export class YeomanUIPanel extends AbstractWebviewPanel {
 	public static YEOMAN_UI = "Application Wizard";
-	private static readonly NODE_MODULES = 'node_modules';
 
 	private static getGensMeta(): Promise<any> {
-		return new Promise(resolve => {
-			const env: Environment.Options = Environment.createEnv();
-			const npmPaths = YeomanUIPanel.getNpmPaths();
-			env.lookup({ npmPaths }, () => {
-				resolve(env.getGeneratorsMeta());
-			});
-		});
+		const npmPaths = YeomanUIPanel.getNpmPaths();
+		return envUtils.getGeneratorsMeta(npmPaths);
 	}
 
 	private static getNpmPaths() {
 		const parts: string[] = YeomanUIPanel.HOME_DIR.split(path.sep);
 		const userPaths = _.map(parts, (part, index) => {
-			const resPath = path.join(...parts.slice(0, index + 1), YeomanUIPanel.NODE_MODULES);
+			const resPath = path.join(...parts.slice(0, index + 1), envUtils.NODE_MODULES);
 			return YeomanUIPanel.isWin32 ? resPath : path.join(path.sep, resPath);
 		});
 
@@ -96,7 +90,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 	private static getDefaultPaths(): string[] {
 		const customGensLocation: string = ExploreGens.getInstallationLocation(vscode.workspace.getConfiguration());
 		if (!_.isEmpty(customGensLocation)) {
-			return _.concat(YeomanUIPanel.npmGlobalPaths, path.join(customGensLocation, YeomanUIPanel.NODE_MODULES));
+			return _.concat(YeomanUIPanel.npmGlobalPaths, path.join(customGensLocation, envUtils.NODE_MODULES));
 		}
 
 		return YeomanUIPanel.npmGlobalPaths;

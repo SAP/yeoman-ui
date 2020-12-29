@@ -6,7 +6,7 @@ import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import * as util from "util";
 import * as path from "path";
 import messages from "./exploreGensMessages";
-import Environment = require("yeoman-environment");
+import * as envUtils from "./env/utils";
 
 export enum GenState {
     uninstalling = "uninstalling",
@@ -36,10 +36,9 @@ export class ExploreGens {
     private readonly LAST_AUTO_UPDATE_DATE = "global.exploreGens.lastAutoUpdateDate";
     private readonly SEARCH_QUERY = "ApplicationWizard.searchQuery";
     private readonly AUTO_UPDATE = "ApplicationWizard.autoUpdate"
-    private readonly NPM = (process.platform === "win32" ? "npm.cmd" : "npm");
+    private readonly NPM = (envUtils.isWin32 ? "npm.cmd" : "npm");
     private readonly EMPTY = "";
     private readonly SLASH = "/";
-    private readonly NODE_MODULES = "node_modules";
     private readonly GENERATOR = "generator-";
     private readonly ONE_DAY = 1000 * 60 * 60 * 24;
     private readonly NPM_REGISTRY_HOST = _.get(process, "env.NPM_CFG_REGISTRY", "http://registry.npmjs.com/");
@@ -63,9 +62,16 @@ export class ExploreGens {
 
     private async getAllInstalledGenerators(withNamespace = false): Promise<string[]> {
         const npmPaths = await this.getNpmPaths();
-        return new Promise(resolve => {
-            const yoEnv: Environment.Options = Environment.createEnv();
-            yoEnv.lookup({ npmPaths }, async () => this.onEnvLookup(yoEnv, resolve, withNamespace));
+        const gensMeta = await envUtils.getGeneratorsMeta(npmPaths);
+        const namespaces = _.keys(gensMeta);
+        if (withNamespace) {
+            return namespaces;
+        } 
+
+        return _.map(namespaces, (namepsace: string) => {
+            const genName = _.split(namepsace, ":")[0];
+            const parts = _.split(genName, this.SLASH);
+            return _.size(parts) === 1 ? `${this.GENERATOR}${genName}` : `${parts[0]}${this.SLASH}${this.GENERATOR}${parts[1]}`;
         });
     }
 	
@@ -311,20 +317,6 @@ export class ExploreGens {
             return this.getNpmGlobalPath();
         }
 
-        return [path.join(customLocation, this.NODE_MODULES)];
-    }
-
-    private onEnvLookup(env: Environment.Options, resolve: any, withNamespace = false) {
-        let genFullNames;
-        if (withNamespace) {
-            genFullNames = _.keys(env.getGeneratorsMeta());
-        } else {
-            genFullNames = _.map(env.getGeneratorNames(), genName => {
-                const parts = _.split(genName, this.SLASH);
-                return _.size(parts) === 1 ? `${this.GENERATOR}${genName}` : `${parts[0]}${this.SLASH}${this.GENERATOR}${parts[1]}`;
-            });
-        }
-
-        resolve(genFullNames);
+        return [path.join(customLocation, envUtils.NODE_MODULES)];
     }
 }
