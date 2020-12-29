@@ -22,10 +22,10 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 	}
 
 	private static getNpmPaths() {
-		const parts: string[] = YeomanUIPanel.HOME_DIR.split(path.sep);
+		const parts: string[] = envUtils.HOME_DIR.split(path.sep);
 		const userPaths = _.map(parts, (part, index) => {
 			const resPath = path.join(...parts.slice(0, index + 1), envUtils.NODE_MODULES);
-			return YeomanUIPanel.isWin32 ? resPath : path.join(path.sep, resPath);
+			return envUtils.isWin32 ? resPath : path.join(path.sep, resPath);
 		});
 
 		return YeomanUIPanel.getDefaultPaths().concat(userPaths);
@@ -111,7 +111,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 		try {
 			uri = vscode.Uri.file(currentPath);
 		} catch (e) {
-			uri = vscode.Uri.file(path.join(YeomanUIPanel.HOME_DIR));
+			uri = vscode.Uri.file(path.join(envUtils.HOME_DIR));
 		}
 
 		try {
