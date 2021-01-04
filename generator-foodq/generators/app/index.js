@@ -6,7 +6,7 @@ const _ = require('lodash');
 const types = require('@sap-devx/yeoman-ui-types');
 const Datauri = require('datauri/sync');
 const DEFAULT_IMAGE = require("./images/defaultImage");
-
+   
 module.exports = class extends Generator {
 	constructor(args, opts) {
 		super(args, opts);
