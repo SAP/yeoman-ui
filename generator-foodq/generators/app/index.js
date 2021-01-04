@@ -21,6 +21,12 @@ module.exports = class extends Generator {
 
 		this.argument("hungry", { type: Boolean, required: false, default: (lcnc ? true : undefined) });
 		this.argument("confirmHungry", { type: Boolean, required: false, default: (lcnc ? true : undefined) });
+		this.argument("favColor", { type: String, required: false, default: (lcnc ? "green" : undefined) });
+		this.argument("number", { type: Number, required: false, default: (lcnc ? 12 : undefined) });
+		this.argument("beers", {
+			type: Array, required: false, default: (lcnc ? ["Allagash White Ale",
+				"St. Feuillien Blonde"]: undefined)
+		});
 
 		this.setPromptsCallback = fn => {
 			if (this.prompts) {
@@ -149,10 +155,12 @@ module.exports = class extends Generator {
 
 		this.answers = await this.prompt(prompts);
 		this.answers.hungry = this._getAnswer("hungry", this.answers);
-		this.answers.hungry = this._getAnswer("confirmHungry", this.answers);
-		this.answers.hungry = this._getAnswer("favColor", this.answers);
-		this.answers.hungry = this._getAnswer("number", this.answers);
-		this.answers.hungry = this._getAnswer("beers", this.answers);
+		this.answers.confirmHungry = this._getAnswer("confirmHungry", this.answers);
+		this.answers.favColor = this._getAnswer("favColor", this.answers);
+		this.answers.number = this._getAnswer("number", this.answers);
+		this.answers.beers = this._getAnswer("beers", this.answers);
+
+		this.log(this.answers);
 
 		prompts = [
 			{
