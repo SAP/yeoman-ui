@@ -31,6 +31,10 @@ module.exports = class extends Generator {
 		this.argument("dump", { type: String, required: false, default: (lcnc ? "/" : undefined) });
 		this.argument("enjoy", { type: String, required: false, default: (lcnc ? "ok" : undefined) });
 		this.argument("comments", { type: String, required: false, default: (lcnc ? "hello\nmy friend\n" : undefined) });
+		this.argument("repotype", { type: String, required: false, default: (lcnc ? "GitLab" : undefined) });
+		this.argument("repoperms", { type: String, required: false, default: (lcnc ? "public" : undefined) });
+		this.argument("email", { type: String, required: false, default: (lcnc ? "myUsername" : undefined) });
+		this.argument("password", { type: String, required: false, default: (lcnc ? "password123" : undefined) });
 
 
 		this.setPromptsCallback = fn => {
@@ -180,7 +184,7 @@ module.exports = class extends Generator {
 				{ value: "spaghetti", name: "Spaghetti Carbonara", description: "Classic spaghetti alla carbonara, made with pancetta and Italian-style bacon.", homepage: "https://www.allrecipes.com/recipe/11973/spaghetti-carbonara-ii/", image: DEFAULT_IMAGE },
 			],
 			default: "junk-food",
-			validate: (value) => {
+			validate: value => {
 				if (_.includes(["jerk-chicken", "steak"], value)) {
 					this.appWizard.showWarning("You are a vegan, aren't you ?");
 				} else if (value === "junk-food") {
@@ -318,7 +322,8 @@ module.exports = class extends Generator {
 				'Bitbucket',
 				new Inquirer.Separator("Text separator"),
 				'Gitea'
-			]
+			],
+			when: () => _.isNil(this._getOption("repotype"))
 		}, {
 			type: 'expand',
 			guiOptions: {
@@ -326,24 +331,22 @@ module.exports = class extends Generator {
 			},
 			name: 'repoperms',
 			message: 'Git repository permissions',
-			choices: [
-				{
-					key: 'u',
-					name: 'Public',
-					value: 'public'
-				},
-				{
-					key: 'r',
-					name: 'Private',
-					value: 'private'
-				}
-			],
+			choices: [{
+				key: 'u',
+				name: 'Public',
+				value: 'public'
+			}, {
+				key: 'r',
+				name: 'Private',
+				value: 'private'
+			}],
 			validate: value => {
 				if (value === "private") {
 					this.appWizard.showError("Private repository is not supported", types.MessageType.notification);
 				}
 				return (value !== 'private' ? true : "private repository is not supported");
-			}
+			},
+			when: () => _.isNil(this._getOption("repoperms"))
 		}, {
 			guiOptions: {
 				hint: "Enter your user name",
@@ -354,7 +357,8 @@ module.exports = class extends Generator {
 			store: true,
 			validate: value => {
 				return (value.length > 0 ? true : "Mandatory field");
-			}
+			},
+				when: () => _.isNil(this._getOption("email"))
 		}, {
 			type: "password",
 			guiOptions: {
@@ -367,11 +371,18 @@ module.exports = class extends Generator {
 			mask: '*',
 			validate: this._requireLetterAndNumber,
 			when: response => {
-				return response.email !== "root";
+				if (_.isNil(this._getOption("password"))) {
+					return this._getAnswer("email", response) !== "root";
+				}
+				return false;
 			}
 		}];
 
 		const answers_login = await this.prompt(prompts);
+		answers_login.repotype = this._getAnswer("repotype", answers_login);
+		answers_login.repoperms = this._getAnswer("repoperms", answers_login);
+		answers_login.email = this._getAnswer("email", answers_login);
+		answers_login.password = this._getAnswer("password", answers_login);
 		this.answers = Object.assign({}, this.answers, answers_login);
 	}
 
@@ -432,8 +443,8 @@ module.exports = class extends Generator {
 			repoperms: this.answers.repoperms,
 			email: this.answers.email,
 			password: this.answers.password
-		}
-		);
+		});
+		
 		this.fs.copy(
 			this.templatePath('README.md'),
 			this.destinationPath('README.md')
