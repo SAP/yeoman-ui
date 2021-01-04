@@ -63,7 +63,8 @@ module.exports = class extends Generator {
 	}
 
 	async initializing() {
-		this.composeWith(require.resolve("../app2"), { prompts: this.prompts, appWizard: this.appWizard, lcnc: this._getOption("lcnc") });
+		const lcnc = this._getOption("lcnc");
+		this.composeWith(require.resolve("../app2"), { prompts: this.prompts, appWizard: this.appWizard, lcnc });
 	}
 
 	async prompting() {
@@ -444,7 +445,7 @@ module.exports = class extends Generator {
 			email: this.answers.email,
 			password: this.answers.password
 		});
-		
+
 		this.fs.copy(
 			this.templatePath('README.md'),
 			this.destinationPath('README.md')

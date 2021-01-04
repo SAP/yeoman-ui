@@ -12,9 +12,9 @@ module.exports = class extends Generator {
 		this.appWizard = opts.appWizard;
 		this.parentPromptsQuantity = _.size(this.prompts);
 
+		this.option("lcnc", { type: Boolean });
 		const lcnc = opts.lcnc || _.get(this.options, "lcnc", false);
 		
-		this.option("lcnc", { type: Boolean });
 		this.argument("isDelivery", { type: Boolean, required: false, default: (lcnc ? true : undefined) });
 		this.argument("deliveryMethod", { type: Array, required: false, default: (lcnc ? "Drone" : undefined) });
 		this.argument("address", { type: String, required: false, default: (lcnc ? "the best street" : undefined) });
@@ -63,7 +63,7 @@ module.exports = class extends Generator {
 				{ value: "car", name: "Car", image: this._getImage(path.join(this.sourceRoot(), "../images/car.png")) },
 				{ value: "drone", name: "Drone", image: this._getImage(path.join(this.sourceRoot(), "../images/drone.png")) }
 			],
-			validate: (value) => {
+			validate: value => {
 				if (value === "car") {
 					this.appWizard.showWarning("Car delivery is not reliable.", types.MessageType.prompt);
 				} else {
@@ -99,6 +99,7 @@ module.exports = class extends Generator {
 
 		this.answers = await this.prompt(prompts);
 		this.answers.isDelivery = this._getAnswer("isDelivery", this.answers);
+		this.answers.deliveryMethod = this._getAnswer("deliveryMethod", this.answers);
 
 		if (this._getAnswer("isDelivery", this.answers)) {
 			const addressPrompt = [{
@@ -111,8 +112,8 @@ module.exports = class extends Generator {
 				when: () => _.isNil(this._getOption("address"))
 			}];
 			const answersDelivery = await this.prompt(addressPrompt);
+			answersDelivery.address = this._getAnswer("address", answersDelivery);
 			this.answers = Object.assign({}, this.answers, answersDelivery);
-			this.answers.address = this._getAnswer("address", this.answers);
 		}
 
 		const tipPrompt = [{
@@ -124,8 +125,8 @@ module.exports = class extends Generator {
 		}];
 
 		const answersTip = await this.prompt(tipPrompt);
+		answersTip.tip = this._getAnswer("tip", answersTip);
 		this.answers = Object.assign({}, this.answers, answersTip);
-		this.answers.tip = this._getAnswer("tip", this.answers);
 	}
 
 	writing() {
