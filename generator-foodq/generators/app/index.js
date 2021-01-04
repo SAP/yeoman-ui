@@ -15,26 +15,26 @@ module.exports = class extends Generator {
 
 		this.appWizard = types.AppWizard.create(opts);
 
-		this.option("np", { type: Boolean });
+		this.option("silent", { type: Boolean });
 
-		const np = _.get(this.options, "np", false);
+		const silent = _.get(this.options, "silent", false);
 
-		this.argument("food", { type: String, required: false, default: (np ? "lasagna" : undefined) });
-		this.argument("hungry", { type: Boolean, required: false, default: (np ? true : undefined) });
-		this.argument("confirmHungry", { type: Boolean, required: false, default: (np ? true : undefined) });
-		this.argument("favColor", { type: String, required: false, default: (np ? "green" : undefined) });
-		this.argument("number", { type: Number, required: false, default: (np ? 12 : undefined) });
-		this.argument("beers", { type: Array, required: false, default: (np ? ["Allagash White Ale", "St. Feuillien Blonde"] : undefined) });
-		this.argument("hungerLevel", { type: String, required: false, default: (np ? "A bit hungry" : undefined) });
-		this.argument("dessert", { type: Array, required: false, default: (np ? ["includeSass"] : undefined) });
-		this.argument("uploadMenu", { type: String, required: false, default: (np ? "/" : undefined) });
-		this.argument("dump", { type: String, required: false, default: (np ? "/" : undefined) });
-		this.argument("enjoy", { type: String, required: false, default: (np ? "ok" : undefined) });
-		this.argument("comments", { type: String, required: false, default: (np ? "hello\nmy friend\n" : undefined) });
-		this.argument("repotype", { type: String, required: false, default: (np ? "GitLab" : undefined) });
-		this.argument("repoperms", { type: String, required: false, default: (np ? "public" : undefined) });
-		this.argument("email", { type: String, required: false, default: (np ? "myUsername" : undefined) });
-		this.argument("password", { type: String, required: false, default: (np ? "password123" : undefined) });
+		this.argument("food", { type: String, required: false, default: (silent ? "lasagna" : undefined) });
+		this.argument("hungry", { type: Boolean, required: false, default: (silent ? true : undefined) });
+		this.argument("confirmHungry", { type: Boolean, required: false, default: (silent ? true : undefined) });
+		this.argument("favColor", { type: String, required: false, default: (silent ? "green" : undefined) });
+		this.argument("number", { type: Number, required: false, default: (silent ? 12 : undefined) });
+		this.argument("beers", { type: Array, required: false, default: (silent ? ["Allagash White Ale", "St. Feuillien Blonde"] : undefined) });
+		this.argument("hungerLevel", { type: String, required: false, default: (silent ? "A bit hungry" : undefined) });
+		this.argument("dessert", { type: Array, required: false, default: (silent ? ["includeSass"] : undefined) });
+		this.argument("uploadMenu", { type: String, required: false, default: (silent ? "/" : undefined) });
+		this.argument("dump", { type: String, required: false, default: (silent ? "/" : undefined) });
+		this.argument("enjoy", { type: String, required: false, default: (silent ? "ok" : undefined) });
+		this.argument("comments", { type: String, required: false, default: (silent ? "hello\nmy friend\n" : undefined) });
+		this.argument("repotype", { type: String, required: false, default: (silent ? "GitLab" : undefined) });
+		this.argument("repoperms", { type: String, required: false, default: (silent ? "public" : undefined) });
+		this.argument("email", { type: String, required: false, default: (silent ? "myUsername" : undefined) });
+		this.argument("password", { type: String, required: false, default: (silent ? "password123" : undefined) });
 
 
 		this.setPromptsCallback = fn => {
@@ -63,8 +63,8 @@ module.exports = class extends Generator {
 	}
 
 	async initializing() {
-		const np = this._getOption("np");
-		this.composeWith(require.resolve("../app2"), { prompts: this.prompts, appWizard: this.appWizard, np });
+		const silent = this._getOption("silent");
+		this.composeWith(require.resolve("../app2"), { prompts: this.prompts, appWizard: this.appWizard, silent });
 	}
 
 	async prompting() {
