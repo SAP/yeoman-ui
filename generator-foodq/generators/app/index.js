@@ -26,7 +26,7 @@ module.exports = class extends Generator {
 		this.argument("number", { type: Number, required: false, default: (silent ? 12 : undefined) });
 		this.argument("beers", { type: Array, required: false, default: (silent ? ["Allagash White Ale", "St. Feuillien Blonde"] : undefined) });
 		this.argument("hungerLevel", { type: String, required: false, default: (silent ? "A bit hungry" : undefined) });
-		this.argument("dessert", { type: Array, required: false, default: (silent ? ["includeSass"] : undefined) });
+		this.argument("dessert", { type: Array, required: false, default: (silent ? ["ice-cream"] : undefined) });
 		this.argument("uploadMenu", { type: String, required: false, default: (silent ? "/" : undefined) });
 		this.argument("dump", { type: String, required: false, default: (silent ? "/" : undefined) });
 		this.argument("enjoy", { type: String, required: false, default: (silent ? "ok" : undefined) });
