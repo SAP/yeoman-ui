@@ -23,10 +23,15 @@ module.exports = class extends Generator {
 		this.argument("confirmHungry", { type: Boolean, required: false, default: (lcnc ? true : undefined) });
 		this.argument("favColor", { type: String, required: false, default: (lcnc ? "green" : undefined) });
 		this.argument("number", { type: Number, required: false, default: (lcnc ? 12 : undefined) });
-		this.argument("beers", {
-			type: Array, required: false, default: (lcnc ? ["Allagash White Ale",
-				"St. Feuillien Blonde"]: undefined)
-		});
+		this.argument("beers", { type: Array, required: false, default: (lcnc ? ["Allagash White Ale", "St. Feuillien Blonde"] : undefined) });
+		this.argument("food", { type: String, required: false, default: (lcnc ? "steak" : undefined) });
+		this.argument("hungerLevel", { type: String, required: false, default: (lcnc ? "A bit hungry" : undefined) });
+		this.argument("dessert", { type: Array, required: false, default: (lcnc ? ["includeSass"] : undefined) });
+		this.argument("uploadMenu", { type: String, required: false, default: (lcnc ? "/" : undefined) });
+		this.argument("dump", { type: String, required: false, default: (lcnc ? "/" : undefined) });
+		this.argument("enjoy", { type: String, required: false, default: (lcnc ? "ok" : undefined) });
+		this.argument("comments", { type: String, required: false, default: (lcnc ? "hello\nmy friend\n" : undefined) });
+
 
 		this.setPromptsCallback = fn => {
 			if (this.prompts) {
@@ -54,7 +59,7 @@ module.exports = class extends Generator {
 	}
 
 	async initializing() {
-		this.composeWith(require.resolve("../app2"), { prompts: this.prompts, appWizard: this.appWizard, lcnc: _.get(this.options, "lcnc") });
+		this.composeWith(require.resolve("../app2"), { prompts: this.prompts, appWizard: this.appWizard, lcnc: this._getOption("lcnc") });
 	}
 
 	async prompting() {
@@ -160,38 +165,36 @@ module.exports = class extends Generator {
 		this.answers.number = this._getAnswer("number", this.answers);
 		this.answers.beers = this._getAnswer("beers", this.answers);
 
-		this.log(this.answers);
-
-		prompts = [
-			{
-				name: "food",
-				type: "list",
-				message: "Choose dish",
-				guiOptions: {
-					type: "tiles",
-				},
-				choices: [
-					{ value: "junk-food", name: "Junk Food", description: "It is the best food, but long term, junk food can increase the risk of a heart attack.", homepage: "https://www.betterhealthsolutions.org/junk-food-ruining-body/", image: this._getImage(path.join(this.sourceRoot(), "../images/junk-food.jpg")) },
-					{ value: "jerk-chicken", name: "Pulled Jerk Chicken", description: "A slow cooked pulled chicken.", image: this._getImage(path.join(this.sourceRoot(), "../images/jerk-chicken.jpeg")) },
-					{ value: "lasagna", name: "Lasagna", description: "Layers of creamy ricotta, spinach, and tomato sauce, topped with Parmesan and mozzarella cheese. ", image: this._getImage(path.join(this.sourceRoot(), "../images/lasagna.jpeg")) },
-					{ value: "steak", name: "Rib Eye Steak", description: "Super traditional big rib eye with baked potatos.", image: this._getImage(path.join(this.sourceRoot(), "../images/steak.jpg")) },
-					{ value: "spaghetti", name: "Spaghetti Carbonara", description: "Classic spaghetti alla carbonara, made with pancetta and Italian-style bacon.", homepage: "https://www.allrecipes.com/recipe/11973/spaghetti-carbonara-ii/", image: DEFAULT_IMAGE },
-				],
-				default: "junk-food",
-				validate: (value) => {
-					if (_.includes(["jerk-chicken", "steak"], value)) {
-						this.appWizard.showWarning("You are a vegan, aren't you ?");
-					} else if (value === "junk-food") {
-						this.appWizard.showError("Think twice !!");
-					} else {
-						this.appWizard.showInformation("Good choice.");
-					}
-					return true;
+		prompts = [{
+			name: "food",
+			type: "list",
+			message: "Choose dish",
+			guiOptions: {
+				type: "tiles",
+			},
+			choices: [
+				{ value: "junk-food", name: "Junk Food", description: "It is the best food, but long term, junk food can increase the risk of a heart attack.", homepage: "https://www.betterhealthsolutions.org/junk-food-ruining-body/", image: this._getImage(path.join(this.sourceRoot(), "../images/junk-food.jpg")) },
+				{ value: "jerk-chicken", name: "Pulled Jerk Chicken", description: "A slow cooked pulled chicken.", image: this._getImage(path.join(this.sourceRoot(), "../images/jerk-chicken.jpeg")) },
+				{ value: "lasagna", name: "Lasagna", description: "Layers of creamy ricotta, spinach, and tomato sauce, topped with Parmesan and mozzarella cheese. ", image: this._getImage(path.join(this.sourceRoot(), "../images/lasagna.jpeg")) },
+				{ value: "steak", name: "Rib Eye Steak", description: "Super traditional big rib eye with baked potatos.", image: this._getImage(path.join(this.sourceRoot(), "../images/steak.jpg")) },
+				{ value: "spaghetti", name: "Spaghetti Carbonara", description: "Classic spaghetti alla carbonara, made with pancetta and Italian-style bacon.", homepage: "https://www.allrecipes.com/recipe/11973/spaghetti-carbonara-ii/", image: DEFAULT_IMAGE },
+			],
+			default: "junk-food",
+			validate: (value) => {
+				if (_.includes(["jerk-chicken", "steak"], value)) {
+					this.appWizard.showWarning("You are a vegan, aren't you ?");
+				} else if (value === "junk-food") {
+					this.appWizard.showError("Think twice !!");
+				} else {
+					this.appWizard.showInformation("Good choice.");
 				}
-			}
-		];
+				return true;
+			},
+			when: () => _.isNil(this._getOption("food"))
+		}];
 
 		this.answers_main_dish = await this.prompt(prompts);
+		this.answers_main_dish.food = this._getAnswer("food", this.answers_main_dish);
 
 		// currently not supported:
 		const ui = new Inquirer.ui.BottomBar();
@@ -200,22 +203,26 @@ module.exports = class extends Generator {
 
 		prompts = [{
 			when: () => {
-				return this.answers.confirmHungry;
+				if (_.isNil(this._getOption("hungerLevel"))) {
+					return this._getAnswer("confirmHungry", this.answers);
+				}
+				return false;
 			},
 			type: "list",
 			name: "hungerLevel",
 			message: "How hungry are you?",
-			choices: () => [
-				{ name: "Very hungry" },
-				{ name: "A bit hungry" },
-				{ name: "Not hungry at all" }
-			]
-		},
-		{
+			choices: () => [{
+				name: "Very hungry"
+			}, {
+				name: "A bit hungry"
+			}, {
+				name: "Not hungry at all"
+			}]
+		}, {
 			type: "checkbox",
 			name: "dessert",
 			message: "Which desserts would you like?",
-			validate: (answer) => {
+			validate: answer => {
 				if (answer.length < 1) {
 					return 'You must choose at least one dessert.'
 				}
@@ -233,133 +240,136 @@ module.exports = class extends Generator {
 				name: "Ultimate Gooey Brownies",
 				value: "includeModernizr",
 				checked: true
-			}]
-		},
-		{
+			}],
+			when: () => _.isNil(this._getOption("dessert"))
+		}, {
 			type: "input",
 			guiOptions: {
 				type: "file-browser",
 			},
 			name: "uploadMenu",
 			message: "Upload menu",
-			default: _.get(this.data, "folder", "/")
-		},
-		{
+			default: _.get(this.data, "folder", "/"),
+			when: () => _.isNil(this._getOption("uploadMenu"))
+		}, {
 			type: "input",
 			guiOptions: {
 				type: "folder-browser",
 			},
 			name: "dump",
 			message: "Choose dump folder",
-			default: _.get(this.data, "folder", "/")
-		},
-		{
+			default: _.get(this.data, "folder", "/"),
+			when: () => _.isNil(this._getOption("dump"))
+		}, {
 			type: 'list',
 			name: 'enjoy',
 			message: 'Did you enjoy your meal?',
-			default: (answers) => {
-				return (answers.hungerLevel === "A bit hungry" ? "ok" : "michelin");
+			default: answers => {
+				return (this._getAnswer("hungerLevel", answers) === "A bit hungry" ? "ok" : "michelin");
 			},
-			choices: [
-				{ name: 'Not at all', value: 'no' },
-				{ name: 'It was ok', value: 'ok' },
-				{ name: 'Three Michelin stars', value: 'michelin' },
-			],
-			validate: (answer) => {
+			choices: [{
+				name: 'Not at all', value: 'no'
+			}, {
+				name: 'It was ok', value: 'ok'
+			}, {
+				name: 'Three Michelin stars', value: 'michelin'
+			}],
+			validate: answer => {
 				if (answer === 'no') {
 					return "That's not a possible option."
 				}
 				return true
-			}
-		},
-		{
+			},
+			when: () => _.isNil(this._getOption("enjoy"))
+		}, {
 			type: 'editor',
 			name: 'comments',
 			message: 'Comments',
-			validate: function (text) {
+			validate: text => {
 				if (!text || text.split('\n').length < 2) {
 					return 'Must be at least 2 lines.';
 				}
 				return true;
-			}
-		}
-		];
+			},
+			when: () => _.isNil(this._getOption("comments"))
+		}];
 
 		const answers = await this.prompt(prompts);
+		answers.hungerLevel = this._getAnswer("hungerLevel", answers);
+		answers.dessert = this._getAnswer("dessert", answers);
+		answers.uploadMenu = this._getAnswer("uploadMenu", answers);
+		answers.dump = this._getAnswer("dump", answers);
+		answers.enjoy = this._getAnswer("enjoy", answers);
+		answers.comments = this._getAnswer("comments", answers);
 
 		this.answers = Object.assign({}, this.answers, answers);
 
-		prompts = [
-			{
-				type: 'rawlist',
-				guiOptions: {
-					hint: "Select the repository type"
-				},
-				name: 'repotype',
-				message: 'Git repository type',
-				choices: [
-					'Github',
-					'GitLab',
-					new Inquirer.Separator(),
-					'Bitbucket',
-					new Inquirer.Separator("Text separator"),
-					'Gitea'
-				]
+		prompts = [{
+			type: 'rawlist',
+			guiOptions: {
+				hint: "Select the repository type"
 			},
-			{
-				type: 'expand',
-				guiOptions: {
-					hint: "Select the repository permissions"
-				},
-				name: 'repoperms',
-				message: 'Git repository permissions',
-				choices: [
-					{
-						key: 'u',
-						name: 'Public',
-						value: 'public'
-					},
-					{
-						key: 'r',
-						name: 'Private',
-						value: 'private'
-					}
-				],
-				validate: (value, answers) => {
-					if (value === "private") {
-						this.appWizard.showError("Private repository is not supported", types.MessageType.notification);
-					}
-					return (value !== 'private' ? true : "private repository is not supported");
-				}
+			name: 'repotype',
+			message: 'Git repository type',
+			choices: [
+				'Github',
+				'GitLab',
+				new Inquirer.Separator(),
+				'Bitbucket',
+				new Inquirer.Separator("Text separator"),
+				'Gitea'
+			]
+		}, {
+			type: 'expand',
+			guiOptions: {
+				hint: "Select the repository permissions"
 			},
-			{
-				guiOptions: {
-					hint: "Enter your user name",
-					mandatory: true
+			name: 'repoperms',
+			message: 'Git repository permissions',
+			choices: [
+				{
+					key: 'u',
+					name: 'Public',
+					value: 'public'
 				},
-				name: "email",
-				message: "GitHub user name",
-				store: true,
-				validate: (value, answers) => {
-					return (value.length > 0 ? true : "Mandatory field");
+				{
+					key: 'r',
+					name: 'Private',
+					value: 'private'
 				}
-			},
-			{
-				type: "password",
-				guiOptions: {
-					type: "login",
-					hint: "Enter your password",
-					mandatory: true
-				},
-				name: "password",
-				message: "GitHub password",
-				mask: '*',
-				validate: this._requireLetterAndNumber,
-				when: (response) => {
-					return response.email !== "root";
+			],
+			validate: value => {
+				if (value === "private") {
+					this.appWizard.showError("Private repository is not supported", types.MessageType.notification);
 				}
+				return (value !== 'private' ? true : "private repository is not supported");
 			}
-		];
+		}, {
+			guiOptions: {
+				hint: "Enter your user name",
+				mandatory: true
+			},
+			name: "email",
+			message: "GitHub user name",
+			store: true,
+			validate: value => {
+				return (value.length > 0 ? true : "Mandatory field");
+			}
+		}, {
+			type: "password",
+			guiOptions: {
+				type: "login",
+				hint: "Enter your password",
+				mandatory: true
+			},
+			name: "password",
+			message: "GitHub password",
+			mask: '*',
+			validate: this._requireLetterAndNumber,
+			when: response => {
+				return response.email !== "root";
+			}
+		}];
 
 		const answers_login = await this.prompt(prompts);
 		this.answers = Object.assign({}, this.answers, answers_login);
