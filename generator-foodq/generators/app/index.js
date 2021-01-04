@@ -15,6 +15,13 @@ module.exports = class extends Generator {
 
 		this.appWizard = types.AppWizard.create(opts);
 
+		this.option("lcnc", { type: Boolean });
+
+		const lcnc = _.get(this.options, "lcnc", false);
+
+		this.argument("hungry", { type: Boolean, required: false, default: (lcnc ? true : undefined) });
+		this.argument("confirmHungry", { type: Boolean, required: false, default: (lcnc ? true : undefined) });
+
 		this.setPromptsCallback = fn => {
 			if (this.prompts) {
 				this.prompts.setCallback(fn);
@@ -32,101 +39,120 @@ module.exports = class extends Generator {
 		this.option('babel');
 	}
 
+	_getAnswer(name, res) {
+		return this._getOption(name) || _.get(res, `[${name}]`);
+	}
+
+	_getOption(name) {
+		return _.get(this.options, `[${name}]`);
+	}
+
 	async initializing() {
-		this.composeWith(require.resolve("../app2"), { prompts: this.prompts, appWizard: this.appWizard });
+		this.composeWith(require.resolve("../app2"), { prompts: this.prompts, appWizard: this.appWizard, lcnc: _.get(this.options, "lcnc") });
 	}
 
 	async prompting() {
-		let prompts = [
-			{
-				type: "confirm",
-				name: "hungry",
-				message: "Are you hungry?",
-				default: true
+		let prompts = [{
+			type: "confirm",
+			name: "hungry",
+			message: "Are you hungry?",
+			default: true,
+			when: () => _.isNil(this._getOption("hungry"))
+		}, {
+			type: "confirm",
+			name: "confirmHungry",
+			message: answers => {
+				const isHungry = this._getAnswer("hungry", answers);
+				return `You said you are ${(isHungry ? '' : 'not ')}hungry. Is this correct?`;
 			},
-			{
-				type: "confirm",
-				name: "confirmHungry",
-				message: (answers) => {
-					return `You said you are ${(answers.hungry ? '' : 'not ')}hungry. Is this correct?`;
-				},
-				store: true,
-				validate: (value, answers) => {
-					if (value) {
-						this.appWizard.showInformation("Good news !! You are hungry !!!", types.MessageType.prompt);
-						return true;
-					}
-					this.appWizard.showError("You must be hungry", types.MessageType.prompt);
-					return "You must be hungry";
-				},
+			store: true,
+			validate: value => {
+				if (value) {
+					this.appWizard.showInformation("Good news !! You are hungry !!!", types.MessageType.prompt);
+					return true;
+				}
+				this.appWizard.showError("You must be hungry", types.MessageType.prompt);
+				return "You must be hungry";
 			},
-			{
-				type: 'input',
-				name: 'fav_color',
-				message: "What's your favorite napkin color?",
-				guiOptions: {
-					hint: "Our recommendation is green"
-				},
-				when: (response) => {
-					if (response.hungry) {
+			when: () => _.isNil(this._getOption("confirmHungry"))
+		}, {
+			type: 'input',
+			name: 'favColor',
+			message: "What's your favorite napkin color?",
+			guiOptions: {
+				hint: "Our recommendation is green"
+			},
+			when: response => {
+				if (_.isNil(this._getOption("favColor"))) {
+					const hungry = this._getAnswer("hungry", response);
+					if (hungry) {
 						this.appWizard.showInformation("Our recommendation for color is green", types.MessageType.notification);
 					}
-				
-					return response.hungry;
-				},
-				validate: (value, answers) => {
-					this.fav_color = value;
-					return (value.length > 1 ? true : "Enter at least 2 characters");
-				},
-				transformer: function (color, answers, flags) {
-					const text = chalkPipe(color)(color);
-					if (flags.isFinal) {
-						return `${text}!`;
-					}
-					return text;
+
+					return hungry;
 				}
+				return false;
 			},
-			{
-				default: (answers) => {
-					return (answers.fav_color === "green" ? "11" : answers.fav_color === "red" ? "44" : "5");
-				},
-				validate: (value, answers) => {
-					return (value > 10 ? true : "Enter a number > 10");
-				},
-				type: "number",
-				name: "number",
-				message: "How many times have you been in this restaurant?",
-				guiOptions: {
-					hint: "We hope you have been in our restaurant many times",
-					applyDefaultWhenDirty: true,
-					mandatory: true
-				},
+			validate: value => {
+				this.favColor = value;
+				return (value.length > 1 ? true : "Enter at least 2 characters");
 			},
-			{
-				when: async response => {
+			transformer: function (color, answers, flags) {
+				const text = chalkPipe(color)(color);
+				if (flags.isFinal) {
+					return `${text}!`;
+				}
+				return text;
+			}
+		}, {
+			default: answers => {
+				const favColor = this._getAnswer("favColor", answers);
+				return (favColor === "green" ? "11" : favColor === "red" ? "44" : "5");
+			},
+			validate: value => {
+				return (value > 10 ? true : "Enter a number > 10");
+			},
+			type: "number",
+			name: "number",
+			message: "How many times have you been in this restaurant?",
+			guiOptions: {
+				hint: "We hope you have been in our restaurant many times",
+				applyDefaultWhenDirty: true,
+				mandatory: true
+			},
+			when: () => _.isNil(this._getOption("number"))
+		}, {
+			when: async response => {
+				if (_.isNil(this._getOption("beers"))) {
 					return new Promise(resolve => {
 						setTimeout(() => {
-							resolve(response.hungry);
+							resolve(this._getAnswer("hungry", response));
 						}, 2000);
 					});
-				},
-				type: "checkbox",
-				name: "beers",
-				message: "Which beer would you like?",
-				choices: [
-					"Chimay Trappist Ales",
-					"Paulaner Salvator Doppel Bock",
-					"Weihenstephaner Korbinian",
-					"Hoegaarden Belguim White",
-					"Allagash White Ale",
-					"St. Feuillien Blonde",
-					"Houblon Chouffe Dobbelen IPA Tripel",
-					"Augustiner Hell"
-				]
-			}
-		];
+				}
+				return false;
+			},
+			type: "checkbox",
+			name: "beers",
+			message: "Which beer would you like?",
+			choices: [
+				"Chimay Trappist Ales",
+				"Paulaner Salvator Doppel Bock",
+				"Weihenstephaner Korbinian",
+				"Hoegaarden Belguim White",
+				"Allagash White Ale",
+				"St. Feuillien Blonde",
+				"Houblon Chouffe Dobbelen IPA Tripel",
+				"Augustiner Hell"
+			]
+		}];
 
 		this.answers = await this.prompt(prompts);
+		this.answers.hungry = this._getAnswer("hungry", this.answers);
+		this.answers.hungry = this._getAnswer("confirmHungry", this.answers);
+		this.answers.hungry = this._getAnswer("favColor", this.answers);
+		this.answers.hungry = this._getAnswer("number", this.answers);
+		this.answers.hungry = this._getAnswer("beers", this.answers);
 
 		prompts = [
 			{
@@ -165,90 +191,90 @@ module.exports = class extends Generator {
 		ui.updateBottomBar("This is written to the bottom bar");
 
 		prompts = [{
-				when: () => {
-					return this.answers.confirmHungry;
-				},
-				type: "list",
-				name: "hungerLevel",
-				message: "How hungry are you?",
-				choices: () => [
-					{ name: "Very hungry" },
-					{ name: "A bit hungry" },
-					{ name: "Not hungry at all" }
-				]
+			when: () => {
+				return this.answers.confirmHungry;
 			},
-			{
-				type: "checkbox",
-				name: "dessert",
-				message: "Which desserts would you like?",
-				validate: (answer) => {
-					if (answer.length < 1) {
-						return 'You must choose at least one dessert.'
-					}
-					return true
-				},
-				choices: [{
-					name: "Buttery Raspberry Crumble Bars",
-					value: "includeSass",
-					checked: false
-				}, {
-					name: "Mint Oreo Cake",
-					value: "includeBootstrap",
-					checked: true
-				}, {
-					name: "Ultimate Gooey Brownies",
-					value: "includeModernizr",
-					checked: true
-				}]
-			},
-			{
-				type: "input",
-				guiOptions: {
-					type: "file-browser",
-				},
-				name: "uploadMenu",
-				message: "Upload menu",
-				default: _.get(this.data, "folder", "/")
-			},
-			{
-				type: "input",
-				guiOptions: {
-					type: "folder-browser",
-				},
-				name: "dump",
-				message: "Choose dump folder",
-				default: _.get(this.data, "folder", "/")
-			},
-			{
-				type: 'list',
-				name: 'enjoy',
-				message: 'Did you enjoy your meal?',
-				default: (answers) => {
-					return (answers.hungerLevel === "A bit hungry" ? "ok" : "michelin");
-				},
-				choices: [
-					{ name: 'Not at all', value: 'no' },
-					{ name: 'It was ok', value: 'ok' },
-					{ name: 'Three Michelin stars', value: 'michelin' },
-				],
-				validate: (answer) => {
-					if (answer === 'no') {
-						return "That's not a possible option."
-					}
-					return true
+			type: "list",
+			name: "hungerLevel",
+			message: "How hungry are you?",
+			choices: () => [
+				{ name: "Very hungry" },
+				{ name: "A bit hungry" },
+				{ name: "Not hungry at all" }
+			]
+		},
+		{
+			type: "checkbox",
+			name: "dessert",
+			message: "Which desserts would you like?",
+			validate: (answer) => {
+				if (answer.length < 1) {
+					return 'You must choose at least one dessert.'
 				}
+				return true
 			},
-			{
-				type: 'editor',
-				name: 'comments',
-				message: 'Comments',
-				validate: function (text) {
-					if (!text || text.split('\n').length < 2) {
-						return 'Must be at least 2 lines.';
-					}
-					return true;
+			choices: [{
+				name: "Buttery Raspberry Crumble Bars",
+				value: "includeSass",
+				checked: false
+			}, {
+				name: "Mint Oreo Cake",
+				value: "includeBootstrap",
+				checked: true
+			}, {
+				name: "Ultimate Gooey Brownies",
+				value: "includeModernizr",
+				checked: true
+			}]
+		},
+		{
+			type: "input",
+			guiOptions: {
+				type: "file-browser",
+			},
+			name: "uploadMenu",
+			message: "Upload menu",
+			default: _.get(this.data, "folder", "/")
+		},
+		{
+			type: "input",
+			guiOptions: {
+				type: "folder-browser",
+			},
+			name: "dump",
+			message: "Choose dump folder",
+			default: _.get(this.data, "folder", "/")
+		},
+		{
+			type: 'list',
+			name: 'enjoy',
+			message: 'Did you enjoy your meal?',
+			default: (answers) => {
+				return (answers.hungerLevel === "A bit hungry" ? "ok" : "michelin");
+			},
+			choices: [
+				{ name: 'Not at all', value: 'no' },
+				{ name: 'It was ok', value: 'ok' },
+				{ name: 'Three Michelin stars', value: 'michelin' },
+			],
+			validate: (answer) => {
+				if (answer === 'no') {
+					return "That's not a possible option."
 				}
+				return true
 			}
+		},
+		{
+			type: 'editor',
+			name: 'comments',
+			message: 'Comments',
+			validate: function (text) {
+				if (!text || text.split('\n').length < 2) {
+					return 'Must be at least 2 lines.';
+				}
+				return true;
+			}
+		}
 		];
 
 		const answers = await this.prompt(prompts);
@@ -366,7 +392,7 @@ module.exports = class extends Generator {
 		!_.isNil(this.answers.confirmHungry) && this.log(`Confirm Hungry = ${this.answers.confirmHungry}`);
 		!_.isNil(this.answers_main_dish.food) && this.log(`Main dish = ${this.answers_main_dish.food}`);
 		!_.isEmpty(this.answers.beers) && this.log(`Beers = ${this.answers.beers}`);
-		!_.isNil(this.answers.fav_color) && this.log(`Favorite napkin color = ${this.answers.fav_color}`);
+		!_.isNil(this.answers.favColor) && this.log(`Favorite napkin color = ${this.answers.favColor}`);
 		!_.isNil(this.answers.number) && this.log(`Times you have been in this restaurant = ${this.answers.number}`);
 
 		this.fs.copyTpl(this.templatePath('index.html'),
@@ -376,7 +402,7 @@ module.exports = class extends Generator {
 			confirmHungry: this.answers.confirmHungry,
 			food: this.answers_main_dish.food,
 			beers: this.answers.beers,
-			fav_color: this.answers.fav_color,
+			favColor: this.answers.favColor,
 			number: this.answers.number,
 
 			hungerLevel: this.answers.hungerLevel,

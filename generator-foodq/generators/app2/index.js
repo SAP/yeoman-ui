@@ -12,11 +12,13 @@ module.exports = class extends Generator {
 		this.appWizard = opts.appWizard;
 		this.parentPromptsQuantity = _.size(this.prompts);
 
+		const lcnc = opts.lcnc || _.get(this.options, "lcnc", false);
+		
 		this.option("lcnc", { type: Boolean });
-		this.argument("isDelivery", { type: Boolean, required: false, default: (this.options.lcnc ? true : undefined) });
-		this.argument("deliveryMethod", { type: Array, required: false, default: (this.options.lcnc ? "Drone" : undefined) });
-		this.argument("address", { type: String, required: false, default: (this.options.lcnc ? "the best street" : undefined) });
-		this.argument("tip", { type: Number, required: false, default: (this.options.lcnc ? 20 : undefined) });
+		this.argument("isDelivery", { type: Boolean, required: false, default: (lcnc ? true : undefined) });
+		this.argument("deliveryMethod", { type: Array, required: false, default: (lcnc ? "Drone" : undefined) });
+		this.argument("address", { type: String, required: false, default: (lcnc ? "the best street" : undefined) });
+		this.argument("tip", { type: Number, required: false, default: (lcnc ? 20 : undefined) });
 
 		this.dynamicAddressPrompt = { name: "Address", description: "Provide the address for delivery." };
 
@@ -92,7 +94,7 @@ module.exports = class extends Generator {
 					return bWhen;
 				}
 				return false;
-			}
+			},
 		}];
 
 		this.answers = await this.prompt(prompts);
