@@ -15,26 +15,26 @@ module.exports = class extends Generator {
 
 		this.appWizard = types.AppWizard.create(opts);
 
-		this.option("lcnc", { type: Boolean });
+		this.option("np", { type: Boolean });
 
-		const lcnc = _.get(this.options, "lcnc", false);
+		const np = _.get(this.options, "np", false);
 
-		this.argument("hungry", { type: Boolean, required: false, default: (lcnc ? true : undefined) });
-		this.argument("confirmHungry", { type: Boolean, required: false, default: (lcnc ? true : undefined) });
-		this.argument("favColor", { type: String, required: false, default: (lcnc ? "green" : undefined) });
-		this.argument("number", { type: Number, required: false, default: (lcnc ? 12 : undefined) });
-		this.argument("beers", { type: Array, required: false, default: (lcnc ? ["Allagash White Ale", "St. Feuillien Blonde"] : undefined) });
-		this.argument("food", { type: String, required: false, default: (lcnc ? "steak" : undefined) });
-		this.argument("hungerLevel", { type: String, required: false, default: (lcnc ? "A bit hungry" : undefined) });
-		this.argument("dessert", { type: Array, required: false, default: (lcnc ? ["includeSass"] : undefined) });
-		this.argument("uploadMenu", { type: String, required: false, default: (lcnc ? "/" : undefined) });
-		this.argument("dump", { type: String, required: false, default: (lcnc ? "/" : undefined) });
-		this.argument("enjoy", { type: String, required: false, default: (lcnc ? "ok" : undefined) });
-		this.argument("comments", { type: String, required: false, default: (lcnc ? "hello\nmy friend\n" : undefined) });
-		this.argument("repotype", { type: String, required: false, default: (lcnc ? "GitLab" : undefined) });
-		this.argument("repoperms", { type: String, required: false, default: (lcnc ? "public" : undefined) });
-		this.argument("email", { type: String, required: false, default: (lcnc ? "myUsername" : undefined) });
-		this.argument("password", { type: String, required: false, default: (lcnc ? "password123" : undefined) });
+		this.argument("food", { type: String, required: false, default: (np ? "lasagna" : undefined) });
+		this.argument("hungry", { type: Boolean, required: false, default: (np ? true : undefined) });
+		this.argument("confirmHungry", { type: Boolean, required: false, default: (np ? true : undefined) });
+		this.argument("favColor", { type: String, required: false, default: (np ? "green" : undefined) });
+		this.argument("number", { type: Number, required: false, default: (np ? 12 : undefined) });
+		this.argument("beers", { type: Array, required: false, default: (np ? ["Allagash White Ale", "St. Feuillien Blonde"] : undefined) });
+		this.argument("hungerLevel", { type: String, required: false, default: (np ? "A bit hungry" : undefined) });
+		this.argument("dessert", { type: Array, required: false, default: (np ? ["includeSass"] : undefined) });
+		this.argument("uploadMenu", { type: String, required: false, default: (np ? "/" : undefined) });
+		this.argument("dump", { type: String, required: false, default: (np ? "/" : undefined) });
+		this.argument("enjoy", { type: String, required: false, default: (np ? "ok" : undefined) });
+		this.argument("comments", { type: String, required: false, default: (np ? "hello\nmy friend\n" : undefined) });
+		this.argument("repotype", { type: String, required: false, default: (np ? "GitLab" : undefined) });
+		this.argument("repoperms", { type: String, required: false, default: (np ? "public" : undefined) });
+		this.argument("email", { type: String, required: false, default: (np ? "myUsername" : undefined) });
+		this.argument("password", { type: String, required: false, default: (np ? "password123" : undefined) });
 
 
 		this.setPromptsCallback = fn => {
@@ -63,8 +63,8 @@ module.exports = class extends Generator {
 	}
 
 	async initializing() {
-		const lcnc = this._getOption("lcnc");
-		this.composeWith(require.resolve("../app2"), { prompts: this.prompts, appWizard: this.appWizard, lcnc });
+		const np = this._getOption("np");
+		this.composeWith(require.resolve("../app2"), { prompts: this.prompts, appWizard: this.appWizard, np });
 	}
 
 	async prompting() {
