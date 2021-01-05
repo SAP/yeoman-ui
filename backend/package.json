@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.51",
+	"version": "1.1.52",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -107,6 +107,16 @@
 					],
 					"default": "error",
 					"description": "The verbosity of logging according to the following order: trace > debug > info > warn > error > fatal > off.",
+					"scope": "resource"
+				},
+				"ApplicationWizard.workspace": {
+					"type": "string",
+					"enum": [
+						"Open in a new workspace",
+						"Add to workspace"
+					],
+					"default": "Add to workspace",
+					"description": "Set the default workspace configuration for the application.",
 					"scope": "resource"
 				},
 				"ApplicationWizard.sourceLocationTracking": {

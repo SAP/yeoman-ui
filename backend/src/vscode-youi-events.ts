@@ -51,9 +51,9 @@ export class VSCodeYouiEvents implements YouiEvents {
 		this.appWizard = new YoUiAppWizard(this);
 	}
 
-	public doGeneratorDone(success: boolean, message: string, isTypeProject: boolean, targetFolderPath?: string): void {
+	public doGeneratorDone(success: boolean, message: string, selectedWorkspace: string, targetFolderPath?: string): void {
 		this.doClose();
-		this.showDoneMessage(success, message, isTypeProject, targetFolderPath);
+		this.showDoneMessage(success, message, selectedWorkspace, targetFolderPath);
 	}
 
 	public doGeneratorInstall(): void {
@@ -161,13 +161,12 @@ export class VSCodeYouiEvents implements YouiEvents {
 		return !_.isEmpty(relativePath) && !_.startsWith(relativePath, '..') && !isAbsolute(relativePath);
 	}
 
-	private showDoneMessage(success: boolean, errorMmessage: string, isTypeProject: boolean, targetFolderPath?: string): Thenable<any> {
+	private showDoneMessage(success: boolean, errorMmessage: string, selectedWorkspace: string, targetFolderPath?: string): Thenable<any> {
 		this.resolveInstallingProgress();
 
 		if (success) {
-			const addToWorkspace = "Add to Workspace";
-			const openInNewWorkspace: any = "Open in New Workspace";
-			const items: string[] = [];
+			const addToWorkspace = "Add to workspace";
+			const openInNewWorkspace: any = "Open in a new workspace";
 			let targetFolderUri: vscode.Uri = null;
 
 			// The correct targetFolderPath is unknown ---> no buttons should be shown
@@ -183,29 +182,18 @@ export class VSCodeYouiEvents implements YouiEvents {
 					return ((wsFolder.uri.fsPath === targetFolderUri.fsPath) || this.isPredecessorOf(wsFolder.uri.fsPath, targetFolderUri.fsPath));
 				});
 				// 2. Theia bug: vscode.workspace.workspaceFolders should not be undefined or empty
-				if (!foundInWorkspace && workspacePath) {
-					items.push(addToWorkspace);
-				}
-
-				// target workspace path should not be equal to target generator folder path
-				if (workspacePath !== targetFolderUri.fsPath && isTypeProject) {
-					items.push(openInNewWorkspace);
-				}
 			}
 
 			const successInfoMessage = this.messages.artifact_generated;
-			if (_.isEmpty(items)) {
-				return vscode.window.showInformationMessage(successInfoMessage);
-			}
-
-			return vscode.window.showInformationMessage(`${successInfoMessage}\nWhat would you like to do with it?`, ...items).then(selection => {
-				if (selection === openInNewWorkspace) {
-					return vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
-				} else if (selection === addToWorkspace) {
+			vscode.window.showInformationMessage(successInfoMessage);
+			if (selectedWorkspace){
+				if (selectedWorkspace === openInNewWorkspace) {
+					vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
+				} else if (selectedWorkspace === addToWorkspace) {
 					const wsFoldersQuantity = _.size(vscode.workspace.workspaceFolders);
-					return vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, { uri: targetFolderUri });
+					vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, { uri: targetFolderUri });
 				}
-			});
+			}
 		}
 
 		return vscode.window.showErrorMessage(errorMmessage);

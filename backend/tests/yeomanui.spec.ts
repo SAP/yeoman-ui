@@ -33,7 +33,7 @@ describe('yeomanui unit test', () => {
 	const choiceMessage =
 		"Some quick example text of the generator description. This is a long text so that the example will look good.";
 	class TestEvents implements YouiEvents {
-		public doGeneratorDone(success: boolean, message: string, isTypeProject: boolean, targetPath?: string): void {
+		public doGeneratorDone(success: boolean, message: string, selectedWorkspace: string, targetPath?: string): void {
 			return;
 		}
 		public doGeneratorInstall(): void {

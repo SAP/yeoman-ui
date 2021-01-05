@@ -20,6 +20,8 @@ import TerminalAdapter = require("yeoman-environment/lib/adapter");
 import { Output } from "./output";
 import { resolve } from "path";
 import * as envUtils from "./env/utils";
+import { getSelectedWorkspaceSetting } from "./logger/settings";
+
 
 
 export interface IQuestionsPrompt extends IPrompt {
@@ -75,6 +77,7 @@ export class YeomanUI {
 		this.rpc.registerMethod({ func: this.setCwd, thisArg: this });
 		this.rpc.registerMethod({ func: this.getState, thisArg: this });
 
+		this.initialCwd = process.cwd();
 		this.uiOptions = uiOptions;
 		this.youiAdapter = new YouiAdapter(youiEvents, output);
 		this.youiAdapter.setYeomanUI(this);
@@ -196,7 +199,6 @@ export class YeomanUI {
 
 			this.promptCount = 0;
 			this.gen = (gen as Generator);
-			this.initialCwd = process.cwd();
 			// do not add second parameter with value true
 			// some generators rely on fact that this.env.cwd and 
 			// the current working directory is changed.
@@ -292,10 +294,11 @@ export class YeomanUI {
 
 	private async receiveIsWebviewReady() {
 		try {
+			const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
+			const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 			let generatorId: string = this.uiOptions.generator;
+			//let selectedWorkspace = response.selectedWorkspace;
 			if (!generatorId) {
-				const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
-				const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 				generatorId = response.generator;
 			}
 			this.replayUtils.clear();
@@ -393,12 +396,14 @@ export class YeomanUI {
 			targetFolderPath = targetFolderPathAfterGen;
 		}
 
+		const selectedWorkspace = getSelectedWorkspaceSetting();
+
 		const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
 		const generatedTemplatePath = targetFolderPath ? targetFolderPath : targetFolderPathBeforeGen;
 		this.logger.debug("done running yeomanui! " + message + ` You can find it at ${generatedTemplatePath}`);
 		SWA.updateGeneratorEnded(generatorName, true, this.logger);
-		const isProject: boolean = (this.isTypeProjectMap.has(generatorName)) ? this.isTypeProjectMap.get(generatorName) : false;
-		this.youiEvents.doGeneratorDone(true, message, isProject, targetFolderPath);
+		//const isProject: boolean = (this.isTypeProjectMap.has(generatorName)) ? this.isTypeProjectMap.get(generatorName) : false;
+		this.youiEvents.doGeneratorDone(true, message, selectedWorkspace, targetFolderPath);
 		this.setInitialProcessDir();
 	}
 
@@ -407,7 +412,7 @@ export class YeomanUI {
 		const messagePrefix = `${generatorName} generator failed`;
 		const errorMessage: string = this.logError(error, messagePrefix);
 		SWA.updateGeneratorEnded(generatorName, false, this.logger, errorMessage);
-		this.youiEvents.doGeneratorDone(false, errorMessage, false);
+		this.youiEvents.doGeneratorDone(false, errorMessage, "");
 		this.setInitialProcessDir();
 	}
 
@@ -437,7 +442,22 @@ export class YeomanUI {
 
 		const questions: any[] = [];
 
-		if (_.includes(genFilter.types, GeneratorType.project)) {
+		const vscodeInstance = this.getVscode();
+		if (vscodeInstance) {
+			let config =  await vscodeInstance.workspace.getConfiguration("ApplicationWizard").get("workspace");
+			if(config == "Add to workspace") {
+				if (YeomanUI.PROJECTS === this.outputPath  && _.includes(genFilter.types, GeneratorType.project)){
+					vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("workspace", "Open in a new workspace", vscodeInstance.ConfigurationTarget.Global);
+				}
+			}
+			else if (config == "Open in a new workspace"){
+				if (YeomanUI.PROJECTS != this.outputPath){
+					vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("workspace", "Add to workspace", vscodeInstance.ConfigurationTarget.Global);
+				}
+			}
+		}
+
+//		if (_.includes(genFilter.types, GeneratorType.project)) {
 			const defaultPath = this.getCwd();
 			const targetFolderQuestion: any = {
 				type: "input",
@@ -466,7 +486,25 @@ export class YeomanUI {
 				}
 			};
 			questions.push(targetFolderQuestion);
-		}
+
+	//		if (YeomanUI.PROJECTS != this.outputPath){
+				const locationQuestion: any = {
+					type: "list",
+					guiOptions: {
+						hint: this.uiOptions.messages.select_open_workspace_question_hint
+
+					},
+					name: "selectedWorkspace",
+					message: `Where do you want to open the project? <a href="https://www.w3schools.com">Visit W3Schools.com!</a>`,
+					default: getSelectedWorkspaceSetting(),
+					// getFilePath: async function (currentPath: string, showOpenDialog: Function) {
+					// 	return await showOpenDialog(currentPath);
+					// }
+					choices: ["Open in a new workspace", "Add to workspace"]
+				};
+				questions.push(locationQuestion);
+		//	}
+//		}
 
 		const generatorChoices = await Promise.all(generatorChoicePromises);
 		const generatorQuestion: any = {
