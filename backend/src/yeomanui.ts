@@ -225,9 +225,7 @@ export class YeomanUI {
 	}
 
 	private setInitialProcessDir() {
-		if (this.initialCwd) {
-			process.chdir(this.initialCwd);
-		}
+		process.chdir(this.initialCwd);
 	}
 
 	private setGenInWriting(gen: any) {
