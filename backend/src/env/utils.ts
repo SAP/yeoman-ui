@@ -1,4 +1,4 @@
-import Environment = require("yeoman-environment");
+import * as Environment from "yeoman-environment";
 import * as os from "os";
 import * as _ from "lodash";
 
