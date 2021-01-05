@@ -75,6 +75,7 @@ export class YeomanUI {
 		this.rpc.registerMethod({ func: this.setCwd, thisArg: this });
 		this.rpc.registerMethod({ func: this.getState, thisArg: this });
 
+		this.initialCwd = process.cwd();
 		this.uiOptions = uiOptions;
 		this.youiAdapter = new YouiAdapter(youiEvents, output);
 		this.youiAdapter.setYeomanUI(this);
@@ -196,7 +197,6 @@ export class YeomanUI {
 
 			this.promptCount = 0;
 			this.gen = (gen as Generator);
-			this.initialCwd = process.cwd();
 			// do not add second parameter with value true
 			// some generators rely on fact that this.env.cwd and 
 			// the current working directory is changed.
@@ -223,9 +223,7 @@ export class YeomanUI {
 	}
 
 	private setInitialProcessDir() {
-		if (this.initialCwd) {
-			process.chdir(this.initialCwd);
-		}
+		process.chdir(this.initialCwd);
 	}
 
 	private setGenInWriting(gen: any) {
