@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.27",
+	"version": "1.1.52",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -17,7 +17,7 @@
 	},
 	"icon": "Wizard_logo.png",
 	"engines": {
-		"vscode": "^1.39.2"
+		"vscode": "^1.39.0"
 	},
 	"categories": [
 		"Other"
@@ -34,7 +34,8 @@
 		"onCommand:loadYeomanUI",
 		"onWebviewPanel:yeomanui",
 		"onCommand:exploreGenerators",
-		"onWebviewPanel:exploreGens"
+		"onWebviewPanel:exploreGens",
+		"onWebviewPanel:runGenerator"
 	],
 	"main": "./dist/extension",
 	"contributes": {
@@ -45,7 +46,7 @@
 			},
 			{
 				"command": "loadYeomanUI",
-				"title": "Yeoman UI Generators"
+				"title": "Open Application Wizard"
 			},
 			{
 				"command": "yeomanUI.toggleOutput",
@@ -58,6 +59,10 @@
 			{
 				"command": "exploreGenerators",
 				"title": "Explore and Install Generators"
+			},
+			{
+				"command": "runGenerator",
+				"title": "Run Generator"
 			}
 		],
 		"menus": {
@@ -83,6 +88,12 @@
 			"type": "object",
 			"title": "Application Wizard",
 			"properties": {
+				"ApplicationWizard.enableSapWebAnalytics": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable collecting usage analytics data for Application Wizard.  If enabled, non-personally identifiable information is used to help understand the product usage and improve the tool.",
+					"scope": "resource"
+				},
 				"ApplicationWizard.loggingLevel": {
 					"type": "string",
 					"enum": [
@@ -140,7 +151,7 @@
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"package": "vsce package .",
-		"test": "nyc mocha -p tsconfig.json --opts ./mocha.opts",
+		"test": "nyc mocha -p tsconfig.json",
 		"ws:run": "node ./out/src/webSocketServer/index.js",
 		"ws:egRun": "node ./out/src/webSocketServer/exploreGensIndex.js",
 		"lint": "eslint . --ext .ts,.tsx --cache",
@@ -148,51 +159,71 @@
 	},
 	"dependencies": {
 		"@sap-devx/webview-rpc": "0.2.3",
-		"@sap-devx/yeoman-ui-types": "0.0.1",
-		"@vscode-logging/logger": "1.2.0",
+		"@sap-devx/yeoman-ui-types": "1.0.2",
+		"@sap/swa-for-sapbas-vsx": "1.1.11",
+		"@vscode-logging/logger": "1.2.1",
 		"chalk": "4.1.0",
 		"datauri": "3.0.0",
 		"fs-extra": "9.0.1",
 		"humanize-string": "2.1.0",
 		"lodash": "4.17.20",
-		"npm-registry-fetch": "8.1.4",
+		"npm-registry-fetch": "9.0.0",
 		"object-hash": "2.0.3",
 		"strip-ansi": "6.0.0",
 		"titleize": "2.1.0",
-		"ws": "7.3.1",
-		"yeoman-environment": "2.10.3",
-		"@sap/swa-for-sapbas-vsx": "1.1.2"
+		"ws": "7.4.1",
+		"yeoman-environment": "2.10.3"
 	},
 	"devDependencies": {
-		"@types/npm-registry-fetch": "8.0.0",
-		"@types/chai": "4.2.12",
-		"@types/fs-extra": "9.0.1",
+		"@types/npm-registry-fetch": "^8.0.0",
+		"@types/chai": "^4.2.14",
+		"@types/fs-extra": "^9.0.6",
 		"@types/inquirer": "7.3.1",
-		"@types/lodash": "4.14.161",
-		"@types/mocha": "^5.2.7",
-		"@types/node": "14.6.4",
-		"@types/object-hash": "1.3.3",
-		"@types/sinon": "9.0.5",
+		"@types/lodash": "^4.14.167",
+		"@types/mocha": "^8.2.0",
+		"@types/node": "^14.14.20",
+		"@types/object-hash": "^1.3.4",
+		"@types/sinon": "^9.0.10",
 		"@types/ws": "7.2.6",
-		"@types/yeoman-environment": "2.10.1",
-		"@typescript-eslint/parser": "^2.30.0",
-		"@typescript-eslint/eslint-plugin": "^2.30.0",
+		"@types/vscode": "^1.39.0",
+		"@types/yeoman-environment": "^2.10.2",
+		"@typescript-eslint/parser": "^4.12.0",
+		"@typescript-eslint/eslint-plugin": "^4.12.0",
 		"eslint": "^6.8.0",
-		"eslint-config-prettier": "6.11.0",
+		"eslint-config-prettier": "^7.1.0",
 		"prettier": "2.1.1",
 		"typescript": "4.0.2",
-		"bufferutil": "4.0.1",
-		"chai": "4.2.0",
+		"chai": "^4.2.0",
 		"copy-webpack-plugin": "6.1.0",
-		"mocha": "^6.2.2",
+		"mocha": "7.2.0",
 		"nyc": "15.1.0",
-		"sinon": "9.0.3",
+		"sinon": "^9.2.2",
 		"ts-loader": "8.0.3",
 		"ts-node": "9.0.0",
-		"utf-8-validate": "5.0.2",
 		"string-replace-loader": "2.3.0",
-		"vsce": "1.79.5",
+		"vsce": "^1.83.0",
 		"webpack": "4.44.1",
-		"webpack-cli": "3.3.12"
+		"webpack-cli": "3.3.12",
+		"lcov-result-merger": "3.1.0",
+		"coveralls": "2.11.16",
+		"cz-conventional-changelog": "3.3.0",
+		"@commitlint/cli": "11.0.0",
+		"@commitlint/config-conventional": "11.0.0",
+		"husky": "4.3.6"
+	},
+	"husky": {
+		"hooks": {
+			"commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+		}
+	},
+	"config": {
+		"commitizen": {
+			"path": "cz-conventional-changelog"
+		}
+	},
+	"commitlint": {
+		"extends": [
+			"@commitlint/config-conventional"
+		]
 	}
 }

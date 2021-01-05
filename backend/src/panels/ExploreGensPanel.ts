@@ -9,11 +9,13 @@ import { RpcExtension } from "@sap-devx/webview-rpc/out.ext/rpc-extension";
 export class ExploreGensPanel extends AbstractWebviewPanel {
     public setWebviewPanel(webviewPanel: vscode.WebviewPanel) {
         super.setWebviewPanel(webviewPanel);
-        this.exploreGens.init(new RpcExtension(webviewPanel.webview));
+        this.rpc = new RpcExtension(webviewPanel.webview);
+        this.exploreGens.init(this.rpc);
         this.initWebviewPanel();
     }
 
     private readonly exploreGens: ExploreGens;
+
     public constructor(context: vscode.ExtensionContext) {
         super(context);
         this.viewType = "exploreGens";
@@ -29,9 +31,9 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
 		} else {
             super.loadWebviewPanel();
 		}
-	}
+    }
 
     public disposeWebviewPanel() {
-		super.disposeWebviewPanel();
+        super.disposeWebviewPanel();
     }
 }

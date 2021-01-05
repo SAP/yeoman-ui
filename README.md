@@ -1,6 +1,10 @@
 [![CircleCI](https://circleci.com/gh/SAP/yeoman-ui.svg?style=svg)](https://circleci.com/gh/SAP/yeoman-ui)
+[![Coverage Status](https://coveralls.io/repos/github/SAP/yeoman-ui/badge.svg?branch=master)](https://coveralls.io/github/SAP/yeoman-ui?branch=master)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/SAP/yeoman-ui.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/SAP/yeoman-ui/context:javascript)
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 ![GitHub license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP/yeoman-ui)](https://api.reuse.software/info/github.com/SAP/yeoman-ui)
+[![dependentbot](https://api.dependabot.com/badges/status?host=github&repo=SAP/yeoman-ui)](https://dependabot.com/)
 
 # Application Wizard
 
@@ -48,6 +52,9 @@ To run it do the following:
 #### Run the VSCode extension
 * Start VSCode on your local machine, and click on open workspace. Select this repo folder.
 * On the debug panel choose "Run Extension", and click on the "Run" button.
+
+#### Enable usage analytics reporting from VS Code
+The tool collects non-personally identifiable information about your usage of the tool to improve its services. If you do not want the tool to collect your usage data, you can set the "Enable Sap Web Analytics" setting to "false". Go to File > Preferences > Settings (macOS: Code > Preferences > Settings) > Extensions > Application Wizard, and deselect the "Enable Sap Web Analytics" checkbox.
 
 #### Advanced scenarios
 To develop and contribute you can build and install each package separately. Instruction on each package in the dedicated readme.md file.

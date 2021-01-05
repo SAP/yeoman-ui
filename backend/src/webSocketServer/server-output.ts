@@ -4,7 +4,7 @@ import { Output } from "../output";
 
 export class ServerOutput implements Output {
 	private isVisible: boolean;
-	private rpc: RpcCommon;
+	private readonly rpc: RpcCommon;
 
 	constructor(rpc: RpcCommon, isOutputVisible: boolean) {
 		this.rpc = rpc;

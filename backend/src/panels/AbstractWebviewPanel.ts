@@ -1,10 +1,12 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as os from "os";
 import * as _ from 'lodash';
 import * as fsextra from 'fs-extra';
 import { IChildLogger } from '@vscode-logging/logger';
-import { getLogger } from '../logger/logger-wrapper';
+import { getClassLogger } from '../logger/logger-wrapper';
 import Environment = require('yeoman-environment');
+import { RpcExtension } from '@sap-devx/webview-rpc/out.ext/rpc-extension';
 
 
 export abstract class AbstractWebviewPanel {
@@ -18,11 +20,11 @@ export abstract class AbstractWebviewPanel {
 	protected state: any;
 	protected context: vscode.ExtensionContext;
 
-	protected logger: IChildLogger;
+	protected readonly logger: IChildLogger;
 	protected disposables: vscode.Disposable[];
 	protected isInBAS: boolean;
+	protected rpc: RpcExtension;
 
-	// improves first time performance 
 	protected static readonly npmGlobalPaths: string[] = Environment.createEnv().getNpmPaths();
 
 	public loadWebviewPanel(uiOptions?: any) {
@@ -35,7 +37,7 @@ export abstract class AbstractWebviewPanel {
 		this.extensionPath = context.extensionPath;
 		this.mediaPath = path.join(context.extensionPath, "dist", "media");
 		this.htmlFileName = "index.html";
-		this.logger = getLogger();
+		this.logger = getClassLogger("AbstractWebviewPanel");
 		this.disposables = [];
 		this.context = context;
 		this.isInBAS = !_.isEmpty(_.get(process, "env.WS_BASE_URL"));
@@ -62,6 +64,7 @@ export abstract class AbstractWebviewPanel {
 	}
 
 	protected disposeWebviewPanel() {
+		this.rpc = null;
 		const displayedPanel = this.webViewPanel;
 		if (displayedPanel) {
 			this.dispose();

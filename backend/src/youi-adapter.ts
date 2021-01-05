@@ -1,6 +1,6 @@
 import { YeomanUI } from "./yeomanui";
 import { YouiEvents } from "./youi-events";
-const yoUiLog = require("./logUtils");
+const yoUiLog = require("./logUtils"); // eslint-disable-line @typescript-eslint/no-var-requires
 import * as _ from "lodash";
 import chalk = require('chalk');
 import TerminalAdapter = require("yeoman-environment/lib/adapter");
@@ -49,7 +49,7 @@ export class YouiAdapter extends TerminalAdapter {
         try {
           return await cb(result); // eslint-disable-line @typescript-eslint/await-thenable
         } catch (err) {
-          this.youiEvents.doGeneratorDone(false, (_.get(err, "message", 'Yeoman UI detected an error')));
+          this.youiEvents.doGeneratorDone(false, (_.get(err, "message", 'Application Wizard detected an error')), false);
           return;
         }
       }

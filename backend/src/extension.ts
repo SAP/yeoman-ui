@@ -25,6 +25,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	registerAndSubscribeCommand("loadYeomanUI", yeomanUIPanel.loadWebviewPanel.bind(yeomanUIPanel));
 	registerAndSubscribeCommand("yeomanUI.toggleOutput", yeomanUIPanel.toggleOutput.bind(yeomanUIPanel));
 	registerAndSubscribeCommand("yeomanUI._notifyGeneratorsChange", yeomanUIPanel.notifyGeneratorsChange.bind(yeomanUIPanel));
+	registerAndSubscribeCommand("runGenerator", yeomanUIPanel.runGenerator.bind(yeomanUIPanel));
 	registerWebviewPanelSerializer(yeomanUIPanel);
 
 	// ExploreGensPanel

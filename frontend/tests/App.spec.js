@@ -31,12 +31,42 @@ describe('App.vue', () => {
 		})
 	})
 
+	describe('backButtonText - computed', () => {
+		it('promptIndex is 1', () => {
+			wrapper = initComponent(App, {})
+			wrapper.vm.prompts = [{
+				questions: [{
+					name: "generator", type: "list", guiType: "tiles"
+				}]
+			}, {}, {}]
+			wrapper.vm.promptIndex = 1
+			expect(wrapper.vm.backButtonText).toEqual("Start Over");
+		})
+
+		it('promptIndex is 3', () => {
+			wrapper = initComponent(App, {})
+			wrapper.vm.prompts = [{
+				questions: [{
+					name: "generator", type: "list", guiType: "tiles"
+				}]
+			}, {}, {}]
+			wrapper.vm.promptIndex = 3
+			expect(wrapper.vm.backButtonText).toEqual("Back");
+		})
+	})
+
 	describe('nextButtonText - computed', () => {
 		it('promptIndex is 0', () => {
 			wrapper = initComponent(App, {})
-			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
+			wrapper.vm.prompts = [{
+				questions: [{
+					name: "generator-other", type: "list", guiType: "tiles"
+				}, {
+					name: "generator", type: "list", guiType: "tiles"
+				}]
+			}, {}, {}]
 			wrapper.vm.promptIndex = 0
-			expect(wrapper.vm.nextButtonText).toEqual("Next");
+			expect(wrapper.vm.nextButtonText).toEqual("Start");
 		})
 
 		it('promptIndex is 1', () => {
@@ -46,10 +76,10 @@ describe('App.vue', () => {
 			expect(wrapper.vm.nextButtonText).toEqual("Next");
 		})
 
-		it('promptIndex is 1', () => {
+		it('promptIndex is 2', () => {
 			wrapper = initComponent(App, {})
 			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
-			wrapper.vm.promptIndex = 3
+			wrapper.vm.promptIndex = 2
 			expect(wrapper.vm.nextButtonText).toEqual("Finish");
 		})
 	})
@@ -362,6 +392,7 @@ describe('App.vue', () => {
 			expect(invokeSpy).toHaveBeenCalledWith("getState");
 		});
 
+		// TODO - check the error
 		test('promptIndex is updated', () => {
 			wrapper = initComponent(App, {}, true);
 			wrapper.vm.rpc = {
@@ -417,6 +448,7 @@ describe('App.vue', () => {
 			expect(invokeSpy).toHaveBeenCalledWith("getState");
 		});
 
+		// TODO - check the error
 		test('promptIndex is 3, goto 2 step back', async () => {
 			wrapper = initComponent(App, {}, true);
 			wrapper.vm.rpc = {
@@ -465,7 +497,11 @@ describe('App.vue', () => {
 		it('while replaying', () => {
 			wrapper = initComponent(App);
 
-			wrapper.vm.prompts = [{}, {}];
+			wrapper.vm.prompts = [{
+				questions: [{
+					name: "generator", type: "list", guiType: "tiles"
+				}]
+			}, {}]
 			wrapper.vm.promptIndex = 1;
 			wrapper.vm.isReplaying = true;
 			wrapper.vm.currentPrompt.status = 'pending';
@@ -608,6 +644,7 @@ describe('App.vue', () => {
 	})
 
 	describe("setGenInWriting", () => {
+		// TODO - check the error
 		it('in writing state', () => {
 			wrapper = initComponent(App, {}, true)
 			wrapper.vm.prompts = [{}, {}]
@@ -617,6 +654,7 @@ describe('App.vue', () => {
 			expect(wrapper.vm.showButtons).toBe(false);
 		})
 
+		// TODO - check the error
 		it('not in writing state', () => {
 			wrapper = initComponent(App, {}, true)
 			wrapper.vm.prompts = [{}, {}]
@@ -633,6 +671,53 @@ describe('App.vue', () => {
 			wrapper.vm.setGenInWriting(false);
 			expect(wrapper.vm.isWriting).toBe(false);
 			expect(wrapper.vm.showButtons).toBe(true);
+		})
+	})
+
+	describe("showPromptMessage", () => {
+		it('error message', () => {
+			wrapper = initComponent(App)
+			wrapper.vm.showPromptMessage("errorMessage", 0, "image");
+			expect(wrapper.vm.promptMessageToDisplay).toEqual("errorMessage");
+			expect(wrapper.vm.showPrompt).toEqual("errorMessage");
+			expect(wrapper.vm.promptMessageIcon).toEqual("image");
+			expect(wrapper.vm.promptMessageClass).toEqual("error-prompt-message");
+		})
+
+		it('warning message', () => {
+			wrapper = initComponent(App)
+			wrapper.vm.showPromptMessage("warnMessage", 1, "image");
+			expect(wrapper.vm.promptMessageToDisplay).toEqual("warnMessage");
+			expect(wrapper.vm.showPrompt).toEqual("warnMessage");
+			expect(wrapper.vm.promptMessageIcon).toEqual("image");
+			expect(wrapper.vm.promptMessageClass).toEqual("info-warn-prompt-message");
+		})
+
+		it('info message', () => {
+			wrapper = initComponent(App)
+			wrapper.vm.showPromptMessage("infoMessage", 2, "image");
+			expect(wrapper.vm.promptMessageToDisplay).toEqual("infoMessage");
+			expect(wrapper.vm.showPrompt).toEqual("infoMessage");
+			expect(wrapper.vm.promptMessageIcon).toEqual("image");
+			expect(wrapper.vm.promptMessageClass).toEqual("info-warn-prompt-message");
+		})
+
+		it('no valid message', () => {
+			wrapper = initComponent(App)
+			wrapper.vm.showPromptMessage("infoMessage", "neta", "image");
+			expect(wrapper.vm.promptMessageToDisplay).toEqual("infoMessage");
+			expect(wrapper.vm.showPrompt).toEqual("infoMessage");
+			expect(wrapper.vm.promptMessageIcon).toEqual("image");
+		})
+
+		it('long message', () => {
+			wrapper = initComponent(App) 
+			wrapper.vm.messageMaxLength = 3
+			wrapper.vm.showPromptMessage("infoMessage", 2, "image");
+			expect(wrapper.vm.promptMessageToDisplay).toEqual("infoMessage");
+			expect(wrapper.vm.showPrompt).toEqual("inf...");
+			expect(wrapper.vm.promptMessageIcon).toEqual("image");
+			expect(wrapper.vm.promptMessageClass).toEqual("info-warn-prompt-message");
 		})
 	})
 })

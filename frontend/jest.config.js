@@ -12,6 +12,7 @@ module.exports = {
     "!<rootDir>/src/plugins/**"
   ],
   coverageReporters: [
+    "lcov",
     "html",
     "text-summary"
   ],

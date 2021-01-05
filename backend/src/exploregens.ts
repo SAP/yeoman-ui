@@ -6,7 +6,7 @@ import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import * as util from "util";
 import * as path from "path";
 import messages from "./exploreGensMessages";
-import Environment = require("yeoman-environment");
+import * as envUtils from "./env/utils";
 
 export enum GenState {
     uninstalling = "uninstalling",
@@ -29,17 +29,16 @@ export class ExploreGens {
     private cachedInstalledGeneratorsPromise: Promise<string[]>;
     private readonly context: any;
     private readonly vscode: any;
-    private isInBAS: boolean;
-    private npmGlobalPathsPromise: Promise<any>; 
+    private isInBAS: boolean; // eslint-disable-line @typescript-eslint/prefer-readonly
+    private readonly npmGlobalPathsPromise: Promise<any>; 
 
     private readonly GLOBAL_ACCEPT_LEGAL_NOTE = "global.exploreGens.acceptlegalNote";
     private readonly LAST_AUTO_UPDATE_DATE = "global.exploreGens.lastAutoUpdateDate";
     private readonly SEARCH_QUERY = "ApplicationWizard.searchQuery";
     private readonly AUTO_UPDATE = "ApplicationWizard.autoUpdate"
-    private readonly NPM = (process.platform === "win32" ? "npm.cmd" : "npm");
+    private readonly NPM = (envUtils.isWin32 ? "npm.cmd" : "npm");
     private readonly EMPTY = "";
     private readonly SLASH = "/";
-    private readonly NODE_MODULES = "node_modules";
     private readonly GENERATOR = "generator-";
     private readonly ONE_DAY = 1000 * 60 * 60 * 24;
     private readonly NPM_REGISTRY_HOST = _.get(process, "env.NPM_CFG_REGISTRY", "http://registry.npmjs.com/");
@@ -59,7 +58,18 @@ export class ExploreGens {
     public init(rpc: IRpc) {
         this.initRpc(rpc);
         this.setInstalledGens();
-	}
+    }
+
+    private async getAllInstalledGenerators(): Promise<string[]> {
+        const npmPaths = await this.getNpmPaths();
+        const gensMeta = await envUtils.getGeneratorsMeta(npmPaths);
+
+        return _.map(_.keys(gensMeta), (namepsace: string) => {
+            const genName = _.split(namepsace, ":")[0];
+            const parts = _.split(genName, this.SLASH);
+            return _.size(parts) === 1 ? `${this.GENERATOR}${genName}` : `${parts[0]}${this.SLASH}${this.GENERATOR}${parts[1]}`;
+        });
+    }
 	
 	private async getNpmGlobalPath(): Promise<string> {
         const res = await this.npmGlobalPathsPromise;
@@ -297,30 +307,12 @@ export class ExploreGens {
         return `${this.NPM} uninstall ${locationParams} ${genName}`;
     }
 
-    private async getAllInstalledGenerators(): Promise<string[]> {
-        const npmPaths = await this.getNpmPaths();
-        return new Promise(resolve => {
-            const yoEnv: Environment.Options = Environment.createEnv();
-            yoEnv.lookup({ npmPaths }, async () => this.onEnvLookup(yoEnv, resolve));
-        });
-    }
-
     private async getNpmPaths() {
         const customLocation = ExploreGens.getInstallationLocation(this.getWsConfig());
         if (_.isEmpty(customLocation)) {
             return this.getNpmGlobalPath();
         }
 
-        return [path.join(customLocation, this.NODE_MODULES)];
-    }
-
-    private onEnvLookup(env: Environment.Options, resolve: any) {
-        const genNames = env.getGeneratorNames();
-        const gensFullNames = _.map(genNames, genName => {
-            const parts = _.split(genName, this.SLASH);
-            return _.size(parts) === 1 ? `${this.GENERATOR}${genName}` : `${parts[0]}${this.SLASH}${this.GENERATOR}${parts[1]}`;
-        });
-
-        resolve(gensFullNames);
+        return [path.join(customLocation, envUtils.NODE_MODULES)];
     }
 }
