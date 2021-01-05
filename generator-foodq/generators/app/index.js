@@ -263,7 +263,6 @@ module.exports = class extends Generator {
 			},
 			name: "dump",
 			message: "Choose dump folder",
-			default: _.get(this.data, "folder", "/"),
 			when: () => _.isNil(this._getOption("dump"))
 		}, {
 			type: 'list',
