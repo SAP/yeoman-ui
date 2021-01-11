@@ -299,6 +299,27 @@ describe('App.vue', () => {
 		expect(wrapper.vm.logText).toBe('test_test_log')
 	})
 
+	it('executeCommand - method', () => {
+		wrapper = initComponent(App, {}, true)
+		wrapper.vm.rpc = {
+			invoke: jest.fn()
+		}
+
+		const event = {
+			target: {
+				getAttribute: jest.fn().mockImplementation((key) => { 
+					return key === "command" ? "vscode.open" : key === "params" ? ["param"]: "";
+				})
+			}
+		};
+		const invokeSpy = jest.spyOn(wrapper.vm.rpc, 'invoke')
+		wrapper.vm.executeCommand(event);
+
+		expect(invokeSpy).toHaveBeenCalledWith("executeCommand", ["vscode.open", ["param"]])
+
+		invokeSpy.mockRestore()
+	})
+
 	describe('next - method', () => {
 		it('promptIndex is greater than prompt quantity, resolve is defined', () => {
 			wrapper = initComponent(App, {})

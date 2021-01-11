@@ -47,6 +47,7 @@
               <Form
                 ref="form"
                 :questions="currentPrompt ? currentPrompt.questions : []"
+                @parentExecuteCommand="executeCommand"
                 @answered="onAnswered"
               />
             </v-slide-x-transition>
@@ -281,6 +282,11 @@ export default {
           (this.currentPrompt.status === PENDING ||
             this.currentPrompt.status === EVALUATING) &&
           !this.isDone);
+    },
+    executeCommand(event) {
+      const command = event.target.getAttribute("command");
+      const params = event.target.getAttribute("params");
+      this.rpc.invoke("executeCommand", [command, params]);
     },
     back() {
       this.gotoStep(1); // go 1 step back
