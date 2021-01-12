@@ -22,7 +22,9 @@ import { resolve } from "path";
 import * as envUtils from "./env/utils";
 import { getSelectedWorkspaceSetting } from "./logger/settings";
 
-
+const ADD_TO_WORKSPACE = "Open the project in a multi-root workspace";
+const OPEN_IN_A_NEW_WORKSPACE = "Open the project in a new workspace";
+const CREATE_AND_CLOSE = "Create the project and close it for later use";
 
 export interface IQuestionsPrompt extends IPrompt {
 	questions: any[];
@@ -55,7 +57,8 @@ export class YeomanUI {
 	private errorThrown = false;
 	private readonly outputPath: string;
 	private initialCwd: string;
-	private readonly isTypeProjectMap: Map<string, boolean>;
+	private readonly typesMap: Map<string, string>;
+	private newWorkspace: boolean;
 
 	constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
 		this.rpc = rpc;
@@ -86,7 +89,8 @@ export class YeomanUI {
 		this.customQuestionEventHandlers = new Map();
 		this.setCwd(outputPath);
 		this.gensMetaPromise = _.get(uiOptions, "gensMetaPromise");
-		this.isTypeProjectMap = new Map();
+		this.typesMap = new Map();
+		this.newWorkspace = false;
 	}
 
 	private async getGensMeta() {
@@ -293,10 +297,10 @@ export class YeomanUI {
 	private async receiveIsWebviewReady() {
 		try {
 			const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
-			const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 			let generatorId: string = this.uiOptions.generator;
 			//let selectedWorkspace = response.selectedWorkspace;
 			if (!generatorId) {
+				const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 				generatorId = response.generator;
 			}
 			this.replayUtils.clear();
@@ -394,14 +398,19 @@ export class YeomanUI {
 			targetFolderPath = targetFolderPathAfterGen;
 		}
 
-		const selectedWorkspace = getSelectedWorkspaceSetting();
+		const type: string = (this.typesMap.has(generatorName)) ? this.typesMap.get(generatorName) : "files";
+		let selectedWorkspace: string = (type === "files" || type === "module") ? CREATE_AND_CLOSE : (this.newWorkspace) ? OPEN_IN_A_NEW_WORKSPACE : getSelectedWorkspaceSetting();
+		// For now - A Fiori project is supposed to create the project and not open it
+		if (generatorName.includes("fiori")){
+			selectedWorkspace = CREATE_AND_CLOSE;
+		//	this.isFiori = true;
+		}
 
 		const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
 		const generatedTemplatePath = targetFolderPath ? targetFolderPath : targetFolderPathBeforeGen;
 		this.logger.debug("done running yeomanui! " + message + ` You can find it at ${generatedTemplatePath}`);
 		SWA.updateGeneratorEnded(generatorName, true, this.logger);
-		//const isProject: boolean = (this.isTypeProjectMap.has(generatorName)) ? this.isTypeProjectMap.get(generatorName) : false;
-		this.youiEvents.doGeneratorDone(true, message, selectedWorkspace, targetFolderPath);
+		this.youiEvents.doGeneratorDone(true, message, selectedWorkspace, type, targetFolderPath);
 		this.setInitialProcessDir();
 	}
 
@@ -410,7 +419,7 @@ export class YeomanUI {
 		const messagePrefix = `${generatorName} generator failed`;
 		const errorMessage: string = this.logError(error, messagePrefix);
 		SWA.updateGeneratorEnded(generatorName, false, this.logger, errorMessage);
-		this.youiEvents.doGeneratorDone(false, errorMessage, "");
+		this.youiEvents.doGeneratorDone(false, errorMessage, "", "files");
 		this.setInitialProcessDir();
 	}
 
@@ -440,22 +449,20 @@ export class YeomanUI {
 
 		const questions: any[] = [];
 
-		const vscodeInstance = this.getVscode();
-		if (vscodeInstance) {
-			let config =  await vscodeInstance.workspace.getConfiguration("ApplicationWizard").get("workspace");
-			if(config == "Add to workspace") {
-				if (YeomanUI.PROJECTS === this.outputPath  && _.includes(genFilter.types, GeneratorType.project)){
-					vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("workspace", "Open in a new workspace", vscodeInstance.ConfigurationTarget.Global);
-				}
-			}
-			else if (config == "Open in a new workspace"){
-				if (YeomanUI.PROJECTS != this.outputPath){
-					vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("workspace", "Add to workspace", vscodeInstance.ConfigurationTarget.Global);
-				}
-			}
-		}
-
 //		if (_.includes(genFilter.types, GeneratorType.project)) {
+			const vscodeInstance = this.getVscode();
+			let selectedWorkspaceConfig =  await vscodeInstance.workspace.getConfiguration("ApplicationWizard").get("Workspace");
+			if (vscodeInstance) {
+				if (YeomanUI.PROJECTS.toLowerCase() === this.outputPath.toLowerCase()){
+					vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("Workspace", OPEN_IN_A_NEW_WORKSPACE, vscodeInstance.ConfigurationTarget.Global);
+					this.newWorkspace = true;
+				}
+				else if (YeomanUI.PROJECTS.toLowerCase() != this.outputPath.toLowerCase()) {
+					vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("Workspace", ADD_TO_WORKSPACE, vscodeInstance.ConfigurationTarget.Global);
+				}
+			}
+			selectedWorkspaceConfig = (this.newWorkspace) ? OPEN_IN_A_NEW_WORKSPACE : ADD_TO_WORKSPACE;
+
 			const defaultPath = this.getCwd();
 			const targetFolderQuestion: any = {
 				type: "input",
@@ -493,12 +500,12 @@ export class YeomanUI {
 
 					},
 					name: "selectedWorkspace",
-					message: `Where do you want to open the project? <a href="https://www.w3schools.com">Visit W3Schools.com!</a>`,
-					default: getSelectedWorkspaceSetting(),
+					message: `Where do you want to open the project?`,
+					default: selectedWorkspaceConfig,
 					// getFilePath: async function (currentPath: string, showOpenDialog: Function) {
 					// 	return await showOpenDialog(currentPath);
 					// }
-					choices: ["Open in a new workspace", "Add to workspace"]
+					choices: [OPEN_IN_A_NEW_WORKSPACE, ADD_TO_WORKSPACE, CREATE_AND_CLOSE]
 				};
 				questions.push(locationQuestion);
 		//	}
@@ -534,7 +541,8 @@ export class YeomanUI {
 		const genFilter: GeneratorFilter = GeneratorFilter.create(_.get(packageJson, ["generator-filter"]));
 		const typesHasIntersection: boolean = GeneratorFilter.hasIntersection(filter.types, genFilter.types);
 		const categoriesHasIntersection: boolean = GeneratorFilter.hasIntersection(filter.categories, genFilter.categories);
-		this.isTypeProjectMap.set(genMeta.namespace, (_.includes(genFilter.types, GeneratorType.project)));	
+		let type = (_.includes(genFilter.types, GeneratorType.project)) ? "project" : (_.includes(genFilter.types, GeneratorType.module)) ? "module" : "files" ;
+		this.typesMap.set(genMeta.namespace, type);	
 		
 		if (typesHasIntersection && categoriesHasIntersection) {
 			return this.createGeneratorChoice(genMeta.namespace, genPackagePath, packageJson);

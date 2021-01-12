@@ -33,7 +33,7 @@ describe('yeomanui unit test', () => {
 	const choiceMessage =
 		"Some quick example text of the generator description. This is a long text so that the example will look good.";
 	class TestEvents implements YouiEvents {
-		public doGeneratorDone(success: boolean, message: string, selectedWorkspace: string, targetPath?: string): void {
+		public doGeneratorDone(success: boolean, message: string, selectedWorkspace: string, type: string, targetPath?: string): void {
 			return;
 		}
 		public doGeneratorInstall(): void {
@@ -553,7 +553,7 @@ describe('yeomanui unit test', () => {
 			const afterGen = { targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1", "dirpath2"] };
 			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
 			yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
-			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), false, "dirpath2")).to.be.true;
+			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), "Create the project and close it for later use", "files", "dirpath2")).to.be.true;
 		});
 
 		it("onGeneratorSuccess - two dirs were created", () => {
@@ -561,7 +561,7 @@ describe('yeomanui unit test', () => {
 			const afterGen = { targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1", "dirpath2", "dirpath3"] };
 			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
 			yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
-			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), false, null)).to.be.true;
+			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), "Create the project and close it for later use", "files", null)).to.be.true;
 		});
 
 		it("onGeneratorSuccess - zero dirs were created", () => {
@@ -569,7 +569,7 @@ describe('yeomanui unit test', () => {
 			const afterGen = { targetFolderPath: "testDestinationRoot", childDirs: ["dirparh1"] };
 			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
 			yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
-			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), false, null)).to.be.true;
+			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), "Create the project and close it for later use", "files", null)).to.be.true;
 		});
 
 		it("onGeneratorSuccess - targetFolderPath was changed by generator", () => {
@@ -577,23 +577,23 @@ describe('yeomanui unit test', () => {
 			const afterGen = { targetFolderPath: "testDestinationRoot/generatedProject" };
 			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
 			yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
-			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), false, "testDestinationRoot/generatedProject")).to.be.true;
+			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"), "Create the project and close it for later use", "files", "testDestinationRoot/generatedProject")).to.be.true;
 		});
 
 		it("onGeneratorFailure", () => {
 			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", false, testLogger);
 			yeomanUi["onGeneratorFailure"]("testGenName", "testError");
-			expect(doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed - testError"}`, false)).to.be.true;
+			expect(doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed - testError"}`, "Create the project and close it for later use", "files")).to.be.true;
 		});
 
 		it("onGeneratorSuccess - generator type is project", async () => {
-			yeomanUi["isTypeProjectMap"].clear();
-			yeomanUi["isTypeProjectMap"].set("foodq:app", true);
+			yeomanUi["typesMap"].clear();
+			yeomanUi["typesMap"].set("foodq:app", "project");
 			const beforeGen = { targetFolderPath: "testDestinationRoot" };
 			const afterGen = { targetFolderPath: "testDestinationRoot/generatedProject" };
 			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("foodq:app", true, testLogger);
 			yeomanUi["onGeneratorSuccess"]("foodq:app", beforeGen, afterGen);
-			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("foodq:app"), true, "testDestinationRoot/generatedProject")).to.be.true;
+			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("foodq:app"), "Create the project and close it for later use", "files", "testDestinationRoot/generatedProject")).to.be.true;
 		});
 	});
 

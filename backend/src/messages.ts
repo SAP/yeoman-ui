@@ -16,7 +16,9 @@ export default {
     select_open_workspace_question_hint: selectWhereToOpenTheProjectQuestionHint,
     channel_name: "Generators",
     select_generator_description: `${selectGeneratorQuestionHint}.\n${selectTargetFolderQuestionHint}.`,
-    artifact_generated: `The project has been generated.`,
+    artifact_generated_project: `The project has been generated.`,
+    artifact_generated_module: `The module has been generated.`,
+    artifact_generated_files: `The files have been generated.`,
     artifact_with_name_generated: (artifactName: string) => `The '${artifactName}' project has been generated.`,
     show_progress_button: "Open Output View",
     show_progress_message: "Generating..."

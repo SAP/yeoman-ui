@@ -9,6 +9,10 @@ import { getClassLogger } from './logger/logger-wrapper';
 import { getImage } from "./images/messageImages";
 import { AppWizard, MessageType, Severity } from '@sap-devx/yeoman-ui-types';
 
+const ADD_TO_WORKSPACE = "Open the project in a multi-root workspace";
+const OPEN_IN_A_NEW_WORKSPACE = "Open the project in a new workspace";
+const CREATE_AND_CLOSE = "Create the project and close it for later use";
+
 class YoUiAppWizard extends AppWizard {
 	constructor(private readonly events: VSCodeYouiEvents) {
 		super();
@@ -51,9 +55,9 @@ export class VSCodeYouiEvents implements YouiEvents {
 		this.appWizard = new YoUiAppWizard(this);
 	}
 
-	public doGeneratorDone(success: boolean, message: string, selectedWorkspace: string, targetFolderPath?: string): void {
+	public doGeneratorDone(success: boolean, message: string, selectedWorkspace: string, type: string, targetFolderPath?: string): void {
 		this.doClose();
-		this.showDoneMessage(success, message, selectedWorkspace, targetFolderPath);
+		this.showDoneMessage(success, message, selectedWorkspace, type, targetFolderPath);
 	}
 
 	public doGeneratorInstall(): void {
@@ -161,12 +165,11 @@ export class VSCodeYouiEvents implements YouiEvents {
 		return !_.isEmpty(relativePath) && !_.startsWith(relativePath, '..') && !isAbsolute(relativePath);
 	}
 
-	private showDoneMessage(success: boolean, errorMmessage: string, selectedWorkspace: string, targetFolderPath?: string): Thenable<any> {
+	private showDoneMessage(success: boolean, errorMmessage: string, selectedWorkspace: string, type: string, targetFolderPath?: string): Thenable<any> {
 		this.resolveInstallingProgress();
 
 		if (success) {
-			const addToWorkspace = "Add to workspace";
-			const openInNewWorkspace: any = "Open in a new workspace";
+
 			let targetFolderUri: vscode.Uri = null;
 
 			// The correct targetFolderPath is unknown ---> no buttons should be shown
@@ -184,18 +187,16 @@ export class VSCodeYouiEvents implements YouiEvents {
 				// 2. Theia bug: vscode.workspace.workspaceFolders should not be undefined or empty
 			}
 
-			const successInfoMessage = this.messages.artifact_generated;
-			vscode.window.showInformationMessage(successInfoMessage);
-			if (selectedWorkspace){
-				if (selectedWorkspace === openInNewWorkspace) {
-					vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
-				} else if (selectedWorkspace === addToWorkspace) {
-					const wsFoldersQuantity = _.size(vscode.workspace.workspaceFolders);
-					vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, { uri: targetFolderUri });
-				}
-			}
-		}
+			const successInfoMessage = (type === "project") ? this.messages.artifact_generated_project : (type === "module") ? this.messages.artifact_generated_module : this.messages.artifact_generated_files;
 
+			if (selectedWorkspace === OPEN_IN_A_NEW_WORKSPACE) {
+				vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
+			} else if (selectedWorkspace === ADD_TO_WORKSPACE) {
+				const wsFoldersQuantity = _.size(vscode.workspace.workspaceFolders);
+				vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, { uri: targetFolderUri });
+			}
+			return vscode.window.showInformationMessage(successInfoMessage);
+		}
 		return vscode.window.showErrorMessage(errorMmessage);
 	}
 }

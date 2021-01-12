@@ -6,7 +6,7 @@ import { LogLevel } from "@vscode-logging/logger";
  */
 export const LOGGING_LEVEL_CONFIG_PROP = "ApplicationWizard.loggingLevel";
 export const SOURCE_TRACKING_CONFIG_PROP = "ApplicationWizard.sourceLocationTracking";
-export const SELECTED_WORKSPACE_CONFIG_PROP = "ApplicationWizard.workspace";
+export const SELECTED_WORKSPACE_CONFIG_PROP = "ApplicationWizard.Workspace";
 
 /**
  * @returns {LogLevel}
