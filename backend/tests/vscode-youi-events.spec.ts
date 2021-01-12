@@ -264,7 +264,7 @@ describe('vscode-youi-events unit test', () => {
 		});
 	});
 
-	describe.skip("doGeneratorDone", () => {
+	/*describe.skip("doGeneratorDone", () => {
 		const createAndClose = "Create the project and close it for later use";
 		const openNewWorkspace = "Open the project in a new workspace";
 		const addToWorkspace = "Create the project and close it for later use";
@@ -358,6 +358,6 @@ describe('vscode-youi-events unit test', () => {
 			windowMock.expects("showErrorMessage").withExactArgs("error message");
 			return events.doGeneratorDone(false, "error message", createAndClose);
 		});
-	});
+	});*/
 });
 

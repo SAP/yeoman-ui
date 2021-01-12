@@ -481,6 +481,13 @@ export class YeomanUI {
 				guiOptions: {
 					type: "folder-browser",
 					hint: this.uiOptions.messages.select_target_folder_question_hint,
+					link: {
+						text: "Preferences",
+						command: {
+							id: "workbench.action.openSettings",
+							params: [`ApplicationWizard.TargetFolder`]
+						}
+					},
 					mandatory: true
 				},
 				name: "generator.target.folder",
@@ -509,7 +516,14 @@ export class YeomanUI {
 				const locationQuestion: any = {
 					type: "list",
 					guiOptions: {
-						hint: this.uiOptions.messages.select_open_workspace_question_hint
+						hint: this.uiOptions.messages.select_open_workspace_question_hint,
+						link: {
+							text: "Preferences",
+							command: {
+								id: "workbench.action.openSettings",
+								params: [`ApplicationWizard.Workspace`]
+							}
+						}
 					},
 					name: "selectedWorkspace",
 					message: `Where do you want to open the project?`,
