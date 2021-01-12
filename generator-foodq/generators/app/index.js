@@ -96,6 +96,10 @@ module.exports = class extends Generator {
 			name: 'favColor',
 			message: "What's your favorite napkin color?",
 			guiOptions: {
+				link: {
+					text: "wikipedia",
+					url: "https://en.wikipedia.org/wiki/Color_preferences"
+				},
 				hint: "Our recommendation is green"
 			},
 			when: response => {
@@ -151,6 +155,14 @@ module.exports = class extends Generator {
 			type: "checkbox",
 			name: "beers",
 			message: "Which beer would you like?",
+			guiOptions: {
+				link: {
+					text: "New Untitled File",
+					command: {
+						id: "workbench.action.files.newUntitledFile",
+					}
+				}
+			},
 			choices: [
 				"Chimay Trappist Ales",
 				"Paulaner Salvator Doppel Bock",
@@ -263,7 +275,6 @@ module.exports = class extends Generator {
 			},
 			name: "dump",
 			message: "Choose dump folder",
-			default: _.get(this.data, "folder", "/"),
 			when: () => _.isNil(this._getOption("dump"))
 		}, {
 			type: 'list',

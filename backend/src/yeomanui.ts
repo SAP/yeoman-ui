@@ -78,6 +78,7 @@ export class YeomanUI {
 		this.rpc.registerMethod({ func: this.exploreGenerators, thisArg: this });
 		this.rpc.registerMethod({ func: this.logError, thisArg: this });
 		this.rpc.registerMethod({ func: this.back, thisArg: this });
+		this.rpc.registerMethod({ func: this.executeCommand, thisArg: this });
 		this.rpc.registerMethod({ func: this.setCwd, thisArg: this });
 		this.rpc.registerMethod({ func: this.getState, thisArg: this });
 
@@ -368,6 +369,10 @@ export class YeomanUI {
 		SWA.updateOneOfPreviousStepsClicked(this.generatorName, this.logger);
 		this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
 		this.runGenerator(this.generatorName);
+	}
+
+	private executeCommand(id: string, ...args: any[]): void {
+		this.youiEvents.executeCommand(id, ...args);
 	}
 
 	private getCustomQuestionEventHandler(questionType: string, methodName: string): Function {

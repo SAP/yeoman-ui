@@ -1,7 +1,7 @@
 {
   "name": "yeoman-ui-frontend",
   "displayName": "Application Wizard Frontend",
-  "version": "1.1.45",
+  "version": "1.1.46",
   "publisher": "SAP",
   "license": "Apache 2.0",
   "description": "Frontend for the application wizard framework",
@@ -15,14 +15,14 @@
     "test": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "@sap-devx/webview-rpc": "0.2.3",
-    "@sap-devx/yeoman-ui-types": "1.0.2",
     "@mdi/font": "5.5.55",
-    "@sap-devx/inquirer-gui": "0.1.21",
+    "@sap-devx/inquirer-gui": "0.1.25",
     "@sap-devx/inquirer-gui-file-browser-plugin": "0.0.5",
     "@sap-devx/inquirer-gui-folder-browser-plugin": "0.0.3",
     "@sap-devx/inquirer-gui-login-plugin": "0.0.4",
     "@sap-devx/inquirer-gui-tiles-plugin": "0.0.8",
+    "@sap-devx/webview-rpc": "0.2.3",
+    "@sap-devx/yeoman-ui-types": "1.0.2",
     "core-js": "3.6.5",
     "lodash": "4.17.20",
     "material-design-icons-iconfont": "6.1.0",

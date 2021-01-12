@@ -7,7 +7,11 @@ export class ServerYouiEvents implements YouiEvents {
 
     constructor(rpc: RpcCommon) {
         this.rpc = rpc;        
-	}
+    }
+    
+    executeCommand(id: string, ...args: any[]): Thenable<any> {
+        return;
+    }
 	
 	getAppWizard(): AppWizard {
 		return null;

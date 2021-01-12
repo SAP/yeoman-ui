@@ -69,6 +69,10 @@ export class VSCodeYouiEvents implements YouiEvents {
 		return this.appWizard;
 	}
 
+	public executeCommand(id: string, ...args: any[]): Thenable<any> {
+		return vscode.commands.executeCommand(id, ...args);
+	}
+
 	private getMessageImage(state: Severity): any {
 		return getImage(state, this.isInBAS);
 	}

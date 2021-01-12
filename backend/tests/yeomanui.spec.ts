@@ -45,6 +45,9 @@ describe('yeomanui unit test', () => {
 		public getAppWizard(): AppWizard {
 			return;
 		}
+		public executeCommand(command: string, ...rest: any[]): Thenable<any> {
+			return;
+		}
 	}
 	class TestRpc implements IRpc {
 		public timeout: number;
@@ -145,6 +148,16 @@ describe('yeomanui unit test', () => {
 			const answers = await yeomanUi.showPrompt([]);
 			expect(answers).to.be.empty;
 		});
+	});
+
+	describe("executeCommand", () => {
+		it("called with command id & args", async () => {
+			const commandId = "vscode.open";
+			const commandArgs = [ {	fsPath: "https://en.wikipedia.org"} ];
+			youiEventsMock.expects("executeCommand").withExactArgs(commandId, commandArgs);
+			await yeomanUi["executeCommand"](commandId, commandArgs);
+		});
+
 	});
 
 	describe("showProgress", () => {
