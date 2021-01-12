@@ -6,6 +6,7 @@ import { LogLevel } from "@vscode-logging/logger";
  */
 export const LOGGING_LEVEL_CONFIG_PROP = "ApplicationWizard.loggingLevel";
 export const SOURCE_TRACKING_CONFIG_PROP = "ApplicationWizard.sourceLocationTracking";
+export const TARGET_FOLDER_CONFIG_PROP = "ApplicationWizard.TargetFolder";
 export const SELECTED_WORKSPACE_CONFIG_PROP = "ApplicationWizard.Workspace";
 
 /**
@@ -27,6 +28,14 @@ export function getSourceLocationTrackingSetting(): boolean {
 /**
  * @returns {string}
  */
+export function getTargetFolderSetting(): string {
+  const config = vscode.workspace.getConfiguration();
+  return config.get(TARGET_FOLDER_CONFIG_PROP);
+}
+
+/**
+ * @returns {string}
+ */
 export function getSelectedWorkspaceSetting(): string {
   const config = vscode.workspace.getConfiguration();
   return config.get(SELECTED_WORKSPACE_CONFIG_PROP);
@@ -35,8 +44,10 @@ export function getSelectedWorkspaceSetting(): string {
 module.exports = {
   LOGGING_LEVEL_CONFIG_PROP,
   SOURCE_TRACKING_CONFIG_PROP,
+  TARGET_FOLDER_CONFIG_PROP,
   SELECTED_WORKSPACE_CONFIG_PROP,
   getLoggingLevelSetting,
   getSourceLocationTrackingSetting,
+  getTargetFolderSetting,
   getSelectedWorkspaceSetting
 }; 

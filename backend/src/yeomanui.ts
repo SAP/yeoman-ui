@@ -20,7 +20,7 @@ import TerminalAdapter = require("yeoman-environment/lib/adapter");
 import { Output } from "./output";
 import { resolve } from "path";
 import * as envUtils from "./env/utils";
-import { getSelectedWorkspaceSetting } from "./logger/settings";
+import { getSelectedWorkspaceSetting, getTargetFolderSetting } from "./logger/settings";
 
 const ADD_TO_WORKSPACE = "Open the project in a multi-root workspace";
 const OPEN_IN_A_NEW_WORKSPACE = "Open the project in a new workspace";
@@ -59,6 +59,7 @@ export class YeomanUI {
 	private initialCwd: string;
 	private readonly typesMap: Map<string, string>;
 	private newWorkspace: boolean;
+	private isProjectFromTamplate: boolean;
 
 	constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
 		this.rpc = rpc;
@@ -91,6 +92,7 @@ export class YeomanUI {
 		this.gensMetaPromise = _.get(uiOptions, "gensMetaPromise");
 		this.typesMap = new Map();
 		this.newWorkspace = false;
+		this.isProjectFromTamplate = false;
 	}
 
 	private async getGensMeta() {
@@ -179,6 +181,10 @@ export class YeomanUI {
 		// see issue: https://github.com/yeoman/environment/issues/55
 		// process.chdir() doesn't work after environment has been created
 		try {
+			const type: string = (this.typesMap.has(generatorNamespace)) ? this.typesMap.get(generatorNamespace) : "files";
+			if (type === "project" && this.isProjectFromTamplate) {
+				this.setCwd(getTargetFolderSetting());
+			}		
 			const targetFolder = this.getCwd();
 			await fsextra.mkdirs(targetFolder);
 			const dirsBefore = await this.getChildDirectories(targetFolder);
@@ -403,7 +409,7 @@ export class YeomanUI {
 		// For now - A Fiori project is supposed to create the project and not open it
 		if (generatorName.includes("fiori")){
 			selectedWorkspace = CREATE_AND_CLOSE;
-		//	this.isFiori = true;
+			//this.isFiori = true;
 		}
 
 		const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
@@ -449,8 +455,7 @@ export class YeomanUI {
 
 		const questions: any[] = [];
 
-//		if (_.includes(genFilter.types, GeneratorType.project)) {
-			const vscodeInstance = this.getVscode();
+		const vscodeInstance = this.getVscode();
 			let selectedWorkspaceConfig =  await vscodeInstance.workspace.getConfiguration("ApplicationWizard").get("Workspace");
 			if (vscodeInstance) {
 				if (YeomanUI.PROJECTS.toLowerCase() === this.outputPath.toLowerCase()){
@@ -463,7 +468,9 @@ export class YeomanUI {
 			}
 			selectedWorkspaceConfig = (this.newWorkspace) ? OPEN_IN_A_NEW_WORKSPACE : ADD_TO_WORKSPACE;
 
-			const defaultPath = this.getCwd();
+//		if (_.includes(genFilter.types, GeneratorType.project)) {
+			const defaultPath = YeomanUI.PROJECTS;
+			vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("TargetFolder", defaultPath, vscodeInstance.ConfigurationTarget.Global);
 			const targetFolderQuestion: any = {
 				type: "input",
 				guiOptions: {
@@ -490,6 +497,7 @@ export class YeomanUI {
 					}
 				}
 			};
+			this.isProjectFromTamplate = true;
 			questions.push(targetFolderQuestion);
 
 	//		if (YeomanUI.PROJECTS != this.outputPath){
@@ -497,14 +505,10 @@ export class YeomanUI {
 					type: "list",
 					guiOptions: {
 						hint: this.uiOptions.messages.select_open_workspace_question_hint
-
 					},
 					name: "selectedWorkspace",
 					message: `Where do you want to open the project?`,
 					default: selectedWorkspaceConfig,
-					// getFilePath: async function (currentPath: string, showOpenDialog: Function) {
-					// 	return await showOpenDialog(currentPath);
-					// }
 					choices: [OPEN_IN_A_NEW_WORKSPACE, ADD_TO_WORKSPACE, CREATE_AND_CLOSE]
 				};
 				questions.push(locationQuestion);
