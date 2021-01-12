@@ -5,4 +5,5 @@ export interface YouiEvents {
   doGeneratorInstall(): void;
   showProgress(message?: string): void;
   getAppWizard(): AppWizard;
+  executeCommand(id: string, ...args: any[]): Thenable<any>;
 }
