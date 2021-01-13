@@ -313,7 +313,7 @@ module.exports = class extends Generator {
 			guiOptions: {
 				hint: "Select the repository type",
 				link: {
-					text: "Show preferences",
+					text: "Preferences",
 					command: {
 						id: "workbench.action.openSettings",
 						params: ["ApplicationWizard.Workspace"]
