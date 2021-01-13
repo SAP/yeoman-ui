@@ -303,10 +303,9 @@ export class YeomanUI {
 
 	private async receiveIsWebviewReady() {
 		try {
-			const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
 			let generatorId: string = this.uiOptions.generator;
-			//let selectedWorkspace = response.selectedWorkspace;
 			if (!generatorId) {
+				const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
 				const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 				generatorId = response.generator;
 			}
@@ -409,12 +408,11 @@ export class YeomanUI {
 			targetFolderPath = targetFolderPathAfterGen;
 		}
 
-		const type: string = (this.typesMap.has(generatorName)) ? this.typesMap.get(generatorName) : "files";
+		const type: string = this.typesMap.has(generatorName) ? this.typesMap.get(generatorName) : "files";
 		let selectedWorkspace: string = (type === "files" || type === "module") ? CREATE_AND_CLOSE : (this.newWorkspace) ? OPEN_IN_A_NEW_WORKSPACE : getSelectedWorkspaceSetting();
 		// For now - A Fiori project is supposed to create the project and not open it
 		if (generatorName.includes("fiori")){
 			selectedWorkspace = CREATE_AND_CLOSE;
-			//this.isFiori = true;
 		}
 
 		const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
@@ -461,8 +459,9 @@ export class YeomanUI {
 		const questions: any[] = [];
 
 		const vscodeInstance = this.getVscode();
-			let selectedWorkspaceConfig =  await vscodeInstance.workspace.getConfiguration("ApplicationWizard").get("Workspace");
-			if (vscodeInstance) {
+			let selectedWorkspaceConfig =  await vscodeInstance.workspace.getConfiguration("ApplicationWizard");
+			if (vscodeInstance && selectedWorkspaceConfig) {
+				selectedWorkspaceConfig =  await vscodeInstance.workspace.getConfiguration("ApplicationWizard").get("Workspace");
 				if (YeomanUI.PROJECTS.toLowerCase() === this.outputPath.toLowerCase()){
 					vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("Workspace", OPEN_IN_A_NEW_WORKSPACE, vscodeInstance.ConfigurationTarget.Global);
 					this.newWorkspace = true;
@@ -473,9 +472,11 @@ export class YeomanUI {
 			}
 			selectedWorkspaceConfig = (this.newWorkspace) ? OPEN_IN_A_NEW_WORKSPACE : ADD_TO_WORKSPACE;
 
-//		if (_.includes(genFilter.types, GeneratorType.project)) {
+		if (_.includes(genFilter.types, GeneratorType.project)) {
 			const defaultPath = YeomanUI.PROJECTS;
-			vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("TargetFolder", defaultPath, vscodeInstance.ConfigurationTarget.Global);
+			if (vscodeInstance.workspace.getConfiguration("ApplicationWizard")){
+				vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("TargetFolder", defaultPath, vscodeInstance.ConfigurationTarget.Global);
+			}
 			const targetFolderQuestion: any = {
 				type: "input",
 				guiOptions: {
@@ -512,7 +513,7 @@ export class YeomanUI {
 			this.isProjectFromTamplate = true;
 			questions.push(targetFolderQuestion);
 
-	//		if (YeomanUI.PROJECTS != this.outputPath){
+			if (YeomanUI.PROJECTS != this.outputPath){
 				const locationQuestion: any = {
 					type: "list",
 					guiOptions: {
@@ -531,8 +532,8 @@ export class YeomanUI {
 					choices: [OPEN_IN_A_NEW_WORKSPACE, ADD_TO_WORKSPACE, CREATE_AND_CLOSE]
 				};
 				questions.push(locationQuestion);
-		//	}
-//		}
+			}
+		}
 
 		const generatorChoices = await Promise.all(generatorChoicePromises);
 		const generatorQuestion: any = {

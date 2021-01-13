@@ -16,7 +16,23 @@ import messages from "../src/messages";
 import Environment = require("yeoman-environment");
 import { SWA } from "../src/swa-tracker/swa-tracker-wrapper";
 import { AppWizard } from "@sap-devx/yeoman-ui-types";
+import { mockVscode } from "./mockUtil";
 
+const config = {
+    get: () => new Error("not implemented"),
+    update: () => new Error("not implemented"),
+};
+const Global = new Error("not implemented");
+
+const testVscode = {
+    workspace: {
+        getConfiguration: () => config
+	},
+	ConfigurationTarget: {
+		Global
+	}
+};
+mockVscode(testVscode, "src/yeomanui.ts");
 
 describe('yeomanui unit test', () => {
 	let sandbox: any;
@@ -29,6 +45,9 @@ describe('yeomanui unit test', () => {
 	let youiEventsMock: any;
 	const UTF8 = "utf8";
 	const PACKAGE_JSON = "package.json";
+	let vscodeWorkspaceMock: any;
+	let vscodeConfigurationTargetMock: any;
+	let vscodeMock: any;
 
 	const choiceMessage =
 		"Some quick example text of the generator description. This is a long text so that the example will look good.";
@@ -115,6 +134,9 @@ describe('yeomanui unit test', () => {
 		loggerMock = sandbox.mock(testLogger);
 		swaTrackerWrapperMock = sandbox.mock(SWA);
 		youiEventsMock = sandbox.mock(youiEvents);
+		vscodeWorkspaceMock = sandbox.mock(testVscode.workspace);
+		vscodeConfigurationTargetMock = sandbox.mock(testVscode.ConfigurationTarget.Global);
+		vscodeMock = sandbox.mock(testVscode.ConfigurationTarget.Global);
 	});
 
 	afterEach(() => {
@@ -125,6 +147,9 @@ describe('yeomanui unit test', () => {
 		loggerMock.verify();
 		swaTrackerWrapperMock.verify();
 		youiEventsMock.verify();
+		vscodeWorkspaceMock.verify();
+		vscodeConfigurationTargetMock.verify();
+		vscodeMock.verify();
 	});
 
 	describe("receiveIsWebviewReady", () => {
@@ -596,7 +621,7 @@ describe('yeomanui unit test', () => {
 		it("onGeneratorFailure", () => {
 			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", false, testLogger);
 			yeomanUi["onGeneratorFailure"]("testGenName", "testError");
-			expect(doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed - testError"}`, "Create the project and close it for later use", "files")).to.be.true;
+			expect(doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed - testError"}`, "", "files")).to.be.true;
 		});
 
 		it("onGeneratorSuccess - generator type is project", async () => {
@@ -605,8 +630,20 @@ describe('yeomanui unit test', () => {
 			const beforeGen = { targetFolderPath: "testDestinationRoot" };
 			const afterGen = { targetFolderPath: "testDestinationRoot/generatedProject" };
 			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("foodq:app", true, testLogger);
+			yeomanUi["newWorkspace"] = true;
 			yeomanUi["onGeneratorSuccess"]("foodq:app", beforeGen, afterGen);
-			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("foodq:app"), "Create the project and close it for later use", "files", "testDestinationRoot/generatedProject")).to.be.true;
+			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("foodq:app"), "Open the project in a new workspace", "project", "testDestinationRoot/generatedProject")).to.be.true;
+		});
+
+		it("onGeneratorSuccess - Fiori generator with type project", async () => {
+			yeomanUi["typesMap"].clear();
+			yeomanUi["typesMap"].set("fiori-generator:app", "project");
+			const beforeGen = { targetFolderPath: "testDestinationRoot" };
+			const afterGen = { targetFolderPath: "testDestinationRoot/generatedProject" };
+			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("fiori-generator:app", true, testLogger);
+			yeomanUi["newWorkspace"] = true;
+			yeomanUi["onGeneratorSuccess"]("fiori-generator:app", beforeGen, afterGen);
+			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("fiori-generator:app"), "Create the project and close it for later use", "project", "testDestinationRoot/generatedProject")).to.be.true;
 		});
 	});
 

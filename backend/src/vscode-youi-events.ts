@@ -173,22 +173,11 @@ export class VSCodeYouiEvents implements YouiEvents {
 		this.resolveInstallingProgress();
 
 		if (success) {
-
 			let targetFolderUri: vscode.Uri = null;
 
-			// The correct targetFolderPath is unknown ---> no buttons should be shown
+			// The correct targetFolderPath is unknown
 			if (!_.isNil(targetFolderPath)) {
-				// Target folder is visible in workpace ---> addToWorkspace only
-				// Target folder is not visible in workpace ---> addToWorkspace and openInNewWorkspace
-
 				targetFolderUri = vscode.Uri.file(targetFolderPath);
-				const workspacePath = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
-				// 1. target workspace folder should not already contain target generator folder
-				const foundInWorkspace = _.find(vscode.workspace.workspaceFolders, (wsFolder: vscode.WorkspaceFolder) => {
-					// wsFolder is accessor of targetFolderUri, so targetFolderUri is already shown inside wsFolder
-					return ((wsFolder.uri.fsPath === targetFolderUri.fsPath) || this.isPredecessorOf(wsFolder.uri.fsPath, targetFolderUri.fsPath));
-				});
-				// 2. Theia bug: vscode.workspace.workspaceFolders should not be undefined or empty
 			}
 
 			const successInfoMessage = (type === "project") ? this.messages.artifact_generated_project : (type === "module") ? this.messages.artifact_generated_module : this.messages.artifact_generated_files;
