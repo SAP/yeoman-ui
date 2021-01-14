@@ -63,7 +63,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 		this.output.setChannelName(`${YeomanUIPanel.YEOMAN_UI}.${this.messages.channel_name}`);
 		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.webViewPanel, this.messages, this.output, this.isInBAS);
 
-		const outputPath = this.isInBAS ? undefined: _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath"); 
+		const outputPath = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath"); 
 		this.yeomanui = new YeomanUI(this.rpc,
 			vscodeYouiEvents,
 			this.output,

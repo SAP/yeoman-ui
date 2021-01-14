@@ -267,12 +267,13 @@ describe('vscode-youi-events unit test', () => {
 	describe("doGeneratorDone", () => {
 		const createAndClose = "Create the project and close it for later use";
 		const openNewWorkspace = "Open the project in a new workspace";
-		const addToWorkspace = "Create the project and close it for later use";
+		const addToWorkspace = "Open the project in a multi-root workspace";
 
 		it("on success, project path and workspace folder are Windows style ---> the project added to current workspace", () => {
 			eventsMock.expects("doClose");
 			_.set(vscode, "workspace.workspaceFolders", [{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testRoot" } }]);
 			windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated_project).resolves();
+			workspaceMock.expects("updateWorkspaceFolders").withArgs(2, null).resolves();
 			return events.doGeneratorDone(true, "success message", addToWorkspace, "project", "testDestinationRoot");
 		});
 
@@ -280,6 +281,7 @@ describe('vscode-youi-events unit test', () => {
 			eventsMock.expects("doClose");
 			_.set(vscode, "workspace.workspaceFolders", [{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
 			windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated_project).resolves();
+			workspaceMock.expects("updateWorkspaceFolders").withArgs(2, null).resolves();
 			return events.doGeneratorDone(true, "success message", addToWorkspace, "project", "testDestinationRoot");
 		});
 

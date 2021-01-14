@@ -161,11 +161,43 @@ describe('yeomanui unit test', () => {
 			await yeomanUi["receiveIsWebviewReady"]();
 		});
 
+		it("typesMap has the generator but it's not from project frpm template", async () => {
+			rpcMock.expects("invoke").withArgs("showPrompt").resolves({ generator: "testGenerator" });
+			swaTrackerWrapperMock.expects("updateGeneratorStarted").withArgs("testGenerator");
+			yeomanUi["typesMap"].set("testGenerator:app", "project");
+
+			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenerator:app", false);
+			youiEventsMock.expects("doGeneratorDone").withArgs(false);
+			await yeomanUi["receiveIsWebviewReady"]();
+		});
+
 		it("an error is thrown", async () => {
 			loggerMock.expects("error");
 			youiEventsMock.expects("doGeneratorDone").never();
 			await yeomanUi["receiveIsWebviewReady"]();
 		});
+
+		it("typesMap has the generator and it's from project frpm template", async () => {
+			rpcMock.expects("invoke").withArgs("showPrompt").resolves({ generator: "testGenerator" });
+			swaTrackerWrapperMock.expects("updateGeneratorStarted").withArgs("testGenerator");
+			yeomanUi["typesMap"].set("testGenerator:app", "project");
+			yeomanUi["isProjectFromTamplate"] = true;
+
+			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenerator:app", false);
+			youiEventsMock.expects("doGeneratorDone").withArgs(false);
+			await yeomanUi["receiveIsWebviewReady"]();
+		});
+
+		it("single generator", async () => {
+			yeomanUi["uiOptions"].generator = "testGenerator:app2"
+			swaTrackerWrapperMock.expects("updateGeneratorStarted").withArgs("testGenerator:app2");
+
+			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenerator:app2", false);
+			youiEventsMock.expects("doGeneratorDone").withArgs(false);
+			await yeomanUi["receiveIsWebviewReady"]();
+		});
+
+		
 	});
 
 	describe("showPrompt", () => {
