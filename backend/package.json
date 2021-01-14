@@ -171,7 +171,7 @@
 		"object-hash": "2.1.1",
 		"strip-ansi": "6.0.0",
 		"titleize": "2.1.0",
-		"ws": "7.4.1",
+		"ws": "7.4.2",
 		"yeoman-environment": "2.10.3"
 	},
 	"devDependencies": {
