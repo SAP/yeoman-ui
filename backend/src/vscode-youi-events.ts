@@ -11,7 +11,6 @@ import { AppWizard, MessageType, Severity } from '@sap-devx/yeoman-ui-types';
 
 const ADD_TO_WORKSPACE = "Open the project in a multi-root workspace";
 const OPEN_IN_A_NEW_WORKSPACE = "Open the project in a new workspace";
-const CREATE_AND_CLOSE = "Create the project and close it for later use";
 
 class YoUiAppWizard extends AppWizard {
 	constructor(private readonly events: VSCodeYouiEvents) {

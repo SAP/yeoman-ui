@@ -461,7 +461,6 @@ export class YeomanUI {
 		const vscodeInstance = this.getVscode();
 			let selectedWorkspaceConfig =  await vscodeInstance.workspace.getConfiguration("ApplicationWizard");
 			if (vscodeInstance && selectedWorkspaceConfig) {
-				selectedWorkspaceConfig =  await vscodeInstance.workspace.getConfiguration("ApplicationWizard").get("Workspace");
 				if (YeomanUI.PROJECTS.toLowerCase() === this.outputPath.toLowerCase()){
 					vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("Workspace", OPEN_IN_A_NEW_WORKSPACE, vscodeInstance.ConfigurationTarget.Global);
 					this.newWorkspace = true;
@@ -513,7 +512,7 @@ export class YeomanUI {
 			this.isProjectFromTamplate = true;
 			questions.push(targetFolderQuestion);
 
-			if (YeomanUI.PROJECTS != this.outputPath){
+			if (YeomanUI.PROJECTS.toLowerCase() != this.outputPath.toLowerCase()){
 				const locationQuestion: any = {
 					type: "list",
 					guiOptions: {
