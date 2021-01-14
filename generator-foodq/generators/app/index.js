@@ -475,7 +475,7 @@ module.exports = class extends Generator {
 
 	install() {
 		this.log('FoodQ is installing dependencies.');
-		this.npmInstall(['lodash'], { 'save-dev': true });
+		this.npmInstall(['lodash'], { 'save-dev': true }, { stdio: ['inherit', 'ignore', 'ignore' ] } );
 	}
 
 	end() {
