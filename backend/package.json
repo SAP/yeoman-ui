@@ -168,7 +168,7 @@
 		"humanize-string": "2.1.0",
 		"lodash": "4.17.20",
 		"npm-registry-fetch": "9.0.0",
-		"object-hash": "2.0.3",
+		"object-hash": "2.1.1",
 		"strip-ansi": "6.0.0",
 		"titleize": "2.1.0",
 		"ws": "7.4.1",
