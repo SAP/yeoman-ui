@@ -58,7 +58,7 @@ export class YeomanUI {
 	private readonly outputPath: string;
 	private initialCwd: string;
 	private readonly typesMap: Map<string, string>;
-	private newWorkspace: boolean;
+	private forceNewWorkspace: boolean;
 	private isProjectFromTamplate: boolean;
 
 	constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
@@ -92,7 +92,7 @@ export class YeomanUI {
 		this.setCwd(outputPath);
 		this.gensMetaPromise = _.get(uiOptions, "gensMetaPromise");
 		this.typesMap = new Map();
-		this.newWorkspace = false;
+		this.forceNewWorkspace = false;
 		this.isProjectFromTamplate = false;
 	}
 
@@ -185,7 +185,7 @@ export class YeomanUI {
 			const type: string = (this.typesMap.has(generatorNamespace)) ? this.typesMap.get(generatorNamespace) : "files";
 			if (type === "project" && this.isProjectFromTamplate) {
 				this.setCwd(getTargetFolderSetting());
-			}		
+			} 	
 			const targetFolder = this.getCwd();
 			await fsextra.mkdirs(targetFolder);
 			const dirsBefore = await this.getChildDirectories(targetFolder);
@@ -409,7 +409,7 @@ export class YeomanUI {
 		}
 
 		const type: string = this.typesMap.has(generatorName) ? this.typesMap.get(generatorName) : "files";
-		let selectedWorkspace: string = (type === "files" || type === "module") ? CREATE_AND_CLOSE : (this.newWorkspace) ? OPEN_IN_A_NEW_WORKSPACE : getSelectedWorkspaceSetting();
+		let selectedWorkspace: string = (type === "files" || type === "module") ? CREATE_AND_CLOSE : (this.forceNewWorkspace) ? OPEN_IN_A_NEW_WORKSPACE : getSelectedWorkspaceSetting();
 		// For now - A Fiori project is supposed to create the project and not open it
 		if (generatorName.includes("fiori")){
 			selectedWorkspace = CREATE_AND_CLOSE;
@@ -458,18 +458,23 @@ export class YeomanUI {
 
 		const questions: any[] = [];
 
+		let selectedWorkspaceConfig = YeomanUI.PROJECTS;
 		const vscodeInstance = this.getVscode();
-			let selectedWorkspaceConfig =  await vscodeInstance.workspace.getConfiguration("ApplicationWizard");
-			if (vscodeInstance && selectedWorkspaceConfig) {
-				if (YeomanUI.PROJECTS.toLowerCase() === this.outputPath.toLowerCase()){
+		if (vscodeInstance) {
+			selectedWorkspaceConfig =  await vscodeInstance.workspace.getConfiguration("ApplicationWizard");
+			const currentPath = _.get(vscodeInstance, "workspace.workspaceFolders[0].uri.fsPath") || this.outputPath;
+			if (selectedWorkspaceConfig){
+				if (YeomanUI.PROJECTS === currentPath){
 					vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("Workspace", OPEN_IN_A_NEW_WORKSPACE, vscodeInstance.ConfigurationTarget.Global);
-					this.newWorkspace = true;
+					this.forceNewWorkspace = true;
 				}
-				else if (YeomanUI.PROJECTS.toLowerCase() != this.outputPath.toLowerCase()) {
+				else if (YeomanUI.PROJECTS != currentPath) {
 					vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("Workspace", ADD_TO_WORKSPACE, vscodeInstance.ConfigurationTarget.Global);
+					this.forceNewWorkspace = false;
 				}
 			}
-			selectedWorkspaceConfig = (this.newWorkspace) ? OPEN_IN_A_NEW_WORKSPACE : ADD_TO_WORKSPACE;
+			selectedWorkspaceConfig = (this.forceNewWorkspace) ? OPEN_IN_A_NEW_WORKSPACE : ADD_TO_WORKSPACE;
+		}
 
 		if (_.includes(genFilter.types, GeneratorType.project)) {
 			const defaultPath = YeomanUI.PROJECTS;
@@ -512,7 +517,7 @@ export class YeomanUI {
 			this.isProjectFromTamplate = true;
 			questions.push(targetFolderQuestion);
 
-			if (YeomanUI.PROJECTS.toLowerCase() != this.outputPath.toLowerCase()){
+			if (!this.forceNewWorkspace){
 				const locationQuestion: any = {
 					type: "list",
 					guiOptions: {

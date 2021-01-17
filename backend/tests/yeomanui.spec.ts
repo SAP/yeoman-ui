@@ -26,7 +26,8 @@ const Global = new Error("not implemented");
 
 const testVscode = {
     workspace: {
-        getConfiguration: () => config
+		getConfiguration: () => config,
+		workspaceFolders: [{}]
 	},
 	ConfigurationTarget: {
 		Global
@@ -387,12 +388,13 @@ describe('yeomanui unit test', () => {
 			expect(test3Choice.name).to.be.equal("3rd - Test");
 		});
 
-		it("get generators with homepage", async () => {
+		it("get generators with homepage and YeomanUI.PROJECTS != currentPath", async () => {
 			yeomanUi["gensMetaPromise"] = Promise.resolve({
 				"test1:app": { namespace: "test1:app", packagePath: "test1Path" },
 				"test2:app": { namespace: "test2:app", packagePath: "test2Path" },
 				"test3:app": { namespace: "test3:app", packagePath: "test3Path" }
 			});
+			_.set(testVscode, "workspace.workspaceFolders", [{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testRoot" } }]);
 
 			fsExtraMock.expects("readFile").withExactArgs(path.join("test1Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "project"}, "description": "test1Description", "homepage": "https://myhomepage.com/ANY/generator-test1-project#readme"}`);
 			fsExtraMock.expects("readFile").withExactArgs(path.join("test2Path", PACKAGE_JSON), UTF8).resolves(`{"generator-filter": {"type": "module"}, "homepage": "https://myhomepage.com/ANY/generator-test2-module#readme"}`);
@@ -400,6 +402,8 @@ describe('yeomanui unit test', () => {
 
 			yeomanUi["uiOptions"] = { filter: GeneratorFilter.create(), messages };
 			const result = await yeomanUi["getGeneratorsPrompt"]();
+
+			expect (yeomanUi["forceNewWorkspace"]).to.be.equals(false);
 
 			const choices = result.questions[0].choices;
 			expect(choices).to.have.lengthOf(3);
@@ -662,7 +666,7 @@ describe('yeomanui unit test', () => {
 			const beforeGen = { targetFolderPath: "testDestinationRoot" };
 			const afterGen = { targetFolderPath: "testDestinationRoot/generatedProject" };
 			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("foodq:app", true, testLogger);
-			yeomanUi["newWorkspace"] = true;
+			yeomanUi["forceNewWorkspace"] = true;
 			yeomanUi["onGeneratorSuccess"]("foodq:app", beforeGen, afterGen);
 			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("foodq:app"), "Open the project in a new workspace", "project", "testDestinationRoot/generatedProject")).to.be.true;
 		});
@@ -673,7 +677,7 @@ describe('yeomanui unit test', () => {
 			const beforeGen = { targetFolderPath: "testDestinationRoot" };
 			const afterGen = { targetFolderPath: "testDestinationRoot/generatedProject" };
 			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("fiori-generator:app", true, testLogger);
-			yeomanUi["newWorkspace"] = true;
+			yeomanUi["forceNewWorkspace"] = true;
 			yeomanUi["onGeneratorSuccess"]("fiori-generator:app", beforeGen, afterGen);
 			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("fiori-generator:app"), "Create the project and close it for later use", "project", "testDestinationRoot/generatedProject")).to.be.true;
 		});
