@@ -304,8 +304,8 @@ export class YeomanUI {
 	private async receiveIsWebviewReady() {
 		try {
 			let generatorId: string = this.uiOptions.generator;
+			const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
 			if (!generatorId) {
-				const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
 				const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 				generatorId = response.generator;
 			}
@@ -458,33 +458,34 @@ export class YeomanUI {
 
 		const questions: any[] = [];
 
-		let selectedWorkspaceConfig = YeomanUI.PROJECTS;
+		let selectedWorkspaceConfig = CREATE_AND_CLOSE;
 		const vscodeInstance = this.getVscode();
 		if (vscodeInstance) {
-			selectedWorkspaceConfig =  await vscodeInstance.workspace.getConfiguration("ApplicationWizard");
-			const currentPath = _.get(vscodeInstance, "workspace.workspaceFolders[0].uri.fsPath") || this.outputPath;
-			if (selectedWorkspaceConfig){
-				if (YeomanUI.PROJECTS === currentPath){
+			let newSelectedWorkspaceConfig =  await vscodeInstance.workspace.getConfiguration("ApplicationWizard");
+			if (newSelectedWorkspaceConfig){
+				const currentPath = _.get(vscodeInstance, "workspace.workspaceFolders[0].uri.fsPath");
+				if (!currentPath || YeomanUI.PROJECTS === currentPath){
 					vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("Workspace", OPEN_IN_A_NEW_WORKSPACE, vscodeInstance.ConfigurationTarget.Global);
 					this.forceNewWorkspace = true;
+					selectedWorkspaceConfig = OPEN_IN_A_NEW_WORKSPACE;
 				}
 				else if (YeomanUI.PROJECTS != currentPath) {
 					vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("Workspace", ADD_TO_WORKSPACE, vscodeInstance.ConfigurationTarget.Global);
 					this.forceNewWorkspace = false;
+					selectedWorkspaceConfig = ADD_TO_WORKSPACE;
 				}
 			}
-			selectedWorkspaceConfig = (this.forceNewWorkspace) ? OPEN_IN_A_NEW_WORKSPACE : ADD_TO_WORKSPACE;
 		}
 
 		if (_.includes(genFilter.types, GeneratorType.project)) {
-			const defaultPath = YeomanUI.PROJECTS;
+			const defaultPath = this.getCwd();
 			if (vscodeInstance.workspace.getConfiguration("ApplicationWizard")){
 				vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("TargetFolder", defaultPath, vscodeInstance.ConfigurationTarget.Global);
 			}
 			const targetFolderQuestion: any = {
 				type: "input",
 				guiOptions: {
-					type: "folder-browser",
+					type: "label",
 					hint: this.uiOptions.messages.select_target_folder_question_hint,
 					link: {
 						text: "Preferences",
@@ -493,33 +494,17 @@ export class YeomanUI {
 							params: [`ApplicationWizard.TargetFolder`]
 						}
 					},
-					mandatory: true
 				},
 				name: "generator.target.folder",
 				message: "Specify a target folder path",
-				default: defaultPath,
-				getPath: async (path: string) => path,
-				validate: async (path: string) => {
-					try {
-						// Without resolve this code worked only for absolute paths without / at the end.
-						// The user can put a relative path, path including . and .. and / at the end.
-						// In this case many project generation failed or opened invalid folders instead of project at the end (after clicking on the button 'Open project in workspace').
-						path = resolve(this.outputPath, path);
-						await fsextra.access(path, fsextra.constants.W_OK);
-						this.setCwd(path);
-						return true;
-					} catch (error) {
-						this.logError(error);
-						return "The selected target folder is not writable";
-					}
-				}
+				default: defaultPath
 			};
 			this.isProjectFromTamplate = true;
 			questions.push(targetFolderQuestion);
 
 			if (!this.forceNewWorkspace){
 				const locationQuestion: any = {
-					type: "list",
+					type: "label",
 					guiOptions: {
 						hint: this.uiOptions.messages.select_open_workspace_question_hint,
 						link: {
@@ -532,8 +517,7 @@ export class YeomanUI {
 					},
 					name: "selectedWorkspace",
 					message: `Where do you want to open the project?`,
-					default: selectedWorkspaceConfig,
-					choices: [OPEN_IN_A_NEW_WORKSPACE, ADD_TO_WORKSPACE, CREATE_AND_CLOSE]
+					default: selectedWorkspaceConfig
 				};
 				questions.push(locationQuestion);
 			}
