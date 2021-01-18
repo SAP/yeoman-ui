@@ -3,11 +3,11 @@ const selectTargetFolderQuestionHint = "The project will contain the relevant fi
 const selectWhereToOpenTheProjectQuestionHint = "Where do you want to open the project?";
 
 export default {
-    panel_title: "Application Wizard",
+    panel_title: "Template Wizard",
 	generators_loading: "Loading the Yeoman generators...",
 	step_is_pending: "Loading...",
 	step_is_generating: "Generating...",
-    yeoman_ui_title: "Application Wizard",
+    yeoman_ui_title: "Template Wizard",
     select_generator_name: "Select Generator",
     select_generator_question_message: "Generators",
     select_generator_question_hint: selectGeneratorQuestionHint,

@@ -46,7 +46,7 @@
 			},
 			{
 				"command": "loadYeomanUI",
-				"title": "Open Application Wizard"
+				"title": "Open Template Wizard"
 			},
 			{
 				"command": "yeomanUI.toggleOutput",
