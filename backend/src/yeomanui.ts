@@ -58,6 +58,7 @@ export class YeomanUI {
 	private readonly outputPath: string;
 	private initialCwd: string;
 	private readonly typesMap: Map<string, string>;
+	private readonly generaorsToIgnoreMap: Map<string, boolean>;
 	private forceNewWorkspace: boolean;
 	private isProjectFromTamplate: boolean;
 
@@ -92,6 +93,7 @@ export class YeomanUI {
 		this.setCwd(outputPath);
 		this.gensMetaPromise = _.get(uiOptions, "gensMetaPromise");
 		this.typesMap = new Map();
+		this.generaorsToIgnoreMap = new Map();
 		this.forceNewWorkspace = false;
 		this.isProjectFromTamplate = false;
 	}
@@ -409,11 +411,9 @@ export class YeomanUI {
 		}
 
 		const type: string = this.typesMap.has(generatorName) ? this.typesMap.get(generatorName) : "files";
-		let selectedWorkspace: string = (type === "files" || type === "module") ? CREATE_AND_CLOSE : (this.forceNewWorkspace) ? OPEN_IN_A_NEW_WORKSPACE : getSelectedWorkspaceSetting();
 		// For now - A Fiori project is supposed to create the project and not open it
-		if (generatorName.includes("fiori")){
-			selectedWorkspace = CREATE_AND_CLOSE;
-		}
+		const ignoreGen: boolean = this.generaorsToIgnoreMap.has(generatorName) ? this.generaorsToIgnoreMap.get(generatorName) : false;
+		let selectedWorkspace: string = (type === "files" || type === "module" ||ignoreGen) ? CREATE_AND_CLOSE : (this.forceNewWorkspace) ? OPEN_IN_A_NEW_WORKSPACE : getSelectedWorkspaceSetting();
 
 		const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
 		const generatedTemplatePath = targetFolderPath ? targetFolderPath : targetFolderPathBeforeGen;
@@ -555,6 +555,7 @@ export class YeomanUI {
 		const categoriesHasIntersection: boolean = GeneratorFilter.hasIntersection(filter.categories, genFilter.categories);
 		let type = (_.includes(genFilter.types, GeneratorType.project)) ? "project" : (_.includes(genFilter.types, GeneratorType.module)) ? "module" : "files" ;
 		this.typesMap.set(genMeta.namespace, type);	
+		this.generaorsToIgnoreMap.set(genMeta.namespace, _.includes(genFilter.types, "tools-suite"));
 		
 		if (typesHasIntersection && categoriesHasIntersection) {
 			return this.createGeneratorChoice(genMeta.namespace, genPackagePath, packageJson);
@@ -576,13 +577,16 @@ export class YeomanUI {
 		const genDisplayName = _.get(packageJson, "displayName", '');
 		const genPrettyName = _.isEmpty(genDisplayName) ? titleize(humanizeString(genName)) : genDisplayName;
 		const genHomepage = _.get(packageJson, "homepage", '');
+		const filter = _.get(packageJson, "generator-filter", undefined);
+		const isToolsSuiteType = filter ? _.includes(filter.types, "tools-suite") : false;
 
 		return {
 			value: genName,
 			name: genPrettyName,
 			description: genMessage,
 			homepage: genHomepage,
-			image: genImageUrl
+			image: genImageUrl,
+			isToolsSuiteType: isToolsSuiteType
 		};
 	}
 
