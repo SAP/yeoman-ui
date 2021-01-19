@@ -184,6 +184,30 @@ describe('App.vue', () => {
 
 			expect(wrapper.vm.isToolsSuiteTypeGen).toBe(false);
 		})
+
+		it('questions have no question with name: generator', () => {
+			wrapper = initComponent(App)
+			wrapper.vm.prompts = [{}, {}]
+			wrapper.vm.promptIndex = 1
+			wrapper.vm.currentPrompt.status = 'pending'
+			wrapper.vm.setPromptList([])
+
+			const answerFiori = {
+				generator: "stam-generator"
+			}
+			const question = [{
+				choices: [{
+					"isToolsSuiteType": false,
+					"value": "stam-generator"
+				}],
+				name: "not-generator"
+			}]
+			wrapper.vm.currentPrompt.answers = answerFiori;
+			wrapper.vm.currentPrompt.questions = question;
+			wrapper.vm.onAnswered(answerFiori, "");
+
+			expect(wrapper.vm.isToolsSuiteTypeGen).toBe(false);
+		})
 	})
 
 	describe('setQuestionProps - method', () => {
