@@ -361,8 +361,11 @@ export default {
     },
     isToolsSuiteType(genName) {
       const questions = _.compact(_.get(this.currentPrompt, "questions"));
-      if (questions && questions[0]){
-        const choices = _.compact(_.get(questions[0], "choices"));
+      const generatorQuestion = _.find(questions, (question) => {
+        return _.get(question, "name") === "generator";
+      });
+      if (generatorQuestion){
+        const choices = _.compact(_.get(generatorQuestion, "choices"));
         if (choices){
           const isToolsSuiteGen = _.find(choices, (choice) => {
             return _.get(choice, "isToolsSuiteType") === true && _.get(choice, "value") === genName;

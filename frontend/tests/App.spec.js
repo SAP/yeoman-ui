@@ -151,7 +151,8 @@ describe('App.vue', () => {
 				choices: [{
 					"isToolsSuiteType": true,
 					"value": "fiori-generator"
-				}]
+				}],
+				name: "generator"
 			}]
 			wrapper.vm.currentPrompt.answers = answerFiori;
 			wrapper.vm.currentPrompt.questions = question;
@@ -174,7 +175,8 @@ describe('App.vue', () => {
 				choices: [{
 					"isToolsSuiteType": false,
 					"value": "stam-generator"
-				}]
+				}],
+				name: "generator"
 			}]
 			wrapper.vm.currentPrompt.answers = answerFiori;
 			wrapper.vm.currentPrompt.questions = question;
