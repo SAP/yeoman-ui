@@ -361,14 +361,13 @@ export default {
     },
     isToolsSuiteType(genName) {
       const questions = _.compact(_.get(this.currentPrompt, "questions"));
-      let currentPrompt = this.currentPrompt;
-      if (currentPrompt) {
-        let questionsChoices = (questions && currentPrompt.questions[0].choices) ? currentPrompt.questions[0].choices : undefined;
-        if (questionsChoices){
-          const isToolsSuiteGen = _.find(questionsChoices, (choice) => {
+      if (questions && questions[0]){
+        const choices = _.compact(_.get(questions[0], "choices"));
+        if (choices){
+          const isToolsSuiteGen = _.find(choices, (choice) => {
             return _.get(choice, "isToolsSuiteType") === true && _.get(choice, "value") === genName;
-        });
-        return (_.isEmpty(isToolsSuiteGen) === false);
+          });
+          return (_.isEmpty(isToolsSuiteGen) === false);
         }
       }
       return false;

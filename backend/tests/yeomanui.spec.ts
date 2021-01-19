@@ -674,6 +674,7 @@ describe('yeomanui unit test', () => {
 		it("onGeneratorSuccess - Fiori generator with type project", async () => {
 			yeomanUi["typesMap"].clear();
 			yeomanUi["typesMap"].set("fiori-generator:app", "project");
+			yeomanUi["generaorsToIgnoreMap"].set("fiori-generator:app", true);
 			const beforeGen = { targetFolderPath: "testDestinationRoot" };
 			const afterGen = { targetFolderPath: "testDestinationRoot/generatedProject" };
 			swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("fiori-generator:app", true, testLogger);
