@@ -22,10 +22,6 @@ import { resolve } from "path";
 import * as envUtils from "./env/utils";
 import { getSelectedWorkspaceSetting, getTargetFolderSetting } from "./logger/settings";
 
-const ADD_TO_WORKSPACE = "Open the project in a multi-root workspace";
-const OPEN_IN_A_NEW_WORKSPACE = "Open the project in a new workspace";
-const CREATE_AND_CLOSE = "Create the project and close it for later use";
-
 export interface IQuestionsPrompt extends IPrompt {
 	questions: any[];
 }
@@ -413,7 +409,7 @@ export class YeomanUI {
 		const type: string = this.typesMap.has(generatorName) ? this.typesMap.get(generatorName) : "files";
 		// For now - A Fiori project is supposed to create the project and not open it
 		const ignoreGen: boolean = this.generaorsToIgnoreMap.has(generatorName) ? this.generaorsToIgnoreMap.get(generatorName) : false;
-		let selectedWorkspace: string = (type === "files" || type === "module" ||ignoreGen) ? CREATE_AND_CLOSE : (this.forceNewWorkspace) ? OPEN_IN_A_NEW_WORKSPACE : getSelectedWorkspaceSetting();
+		let selectedWorkspace: string = (type === "files" || type === "module" || ignoreGen) ? this.uiOptions.messages.create_and_close : (this.forceNewWorkspace) ? this.uiOptions.messages.open_in_a_new_workspace : getSelectedWorkspaceSetting();
 
 		const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
 		const generatedTemplatePath = targetFolderPath ? targetFolderPath : targetFolderPathBeforeGen;
@@ -458,21 +454,21 @@ export class YeomanUI {
 
 		const questions: any[] = [];
 
-		let selectedWorkspaceConfig = CREATE_AND_CLOSE;
+		let selectedWorkspaceConfig = this.uiOptions.messages.create_and_close;
 		const vscodeInstance = this.getVscode();
 		if (vscodeInstance) {
 			let newSelectedWorkspaceConfig =  await vscodeInstance.workspace.getConfiguration("ApplicationWizard");
 			if (newSelectedWorkspaceConfig){
 				const currentPath = _.get(vscodeInstance, "workspace.workspaceFolders[0].uri.fsPath");
-				if (!currentPath || YeomanUI.PROJECTS === currentPath){
-					vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("Workspace", OPEN_IN_A_NEW_WORKSPACE, vscodeInstance.ConfigurationTarget.Global);
+				if (!currentPath || YeomanUI.PROJECTS.toLowerCase() === currentPath.toLowerCase()){
+					vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("Workspace", this.uiOptions.messages.open_in_a_new_workspace, vscodeInstance.ConfigurationTarget.Global);
 					this.forceNewWorkspace = true;
-					selectedWorkspaceConfig = OPEN_IN_A_NEW_WORKSPACE;
+					selectedWorkspaceConfig = this.uiOptions.messages.open_in_a_new_workspace;
 				}
-				else if (YeomanUI.PROJECTS != currentPath) {
-					vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("Workspace", ADD_TO_WORKSPACE, vscodeInstance.ConfigurationTarget.Global);
+				else if (YeomanUI.PROJECTS.toLowerCase() != currentPath.toLowerCase()) {
+					vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("Workspace", this.uiOptions.messages.add_to_workspace, vscodeInstance.ConfigurationTarget.Global);
 					this.forceNewWorkspace = false;
-					selectedWorkspaceConfig = ADD_TO_WORKSPACE;
+					selectedWorkspaceConfig = this.uiOptions.messages.add_to_workspace;
 				}
 			}
 		}

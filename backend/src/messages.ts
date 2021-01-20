@@ -21,5 +21,8 @@ export default {
     artifact_generated_files: `The files have been generated.`,
     artifact_with_name_generated: (artifactName: string) => `The '${artifactName}' project has been generated.`,
     show_progress_button: "Open Output View",
-    show_progress_message: "Generating..."
+    show_progress_message: "Generating...",
+    add_to_workspace: "Open the project in a multi-root workspace",
+    open_in_a_new_workspace: "Open the project in a new workspace",
+    create_and_close: "Create the project and close it for later use"
 }; 

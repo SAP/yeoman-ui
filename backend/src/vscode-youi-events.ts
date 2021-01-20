@@ -9,9 +9,6 @@ import { getClassLogger } from './logger/logger-wrapper';
 import { getImage } from "./images/messageImages";
 import { AppWizard, MessageType, Severity } from '@sap-devx/yeoman-ui-types';
 
-const ADD_TO_WORKSPACE = "Open the project in a multi-root workspace";
-const OPEN_IN_A_NEW_WORKSPACE = "Open the project in a new workspace";
-
 class YoUiAppWizard extends AppWizard {
 	constructor(private readonly events: VSCodeYouiEvents) {
 		super();
@@ -181,9 +178,9 @@ export class VSCodeYouiEvents implements YouiEvents {
 
 			const successInfoMessage = (type === "project") ? this.messages.artifact_generated_project : (type === "module") ? this.messages.artifact_generated_module : this.messages.artifact_generated_files;
 
-			if (selectedWorkspace === OPEN_IN_A_NEW_WORKSPACE) {
+			if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
 				vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
-			} else if (selectedWorkspace === ADD_TO_WORKSPACE) {
+			} else if (selectedWorkspace === this.messages.add_to_workspace) {
 				const wsFoldersQuantity = _.size(vscode.workspace.workspaceFolders);
 				vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, { uri: targetFolderUri });
 			}
