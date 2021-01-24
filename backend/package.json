@@ -111,7 +111,7 @@
 				},
 				"ApplicationWizard.TargetFolder": {
 					"type": "string",
-					"default": "/home/user/projects",
+					"default": "",
 					"description": "Set the default target folder path for the project.",
 					"scope": "resource"
 				},

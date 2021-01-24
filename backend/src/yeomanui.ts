@@ -20,7 +20,6 @@ import TerminalAdapter = require("yeoman-environment/lib/adapter");
 import { Output } from "./output";
 import { resolve } from "path";
 import * as envUtils from "./env/utils";
-import { getSelectedWorkspaceSetting, getTargetFolderSetting } from "./logger/settings";
 
 export interface IQuestionsPrompt extends IPrompt {
 	questions: any[];
@@ -54,9 +53,12 @@ export class YeomanUI {
 	private readonly outputPath: string;
 	private initialCwd: string;
 	private readonly typesMap: Map<string, string>;
-	private readonly generaorsToIgnoreMap: Map<string, boolean>;
+	private readonly generaorsToIgnoreArray: string[];
 	private forceNewWorkspace: boolean;
-	private isProjectFromTamplate: boolean;
+
+	private readonly TARGET_FOLDER_CONFIG_PROP = "ApplicationWizard.TargetFolder";
+    private readonly SELECTED_WORKSPACE_CONFIG_PROP = "ApplicationWizard.Workspace";
+
 
 	constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
 		this.rpc = rpc;
@@ -89,9 +91,8 @@ export class YeomanUI {
 		this.setCwd(outputPath);
 		this.gensMetaPromise = _.get(uiOptions, "gensMetaPromise");
 		this.typesMap = new Map();
-		this.generaorsToIgnoreMap = new Map();
+		this.generaorsToIgnoreArray = new Array();
 		this.forceNewWorkspace = false;
-		this.isProjectFromTamplate = false;
 	}
 
 	private async getGensMeta() {
@@ -114,6 +115,10 @@ export class YeomanUI {
 		const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
 		await this.rpc.invoke("updateGeneratorsPrompt", [generators.questions]);
 	}
+
+	private getWsConfig(config: string) {
+        return this.getVscode().workspace.getConfiguration().get(config);
+    }
 
 	public registerCustomQuestionEventHandler(questionType: string, methodName: string, handler: Function): void {
 		let entry: Map<string, Function> = this.customQuestionEventHandlers.get(questionType);
@@ -180,9 +185,9 @@ export class YeomanUI {
 		// see issue: https://github.com/yeoman/environment/issues/55
 		// process.chdir() doesn't work after environment has been created
 		try {
-			const type: string = (this.typesMap.has(generatorNamespace)) ? this.typesMap.get(generatorNamespace) : "files";
-			if (type === "project" && this.isProjectFromTamplate) {
-				this.setCwd(getTargetFolderSetting());
+			const targetFolderProp = this.getWsConfig(this.TARGET_FOLDER_CONFIG_PROP);
+			if (targetFolderProp) {
+				this.setCwd(targetFolderProp);
 			} 	
 			const targetFolder = this.getCwd();
 			await fsextra.mkdirs(targetFolder);
@@ -408,8 +413,8 @@ export class YeomanUI {
 
 		const type: string = this.typesMap.has(generatorName) ? this.typesMap.get(generatorName) : "files";
 		// For now - A Fiori project is supposed to create the project and not open it
-		const ignoreGen: boolean = this.generaorsToIgnoreMap.has(generatorName) ? this.generaorsToIgnoreMap.get(generatorName) : false;
-		let selectedWorkspace: string = (type === "files" || type === "module" || ignoreGen) ? this.uiOptions.messages.create_and_close : (this.forceNewWorkspace) ? this.uiOptions.messages.open_in_a_new_workspace : getSelectedWorkspaceSetting();
+		const ignoreGen: boolean = this.generaorsToIgnoreArray.includes(generatorName);
+		let selectedWorkspace: string = (type === "files" || type === "module" || ignoreGen) ? this.uiOptions.messages.create_and_close : (this.forceNewWorkspace) ? this.uiOptions.messages.open_in_a_new_workspace : this.getWsConfig(this.SELECTED_WORKSPACE_CONFIG_PROP);
 
 		const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
 		const generatedTemplatePath = targetFolderPath ? targetFolderPath : targetFolderPathBeforeGen;
@@ -461,23 +466,18 @@ export class YeomanUI {
 			if (newSelectedWorkspaceConfig){
 				const currentPath = _.get(vscodeInstance, "workspace.workspaceFolders[0].uri.fsPath");
 				if (!currentPath || YeomanUI.PROJECTS.toLowerCase() === currentPath.toLowerCase()){
-					vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("Workspace", this.uiOptions.messages.open_in_a_new_workspace, vscodeInstance.ConfigurationTarget.Global);
 					this.forceNewWorkspace = true;
 					selectedWorkspaceConfig = this.uiOptions.messages.open_in_a_new_workspace;
 				}
-				else if (YeomanUI.PROJECTS.toLowerCase() != currentPath.toLowerCase()) {
-					vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("Workspace", this.uiOptions.messages.add_to_workspace, vscodeInstance.ConfigurationTarget.Global);
+				else {
 					this.forceNewWorkspace = false;
-					selectedWorkspaceConfig = this.uiOptions.messages.add_to_workspace;
+					selectedWorkspaceConfig = this.getWsConfig(this.SELECTED_WORKSPACE_CONFIG_PROP);
 				}
 			}
 		}
 
 		if (_.includes(genFilter.types, GeneratorType.project)) {
-			const defaultPath = this.getCwd();
-			if (vscodeInstance.workspace.getConfiguration("ApplicationWizard")){
-				vscodeInstance.workspace.getConfiguration("ApplicationWizard").update("TargetFolder", defaultPath, vscodeInstance.ConfigurationTarget.Global);
-			}
+			const defaultPath = this.getWsConfig(this.TARGET_FOLDER_CONFIG_PROP) ? this.getWsConfig(this.TARGET_FOLDER_CONFIG_PROP) : this.getCwd();
 			const targetFolderQuestion: any = {
 				type: "input",
 				guiOptions: {
@@ -495,7 +495,6 @@ export class YeomanUI {
 				message: "Specify a target folder path",
 				default: defaultPath
 			};
-			this.isProjectFromTamplate = true;
 			questions.push(targetFolderQuestion);
 
 			if (!this.forceNewWorkspace){
@@ -551,8 +550,8 @@ export class YeomanUI {
 		const categoriesHasIntersection: boolean = GeneratorFilter.hasIntersection(filter.categories, genFilter.categories);
 		let type = (_.includes(genFilter.types, GeneratorType.project)) ? "project" : (_.includes(genFilter.types, GeneratorType.module)) ? "module" : "files" ;
 		this.typesMap.set(genMeta.namespace, type);	
-		this.generaorsToIgnoreMap.set(genMeta.namespace, _.includes(genFilter.types, "tools-suite"));
-		
+		_.includes(genFilter.types, "tools-suite") && this.generaorsToIgnoreArray.push(genMeta.namespace);
+
 		if (typesHasIntersection && categoriesHasIntersection) {
 			return this.createGeneratorChoice(genMeta.namespace, genPackagePath, packageJson);
 		}

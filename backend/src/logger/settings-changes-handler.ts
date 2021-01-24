@@ -1,6 +1,6 @@
 import * as vscode from "vscode"; // NOSONAR
 import {getLogger} from "./logger-wrapper";
-import {LOGGING_LEVEL_CONFIG_PROP, SOURCE_TRACKING_CONFIG_PROP, SELECTED_WORKSPACE_CONFIG_PROP} from "./settings";
+import {LOGGING_LEVEL_CONFIG_PROP, SOURCE_TRACKING_CONFIG_PROP} from "./settings";
 import { LogLevel } from "@vscode-logging/logger";
 
 export function logLoggerDetails(context: vscode.ExtensionContext, configLogLevel: string): void {
@@ -36,24 +36,6 @@ export function listenToLogSettingsChanges(context: vscode.ExtensionContext) {
           .get(SOURCE_TRACKING_CONFIG_PROP);
 
         getLogger().changeSourceLocationTracking(newSourceLocationTracking);
-      }
-    })
-  );
-}
-
-/**
- * @param {vscode.ExtensionContext} context
- */
-export function listenToSelectedWorkspaceSettingsChanges(context: vscode.ExtensionContext) {
-  // To enable dynamic selected workspace we must listen to VSCode configuration changes
-  context.subscriptions.push(
-    vscode.workspace.onDidChangeConfiguration(e => {
-      if (e.affectsConfiguration(SELECTED_WORKSPACE_CONFIG_PROP)) {
-        const selectedWorkspace: string = vscode.workspace
-          .getConfiguration()
-          .get(SELECTED_WORKSPACE_CONFIG_PROP);
-
-          console.log(`SELECTED_WORKSPACE_CONFIG_PROP was changed to: ${selectedWorkspace}`);
       }
     })
   );
