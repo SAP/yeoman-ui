@@ -153,7 +153,7 @@ describe('yeomanui unit test', () => {
 			await yeomanUi["receiveIsWebviewReady"]();
 		});
 
-		it("typesMap has the generator but it's not from project frpm template", async () => {
+		it("typesMap has the generator but it's not from project from template", async () => {
 			rpcMock.expects("invoke").withArgs("showPrompt").resolves({ generator: "testGenerator" });
 			swaTrackerWrapperMock.expects("updateGeneratorStarted").withArgs("testGenerator");
 			yeomanUi["typesMap"].set("testGenerator:app", "project");
@@ -169,7 +169,7 @@ describe('yeomanui unit test', () => {
 			await yeomanUi["receiveIsWebviewReady"]();
 		});
 
-		it("typesMap has the generator and it's from project frpm template", async () => {
+		it("typesMap has the generator and it's from project from template", async () => {
 			rpcMock.expects("invoke").withArgs("showPrompt").resolves({ generator: "testGenerator" });
 			swaTrackerWrapperMock.expects("updateGeneratorStarted").withArgs("testGenerator");
 			yeomanUi["typesMap"].set("testGenerator:app", "project");
@@ -412,8 +412,6 @@ describe('yeomanui unit test', () => {
 
 			yeomanUi["uiOptions"] = { filter: GeneratorFilter.create(), messages };
 			const result = await yeomanUi["getGeneratorsPrompt"]();
-
-			expect(yeomanUi["forceNewWorkspace"]).to.be.equals(false);
 
 			const choices = result.questions[0].choices;
 			expect(choices).to.have.lengthOf(3);
@@ -723,7 +721,7 @@ describe('yeomanui unit test', () => {
 			expect(doGeneratorDoneSpy.calledWith(true, _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("foodq:app"), "Open the project in a new workspace", "project", "testDestinationRoot/generatedProject")).to.be.true;
 		});
 
-		it("onGeneratorSuccess - Fiori generator with type project", async () => {
+		it("onGeneratorSuccess - Fiori generator with type project and type tools-suite", async () => {
 			yeomanUi["typesMap"].clear();
 			yeomanUi["typesMap"].set("fiori-generator:app", "project");
 			yeomanUi["generaorsToIgnoreArray"].push("fiori-generator:app");
