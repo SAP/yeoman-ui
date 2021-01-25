@@ -459,20 +459,17 @@ export class YeomanUI {
 
 		const questions: any[] = [];
 
-		let selectedWorkspaceConfig = this.uiOptions.messages.create_and_close;
+		let selectedWorkspaceConfig = this.uiOptions.messages.open_in_a_new_workspace;
 		const vscodeInstance = this.getVscode();
 		if (vscodeInstance) {
-			let newSelectedWorkspaceConfig =  await vscodeInstance.workspace.getConfiguration("ApplicationWizard");
-			if (newSelectedWorkspaceConfig){
-				const currentPath = _.get(vscodeInstance, "workspace.workspaceFolders[0].uri.fsPath");
-				if (!currentPath || YeomanUI.PROJECTS.toLowerCase() === currentPath.toLowerCase()){
-					this.forceNewWorkspace = true;
-					selectedWorkspaceConfig = this.uiOptions.messages.open_in_a_new_workspace;
-				}
-				else {
-					this.forceNewWorkspace = false;
-					selectedWorkspaceConfig = this.getWsConfig(this.SELECTED_WORKSPACE_CONFIG_PROP);
-				}
+			const currentPath = _.get(vscodeInstance, "workspace.workspaceFolders[0].uri.fsPath");
+			if (!currentPath || YeomanUI.PROJECTS.toLowerCase() === currentPath.toLowerCase()){
+				this.forceNewWorkspace = true;
+				selectedWorkspaceConfig = this.uiOptions.messages.open_in_a_new_workspace;
+			}
+			else {
+				this.forceNewWorkspace = false;
+				selectedWorkspaceConfig = this.getWsConfig(this.SELECTED_WORKSPACE_CONFIG_PROP);
 			}
 		}
 
