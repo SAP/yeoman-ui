@@ -21,7 +21,6 @@ import { Output } from "./output";
 import { resolve } from "path";
 import * as envUtils from "./env/utils";
 
-
 export interface IQuestionsPrompt extends IPrompt {
 	questions: any[];
 }
@@ -53,7 +52,13 @@ export class YeomanUI {
 	private errorThrown = false;
 	private readonly outputPath: string;
 	private initialCwd: string;
-	private readonly isTypeProjectMap: Map<string, boolean>;
+	private readonly typesMap: Map<string, string>;
+	private readonly generaorsToIgnoreArray: string[];
+	private forceNewWorkspace: boolean;
+
+	private readonly TARGET_FOLDER_CONFIG_PROP = "ApplicationWizard.TargetFolder";
+    private readonly SELECTED_WORKSPACE_CONFIG_PROP = "ApplicationWizard.Workspace";
+
 
 	constructor(rpc: IRpc, youiEvents: YouiEvents, output: Output, logger: IChildLogger, uiOptions: any, outputPath: string = YeomanUI.PROJECTS) {
 		this.rpc = rpc;
@@ -85,7 +90,9 @@ export class YeomanUI {
 		this.customQuestionEventHandlers = new Map();
 		this.setCwd(outputPath);
 		this.gensMetaPromise = _.get(uiOptions, "gensMetaPromise");
-		this.isTypeProjectMap = new Map();
+		this.typesMap = new Map();
+		this.generaorsToIgnoreArray = new Array();
+		this.forceNewWorkspace = false;
 	}
 
 	private async getGensMeta() {
@@ -108,6 +115,10 @@ export class YeomanUI {
 		const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
 		await this.rpc.invoke("updateGeneratorsPrompt", [generators.questions]);
 	}
+
+	private getWsConfig(config: string) {
+        return this.getVscode().workspace.getConfiguration().get(config);
+    }
 
 	public registerCustomQuestionEventHandler(questionType: string, methodName: string, handler: Function): void {
 		let entry: Map<string, Function> = this.customQuestionEventHandlers.get(questionType);
@@ -174,6 +185,10 @@ export class YeomanUI {
 		// see issue: https://github.com/yeoman/environment/issues/55
 		// process.chdir() doesn't work after environment has been created
 		try {
+			const targetFolderProp = this.getWsConfig(this.TARGET_FOLDER_CONFIG_PROP);
+			if (targetFolderProp) {
+				this.setCwd(targetFolderProp);
+			} 	
 			const targetFolder = this.getCwd();
 			await fsextra.mkdirs(targetFolder);
 			const dirsBefore = await this.getChildDirectories(targetFolder);
@@ -292,8 +307,8 @@ export class YeomanUI {
 	private async receiveIsWebviewReady() {
 		try {
 			let generatorId: string = this.uiOptions.generator;
+			const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
 			if (!generatorId) {
-				const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
 				const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 				generatorId = response.generator;
 			}
@@ -396,12 +411,16 @@ export class YeomanUI {
 			targetFolderPath = targetFolderPathAfterGen;
 		}
 
+		const type: string = this.typesMap.has(generatorName) ? this.typesMap.get(generatorName) : "files";
+		// For now - A Fiori project is supposed to create the project and not open it
+		const ignoreGen: boolean = this.generaorsToIgnoreArray.includes(generatorName);
+		let selectedWorkspace: string = (type === "files" || type === "module" || ignoreGen) ? this.uiOptions.messages.create_and_close : (this.forceNewWorkspace) ? this.uiOptions.messages.open_in_a_new_workspace : this.getWsConfig(this.SELECTED_WORKSPACE_CONFIG_PROP);
+
 		const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
 		const generatedTemplatePath = targetFolderPath ? targetFolderPath : targetFolderPathBeforeGen;
 		this.logger.debug("done running yeomanui! " + message + ` You can find it at ${generatedTemplatePath}`);
 		SWA.updateGeneratorEnded(generatorName, true, this.logger);
-		const isProject: boolean = (this.isTypeProjectMap.has(generatorName)) ? this.isTypeProjectMap.get(generatorName) : false;
-		this.youiEvents.doGeneratorDone(true, message, isProject, targetFolderPath);
+		this.youiEvents.doGeneratorDone(true, message, selectedWorkspace, type, targetFolderPath);
 		this.setInitialProcessDir();
 	}
 
@@ -410,7 +429,7 @@ export class YeomanUI {
 		const messagePrefix = `${generatorName} generator failed`;
 		const errorMessage: string = this.logError(error, messagePrefix);
 		SWA.updateGeneratorEnded(generatorName, false, this.logger, errorMessage);
-		this.youiEvents.doGeneratorDone(false, errorMessage, false);
+		this.youiEvents.doGeneratorDone(false, errorMessage, "", "files");
 		this.setInitialProcessDir();
 	}
 
@@ -440,35 +459,60 @@ export class YeomanUI {
 
 		const questions: any[] = [];
 
+		let selectedWorkspaceConfig = this.uiOptions.messages.open_in_a_new_workspace;
+		const vscodeInstance = this.getVscode();
+		if (vscodeInstance) {
+			const currentPath = _.get(vscodeInstance, "workspace.workspaceFolders[0].uri.fsPath");
+			if (!currentPath || YeomanUI.PROJECTS.toLowerCase() === currentPath.toLowerCase()){
+				this.forceNewWorkspace = true;
+				selectedWorkspaceConfig = this.uiOptions.messages.open_in_a_new_workspace;
+			}
+			else {
+				this.forceNewWorkspace = false;
+				selectedWorkspaceConfig = this.getWsConfig(this.SELECTED_WORKSPACE_CONFIG_PROP);
+			}
+		}
+
 		if (_.includes(genFilter.types, GeneratorType.project)) {
-			const defaultPath = this.getCwd();
+			const defaultPath = this.getWsConfig(this.TARGET_FOLDER_CONFIG_PROP) ? this.getWsConfig(this.TARGET_FOLDER_CONFIG_PROP) : this.getCwd();
 			const targetFolderQuestion: any = {
 				type: "input",
 				guiOptions: {
-					type: "folder-browser",
+					type: "label",
 					hint: this.uiOptions.messages.select_target_folder_question_hint,
-					mandatory: true
+					link: {
+						text: "Preferences",
+						command: {
+							id: "workbench.action.openSettings",
+							params: [`ApplicationWizard.TargetFolder`]
+						}
+					},
 				},
 				name: "generator.target.folder",
 				message: "Specify a target folder path",
-				default: defaultPath,
-				getPath: async (path: string) => path,
-				validate: async (path: string) => {
-					try {
-						// Without resolve this code worked only for absolute paths without / at the end.
-						// The user can put a relative path, path including . and .. and / at the end.
-						// In this case many project generation failed or opened invalid folders instead of project at the end (after clicking on the button 'Open project in workspace').
-						path = resolve(this.outputPath, path);
-						await fsextra.access(path, fsextra.constants.W_OK);
-						this.setCwd(path);
-						return true;
-					} catch (error) {
-						this.logError(error);
-						return "The selected target folder is not writable";
-					}
-				}
+				default: defaultPath
 			};
 			questions.push(targetFolderQuestion);
+
+			if (!this.forceNewWorkspace){
+				const locationQuestion: any = {
+					type: "label",
+					guiOptions: {
+						hint: this.uiOptions.messages.select_open_workspace_question_hint,
+						link: {
+							text: "Preferences",
+							command: {
+								id: "workbench.action.openSettings",
+								params: [`ApplicationWizard.Workspace`]
+							}
+						}
+					},
+					name: "selectedWorkspace",
+					message: `Where do you want to open the project?`,
+					default: selectedWorkspaceConfig
+				};
+				questions.push(locationQuestion);
+			}
 		}
 
 		const generatorChoices = await Promise.all(generatorChoicePromises);
@@ -501,8 +545,10 @@ export class YeomanUI {
 		const genFilter: GeneratorFilter = GeneratorFilter.create(_.get(packageJson, ["generator-filter"]));
 		const typesHasIntersection: boolean = GeneratorFilter.hasIntersection(filter.types, genFilter.types);
 		const categoriesHasIntersection: boolean = GeneratorFilter.hasIntersection(filter.categories, genFilter.categories);
-		this.isTypeProjectMap.set(genMeta.namespace, (_.includes(genFilter.types, GeneratorType.project)));	
-		
+		let type = (_.includes(genFilter.types, GeneratorType.project)) ? "project" : (_.includes(genFilter.types, GeneratorType.module)) ? "module" : "files" ;
+		this.typesMap.set(genMeta.namespace, type);	
+		_.includes(genFilter.types, "tools-suite") && this.generaorsToIgnoreArray.push(genMeta.namespace);
+
 		if (typesHasIntersection && categoriesHasIntersection) {
 			return this.createGeneratorChoice(genMeta.namespace, genPackagePath, packageJson);
 		}
@@ -523,13 +569,16 @@ export class YeomanUI {
 		const genDisplayName = _.get(packageJson, "displayName", '');
 		const genPrettyName = _.isEmpty(genDisplayName) ? titleize(humanizeString(genName)) : genDisplayName;
 		const genHomepage = _.get(packageJson, "homepage", '');
+		const filter = _.get(packageJson, "generator-filter", undefined);
+		const isToolsSuiteType = filter ? _.includes(filter.types, "tools-suite") : false;
 
 		return {
 			value: genName,
 			name: genPrettyName,
 			description: genMessage,
 			homepage: genHomepage,
-			image: genImageUrl
+			image: genImageUrl,
+			isToolsSuiteType: isToolsSuiteType
 		};
 	}
 

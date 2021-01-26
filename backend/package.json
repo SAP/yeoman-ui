@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.54",
+	"version": "1.1.55",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -46,7 +46,7 @@
 			},
 			{
 				"command": "loadYeomanUI",
-				"title": "Open Application Wizard"
+				"title": "Open Template Wizard"
 			},
 			{
 				"command": "yeomanUI.toggleOutput",
@@ -107,6 +107,23 @@
 					],
 					"default": "error",
 					"description": "The verbosity of logging according to the following order: trace > debug > info > warn > error > fatal > off.",
+					"scope": "resource"
+				},
+				"ApplicationWizard.TargetFolder": {
+					"type": "string",
+					"default": "",
+					"description": "Set the default target folder path for the project.",
+					"scope": "resource"
+				},
+				"ApplicationWizard.Workspace": {
+					"type": "string",
+					"enum": [
+						"Open the project in a new workspace",
+						"Open the project in a multi-root workspace",
+						"Create the project and close it for later use"
+					],
+					"default": "Open the project in a new workspace",
+					"description": "Define the preferred behavior upon project creation.",
 					"scope": "resource"
 				},
 				"ApplicationWizard.sourceLocationTracking": {

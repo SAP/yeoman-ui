@@ -136,6 +136,80 @@ describe('App.vue', () => {
 		})
 	})
 
+	describe('onAnswered - method', () => {
+		it('the project is a fiori project', () => {
+			wrapper = initComponent(App)
+			wrapper.vm.prompts = [{}, {}]
+			wrapper.vm.promptIndex = 1
+			wrapper.vm.currentPrompt.status = 'pending'
+			wrapper.vm.setPromptList([])
+
+			const answerFiori = {
+				generator: "fiori-generator"
+			}
+			const question = [{
+				choices: [{
+					"isToolsSuiteType": true,
+					"value": "fiori-generator"
+				}],
+				name: "generator"
+			}]
+			wrapper.vm.currentPrompt.answers = answerFiori;
+			wrapper.vm.currentPrompt.questions = question;
+			wrapper.vm.onAnswered(answerFiori, "");
+
+			expect(wrapper.vm.isToolsSuiteTypeGen).toBe(true);
+		})
+
+		it('the project is not a fiori project', () => {
+			wrapper = initComponent(App)
+			wrapper.vm.prompts = [{}, {}]
+			wrapper.vm.promptIndex = 1
+			wrapper.vm.currentPrompt.status = 'pending'
+			wrapper.vm.setPromptList([])
+
+			const answerFiori = {
+				generator: "stam-generator"
+			}
+			const question = [{
+				choices: [{
+					"isToolsSuiteType": false,
+					"value": "stam-generator"
+				}],
+				name: "generator"
+			}]
+			wrapper.vm.currentPrompt.answers = answerFiori;
+			wrapper.vm.currentPrompt.questions = question;
+			wrapper.vm.onAnswered(answerFiori, "");
+
+			expect(wrapper.vm.isToolsSuiteTypeGen).toBe(false);
+		})
+
+		it('questions have no question with name: generator', () => {
+			wrapper = initComponent(App)
+			wrapper.vm.prompts = [{}, {}]
+			wrapper.vm.promptIndex = 1
+			wrapper.vm.currentPrompt.status = 'pending'
+			wrapper.vm.setPromptList([])
+
+			const answerFiori = {
+				generator: "stam-generator"
+			}
+			const question = [{
+				choices: [{
+					"isToolsSuiteType": false,
+					"value": "stam-generator"
+				}],
+				name: "not-generator"
+			}]
+			wrapper.vm.currentPrompt.answers = answerFiori;
+			wrapper.vm.currentPrompt.questions = question;
+			wrapper.vm.onAnswered(answerFiori, "");
+
+			expect(wrapper.vm.isToolsSuiteTypeGen).toBe(false);
+		})
+	})
+
 	describe('setQuestionProps - method', () => {
 		// the delay ensures we call the busy indicator
 		it('validate() with delay', async () => {
@@ -212,6 +286,34 @@ describe('App.vue', () => {
 			]
 			wrapper.vm.prepQuestions(questions, 'promptName');
 			await expect(questions[0].validate()).rejects.toEqual("error");
+		})
+
+		it('fiori project will not open in a new workspace', async () => {
+			wrapper = initComponent(App, {})
+			wrapper.vm.rpc = {
+				invoke: jest.fn().mockImplementation((methodName, question) => { return question[1] })
+			}
+
+			wrapper.vm.promptsInfoToDisplay = [{}, {}, {}]
+			wrapper.vm.promptIndex = 2
+
+			wrapper.vm.isToolsSuiteTypeGen = true;
+			const message = "The generated project will not open in a new workspace.";
+			const image = "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHdpZHRoPSIxNyIgaGVpZ2h0PSIxNyIgdmlld0JveD0iMCAwIDE3IDE3Ij4NCiAgPGRlZnM+DQogICAgPGNsaXBQYXRoIGlkPSJjbGlwLWluZm9fdmNvZGUiPg0KICAgICAgPHJlY3Qgd2lkdGg9IjE3IiBoZWlnaHQ9IjE3Ii8+DQogICAgPC9jbGlwUGF0aD4NCiAgPC9kZWZzPg0KICA8ZyBpZD0iaW5mb192Y29kZSIgY2xpcC1wYXRoPSJ1cmwoI2NsaXAtaW5mb192Y29kZSkiPg0KICAgIDxnIGlkPSJHcm91cF8zNTQ0IiBkYXRhLW5hbWU9Ikdyb3VwIDM1NDQiPg0KICAgICAgPGcgaWQ9Ikdyb3VwXzM1NDMiIGRhdGEtbmFtZT0iR3JvdXAgMzU0MyI+DQogICAgICAgIDxnIGlkPSJHcm91cF8zNTQyIiBkYXRhLW5hbWU9Ikdyb3VwIDM1NDIiPg0KICAgICAgICAgIDxnIGlkPSJFbGxpcHNlXzU0IiBkYXRhLW5hbWU9IkVsbGlwc2UgNTQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzZmYmFmNyIgc3Ryb2tlLXdpZHRoPSIxLjUiPg0KICAgICAgICAgICAgPGNpcmNsZSBjeD0iOC41IiBjeT0iOC41IiByPSI4LjUiIHN0cm9rZT0ibm9uZSIvPg0KICAgICAgICAgICAgPGNpcmNsZSBjeD0iOC41IiBjeT0iOC41IiByPSI3Ljc1IiBmaWxsPSJub25lIi8+DQogICAgICAgICAgPC9nPg0KICAgICAgICAgIDxwYXRoIGlkPSJQYXRoXzE2NDAiIGRhdGEtbmFtZT0iUGF0aCAxNjQwIiBkPSJNMTg1Mi41LTI3NzkuNzMxdjQuNTA2IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMTg0NCAyNzg3Ljc1KSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNmZiYWY3IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS13aWR0aD0iMS41Ii8+DQogICAgICAgICAgPHBhdGggaWQ9IlBhdGhfMTY0MSIgZGF0YS1uYW1lPSJQYXRoIDE2NDEiIGQ9Ik0xODUyLjUtMjc3NC43MzFoMCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTE4NDQgMjc4MCkiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzZmYmFmNyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2Utd2lkdGg9IjIiLz4NCiAgICAgICAgPC9nPg0KICAgICAgPC9nPg0KICAgIDwvZz4NCiAgPC9nPg0KPC9zdmc+DQo=";
+
+			const questions = [
+				{ name: 'defaultQ', default: '__Function' },
+				{ name: 'whenQ', when: '__Function' },
+				{ name: 'messageQ', message: '__Function' },
+				{ name: 'choicesQ', choices: '__Function' },
+				{ name: 'filterQ', filter: '__Function' },
+				{ name: 'validateQ', validate: '__Function' },
+				{ name: 'whenQ6', default: 'whenAnswer6', type: 'confirm' }
+			]
+			wrapper.vm.showPrompt(questions, 'promptName')
+
+			expect(wrapper.vm.promptMessageToDisplay).toEqual(message);
+			expect(wrapper.vm.promptMessageIcon).toEqual(image);
 		})
 	})
 

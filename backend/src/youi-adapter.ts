@@ -49,7 +49,7 @@ export class YouiAdapter extends TerminalAdapter {
         try {
           return await cb(result); // eslint-disable-line @typescript-eslint/await-thenable
         } catch (err) {
-          this.youiEvents.doGeneratorDone(false, (_.get(err, "message", 'Application Wizard detected an error')), false);
+          this.youiEvents.doGeneratorDone(false, (_.get(err, "message", 'Template Wizard detected an error')), "", "files");
           return;
         }
       }
