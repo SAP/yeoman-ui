@@ -11,6 +11,7 @@ import { AbstractWebviewPanel } from './AbstractWebviewPanel';
 import { ExploreGens } from '../exploregens';
 import { GeneratorOutput } from '../vscode-output';
 import * as envUtils from "../env/utils";
+import { getWebviewRpcLibraryLogger } from '../logger/logger-wrapper';
 
 
 export class YeomanUIPanel extends AbstractWebviewPanel {
@@ -59,7 +60,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 		const generator = _.get(uiOptions, "generator");
 		const gensMetaPromise = YeomanUIPanel.getGensMeta();
 
-		this.rpc = new RpcExtension(this.webViewPanel.webview);
+		this.rpc = new RpcExtension(this.webViewPanel.webview, getWebviewRpcLibraryLogger());
 		this.output.setChannelName(`${YeomanUIPanel.YEOMAN_UI}.${this.messages.channel_name}`);
 		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.webViewPanel, this.messages, this.output, this.isInBAS);
 
