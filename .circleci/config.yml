@@ -26,9 +26,9 @@ build-steps: &common-build
         command: npm run test
 
 jobs: # a collection of steps
-  build-and-test-node10:
+  build-and-test-node14:
     docker:
-      - image: circleci/node:10.23 # Current BAS node version
+      - image: circleci/node:14.15.4 # Current BAS node version
     <<: *common-build
   
   build-and-test-node12:
@@ -50,7 +50,7 @@ jobs: # a collection of steps
 
   build-and-test:
     docker:
-      - image: circleci/node:14
+      - image: circleci/node:15
     working_directory: ~/repo
     steps:
       - checkout
@@ -144,7 +144,7 @@ workflows:
   version: 2
   test-deploy:
     jobs:
-      - build-and-test-node10
+      - build-and-test-node14
       - build-and-test-node12
       - compliance
       - build-and-test:
