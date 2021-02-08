@@ -7,6 +7,7 @@ import { getLoggingLevelSetting, getSourceLocationTrackingSetting} from "./setti
 // const PACKAGE_JSON = "package.json";
 const YEOMAN_UI_LOGGER_NAME = "yeomanui";
 const YEOMAN_UI = "Application Wizard";
+const WEBVIEW_RPC_LOGGER_NAME = "Webview Rpc";
 
 /**
  * A Simple Wrapper to hold the state of our "singleton" (per extension) IVSCodeExtLogger
@@ -45,6 +46,10 @@ export function getYeomanUILibraryLogger(): IChildLogger {
 	return getLibraryLogger(YEOMAN_UI_LOGGER_NAME);
 }
 
+export function getWebviewRpcLibraryLogger(): IChildLogger {
+	return getLibraryLogger(WEBVIEW_RPC_LOGGER_NAME);
+}
+
 function getLibraryLogger(libraryName: string): IChildLogger {
 	return getLogger().getChildLogger({label:libraryName});
 }
@@ -53,6 +58,21 @@ export function createExtensionLoggerAndSubscribeToLogSettingsChanges(context: v
 	createExtensionLogger(context);
 	// Subscribe to Logger settings changes.
 	listenToLogSettingsChanges(context);	
+}
+
+export function getConsoleWarnLogger(): IChildLogger {
+    const consoleLog =  (msg: string, ...args: any[]): void => { console.log(msg, args); };
+      const noopLog = () => {};
+      const warningLogger = {
+        fatal: consoleLog,
+        error: consoleLog,
+        warn: consoleLog,
+        info: noopLog,
+        debug: noopLog,
+        trace: noopLog,
+        getChildLogger: () => { return warningLogger; }
+	  };
+	  return warningLogger;
 }
 
 /**

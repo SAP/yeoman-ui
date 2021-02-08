@@ -8,6 +8,7 @@ import { IChildLogger } from "@vscode-logging/logger";
 import { YouiEvents } from '../youi-events';
 import { GeneratorFilter } from '../filter';
 import * as envUtils from "../env/utils";
+import { getConsoleWarnLogger } from '../logger/logger-wrapper';
 
 class YeomanUIWebSocketServer {
   private rpc: RpcExtensionWebSockets | undefined;
@@ -33,7 +34,7 @@ class YeomanUIWebSocketServer {
     wss.on('connection', (ws) => {
       console.log('new ws connection');
 
-      this.rpc = new RpcExtensionWebSockets(ws);
+      this.rpc = new RpcExtensionWebSockets(ws, getConsoleWarnLogger());
       //TODO: Use RPC to send it to the browser log (as a collapsed pannel in Vue)
       const serverOutput = new ServerOutput(this.rpc, true);
       const childLogger = { debug: () => {/* do nothing */ }, error: () => {/* do nothing */ }, fatal: () => {/* do nothing */ }, warn: () => {/* do nothing */ }, info: () => {/* do nothing */ }, trace: () => {/* do nothing */ }, getChildLogger: () => { return {} as IChildLogger; } };
