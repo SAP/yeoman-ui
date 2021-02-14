@@ -176,16 +176,33 @@ export class VSCodeYouiEvents implements YouiEvents {
 				targetFolderUri = vscode.Uri.file(targetFolderPath);
 			}
 
-			const successInfoMessage = (type === "project") ? this.messages.artifact_generated_project : (type === "module") ? this.messages.artifact_generated_module : this.messages.artifact_generated_files;
-
+			const successInfoMessage = this.getSuccessInfoMessage(selectedWorkspace, type);
+			
 			if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
 				vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
 			} else if (selectedWorkspace === this.messages.add_to_workspace) {
 				const wsFoldersQuantity = _.size(vscode.workspace.workspaceFolders);
 				vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, { uri: targetFolderUri });
 			}
+
 			return vscode.window.showInformationMessage(successInfoMessage);
 		}
 		return vscode.window.showErrorMessage(errorMmessage);
+	}
+
+	private getSuccessInfoMessage(selectedWorkspace: string, type: string): string {
+		let successInfoMessage: string = this.messages.artifact_generated_files;
+		if (type === "project") {
+			if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
+				successInfoMessage = this.messages.artifact_generated_project_open_in_a_new_workspace;
+			} else if (selectedWorkspace === this.messages.add_to_workspace) {
+				successInfoMessage = this.messages.artifact_generated_project_add_to_workspace;
+			} else {
+				successInfoMessage = this.messages.artifact_generated_project_saved_for_future;
+			}
+		} else if (type === "module") {
+			successInfoMessage = this.messages.artifact_generated_module;
+		}
+		return successInfoMessage;
 	}
 }
