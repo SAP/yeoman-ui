@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.55",
+	"version": "1.1.56",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -120,7 +120,7 @@
 					"enum": [
 						"Open the project in a new workspace",
 						"Open the project in a multi-root workspace",
-						"Create the project and close it for later use"
+						"Create the project and close it for future use"
 					],
 					"default": "Open the project in a new workspace",
 					"description": "Define the preferred behavior upon project creation.",
