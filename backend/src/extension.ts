@@ -26,6 +26,22 @@ export async function activate(context: vscode.ExtensionContext) {
 	registerAndSubscribeCommand("yeomanUI.toggleOutput", yeomanUIPanel.toggleOutput.bind(yeomanUIPanel));
 	registerAndSubscribeCommand("yeomanUI._notifyGeneratorsChange", yeomanUIPanel.notifyGeneratorsChange.bind(yeomanUIPanel));
 	registerAndSubscribeCommand("runGenerator", yeomanUIPanel.runGenerator.bind(yeomanUIPanel));
+	registerAndSubscribeCommand("tomer._notifyGeneratorsChange", () => {
+		return vscode.commands.executeCommand("yeomanUI._notifyGeneratorsChange" , [
+			{
+				name: "@sap/generator-mine",
+				versionRange: "2.0.1"
+			},
+			{
+				name: "generator-java-thing",
+				versionRange: "*"
+			},
+			{
+				name: "@sap/generator-my-second",
+				versionRange: "^2.0.1"
+			}
+		]);
+	} );
 	registerWebviewPanelSerializer(yeomanUIPanel);
 
 	// ExploreGensPanel

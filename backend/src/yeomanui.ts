@@ -14,7 +14,7 @@ import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 import { GeneratorFilter, GeneratorType } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
-import { IPrompt } from "@sap-devx/yeoman-ui-types";
+import { IPrompt, MessageType } from "@sap-devx/yeoman-ui-types";
 import { SWA } from "./swa-tracker/swa-tracker-wrapper";
 import TerminalAdapter = require("yeoman-environment/lib/adapter");
 import { Output } from "./output";
@@ -114,6 +114,11 @@ export class YeomanUI {
 		this.gensMetaPromise = gensMetaPromise;
 		const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
 		await this.rpc.invoke("updateGeneratorsPrompt", [generators.questions]);
+	}
+
+	public async _notifyGeneratorsInstalling(args: []) {
+		const message = "There are some generators that are being installed.";
+		this.youiEvents.getAppWizard().showInformation(message, MessageType.prompt);
 	}
 
 	private getWsConfig(config: string) {

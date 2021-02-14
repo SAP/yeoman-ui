@@ -31,15 +31,15 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 
 		return YeomanUIPanel.getDefaultPaths().concat(userPaths);
 	}
-	
+
 	public toggleOutput() {
 		this.output.show();
 	}
 
-	public notifyGeneratorsChange() {
+	public notifyGeneratorsChange(args?: []) {
 		const yeomanUi = _.get(this, "yeomanui");
 		if (yeomanUi) {
-			yeomanUi._notifyGeneratorsChange(YeomanUIPanel.getGensMeta());
+			_.isEmpty(args) ? yeomanUi._notifyGeneratorsChange(YeomanUIPanel.getGensMeta()) : yeomanUi._notifyGeneratorsInstalling(args);
 		}
 	}
 
@@ -48,12 +48,12 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 		const gensMeta: string[] = await gensMetaPromise;
 		const generator = await vscode.window.showQuickPick(_.keys(gensMeta));
 		if (generator) {
-			this.loadWebviewPanel({generator});
+			this.loadWebviewPanel({ generator });
 		}
 	}
 
 	public setWebviewPanel(webViewPanel: vscode.WebviewPanel, uiOptions?: any) {
-        super.setWebviewPanel(webViewPanel);
+		super.setWebviewPanel(webViewPanel);
 
 		this.messages = _.assign({}, backendMessages, _.get(uiOptions, "messages", {}));
 		const filter = GeneratorFilter.create(_.get(uiOptions, "filter"));
@@ -64,7 +64,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 		this.output.setChannelName(`${YeomanUIPanel.YEOMAN_UI}.${this.messages.channel_name}`);
 		const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.webViewPanel, this.messages, this.output, this.isInBAS);
 
-		const outputPath = this.isInBAS ? undefined: _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath"); 
+		const outputPath = this.isInBAS ? undefined : _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
 		this.yeomanui = new YeomanUI(this.rpc,
 			vscodeYouiEvents,
 			this.output,

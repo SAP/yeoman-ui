@@ -41,6 +41,10 @@
 	"contributes": {
 		"commands": [
 			{
+				"command": "tomer._notifyGeneratorsChange",
+				"title": "TOMER notify about generator change"
+			},
+			{
 				"command": "yeomanUI._notifyGeneratorsChange",
 				"title": "notify about generator change"
 			},
