@@ -21,14 +21,14 @@ describe('YouiAdapter', () => {
       public executeCommand(command: string, ...rest: any[]): Thenable<any> {
         return;
       }
-	}   
+  }   
 
-	const outputChannel: any = {
-		appendLine: () => "",
-		show: () => ""
+  const outputChannel: any = {
+	appendLine: () => "",
+	show: () => ""
   };
     
-	const youiEvents = new TestEvents();
+  const youiEvents = new TestEvents();
 
   describe('#prompt()', () => {
         it('passes null call back', async () => {
