@@ -45,7 +45,7 @@ export class YouiAdapter extends TerminalAdapter {
   ): Promise<T2> {
     if (this.yeomanui && questions) {
       const result: any = await (this.yeomanui.showPrompt(questions) as Promise<T2>);
-      if (!_.isNil(cb)) {
+      if (_.isFunction(cb)) {
         try {
           return await cb(result); // eslint-disable-line @typescript-eslint/await-thenable
         } catch (err) {
