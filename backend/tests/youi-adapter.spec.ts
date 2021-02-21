@@ -80,11 +80,28 @@ describe('YouiAdapter', () => {
 	{ filter: GeneratorFilter.create(), messages }, undefined);
 
     describe('#prompt()', () => {
+        
         it('passes null call back', async () => {
+            const firstName = "john";
+	    const lastName = "doe";
+	    (rpc.invoke as (methodName: string, params: any[]) => Promise<any>) = async (methodName: string, params: any[]) => {
+                const questionName: string = params[0][0].name;
+		if (questionName === "q1") {
+			return {
+				firstName,
+				lastName
+			};
+		} else {
+			return {};
+		}
+            };
+            
             const youiAdapter = new YouiAdapter(youiEvents, outputChannel); 
             youiAdapter.setYeomanUI(yeomanUi);
-            const response = await youiAdapter.prompt([], null);
-            expect(response).to.be.empty;
+            const questions = [{ name: "q1" }];
+            let response = await youiAdapter.prompt(questions, null);
+            expect(response.firstName).to.equal(firstName);
+            expect(response.lastName).to.equal(lastName);
         });
     });
 });
