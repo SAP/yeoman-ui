@@ -99,7 +99,7 @@ describe('YouiAdapter', () => {
             const youiAdapter = new YouiAdapter(youiEvents, outputChannel); 
             youiAdapter.setYeomanUI(yeomanUi);
             const questions = [{ name: "q1" }];
-            let response = await youiAdapter.prompt(questions, null);
+            const response: any = await youiAdapter.prompt(questions, null);
             expect(response.firstName).to.equal(firstName);
             expect(response.lastName).to.equal(lastName);
         });
