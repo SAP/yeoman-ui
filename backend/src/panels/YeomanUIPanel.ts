@@ -37,9 +37,17 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 	}
 
 	public notifyGeneratorsChange(args?: []) {
+		this.installGens = !_.isObject(args) ? undefined : args;
 		const yeomanUi = _.get(this, "yeomanui");
 		if (yeomanUi) {
-			_.isEmpty(args) ? yeomanUi._notifyGeneratorsChange(YeomanUIPanel.getGensMeta()) : yeomanUi._notifyGeneratorsInstalling(args);
+			if (_.isNil(this.installGens)) {
+				yeomanUi._notifyGeneratorsChange(YeomanUIPanel.getGensMeta());
+			} else {
+				yeomanUi._notifyGeneratorsInstall(this.installGens);
+				if (_.isEmpty(this.installGens)) {
+					this.installGens =  undefined;
+				}
+			}
 		}
 	}
 
@@ -69,7 +77,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 			vscodeYouiEvents,
 			this.output,
 			this.logger,
-			{ generator, filter, messages: this.messages, data: _.get(uiOptions, "data"), gensMetaPromise }, outputPath);
+			{ generator, filter, messages: this.messages, installGens: this.installGens, data: _.get(uiOptions, "data"), gensMetaPromise }, outputPath);
 		this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
 		this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
 
@@ -78,6 +86,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 
 	private yeomanui: YeomanUI;
 	private messages: any;
+	private installGens: any;
 	private readonly output: GeneratorOutput;
 
 	public constructor(context: vscode.ExtensionContext) {

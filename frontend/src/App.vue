@@ -207,7 +207,7 @@ export default {
         this.isWriting
       ) {
         return "Finish";
-      } else if (this.promptIndex === 0 && this.selectGeneratorPromptExists()) {
+      } else if (this.isGeneratorsPrompt()) {
         return "Start";
       }
       return "Next";
@@ -466,6 +466,10 @@ export default {
       }
     },
 
+    async isGeneratorsPrompt() {
+      return (this.promptIndex === 0 && this.selectGeneratorPromptExists());
+    },
+
     async showPrompt(questions, name) {
       this.prepQuestions(questions);
       if (this.isReplaying) {
@@ -576,6 +580,7 @@ export default {
         "generatorDone",
         "log",
         "updateGeneratorsPrompt",
+        "isGeneratorsPrompt",
         "setGenInWriting",
         "showPromptMessage",
       ];

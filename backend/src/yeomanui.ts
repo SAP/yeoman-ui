@@ -116,10 +116,22 @@ export class YeomanUI {
 		await this.rpc.invoke("updateGeneratorsPrompt", [generators.questions]);
 	}
 
-	public async _notifyGeneratorsInstalling(args: []) {
-		const message = "There are some generators that are being installed.";
-		this.youiEvents.getAppWizard().showInformation(message, MessageType.prompt);
+	public async _notifyGeneratorsInstall(args: [], force: boolean) {
+		if (!_.isNil(args)) {
+			const isGeneratorsPrompt: boolean = await this.rpc.invoke("isGeneratorsPrompt");
+			if (isGeneratorsPrompt || force) {
+				const message = this.getGeneratorsInstallingMessage(args);
+				this.youiEvents.getAppWizard().showInformation(message, MessageType.prompt);
+			}
+		}
 	}
+
+	private getGeneratorsInstallingMessage(args: []): string {
+		if (_.isEmpty(args)) {
+			return "We have finished installing all generators, enjoy your work!";
+		}
+		return "There are some generators that are being installed.";
+    }
 
 	private getWsConfig(config: string) {
         return this.getVscode().workspace.getConfiguration().get(config);
@@ -312,8 +324,9 @@ export class YeomanUI {
 	private async receiveIsWebviewReady() {
 		try {
 			let generatorId: string = this.uiOptions.generator;
-			const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
 			if (!generatorId) {
+				const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
+				await this._notifyGeneratorsInstall(this.uiOptions.installGens, true);
 				const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 				generatorId = response.generator;
 			}
