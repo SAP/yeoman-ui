@@ -42,14 +42,6 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "tomer._notifyGeneratorsInstallStart",
-				"title": "TOMER notify about generator install START"
-			},
-			{
-				"command": "tomer._notifyGeneratorsInstallEnd",
-				"title": "TOMER notify about generator install END"
-			},
-			{
 				"command": "yeomanUI._notifyGeneratorsChange",
 				"title": "notify about generator change"
 			},

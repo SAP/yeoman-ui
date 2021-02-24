@@ -116,7 +116,7 @@ export class YeomanUI {
 		await this.rpc.invoke("updateGeneratorsPrompt", [generators.questions]);
 	}
 
-	public async _notifyGeneratorsInstall(args: [], force: boolean) {
+	public async _notifyGeneratorsInstall(args: any[], force: boolean) {
 		if (!_.isNil(args)) {
 			const isGeneratorsPrompt: boolean = await this.rpc.invoke("isGeneratorsPrompt");
 			if (isGeneratorsPrompt || force) {
@@ -124,13 +124,14 @@ export class YeomanUI {
 				this.youiEvents.getAppWizard().showInformation(message, MessageType.prompt);
 			}
 		}
+		this.uiOptions.installGens = (_.isObject(args) && _.isEmpty(args)) ? undefined : args;
 	}
 
-	private getGeneratorsInstallingMessage(args: []): string {
+	private getGeneratorsInstallingMessage(args: any[]): string {
 		if (_.isEmpty(args)) {
-			return "We have finished installing all generators, enjoy your work!";
+			return this.uiOptions.messages.all_generators_have_been_installed;
 		}
-		return "There are some generators that are being installed.";
+		return this.uiOptions.messages.generators_are_being_installed;
     }
 
 	private getWsConfig(config: string) {

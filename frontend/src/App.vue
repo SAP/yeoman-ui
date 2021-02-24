@@ -466,7 +466,7 @@ export default {
       }
     },
 
-    async isGeneratorsPrompt() {
+    isGeneratorsPrompt() {
       return (this.promptIndex === 0 && this.selectGeneratorPromptExists());
     },
 
