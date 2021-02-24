@@ -102,6 +102,37 @@ describe('App.vue', () => {
 		})
 	});
 
+	describe('isGeneratorsPrompt - method', () => {
+		it('promptIndex = 0, selectGeneratorPromptExists = true', () => {
+			wrapper = initComponent(App, {}, true)
+			wrapper.vm.promptIndex = 0;
+			wrapper.vm.selectGeneratorPromptExists = () => true;
+			const result = wrapper.vm.isGeneratorsPrompt();
+			expect(result).toBeTruthy();
+		})
+		it('promptIndex = 0, selectGeneratorPromptExists = false', () => {
+			wrapper = initComponent(App, {}, true)
+			wrapper.vm.promptIndex = 0;
+			wrapper.vm.selectGeneratorPromptExists = () => false;
+			const result = wrapper.vm.isGeneratorsPrompt();
+			expect(result).toBeFalsy();
+		})
+		it('promptIndex > 0, selectGeneratorPromptExists = true', () => {
+			wrapper = initComponent(App, {}, true)
+			wrapper.vm.promptIndex = 1;
+			wrapper.vm.selectGeneratorPromptExists = () => true;
+			const result = wrapper.vm.isGeneratorsPrompt();
+			expect(result).toBeFalsy();
+		})
+		it('promptIndex > 0, selectGeneratorPromptExists = false', () => {
+			wrapper = initComponent(App, {}, true)
+			wrapper.vm.promptIndex = 1;
+			wrapper.vm.selectGeneratorPromptExists = () => false;
+			const result = wrapper.vm.isGeneratorsPrompt();
+			expect(result).toBeFalsy();
+		})
+	})
+
 	describe('isNoGenerators - method', () => {
 		it('no generators', () => {
 			wrapper = initComponent(App, {}, true)

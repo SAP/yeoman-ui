@@ -14,7 +14,7 @@ import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import Generator = require("yeoman-generator");
 import { GeneratorFilter, GeneratorType } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
-import { IPrompt } from "@sap-devx/yeoman-ui-types";
+import { IPrompt, MessageType } from "@sap-devx/yeoman-ui-types";
 import { SWA } from "./swa-tracker/swa-tracker-wrapper";
 import TerminalAdapter = require("yeoman-environment/lib/adapter");
 import { Output } from "./output";
@@ -115,6 +115,24 @@ export class YeomanUI {
 		const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
 		await this.rpc.invoke("updateGeneratorsPrompt", [generators.questions]);
 	}
+
+	public async _notifyGeneratorsInstall(args: any[], force: boolean) {
+		if (!_.isNil(args)) {
+			const isGeneratorsPrompt: boolean = await this.rpc.invoke("isGeneratorsPrompt");
+			if (isGeneratorsPrompt || force) {
+				const message = this.getGeneratorsInstallingMessage(args);
+				this.youiEvents.getAppWizard().showInformation(message, MessageType.prompt);
+			}
+		}
+		this.uiOptions.installGens = (_.isObject(args) && _.isEmpty(args)) ? undefined : args;
+	}
+
+	private getGeneratorsInstallingMessage(args: any[]): string {
+		if (_.isEmpty(args)) {
+			return this.uiOptions.messages.all_generators_have_been_installed;
+		}
+		return this.uiOptions.messages.generators_are_being_installed;
+    }
 
 	private getWsConfig(config: string) {
         return this.getVscode().workspace.getConfiguration().get(config);
@@ -307,8 +325,9 @@ export class YeomanUI {
 	private async receiveIsWebviewReady() {
 		try {
 			let generatorId: string = this.uiOptions.generator;
-			const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
 			if (!generatorId) {
+				const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
+				await this._notifyGeneratorsInstall(this.uiOptions.installGens, true);
 				const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 				generatorId = response.generator;
 			}
