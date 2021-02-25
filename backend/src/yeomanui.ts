@@ -120,18 +120,18 @@ export class YeomanUI {
 		if (!_.isNil(args)) {
 			const isGeneratorsPrompt: boolean = await this.rpc.invoke("isGeneratorsPrompt");
 			if (isGeneratorsPrompt || force) {
-				const message = this.getGeneratorsInstallingMessage(args);
-				this.youiEvents.getAppWizard().showInformation(message, MessageType.prompt);
+				this.showGeneratorsInstallingMessage(args);
 			}
 		}
 		this.uiOptions.installGens = (_.isObject(args) && _.isEmpty(args)) ? undefined : args;
 	}
 
-	private getGeneratorsInstallingMessage(args: any[]): string {
+	private showGeneratorsInstallingMessage(args: any[]) {
 		if (_.isEmpty(args)) {
-			return this.uiOptions.messages.all_generators_have_been_installed;
+			this.youiEvents.getAppWizard().showInformation(this.uiOptions.messages.all_generators_have_been_installed, MessageType.prompt);
+		} else {
+			this.youiEvents.getAppWizard().showWarning(this.uiOptions.messages.generators_are_being_installed, MessageType.prompt);
 		}
-		return this.uiOptions.messages.generators_are_being_installed;
     }
 
 	private getWsConfig(config: string) {
