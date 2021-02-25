@@ -29,5 +29,5 @@ export default {
     open_in_a_new_workspace: "Open the project in a new workspace",
     create_and_close: "Create the project and close it for future use",
     all_generators_have_been_installed: "All generators have been installed, enjoy your work!",
-    generators_are_being_installed: "Generators are being installed in the background."
+    generators_are_being_installed: "Generators are being installed in the background..."
 }; 

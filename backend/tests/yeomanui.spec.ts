@@ -277,6 +277,7 @@ describe('yeomanui unit test', () => {
 			rpcMock.expects("invoke").withExactArgs("isGeneratorsPrompt").resolves(true);
 			youiEventsMock.expects("getAppWizard").returns(appWizard);
 			appWizardMock.expects("showInformation").withExactArgs(yeomanUi["uiOptions"].messages.all_generators_have_been_installed, MessageType.prompt);
+			appWizardMock.expects("showWarning").never();
 			await yeomanUi._notifyGeneratorsInstall(args, false);
 			expect(yeomanUi["uiOptions"].installGens).to.be.undefined;
 		});
@@ -297,7 +298,8 @@ describe('yeomanui unit test', () => {
 			];
 			rpcMock.expects("invoke").withExactArgs("isGeneratorsPrompt").resolves(true);
 			youiEventsMock.expects("getAppWizard").returns(appWizard);
-			appWizardMock.expects("showInformation").withExactArgs(yeomanUi["uiOptions"].messages.generators_are_being_installed, MessageType.prompt);
+			appWizardMock.expects("showWarning").withExactArgs(yeomanUi["uiOptions"].messages.generators_are_being_installed, MessageType.prompt);
+			appWizardMock.expects("showInformation").never();
 			await yeomanUi._notifyGeneratorsInstall(args, false);
 			expect(yeomanUi["uiOptions"].installGens).to.be.deep.equal(args);
 		});
@@ -318,7 +320,8 @@ describe('yeomanui unit test', () => {
 			];
 			rpcMock.expects("invoke").withExactArgs("isGeneratorsPrompt").resolves(false);
 			youiEventsMock.expects("getAppWizard").returns(appWizard);
-			appWizardMock.expects("showInformation").withExactArgs(yeomanUi["uiOptions"].messages.generators_are_being_installed, MessageType.prompt);
+			appWizardMock.expects("showWarning").withExactArgs(yeomanUi["uiOptions"].messages.generators_are_being_installed, MessageType.prompt);
+			appWizardMock.expects("showInformation").never();
 			await yeomanUi._notifyGeneratorsInstall(args, true);
 			expect(yeomanUi["uiOptions"].installGens).to.be.deep.equal(args);
 		});
@@ -345,14 +348,18 @@ describe('yeomanui unit test', () => {
 		});
 	});
 
-	describe("getGeneratorsInstallingMessage", async () => {
+	describe("showGeneratorsInstallingMessage", async () => {
 		it("called with empty args array (install ended)", async () => {
-			const result = await yeomanUi["getGeneratorsInstallingMessage"]([]);
-			expect(result).to.be.deep.equal(yeomanUi["uiOptions"].messages.all_generators_have_been_installed);
+			youiEventsMock.expects("getAppWizard").returns(appWizard);
+			appWizardMock.expects("showInformation").withExactArgs(yeomanUi["uiOptions"].messages.all_generators_have_been_installed, MessageType.prompt);
+			appWizardMock.expects("showWarning").never();
+			yeomanUi["showGeneratorsInstallingMessage"]([]);
 		});
 		it("called with args array containing generators (install started)", async () => {
-			const result = await yeomanUi["getGeneratorsInstallingMessage"]([{}]);
-			expect(result).to.be.deep.equal(yeomanUi["uiOptions"].messages.generators_are_being_installed);
+			youiEventsMock.expects("getAppWizard").returns(appWizard);
+			appWizardMock.expects("showWarning").withExactArgs(yeomanUi["uiOptions"].messages.generators_are_being_installed, MessageType.prompt);
+			appWizardMock.expects("showInformation").never();
+			yeomanUi["showGeneratorsInstallingMessage"]([{}]);
 		});
 	});
 
