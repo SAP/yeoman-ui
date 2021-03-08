@@ -184,7 +184,7 @@
 		"datauri": "3.0.0",
 		"fs-extra": "9.0.1",
 		"humanize-string": "2.1.0",
-		"lodash": "4.17.20",
+		"lodash": "4.17.21",
 		"npm-registry-fetch": "9.0.0",
 		"object-hash": "2.1.1",
 		"strip-ansi": "6.0.0",
