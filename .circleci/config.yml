@@ -1,11 +1,41 @@
 version: 2.1 # use CircleCI 2.1
 
-defaults: &defaults
-  working_directory: ~/repo
-  docker:
-    - image: circleci/node:10.17.0
+build-steps: &common-build 
+  working_directory: ~/repo    
+  steps:
+    - checkout      
+    - run:
+        name: install frontend
+        working_directory: frontend
+        command: npm install
+    - run:
+        name: build frontend
+        working_directory: frontend
+        command: npm run build
+    - run:
+        name: test frontend
+        working_directory: frontend
+        command: npm run test
+    - run:
+        name: build backend
+        working_directory: backend
+        command: npm run backend
+    - run:
+        name: test backend 
+        working_directory: backend
+        command: npm run test
 
 jobs: # a collection of steps
+  build-and-test-node10:
+    docker:
+      - image: circleci/node:10.23 # Current BAS node version
+    <<: *common-build
+  
+  build-and-test-node12:
+    docker:
+      - image: circleci/node:12 # Future BAS node version
+    <<: *common-build
+
   compliance:
     docker:
       - image: circleci/python:3.6.4
@@ -19,7 +49,9 @@ jobs: # a collection of steps
             ~/.local/bin/reuse lint
 
   build-and-test:
-    <<: *defaults  
+    docker:
+      - image: circleci/node:14
+    working_directory: ~/repo
     steps:
       - checkout
       - restore_cache:
@@ -54,7 +86,9 @@ jobs: # a collection of steps
       - run:
           name: create .vsix
           working_directory: backend
-          command: npx vsce package .
+          command: |
+            cp ../README.md ./README.md  
+            npx vsce package .
       - run:
           name: test backend 
           working_directory: backend
@@ -112,6 +146,8 @@ workflows:
   version: 2
   test-deploy:
     jobs:
+      - build-and-test-node10
+      - build-and-test-node12
       - compliance
       - build-and-test:
           filters:

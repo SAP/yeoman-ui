@@ -2,6 +2,7 @@ import * as WebSocket from 'ws';
 import { RpcExtensionWebSockets } from '@sap-devx/webview-rpc/out.ext/rpc-extension-ws';
 import { IChildLogger } from "@vscode-logging/logger";
 import { ExploreGens } from '../exploregens';
+import { getConsoleWarnLogger } from '../logger/logger-wrapper';
 
 class ExploreGensWebSocketServer {
   private rpc: RpcExtensionWebSockets;
@@ -24,8 +25,8 @@ class ExploreGensWebSocketServer {
 
     wss.on('connection', (ws) => {
       console.log('exploregens: new ws connection');
-
-      this.rpc = new RpcExtensionWebSockets(ws);
+  
+      this.rpc = new RpcExtensionWebSockets(ws, getConsoleWarnLogger());
       //TODO: Use RPC to send it to the browser log (as a collapsed pannel in Vue)
       const childLogger = { debug: () => {/* do nothing */}, error: () => {/* do nothing */}, fatal: () => {/* do nothing */}, warn: () => {/* do nothing */}, info: () => {/* do nothing */}, trace: () => {/* do nothing */}, getChildLogger: () => { return {} as IChildLogger; } };
       const context = {

@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.54",
+	"version": "1.1.59",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -32,6 +32,7 @@
 	"activationEvents": [
 		"*",
 		"onCommand:loadYeomanUI",
+		"onCommand:yeomanUI._notifyGeneratorsChange",
 		"onWebviewPanel:yeomanui",
 		"onCommand:exploreGenerators",
 		"onWebviewPanel:exploreGens",
@@ -46,7 +47,7 @@
 			},
 			{
 				"command": "loadYeomanUI",
-				"title": "Open Application Wizard"
+				"title": "Open Template Wizard"
 			},
 			{
 				"command": "yeomanUI.toggleOutput",
@@ -109,6 +110,23 @@
 					"description": "The verbosity of logging according to the following order: trace > debug > info > warn > error > fatal > off.",
 					"scope": "resource"
 				},
+				"ApplicationWizard.TargetFolder": {
+					"type": "string",
+					"default": "",
+					"description": "Set the default target folder path for the project.",
+					"scope": "resource"
+				},
+				"ApplicationWizard.Workspace": {
+					"type": "string",
+					"enum": [
+						"Open the project in a new workspace",
+						"Open the project in a multi-root workspace",
+						"Create the project and close it for future use"
+					],
+					"default": "Open the project in a new workspace",
+					"description": "Define the preferred behavior upon project creation.",
+					"scope": "resource"
+				},
 				"ApplicationWizard.sourceLocationTracking": {
 					"type": "boolean",
 					"default": false,
@@ -158,9 +176,9 @@
 		"lint:fix": "eslint . --ext .ts,.tsx --cache --fix"
 	},
 	"dependencies": {
-		"@sap-devx/webview-rpc": "0.2.3",
+		"@sap-devx/webview-rpc": "0.3.1",
 		"@sap-devx/yeoman-ui-types": "1.0.2",
-		"@sap/swa-for-sapbas-vsx": "1.1.11",
+		"@sap/swa-for-sapbas-vsx": "1.1.13",
 		"@vscode-logging/logger": "1.2.2",
 		"chalk": "4.1.0",
 		"datauri": "3.0.0",

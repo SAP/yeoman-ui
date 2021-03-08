@@ -4,12 +4,13 @@ import * as path from "path";
 import { ExploreGens } from "../exploregens";
 import { AbstractWebviewPanel } from "./AbstractWebviewPanel";
 import { RpcExtension } from "@sap-devx/webview-rpc/out.ext/rpc-extension";
+import { getWebviewRpcLibraryLogger } from "../logger/logger-wrapper";
 
 
 export class ExploreGensPanel extends AbstractWebviewPanel {
     public setWebviewPanel(webviewPanel: vscode.WebviewPanel) {
         super.setWebviewPanel(webviewPanel);
-        this.rpc = new RpcExtension(webviewPanel.webview);
+        this.rpc = new RpcExtension(webviewPanel.webview, getWebviewRpcLibraryLogger());
         this.exploreGens.init(this.rpc);
         this.initWebviewPanel();
     }

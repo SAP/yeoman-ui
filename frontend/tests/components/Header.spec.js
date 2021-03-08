@@ -22,7 +22,7 @@ describe('Header.vue', () => {
     })
 
     test('generator brand', () => {
-        const testGen = 'Application Wizard'
+        const testGen = 'Template Wizard'
         wrapper = initComponent(Header, { headerTitle: testGen})
         expect(wrapper.find('v-toolbar-title-stub').text()).toBe(testGen)
         expect(wrapper.find('v-icon-stub').text()).toBe("mdi-console")

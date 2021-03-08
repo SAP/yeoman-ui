@@ -51,9 +51,9 @@ export class VSCodeYouiEvents implements YouiEvents {
 		this.appWizard = new YoUiAppWizard(this);
 	}
 
-	public doGeneratorDone(success: boolean, message: string, isTypeProject: boolean, targetFolderPath?: string): void {
+	public doGeneratorDone(success: boolean, message: string, selectedWorkspace: string, type: string, targetFolderPath?: string): void {
 		this.doClose();
-		this.showDoneMessage(success, message, isTypeProject, targetFolderPath);
+		this.showDoneMessage(success, message, selectedWorkspace, type, targetFolderPath);
 	}
 
 	public doGeneratorInstall(): void {
@@ -165,53 +165,44 @@ export class VSCodeYouiEvents implements YouiEvents {
 		return !_.isEmpty(relativePath) && !_.startsWith(relativePath, '..') && !isAbsolute(relativePath);
 	}
 
-	private showDoneMessage(success: boolean, errorMmessage: string, isTypeProject: boolean, targetFolderPath?: string): Thenable<any> {
+	private showDoneMessage(success: boolean, errorMmessage: string, selectedWorkspace: string, type: string, targetFolderPath?: string): Thenable<any> {
 		this.resolveInstallingProgress();
 
 		if (success) {
-			const addToWorkspace = "Add to Workspace";
-			const openInNewWorkspace: any = "Open in New Workspace";
-			const items: string[] = [];
 			let targetFolderUri: vscode.Uri = null;
 
-			// The correct targetFolderPath is unknown ---> no buttons should be shown
+			// The correct targetFolderPath is unknown
 			if (!_.isNil(targetFolderPath)) {
-				// Target folder is visible in workpace ---> addToWorkspace only
-				// Target folder is not visible in workpace ---> addToWorkspace and openInNewWorkspace
-
 				targetFolderUri = vscode.Uri.file(targetFolderPath);
-				const workspacePath = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
-				// 1. target workspace folder should not already contain target generator folder
-				const foundInWorkspace = _.find(vscode.workspace.workspaceFolders, (wsFolder: vscode.WorkspaceFolder) => {
-					// wsFolder is accessor of targetFolderUri, so targetFolderUri is already shown inside wsFolder
-					return ((wsFolder.uri.fsPath === targetFolderUri.fsPath) || this.isPredecessorOf(wsFolder.uri.fsPath, targetFolderUri.fsPath));
-				});
-				// 2. Theia bug: vscode.workspace.workspaceFolders should not be undefined or empty
-				if (!foundInWorkspace && workspacePath) {
-					items.push(addToWorkspace);
-				}
-
-				// target workspace path should not be equal to target generator folder path
-				if (workspacePath !== targetFolderUri.fsPath && isTypeProject) {
-					items.push(openInNewWorkspace);
-				}
 			}
 
-			const successInfoMessage = this.messages.artifact_generated;
-			if (_.isEmpty(items)) {
-				return vscode.window.showInformationMessage(successInfoMessage);
+			const successInfoMessage = this.getSuccessInfoMessage(selectedWorkspace, type);
+			
+			if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
+				vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
+			} else if (selectedWorkspace === this.messages.add_to_workspace) {
+				const wsFoldersQuantity = _.size(vscode.workspace.workspaceFolders);
+				vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, { uri: targetFolderUri });
 			}
 
-			return vscode.window.showInformationMessage(`${successInfoMessage}\nWhat would you like to do with it?`, ...items).then(selection => {
-				if (selection === openInNewWorkspace) {
-					return vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
-				} else if (selection === addToWorkspace) {
-					const wsFoldersQuantity = _.size(vscode.workspace.workspaceFolders);
-					return vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, { uri: targetFolderUri });
-				}
-			});
+			return vscode.window.showInformationMessage(successInfoMessage);
 		}
-
 		return vscode.window.showErrorMessage(errorMmessage);
+	}
+
+	private getSuccessInfoMessage(selectedWorkspace: string, type: string): string {
+		let successInfoMessage: string = this.messages.artifact_generated_files;
+		if (type === "project") {
+			if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
+				successInfoMessage = this.messages.artifact_generated_project_open_in_a_new_workspace;
+			} else if (selectedWorkspace === this.messages.add_to_workspace) {
+				successInfoMessage = this.messages.artifact_generated_project_add_to_workspace;
+			} else {
+				successInfoMessage = this.messages.artifact_generated_project_saved_for_future;
+			}
+		} else if (type === "module") {
+			successInfoMessage = this.messages.artifact_generated_module;
+		}
+		return successInfoMessage;
 	}
 }
