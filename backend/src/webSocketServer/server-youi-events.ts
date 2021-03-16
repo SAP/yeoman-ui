@@ -13,6 +13,10 @@ export class ServerYouiEvents implements YouiEvents {
         return;
     }
 	
+	getWsConfig(config: string): any {
+        return null;
+    }
+
 	getAppWizard(): AppWizard {
 		return null;
 	}

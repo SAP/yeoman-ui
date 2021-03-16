@@ -61,6 +61,10 @@ export class VSCodeYouiEvents implements YouiEvents {
 		this.showInstallMessage();
 	}
 
+	public getWsConfig(config: string): any {
+		return vscode.workspace.getConfiguration().get(config);
+	}
+
 	public getAppWizard(): AppWizard {
 		return this.appWizard;
 	}

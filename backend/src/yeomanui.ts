@@ -134,10 +134,6 @@ export class YeomanUI {
 		}
     }
 
-	private getWsConfig(config: string) {
-        return this.getVscode().workspace.getConfiguration().get(config);
-    }
-
 	public registerCustomQuestionEventHandler(questionType: string, methodName: string, handler: Function): void {
 		let entry: Map<string, Function> = this.customQuestionEventHandlers.get(questionType);
 		if (entry === undefined) {
@@ -203,7 +199,7 @@ export class YeomanUI {
 		// see issue: https://github.com/yeoman/environment/issues/55
 		// process.chdir() doesn't work after environment has been created
 		try {
-			const targetFolderProp = this.getWsConfig(this.TARGET_FOLDER_CONFIG_PROP);
+			const targetFolderProp = this.youiEvents.getWsConfig(this.TARGET_FOLDER_CONFIG_PROP);
 			if (targetFolderProp) {
 				this.setCwd(targetFolderProp);
 			} 	
@@ -433,7 +429,7 @@ export class YeomanUI {
 		const type: string = this.typesMap.has(generatorName) ? this.typesMap.get(generatorName) : "files";
 		// For now - A Fiori project is supposed to create the project and not open it
 		const ignoreGen: boolean = this.generaorsToIgnoreArray.includes(generatorName);
-		let selectedWorkspace: string = (type === "files" || type === "module" || ignoreGen) ? this.uiOptions.messages.create_and_close : (this.forceNewWorkspace) ? this.uiOptions.messages.open_in_a_new_workspace : this.getWsConfig(this.SELECTED_WORKSPACE_CONFIG_PROP);
+		let selectedWorkspace: string = (type === "files" || type === "module" || ignoreGen) ? this.uiOptions.messages.create_and_close : (this.forceNewWorkspace) ? this.uiOptions.messages.open_in_a_new_workspace : this.youiEvents.getWsConfig(this.SELECTED_WORKSPACE_CONFIG_PROP);
 
 		const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
 		const generatedTemplatePath = targetFolderPath ? targetFolderPath : targetFolderPathBeforeGen;
@@ -488,12 +484,12 @@ export class YeomanUI {
 			}
 			else {
 				this.forceNewWorkspace = false;
-				selectedWorkspaceConfig = this.getWsConfig(this.SELECTED_WORKSPACE_CONFIG_PROP);
+				selectedWorkspaceConfig = this.youiEvents.getWsConfig(this.SELECTED_WORKSPACE_CONFIG_PROP);
 			}
 		}
 
 		if (_.includes(genFilter.types, GeneratorType.project)) {
-			const defaultPath = this.getWsConfig(this.TARGET_FOLDER_CONFIG_PROP) ? this.getWsConfig(this.TARGET_FOLDER_CONFIG_PROP) : this.getCwd();
+			const defaultPath = this.youiEvents.getWsConfig(this.TARGET_FOLDER_CONFIG_PROP) ? this.youiEvents.getWsConfig(this.TARGET_FOLDER_CONFIG_PROP) : this.getCwd();
 			const targetFolderQuestion: any = {
 				type: "input",
 				guiOptions: {
