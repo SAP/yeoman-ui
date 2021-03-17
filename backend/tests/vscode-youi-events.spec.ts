@@ -78,6 +78,7 @@ describe('vscode-youi-events unit test', () => {
 		_.set(vscode, "window.showWarningMessage", () => Promise.resolve(""));
 		_.set(vscode, "workspace.workspaceFolders", []);
 		_.set(vscode, "workspace.updateWorkspaceFolders", (): any => undefined);
+		_.set(vscode, "workspace.getConfiguration", (): any => {});
 		_.set(vscode, "commands.executeCommand", (): any => undefined);
 	});
 
@@ -197,6 +198,13 @@ describe('vscode-youi-events unit test', () => {
 			rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.information, "infoVSCode"]);
 			appWizard.showInformation(message, MessageType.prompt);
 		});
+	});
+
+	it("getWsConfig", () => {
+		const config = "config";
+		workspaceMock.expects("getConfiguration").returns({get: (section: string) => section});
+		const wsConfig = events.getWsConfig(config);
+		expect(wsConfig).to.be.equal(config);
 	});
 
 	it("executeCommand", () => {

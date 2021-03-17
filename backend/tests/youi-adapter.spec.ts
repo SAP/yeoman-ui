@@ -19,6 +19,9 @@ describe('YouiAdapter', () => {
 	public showProgress(message?: string): void {
 		return;
 	}
+	public getWsConfig(config: string): any {
+        return ;
+    }
 	public getAppWizard(): AppWizard {
 		return;
 	}
