@@ -326,8 +326,8 @@ export class YeomanUI {
 				await this._notifyGeneratorsInstall(this.uiOptions.installGens, true);
 				const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
 				generatorId = response.generator;
+				this.replayUtils.clear();
 			}
-			this.replayUtils.clear();
 			SWA.updateGeneratorStarted(generatorId, this.logger);
 			if (!_.includes(generatorId, ":")) {
 				generatorId = this.getGenNamespace(generatorId);
