@@ -9,7 +9,7 @@ import * as npmFetch from 'npm-registry-fetch';
 import { mockVscode } from "./mockUtil";
 import messages from "../src/exploreGensMessages";
 import Environment = require("yeoman-environment");
-import * as envutils from "../src/env/utils";
+import * as envUtils from "../src/env/utils";
 
 const testYoEnv = {
     lookup: () => true,
@@ -136,7 +136,7 @@ describe('exploregens unit test', () => {
         yoEnvMock = sandbox.mock(Environment);
         testYoEnvMock = sandbox.mock(testYoEnv);
         vscodeCommandsMock = sandbox.mock(testVscode.commands);
-        envUtilsMock = sandbox.mock(envutils);
+        envUtilsMock = sandbox.mock(envUtils);
     });
 
     afterEach(() => {
@@ -200,7 +200,7 @@ describe('exploregens unit test', () => {
             const customLocation = path.join("home", "user", "projects");
             workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns(customLocation);
             yoEnvMock.expects("createEnv").returns(testYoEnv);
-            testYoEnvMock.expects("lookup").withArgs({ npmPaths: [path.join(customLocation, envutils.NODE_MODULES)] });
+            testYoEnvMock.expects("lookup").withArgs({ npmPaths: [path.join(customLocation, envUtils.NODE_MODULES)] });
             exploregens["init"](rpc);
         });
 
@@ -333,6 +333,14 @@ describe('exploregens unit test', () => {
             workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns(`   ${TESTVALUE}   `);
             const res = exploregens["getGeneratorsLocationParams"]();
             expect(res).to.be.deep.equal(`--prefix ${TESTVALUE}`);
+        });
+
+        it("location starts with tild ~", () => {
+            const location = '~/location';
+            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns(location);
+            const res = exploregens["getGeneratorsLocationParams"]();
+            const install_location = _.replace(location,"~",envUtils.HOME_DIR);
+            expect(res).to.be.equal(`--prefix ${install_location}`);
         });
     });
 

@@ -18,7 +18,11 @@ export enum GenState {
 
 export class ExploreGens {
     public static getInstallationLocation(wsConfig: any) {
-        return _.trim(wsConfig.get(ExploreGens.INSTALLATION_LOCATION));
+        let location = _.trim(wsConfig.get(ExploreGens.INSTALLATION_LOCATION));
+        if (_.startsWith(location, "~")) {
+            location = _.replace(location,"~",envUtils.HOME_DIR);
+        }
+        return location;
     }
 
     private static readonly INSTALLATION_LOCATION = "ApplicationWizard.installationLocation";
