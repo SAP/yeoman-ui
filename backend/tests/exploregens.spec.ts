@@ -1,16 +1,15 @@
 import * as mocha from "mocha";
 import { expect } from "chai";
-import { SinonSandbox, SinonMock, createSandbox } from "sinon";
+import * as sinon from "sinon";
 import * as _ from "lodash";
 import * as path from "path";
-import * as fs from "fs";
 import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc, IPromiseCallbacks, IMethod } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import * as npmFetch from 'npm-registry-fetch';
 import { mockVscode } from "./mockUtil";
 import messages from "../src/exploreGensMessages";
 import Environment = require("yeoman-environment");
-import * as envUtils from "../src/env/utils";
+import * as envutils from "../src/env/utils";
 
 const testYoEnv = {
     lookup: () => true,
@@ -59,22 +58,21 @@ import { ExploreGens, GenState } from "../src/exploregens";
 import { fail } from "assert";
 
 describe('exploregens unit test', () => {
-    let sandbox: SinonSandbox;
-    let rpcMock: SinonMock;
-    let fsMock: SinonMock;
-    let workspaceConfigMock: SinonMock;
-    let exploreGensMock: SinonMock;
-    let loggerMock: SinonMock;
-    let npmFetchMock: SinonMock;
-    let vscodeWindowMock: SinonMock;
-    let vscodeCommandsMock: SinonMock;
-    let vscodeWorkspaceMock: SinonMock;
-    let statusBarMessageMock: SinonMock;
-    let globalStateMock: SinonMock;
-    let processMock: SinonMock;
-    let yoEnvMock: SinonMock;
-    let testYoEnvMock: SinonMock;
-    let envUtilsMock: SinonMock;
+    let sandbox: any;
+    let rpcMock: any;
+    let workspaceConfigMock: any;
+    let exploreGensMock: any;
+    let loggerMock: any;
+    let npmFetchMock: any;
+    let vscodeWindowMock: any;
+    let vscodeCommandsMock: any;
+    let vscodeWorkspaceMock: any;
+    let statusBarMessageMock: any;
+    let globalStateMock: any;
+    let processMock: any;
+    let yoEnvMock: any;
+    let testYoEnvMock: any;
+    let envUtilsMock: any;
 
     class TestRpc implements IRpc {
         public timeout: number;
@@ -117,7 +115,7 @@ describe('exploregens unit test', () => {
     exploregens.init(rpc);
 
     before(() => {
-        sandbox = createSandbox();
+        sandbox = sinon.createSandbox();
     });
 
     after(() => {
@@ -126,7 +124,6 @@ describe('exploregens unit test', () => {
 
     beforeEach(() => {
         rpcMock = sandbox.mock(rpc);
-        fsMock = sandbox.mock(fs);
         workspaceConfigMock = sandbox.mock(config);
         loggerMock = sandbox.mock(childLogger);
         exploreGensMock = sandbox.mock(exploregens);
@@ -139,12 +136,11 @@ describe('exploregens unit test', () => {
         yoEnvMock = sandbox.mock(Environment);
         testYoEnvMock = sandbox.mock(testYoEnv);
         vscodeCommandsMock = sandbox.mock(testVscode.commands);
-        envUtilsMock = sandbox.mock(envUtils);
+        envUtilsMock = sandbox.mock(envutils);
     });
 
     afterEach(() => {
         rpcMock.verify();
-        fsMock.verify();
         workspaceConfigMock.verify();
         loggerMock.verify();
         exploreGensMock.verify();
@@ -202,10 +198,9 @@ describe('exploregens unit test', () => {
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["acceptLegalNote"], thisArg: exploregens });
 
             const customLocation = path.join("home", "user", "projects");
-            fsMock.expects("existsSync").withExactArgs(customLocation).returns(true);
             workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns(customLocation);
             yoEnvMock.expects("createEnv").returns(testYoEnv);
-            testYoEnvMock.expects("lookup").withArgs({ npmPaths: [path.join(customLocation, envUtils.NODE_MODULES)] });
+            testYoEnvMock.expects("lookup").withArgs({ npmPaths: [path.join(customLocation, envutils.NODE_MODULES)] });
             exploregens["init"](rpc);
         });
 
@@ -219,7 +214,7 @@ describe('exploregens unit test', () => {
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["isLegalNoteAccepted"], thisArg: exploregens });
             rpcMock.expects("registerMethod").withExactArgs({ func: exploregens["acceptLegalNote"], thisArg: exploregens });
 
-            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]);
+            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns();
             yoEnvMock.expects("createEnv").returns(testYoEnv);
             exploregens["init"](rpc);
         });
@@ -323,32 +318,21 @@ describe('exploregens unit test', () => {
         });
 
         it("location undefined", () => {
-            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]);
+            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns();
             const res = exploregens["getGeneratorsLocationParams"]();
             expect(res).to.be.equal("-g");
         });
 
         it("location is a valid string", () => {
-            const customLocation = TESTVALUE;
-            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns(customLocation);
-            fsMock.expects("existsSync").withExactArgs(customLocation).returns(true);
+            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns(TESTVALUE);
             const res = exploregens["getGeneratorsLocationParams"]();
             expect(res).to.be.equal(`--prefix ${TESTVALUE}`);
         });
 
         it("location is a string with unnecessary spaces", () => {
-            const customLocation = `   ${TESTVALUE}   `;
-            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns(customLocation);
-            fsMock.expects("existsSync").withExactArgs(TESTVALUE).returns(true);
+            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns(`   ${TESTVALUE}   `);
             const res = exploregens["getGeneratorsLocationParams"]();
             expect(res).to.be.deep.equal(`--prefix ${TESTVALUE}`);
-        });
-
-        it("location starts with tild ~", () => {
-            const location = '~/notExistLocation';
-            workspaceConfigMock.expects("get").withExactArgs(ExploreGens["INSTALLATION_LOCATION"]).returns(location);
-            const res = exploregens["getGeneratorsLocationParams"]();
-            expect(res).to.be.equal("-g");
         });
     });
 
@@ -369,7 +353,7 @@ describe('exploregens unit test', () => {
         });
 
         it("recommended array is undefined", () => {
-            workspaceConfigMock.expects("get").withExactArgs(exploregens["SEARCH_QUERY"]);
+            workspaceConfigMock.expects("get").withExactArgs(exploregens["SEARCH_QUERY"]).returns();
             const res = exploregens["getRecommendedQuery"]();
             expect(res).to.have.lengthOf(0);
         });
