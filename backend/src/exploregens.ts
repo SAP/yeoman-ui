@@ -5,6 +5,7 @@ import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import * as util from "util";
 import * as path from "path";
+import * as fs from "fs";
 import messages from "./exploreGensMessages";
 import * as envUtils from "./env/utils";
 
@@ -18,7 +19,8 @@ export enum GenState {
 
 export class ExploreGens {
     public static getInstallationLocation(wsConfig: any) {
-        return _.trim(wsConfig.get(ExploreGens.INSTALLATION_LOCATION));
+        const location = _.trim(wsConfig.get(ExploreGens.INSTALLATION_LOCATION));
+        return fs.existsSync(location) ? location : undefined;
     }
 
     private static readonly INSTALLATION_LOCATION = "ApplicationWizard.installationLocation";

@@ -1,6 +1,6 @@
 {
 	"name": "yeoman-ui",
-	"version": "1.1.60",
+	"version": "1.1.61",
 	"displayName": "Application Wizard",
 	"publisher": "SAPOS",
 	"author": {
@@ -135,7 +135,7 @@
 				},
 				"ApplicationWizard.installationLocation": {
 					"type": "string",
-					"markdownDescription": "Install generators in a specified location. If not set, global location is used."
+					"markdownDescription": "Set the default folder in which generators will be installed. The path to this folder must be valid and absolute. If there is no path defined, the global location will be used."
 				},
 				"ApplicationWizard.autoUpdate": {
 					"type": "boolean",
