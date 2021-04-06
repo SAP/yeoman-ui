@@ -5,13 +5,37 @@ import { YeomanUI } from "./yeomanui";
 
 
 module.exports = ( output: Output, yeomanUi: YeomanUI) => {
-	function getMessage(args: any) {
+
+	const defaultColors = {
+		skip: 'yellow',
+		force: 'yellow',
+		create: 'green',
+		invoke: 'bold',
+		conflict: 'red',
+		identical: 'cyan',
+		info: 'gray'
+	  };
+
+	function pad(status: string) {
+		const max = 'identical'.length;
+		const delta = max - status.length;
+		return delta ? ' '.repeat(delta) + status : status;
+	}
+	  
+	function getPrefix(status: string) {
+		const color = _.get(defaultColors, status);
+		if (_.isEmpty(color)) return '';
+		return `${pad(status)} `;
+	}
+	
+	function getMessage(args: any, status = '') {
+		const prefix = getPrefix(status);
 		const message = stripAnsi(_.get(args, "[0]", ""));
-		return `${message}`;
+		return `${prefix}${message}`;
 	}
 
-	function showMessage(args: any, withNewLine = true) {
-		const message = getMessage(args);
+	function showMessage(args: any, status = '', withNewLine = true) {
+		const message = getMessage(args, status);
 		withNewLine ? output.appendLine(message) : output.append(message);
 	}
 
@@ -36,7 +60,7 @@ module.exports = ( output: Output, yeomanUi: YeomanUI) => {
 	};
 
 	log.create = function() {
-		showMessage(arguments);
+		showMessage(arguments, 'create');
 		return log;
 	};
 
@@ -47,22 +71,32 @@ module.exports = ( output: Output, yeomanUi: YeomanUI) => {
 	};
 
 	log.force = function() {
-		showMessage(arguments);
+		showMessage(arguments, 'force');
+		return log;
+	};
+
+	log.invoke = function() {
+		showMessage(arguments, 'invoke');
 		return log;
 	};
 
 	log.conflict = function() {
-		showMessage(arguments);
+		showMessage(arguments, 'conflict');
 		return log;
 	};
 
 	log.identical = function() {
-		showMessage(arguments);
+		showMessage(arguments, 'identical');
+		return log;
+	};
+
+	log.info = function() {
+		showMessage(arguments, 'info');
 		return log;
 	};
 
 	log.skip = function() {
-		showMessage(arguments);
+		showMessage(arguments, 'skip');
 		return log;
 	};
 
