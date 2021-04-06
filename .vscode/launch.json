@@ -9,10 +9,8 @@
       "type": "node",
       "request": "launch",
       "name": "Run ExploreGens websocket server",
-      "program": "${workspaceFolder}/backend/src/webSocketServer/exploreGensIndex.ts",
-      "outFiles": [
-        "${workspaceFolder}/backend/out/**/*.js"
-      ],
+      "program": "${workspaceFolder}/packages/backend/src/webSocketServer/exploreGensIndex.ts",
+      "outFiles": ["${workspaceFolder}/packages/backend/dist/**/*.js"],
       "env": {
         "PORT": "8082"
       },
@@ -22,10 +20,8 @@
       "type": "node",
       "request": "launch",
       "name": "Run websocket server",
-      "program": "${workspaceFolder}/backend/src/webSocketServer/index.ts",
-      "outFiles": [
-        "${workspaceFolder}/backend/out/**/*.js"
-      ],
+      "program": "${workspaceFolder}/packages/backend/src/webSocketServer/index.ts",
+      "outFiles": ["${workspaceFolder}/packages/backend/dist/**/*.js"],
       "env": {
         "PORT": "8081"
       },
@@ -35,14 +31,14 @@
       "type": "node",
       "request": "launch",
       "name": "backend unit tests",
-      "program": "${workspaceFolder}/backend/node_modules/mocha/bin/mocha",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
       "args": [
         "-r",
         "ts-node/register",
         "--timeout",
         "999999",
         "--colors",
-        "${workspaceFolder}/backend/tests/**/*.spec.ts"
+        "${workspaceFolder}/packages/backend/test/**/*.spec.ts"
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
@@ -54,11 +50,9 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}/backend"
+        "--extensionDevelopmentPath=${workspaceFolder}/packages/backend"
       ],
-      "outFiles": [
-        "${workspaceFolder}/backend/dist/**/*.js"
-      ],
+      "outFiles": ["${workspaceFolder}/packages/backend/dist/**/*.js"],
       "preLaunchTask": "watch backend (webpack)"
     },
     {
@@ -67,27 +61,21 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}/backend",
-        "--extensionTestsPath=${workspaceFolder}/backend/out/tests"
+        "--extensionDevelopmentPath=${workspaceFolder}/packages/backend",
+        "--extensionTestsPath=${workspaceFolder}/packages/backend/dist/test"
       ],
-      "outFiles": [
-        "${workspaceFolder}/backend/dist/**/*.js"
-      ],
-      "preLaunchTask": "watch backend"
+      "outFiles": ["${workspaceFolder}/packages/backend/dist/**/*.js"],
+      "preLaunchTask": "watch backend (tsc)"
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Run reference generator (foodq)",
       "program": "${workspaceFolder}/generator-foodq/node_modules/yo/lib/cli.js",
-      "args": [
-        "foodq"
-      ],
+      "args": ["foodq"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "skipFiles": [
-        "<node_internals>/**"
-      ]
+      "skipFiles": ["<node_internals>/**"]
     },
     {
       "name": "frontend unit tests",
@@ -99,14 +87,12 @@
         "test:unit",
         "--runInBand"
       ],
-      "cwd": "${workspaceFolder}/frontend",
+      "cwd": "${workspaceFolder}/packages/frontend",
       "protocol": "inspector",
       "disableOptimisticBPs": true,
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "outFiles": [
-        "${workspaceFolder}/frontend/src/**/*.js"
-      ],
+      "outFiles": ["${workspaceFolder}/packages/frontend/src/**/*.js"],
       "port": 9229
     }
   ]

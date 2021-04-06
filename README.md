@@ -11,59 +11,41 @@
 ![](screenshot.png)
 
 ## Description
+
 With the Application Wizard extension, you can benefit from a rich user experience for yeoman generators. This extension allows developers to reuse existing yeoman generators and provide wizard-like experience with no development efforts.
-The repository contains three main packages:
-* **Frontend** - The Application Wizard as a standalone vue.js application.
-* **Backend** - The backend part which communicates with Yeoman and the system. Runs as a VSCode extension or node.js application.
-* **Yeoman example generator** - Example generator to show usages and test the platform.
 
-## Requirements
-* [node.js](https://www.npmjs.com/package/node) version 10 or higher.
-* [VSCode](https://code.visualstudio.com/) 1.39.2 or higher or [Theia](https://www.theia-ide.org/) 0.12 or higher.
+This npm [mono-repo][mono-repo] currently contains:
 
-## Download and Installation
-To test run the framework you only need to build and install the backend package, which will automatically build and run the UI.
-### installation
-* Clone this repository
-* cd into the backend folder
-    ```bash
-    cd backend
-    ```
-* To install, compile and prepare the static resources run the following commands:
-    ```bash
-    npm run backend
-    npm run frontend
-    ```
-### Usage & Development
-#### Run the dev mode
-Dev mode allows you to run the framework in the browser, using vue cli for fast development cycles, and easy debug tools.
-To run it do the following:
-* In the backend folder run webpack or webpack-dev, then run the server.
-    ```bash
-    npm run webpack-dev
-    npm run ws:run
-    ```
-* In the frontend folder run serve
-    ```bash
-    npm run serve
-    ```
-* Open the broswer on localhost:8080 to access the framework.
+- [VSCode Extension](./packages/backend) The backend part which communicates with Yeoman and the system. It runs as a VSCode extension or node.js application.
+- [Application Wizard UI](./packages/frontend) The Application Wizard as a standalone vue.js application.
+- [Yeoman generator sample](./packages/generator-foodq) Sample yeoman generator to show usages and test the platform.
+- [![npm-yeoman-ui-types][npm-yeoman-ui-types-image]][npm-yeoman-ui-types-url] [@sap-devx/yeoman-ui-types](./packages/types) Type signatures supposed to be used in the yeoman generators.
 
-#### Run the VSCode extension
-* Start VSCode on your local machine, and click on open workspace. Select this repo folder.
-* On the debug panel choose "Run Extension", and click on the "Run" button.
+[npm-yeoman-ui-types-image]: https://img.shields.io/npm/v/@sap-devx/yeoman-ui-types.svg
+[npm-yeoman-ui-types-url]: https://www.npmjs.com/package/@sap-devx/yeoman-ui-types
 
-#### Enable usage analytics reporting from VS Code
-The tool collects non-personally identifiable information about your usage of the tool to improve its services. If you do not want the tool to collect your usage data, you can set the "Enable Sap Web Analytics" setting to "false". Go to File > Preferences > Settings (macOS: Code > Preferences > Settings) > Extensions > Application Wizard, and deselect the "Enable Sap Web Analytics" checkbox.
+## Support
 
-#### Advanced scenarios
-To develop and contribute you can build and install each package separately. Instruction on each package in the dedicated readme.md file.
-* [Build & install the client](frontend/README.md)
-* [Build & install the backend](backend/README.md)
-* [Build & install the yeoman example generator](generator-foodq/README.md)
-
-## How to obtain support
 To get more help, support, and information please open a github [issue](https://github.com/SAP/yeoman-ui/issues).
 
+## Report an Issue
+
+To report an issue please use the github issue tracker. Please try to make sure you have these in your issue:
+
+- No duplicate
+- Reproducible
+- Good summary
+- Well-documented
+- Minimal example
+
+## Issue handling process
+
+When an issue is reported, a committer will look at it and either confirm it as a real issue (by giving the "in progress" label), close it if it is not an issue, or ask for more details. In-progress issues are then either assigned to a committer in GitHub, reported in our internal issue handling system, or left open as "contribution welcome" for easy or not urgent fixes.
+
+An issue that is about a real bug is closed as soon as the fix is committed.
+
 ## Contributing
-Contributing information can be found in the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+[mono-repo]: https://github.com/babel/babel/blob/master/doc/design/monorepo.md

@@ -1,0 +1,91 @@
+{
+  "name": "yeoman-ui-frontend",
+  "displayName": "Application Wizard Frontend",
+  "version": "1.1.60",
+  "publisher": "SAP",
+  "license": "Apache 2.0",
+  "description": "Frontend for the application wizard framework",
+  "private": true,
+  "scripts": {
+    "serve-eg": "vue-cli-service serve --exploregens",
+    "serve": "vue-cli-service serve",
+    "ci": "npm-run-all clean build coverage coverage:copy",
+    "clean": "rimraf ./dist ./coverage",
+    "build": "vue-cli-service build",
+    "build-dev": "vue-cli-service build --mode development",
+    "test": "vue-cli-service test:unit",
+    "coverage": "vue-cli-service test:unit",
+    "coverage:copy": "shx mkdir -p ../../coverage && shx cp -u ./coverage/lcov.info ../../coverage/lcov_frontend.info"
+  },
+  "dependencies": {
+    "@mdi/font": "5.5.55",
+    "@sap-devx/inquirer-gui": "0.1.26",
+    "@sap-devx/inquirer-gui-file-browser-plugin": "0.0.5",
+    "@sap-devx/inquirer-gui-folder-browser-plugin": "0.0.3",
+    "@sap-devx/inquirer-gui-label-plugin": "0.0.1",
+    "@sap-devx/inquirer-gui-login-plugin": "0.0.4",
+    "@sap-devx/inquirer-gui-tiles-plugin": "0.0.8",
+    "@sap-devx/webview-rpc": "0.3.1",
+    "@sap-devx/yeoman-ui-types": "^1.1.60",
+    "core-js": "3.6.5",
+    "material-design-icons-iconfont": "6.1.0",
+    "vue": "2.6.12",
+    "vue-loading-overlay": "3.3.0",
+    "vuetify": "2.3.10"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "7.11.5",
+    "@vue/cli-plugin-babel": "4.5.4",
+    "@vue/cli-plugin-unit-jest": "4.5.4",
+    "@vue/cli-service": "4.5.4",
+    "@vue/test-utils": "1.0.5",
+    "babel-eslint": "^10.0.1",
+    "babel-jest": "^24.9.0",
+    "husky": "4.2.5",
+    "jest": "^24.9.0",
+    "jest-serializer-vue": "^2.0.2",
+    "mock-socket": "^9.0.2",
+    "sass": "1.26.10",
+    "sass-loader": "10.0.2",
+    "vue-cli-plugin-vuetify": "2.0.7",
+    "vue-jest": "3.0.6",
+    "vue-template-compiler": "2.6.12",
+    "vuetify-loader": "1.6.0"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true,
+      "jest": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "rules": {},
+    "parserOptions": {
+      "parser": "babel-eslint"
+    }
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ],
+  "jest": {
+    "coverageReporters": [
+      "json"
+    ]
+  },
+  "nyc": {
+    "reporter": [
+      "lcov",
+      "text"
+    ],
+    "tempDirectory": "./coverage"
+  }
+}
