@@ -111,12 +111,12 @@ workflows:
       - compliance
   release:
     jobs:
-      # - deploy-npm:
-      #     filters:
-      #       tags:
-      #         only: /^v[0-9]+(\.[0-9]+)*/
-      #       branches:
-      #         ignore: /.*/
+      - deploy-npm:
+          filters:
+            tags:
+              only: /^v[0-9]+(\.[0-9]+)*/
+            branches:
+              ignore: /.*/
       - prepare-vsix:
           filters:
             tags:
