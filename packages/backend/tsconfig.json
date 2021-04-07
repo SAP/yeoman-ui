@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "listEmittedFiles": false,
+    "listFiles": false,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "outDir": "./dist",
+    "removeComments": true,
+    "experimentalDecorators": true,
+    "rootDir": ".",
+    "rootDirs": ["./src", "./tests"],
+    "baseUrl": ".",
+    "sourceMap": true,
+    "target": "es6",
+    "traceResolution": false,
+    "declaration": true,
+    "alwaysStrict": true
+  },
+  "include": ["src/**/*", "test/**/*", "api.d.ts"]
+}

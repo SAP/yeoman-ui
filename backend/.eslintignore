@@ -1,6 +1,0 @@
-node_modules
-dist
-out
-coverage
-test/resources
-*.d.ts

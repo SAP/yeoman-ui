@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["es2017", "es7", "es6", "dom"],
+    "rootDir": ".",
+    "outDir": "dist",
+    "baseUrl": ".",
+    "target": "es5",
+    "esModuleInterop": true,
+    "strict": true
+  },
+  "include": ["src/**/*", "test/**/*", "api.d.ts"]
+}

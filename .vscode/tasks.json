@@ -1,70 +1,67 @@
 // See https://go.microsoft.com/fwlink/?LinkId=733558
 // for the documentation about the tasks.json format
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			// not working. see https://github.com/microsoft/vscode/issues/70283
-			"label": "dev",
-			"dependsOrder": "parallel",
-			"dependsOn": [
-				"watch backend (webpack)",
-				"serve frontend"
-			]
-		},
-		{
-			"type": "npm",
-			"label": "watch backend (webpack)",
-			"isBackground": true,
-			"options": {
-				"cwd": "${workspaceFolder}/backend"
-			},
-			"script": "webpack-dev",
-			"problemMatcher": {
-				"pattern": {
-					"regexp": ""
-				},
-				"background": {
-					"beginsPattern": "webpack is watching the files",
-					"endsPattern": "Built at"
-				}
-			},
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
-		},
-		{
-			"type": "npm",
-			"label": "watch backend (tsc)",
-			"isBackground": true,
-			"options": {
-				"cwd": "${workspaceFolder}/backend"
-			},
-			"script": "watch",
-			"problemMatcher": "$tsc-watch",
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
-		},
-		{
-			"type": "npm",
-			"label": "serve frontend",
-			"options": {
-				"cwd": "${workspaceFolder}/frontend"
-			},
-			"isBackground": true,
-			"script": "serve",
-			"problemMatcher": {
-				"pattern": {
-					"regexp": ""
-				},
-				"background": {
-					"beginsPattern": ".*Starting development server.*",
-					"endsPattern": ".*Compiled successfully.*"
-				}
-			}
-		}
-	]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      // not working. see https://github.com/microsoft/vscode/issues/70283
+      "label": "dev",
+      "dependsOrder": "parallel",
+      "dependsOn": ["watch backend (webpack)", "serve frontend"]
+    },
+    {
+      "type": "npm",
+      "label": "watch backend (webpack)",
+      "isBackground": true,
+      "options": {
+        "cwd": "${workspaceFolder}/packages/backend"
+      },
+      "script": "webpack-dev:watch",
+      "problemMatcher": {
+        "pattern": {
+          "regexp": ""
+        },
+        "background": {
+          "beginsPattern": "webpack is watching the files",
+          "endsPattern": "Built at"
+        }
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "type": "npm",
+      "label": "watch backend (tsc)",
+      "isBackground": true,
+      "options": {
+        "cwd": "${workspaceFolder}/packages/backend"
+      },
+      "script": "compile:watch",
+      "problemMatcher": "$tsc-watch",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "type": "npm",
+      "label": "serve frontend",
+      "options": {
+        "cwd": "${workspaceFolder}/packages/frontend"
+      },
+      "isBackground": true,
+      "script": "serve",
+      "problemMatcher": {
+        "pattern": {
+          "regexp": ""
+        },
+        "background": {
+          "beginsPattern": ".*Starting development server.*",
+          "endsPattern": ".*Compiled successfully.*"
+        }
+      }
+    }
+  ]
 }

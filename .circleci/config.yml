@@ -1,41 +1,45 @@
-version: 2.1 # use CircleCI 2.1
-
-build-steps: &common-build 
-  working_directory: ~/repo    
-  steps:
-    - checkout      
-    - run:
-        name: install frontend
-        working_directory: frontend
-        command: npm install
-    - run:
-        name: build frontend
-        working_directory: frontend
-        command: npm run build
-    - run:
-        name: test frontend
-        working_directory: frontend
-        command: npm run test
-    - run:
-        name: build backend
-        working_directory: backend
-        command: npm run backend
-    - run:
-        name: test backend 
-        working_directory: backend
-        command: npm run test
-
-jobs: # a collection of steps
-  build-and-test-node10:
+version: 2.1
+jobs:
+  build-node14:
     docker:
-      - image: circleci/node:10.23 # Current BAS node version
-    <<: *common-build
+      - image: circleci/node:14
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run: yarn
+      - run: yarn run ci
+      - run:
+          name: Define environment variable with lastest commit's message
+          command: |
+            echo 'export COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")' >> $BASH_ENV
+            source $BASH_ENV
+      - run:
+          name: Lint commit message
+          command: echo "$COMMIT_MESSAGE" | npx commitlint
+      - run:
+          command: cat ./coverage/lcov.info | ./node_modules/.bin/coveralls
+          environment:
+            COVERALLS_SERVICE_NAME: circle-ci
+            COVERALLS_GIT_BRANCH: ${CIRCLE_BRANCH}
+
+  build-node12:
+    docker:
+      - image: circleci/node:12
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run: yarn
+      - run: yarn run ci
+
+  build-node10:
+    docker:
+      - image: circleci/node:10
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run: yarn
+      - run: yarn run ci
   
-  build-and-test-node12:
-    docker:
-      - image: circleci/node:12 # Future BAS node version
-    <<: *common-build
-
   compliance:
     docker:
       - image: circleci/python:3.6.4
@@ -48,114 +52,80 @@ jobs: # a collection of steps
             pip3 install --user reuse
             ~/.local/bin/reuse lint
 
-  build-and-test:
+  deploy-npm:
     docker:
       - image: circleci/node:14
     working_directory: ~/repo
     steps:
       - checkout
-      - restore_cache:
-          key: dependency-cache-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}
+      - run: yarn --pure-lockfile
+      - run: yarn run ci
+      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      # To help debug when lerna detects changes to the working tree and fails the publish
+      - run: git status
+      - run: yarn run release:publish
+
+  prepare-vsix:
+    docker:
+      - image: circleci/node:14
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run: yarn
+      - run: yarn run ci
+      - run: mkdir -p artifacts && cp packages/*/*.vsix ./artifacts
       - run:
-          name: install frontend
-          working_directory: frontend
-          command: npm install
-      - run:
-          name: build frontend
-          working_directory: frontend
-          command: npm run build
-      - run:
-          name: test frontend
-          working_directory: frontend
-          command: npm run test
-      - store_artifacts: # special step to save test results as as artifact
-          path: frontend/coverage
-          destination: frontend-coverage
-      - run:
-          name: build backend
-          working_directory: backend
-          command: npm run backend
-      - run:
-          name: prepare frontend artifact
-          working_directory: backend
-          command: npm run frontend:copy
-      - run:
-          name: webpack backend
-          working_directory: backend
-          command: npm run webpack-prod
-      - run:
-          name: create .vsix
-          working_directory: backend
-          command: |
-            cp ../README.md ./README.md  
-            npx vsce package .
-      - run:
-          name: test backend 
-          working_directory: backend
-          command: npm run test
-      - store_artifacts: # special step to save test results as as artifact
-          # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
-          path: backend/reports/coverage/lcov-report
-          destination: backend-coverage
-      - run:
-          name: copy frontend coverage
-          command: cp ./frontend/coverage/lcov.info ./backend/reports/coverage/lcov_frontend.info  
-      - run:
-          name: merge frontend and backend coverage
-          command: ./backend/node_modules/.bin/lcov-result-merger './backend/reports/coverage/lco*.info' './backend/reports/coverage/lcov_merged.info'
-      - run:
-          command: cat ./backend/reports/coverage/lcov_merged.info | ./backend/node_modules/.bin/coveralls
-          environment:
-            COVERALLS_SERVICE_NAME: circle-ci
-            COVERALLS_GIT_BRANCH: ${CIRCLE_BRANCH}  
-      - run:
-          name: Define environment variable with lastest commit's message
-          command: |
-            echo 'export COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")' >> $BASH_ENV
-            source $BASH_ENV
-      - run:
-          name: Lint commit message
-          working_directory: backend
-          command: echo "$COMMIT_MESSAGE" | npx commitlint     
-      - save_cache:
-          paths:
-            - backend/node_modules
-            - frontend/node_modules
-          key: dependency-cache-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}
+          name: "Inspect Artifacts Folder"
+          working_directory: ./artifacts
+          command: ls -la
       - persist_to_workspace:
-          root: backend
-          paths: 
-           # https://golang.org/pkg/path/filepath/#Match
-            - yeoman-ui-*
-      - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
-          path: test-results.xml
-  
-  deploy:
+          root: "./artifacts"
+          paths:
+            # https://golang.org/pkg/path/filepath/#Match
+            - "*.vsix"
+
+  deploy-gh-releases:
     docker:
       - image: circleci/golang:1.13
     steps:
       - attach_workspace:
-          at: ./dist
+          at: ./artifacts
+      - run:
+          name: "Inspect Artifacts Folder"
+          working_directory: ./artifacts
+          command: ls -la
       - run:
           name: "Publish Release on GitHub"
           command: |
             go get github.com/tcnksm/ghr
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} ${CIRCLE_TAG} ./dist/ 
+            VERSION=${CIRCLE_TAG}
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
 
 workflows:
   version: 2
-  test-deploy:
+  voter:
     jobs:
-      - build-and-test-node10
-      - build-and-test-node12
+      - build-node10
+      - build-node12
+      - build-node14
       - compliance
-      - build-and-test:
+  release:
+    jobs:
+      # - deploy-npm:
+      #     filters:
+      #       tags:
+      #         only: /^v[0-9]+(\.[0-9]+)*/
+      #       branches:
+      #         ignore: /.*/
+      - prepare-vsix:
           filters:
             tags:
-              only: /.*/
-      - deploy:
+              only: /^v[0-9]+(\.[0-9]+)*/
+            branches:
+              ignore: /.*/
+      - deploy-gh-releases:
           requires:
-            - build-and-test
+            - prepare-vsix
           filters:
             tags:
               only: /^v[0-9]+(\.[0-9]+)*/
