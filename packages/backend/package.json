@@ -1,6 +1,6 @@
 {
   "name": "yeoman-ui",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "displayName": "Application Wizard",
   "publisher": "SAPOS",
   "private": true,
@@ -189,7 +189,7 @@
     "titleize": "2.1.0",
     "ws": "7.4.2",
     "yeoman-environment": "2.10.3",
-    "yeoman-ui-frontend": "^1.2.0"
+    "yeoman-ui-frontend": "^1.2.1"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.6",
