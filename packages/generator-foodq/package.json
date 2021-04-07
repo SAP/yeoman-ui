@@ -1,7 +1,7 @@
 {
   "name": "generator-foodq",
   "description": "A sample generator to preview all the options available when using the Yeoman-UI",
-  "version": "1.1.60",
+  "version": "1.2.0",
   "license": "Apache 2.0",
   "homepage": "https://github.com/SAP/yeoman-ui/tree/master/generator-foodq#readme",
   "repository": {
@@ -17,7 +17,7 @@
     "yeoman-generator"
   ],
   "dependencies": {
-    "@sap-devx/yeoman-ui-types": "1.1.60",
+    "@sap-devx/yeoman-ui-types": "^1.2.0",
     "chalk-pipe": "^4.0.0",
     "datauri": "^3.0.0",
     "inquirer": "^7.3.3",
