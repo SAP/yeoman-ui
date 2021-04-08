@@ -110,6 +110,7 @@ Code Coverage is enforced for all productive code in this mono repo.
 ### Full Build
 
 To run the full **C**ontinuous **I**ntegration build run `yarn ci` in either the top-level package or a specific subpackage.
+(When running in a specific package, ensure to run at least once in the top-level package.)
 
 ### Release Life-Cycle.
 
@@ -124,9 +125,11 @@ Performing a release requires push permissions to the repository.
 - Ensure you are on the default branch and synced with origin.
 - `yarn run release:version`
 - Follow the lerna CLI instructions.
-- Track the newly pushed **tag** (`/^v[0-9]+(\.[0-9]+)*/`) build in the build system
-  until successful completion.
-- Inspect the newly artifacts published on npmjs.com / Github Releases / other relevant release targets.
+- Track the release and tag builds on circle-ci.
+  - https://circleci.com/gh/SAP/yeoman-ui.
+- Once the tag builds have successfully finished:
+  - Inspect the npm registry to see the new sub packages versions.
+  - Inspect the new github release and verify it contains the `.vsix` artifact.
 
 ## Contribute Code
 

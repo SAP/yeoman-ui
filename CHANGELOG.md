@@ -7,7 +7,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Bug Fixes
 
-- add yarn.lock with @sap-devx/inquirer-gui@0.1.27 ([#546](https://github.com/SAP/yeoman-ui/issues/546)) ([f52d797](https://github.com/SAP/yeoman-ui/commit/f52d797ac62d6b0af7432b2552deedc95a2c73a6))
 - bump inquirer-gui to 0.1.27 ([#544](https://github.com/SAP/yeoman-ui/issues/544)) ([6b5ad11](https://github.com/SAP/yeoman-ui/commit/6b5ad11b607ab22f5365f2df12aafc3a2f89f53f))
 - generator log - add status prefix ([#545](https://github.com/SAP/yeoman-ui/issues/545)) ([e0baf26](https://github.com/SAP/yeoman-ui/commit/e0baf261a04f15f4bd3cae9d7a06547800f68c48))
 - install generator to a valid and absolute location ([#543](https://github.com/SAP/yeoman-ui/issues/543)) ([35332b4](https://github.com/SAP/yeoman-ui/commit/35332b472a7eeec3b03f0d5193cef4f5d68165e3))

@@ -68,7 +68,6 @@
     "rimraf": "3.0.2",
     "coveralls": "2.11.16",
     "shx": "0.3.3",
-    "patch-package": "^6.2.2",
     "make-dir": "^3.1.0",
     "glob": "^7.1.6"
   },
