@@ -10,7 +10,7 @@ import { VSCodeYouiEvents } from "../vscode-youi-events";
 import { AbstractWebviewPanel } from "./AbstractWebviewPanel";
 import { ExploreGens } from "../exploregens";
 import { GeneratorOutput } from "../vscode-output";
-import * as envUtils from "../env/utils";
+import * as envUtils from "../utils/env";
 import { getWebviewRpcLibraryLogger } from "../logger/logger-wrapper";
 
 export class YeomanUIPanel extends AbstractWebviewPanel {

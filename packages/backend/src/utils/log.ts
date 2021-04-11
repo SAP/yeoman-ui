@@ -1,7 +1,7 @@
 import stripAnsi = require("strip-ansi");
-import * as _ from "lodash";
-import { Output } from "./output";
-import { YeomanUI } from "./yeomanui";
+import { get, isEmpty } from "lodash";
+import { Output } from "../output";
+import { YeomanUI } from "../yeomanui";
 
 module.exports = (output: Output, yeomanUi: YeomanUI) => {
   const defaultColors = {
@@ -17,18 +17,18 @@ module.exports = (output: Output, yeomanUi: YeomanUI) => {
   function pad(status: string) {
     const max = "identical".length;
     const delta = max - status.length;
-    return delta ? " ".repeat(delta) + status : status;
+    return delta ? `${" ".repeat(delta)}${status}` : status;
   }
 
   function getPrefix(status: string) {
-    const color = _.get(defaultColors, status);
-    if (_.isEmpty(color)) return "";
+    const color = get(defaultColors, status);
+    if (isEmpty(color)) return "";
     return `${pad(status)} `;
   }
 
   function getMessage(args: any, status = "") {
     const prefix = getPrefix(status);
-    const message = stripAnsi(_.get(args, "[0]", ""));
+    const message = stripAnsi(get(args, "[0]", ""));
     return `${prefix}${message}`;
   }
 

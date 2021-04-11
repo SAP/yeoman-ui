@@ -7,7 +7,7 @@ import backendMessages from "../messages";
 import { IChildLogger } from "@vscode-logging/logger";
 import { YouiEvents } from "../youi-events";
 import { GeneratorFilter } from "../filter";
-import * as envUtils from "../env/utils";
+import * as envUtils from "../utils/env";
 
 class YeomanUIWebSocketServer {
   private rpc: RpcExtensionWebSockets | undefined;

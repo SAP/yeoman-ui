@@ -3,11 +3,11 @@
   "include": ["src/**/*.ts"],
   "exclude": [
     "src/logger/*.ts",
+    "src/utils/*.ts",
     "src/swa-tracker/*.ts",
     "src/panels/*.ts",
     "src/images/*.ts",
     "src/webSocketServer/*.ts",
-    "src/logUtils.ts",
     "src/vscode-output.ts",
     "src/youi-adapter.ts"
   ],
@@ -15,8 +15,8 @@
   "extension": [".ts"],
   "all": true,
   "check-coverage": true,
-  "branches": 85,
-  "lines": 90,
-  "functions": 87,
-  "statements": 90
+  "branches": 87,
+  "lines": 92,
+  "functions": 88,
+  "statements": 92
 }
