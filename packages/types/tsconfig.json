@@ -9,5 +9,5 @@
     "esModuleInterop": true,
     "strict": true
   },
-  "include": ["src/**/*", "test/**/*", "api.d.ts"]
+  "include": ["src/**/*", "api.d.ts"]
 }
