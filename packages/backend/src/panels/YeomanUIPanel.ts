@@ -17,21 +17,12 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   public static YEOMAN_UI = "Application Wizard";
 
   private static getGensMeta(): Promise<any> {
-    const npmPaths = YeomanUIPanel.getNpmPaths();
+    const npmPaths = YeomanUI.getNpmPaths();
     return envUtils.getGeneratorsMeta(npmPaths);
   }
 
   private static getNpmPaths() {
-    const parts: string[] = envUtils.HOME_DIR.split(path.sep);
-    const userPaths = _.map(parts, (part, index) => {
-      const resPath = path.join(
-        ...parts.slice(0, index + 1),
-        envUtils.NODE_MODULES
-      );
-      return envUtils.isWin32 ? resPath : path.join(path.sep, resPath);
-    });
-
-    return YeomanUIPanel.getDefaultPaths().concat(userPaths);
+    return YeomanUI.getNpmPaths();
   }
 
   public toggleOutput() {

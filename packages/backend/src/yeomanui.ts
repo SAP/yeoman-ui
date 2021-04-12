@@ -20,12 +20,17 @@ import TerminalAdapter = require("yeoman-environment/lib/adapter");
 import { Output } from "./output";
 import { resolve } from "path";
 import * as envUtils from "./env/utils";
+import messages from "./exploreGensMessages";
+import { ExploreGens } from "./exploregens";
+import { InstallUtils } from "./installUtils";
+import { YeomanUIPanel } from "./panels/YeomanUIPanel";
 
 export interface IQuestionsPrompt extends IPrompt {
   questions: any[];
 }
 
 export class YeomanUI {
+  public static readonly npmGlobalPaths: string[] = Environment.createEnv().getNpmPaths();
   private static readonly defaultMessage =
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
   private static readonly YEOMAN_PNG = "yeoman.png";
@@ -111,7 +116,55 @@ export class YeomanUI {
     this.forceNewWorkspace = false;
   }
 
-  private async getGensMeta() {
+  private static getGensMeta(): Promise<any> {
+    const npmPaths = YeomanUI.getNpmPaths();
+    return envUtils.getGeneratorsMeta(npmPaths);
+  }
+  private static getVscode() {
+    try {
+      return require("vscode");
+    } catch (error) {
+      return undefined;
+    }
+  }
+
+  private static getDefaultPaths(): string[] {
+    const vscode = this.getVscode();
+    let customGensLocation: string | undefined;
+    if (vscode) {
+      customGensLocation = ExploreGens.getInstallationLocation(
+        vscode.workspace.getConfiguration()
+      );
+    }
+    if (!_.isEmpty(customGensLocation)) {
+      return _.concat(
+        YeomanUI.npmGlobalPaths,
+        path.join(customGensLocation, envUtils.NODE_MODULES)
+      );
+    }
+
+    return YeomanUI.npmGlobalPaths;
+  }
+
+  public static getNpmPaths() {
+    const parts: string[] = envUtils.HOME_DIR.split(path.sep);
+    const userPaths = _.map(parts, (part, index) => {
+      const resPath = path.join(
+        ...parts.slice(0, index + 1),
+        envUtils.NODE_MODULES
+      );
+      return envUtils.isWin32 ? resPath : path.join(path.sep, resPath);
+    });
+
+    return YeomanUI.getDefaultPaths().concat(userPaths);
+  }
+
+  private static getLatestGensMeta(): Promise<any> {
+    const npmPaths = YeomanUI.getNpmPaths();
+    return envUtils.getGeneratorsMeta(npmPaths);
+  }
+
+  private async getGensMeta(): Promise<string[]> {
     const gensMeta = await this.gensMetaPromise;
     if (_.get(this.uiOptions, "generator")) {
       return gensMeta;
@@ -252,10 +305,44 @@ export class YeomanUI {
         { sharedOptions: { forwardErrorToEnvironment: true } },
         this.youiAdapter
       );
-      const meta: Environment.GeneratorMeta = this.getGenMetadata(
+      let meta: Environment.GeneratorMeta = this.getGenMetadata(
         generatorNamespace,
         gensMeta
       );
+      // Generator is not yet installed. Ask user to install it.
+      if (meta === undefined) {
+        const generatorNameWoSubgen = generatorNamespace.split(":")[0];
+        const generatorName = generatorNameWoSubgen.includes("/")
+          ? [
+              generatorNameWoSubgen.slice(
+                0,
+                generatorNameWoSubgen.indexOf("/")
+              ),
+              "/generator-",
+              generatorNameWoSubgen.slice(
+                generatorNameWoSubgen.indexOf("/") + 1
+              ),
+            ].join("")
+          : `generator-${generatorNameWoSubgen}`;
+
+        const vscode = this.getVscode();
+        if (vscode) {
+          const result = await vscode.window.showInformationMessage(
+            `Load ${generatorNamespace} - ${generatorName} is not installed. Install it? `,
+            ...["Yes", "No"]
+          );
+          if (result === "Yes") {
+            const installGen = new InstallUtils(this.logger);
+            await installGen.installGenerator(generatorName);
+            const updatedGensMeta: string[] = await YeomanUI.getLatestGensMeta();
+            meta = this.getGenMetadata(
+              generatorNamespace,
+              updatedGensMeta
+            );
+          }
+        }
+      }
+
       env.register(meta.resolved, generatorNamespace, meta.packagePath);
 
       const options = {

@@ -8,6 +8,7 @@ import * as path from "path";
 import * as fs from "fs";
 import messages from "./exploreGensMessages";
 import * as envUtils from "./env/utils";
+import {InstallUtils} from "./installUtils";
 
 export enum GenState {
   uninstalling = "uninstalling",
@@ -19,12 +20,12 @@ export enum GenState {
 
 export class ExploreGens {
   public static getInstallationLocation(wsConfig: any) {
-    const location = _.trim(wsConfig.get(ExploreGens.INSTALLATION_LOCATION));
-    return fs.existsSync(location) ? location : undefined;
+    let location = _.trim(wsConfig.get(ExploreGens.INSTALLATION_LOCATION));
+    location = fs.existsSync(location) ? location : undefined;
+    return location;
   }
 
-  private static readonly INSTALLATION_LOCATION =
-    "ApplicationWizard.installationLocation";
+  private static readonly INSTALLATION_LOCATION = InstallUtils.INSTALLATION_LOCATION;
 
   private readonly logger: IChildLogger;
   private rpc: IRpc;
@@ -41,10 +42,10 @@ export class ExploreGens {
     "global.exploreGens.lastAutoUpdateDate";
   private readonly SEARCH_QUERY = "ApplicationWizard.searchQuery";
   private readonly AUTO_UPDATE = "ApplicationWizard.autoUpdate";
-  private readonly NPM = envUtils.isWin32 ? "npm.cmd" : "npm";
+  private readonly NPM = InstallUtils.NPM;
   private readonly EMPTY = "";
   private readonly SLASH = "/";
-  private readonly GENERATOR = "generator-";
+  private readonly GENERATOR = InstallUtils.GENERATOR;
   private readonly ONE_DAY = 1000 * 60 * 60 * 24;
   private readonly NPM_REGISTRY_HOST = _.get(
     process,
@@ -344,7 +345,7 @@ export class ExploreGens {
   }
 
   private getNpmInstallCommand(locationParams: string, genName: string) {
-    return `${this.NPM} install ${locationParams} ${genName}@latest`;
+    return InstallUtils.getNpmInstallCommand(locationParams, genName);
   }
 
   private getNpmUninstallCommand(locationParams: string, genName: string) {
