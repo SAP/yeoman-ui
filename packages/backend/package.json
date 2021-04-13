@@ -1,6 +1,6 @@
 {
   "name": "yeoman-ui",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "displayName": "Application Wizard",
   "publisher": "SAPOS",
   "private": true,
@@ -176,7 +176,7 @@
   },
   "dependencies": {
     "@sap-devx/webview-rpc": "0.3.1",
-    "@sap-devx/yeoman-ui-types": "^1.2.0",
+    "@sap-devx/yeoman-ui-types": "^1.2.2",
     "@sap/swa-for-sapbas-vsx": "1.2.7",
     "@vscode-logging/logger": "1.2.2",
     "chalk": "4.1.0",
@@ -189,7 +189,7 @@
     "titleize": "2.1.0",
     "ws": "7.4.2",
     "yeoman-environment": "2.10.3",
-    "yeoman-ui-frontend": "^1.2.1"
+    "yeoman-ui-frontend": "^1.2.2"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.6",
