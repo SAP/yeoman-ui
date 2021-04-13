@@ -26,7 +26,7 @@ In the [Application Wizard](https://marketplace.visualstudio.com/items?itemName=
 ## Updates
 
 By default, VS Code auto-updates extensions as new versions become available as explained in https://code.visualstudio.com/docs/supporting/faq#_how-do-i-opt-out-of-vs-code-autoupdates.
-In case the auto-update is disabled in your VS Code, you should care to frequently update the extension manually to the latest version in order to avoid supply chain attack and other cyber-attacks.
+If auto-update is disabled in your VS Code, you should update the extension manually to the latest version frequently to avoid supply-chain attack and other cyberattacks.
 
 ## Usage
 
