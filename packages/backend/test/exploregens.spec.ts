@@ -14,7 +14,7 @@ import * as npmFetch from "npm-registry-fetch";
 import { mockVscode } from "./mockUtil";
 import messages from "../src/exploreGensMessages";
 import Environment = require("yeoman-environment");
-import * as envUtils from "../src/env/utils";
+import * as envUtils from "../src/utils/env";
 
 const testYoEnv = {
   lookup: () => true,
