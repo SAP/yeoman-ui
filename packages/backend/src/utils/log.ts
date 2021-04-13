@@ -1,39 +1,23 @@
 import stripAnsi = require("strip-ansi");
-import { get, isEmpty } from "lodash";
+import { get } from "lodash";
 import { Output } from "../output";
 import { YeomanUI } from "../yeomanui";
 
 module.exports = (output: Output, yeomanUi: YeomanUI) => {
-  const defaultColors = {
-    skip: "yellow",
-    force: "yellow",
-    create: "green",
-    invoke: "bold",
-    conflict: "red",
-    identical: "cyan",
-    info: "gray",
-  };
-
-  function pad(status: string) {
+  function pad(methodName: string) {
     const max = "identical".length;
-    const delta = max - status.length;
-    return delta ? `${" ".repeat(delta)}${status}` : status;
+    const delta = max - methodName.length;
+    return delta ? `${" ".repeat(delta)}${methodName}` : methodName;
   }
 
-  function getPrefix(status: string) {
-    const color = get(defaultColors, status);
-    if (isEmpty(color)) return "";
-    return `${pad(status)} `;
-  }
-
-  function getMessage(args: any, status = "") {
-    const prefix = getPrefix(status);
+  function getMessage(args: any, methodName = "") {
+    const prefix = `${pad(methodName)} `;
     const message = stripAnsi(get(args, "[0]", ""));
     return `${prefix}${message}`;
   }
 
-  function showMessage(args: any, status = "", withNewLine = true) {
-    const message = getMessage(args, status);
+  function showMessage(args: any, methodName = "", withNewLine = true) {
+    const message = getMessage(args, methodName);
     withNewLine ? output.appendLine(message) : output.append(message);
   }
 
