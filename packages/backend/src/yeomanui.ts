@@ -20,6 +20,7 @@ import { Output } from "./output";
 import { resolve } from "path";
 import * as envUtils from "./utils/env";
 import { Questions } from "yeoman-environment/lib/adapter";
+import TerminalAdapter = require("yeoman-environment/lib/adapter");
 
 export interface IQuestionsPrompt extends IPrompt {
   questions: any[];
