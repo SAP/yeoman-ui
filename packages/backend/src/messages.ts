@@ -1,5 +1,5 @@
 const selectGeneratorQuestionHint =
-  "When you create a project using a template, you become the code owner and as such, you are responsible for any updates or fixes that must be performed for it. We recommend you follow the industry best practice to use automated vulnerability scanning in the CI/CD pipeline to avoid supply chain and other cyber-attacks.";
+  "When you create a project using a template, you become the code owner and as such, you are responsible for any updates or fixes that must be performed for it. We recommend you to follow the software security industry best practice, to use automated vulnerability scanning in the CI/CD pipeline to avoid supply chain attack and other cyber-attacks.";
 const selectTargetFolderQuestionHint =
   "The project will contain the relevant files and configurations required to create your application";
 const selectWhereToOpenTheProjectQuestionHint =
