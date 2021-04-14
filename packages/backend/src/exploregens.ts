@@ -8,7 +8,8 @@ import * as path from "path";
 import * as fs from "fs";
 import messages from "./exploreGensMessages";
 import * as envUtils from "./env/utils";
-import {InstallUtils} from "./installUtils";
+import { InstallUtils } from "./installUtils";
+import { Terminal } from "vscode";
 
 export enum GenState {
   uninstalling = "uninstalling",
@@ -18,6 +19,10 @@ export enum GenState {
   installed = "installed",
 }
 
+function timeout(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export class ExploreGens {
   public static getInstallationLocation(wsConfig: any) {
     let location = _.trim(wsConfig.get(ExploreGens.INSTALLATION_LOCATION));
@@ -25,7 +30,8 @@ export class ExploreGens {
     return location;
   }
 
-  private static readonly INSTALLATION_LOCATION = InstallUtils.INSTALLATION_LOCATION;
+  private static readonly INSTALLATION_LOCATION =
+    InstallUtils.INSTALLATION_LOCATION;
 
   private readonly logger: IChildLogger;
   private rpc: IRpc;
@@ -154,7 +160,7 @@ export class ExploreGens {
       const statusBarMessage = this.vscode.window.setStatusBarMessage(
         messages.auto_update_started
       );
-      const locationParams = this.getGeneratorsLocationParams();
+      const locationParams = await this.getGeneratorsLocationParams();
       const promises = _.map(installedGenerators, (genName) => {
         return this.update(locationParams, genName);
       });
@@ -219,9 +225,36 @@ export class ExploreGens {
     return _.uniq(recommended);
   }
 
-  private getGeneratorsLocationParams() {
-    const location = ExploreGens.getInstallationLocation(this.getWsConfig());
-    return _.isEmpty(location) ? "-g" : `--prefix ${location}`;
+  private async getGeneratorsLocationParams() {
+    // const location = ExploreGens.getInstallationLocation(this.getWsConfig());
+    const installUtil = new InstallUtils(this.logger);
+    const locationParams = await installUtil.getGeneratorsLocationParams(
+      this.vscode
+    );
+    let continueWithGeneratorInstall = false;
+    // Change ownership
+    if (locationParams.sudo_terminal) {
+      const changeOwnerCommand = `sudo chown -R $USER ${locationParams.globalNpmPath} && exit`;
+      const terminalName =
+        "Change NPM Global node_modules owner to current user";
+      const terminal = await this.vscode.window.createTerminal(terminalName);
+      if (terminal) {
+        await terminal.show();
+        await terminal.sendText(changeOwnerCommand);
+        this.vscode.window.onDidCloseTerminal((t: Terminal) => {
+          if (t.name === terminalName) {
+            continueWithGeneratorInstall = true;
+          }
+        });
+      }
+    } else {
+      continueWithGeneratorInstall = true;
+    }
+    while (continueWithGeneratorInstall === false) {
+      await timeout(3000);
+    }
+
+    return locationParams.location;
   }
 
   private async exec(arg: string) {
@@ -249,7 +282,7 @@ export class ExploreGens {
     try {
       this.logger.debug(installingMessage);
       this.updateBeingHandledGenerator(genName, GenState.installing);
-      const locationParams = this.getGeneratorsLocationParams();
+      const locationParams = await this.getGeneratorsLocationParams();
       const installCommand = this.getNpmInstallCommand(locationParams, genName);
       await this.exec(installCommand);
       const successMessage = messages.installed(genName);
@@ -278,7 +311,7 @@ export class ExploreGens {
     try {
       this.logger.debug(uninstallingMessage);
       this.updateBeingHandledGenerator(genName, GenState.uninstalling);
-      const locationParams = this.getGeneratorsLocationParams();
+      const locationParams = await this.getGeneratorsLocationParams();
       const uninstallCommand = this.getNpmUninstallCommand(
         locationParams,
         genName
