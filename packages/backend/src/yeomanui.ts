@@ -16,10 +16,10 @@ import { GeneratorFilter, GeneratorType } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import { IPrompt, MessageType } from "@sap-devx/yeoman-ui-types";
 import { SWA } from "./swa-tracker/swa-tracker-wrapper";
-import TerminalAdapter = require("yeoman-environment/lib/adapter");
 import { Output } from "./output";
 import { resolve } from "path";
-import * as envUtils from "./env/utils";
+import * as envUtils from "./utils/env";
+import { Questions } from "yeoman-environment/lib/adapter";
 import messages from "./exploreGensMessages";
 import { ExploreGens } from "./exploregens";
 import { InstallUtils } from "./installUtils";
@@ -53,7 +53,7 @@ export class YeomanUI {
   private gen: Generator | undefined;
   private promptCount: number;
   private gensMetaPromise: Promise<any>;
-  private currentQuestions: TerminalAdapter.Questions<any>;
+  private currentQuestions: Questions<any>;
   private generatorName: string;
   private readonly replayUtils: ReplayUtils;
   private readonly customQuestionEventHandlers: Map<
@@ -303,7 +303,7 @@ export class YeomanUI {
       const env: Environment = Environment.createEnv(
         undefined,
         { sharedOptions: { forwardErrorToEnvironment: true } },
-        this.youiAdapter
+        this.youiAdapter as any
       );
       let meta: Environment.GeneratorMeta = this.getGenMetadata(
         generatorNamespace,
@@ -335,10 +335,7 @@ export class YeomanUI {
             const installGen = new InstallUtils(this.logger);
             await installGen.installGenerator(generatorName);
             const updatedGensMeta: string[] = await YeomanUI.getLatestGensMeta();
-            meta = this.getGenMetadata(
-              generatorNamespace,
-              updatedGensMeta
-            );
+            meta = this.getGenMetadata(generatorNamespace, updatedGensMeta);
           }
         }
       }
@@ -527,7 +524,7 @@ export class YeomanUI {
   }
 
   public async showPrompt(
-    questions: TerminalAdapter.Questions<any>
+    questions: Questions<any>
   ): Promise<inquirer.Answers> {
     this.promptCount++;
     const promptName = this.getPromptName(questions);
@@ -542,9 +539,7 @@ export class YeomanUI {
     this.replayUtils.recall(questions);
 
     this.currentQuestions = questions;
-    const mappedQuestions: TerminalAdapter.Questions<any> = this.normalizeFunctions(
-      questions
-    );
+    const mappedQuestions: Questions<any> = this.normalizeFunctions(questions);
     if (_.isEmpty(mappedQuestions)) {
       return {};
     }
@@ -579,7 +574,7 @@ export class YeomanUI {
     }
   }
 
-  private getPromptName(questions: TerminalAdapter.Questions<any>): string {
+  private getPromptName(questions: Questions<any>): string {
     const firstQuestionName = _.get(questions, "[0].name");
     return firstQuestionName
       ? _.startCase(firstQuestionName)
@@ -895,9 +890,7 @@ export class YeomanUI {
    * Functions are lost when being passed to client (using JSON.Stringify)
    * Also functions cannot be evaluated on client)
    */
-  private normalizeFunctions(
-    questions: TerminalAdapter.Questions<any>
-  ): TerminalAdapter.Questions<any> {
+  private normalizeFunctions(questions: Questions<any>): Questions<any> {
     this.addCustomQuestionEventHandlers(questions);
     return JSON.parse(JSON.stringify(questions, YeomanUI.funcReplacer));
   }
@@ -914,9 +907,7 @@ export class YeomanUI {
     }
   }
 
-  private addCustomQuestionEventHandlers(
-    questions: TerminalAdapter.Questions<any>
-  ): void {
+  private addCustomQuestionEventHandlers(questions: Questions<any>): void {
     for (const question of questions as any[]) {
       const guiType = _.get(question, "guiOptions.type", question.guiType);
       const questionHandlers = this.customQuestionEventHandlers.get(guiType);

@@ -1,20 +1,21 @@
 import { YeomanUI } from "./yeomanui";
 import { YouiEvents } from "./youi-events";
-const yoUiLog = require("./logUtils"); // eslint-disable-line @typescript-eslint/no-var-requires
-import * as _ from "lodash";
+const yoUiLog = require("./utils/log"); // eslint-disable-line @typescript-eslint/no-var-requires
+import { isFunction, get } from "lodash";
 import chalk = require("chalk");
-import TerminalAdapter = require("yeoman-environment/lib/adapter");
+import { Questions } from "yeoman-environment/lib/adapter";
 import { Output } from "./output";
 
-export class YouiAdapter extends TerminalAdapter {
-  private yeomanui: YeomanUI | undefined = undefined;
-  private readonly youiEvents: YouiEvents;
-  private readonly output: Output;
+export class YouiAdapter {
+  private yeomanui: YeomanUI;
 
-  constructor(youiEvents: YouiEvents, output: Output) {
-    super({});
-    this.youiEvents = youiEvents;
-    this.output = output;
+  constructor(
+    private readonly youiEvents: YouiEvents,
+    private readonly output: Output
+  ) {}
+
+  public log() {
+    console.log(arguments);
   }
 
   public setYeomanUI(yeomanui: YeomanUI) {
@@ -30,7 +31,7 @@ export class YouiAdapter extends TerminalAdapter {
     return chalk.bgRed;
   }
 
-  public colorLines(name: string, str: string) {
+  public colorLines() {
     return "";
   }
 
@@ -39,20 +40,20 @@ export class YouiAdapter extends TerminalAdapter {
    * @param {Function} callback
    */
   public async prompt<T1, T2>(
-    questions: TerminalAdapter.Questions<T1>,
+    questions: Questions<T1>,
     cb?: (res: T1) => T2
   ): Promise<T2> {
     if (this.yeomanui && questions) {
       const result: any = await (this.yeomanui.showPrompt(
         questions
       ) as Promise<T2>);
-      if (_.isFunction(cb)) {
+      if (isFunction(cb)) {
         try {
           return await cb(result); // eslint-disable-line @typescript-eslint/await-thenable
         } catch (err) {
           this.youiEvents.doGeneratorDone(
             false,
-            _.get(err, "message", "Template Wizard detected an error"),
+            get(err, "message", "Template Wizard detected an error"),
             "",
             "files"
           );
@@ -72,7 +73,7 @@ export class YouiAdapter extends TerminalAdapter {
    * @param {string} actual
    * @param {string} expected
    */
-  public diff(actual: string, expected: string): string {
+  public diff(): string {
     return "";
   }
 }
