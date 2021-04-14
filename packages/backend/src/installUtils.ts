@@ -6,7 +6,7 @@ import { join } from "path";
 import { IChildLogger } from "@vscode-logging/logger";
 import * as util from "util";
 import * as cp from "child_process";
-import * as envUtils from "./env/utils";
+import * as envUtils from "./utils/env";
 import messages from "./exploreGensMessages";
 import { Terminal } from "vscode";
 
