@@ -205,7 +205,7 @@
     "copy-webpack-plugin": "6.4.1",
     "lcov-result-merger": "3.1.0",
     "sinon": "^9.2.2",
-    "string-replace-loader": "2.3.0",
+    "string-replace-loader": "3.0.1",
     "ts-loader": "^8.0.13",
     "ts-node": "^9.1.1",
     "vsce": "^1.83.0",
