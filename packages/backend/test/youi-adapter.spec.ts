@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import * as mocha from "mocha";
 import { expect } from "chai";
 import { YouiEvents } from "../src/youi-events";
 import {
@@ -13,28 +15,19 @@ import messages from "../src/messages";
 
 describe("YouiAdapter", () => {
   class TestEvents implements YouiEvents {
-    public doGeneratorDone(
-      success: boolean,
-      message: string,
-      selectedWorkspace: string,
-      type: string,
-      targetPath?: string
-    ): void {
+    public doGeneratorDone(): void {
       return;
     }
     public doGeneratorInstall(): void {
       return;
     }
-    public showProgress(message?: string): void {
-      return;
-    }
-    public getWsConfig(config: string): any {
+    public showProgress(): void {
       return;
     }
     public getAppWizard(): AppWizard {
       return;
     }
-    public executeCommand(command: string, ...rest: any[]): Thenable<any> {
+    public executeCommand(): Thenable<any> {
       return;
     }
   }

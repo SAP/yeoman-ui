@@ -7,12 +7,12 @@ import backendMessages from "../messages";
 import { IChildLogger } from "@vscode-logging/logger";
 import { YouiEvents } from "../youi-events";
 import { GeneratorFilter } from "../filter";
-import * as envUtils from "../utils/env";
+import { getConsoleWarnLogger } from "../logger/console-logger";
 
 class YeomanUIWebSocketServer {
   private rpc: RpcExtensionWebSockets | undefined;
   private yeomanui: YeomanUI | undefined;
-  private async mockFolderDialog() {
+  private mockFolderDialog() {
     return "mock path";
   }
 
@@ -32,45 +32,16 @@ class YeomanUIWebSocketServer {
 
     wss.on("connection", (ws) => {
       console.log("new ws connection");
-
-      const childLogger = {
-        debug: () => {
-          /* do nothing */
-        },
-        error: () => {
-          /* do nothing */
-        },
-        fatal: () => {
-          /* do nothing */
-        },
-        warn: () => {
-          /* do nothing */
-        },
-        info: () => {
-          /* do nothing */
-        },
-        trace: () => {
-          /* do nothing */
-        },
-        getChildLogger: () => {
-          return childLogger as IChildLogger;
-        },
-      };
-      this.rpc = new RpcExtensionWebSockets(ws, childLogger as IChildLogger);
-      //TODO: Use RPC to send it to the browser log (as a collapsed pannel in Vue)
+      const childLogger: IChildLogger = getConsoleWarnLogger();
+      this.rpc = new RpcExtensionWebSockets(ws, childLogger);
       const serverOutput = new ServerOutput(this.rpc, true);
       const youiEvents: YouiEvents = new ServerYouiEvents(this.rpc);
-      const gensMetaPromise = envUtils.getGeneratorsMeta();
       this.yeomanui = new YeomanUI(
         this.rpc,
         youiEvents,
         serverOutput,
-        childLogger as IChildLogger,
-        {
-          filter: GeneratorFilter.create(),
-          messages: backendMessages,
-          gensMetaPromise,
-        },
+        childLogger,
+        { filter: GeneratorFilter.create(), messages: backendMessages },
         undefined
       );
       this.yeomanui.registerCustomQuestionEventHandler(

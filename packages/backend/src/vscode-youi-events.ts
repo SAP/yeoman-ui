@@ -65,7 +65,7 @@ export class VSCodeYouiEvents implements YouiEvents {
     targetFolderPath?: string
   ): void {
     this.doClose();
-    this.showDoneMessage(
+    void this.showDoneMessage(
       success,
       message,
       selectedWorkspace,
@@ -79,15 +79,11 @@ export class VSCodeYouiEvents implements YouiEvents {
     this.showInstallMessage();
   }
 
-  public getWsConfig(config: string): any {
-    return vscode.workspace.getConfiguration().get(config);
-  }
-
   public getAppWizard(): AppWizard {
     return this.appWizard;
   }
 
-  public executeCommand(id: string, ...args: any[]): Thenable<any> {
+  public executeCommand(id: string, args: any[]): Thenable<any> {
     return vscode.commands.executeCommand(id, ...args);
   }
 
@@ -97,19 +93,17 @@ export class VSCodeYouiEvents implements YouiEvents {
 
   private showPromptMessage(message: string, state: Severity) {
     const image = this.getMessageImage(state);
-    this.rpc.invoke("showPromptMessage", [`${message}`, state, image]);
+    void this.rpc.invoke("showPromptMessage", [`${message}`, state, image]);
   }
 
   private showNotificationMessage(message: string, state: Severity) {
     switch (state) {
       case Severity.error:
-        vscode.window.showErrorMessage(message);
-        break;
+        return vscode.window.showErrorMessage(message);
       case Severity.warning:
-        vscode.window.showWarningMessage(message);
-        break;
+        return vscode.window.showWarningMessage(message);
       default:
-        vscode.window.showInformationMessage(message); // Severity.information
+        return vscode.window.showInformationMessage(message); // Severity.information
     }
   }
 
@@ -117,7 +111,7 @@ export class VSCodeYouiEvents implements YouiEvents {
     message = `${message}`;
     this.output.appendLine(message);
     if (type === MessageType.notification) {
-      this.showNotificationMessage(message, state);
+      void this.showNotificationMessage(message, state);
     } else {
       // prompt
       this.showPromptMessage(message, state);
@@ -135,7 +129,7 @@ export class VSCodeYouiEvents implements YouiEvents {
     this.logger.debug("Showing Progress.", {
       notificationMessage: message,
     });
-    vscode.window
+    void vscode.window
       .showInformationMessage(message, ...buttons)
       .then((selection) => {
         if (selection === openOutput) {
@@ -157,7 +151,7 @@ export class VSCodeYouiEvents implements YouiEvents {
   }
 
   private showInstallMessage(): void {
-    vscode.window.withProgress(
+    void vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Notification,
         title: "Installing dependencies...",
@@ -227,7 +221,10 @@ export class VSCodeYouiEvents implements YouiEvents {
       );
 
       if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
-        vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
+        void vscode.commands.executeCommand(
+          "vscode.openFolder",
+          targetFolderUri
+        );
       } else if (selectedWorkspace === this.messages.add_to_workspace) {
         const wsFoldersQuantity = _.size(vscode.workspace.workspaceFolders);
         vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, {

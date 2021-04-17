@@ -1,10 +1,9 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import * as _ from "lodash";
-import * as fsextra from "fs-extra";
+import { readFileSync } from "fs";
 import { IChildLogger } from "@vscode-logging/logger";
 import { getClassLogger } from "../logger/logger-wrapper";
-import Environment = require("yeoman-environment");
 import { RpcExtension } from "@sap-devx/webview-rpc/out.ext/rpc-extension";
 
 export abstract class AbstractWebviewPanel {
@@ -23,12 +22,10 @@ export abstract class AbstractWebviewPanel {
   protected isInBAS: boolean;
   protected rpc: RpcExtension;
 
-  protected static readonly npmGlobalPaths: string[] = Environment.createEnv().getNpmPaths();
-
-  public loadWebviewPanel(uiOptions?: any) {
+  public async loadWebviewPanel(uiOptions?: any) {
     this.disposeWebviewPanel();
     const webViewPanel = this.createWebviewPanel();
-    this.setWebviewPanel(webViewPanel, uiOptions);
+    return this.setWebviewPanel(webViewPanel, uiOptions);
   }
 
   protected constructor(context: vscode.ExtensionContext) {
@@ -84,7 +81,7 @@ export abstract class AbstractWebviewPanel {
 
     // Update the content based on view changes
     this.webViewPanel.onDidChangeViewState(
-      (e) => {
+      () => {
         this.setFocused(this.webViewPanel.active);
       },
       null,
@@ -93,7 +90,11 @@ export abstract class AbstractWebviewPanel {
   }
 
   protected setFocused(focusedValue: boolean) {
-    vscode.commands.executeCommand("setContext", this.focusedKey, focusedValue);
+    void vscode.commands.executeCommand(
+      "setContext",
+      this.focusedKey,
+      focusedValue
+    );
   }
 
   private dispose() {
@@ -111,8 +112,8 @@ export abstract class AbstractWebviewPanel {
     }
   }
 
-  protected async initHtmlContent() {
-    let indexHtml = await fsextra.readFile(
+  protected initHtmlContent(): void {
+    let indexHtml = readFileSync(
       path.join(this.mediaPath, this.htmlFileName),
       "utf8"
     );

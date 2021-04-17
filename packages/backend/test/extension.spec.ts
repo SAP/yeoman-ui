@@ -1,45 +1,25 @@
-import * as mocha from "mocha";
-import { expect } from "chai";
-import * as sinon from "sinon";
-import * as _ from "lodash";
-import { mockVscode } from "./mockUtil";
+import { vscode } from "./mockUtil";
 
-const oRegisteredCommands = {};
-const testVscode = {
-  workspace: {
-    getConfiguration: (): any => undefined,
-  },
-  commands: {
-    registerCommand: (id: string, cmd: any) => {
-      _.set(oRegisteredCommands, id, cmd);
-      return Promise.resolve(oRegisteredCommands);
-    },
-    executeCommand: () => Promise.resolve(),
-  },
-  window: {
-    registerWebviewPanelSerializer: () => true,
-  },
-};
-mockVscode(testVscode, "src/extension.ts");
+import { expect } from "chai";
+import { createSandbox, SinonSandbox, SinonMock } from "sinon";
+import * as _ from "lodash";
 import * as extension from "../src/extension";
 import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { SWA } from "../src/swa-tracker/swa-tracker-wrapper";
 
 describe("extension unit test", () => {
-  let sandbox: any;
-  let commandsMock: any;
-  let windowMock: any;
-  let workspaceMock: any;
-  let loggerWrapperMock: any;
-  let swaTrackerWrapperMock: any;
+  let sandbox: SinonSandbox;
+  let commandsMock: SinonMock;
+  let windowMock: SinonMock;
+  let loggerWrapperMock: SinonMock;
+  let swaTrackerWrapperMock: SinonMock;
   const testContext: any = {
     subscriptions: [],
     extensionPath: "testExtensionpath",
-    globalState: { get: () => Date.now(), update: () => true },
   };
 
   before(() => {
-    sandbox = sinon.createSandbox();
+    sandbox = createSandbox();
   });
 
   after(() => {
@@ -49,9 +29,8 @@ describe("extension unit test", () => {
   beforeEach(() => {
     loggerWrapperMock = sandbox.mock(loggerWrapper);
     swaTrackerWrapperMock = sandbox.mock(SWA);
-    commandsMock = sandbox.mock(testVscode.commands);
-    windowMock = sandbox.mock(testVscode.window);
-    workspaceMock = sandbox.mock(testVscode.workspace);
+    commandsMock = sandbox.mock(vscode.commands);
+    windowMock = sandbox.mock(vscode.window);
   });
 
   afterEach(() => {
@@ -59,18 +38,23 @@ describe("extension unit test", () => {
     swaTrackerWrapperMock.verify();
     commandsMock.verify();
     windowMock.verify();
-    workspaceMock.verify();
   });
 
   describe("activate", () => {
-    it("commands registration", async () => {
+    it("commands registration", () => {
       loggerWrapperMock.expects(
         "createExtensionLoggerAndSubscribeToLogSettingsChanges"
       );
       loggerWrapperMock.expects("getLogger");
       loggerWrapperMock.expects("getClassLogger").twice();
       swaTrackerWrapperMock.expects("createSWATracker");
-      await extension.activate(testContext);
+      windowMock.expects("registerWebviewPanelSerializer").withArgs("yeomanui");
+      windowMock
+        .expects("registerWebviewPanelSerializer")
+        .withArgs("exploreGens");
+      extension.activate(testContext);
+
+      const oRegisteredCommands = vscode.commands.getCommands();
       expect(_.get(oRegisteredCommands, "loadYeomanUI")).to.be.not.undefined;
       expect(_.get(oRegisteredCommands, "yeomanUI.toggleOutput")).to.be.not
         .undefined;
@@ -93,7 +77,6 @@ describe("extension unit test", () => {
   });
 
   it("deactivate", () => {
-    extension.activate(testContext);
     extension.deactivate();
   });
 });

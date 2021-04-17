@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import * as _ from "lodash";
 import * as path from "path";
 import { ExploreGens } from "../exploregens";
 import { AbstractWebviewPanel } from "./AbstractWebviewPanel";
@@ -25,19 +24,14 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
     this.viewTitle = "Explore and Install Generators";
     this.focusedKey = "exploreGens.Focused";
     this.htmlFileName = path.join("exploregens", "index.html");
-    this.exploreGens = new ExploreGens(
-      this.logger,
-      this.isInBAS,
-      this.context,
-      vscode
-    );
+    this.exploreGens = new ExploreGens(this.logger, this.isInBAS, this.context);
   }
 
-  public loadWebviewPanel() {
+  public async loadWebviewPanel() {
     if (this.webViewPanel) {
       this.webViewPanel.reveal();
     } else {
-      super.loadWebviewPanel();
+      return super.loadWebviewPanel();
     }
   }
 

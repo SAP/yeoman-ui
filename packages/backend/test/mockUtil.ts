@@ -1,25 +1,20 @@
-import * as path from "path";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import * as mocha from "mocha";
+import { getVscodeMock } from "../src/utils/vscodeProxy";
 
-const Module = require("module"); // eslint-disable-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Module = require("module");
 const originalRequire = Module.prototype.require;
 
-export function mockVscode(oVscodeMock: any, testModulePath?: string) {
-  clearModuleCache(testModulePath);
-
+const mockVscode = () => {
   Module.prototype.require = function (request: any) {
     if (request === "vscode") {
-      return oVscodeMock;
+      return getVscodeMock();
     }
 
     return originalRequire.apply(this, arguments);
   };
-}
+};
 
-export function clearModuleCache(testModulePath?: string) {
-  if (testModulePath) {
-    const key = path.resolve(testModulePath);
-    if (require.cache[key]) {
-      delete require.cache[key];
-    }
-  }
-}
+mockVscode();
+export const vscode = getVscodeMock();
