@@ -42,26 +42,19 @@ describe("extension unit test", () => {
 
   describe("activate", () => {
     it("commands registration", () => {
-      loggerWrapperMock.expects(
-        "createExtensionLoggerAndSubscribeToLogSettingsChanges"
-      );
+      loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
       loggerWrapperMock.expects("getLogger");
       loggerWrapperMock.expects("getClassLogger").twice();
       swaTrackerWrapperMock.expects("createSWATracker");
       windowMock.expects("registerWebviewPanelSerializer").withArgs("yeomanui");
-      windowMock
-        .expects("registerWebviewPanelSerializer")
-        .withArgs("exploreGens");
+      windowMock.expects("registerWebviewPanelSerializer").withArgs("exploreGens");
       extension.activate(testContext);
 
       const oRegisteredCommands = vscode.commands.getCommands();
       expect(_.get(oRegisteredCommands, "loadYeomanUI")).to.be.not.undefined;
-      expect(_.get(oRegisteredCommands, "yeomanUI.toggleOutput")).to.be.not
-        .undefined;
-      expect(_.get(oRegisteredCommands, "exploreGenerators")).to.be.not
-        .undefined;
-      expect(_.get(oRegisteredCommands, "yeomanUI._notifyGeneratorsChange")).to
-        .be.not.undefined;
+      expect(_.get(oRegisteredCommands, "yeomanUI.toggleOutput")).to.be.not.undefined;
+      expect(_.get(oRegisteredCommands, "exploreGenerators")).to.be.not.undefined;
+      expect(_.get(oRegisteredCommands, "yeomanUI._notifyGeneratorsChange")).to.be.not.undefined;
     });
 
     it("logger failure on extenion activation", () => {
@@ -69,9 +62,7 @@ describe("extension unit test", () => {
       loggerWrapperMock
         .expects("createExtensionLoggerAndSubscribeToLogSettingsChanges")
         .throws(new Error("activation error"));
-      consoleMock
-        .expects("error")
-        .withExactArgs("Extension activation failed.", "activation error");
+      consoleMock.expects("error").withExactArgs("Extension activation failed.", "activation error");
       extension.activate(null);
     });
   });

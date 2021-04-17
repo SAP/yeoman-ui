@@ -58,8 +58,6 @@ describe("Header.vue", () => {
     );
 
     wrapper.findAll("button").wrappers[0].trigger("click");
-    expect(rpcInvokeMockFunction).toHaveBeenCalledWith("exploreGenerators", [
-      {},
-    ]);
+    expect(rpcInvokeMockFunction).toHaveBeenCalledWith("exploreGenerators", [{}]);
   });
 });

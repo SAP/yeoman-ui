@@ -6,15 +6,9 @@ import {
   IVSCodeExtLogger,
   LogLevel,
 } from "@vscode-logging/logger";
-import {
-  listenToLogSettingsChanges,
-  logLoggerDetails,
-} from "./settings-changes-handler";
+import { listenToLogSettingsChanges, logLoggerDetails } from "./settings-changes-handler";
 // import {resolve} from "path";
-import {
-  getLoggingLevelSetting,
-  getSourceLocationTrackingSetting,
-} from "./settings";
+import { getLoggingLevelSetting, getSourceLocationTrackingSetting } from "./settings";
 
 // const PACKAGE_JSON = "package.json";
 const YEOMAN_UI_LOGGER_NAME = "yeomanui";
@@ -26,8 +20,7 @@ const WEBVIEW_RPC_LOGGER_NAME = "Webview Rpc";
  * implementation.
  */
 
-export const ERROR_LOGGER_NOT_INITIALIZED =
-  "Logger has not yet been initialized!";
+export const ERROR_LOGGER_NOT_INITIALIZED = "Logger has not yet been initialized!";
 
 /**
  * @type {IVSCodeExtLogger}
@@ -67,9 +60,7 @@ function getLibraryLogger(libraryName: string): IChildLogger {
   return getLogger().getChildLogger({ label: libraryName });
 }
 
-export function createExtensionLoggerAndSubscribeToLogSettingsChanges(
-  context: vscode.ExtensionContext
-) {
+export function createExtensionLoggerAndSubscribeToLogSettingsChanges(context: vscode.ExtensionContext) {
   createExtensionLogger(context);
   // Subscribe to Logger settings changes.
   listenToLogSettingsChanges(context);

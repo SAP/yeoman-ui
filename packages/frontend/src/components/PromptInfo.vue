@@ -2,9 +2,7 @@
   <div id="prompt-info-component">
     <div>
       <v-card-title class="prompt-title">{{ currentPrompt.name }}</v-card-title>
-      <v-card-subtitle class="prompt-title">{{
-        currentPrompt.description
-      }}</v-card-subtitle>
+      <v-card-subtitle class="prompt-title">{{ currentPrompt.description }}</v-card-subtitle>
     </div>
   </div>
 </template>

@@ -6,12 +6,9 @@ export default {
   failed_to_update: (genName: string) => `Could not update ${genName}`,
   uninstalling: (genName: string) => `Uninstalling ${genName} ...`,
   uninstalled: (genName: string) => `${genName} has been uninstalled.`,
-  installing: (genName: string) =>
-    `Installing the latest version of ${genName}...`,
+  installing: (genName: string) => `Installing the latest version of ${genName}...`,
   installed: (genName: string) => `${genName} has been installed.`,
-  updating: (genName: string) =>
-    `Updating to the latest version of ${genName}...`,
+  updating: (genName: string) => `Updating to the latest version of ${genName}...`,
   updated: (genName: string) => `${genName} has been updated.`,
-  failed_to_get: (gensQueryUrl: string) =>
-    `Could not get generators with the queryUrl ${gensQueryUrl}`,
+  failed_to_get: (gensQueryUrl: string) => `Could not get generators with the queryUrl ${gensQueryUrl}`,
 };

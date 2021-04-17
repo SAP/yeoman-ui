@@ -26,9 +26,7 @@ describe("Done.vue", () => {
       doneStatus: true,
       doneMessage: testDoneMessage,
     });
-    expect(wrapper.find("p").text()).toBe(
-      "mdi-checkbox-marked-circle-outline testDoneMessage"
-    );
+    expect(wrapper.find("p").text()).toBe("mdi-checkbox-marked-circle-outline testDoneMessage");
   });
 
   test("doneMessage set, failure", () => {
@@ -36,8 +34,6 @@ describe("Done.vue", () => {
       doneStatus: false,
       doneMessage: testDoneMessage,
     });
-    expect(wrapper.find("p").text()).toBe(
-      "mdi-close-circle-outline testDoneMessage"
-    );
+    expect(wrapper.find("p").text()).toBe("mdi-close-circle-outline testDoneMessage");
   });
 });

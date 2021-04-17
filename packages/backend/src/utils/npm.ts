@@ -7,14 +7,9 @@ import { getInstallationPath } from "./customLocation";
 export const isWin32 = platform() === "win32";
 const NPM = isWin32 ? "npm.cmd" : "npm";
 
-const NPM_REGISTRY_HOST = _.get(
-  process,
-  "env.NPM_CFG_REGISTRY",
-  "http://registry.npmjs.com/"
-);
+const NPM_REGISTRY_HOST = _.get(process, "env.NPM_CFG_REGISTRY", "http://registry.npmjs.com/");
 const SEARCH_QUERY_PREFIX = `${NPM_REGISTRY_HOST}-/v1/search?text=`;
-const SEARCH_QUERY_SUFFIX =
-  "keywords:yeoman-generator &size=25&ranking=popularity";
+const SEARCH_QUERY_SUFFIX = "keywords:yeoman-generator &size=25&ranking=popularity";
 
 class Command {
   private readonly npmGlobalPath;
@@ -25,9 +20,7 @@ class Command {
 
   private getGenLocationParams(): string {
     const customInstallationPath = getInstallationPath();
-    return _.isEmpty(customInstallationPath)
-      ? "-g"
-      : `--prefix ${customInstallationPath}`;
+    return _.isEmpty(customInstallationPath) ? "-g" : `--prefix ${customInstallationPath}`;
   }
 
   public getGlobalNpmPath(): string {
@@ -39,9 +32,7 @@ class Command {
   }
 
   public getGensQueryURL(query: string, recommended: string): string {
-    return encodeURI(
-      `${SEARCH_QUERY_PREFIX} ${query} ${recommended} ${SEARCH_QUERY_SUFFIX}`
-    );
+    return encodeURI(`${SEARCH_QUERY_PREFIX} ${query} ${recommended} ${SEARCH_QUERY_SUFFIX}`);
   }
 
   public async install(genName: string): Promise<any> {
