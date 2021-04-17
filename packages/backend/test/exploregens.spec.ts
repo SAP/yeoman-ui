@@ -120,45 +120,35 @@ describe("exploregens unit test", () => {
   });
 
   it("init", () => {
-    rpcMock
-      .expects("registerMethod")
-      .withExactArgs({
-        func: exploregens["getFilteredGenerators"],
-        thisArg: exploregens,
-      });
+    rpcMock.expects("registerMethod").withExactArgs({
+      func: exploregens["getFilteredGenerators"],
+      thisArg: exploregens,
+    });
     rpcMock
       .expects("registerMethod")
       .withExactArgs({ func: exploregens["install"], thisArg: exploregens });
     rpcMock
       .expects("registerMethod")
       .withExactArgs({ func: exploregens["uninstall"], thisArg: exploregens });
-    rpcMock
-      .expects("registerMethod")
-      .withExactArgs({
-        func: exploregens["isInstalled"],
-        thisArg: exploregens,
-      });
+    rpcMock.expects("registerMethod").withExactArgs({
+      func: exploregens["isInstalled"],
+      thisArg: exploregens,
+    });
     rpcMock
       .expects("registerMethod")
       .withExactArgs({ func: exploregens["getIsInBAS"], thisArg: exploregens });
-    rpcMock
-      .expects("registerMethod")
-      .withExactArgs({
-        func: exploregens["getRecommendedQuery"],
-        thisArg: exploregens,
-      });
-    rpcMock
-      .expects("registerMethod")
-      .withExactArgs({
-        func: exploregens["isLegalNoteAccepted"],
-        thisArg: exploregens,
-      });
-    rpcMock
-      .expects("registerMethod")
-      .withExactArgs({
-        func: exploregens["acceptLegalNote"],
-        thisArg: exploregens,
-      });
+    rpcMock.expects("registerMethod").withExactArgs({
+      func: exploregens["getRecommendedQuery"],
+      thisArg: exploregens,
+    });
+    rpcMock.expects("registerMethod").withExactArgs({
+      func: exploregens["isLegalNoteAccepted"],
+      thisArg: exploregens,
+    });
+    rpcMock.expects("registerMethod").withExactArgs({
+      func: exploregens["acceptLegalNote"],
+      thisArg: exploregens,
+    });
     envUtilsMock.expects("getGeneratorsMetaByPaths").resolves();
 
     exploregens["init"](rpc);
