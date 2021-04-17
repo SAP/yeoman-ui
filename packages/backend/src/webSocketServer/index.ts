@@ -44,11 +44,7 @@ class YeomanUIWebSocketServer {
         { filter: GeneratorFilter.create(), messages: backendMessages },
         undefined
       );
-      this.yeomanui.registerCustomQuestionEventHandler(
-        "folder-browser",
-        "getPath",
-        this.mockFolderDialog.bind(this)
-      );
+      this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.mockFolderDialog.bind(this));
     });
   }
 }

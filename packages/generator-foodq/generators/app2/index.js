@@ -88,50 +88,33 @@ module.exports = class extends Generator {
           {
             value: "car",
             name: "Car",
-            image: this._getImage(
-              path.join(this.sourceRoot(), "../images/car.png")
-            ),
+            image: this._getImage(path.join(this.sourceRoot(), "../images/car.png")),
           },
           {
             value: "drone",
             name: "Drone",
-            image: this._getImage(
-              path.join(this.sourceRoot(), "../images/drone.png")
-            ),
+            image: this._getImage(path.join(this.sourceRoot(), "../images/drone.png")),
           },
         ],
         validate: (value) => {
           if (value === "car") {
-            this.appWizard.showWarning(
-              "Car delivery is not reliable.",
-              types.MessageType.prompt
-            );
+            this.appWizard.showWarning("Car delivery is not reliable.", types.MessageType.prompt);
           } else {
-            this.appWizard.showInformation(
-              "Drone is very fast.",
-              types.MessageType.prompt
-            );
+            this.appWizard.showInformation("Drone is very fast.", types.MessageType.prompt);
           }
           return true;
         },
         when: (answers) => {
           if (_.isNil(this._getOption("deliveryMethod"))) {
-            const indexOfAddress = _.findIndex(
-              _.get(this.prompts, "items"),
-              (prompt) => {
-                return prompt.name === this.dynamicAddressPrompt.name;
-              }
-            );
+            const indexOfAddress = _.findIndex(_.get(this.prompts, "items"), (prompt) => {
+              return prompt.name === this.dynamicAddressPrompt.name;
+            });
 
             let bWhen = false;
             if (this._getAnswer("isDelivery", answers)) {
               // add address prompt if doesn't exist
               if (indexOfAddress === -1 && this.prompts) {
-                this.prompts.splice(
-                  this.parentPromptsQuantity + 1,
-                  0,
-                  this.dynamicAddressPrompt
-                );
+                this.prompts.splice(this.parentPromptsQuantity + 1, 0, this.dynamicAddressPrompt);
               }
               bWhen = true;
             } else {
@@ -150,10 +133,7 @@ module.exports = class extends Generator {
 
     this.answers = await this.prompt(prompts);
     this.answers.isDelivery = this._getAnswer("isDelivery", this.answers);
-    this.answers.deliveryMethod = this._getAnswer(
-      "deliveryMethod",
-      this.answers
-    );
+    this.answers.deliveryMethod = this._getAnswer("deliveryMethod", this.answers);
 
     if (this._getAnswer("isDelivery", this.answers)) {
       const addressPrompt = [
@@ -189,10 +169,8 @@ module.exports = class extends Generator {
 
   writing() {
     !_.isNil(this.answers.tip) && this.log(`Tip = ${this.answers.tip}`);
-    !_.isNil(this.answers.address) &&
-      this.log(`Address = ${this.answers.address}`);
-    !_.isNil(this.answers.deliveryMethod) &&
-      this.log(`Delivery method = ${this.answers.deliveryMethod}`);
+    !_.isNil(this.answers.address) && this.log(`Address = ${this.answers.address}`);
+    !_.isNil(this.answers.deliveryMethod) && this.log(`Delivery method = ${this.answers.deliveryMethod}`);
   }
 
   _getImage(imagePath) {

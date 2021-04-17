@@ -49,9 +49,7 @@
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
-      "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}/packages/backend"
-      ],
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}/packages/backend"],
       "outFiles": ["${workspaceFolder}/packages/backend/dist/**/*.js"],
       "preLaunchTask": "watch backend (webpack)"
     },

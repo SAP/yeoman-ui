@@ -58,10 +58,7 @@ export class SWA {
               });
             } else if (typeof error === "number") {
               // bug in matomo-tracker: they think that success is 200 or 30[12478], so we are rechecking here
-              if (
-                !(error >= 200 && error <= 299) &&
-                !(error >= 300 && error <= 399)
-              ) {
+              if (!(error >= 200 && error <= 299) && !(error >= 300 && error <= 399)) {
                 logger.error("SAP Web Analytics tracker failed to track", {
                   statusCode: error,
                 });
@@ -74,19 +71,14 @@ export class SWA {
       // Update the swa-tracker-wrapper with a reference to the swaTracker.
       SWA.initSWATracker(swaTracker);
       if (logger) {
-        logger.info(
-          `SAP Web Analytics tracker was created for ${SWA.YEOMAN_UI}`
-        );
+        logger.info(`SAP Web Analytics tracker was created for ${SWA.YEOMAN_UI}`);
       }
     } catch (error) {
       logger.error(error);
     }
   }
 
-  public static updateGeneratorStarted(
-    generatorName: string,
-    logger?: IChildLogger
-  ) {
+  public static updateGeneratorStarted(generatorName: string, logger?: IChildLogger) {
     try {
       if (SWA.isInitialized()) {
         const eventType = SWA.EVENT_TYPES.PROJECT_GENERATION_STARTED;
@@ -94,15 +86,12 @@ export class SWA {
         SWA.startTime = Date.now();
         SWA.getSWATracker().track(eventType, customEvents);
         if (logger) {
-          logger.trace(
-            "SAP Web Analytics tracker was called and start time was initialized",
-            {
-              eventType,
-              generatorName,
-              startTime: SWA.startTime,
-              customEvents,
-            }
-          );
+          logger.trace("SAP Web Analytics tracker was called and start time was initialized", {
+            eventType,
+            generatorName,
+            startTime: SWA.startTime,
+            customEvents,
+          });
         }
       }
     } catch (error) {
@@ -148,9 +137,7 @@ export class SWA {
     }
   }
 
-  public static updateExploreAndInstallGeneratorsLinkClicked(
-    logger?: IChildLogger
-  ) {
+  public static updateExploreAndInstallGeneratorsLinkClicked(logger?: IChildLogger) {
     try {
       if (SWA.isInitialized()) {
         const eventType = SWA.EVENT_TYPES.EXPLORE_AND_INSTALL_GENERATORS_LINK;
@@ -164,10 +151,7 @@ export class SWA {
     }
   }
 
-  public static updateOneOfPreviousStepsClicked(
-    generatorName: string,
-    logger?: IChildLogger
-  ) {
+  public static updateOneOfPreviousStepsClicked(generatorName: string, logger?: IChildLogger) {
     try {
       if (SWA.isInitialized()) {
         const eventType = SWA.EVENT_TYPES.PREVIOUS_STEP;

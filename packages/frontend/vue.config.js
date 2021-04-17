@@ -33,10 +33,7 @@ module.exports = {
       // the source template
       template: path.join("public", path.join("exploregens", INDEX_HTML)),
       // output as dist/exploregens/index.html
-      filename:
-        pagePath === "exploregens"
-          ? INDEX_HTML
-          : path.join("exploregens", INDEX_HTML),
+      filename: pagePath === "exploregens" ? INDEX_HTML : path.join("exploregens", INDEX_HTML),
       // chunks to include on this page, by default includes
       // extracted common chunks and vendor chunks.
       chunks: ["chunk-vendors", "chunk-common", "exploreGensIndex"],

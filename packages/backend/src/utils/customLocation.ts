@@ -5,9 +5,7 @@ import { vscode } from "./vscodeProxy";
 import { execSync } from "child_process";
 
 export const getInstallationPath = (): string => {
-  return vscode.workspace
-    .getConfiguration()
-    .get("ApplicationWizard.installationLocation");
+  return vscode.workspace.getConfiguration().get("ApplicationWizard.installationLocation");
 };
 
 export const getCustomNpmPath = (): string => {

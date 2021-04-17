@@ -3,11 +3,7 @@ import { vscode } from "./mockUtil";
 import { expect } from "chai";
 import { createSandbox, SinonSandbox, SinonMock } from "sinon";
 import * as _ from "lodash";
-import {
-  IMethod,
-  IPromiseCallbacks,
-  IRpc,
-} from "@sap-devx/webview-rpc/out.ext/rpc-common";
+import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import * as messages from "../src/messages";
 import { MessageType, Severity } from "@sap-devx/yeoman-ui-types";
 import { GeneratorOutput } from "../src/vscode-output";
@@ -88,13 +84,7 @@ describe("vscode-youi-events unit test", () => {
     const webViewPanel: any = { dispose: () => true };
     loggerWrapperMock = sandbox.mock(loggerWrapper);
     loggerWrapperMock.expects("getClassLogger").returns(testLogger);
-    events = new VSCodeYouiEvents(
-      rpc,
-      webViewPanel,
-      messages.default,
-      generatorOutput,
-      true
-    );
+    events = new VSCodeYouiEvents(rpc, webViewPanel, messages.default, generatorOutput, true);
     windowMock = sandbox.mock(vscode.window);
     commandsMock = sandbox.mock(vscode.commands);
     workspaceMock = sandbox.mock(vscode.workspace);
@@ -149,13 +139,7 @@ describe("vscode-youi-events unit test", () => {
       const appWizard = events.getAppWizard();
       generatorOutputMock.expects("appendLine").withExactArgs(message);
       events["getMessageImage"] = () => "errorTheia";
-      rpcMock
-        .expects("invoke")
-        .withExactArgs("showPromptMessage", [
-          message,
-          Severity.error,
-          "errorTheia",
-        ]);
+      rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.error, "errorTheia"]);
       appWizard.showError(message, MessageType.prompt);
     });
 
@@ -165,13 +149,7 @@ describe("vscode-youi-events unit test", () => {
       const appWizard = events.getAppWizard();
       generatorOutputMock.expects("appendLine").withExactArgs(message);
       events["getMessageImage"] = () => "warnTheia";
-      rpcMock
-        .expects("invoke")
-        .withExactArgs("showPromptMessage", [
-          message,
-          Severity.warning,
-          "warnTheia",
-        ]);
+      rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.warning, "warnTheia"]);
       appWizard.showWarning(message, MessageType.prompt);
     });
 
@@ -181,13 +159,7 @@ describe("vscode-youi-events unit test", () => {
       const appWizard = events.getAppWizard();
       generatorOutputMock.expects("appendLine").withExactArgs(message);
       events["getMessageImage"] = () => "infoTheia";
-      rpcMock
-        .expects("invoke")
-        .withExactArgs("showPromptMessage", [
-          message,
-          Severity.information,
-          "infoTheia",
-        ]);
+      rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.information, "infoTheia"]);
       appWizard.showInformation(message, MessageType.prompt);
     });
 
@@ -197,13 +169,7 @@ describe("vscode-youi-events unit test", () => {
       const appWizard = events.getAppWizard();
       events["getMessageImage"] = () => "errorVSCodeDark";
       generatorOutputMock.expects("appendLine").withExactArgs(message);
-      rpcMock
-        .expects("invoke")
-        .withExactArgs("showPromptMessage", [
-          message,
-          Severity.error,
-          "errorVSCodeDark",
-        ]);
+      rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.error, "errorVSCodeDark"]);
       appWizard.showError(message, MessageType.prompt);
     });
 
@@ -213,13 +179,7 @@ describe("vscode-youi-events unit test", () => {
       const appWizard = events.getAppWizard();
       events["getMessageImage"] = () => "warnVSCode";
       generatorOutputMock.expects("appendLine").withExactArgs(message);
-      rpcMock
-        .expects("invoke")
-        .withExactArgs("showPromptMessage", [
-          message,
-          Severity.warning,
-          "warnVSCode",
-        ]);
+      rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.warning, "warnVSCode"]);
       appWizard.showWarning(message, MessageType.prompt);
     });
 
@@ -229,13 +189,7 @@ describe("vscode-youi-events unit test", () => {
       const appWizard = events.getAppWizard();
       events["getMessageImage"] = () => "infoVSCode";
       generatorOutputMock.expects("appendLine").withExactArgs(message);
-      rpcMock
-        .expects("invoke")
-        .withExactArgs("showPromptMessage", [
-          message,
-          Severity.information,
-          "infoVSCode",
-        ]);
+      rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.information, "infoVSCode"]);
       appWizard.showInformation(message, MessageType.prompt);
     });
   });
@@ -282,10 +236,7 @@ describe("vscode-youi-events unit test", () => {
       generatorOutputMock.expects("appendLine");
       windowMock
         .expects("showInformationMessage")
-        .withExactArgs(
-          messages.default.show_progress_message,
-          messages.default.show_progress_button
-        )
+        .withExactArgs(messages.default.show_progress_message, messages.default.show_progress_button)
         .resolves();
       appWizard.showProgress();
     });
@@ -295,10 +246,7 @@ describe("vscode-youi-events unit test", () => {
       generatorOutputMock.expects("appendLine");
       windowMock
         .expects("showInformationMessage")
-        .withExactArgs(
-          messages.default.show_progress_message,
-          messages.default.show_progress_button
-        )
+        .withExactArgs(messages.default.show_progress_message, messages.default.show_progress_button)
         .resolves();
       events.showProgress();
     });
@@ -320,10 +268,7 @@ describe("vscode-youi-events unit test", () => {
       generatorOutputMock.expects("appendLine");
       windowMock
         .expects("showInformationMessage")
-        .withExactArgs(
-          messages.default.show_progress_message,
-          messages.default.show_progress_button
-        )
+        .withExactArgs(messages.default.show_progress_message, messages.default.show_progress_button)
         .resolves(messages.default.show_progress_button);
       generatorOutputMock.expects("show");
       events.showProgress();
@@ -352,21 +297,10 @@ describe("vscode-youi-events unit test", () => {
       ]);
       windowMock
         .expects("showInformationMessage")
-        .withExactArgs(
-          messages.default.artifact_generated_project_add_to_workspace
-        )
+        .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
         .resolves();
-      workspaceMock
-        .expects("updateWorkspaceFolders")
-        .withArgs(2, null)
-        .resolves();
-      return events.doGeneratorDone(
-        true,
-        "success message",
-        addToWorkspace,
-        "project",
-        "testDestinationRoot"
-      );
+      workspaceMock.expects("updateWorkspaceFolders").withArgs(2, null).resolves();
+      return events.doGeneratorDone(true, "success message", addToWorkspace, "project", "testDestinationRoot");
     });
 
     it("on success, project path is already openned in workspace ---> the project added to current workspace", () => {
@@ -377,21 +311,10 @@ describe("vscode-youi-events unit test", () => {
       ]);
       windowMock
         .expects("showInformationMessage")
-        .withExactArgs(
-          messages.default.artifact_generated_project_add_to_workspace
-        )
+        .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
         .resolves();
-      workspaceMock
-        .expects("updateWorkspaceFolders")
-        .withArgs(2, null)
-        .resolves();
-      return events.doGeneratorDone(
-        true,
-        "success message",
-        addToWorkspace,
-        "project",
-        "testDestinationRoot"
-      );
+      workspaceMock.expects("updateWorkspaceFolders").withArgs(2, null).resolves();
+      return events.doGeneratorDone(true, "success message", addToWorkspace, "project", "testDestinationRoot");
     });
 
     it("on success, project path parent folder is already openned in workspace ---> the user changed to create and close the project for later use", () => {
@@ -402,9 +325,7 @@ describe("vscode-youi-events unit test", () => {
       ]);
       windowMock
         .expects("showInformationMessage")
-        .withExactArgs(
-          messages.default.artifact_generated_project_saved_for_future
-        )
+        .withExactArgs(messages.default.artifact_generated_project_saved_for_future)
         .resolves();
       return events.doGeneratorDone(
         true,
@@ -423,14 +344,9 @@ describe("vscode-youi-events unit test", () => {
       ]);
       windowMock
         .expects("showInformationMessage")
-        .withExactArgs(
-          messages.default.artifact_generated_project_open_in_a_new_workspace
-        )
+        .withExactArgs(messages.default.artifact_generated_project_open_in_a_new_workspace)
         .resolves();
-      commandsMock
-        .expects("executeCommand")
-        .withArgs("vscode.openFolder")
-        .resolves();
+      commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
       return events.doGeneratorDone(
         true,
         "success message",
@@ -446,10 +362,7 @@ describe("vscode-youi-events unit test", () => {
         { uri: { fsPath: "rootFolderPath" } },
         { uri: { fsPath: "testDestinationRoot" } },
       ]);
-      windowMock
-        .expects("showInformationMessage")
-        .withExactArgs(messages.default.artifact_generated_module)
-        .resolves();
+      windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated_module).resolves();
       return events.doGeneratorDone(
         true,
         "success message",
@@ -465,10 +378,7 @@ describe("vscode-youi-events unit test", () => {
         { uri: { fsPath: "rootFolderPath" } },
         { uri: { fsPath: "testDestinationRoot/../testDestinationRoot" } },
       ]);
-      windowMock
-        .expects("showInformationMessage")
-        .withExactArgs(messages.default.artifact_generated_files)
-        .resolves();
+      windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated_files).resolves();
       return events.doGeneratorDone(
         true,
         "success message",
@@ -480,31 +390,15 @@ describe("vscode-youi-events unit test", () => {
 
     it("on success with null targetFolderPath", () => {
       eventsMock.expects("doClose");
-      _.set(vscode, "workspace.workspaceFolders", [
-        { uri: { fsPath: "rootFolderPath" } },
-      ]);
-      windowMock
-        .expects("showInformationMessage")
-        .withExactArgs(messages.default.artifact_generated_files)
-        .resolves();
-      return events.doGeneratorDone(
-        true,
-        "success message",
-        createAndClose,
-        "files",
-        null
-      );
+      _.set(vscode, "workspace.workspaceFolders", [{ uri: { fsPath: "rootFolderPath" } }]);
+      windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated_files).resolves();
+      return events.doGeneratorDone(true, "success message", createAndClose, "files", null);
     });
 
     it("on failure", () => {
       eventsMock.expects("doClose");
       windowMock.expects("showErrorMessage").withExactArgs("error message");
-      return events.doGeneratorDone(
-        false,
-        "error message",
-        createAndClose,
-        "files"
-      );
+      return events.doGeneratorDone(false, "error message", createAndClose, "files");
     });
   });
 });

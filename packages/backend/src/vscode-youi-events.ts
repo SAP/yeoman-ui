@@ -41,13 +41,7 @@ export class VSCodeYouiEvents implements YouiEvents {
   private isInBAS: boolean; // eslint-disable-line @typescript-eslint/prefer-readonly
   private readonly appWizard: AppWizard;
 
-  constructor(
-    rpc: IRpc,
-    webviewPanel: vscode.WebviewPanel,
-    messages: any,
-    output: GeneratorOutput,
-    isInBAS: boolean
-  ) {
+  constructor(rpc: IRpc, webviewPanel: vscode.WebviewPanel, messages: any, output: GeneratorOutput, isInBAS: boolean) {
     this.rpc = rpc;
     this.webviewPanel = webviewPanel;
     this.messages = messages;
@@ -65,13 +59,7 @@ export class VSCodeYouiEvents implements YouiEvents {
     targetFolderPath?: string
   ): void {
     this.doClose();
-    void this.showDoneMessage(
-      success,
-      message,
-      selectedWorkspace,
-      type,
-      targetFolderPath
-    );
+    void this.showDoneMessage(success, message, selectedWorkspace, type, targetFolderPath);
   }
 
   public doGeneratorInstall(): void {
@@ -129,13 +117,11 @@ export class VSCodeYouiEvents implements YouiEvents {
     this.logger.debug("Showing Progress.", {
       notificationMessage: message,
     });
-    void vscode.window
-      .showInformationMessage(message, ...buttons)
-      .then((selection) => {
-        if (selection === openOutput) {
-          return this.toggleOutput();
-        }
-      });
+    void vscode.window.showInformationMessage(message, ...buttons).then((selection) => {
+      if (selection === openOutput) {
+        return this.toggleOutput();
+      }
+    });
   }
 
   private toggleOutput() {
@@ -186,16 +172,9 @@ export class VSCodeYouiEvents implements YouiEvents {
    * @param probablePredecessorPath
    * @param currentPath
    */
-  private isPredecessorOf(
-    probablePredecessorPath: string,
-    currentPath: string
-  ) {
+  private isPredecessorOf(probablePredecessorPath: string, currentPath: string) {
     const relativePath = relative(probablePredecessorPath, currentPath);
-    return (
-      !_.isEmpty(relativePath) &&
-      !_.startsWith(relativePath, "..") &&
-      !isAbsolute(relativePath)
-    );
+    return !_.isEmpty(relativePath) && !_.startsWith(relativePath, "..") && !isAbsolute(relativePath);
   }
 
   private showDoneMessage(
@@ -215,16 +194,10 @@ export class VSCodeYouiEvents implements YouiEvents {
         targetFolderUri = vscode.Uri.file(targetFolderPath);
       }
 
-      const successInfoMessage = this.getSuccessInfoMessage(
-        selectedWorkspace,
-        type
-      );
+      const successInfoMessage = this.getSuccessInfoMessage(selectedWorkspace, type);
 
       if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
-        void vscode.commands.executeCommand(
-          "vscode.openFolder",
-          targetFolderUri
-        );
+        void vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
       } else if (selectedWorkspace === this.messages.add_to_workspace) {
         const wsFoldersQuantity = _.size(vscode.workspace.workspaceFolders);
         vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, {
@@ -237,21 +210,15 @@ export class VSCodeYouiEvents implements YouiEvents {
     return vscode.window.showErrorMessage(errorMmessage);
   }
 
-  private getSuccessInfoMessage(
-    selectedWorkspace: string,
-    type: string
-  ): string {
+  private getSuccessInfoMessage(selectedWorkspace: string, type: string): string {
     let successInfoMessage: string = this.messages.artifact_generated_files;
     if (type === "project") {
       if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
-        successInfoMessage = this.messages
-          .artifact_generated_project_open_in_a_new_workspace;
+        successInfoMessage = this.messages.artifact_generated_project_open_in_a_new_workspace;
       } else if (selectedWorkspace === this.messages.add_to_workspace) {
-        successInfoMessage = this.messages
-          .artifact_generated_project_add_to_workspace;
+        successInfoMessage = this.messages.artifact_generated_project_add_to_workspace;
       } else {
-        successInfoMessage = this.messages
-          .artifact_generated_project_saved_for_future;
+        successInfoMessage = this.messages.artifact_generated_project_saved_for_future;
       }
     } else if (type === "module") {
       successInfoMessage = this.messages.artifact_generated_module;

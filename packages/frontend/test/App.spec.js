@@ -164,9 +164,7 @@ describe("App.vue", () => {
     it("no generators", () => {
       wrapper = initComponent(App, {}, true);
       wrapper.vm.promptIndex = 0;
-      wrapper.vm.prompts = [
-        { name: "Select Generator", questions: [{ choices: [] }] },
-      ];
+      wrapper.vm.prompts = [{ name: "Select Generator", questions: [{ choices: [] }] }];
       wrapper.vm.$data.messages = { select_generator_name: "Select Generator" };
       expect(wrapper.vm.isNoGenerators).toBeTruthy();
     });
@@ -187,9 +185,7 @@ describe("App.vue", () => {
     it("generators exist question.name != 'generator'", () => {
       wrapper = initComponent(App, {}, true);
       wrapper.vm.promptIndex = 0;
-      wrapper.vm.prompts = [
-        { name: "Select Generator", questions: [{}, { choices: [{}] }] },
-      ];
+      wrapper.vm.prompts = [{ name: "Select Generator", questions: [{}, { choices: [{}] }] }];
       wrapper.vm.$data.messages = { select_generator_name: "Select Generator" };
       expect(wrapper.vm.isNoGenerators).toBeTruthy();
     });
@@ -197,9 +193,7 @@ describe("App.vue", () => {
     it("prompt name != generators", () => {
       wrapper = initComponent(App, {}, true);
       wrapper.vm.promptIndex = 0;
-      wrapper.vm.prompts = [
-        { name: "Prompt Name", questions: [{ choices: [{}] }] },
-      ];
+      wrapper.vm.prompts = [{ name: "Prompt Name", questions: [{ choices: [{}] }] }];
       wrapper.vm.$data.messages = { select_generator_name: "Select Generator" };
       expect(wrapper.vm.isNoGenerators).toBeFalsy();
     });
@@ -511,21 +505,14 @@ describe("App.vue", () => {
     const event = {
       target: {
         getAttribute: jest.fn().mockImplementation((key) => {
-          return key === "command"
-            ? "vscode.open"
-            : key === "params"
-            ? ["param"]
-            : "";
+          return key === "command" ? "vscode.open" : key === "params" ? ["param"] : "";
         }),
       },
     };
     const invokeSpy = jest.spyOn(wrapper.vm.rpc, "invoke");
     wrapper.vm.executeCommand(event);
 
-    expect(invokeSpy).toHaveBeenCalledWith("executeCommand", [
-      "vscode.open",
-      ["param"],
-    ]);
+    expect(invokeSpy).toHaveBeenCalledWith("executeCommand", ["vscode.open", ["param"]]);
 
     invokeSpy.mockRestore();
   });
@@ -578,8 +565,7 @@ describe("App.vue", () => {
       wrapper.vm.promptIndex = 1;
       wrapper.vm.prompts = [{}, {}];
       wrapper.vm.rpc = {
-        invoke: () =>
-          new Promise((resolve) => setTimeout(() => resolve(), 300)),
+        invoke: () => new Promise((resolve) => setTimeout(() => resolve(), 300)),
       };
 
       wrapper.vm.next();
@@ -880,9 +866,7 @@ describe("App.vue", () => {
       wrapper.vm.promptIndex = 1;
       wrapper.vm.$data.generatorPrettyName = "testGeneratorPrettyName";
       wrapper.vm.$data.messages = { yeoman_ui_title: "yeoman_ui_title" };
-      expect(wrapper.vm.headerTitle).toEqual(
-        "yeoman_ui_title - testGeneratorPrettyName"
-      );
+      expect(wrapper.vm.headerTitle).toEqual("yeoman_ui_title - testGeneratorPrettyName");
     });
   });
 

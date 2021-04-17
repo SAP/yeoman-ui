@@ -9,10 +9,7 @@ import { Output } from "./output";
 export class YouiAdapter {
   private yeomanui: YeomanUI;
 
-  constructor(
-    private readonly youiEvents: YouiEvents,
-    private readonly output: Output
-  ) {}
+  constructor(private readonly youiEvents: YouiEvents, private readonly output: Output) {}
 
   public log() {
     console.log(arguments);
@@ -39,24 +36,14 @@ export class YouiAdapter {
    * @param {Array} questions
    * @param {Function} callback
    */
-  public async prompt<T1, T2>(
-    questions: Questions<T1>,
-    cb?: (res: T1) => T2
-  ): Promise<T2> {
+  public async prompt<T1, T2>(questions: Questions<T1>, cb?: (res: T1) => T2): Promise<T2> {
     if (this.yeomanui && questions) {
-      const result: any = await (this.yeomanui.showPrompt(
-        questions
-      ) as Promise<T2>);
+      const result: any = await (this.yeomanui.showPrompt(questions) as Promise<T2>);
       if (isFunction(cb)) {
         try {
           return await cb(result); // eslint-disable-line @typescript-eslint/await-thenable
         } catch (err) {
-          this.youiEvents.doGeneratorDone(
-            false,
-            get(err, "message", "Template Wizard detected an error"),
-            "",
-            "files"
-          );
+          this.youiEvents.doGeneratorDone(false, get(err, "message", "Template Wizard detected an error"), "", "files");
           return;
         }
       }
