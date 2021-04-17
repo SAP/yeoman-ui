@@ -181,6 +181,24 @@ const config = {
           flags: "g",
         },
       },
+      {
+        test: /utils[/|\\]env.ts/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[.]cache",
+          replace: "__non_webpack_require__.cache",
+          flags: "g",
+        },
+      },
+      {
+        test: /utils[/|\\]vscodeProxy.ts/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[.]main",
+          replace: "__non_webpack_require__.main",
+          flags: "g",
+        },
+      },
     ],
   },
 };
