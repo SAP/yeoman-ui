@@ -200,7 +200,7 @@
     "@types/object-hash": "^2.1.0",
     "@types/sinon": "^9.0.10",
     "@types/vscode": "^1.39.0",
-    "@types/ws": "7.4.0",
+    "@types/ws": "7.4.1",
     "@types/yeoman-environment": "^2.10.2",
     "copy-webpack-plugin": "8.1.1",
     "lcov-result-merger": "3.1.0",
