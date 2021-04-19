@@ -1,5 +1,5 @@
 const selectGeneratorQuestionHint =
-  "Select the generator that best fits the type of application you want to develop";
+  "When you create a project using a template, you become the code owner and, as such, you are responsible for any required updates or fixes. We recommend following the industry best practice to use automated vulnerability scanning in the CI/CD pipeline to avoid supply-chain attack and other cyberattacks.";
 const selectTargetFolderQuestionHint =
   "The project will contain the relevant files and configurations required to create your application";
 const selectWhereToOpenTheProjectQuestionHint =
