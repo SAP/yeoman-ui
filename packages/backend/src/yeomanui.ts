@@ -280,6 +280,8 @@ export class YeomanUI {
       this.gen.destinationRoot(targetFolder);
       // notifies ui wether generator is in writing state
       this.setGenInWriting(this.gen);
+      // TODO: workaround, remove after a solution is found
+      this.onGenInitializing(this.gen);
       // handles generator install step if exists
       this.onGenInstall(this.gen);
       // handles generator errors
@@ -581,6 +583,24 @@ export class YeomanUI {
   private onGenInstall(gen: any) {
     gen.on("method:install", () => {
       this.youiEvents.doGeneratorInstall();
+    });
+  }
+
+  // TODO: Remove this workaround after the rootcause and fix are found for:
+  // https://sapjira.wdf.sap.corp/browse/DEVXBUGS-8741
+  private onGenInitializing(gen: any) {
+    const genMethodName = "initializing";
+    const originalPrototype = Object.getPrototypeOf(gen);
+    const originalGenWriting = _.get(originalPrototype, genMethodName);
+    if (!originalGenWriting) {
+      originalPrototype[genMethodName] = () => "";
+    }
+
+    gen.on(`method:${genMethodName}`, () => {
+      gen.prompt({
+        type: "confirm",
+        name: "workaround",
+      });
     });
   }
 
