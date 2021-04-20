@@ -11,7 +11,8 @@
     <v-expansion-panels
       v-if="isInBAS && isLegalNoteAccepted && ready"
       flat
-      class="explore-generators"
+      id="workaround-ex"
+      class="explore-generators material-icons"
     >
       <v-expansion-panel @click="onDisclaimer">
         <v-expansion-panel-header class="homepage pa-2"
@@ -297,6 +298,15 @@ export default {
       this.getFilteredGenerators(),
     ]);
     this.ready = true;
+  },
+  mounted() {
+    const refreshId = setInterval(() => {
+      const wrElem = document.getElementById("workaround-ex");
+      if (wrElem) {
+        wrElem.classList.remove("material-icons");
+        clearInterval(refreshId);
+      }
+    }, 100);
   },
 };
 </script>
