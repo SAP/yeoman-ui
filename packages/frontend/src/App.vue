@@ -11,9 +11,6 @@
     ></loading>
 
     <Header
-      id="workaround"
-      class="material-icons"
-      ref="workaround"
       v-if="prompts.length"
       :headerTitle="headerTitle"
       :stepName="promptIndex < prompts.length ? prompts[promptIndex].name : ''"
@@ -236,9 +233,6 @@ export default {
       return _.get(this.prompts, "[" + this.promptIndex + "]");
     },
     isNoGenerators() {
-      const wEl = document.getElementById("workaround");
-      wEl?.classList.remove("material-icons");
-
       const promptName = _.get(this.currentPrompt, "name");
       const message = _.get(this.messages, "select_generator_name", "");
       if (promptName && promptName === message) {
