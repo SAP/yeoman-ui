@@ -26,7 +26,7 @@ module.exports = {
   snapshotSerializers: ["<rootDir>/node_modules/jest-serializer-vue"],
   coverageThreshold: {
     global: {
-      branches: 93,
+      branches: 92,
       functions: 98,
       lines: 96,
       statements: 96,
