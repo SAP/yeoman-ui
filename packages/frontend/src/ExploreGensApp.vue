@@ -118,9 +118,12 @@
     <div v-if="!isLegalNoteAccepted && ready">
       <v-row class="pa-2">
         <v-col>
-          <v-card-text class="pa-0 ma-0" style="font-size: 14px">{{
-            messages.legal_note
-          }}</v-card-text>
+          <v-card-text
+            id="legal-note"
+            class="pa-0 ma-0"
+            style="font-size: 14px"
+            >{{ messages.legal_note }}</v-card-text
+          >
           <v-btn class="mt-6" @click="onAcceptLegalNote">{{
             messages.accept
           }}</v-btn>
@@ -301,7 +304,7 @@ export default {
   },
   mounted() {
     // TODO: remove after a solution is found for DEVXBUGS-8741
-    utils.addAndRemoveClass("app-bar", "material-icons");
+    utils.addAndRemoveClass("legal-note", "material-icons");
   },
 };
 </script>
