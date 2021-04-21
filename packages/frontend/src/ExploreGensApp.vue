@@ -304,7 +304,8 @@ export default {
     this.ready = true;
   },
   mounted() {
-    utils.removeClass("workaround-ex", "material-icons");
+    // TODO: remove after a solution is found for DEVXBUGS-8741
+    utils.addAndRemoveClass("workaround-ex", "material-icons");
   },
 };
 </script>

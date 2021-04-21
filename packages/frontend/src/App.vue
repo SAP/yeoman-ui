@@ -11,8 +11,7 @@
     ></loading>
 
     <Header
-      id="workaround"
-      class="material-icons"
+      id="header"
       v-if="prompts.length"
       :headerTitle="headerTitle"
       :stepName="promptIndex < prompts.length ? prompts[promptIndex].name : ''"
@@ -667,7 +666,8 @@ export default {
   },
   mounted() {
     this.init();
-    utils.removeClass("workaround", "material-icons");
+    // TODO: remove after a solution is found for DEVXBUGS-8741
+    utils.addAndRemoveClass("header", "material-icons");
   },
 };
 </script>
