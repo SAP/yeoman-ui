@@ -60,6 +60,7 @@ div.v-stepper.v-stepper--vertical {
   background-color: transparent;
   box-shadow: none;
   border-radius: 0;
+  border-image: url("../assets/dots.svg");
 }
 div.v-stepper div.v-stepper__step {
   padding: 24px;
