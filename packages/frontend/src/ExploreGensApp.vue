@@ -1,7 +1,11 @@
 <template>
   <v-app id="exploregens" class="exploregens-main explore-generators">
     <div>
-      <v-app-bar dense class="pa-0 ma-0 elevation-0">
+      <v-app-bar
+        id="workaround-ex"
+        dense
+        class="pa-0 ma-0 elevation-0 material-icons"
+      >
         <v-toolbar-title>{{ messages.title }}</v-toolbar-title>
       </v-app-bar>
     </div>
@@ -11,8 +15,7 @@
     <v-expansion-panels
       v-if="isInBAS && isLegalNoteAccepted && ready"
       flat
-      id="workaround-ex"
-      class="explore-generators material-icons"
+      class="explore-generators"
     >
       <v-expansion-panel @click="onDisclaimer">
         <v-expansion-panel-header class="homepage pa-2"
