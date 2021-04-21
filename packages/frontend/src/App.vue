@@ -143,6 +143,7 @@ import LoginPlugin from "@sap-devx/inquirer-gui-login-plugin";
 import TilesPlugin from "@sap-devx/inquirer-gui-tiles-plugin";
 import LabelPlugin from "@sap-devx/inquirer-gui-label-plugin";
 import { Severity } from "@sap-devx/yeoman-ui-types";
+import utils from "./utils";
 
 const FUNCTION = "__Function";
 const PENDING = "pending";
@@ -666,13 +667,7 @@ export default {
   },
   mounted() {
     this.init();
-    const refreshId = setInterval(() => {
-      const wrElem = document.getElementById("workaround");
-      if (wrElem) {
-        wrElem.classList.remove("material-icons");
-        clearInterval(refreshId);
-      }
-    }, 100);
+    utils.removeClass("workaround", "material-icons");
   },
 };
 </script>

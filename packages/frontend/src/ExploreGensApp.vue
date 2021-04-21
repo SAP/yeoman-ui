@@ -140,6 +140,7 @@ import * as _ from "lodash";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import messages from "./exploreGensMessages";
+import utils from "./utils";
 
 export default {
   name: "exploregens",
@@ -303,13 +304,7 @@ export default {
     this.ready = true;
   },
   mounted() {
-    const refreshId = setInterval(() => {
-      const wrElem = document.getElementById("workaround-ex");
-      if (wrElem) {
-        wrElem.classList.remove("material-icons");
-        clearInterval(refreshId);
-      }
-    }, 100);
+    utils.removeClass("workaround-ex", "material-icons");
   },
 };
 </script>
