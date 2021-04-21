@@ -1,11 +1,7 @@
 <template>
   <v-app id="exploregens" class="exploregens-main explore-generators">
     <div>
-      <v-app-bar
-        id="app-bar"
-        dense
-        class="pa-0 ma-0 elevation-0 material-icons"
-      >
+      <v-app-bar id="app-bar" dense class="pa-0 ma-0 elevation-0">
         <v-toolbar-title>{{ messages.title }}</v-toolbar-title>
       </v-app-bar>
     </div>
