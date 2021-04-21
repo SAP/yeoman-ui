@@ -5,6 +5,7 @@ module.exports = {
   collectCoverageFrom: [
     "src/**/*.{js,vue}",
     "!**/node_modules/**",
+    "!<rootDir>/src/utils.js",
     "!<rootDir>/src/main.js",
     "!<rootDir>/src/exploreGensMain.js",
     "!<rootDir>/src/exploreGensMessages.js",

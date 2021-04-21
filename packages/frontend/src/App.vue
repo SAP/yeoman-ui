@@ -11,6 +11,7 @@
     ></loading>
 
     <Header
+      id="header"
       v-if="prompts.length"
       :headerTitle="headerTitle"
       :stepName="promptIndex < prompts.length ? prompts[promptIndex].name : ''"
@@ -141,6 +142,7 @@ import LoginPlugin from "@sap-devx/inquirer-gui-login-plugin";
 import TilesPlugin from "@sap-devx/inquirer-gui-tiles-plugin";
 import LabelPlugin from "@sap-devx/inquirer-gui-label-plugin";
 import { Severity } from "@sap-devx/yeoman-ui-types";
+import utils from "./utils";
 
 const FUNCTION = "__Function";
 const PENDING = "pending";
@@ -664,6 +666,8 @@ export default {
   },
   mounted() {
     this.init();
+    // TODO: remove after a solution is found for DEVXBUGS-8741
+    utils.addAndRemoveClass("header", "material-icons");
   },
 };
 </script>
