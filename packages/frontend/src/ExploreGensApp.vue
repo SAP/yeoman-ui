@@ -2,7 +2,7 @@
   <v-app id="exploregens" class="exploregens-main explore-generators">
     <div>
       <v-app-bar
-        id="workaround-ex"
+        id="app-bar"
         dense
         class="pa-0 ma-0 elevation-0 material-icons"
       >
@@ -305,7 +305,7 @@ export default {
   },
   mounted() {
     // TODO: remove after a solution is found for DEVXBUGS-8741
-    utils.addAndRemoveClass("workaround-ex", "material-icons");
+    utils.addAndRemoveClass("app-bar", "material-icons");
   },
 };
 </script>
