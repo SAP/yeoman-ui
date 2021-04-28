@@ -10,7 +10,7 @@
     "removeComments": true,
     "experimentalDecorators": true,
     "rootDir": ".",
-    "rootDirs": ["./src", "./tests"],
+    "rootDirs": ["./src", "./test"],
     "baseUrl": ".",
     "sourceMap": true,
     "target": "es6",
