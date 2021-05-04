@@ -1,15 +1,15 @@
 {
   "name": "@sap-devx/yeoman-ui-types",
   "displayName": "yeoman-ui-types",
-  "description": "Yeoman-UI prompt types",
   "version": "1.2.3",
-  "author": "SAP SE",
-  "publisher": "SAP",
-  "license": "Apache-2.0",
+  "description": "Yeoman-UI prompt types",
   "repository": {
     "type": "git",
     "url": "https://github.com/SAP/yeoman-ui.git"
   },
+  "license": "Apache-2.0",
+  "author": "SAP SE",
+  "publisher": "SAP",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "scripts": {
