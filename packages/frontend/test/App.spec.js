@@ -16,6 +16,9 @@ describe("App.vue", () => {
 
   it("createPrompt - method", () => {
     wrapper = initComponent(App, {}, true);
+    wrapper.vm.prompts = [
+      { questions: [{ name: "generator", type: "list", guiType: "tiles" }] },
+    ];
     expect(wrapper.vm.createPrompt().name).toBe();
     expect(wrapper.vm.createPrompt([]).name).toBe();
     expect(wrapper.vm.createPrompt([], "name").name).toBe("name");
@@ -701,6 +704,25 @@ describe("App.vue", () => {
       expect(wrapper.vm.numOfSteps).toBe(2);
       expect(invokeSpy).toHaveBeenCalledWith("back", [undefined, 2]);
     });
+
+    test("promptIndex is 3, goto 3, exception thrown", async () => {
+      wrapper = initComponent(App, {}, true);
+      wrapper.vm.rpc = {
+        invoke: jest.fn(),
+        registerMethod: jest.fn(),
+      };
+      const err = new Error("error");
+      wrapper.vm.reload = jest.fn().mockImplementation(() => {
+        throw err;
+      });
+      wrapper.vm.reject = jest.fn();
+      wrapper.vm.promptIndex = 3;
+      wrapper.vm.prompts = [{}, {}, {}, {}];
+      wrapper.vm.gotoStep(3);
+
+      expect(wrapper.vm.rpc.invoke).toHaveBeenCalledWith("logError", [err]);
+      expect(wrapper.vm.reject).toHaveBeenCalledWith(err);
+    });
   });
 
   describe("setPromptList - method", () => {
@@ -790,7 +812,8 @@ describe("App.vue", () => {
       wrapper = initComponent(App);
       wrapper.vm.prompts = [];
       wrapper.vm.setBusyIndicator();
-      expect(wrapper.vm.showBusyIndicator).toBeTruthy();
+      expect(wrapper.vm.showBusyIndicator).toBeFalsy();
+      expect(wrapper.vm.expectedShowBusyIndicator).toBeTruthy();
     });
 
     it("isDone is false, status is pending, prompts is not empty", () => {
@@ -799,7 +822,8 @@ describe("App.vue", () => {
       wrapper.vm.isDone = false;
       wrapper.vm.currentPrompt.status = "pending";
       wrapper.vm.setBusyIndicator();
-      expect(wrapper.vm.showBusyIndicator).toBeTruthy();
+      expect(wrapper.vm.showBusyIndicator).toBeFalsy();
+      expect(wrapper.vm.expectedShowBusyIndicator).toBeTruthy();
     });
 
     it("isDone is true, status is pending, prompts is not empty", () => {
@@ -809,6 +833,7 @@ describe("App.vue", () => {
       wrapper.vm.currentPrompt.status = "pending";
       wrapper.vm.setBusyIndicator();
       expect(wrapper.vm.showBusyIndicator).toBeFalsy();
+      expect(wrapper.vm.expectedShowBusyIndicator).toBeFalsy();
     });
   });
 
