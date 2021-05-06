@@ -1,25 +1,9 @@
 {
   "name": "yeoman-ui",
-  "version": "1.2.2",
   "displayName": "Application Wizard",
-  "publisher": "SAPOS",
+  "version": "1.2.4",
   "private": true,
-  "author": {
-    "name": "SAP SE"
-  },
-  "license": "Apache 2.0",
   "description": "Provides rich user experience for Yeoman generators.",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/SAP/yeoman-ui.git"
-  },
-  "bugs": {
-    "url": "https://github.com/SAP/yeoman-ui/issues"
-  },
-  "icon": "Wizard_logo.png",
-  "engines": {
-    "vscode": "^1.39.0"
-  },
   "categories": [
     "Other"
   ],
@@ -30,16 +14,36 @@
     "sap",
     "generator"
   ],
-  "activationEvents": [
-    "*",
-    "onCommand:loadYeomanUI",
-    "onCommand:yeomanUI._notifyGeneratorsChange",
-    "onWebviewPanel:yeomanui",
-    "onCommand:exploreGenerators",
-    "onWebviewPanel:exploreGens",
-    "onWebviewPanel:runGenerator"
-  ],
-  "main": "./dist/src/extension",
+  "bugs": {
+    "url": "https://github.com/SAP/yeoman-ui/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SAP/yeoman-ui.git"
+  },
+  "license": "Apache 2.0",
+  "author": {
+    "name": "SAP SE"
+  },
+  "publisher": "SAPOS",
+  "main": "./dist/extension",
+  "scripts": {
+    "bundle": "webpack --mode production",
+    "ci": "npm-run-all clean compile coverage bundle frontend:copy package coverage:copy",
+    "clean": "rimraf ./dist ./coverage *.vsix",
+    "clean:frontend": "cd ./dist && shx rm -rf ./media",
+    "compile": "tsc",
+    "compile:watch": "tsc -watch",
+    "coverage": "nyc mocha",
+    "coverage:copy": "shx mkdir -p ../../coverage && shx cp -u ./coverage/lcov.info ../../coverage/lcov_backend.info",
+    "frontend:copy": "npm-run-all clean:frontend && shx cp -r ../frontend/dist/. ./dist/media/",
+    "package": "vsce package  --yarn .",
+    "test": "mocha",
+    "webpack": "webpack --mode development",
+    "webpack-dev:watch": "webpack --mode development --watch",
+    "ws:egRun": "node ./dist/src/webSocketServer/exploreGensIndex.js",
+    "ws:run": "node ./dist/src/webSocketServer/index.js"
+  },
   "contributes": {
     "commands": [
       {
@@ -67,25 +71,6 @@
         "title": "Run Generator"
       }
     ],
-    "menus": {
-      "commandPalette": [
-        {
-          "command": "yeomanUI.toggleOutput",
-          "when": "false"
-        },
-        {
-          "command": "yeomanUI._notifyGeneratorsChange",
-          "when": "false"
-        }
-      ],
-      "editor/title": [
-        {
-          "command": "yeomanUI.toggleOutput",
-          "group": "navigation",
-          "when": "yeomanUI.Focused"
-        }
-      ]
-    },
     "configuration": {
       "type": "object",
       "title": "Application Wizard",
@@ -155,30 +140,56 @@
           "description": "Saved search query."
         }
       }
+    },
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "yeomanUI.toggleOutput",
+          "when": "false"
+        },
+        {
+          "command": "yeomanUI._notifyGeneratorsChange",
+          "when": "false"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "yeomanUI.toggleOutput",
+          "group": "navigation",
+          "when": "yeomanUI.Focused"
+        }
+      ]
     }
   },
-  "scripts": {
-    "webpack": "webpack --mode development",
-    "webpack-dev:watch": "webpack --mode development --watch",
-    "ci": "npm-run-all clean compile coverage bundle frontend:copy package coverage:copy",
-    "clean": "rimraf ./dist ./coverage *.vsix",
-    "compile": "tsc",
-    "compile:watch": "tsc -watch",
-    "bundle": "webpack --mode production",
-    "clean:frontend": "cd ./dist && shx rm -rf ./media",
-    "frontend:copy": "npm-run-all clean:frontend && shx cp -r ../frontend/dist/. ./dist/media/",
-    "package": "vsce package  --yarn .",
-    "test": "mocha",
-    "coverage": "nyc mocha",
-    "coverage:copy": "shx mkdir -p ../../coverage && shx cp -u ./coverage/lcov.info ../../coverage/lcov_backend.info",
-    "ws:run": "node ./dist/src/webSocketServer/index.js",
-    "ws:egRun": "node ./dist/src/webSocketServer/exploreGensIndex.js"
+  "activationEvents": [
+    "*",
+    "onCommand:loadYeomanUI",
+    "onCommand:yeomanUI._notifyGeneratorsChange",
+    "onWebviewPanel:yeomanui",
+    "onCommand:exploreGenerators",
+    "onWebviewPanel:exploreGens",
+    "onWebviewPanel:runGenerator"
+  ],
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   },
   "dependencies": {
     "@sap-devx/webview-rpc": "0.3.1",
-    "@sap-devx/yeoman-ui-types": "^1.2.2",
+    "@sap-devx/yeoman-ui-types": "^1.2.4",
     "@sap/swa-for-sapbas-vsx": "1.2.7",
-    "@vscode-logging/logger": "1.2.2",
+    "@vscode-logging/logger": "1.2.3",
     "chalk": "4.1.0",
     "datauri": "3.0.0",
     "fs-extra": "9.1.0",
@@ -190,7 +201,7 @@
     "titleize": "2.1.0",
     "ws": "7.4.2",
     "yeoman-environment": "2.10.3",
-    "yeoman-ui-frontend": "^1.2.2"
+    "yeoman-ui-frontend": "^1.2.4"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.6",
@@ -201,7 +212,7 @@
     "@types/object-hash": "^2.1.0",
     "@types/sinon": "^9.0.10",
     "@types/vscode": "^1.39.0",
-    "@types/ws": "7.4.0",
+    "@types/ws": "7.4.2",
     "@types/yeoman-environment": "^2.10.2",
     "copy-webpack-plugin": "8.1.1",
     "lcov-result-merger": "3.1.0",
@@ -211,21 +222,10 @@
     "ts-node": "^9.1.1",
     "vsce": "^1.83.0",
     "webpack": "5.33.2",
-    "webpack-cli": "4.5.0"
+    "webpack-cli": "4.6.0"
   },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
+  "engines": {
+    "vscode": "^1.39.0"
   },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  }
+  "icon": "Wizard_logo.png"
 }

@@ -11,6 +11,7 @@
     ></loading>
 
     <Header
+      id="header"
       v-if="prompts.length"
       :headerTitle="headerTitle"
       :stepName="promptIndex < prompts.length ? prompts[promptIndex].name : ''"
@@ -141,6 +142,7 @@ import LoginPlugin from "@sap-devx/inquirer-gui-login-plugin";
 import TilesPlugin from "@sap-devx/inquirer-gui-tiles-plugin";
 import LabelPlugin from "@sap-devx/inquirer-gui-label-plugin";
 import { Severity } from "@sap-devx/yeoman-ui-types";
+import utils from "./utils";
 
 const FUNCTION = "__Function";
 const PENDING = "pending";
@@ -165,6 +167,7 @@ function initialState() {
     showConsole: false,
     messages: {},
     showBusyIndicator: false,
+    expectedShowBusyIndicator: false,
     promptsInfoToDisplay: [],
     isReplaying: false,
     numOfSteps: 1,
@@ -281,12 +284,21 @@ export default {
       }
     },
     setBusyIndicator() {
-      this.showBusyIndicator =
+      this.expectedShowBusyIndicator =
         _.isEmpty(this.prompts) ||
         (this.currentPrompt &&
           (this.currentPrompt.status === PENDING ||
             this.currentPrompt.status === EVALUATING) &&
           !this.isDone);
+      if (this.expectedShowBusyIndicator) {
+        setTimeout(() => {
+          if (this.expectedShowBusyIndicator) {
+            this.showBusyIndicator = true;
+          }
+        }, 1000);
+      } else {
+        this.showBusyIndicator = false;
+      }
     },
     executeCommand(event) {
       const command = event.target.getAttribute("command");
@@ -664,6 +676,8 @@ export default {
   },
   mounted() {
     this.init();
+    // TODO: remove after a solution is found for DEVXBUGS-8741
+    utils.addAndRemoveClass("header", "material-icons");
   },
 };
 </script>

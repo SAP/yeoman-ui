@@ -1,7 +1,7 @@
 <template>
   <v-app id="exploregens" class="exploregens-main explore-generators">
     <div>
-      <v-app-bar dense class="pa-0 ma-0 elevation-0">
+      <v-app-bar id="app-bar" dense class="pa-0 ma-0 elevation-0">
         <v-toolbar-title>{{ messages.title }}</v-toolbar-title>
       </v-app-bar>
     </div>
@@ -118,9 +118,12 @@
     <div v-if="!isLegalNoteAccepted && ready">
       <v-row class="pa-2">
         <v-col>
-          <v-card-text class="pa-0 ma-0" style="font-size: 14px">{{
-            messages.legal_note
-          }}</v-card-text>
+          <v-card-text
+            id="legal-note"
+            class="pa-0 ma-0"
+            style="font-size: 14px"
+            >{{ messages.legal_note }}</v-card-text
+          >
           <v-btn class="mt-6" @click="onAcceptLegalNote">{{
             messages.accept
           }}</v-btn>
@@ -136,6 +139,7 @@ import * as _ from "lodash";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import messages from "./exploreGensMessages";
+import utils from "./utils";
 
 export default {
   name: "exploregens",
@@ -297,6 +301,10 @@ export default {
       this.getFilteredGenerators(),
     ]);
     this.ready = true;
+  },
+  mounted() {
+    // TODO: remove after a solution is found for DEVXBUGS-8741
+    utils.addAndRemoveClass("legal-note", "material-icons");
   },
 };
 </script>

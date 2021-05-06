@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.4](https://github.com/SAP/yeoman-ui/compare/v1.2.3...v1.2.4) (2021-05-04)
+
+**Note:** Version bump only for package yeoman-ui-frontend
+
+## [1.2.3](https://github.com/SAP/yeoman-ui/compare/v1.2.2...v1.2.3) (2021-04-21)
+
+### Bug Fixes
+
+- workaround for chrome issue ([#569](https://github.com/SAP/yeoman-ui/issues/569)) ([5d73261](https://github.com/SAP/yeoman-ui/commit/5d73261279ac63b1b97a3f5ad394d0ebe7227851))
+
 ## [1.2.2](https://github.com/SAP/yeoman-ui/compare/v1.2.1...v1.2.2) (2021-04-11)
 
 **Note:** Version bump only for package yeoman-ui-frontend
