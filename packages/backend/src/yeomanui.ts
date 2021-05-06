@@ -327,16 +327,10 @@ export class YeomanUI {
 
         const vscode = this.getVscode();
         if (vscode) {
-          const result = await vscode.window.showInformationMessage(
-            `Load ${generatorNamespace} - ${generatorName} is not installed. Install it? `,
-            ...["Yes", "No"]
-          );
-          if (result === "Yes") {
             const installGen = new InstallUtils(this.logger);
             await installGen.installGenerator(generatorName);
             const updatedGensMeta: string[] = await YeomanUI.getLatestGensMeta();
             meta = this.getGenMetadata(generatorNamespace, updatedGensMeta);
-          }
         }
       }
 

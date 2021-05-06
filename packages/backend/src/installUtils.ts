@@ -8,7 +8,7 @@ import * as util from "util";
 import * as cp from "child_process";
 import * as envUtils from "./utils/env";
 import messages from "./exploreGensMessages";
-import { Terminal } from "vscode";
+import * as sudo from "sudo-prompt";
 
 function timeout(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -27,6 +27,18 @@ export class InstallUtils {
     "ApplicationWizard.installationLocation";
   private async exec(arg: string) {
     return util.promisify(cp.exec)(arg);
+  }
+
+  public async sudoExec(command: string) {
+    const options = {
+      name: "Application Wizard",
+    };
+    return new Promise((resolve, reject) => {
+      sudo.exec(command, options, (err, script) => {
+        if (err) reject(err);
+        else resolve(script);
+      });
+    });
   }
 
   public static getInstallationLocation(wsConfig: any) {
@@ -66,20 +78,18 @@ export class InstallUtils {
         .then(() => true)
         .catch(() => false);
       if (hasWriteAccess === false) {
-		  const defaultUserLocation = join(
-			  homedir(),
-			  ".application_wizard",
-			  "generators"
-		  );
-      	const C_CUSTOM = `Set Generators install location to ${defaultUserLocation}`;
-        // const C_NO = "Cancel";
+        const defaultUserLocation = join(
+          homedir(),
+          ".application_wizard",
+          "generators"
+        );
+        const C_CUSTOM = `Set Generators install location to ${defaultUserLocation}`;
         const C_SUDO = `Change owner ${globalNpmPath} to current user in the Terminal`;
 
         const result = await this.vscode.window.showInformationMessage(
           `Application Wizard\nYou do not have write access to directory "${globalNpmPath}". \nChoose one of the following:`,
-			{modal:true},
-			...[ C_SUDO, C_CUSTOM]
-
+          { modal: true },
+          ...[C_SUDO, C_CUSTOM]
         );
         if (result === C_CUSTOM) {
           location = defaultUserLocation;
@@ -93,8 +103,8 @@ export class InstallUtils {
         }
 
         if (result === undefined) {
-			throw new Error('Action cancelled');
-		}
+          throw new Error("Action cancelled");
+        }
       }
     } else {
       hasWriteAccess = await fs.promises
@@ -150,25 +160,15 @@ export class InstallUtils {
       let continueWithGeneratorInstall = false;
       // Change ownership
       if (locationParams.sudo_terminal) {
-        const changeOwnerCommand = `sudo chown -R $USER ${locationParams.globalNpmPath} && exit`;
-        const terminalName =
-          "Change NPM Global node_modules owner to current user";
-        const terminal = await this.vscode.window.createTerminal(terminalName);
-        if (terminal) {
-          await terminal.show();
-          await terminal.sendText(changeOwnerCommand);
-          this.vscode.window.onDidCloseTerminal((t: Terminal) => {
-            if (t.name === terminalName) {
-              continueWithGeneratorInstall = true;
-            }
-          });
-        }
+        const changeOwnerCommand = `chown -R $USER ${locationParams.globalNpmPath}`;
+        await this.sudoExec(changeOwnerCommand);
+        continueWithGeneratorInstall = true;
       } else {
         continueWithGeneratorInstall = true;
       }
-      while (continueWithGeneratorInstall === false) {
-        await timeout(3000);
-      }
+      // while (continueWithGeneratorInstall === false) {
+      //   await timeout(3000);
+      // }
 
       if (continueWithGeneratorInstall === true) {
         this.vscode.window.showInformationMessage(
