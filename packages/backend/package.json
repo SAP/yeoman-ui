@@ -215,7 +215,7 @@
     "@types/yeoman-environment": "^2.10.2",
     "copy-webpack-plugin": "8.1.1",
     "lcov-result-merger": "3.1.0",
-    "sinon": "^9.2.2",
+    "sinon": "^10.0.0",
     "string-replace-loader": "3.0.1",
     "ts-loader": "^8.0.13",
     "ts-node": "^9.1.1",
