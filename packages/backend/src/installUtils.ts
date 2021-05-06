@@ -166,9 +166,6 @@ export class InstallUtils {
       } else {
         continueWithGeneratorInstall = true;
       }
-      // while (continueWithGeneratorInstall === false) {
-      //   await timeout(3000);
-      // }
 
       if (continueWithGeneratorInstall === true) {
         this.vscode.window.showInformationMessage(
