@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.5](https://github.com/SAP/yeoman-ui/compare/v1.2.4...v1.2.5) (2021-05-06)
+
+
+### Bug Fixes
+
+* input prompts are always showing loading icon ([#577](https://github.com/SAP/yeoman-ui/issues/577)) ([a614a4b](https://github.com/SAP/yeoman-ui/commit/a614a4b5b47b073e999b6eccabcb6db49c6e9c76))
+
+
+
+
+
 ## [1.2.4](https://github.com/SAP/yeoman-ui/compare/v1.2.3...v1.2.4) (2021-05-04)
 
 **Note:** Version bump only for package root
