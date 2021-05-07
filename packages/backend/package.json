@@ -18,7 +18,7 @@
   },
   "icon": "Wizard_logo.png",
   "engines": {
-    "vscode": "^1.39.0"
+    "vscode": "^1.44.0"
   },
   "categories": [
     "Other"
@@ -178,7 +178,7 @@
     "@sap-devx/webview-rpc": "0.3.1",
     "@sap-devx/yeoman-ui-types": "^1.2.2",
     "@sap/swa-for-sapbas-vsx": "1.2.7",
-    "@vscode-logging/logger": "1.2.2",
+    "@vscode-logging/logger": "1.2.3",
     "chalk": "4.1.0",
     "datauri": "3.0.0",
     "fs-extra": "9.1.0",
@@ -187,8 +187,8 @@
     "object-hash": "2.1.1",
     "strip-ansi": "6.0.0",
     "titleize": "2.1.0",
-    "ws": "7.4.2",
-    "yeoman-environment": "3.2.0",
+    "ws": "7.4.5",
+    "yeoman-environment": "3.3.0",
     "yeoman-ui-frontend": "^1.2.2"
   },
   "devDependencies": {
@@ -201,8 +201,8 @@
     "@types/webpack-env": "1.16.0",
     "@types/sinon": "^9.0.10",
     "@types/vscode": "^1.39.0",
-    "@types/ws": "7.4.0",
-    "@types/yeoman-environment": "^2.10.2",
+    "@types/ws": "7.4.2",
+    "@types/yeoman-environment": "^2.10.3",
     "copy-webpack-plugin": "8.1.1",
     "lcov-result-merger": "3.1.0",
     "sinon": "^9.2.2",
@@ -210,8 +210,8 @@
     "ts-loader": "^8.0.13",
     "ts-node": "^9.1.1",
     "vsce": "^1.83.0",
-    "webpack": "5.33.2",
-    "webpack-cli": "4.5.0"
+    "webpack": "5.36.2",
+    "webpack-cli": "4.7.0"
   },
   "husky": {
     "hooks": {

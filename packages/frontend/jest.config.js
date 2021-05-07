@@ -5,6 +5,7 @@ module.exports = {
   collectCoverageFrom: [
     "src/**/*.{js,vue}",
     "!**/node_modules/**",
+    "!<rootDir>/src/utils.js",
     "!<rootDir>/src/main.js",
     "!<rootDir>/src/exploreGensMain.js",
     "!<rootDir>/src/exploreGensMessages.js",
@@ -18,7 +19,8 @@ module.exports = {
   transform: {
     ".*\\.(vue)$": "vue-jest",
     "^.+\\.vue$": "vue-jest",
-    ".+\\.(css|styl|less|sass|scss|svg|png|jpg|ttf|woff|woff2)$": "jest-transform-stub",
+    ".+\\.(css|styl|less|sass|scss|svg|png|jpg|ttf|woff|woff2)$":
+      "jest-transform-stub",
     "^.+\\.tsx?$": "ts-jest",
     "^.+\\.js$": "<rootDir>/node_modules/babel-jest",
   },
@@ -27,8 +29,8 @@ module.exports = {
     global: {
       branches: 93,
       functions: 98,
-      lines: 96,
-      statements: 96,
+      lines: 98,
+      statements: 98,
     },
   },
 };

@@ -12,7 +12,10 @@
         >
           {{ prompts[index - 1] ? prompts[index - 1].name : "" }}
         </v-stepper-step>
-        <v-stepper-content :step="index" :key="`${index}-content`"></v-stepper-content>
+        <v-stepper-content
+          :step="index"
+          :key="`${index}-content`"
+        ></v-stepper-content>
       </template>
     </v-stepper>
   </div>
@@ -57,6 +60,7 @@ div.v-stepper.v-stepper--vertical {
   background-color: transparent;
   box-shadow: none;
   border-radius: 0;
+  border-image: url("../assets/dots.svg");
 }
 div.v-stepper div.v-stepper__step {
   padding: 24px;
@@ -85,22 +89,30 @@ span.v-stepper__step__step .v-icon.v-icon {
 div.v-application div.v-stepper__step--complete span.v-stepper__step__step {
   background: var(--vscode-editorCodeLens-foreground, #999999) !important;
 }
-div.v-application div.v-stepper__step--active span.v-stepper__step__step.primary {
+div.v-application
+  div.v-stepper__step--active
+  span.v-stepper__step__step.primary {
   background: var(--vscode-foreground, #cccccc) !important;
 }
 div.v-application div.v-stepper__step--inactive .v-stepper__step__step {
   background: var(--vscode-input-background, #3c3c3c) !important;
 }
-div.v-stepper div.v-stepper__step.v-stepper__step--complete div.v-stepper__label {
+div.v-stepper
+  div.v-stepper__step.v-stepper__step--complete
+  div.v-stepper__label {
   color: var(--vscode-editorCodeLens-foreground, #999999);
 }
 div.v-stepper div.v-stepper__step.v-stepper__step--active div.v-stepper__label {
   color: var(--vscode-foreground, #cccccc);
 }
-div.v-stepper div.v-stepper__step.v-stepper__step--inactive div.v-stepper__label {
+div.v-stepper
+  div.v-stepper__step.v-stepper__step--inactive
+  div.v-stepper__label {
   color: var(--vscode-editorCodeLens-foreground, #999999);
 }
-div.v-application div.v-stepper.v-stepper--vertical .v-stepper__content:not(:last-child) {
+div.v-application
+  div.v-stepper.v-stepper--vertical
+  .v-stepper__content:not(:last-child) {
   transition: none;
   margin-left: 29px;
   margin-top: -22px;

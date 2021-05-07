@@ -23,6 +23,11 @@ In the [Application Wizard](https://marketplace.visualstudio.com/items?itemName=
 2. Search for the `.vsix` archive under Assets for the specific release.
 3. Follow the instructions for installing an extension from a `.vsix` file in the [VSCode's guide](https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix).
 
+## Updates
+
+By default, VS Code auto-updates extensions as new versions become available as explained in https://code.visualstudio.com/docs/supporting/faq#_how-do-i-opt-out-of-vs-code-autoupdates.
+If auto-update is disabled in your VS Code, you should update the extension manually to the latest version frequently to avoid supply-chain attack and other cyberattacks.
+
 ## Usage
 
 Open VS Code Command Palette and choose "Open Template Wizard" command to open the Wizard.

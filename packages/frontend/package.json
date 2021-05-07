@@ -18,8 +18,8 @@
     "coverage:copy": "shx mkdir -p ../../coverage && shx cp -u ./coverage/lcov.info ../../coverage/lcov_frontend.info"
   },
   "dependencies": {
-    "@mdi/font": "5.5.55",
-    "@sap-devx/inquirer-gui": "0.1.27",
+    "@mdi/font": "5.9.55",
+    "@sap-devx/inquirer-gui": "0.2.0",
     "@sap-devx/inquirer-gui-file-browser-plugin": "0.0.5",
     "@sap-devx/inquirer-gui-folder-browser-plugin": "0.0.3",
     "@sap-devx/inquirer-gui-label-plugin": "0.0.1",
