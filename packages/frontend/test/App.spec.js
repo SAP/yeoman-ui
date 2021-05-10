@@ -410,6 +410,17 @@ describe("App.vue", () => {
     });
   });
 
+  describe("showPrompt - method", () => {
+    it("questions are empty array", async () => {
+      wrapper = initComponent(App, {}, true);
+      const promise = wrapper.vm.showPrompt([], "test");
+      wrapper.vm.$data.resolve({});
+      await promise;
+      expect(wrapper.vm.$data.resolve).toBe(null);
+      expect(wrapper.vm.$data.reject).toBe(null);
+    });
+  });
+
   describe("setMessagesAndSaveState - method", () => {
     it("vscode api exists", async () => {
       wrapper = initComponent(App, {}, true);
@@ -595,6 +606,19 @@ describe("App.vue", () => {
       wrapper = initComponent(App, {});
 
       wrapper.vm.resolve = undefined;
+      wrapper.vm.promptIndex = 1;
+      wrapper.vm.prompts = [{}, {}];
+
+      wrapper.vm.next();
+
+      expect(wrapper.vm.promptIndex).toBe(1);
+      expect(wrapper.vm.prompts[0].active).toBeFalsy();
+    });
+
+    it("resolve method exists", () => {
+      wrapper = initComponent(App, {});
+
+      wrapper.vm.resolve = () => true;
       wrapper.vm.promptIndex = 1;
       wrapper.vm.prompts = [{}, {}];
 
