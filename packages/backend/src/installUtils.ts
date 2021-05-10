@@ -84,7 +84,7 @@ export class InstallUtils {
           "generators"
         );
         const C_CUSTOM = `Set Generators install location to ${defaultUserLocation}`;
-        const C_SUDO = `Change owner ${globalNpmPath} to current user in the Terminal`;
+        const C_SUDO = `Change owner ${globalNpmPath} to current user (recommended). Admin access required`;
 
         const result = await this.vscode.window.showInformationMessage(
           `Application Wizard\nYou do not have write access to directory "${globalNpmPath}". \nChoose one of the following:`,
@@ -153,7 +153,7 @@ export class InstallUtils {
         this.vscode
       );
 
-      let installCommand = this.getNpmInstallCommand(
+      const installCommand = this.getNpmInstallCommand(
         locationParams.location,
         genName
       );

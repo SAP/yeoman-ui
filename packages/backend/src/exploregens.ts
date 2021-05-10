@@ -234,7 +234,7 @@ export class ExploreGens {
     let continueWithGeneratorInstall = false;
     // Change ownership
     if (locationParams.sudo_terminal) {
-      const changeOwnerCommand = `sudo chown -R $USER ${locationParams.globalNpmPath} && exit`;
+      const changeOwnerCommand = `chown -R $USER ${locationParams.globalNpmPath} && exit`;
       const terminalName =
         "Change NPM Global node_modules owner to current user";
       const terminal = await this.vscode.window.createTerminal(terminalName);

@@ -26,7 +26,7 @@
     "name": "SAP SE"
   },
   "publisher": "SAPOS",
-  "main": "./dist/extension",
+  "main": "./dist/src/extension",
   "scripts": {
     "bundle": "webpack --mode production",
     "ci": "npm-run-all clean compile coverage bundle frontend:copy package coverage:copy",
