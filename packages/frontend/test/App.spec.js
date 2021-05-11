@@ -550,6 +550,7 @@ describe("App.vue", () => {
       wrapper.vm.resolve = jest.fn();
       wrapper.vm.reject = jest.fn();
       wrapper.vm.promptIndex = 1;
+      wrapper.vm.stepValidated = true;
       wrapper.vm.prompts = [{}, {}];
       const resolveSpy = jest.spyOn(wrapper.vm, "resolve");
 
@@ -568,6 +569,7 @@ describe("App.vue", () => {
       wrapper.vm.resolve = jest.fn();
       wrapper.vm.reject = jest.fn();
       wrapper.vm.promptIndex = 0;
+      wrapper.vm.stepValidated = true;
       wrapper.vm.prompts = [{}, {}];
       const resolveSpy = jest.spyOn(wrapper.vm, "resolve");
 
@@ -590,6 +592,7 @@ describe("App.vue", () => {
       wrapper.vm.reject = jest.fn();
       const rejectSpy = jest.spyOn(wrapper.vm, "reject");
       wrapper.vm.promptIndex = 1;
+      wrapper.vm.stepValidated = true;
       wrapper.vm.prompts = [{}, {}];
       wrapper.vm.rpc = {
         invoke: () =>
@@ -602,24 +605,12 @@ describe("App.vue", () => {
       rejectSpy.mockRestore();
     });
 
-    it("resolve method does not exist", () => {
-      wrapper = initComponent(App, {});
-
-      wrapper.vm.resolve = undefined;
-      wrapper.vm.promptIndex = 1;
-      wrapper.vm.prompts = [{}, {}];
-
-      wrapper.vm.next();
-
-      expect(wrapper.vm.promptIndex).toBe(1);
-      expect(wrapper.vm.prompts[0].active).toBeFalsy();
-    });
-
     it("resolve method exists", () => {
       wrapper = initComponent(App, {});
 
       wrapper.vm.resolve = () => true;
       wrapper.vm.promptIndex = 1;
+      wrapper.vm.stepValidated = true;
       wrapper.vm.prompts = [{}, {}];
 
       wrapper.vm.next();

@@ -338,28 +338,29 @@ export default {
         : _.get(this.messages, "step_is_pending");
     },
     next() {
-      this.toShowPromptMessage = false;
-      if (this.resolve) {
-        try {
-          this.resolve(this.currentPrompt.answers);
-
-          if (this.promptIndex >= _.size(this.prompts) - 1) {
-            const prompt = {
-              questions: [],
-              name: this.getInProgressStepName(),
-              status: PENDING,
-            };
-            this.setPrompts([prompt]);
-          }
-          this.stepValidated = false;
-          this.promptIndex++;
-          this.prompts[this.promptIndex - 1].active = false;
-          this.prompts[this.promptIndex].active = true;
-        } catch (error) {
-          this.rpc.invoke("logError", [error]);
-          this.reject(error);
-        }
+      if (!this.stepValidated) {
+        return;
       }
+      this.toShowPromptMessage = false;
+      try {
+        this.resolve(this.currentPrompt.answers);
+      } catch (error) {
+        this.rpc.invoke("logError", [error]);
+        this.reject(error);
+      }
+
+      if (this.promptIndex >= _.size(this.prompts) - 1) {
+        const prompt = {
+          questions: [],
+          name: this.getInProgressStepName(),
+          status: PENDING,
+        };
+        this.setPrompts([prompt]);
+      }
+      this.stepValidated = false;
+      this.promptIndex++;
+      this.prompts[this.promptIndex - 1].active = false;
+      this.prompts[this.promptIndex].active = true;
     },
     onAnswered(answers, issues) {
       this.stepValidated = issues === undefined;
@@ -495,6 +496,7 @@ export default {
     },
 
     showPrompt(questions, name) {
+      this.stepValidated = false;
       this.prepQuestions(questions);
       if (this.isReplaying) {
         this.promptIndex -= this.numOfSteps;
@@ -514,18 +516,18 @@ export default {
         this.showPromptMessage(message, Severity.information, image);
       }
 
-      const promise = new Promise((resolve, reject) => {
+      const promptPromise = new Promise((resolve, reject) => {
         this.resolve = resolve;
         this.reject = reject;
       });
-
-      return promise.then(() => {
+      promptPromise.then(() => {
         this.resolve = null;
         this.reject = null;
         if (this.isWriting) {
           this.showButtons = false;
         }
       });
+      return promptPromise;
     },
     createPrompt(questions, name) {
       let promptDescription = "";
