@@ -75,9 +75,7 @@ export class InstallUtil {
 
   public async installGenerator(genName: string) {
     const installingMessage = explorMessages.installing(genName);
-    const statusbarMessage = vscode.window.setStatusBarMessage(
-      installingMessage
-    );
+    const statusbarMessage = vscode.window.setStatusBarMessage(installingMessage);
 
     try {
       const userChoice = await this.getUsersChoice();
@@ -92,9 +90,7 @@ export class InstallUtil {
         return Promise.reject(CANCELED);
       }
 
-      vscode.window.showInformationMessage(
-        `Please wait while generator installing. Check progress in status bar`
-      );
+      vscode.window.showInformationMessage(`Please wait while generator installing. Check progress in status bar`);
       await NpmCommand.install(genName);
       const successMessage = explorMessages.installed(genName);
       vscode.window.showInformationMessage(successMessage);
