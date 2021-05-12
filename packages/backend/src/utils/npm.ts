@@ -2,14 +2,19 @@ import { exec, execSync } from "child_process";
 import { promisify } from "util";
 import { platform } from "os";
 import * as _ from "lodash";
-import { getInstallationPath } from "./customLocation";
+import * as customLocation from "./customLocation";
 
 export const isWin32 = platform() === "win32";
 const NPM = isWin32 ? "npm.cmd" : "npm";
 
-const NPM_REGISTRY_HOST = _.get(process, "env.NPM_CFG_REGISTRY", "http://registry.npmjs.com/");
+const NPM_REGISTRY_HOST = _.get(
+  process,
+  "env.NPM_CFG_REGISTRY",
+  "http://registry.npmjs.com/"
+);
 const SEARCH_QUERY_PREFIX = `${NPM_REGISTRY_HOST}-/v1/search?text=`;
-const SEARCH_QUERY_SUFFIX = "keywords:yeoman-generator &size=25&ranking=popularity";
+const SEARCH_QUERY_SUFFIX =
+  "keywords:yeoman-generator &size=25&ranking=popularity";
 
 class Command {
   private readonly npmGlobalPath;
@@ -19,11 +24,17 @@ class Command {
   }
 
   private getGenLocationParams(): string {
-    const customInstallationPath = getInstallationPath();
-    return _.isEmpty(customInstallationPath) ? "-g" : `--prefix ${customInstallationPath}`;
+    const customInstallationPath = customLocation.getPath();
+    return _.isEmpty(customInstallationPath)
+      ? "-g"
+      : `--prefix ${customInstallationPath}`;
   }
 
-  public getGlobalNpmPath(): string {
+  public getGlobalPath(): string {
+    return this.getGlobalNodeModulesPath().replace("node_modules", "");
+  }
+
+  public getGlobalNodeModulesPath(): string {
     return _.trim(this.npmGlobalPath.toString());
   }
 
@@ -32,7 +43,9 @@ class Command {
   }
 
   public getGensQueryURL(query: string, recommended: string): string {
-    return encodeURI(`${SEARCH_QUERY_PREFIX} ${query} ${recommended} ${SEARCH_QUERY_SUFFIX}`);
+    return encodeURI(
+      `${SEARCH_QUERY_PREFIX} ${query} ${recommended} ${SEARCH_QUERY_SUFFIX}`
+    );
   }
 
   public async install(genName: string): Promise<any> {
