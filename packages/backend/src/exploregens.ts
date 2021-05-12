@@ -23,8 +23,10 @@ export class ExploreGens {
   private readonly context: any;
   private isInBAS: boolean; // eslint-disable-line @typescript-eslint/prefer-readonly
 
-  private readonly GLOBAL_ACCEPT_LEGAL_NOTE = "global.exploreGens.acceptlegalNote";
-  private readonly LAST_AUTO_UPDATE_DATE = "global.exploreGens.lastAutoUpdateDate";
+  private readonly GLOBAL_ACCEPT_LEGAL_NOTE =
+    "global.exploreGens.acceptlegalNote";
+  private readonly LAST_AUTO_UPDATE_DATE =
+    "global.exploreGens.lastAutoUpdateDate";
   private readonly SEARCH_QUERY = "ApplicationWizard.searchQuery";
   private readonly AUTO_UPDATE = "ApplicationWizard.autoUpdate";
   private readonly EMPTY = "";
@@ -56,7 +58,9 @@ export class ExploreGens {
   }
 
   private isLegalNoteAccepted() {
-    return this.isInBAS ? this.context.globalState.get(this.GLOBAL_ACCEPT_LEGAL_NOTE, false) : true;
+    return this.isInBAS
+      ? this.context.globalState.get(this.GLOBAL_ACCEPT_LEGAL_NOTE, false)
+      : true;
   }
 
   private async acceptLegalNote() {
@@ -65,7 +69,10 @@ export class ExploreGens {
   }
 
   private async doGeneratorsUpdate() {
-    const lastUpdateDate = this.context.globalState.get(this.LAST_AUTO_UPDATE_DATE, 0);
+    const lastUpdateDate = this.context.globalState.get(
+      this.LAST_AUTO_UPDATE_DATE,
+      0
+    );
     const currentDate = Date.now();
     if (currentDate - lastUpdateDate > this.ONE_DAY) {
       this.context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
@@ -99,7 +106,9 @@ export class ExploreGens {
     const installedGenerators: string[] = await this.getAllInstalledGenerators();
     if (!_.isEmpty(installedGenerators)) {
       this.logger.debug(messages.auto_update_started);
-      const statusBarMessage = vscode.window.setStatusBarMessage(messages.auto_update_started);
+      const statusBarMessage = vscode.window.setStatusBarMessage(
+        messages.auto_update_started
+      );
       const promises = _.map(installedGenerators, (genName) => {
         return this.update(genName);
       });
@@ -125,7 +134,9 @@ export class ExploreGens {
       const res: any = await json(gensQueryUrl);
       const filteredGenerators = _.map(_.get(res, "objects"), (gen) => {
         const genName = gen.package.name;
-        gen.state = _.includes(cachedGens, genName) ? GenState.installed : GenState.notInstalled;
+        gen.state = _.includes(cachedGens, genName)
+          ? GenState.installed
+          : GenState.notInstalled;
         gen.disabledToHandle = false;
         const handlingState = this.getHandlingState(genName);
         if (handlingState) {
@@ -148,23 +159,22 @@ export class ExploreGens {
   }
 
   private getRecommendedQuery() {
-    const recommended: string[] = this.getWsConfig().get(this.SEARCH_QUERY) || [];
+    const recommended: string[] =
+      this.getWsConfig().get(this.SEARCH_QUERY) || [];
     return _.uniq(recommended);
   }
 
   private notifyGeneratorsChange() {
-    try {
-      return vscode.commands.executeCommand("yeomanUI._notifyGeneratorsChange");
-    } catch (error) {
-      this.showAndLogError(error.message, error);
-    }
+    return vscode.commands.executeCommand("yeomanUI._notifyGeneratorsChange");
   }
 
   private async install(gen: any) {
     const genName = gen.package.name;
     this.addToHandled(genName, GenState.installing);
     const installingMessage = messages.installing(genName);
-    const statusbarMessage = vscode.window.setStatusBarMessage(installingMessage);
+    const statusbarMessage = vscode.window.setStatusBarMessage(
+      installingMessage
+    );
 
     try {
       this.logger.debug(installingMessage);
@@ -189,7 +199,9 @@ export class ExploreGens {
     const genName = gen.package.name;
     this.addToHandled(genName, GenState.uninstalling);
     const uninstallingMessage = messages.uninstalling(genName);
-    const statusbarMessage = vscode.window.setStatusBarMessage(uninstallingMessage);
+    const statusbarMessage = vscode.window.setStatusBarMessage(
+      uninstallingMessage
+    );
 
     try {
       this.logger.debug(uninstallingMessage);

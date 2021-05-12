@@ -8,7 +8,10 @@ import { getWebviewRpcLibraryLogger } from "../logger/logger-wrapper";
 export class ExploreGensPanel extends AbstractWebviewPanel {
   public setWebviewPanel(webviewPanel: vscode.WebviewPanel) {
     super.setWebviewPanel(webviewPanel);
-    this.rpc = new RpcExtension(webviewPanel.webview, getWebviewRpcLibraryLogger());
+    this.rpc = new RpcExtension(
+      webviewPanel.webview,
+      getWebviewRpcLibraryLogger()
+    );
     this.exploreGens.init(this.rpc);
     this.initWebviewPanel();
   }
@@ -24,7 +27,7 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
     this.exploreGens = new ExploreGens(this.logger, this.isInBAS, this.context);
   }
 
-  public async loadWebviewPanel() {
+  public loadWebviewPanel(): Promise<void> {
     if (this.webViewPanel) {
       this.webViewPanel.reveal();
     } else {

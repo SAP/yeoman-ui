@@ -21,14 +21,16 @@ function getCategories(filterObject?: any): string[] {
 
 function getTypes(filterObject?: any): string[] {
   let types: string[] = [];
-  const objectTypes: any = _.get(filterObject, "types", _.get(filterObject, "type"));
+  const objectTypes: any = _.get(
+    filterObject,
+    "types",
+    _.get(filterObject, "type")
+  );
   if (_.isString(objectTypes)) {
     types.push(objectTypes);
   } else if (_.isArray(objectTypes)) {
     // leave only string values
-    types = _.filter(objectTypes, (type) => {
-      return _.isString(type);
-    });
+    types = _.filter(objectTypes, (type) => _.isString(type));
   }
 
   return _.compact(_.map(types, _.trim));
@@ -46,5 +48,8 @@ export class GeneratorFilter {
     return _.isEmpty(array1) || !_.isEmpty(_.intersection(array1, array2));
   }
 
-  private constructor(public readonly types: string[], public readonly categories: string[]) {}
+  private constructor(
+    public readonly types: string[],
+    public readonly categories: string[]
+  ) {}
 }
