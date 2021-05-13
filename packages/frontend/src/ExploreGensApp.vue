@@ -5,16 +5,26 @@
         <v-toolbar-title>{{ messages.title }}</v-toolbar-title>
       </v-app-bar>
     </div>
-    <v-card-text class="pa-2" style="font-size: 14px">{{ messages.description }}</v-card-text>
-    <v-expansion-panels v-if="isInBAS && isLegalNoteAccepted && ready" flat class="explore-generators">
+    <v-card-text class="pa-2" style="font-size: 14px">{{
+      messages.description
+    }}</v-card-text>
+    <v-expansion-panels
+      v-if="isInBAS && isLegalNoteAccepted && ready"
+      flat
+      class="explore-generators"
+    >
       <v-expansion-panel @click="onDisclaimer">
         <v-expansion-panel-header class="homepage pa-2"
-          ><a style="text-decoration: underline">{{ disclaimer }}</a></v-expansion-panel-header
+          ><a style="text-decoration: underline">{{
+            disclaimer
+          }}</a></v-expansion-panel-header
         >
         <v-expansion-panel-content>
           <v-row>
             <v-col>
-              <v-card-text class="pa-0 ma-0" style="font-size: 14px">{{ messages.legal_note }}</v-card-text>
+              <v-card-text class="pa-0 ma-0" style="font-size: 14px">{{
+                messages.legal_note
+              }}</v-card-text>
             </v-col>
           </v-row>
         </v-expansion-panel-content>
@@ -47,29 +57,60 @@
       </v-col>
     </v-row>
 
-    <v-row class="explore-generators-search pa-2" v-if="isLegalNoteAccepted && ready">
+    <v-row
+      class="explore-generators-search pa-2"
+      v-if="isLegalNoteAccepted && ready"
+    >
       <v-card-title>{{ searchResults }}</v-card-title>
       <v-icon v-if="refineSearch" color="blue">mdi-information-outline</v-icon>
-      <v-card-title class="pa-0 ml-2" v-if="refineSearch">{{ messages.refine_search }}</v-card-title>
+      <v-card-title class="pa-0 ml-2" v-if="refineSearch">{{
+        messages.refine_search
+      }}</v-card-title>
     </v-row>
 
     <v-slide-x-transition v-if="isLegalNoteAccepted && ready">
       <v-row class="explore-generators-cards">
-        <v-col v-for="(gen, i) in gens" :key="i" cols="12" md="4" sm="6" class="pb-2 d-flex flex-column">
-          <v-card width="500" class="d-flex flex-column mx-auto" height="260" tile hover flat dark elevation="2">
+        <v-col
+          v-for="(gen, i) in gens"
+          :key="i"
+          cols="12"
+          md="4"
+          sm="6"
+          class="pb-2 d-flex flex-column"
+        >
+          <v-card
+            width="500"
+            class="d-flex flex-column mx-auto"
+            height="260"
+            tile
+            hover
+            flat
+            dark
+            elevation="2"
+          >
             <v-card-title>{{ gen.package.name }}</v-card-title>
             <v-card-subtitle>{{ gen.package.version }}</v-card-subtitle>
-            <v-card-text min-height="70" style="overflow-y: auto">{{ gen.package.description }}</v-card-text>
+            <v-card-text min-height="70" style="overflow-y: auto">{{
+              gen.package.description
+            }}</v-card-text>
             <v-spacer></v-spacer>
             <v-card-text class="homepage">
               <a :href="gen.package.links.npm">{{ messages.more_info }}</a>
             </v-card-text>
             <v-card-actions class="pa-4">
-              <v-btn min-width="130px" :text="gen.disabledToHandle" :color="gen.color" @click="onAction(gen)">{{
-                gen.action
-              }}</v-btn>
+              <v-btn
+                min-width="130px"
+                :text="gen.disabledToHandle"
+                :color="gen.color"
+                @click="onAction(gen)"
+                >{{ gen.action }}</v-btn
+              >
             </v-card-actions>
-            <v-progress-linear v-if="gen.disabledToHandle" indeterminate color="primary"></v-progress-linear>
+            <v-progress-linear
+              v-if="gen.disabledToHandle"
+              indeterminate
+              color="primary"
+            ></v-progress-linear>
           </v-card>
         </v-col>
       </v-row>
@@ -77,8 +118,15 @@
     <div v-if="!isLegalNoteAccepted && ready">
       <v-row class="pa-2">
         <v-col>
-          <v-card-text id="legal-note" class="pa-0 ma-0" style="font-size: 14px">{{ messages.legal_note }}</v-card-text>
-          <v-btn class="mt-6" @click="onAcceptLegalNote">{{ messages.accept }}</v-btn>
+          <v-card-text
+            id="legal-note"
+            class="pa-0 ma-0"
+            style="font-size: 14px"
+            >{{ messages.legal_note }}</v-card-text
+          >
+          <v-btn class="mt-6" @click="onAcceptLegalNote">{{
+            messages.accept
+          }}</v-btn>
         </v-col>
       </v-row>
     </div>
@@ -112,7 +160,9 @@ export default {
   },
   computed: {
     disclaimer() {
-      return this.disclaimerOpened ? this.messages.hide_disclaimer : this.messages.view_disclaimer;
+      return this.disclaimerOpened
+        ? this.messages.hide_disclaimer
+        : this.messages.view_disclaimer;
     },
     refineSearch() {
       const gensQuantity = _.size(this.gens);
@@ -165,7 +215,10 @@ export default {
     },
     async getFilteredGenerators() {
       const recommended = this.recommended === ALL_GENS ? "" : this.recommended;
-      const res = await this.rpc.invoke("getFilteredGenerators", [this.query, recommended]);
+      const res = await this.rpc.invoke("getFilteredGenerators", [
+        this.query,
+        recommended,
+      ]);
       this.gens = _.map(res[0], (gen) => {
         gen.action = this.actionName(gen);
         gen.color = this.actionColor(gen);
@@ -186,13 +239,20 @@ export default {
     async onAcceptLegalNote() {
       this.isLegalNoteAccepted = await this.rpc.invoke("acceptLegalNote");
     },
+    setGenQuery(genFullName) {
+      this.query = genFullName;
+      this.onQueryChange();
+    },
     async updateBeingHandledGenerator(genName, genState) {
       const gen = _.find(this.gens, (gen) => {
         return gen.package.name === genName;
       });
 
       if (gen) {
-        gen.disabledToHandle = _.includes(["uninstalling", "installing", "updating"], genState);
+        gen.disabledToHandle = _.includes(
+          ["uninstalling", "installing", "updating"],
+          genState
+        );
         gen.state = genState;
         gen.action = this.actionName(gen);
         gen.color = this.actionColor(gen);
@@ -209,7 +269,7 @@ export default {
     },
     initRpc(rpc) {
       this.rpc = rpc;
-      const functions = ["updateBeingHandledGenerator"];
+      const functions = ["updateBeingHandledGenerator", "setGenQuery"];
       _.forEach(functions, (funcName) => {
         this.rpc.registerMethod({
           func: this[funcName],
@@ -236,8 +296,14 @@ export default {
   },
   async created() {
     await this.setupRpc();
-    await Promise.all([await this.setIsLegalNoteAccepted(), await this.setIsInBAS()]);
-    await Promise.all([this.getRecommendedQuery(), this.getFilteredGenerators()]);
+    await Promise.all([
+      await this.setIsLegalNoteAccepted(),
+      await this.setIsInBAS(),
+    ]);
+    await Promise.all([
+      this.getRecommendedQuery(),
+      this.getFilteredGenerators(),
+    ]);
     this.ready = true;
   },
   mounted() {
