@@ -6,7 +6,11 @@ import { vscode } from "./vscodeProxy";
 // import { execSync } from "child_process";
 
 const GLOBAL_CONFIG_KEY = "ApplicationWizard.installationLocation";
-export const DEFAULT_LOCATION = path.join(homedir(), ".application_wizard", "generators");
+export const DEFAULT_LOCATION = path.join(
+  homedir(),
+  ".application_wizard",
+  "generators"
+);
 
 export const getPath = (): string => {
   const location = vscode.workspace.getConfiguration().get(GLOBAL_CONFIG_KEY);
@@ -24,9 +28,13 @@ export const setDefaultPath = (): Thenable<void> => {
   mkdirSync(DEFAULT_LOCATION, { recursive: true });
   return vscode.workspace
     .getConfiguration()
-    .update(GLOBAL_CONFIG_KEY, DEFAULT_LOCATION, vscode.ConfigurationTarget.Global);
+    .update(
+      GLOBAL_CONFIG_KEY,
+      DEFAULT_LOCATION,
+      vscode.ConfigurationTarget.Global
+    );
 };
-// TODo: support ~/ as path
+// TODO: support ~/ as path
 // export const checkPathExists = () => {
 //   const npmPath = getNpmPath();
 //   let abs = trim(execSync(`echo ${npmPath}`).toString());
