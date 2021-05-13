@@ -7,15 +7,9 @@ import { getWebviewRpcLibraryLogger } from "../logger/logger-wrapper";
 import _ = require("lodash");
 
 export class ExploreGensPanel extends AbstractWebviewPanel {
-  public async setWebviewPanel(
-    webviewPanel: vscode.WebviewPanel,
-    uiOptions?: any
-  ) {
+  public async setWebviewPanel(webviewPanel: vscode.WebviewPanel, uiOptions?: any) {
     super.setWebviewPanel(webviewPanel);
-    this.rpc = new RpcExtension(
-      webviewPanel.webview,
-      getWebviewRpcLibraryLogger()
-    );
+    this.rpc = new RpcExtension(webviewPanel.webview, getWebviewRpcLibraryLogger());
     this.exploreGens.init(this.rpc);
     this.initWebviewPanel();
     if (uiOptions?.package?.name) {
