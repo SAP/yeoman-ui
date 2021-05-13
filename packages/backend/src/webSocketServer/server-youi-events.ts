@@ -10,7 +10,7 @@ export class ServerYouiEvents implements YouiEvents {
   }
 
   executeCommand(): Thenable<any> {
-    return;
+    return Promise.resolve();
   }
 
   getAppWizard(): AppWizard {
@@ -21,8 +21,20 @@ export class ServerYouiEvents implements YouiEvents {
     void this.rpc.invoke("selectOutputFolder");
   }
 
-  doGeneratorDone(suceeded: boolean, message: string, selectedWorkspace: string, type: string, targetPath = ""): void {
-    void this.rpc.invoke("generatorDone", [suceeded, message, selectedWorkspace, type, targetPath]);
+  doGeneratorDone(
+    suceeded: boolean,
+    message: string,
+    selectedWorkspace: string,
+    type: string,
+    targetPath = ""
+  ): void {
+    void this.rpc.invoke("generatorDone", [
+      suceeded,
+      message,
+      selectedWorkspace,
+      type,
+      targetPath,
+    ]);
   }
 
   public doGeneratorInstall(): void {
