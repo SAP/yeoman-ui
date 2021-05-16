@@ -121,7 +121,7 @@
         },
         "ApplicationWizard.installationLocation": {
           "type": "string",
-          "markdownDescription": "Set the default folder in which generators will be installed. The path to this folder must be valid and absolute. If there is no path defined, the global location will be used."
+          "markdownDescription": "Set the default folder in which generators will be installed. The path to this folder must be valid. If there is no path defined, the global location will be used."
         },
         "ApplicationWizard.autoUpdate": {
           "type": "boolean",
