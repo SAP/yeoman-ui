@@ -2,7 +2,11 @@
 import * as mocha from "mocha";
 import { expect } from "chai";
 import { YouiEvents } from "../src/youi-events";
-import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
+import {
+  IMethod,
+  IPromiseCallbacks,
+  IRpc,
+} from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorFilter } from "../src/filter";
 import { AppWizard } from "@sap-devx/yeoman-ui-types";
 import { YouiAdapter } from "../src/youi-adapter";
@@ -97,18 +101,18 @@ describe("YouiAdapter", () => {
     it("passes null call back", async () => {
       const firstName = "john";
       const lastName = "doe";
-      (rpc.invoke as (methodName: string, params: any[]) => Promise<any>) = async (
+      (rpc.invoke as (methodName: string, params: any[]) => Promise<any>) = (
         methodName: string,
         params: any[]
       ) => {
         const questionName: string = params[0][0].name;
         if (questionName === "q1") {
-          return {
+          return Promise.resolve({
             firstName,
             lastName,
-          };
+          });
         } else {
-          return {};
+          return Promise.resolve({});
         }
       };
 

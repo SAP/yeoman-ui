@@ -40,7 +40,9 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   public async loadWebviewPanel(uiOptions?: any) {
     const genNamespaceToRun = uiOptions?.generator;
     if (genNamespaceToRun) {
-      const generator = Env.getGenNamespaces().find((genNamespace) => genNamespace === genNamespaceToRun);
+      const generator = Env.getGenNamespaces().find(
+        (genNamespace) => genNamespace === genNamespaceToRun
+      );
       if (!generator && !this.isInBAS) {
         try {
           await this.tryToInstallGenerator(genNamespaceToRun);
@@ -51,7 +53,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
       }
     }
 
-    super.loadWebviewPanel(uiOptions);
+    return super.loadWebviewPanel(uiOptions);
   }
 
   private async tryToInstallGenerator(genNamespace: string) {
@@ -65,19 +67,31 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   public async runGenerator() {
     const generator = await vscode.window.showQuickPick(Env.getGenNamespaces());
     if (generator) {
-      this.loadWebviewPanel({ generator });
+      return this.loadWebviewPanel({ generator });
     }
   }
 
-  public setWebviewPanel(webViewPanel: vscode.WebviewPanel, uiOptions?: any): Promise<unknown> {
-    super.setWebviewPanel(webViewPanel);
+  public setWebviewPanel(
+    webViewPanel: vscode.WebviewPanel,
+    uiOptions?: any
+  ): Promise<unknown> {
+    void super.setWebviewPanel(webViewPanel);
 
-    this.messages = _.assign({}, backendMessages, _.get(uiOptions, "messages", {}));
+    this.messages = _.assign(
+      {},
+      backendMessages,
+      _.get(uiOptions, "messages", {})
+    );
     const filter = GeneratorFilter.create(_.get(uiOptions, "filter"));
     const generator = _.get(uiOptions, "generator");
 
-    this.rpc = new RpcExtension(this.webViewPanel.webview, getWebviewRpcLibraryLogger());
-    this.output.setChannelName(`${YeomanUIPanel.YEOMAN_UI}.${this.messages.channel_name}`);
+    this.rpc = new RpcExtension(
+      this.webViewPanel.webview,
+      getWebviewRpcLibraryLogger()
+    );
+    this.output.setChannelName(
+      `${YeomanUIPanel.YEOMAN_UI}.${this.messages.channel_name}`
+    );
     const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(
       this.rpc,
       this.webViewPanel,
@@ -88,34 +102,38 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 
     this.initWebviewPanel();
 
-    const outputPath = this.isInBAS ? undefined : _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
-    return new Promise((resolve: (value: unknown) => void, reject: (value: unknown) => void) => {
-      this.yeomanui = new YeomanUI(
-        this.rpc,
-        vscodeYouiEvents,
-        this.output,
-        this.logger,
-        {
-          generator,
-          filter,
-          messages: this.messages,
-          installGens: this.installGens,
-          data: _.get(uiOptions, "data"),
-        },
-        outputPath,
-        { resolve, reject }
-      );
-      this.yeomanui.registerCustomQuestionEventHandler(
-        "file-browser",
-        "getFilePath",
-        this.showOpenFileDialog.bind(this)
-      );
-      this.yeomanui.registerCustomQuestionEventHandler(
-        "folder-browser",
-        "getPath",
-        this.showOpenFolderDialog.bind(this)
-      );
-    });
+    const outputPath = this.isInBAS
+      ? undefined
+      : _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
+    return new Promise(
+      (resolve: (value: unknown) => void, reject: (value: unknown) => void) => {
+        this.yeomanui = new YeomanUI(
+          this.rpc,
+          vscodeYouiEvents,
+          this.output,
+          this.logger,
+          {
+            generator,
+            filter,
+            messages: this.messages,
+            installGens: this.installGens,
+            data: _.get(uiOptions, "data"),
+          },
+          outputPath,
+          { resolve, reject }
+        );
+        this.yeomanui.registerCustomQuestionEventHandler(
+          "file-browser",
+          "getFilePath",
+          this.showOpenFileDialog.bind(this)
+        );
+        this.yeomanui.registerCustomQuestionEventHandler(
+          "folder-browser",
+          "getPath",
+          this.showOpenFolderDialog.bind(this)
+        );
+      }
+    );
   }
 
   private yeomanui: YeomanUI;
@@ -139,7 +157,10 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
     return await this.showOpenDialog(currentPath, false);
   }
 
-  private async showOpenDialog(currentPath: string, canSelectFiles: boolean): Promise<string> {
+  private async showOpenDialog(
+    currentPath: string,
+    canSelectFiles: boolean
+  ): Promise<string> {
     const canSelectFolders = !canSelectFiles;
 
     let uri;
