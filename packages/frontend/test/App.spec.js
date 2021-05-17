@@ -302,11 +302,9 @@ describe("App.vue", () => {
       wrapper.vm.promptIndex = 1;
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation((methodName, question) => {
-          return new Promise((resolve) => {
-            setTimeout(() => {
-              resolve(question[1]);
-            }, 1500);
-          });
+          return new Promise((resolve) =>
+            setTimeout(() => resolve(question[1]), 1500)
+          );
         }),
       };
 
