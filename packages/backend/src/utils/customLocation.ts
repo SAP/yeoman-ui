@@ -8,9 +8,7 @@ import { execSync } from "child_process";
 export const GLOBAL_CONFIG_KEY = "ApplicationWizard.installationLocation";
 
 const getAbsoluteCustomPath = (): string | undefined => {
-  let customPath = trim(
-    vscode.workspace.getConfiguration().get(GLOBAL_CONFIG_KEY)
-  );
+  let customPath = trim(vscode.workspace.getConfiguration().get(GLOBAL_CONFIG_KEY));
   if (isEmpty(customPath)) {
     return;
   }
@@ -34,11 +32,7 @@ export const getPath = (): string => {
   return isCustomPathExist(customPath) ? trim(customPath) : undefined;
 };
 
-export const DEFAULT_LOCATION = path.join(
-  homedir(),
-  ".application_wizard",
-  "generators"
-);
+export const DEFAULT_LOCATION = path.join(homedir(), ".application_wizard", "generators");
 
 export const getNodeModulesPath = (): string => {
   const customPath: string = getPath();
@@ -52,9 +46,5 @@ export const setDefaultPath = (): Thenable<void> => {
   mkdirSync(DEFAULT_LOCATION, { recursive: true });
   return vscode.workspace
     .getConfiguration()
-    .update(
-      GLOBAL_CONFIG_KEY,
-      DEFAULT_LOCATION,
-      vscode.ConfigurationTarget.Global
-    );
+    .update(GLOBAL_CONFIG_KEY, DEFAULT_LOCATION, vscode.ConfigurationTarget.Global);
 };
