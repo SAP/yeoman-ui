@@ -192,7 +192,7 @@
     "@vscode-logging/logger": "1.2.3",
     "chalk": "4.1.1",
     "datauri": "3.0.0",
-    "fs-extra": "9.1.0",
+    "fs-extra": "10.0.0",
     "humanize-string": "2.1.0",
     "npm-registry-fetch": "9.0.0",
     "object-hash": "2.1.1",
