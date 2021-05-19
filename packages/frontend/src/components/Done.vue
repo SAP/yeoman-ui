@@ -15,11 +15,7 @@ export default {
   props: ["doneStatus", "doneMessage", "donePath"],
   computed: {
     color() {
-      return this.doneStatus
-        ? this.donePath !== ""
-          ? "success"
-          : "indigo"
-        : "red";
+      return this.doneStatus ? (this.donePath !== "" ? "success" : "indigo") : "red";
     },
     icon() {
       return this.doneStatus

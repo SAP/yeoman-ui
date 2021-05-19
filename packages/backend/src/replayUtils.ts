@@ -11,9 +11,7 @@ export enum ReplayState {
 
 export class ReplayUtils {
   // assuming that order of questions is consistent
-  private static getQuestionsHash(
-    questions: TerminalAdapter.Questions<any>
-  ): string {
+  private static getQuestionsHash(questions: TerminalAdapter.Questions<any>): string {
     // we need exclude members that we manipulate in setDefault() below
     // we also need to exclude members set by custom event handlers
     // instead of blacklisting member, we whitelist them based on inquirer.js docs:
@@ -38,10 +36,7 @@ export class ReplayUtils {
     return hash(questions, { excludeKeys });
   }
 
-  private static setDefaults(
-    questions: TerminalAdapter.Questions<any>,
-    answers: Environment.Answers
-  ): void {
+  private static setDefaults(questions: TerminalAdapter.Questions<any>, answers: Environment.Answers): void {
     for (const question of questions as any[]) {
       const name = question["name"];
       const answer = answers[name];
@@ -77,11 +72,7 @@ export class ReplayUtils {
     this.numOfSteps = 0;
   }
 
-  public start(
-    questions: TerminalAdapter.Questions<any>,
-    answers: Environment.Answers,
-    numOfSteps: number
-  ): void {
+  public start(questions: TerminalAdapter.Questions<any>, answers: Environment.Answers, numOfSteps: number): void {
     this._rememberAnswers(questions, answers);
     this.numOfSteps = numOfSteps;
     this.replayQueue = JSON.parse(JSON.stringify(this.replayStack));
@@ -115,10 +106,7 @@ export class ReplayUtils {
     this.prompts = prompts;
   }
 
-  public remember(
-    questions: TerminalAdapter.Questions<any>,
-    answers: Environment.Answers
-  ): void {
+  public remember(questions: TerminalAdapter.Questions<any>, answers: Environment.Answers): void {
     this._rememberAnswers(questions, answers);
     this.replayStack.push(answers);
   }
@@ -143,10 +131,7 @@ export class ReplayUtils {
     }
   }
 
-  private _rememberAnswers(
-    questions: TerminalAdapter.Questions<any>,
-    answers: Environment.Answers
-  ): void {
+  private _rememberAnswers(questions: TerminalAdapter.Questions<any>, answers: Environment.Answers): void {
     const key: string = ReplayUtils.getQuestionsHash(questions);
     this.answersCache.set(key, answers);
   }

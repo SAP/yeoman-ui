@@ -121,7 +121,7 @@
         },
         "ApplicationWizard.installationLocation": {
           "type": "string",
-          "markdownDescription": "Set the default folder in which generators will be installed. The path to this folder must be valid and absolute. If there is no path defined, the global location will be used."
+          "markdownDescription": "Set the default folder in which generators will be installed. The path to this folder must be valid. If there is no path defined, the global location will be used."
         },
         "ApplicationWizard.autoUpdate": {
           "type": "boolean",
@@ -197,34 +197,36 @@
     "npm-registry-fetch": "9.0.0",
     "object-hash": "2.1.1",
     "strip-ansi": "6.0.0",
+    "sudo-prompt": "9.2.1",
     "titleize": "2.1.0",
-    "ws": "7.4.2",
-    "yeoman-environment": "2.10.3",
+    "ws": "7.4.5",
+    "yeoman-environment": "3.3.0",
     "yeoman-ui-frontend": "^1.2.6"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.6",
     "@types/inquirer": "7.3.1",
     "@types/lodash": "^4.14.167",
-    "@types/node": "^14.14.20",
+    "@types/node": "^14.14.44",
     "@types/npm-registry-fetch": "^8.0.0",
     "@types/object-hash": "^2.1.0",
-    "@types/sinon": "^9.0.10",
-    "@types/vscode": "^1.39.0",
-    "@types/ws": "7.4.2",
-    "@types/yeoman-environment": "^2.10.2",
+    "@types/sinon": "^10.0.0",
+    "@types/vscode": "^1.46.0",
+    "@types/webpack-env": "1.16.0",
+    "@types/ws": "^7.4.4",
+    "@types/yeoman-environment": "^2.10.3",
     "copy-webpack-plugin": "8.1.1",
     "lcov-result-merger": "3.1.0",
-    "sinon": "^9.2.2",
+    "sinon": "^10.0.0",
     "string-replace-loader": "3.0.1",
-    "ts-loader": "^8.0.13",
+    "ts-loader": "^9.1.2",
     "ts-node": "^9.1.1",
-    "vsce": "^1.83.0",
-    "webpack": "5.33.2",
-    "webpack-cli": "4.6.0"
+    "vsce": "^1.88.0",
+    "webpack": "5.37.0",
+    "webpack-cli": "4.7.0"
   },
   "engines": {
-    "vscode": "^1.39.0"
+    "vscode": "^1.46.0"
   },
   "icon": "Wizard_logo.png"
 }

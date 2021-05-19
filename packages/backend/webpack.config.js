@@ -41,26 +41,8 @@ const config = {
         test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
         loader: "string-replace-loader",
         options: {
-          search: "require(?=[(]`|([(]'./namespace)|(.resolve))",
-          replace: "__non_webpack_require__",
-          flags: "g",
-        },
-      },
-      {
-        test: /yeoman-environment[/|\\]lib[/|\\]resolver_ignore.js/, // do not delete, does not work for version 2.10.3
-        loader: "string-replace-loader",
-        options: {
-          search: "require[(](?=path)",
-          replace: "__non_webpack_require__(",
-          flags: "g",
-        },
-      },
-      {
-        test: /yeoman-environment[/|\\]lib[/|\\]resolver.js/, // workaround, works for version 2.10.3
-        loader: "string-replace-loader",
-        options: {
-          search: "require[(](?=path).*",
-          replace: '"yeoman-environment";',
+          search: "require[.]resolve[(]",
+          replace: "__non_webpack_require__.resolve(",
           flags: "g",
         },
       },
@@ -68,8 +50,8 @@ const config = {
         test: /yeoman-environment[/|\\]lib[/|\\]store.js/,
         loader: "string-replace-loader",
         options: {
-          search: "require[(](?=[^'])",
-          replace: "__non_webpack_require__(",
+          search: "require[(]path",
+          replace: "__non_webpack_require__(path",
           flags: "g",
         },
       },
@@ -77,8 +59,35 @@ const config = {
         test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]repository.js/,
         loader: "string-replace-loader",
         options: {
-          search: "require[(](?=[^'])",
-          replace: "__non_webpack_require__(",
+          search: "require[(]packageJson",
+          replace: "__non_webpack_require__(packageJson",
+          flags: "g",
+        },
+      },
+      {
+        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]repository.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[(]absolutePath",
+          replace: "__non_webpack_require__(absolutePath",
+          flags: "g",
+        },
+      },
+      {
+        test: /yeoman-environment[/|\\]lib[/|\\]resolver.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[(]path",
+          replace: "__non_webpack_require__(path",
+          flags: "g",
+        },
+      },
+      {
+        test: /yeoman-environment[/|\\]lib[/|\\]resolver.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "PACKAGE_NAME_PATTERN = [[]require.*",
+          replace: "PACKAGE_NAME_PATTERN = ['yeoman-environment'];",
           flags: "g",
         },
       },
@@ -86,17 +95,107 @@ const config = {
         test: /yeoman-environment[/|\\]lib[/|\\]composability.js/,
         loader: "string-replace-loader",
         options: {
-          search: "require[(](?='yeoman)",
+          search: "require[(]'yeoman",
+          replace: "__non_webpack_require__('yeoman",
+          flags: "g",
+        },
+      },
+      {
+        test: /node_modules[/|\\]colors[/|\\]lib[/|\\]colors.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[(]theme",
+          replace: "__non_webpack_require__(theme",
+          flags: "g",
+        },
+      },
+      {
+        test: /node-gyp[/|\\]lib[/|\\]node-gyp.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[(]'[.]",
+          replace: "__non_webpack_require__('.",
+          flags: "g",
+        },
+      },
+      {
+        test: /node-gyp[/|\\]bin[/|\\]node-gyp.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "[#][!]",
+          replace: "//#!",
+          flags: "g",
+        },
+      },
+      {
+        test: /promise-inflight[/|\\]inflight.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[(]",
           replace: "__non_webpack_require__(",
           flags: "g",
         },
       },
       {
-        test: /ejs[/|\\]lib[/|\\]ejs.js/,
+        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]binary-diff.js/,
         loader: "string-replace-loader",
         options: {
-          search: "require(?=.extensions)",
-          replace: "__non_webpack_require__",
+          search: "const istextorbinary.*",
+          replace: "import {isBinary} from 'istextorbinary';",
+          flags: "g",
+        },
+      },
+      {
+        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]binary-diff.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "istextorbinary[.]isBinary",
+          replace: "isBinary",
+          flags: "g",
+        },
+      },
+      {
+        test: /node_modules[/|\\]download-stats[/|\\]lib[/|\\]utils.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[(]",
+          replace: "__non_webpack_require__(",
+          flags: "g",
+        },
+      },
+      {
+        test: /node_modules[/|\\]download-stats[/|\\]lib[/|\\]utils.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[)]",
+          replace: "__non_webpack_require__)",
+          flags: "g",
+        },
+      },
+      {
+        test: /node_modules[/|\\]ejs[/|\\]lib[/|\\]ejs.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[.]extensions",
+          replace: "__non_webpack_require__.extensions",
+          flags: "g",
+        },
+      },
+      {
+        test: /utils[/|\\]env.ts/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[.]cache",
+          replace: "__non_webpack_require__.cache",
+          flags: "g",
+        },
+      },
+      {
+        test: /utils[/|\\]vscodeProxy.ts/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[.]main",
+          replace: "__non_webpack_require__.main",
           flags: "g",
         },
       },

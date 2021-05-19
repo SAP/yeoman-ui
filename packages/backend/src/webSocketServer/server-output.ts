@@ -16,10 +16,10 @@ export class ServerOutput implements Output {
   }
 
   public append(value: string) {
-    this.rpc.invoke("log", [stripAnsi(value) + "\n"]);
+    return this.rpc.invoke("log", [stripAnsi(value) + "\n"]);
   }
 
   public appendLine(value: string) {
-    this.rpc.invoke("log", [stripAnsi(value) + "\n"]);
+    return this.rpc.invoke("log", [stripAnsi(value) + "\n"]);
   }
 }

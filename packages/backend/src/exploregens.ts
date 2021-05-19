@@ -1,13 +1,11 @@
-import * as npmFetch from "npm-registry-fetch";
 import * as _ from "lodash";
-import * as cp from "child_process";
+import { json } from "npm-registry-fetch";
 import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-import * as util from "util";
-import * as path from "path";
-import * as fs from "fs";
+import { NpmCommand } from "./utils/npm";
 import messages from "./exploreGensMessages";
-import * as envUtils from "./utils/env";
+import { Env } from "./utils/env";
+import { vscode } from "./utils/vscodeProxy";
 
 export enum GenState {
   uninstalling = "uninstalling",
@@ -18,93 +16,51 @@ export enum GenState {
 }
 
 export class ExploreGens {
-  public static getInstallationLocation(wsConfig: any) {
-    const location = _.trim(wsConfig.get(ExploreGens.INSTALLATION_LOCATION));
-    return fs.existsSync(location) ? location : undefined;
-  }
-
-  private static readonly INSTALLATION_LOCATION =
-    "ApplicationWizard.installationLocation";
-
   private readonly logger: IChildLogger;
-  private rpc: IRpc;
+  private rpc: Partial<IRpc>;
   private gensBeingHandled: any[]; // eslint-disable-line @typescript-eslint/prefer-readonly
-  private cachedInstalledGeneratorsPromise: Promise<string[]>;
+  private cachedInstalledGenerators: string[];
   private readonly context: any;
-  private readonly vscode: any;
   private isInBAS: boolean; // eslint-disable-line @typescript-eslint/prefer-readonly
-  private readonly npmGlobalPathsPromise: Promise<any>;
 
-  private readonly GLOBAL_ACCEPT_LEGAL_NOTE =
-    "global.exploreGens.acceptlegalNote";
-  private readonly LAST_AUTO_UPDATE_DATE =
-    "global.exploreGens.lastAutoUpdateDate";
+  private readonly GLOBAL_ACCEPT_LEGAL_NOTE = "global.exploreGens.acceptlegalNote";
+  private readonly LAST_AUTO_UPDATE_DATE = "global.exploreGens.lastAutoUpdateDate";
   private readonly SEARCH_QUERY = "ApplicationWizard.searchQuery";
   private readonly AUTO_UPDATE = "ApplicationWizard.autoUpdate";
-  private readonly NPM = envUtils.isWin32 ? "npm.cmd" : "npm";
   private readonly EMPTY = "";
-  private readonly SLASH = "/";
-  private readonly GENERATOR = "generator-";
   private readonly ONE_DAY = 1000 * 60 * 60 * 24;
-  private readonly NPM_REGISTRY_HOST = _.get(
-    process,
-    "env.NPM_CFG_REGISTRY",
-    "http://registry.npmjs.com/"
-  );
-  private readonly SEARCH_QUERY_PREFIX = `${this.NPM_REGISTRY_HOST}-/v1/search?text=`;
-  private readonly SEARCH_QUERY_SUFFIX =
-    "keywords:yeoman-generator &size=25&ranking=popularity";
 
-  constructor(
-    logger: IChildLogger,
-    isInBAS: boolean,
-    context?: any,
-    vscode?: any
-  ) {
+  constructor(logger: IChildLogger, isInBAS: boolean, context?: any) {
     this.context = context;
-    this.vscode = vscode;
     this.logger = logger;
     this.gensBeingHandled = [];
-    this.npmGlobalPathsPromise = this.exec(`${this.NPM} root -g`);
-    this.doGeneratorsUpdate();
+    void this.doGeneratorsUpdate();
     this.isInBAS = isInBAS;
   }
 
-  public init(rpc: IRpc) {
+  public init(rpc: Partial<IRpc>) {
     this.initRpc(rpc);
     this.setInstalledGens();
   }
 
-  private async getAllInstalledGenerators(): Promise<string[]> {
-    const npmPaths = await this.getNpmPaths();
-    const gensMeta = await envUtils.getGeneratorsMeta(npmPaths);
-
-    return _.map(_.keys(gensMeta), (namepsace: string) => {
-      const genName = _.split(namepsace, ":")[0];
-      const parts = _.split(genName, this.SLASH);
-      return _.size(parts) === 1
-        ? `${this.GENERATOR}${genName}`
-        : `${parts[0]}${this.SLASH}${this.GENERATOR}${parts[1]}`;
-    });
+  public setGenFilter(genFullName: string) {
+    return this.rpc.invoke("setGenQuery", [genFullName]);
   }
 
-  private async getNpmGlobalPath(): Promise<string> {
-    const res = await this.npmGlobalPathsPromise;
-    return _.trim(res.stdout);
+  private getAllInstalledGenerators(): string[] {
+    return Env.getGeneratorNamesByPath();
   }
 
-  private async getInstalledGens() {
-    return this.cachedInstalledGeneratorsPromise;
+  private getInstalledGens(): string[] {
+    return this.cachedInstalledGenerators;
   }
 
   private setInstalledGens() {
-    this.cachedInstalledGeneratorsPromise = this.getAllInstalledGenerators();
+    this.cachedInstalledGenerators = this.getAllInstalledGenerators();
   }
 
-  private async isLegalNoteAccepted() {
-    return this.isInBAS
-      ? this.context.globalState.get(this.GLOBAL_ACCEPT_LEGAL_NOTE, false)
-      : true;
+  private isLegalNoteAccepted() {
+    return this.isInBAS ? this.context.globalState.get(this.GLOBAL_ACCEPT_LEGAL_NOTE, false) : true;
   }
 
   private async acceptLegalNote() {
@@ -113,15 +69,13 @@ export class ExploreGens {
   }
 
   private async doGeneratorsUpdate() {
-    const lastUpdateDate = this.context.globalState.get(
-      this.LAST_AUTO_UPDATE_DATE,
-      0
-    );
+    const lastUpdateDate = this.context.globalState.get(this.LAST_AUTO_UPDATE_DATE, 0);
     const currentDate = Date.now();
     if (currentDate - lastUpdateDate > this.ONE_DAY) {
       this.context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
       const autoUpdateEnabled = this.getWsConfig().get(this.AUTO_UPDATE, true);
       if (autoUpdateEnabled) {
+        await NpmCommand.checkAccessAndSetGeneratorsPath();
         await this.updateAllInstalledGenerators();
       }
     }
@@ -131,7 +85,7 @@ export class ExploreGens {
     return this.isInBAS;
   }
 
-  private initRpc(rpc: IRpc) {
+  private initRpc(rpc: Partial<IRpc>) {
     this.rpc = rpc;
     this.rpc.registerMethod({
       func: this.getFilteredGenerators,
@@ -147,44 +101,37 @@ export class ExploreGens {
   }
 
   private async updateAllInstalledGenerators() {
-    const installedGenerators: string[] = await this.getAllInstalledGenerators();
+    const installedGenerators: string[] = this.getAllInstalledGenerators();
     if (!_.isEmpty(installedGenerators)) {
       this.logger.debug(messages.auto_update_started);
-      const statusBarMessage = this.vscode.window.setStatusBarMessage(
-        messages.auto_update_started
-      );
-      const locationParams = this.getGeneratorsLocationParams();
-      const promises = _.map(installedGenerators, (genName) => {
-        return this.update(locationParams, genName);
-      });
-
-      await Promise.all(promises);
+      const statusBarMessage = vscode.window.setStatusBarMessage(messages.auto_update_started);
+      const promises = _.map(installedGenerators, (genName) => this.update(genName));
+      const failedToUpdateGens: any[] = _.compact(await Promise.all(promises));
+      if (!_.isEmpty(failedToUpdateGens)) {
+        const errMessage = messages.failed_to_update_gens(failedToUpdateGens);
+        this.showAndLogError("Update Failure", errMessage);
+      }
       this.setInstalledGens();
       statusBarMessage.dispose();
-      this.vscode.window.setStatusBarMessage(
-        messages.auto_update_finished,
-        10000
-      );
+      vscode.window.setStatusBarMessage(messages.auto_update_finished, 10000);
     }
   }
 
   private getWsConfig() {
-    return this.vscode.workspace.getConfiguration();
+    return vscode.workspace.getConfiguration();
   }
 
   private async getFilteredGenerators(query?: string, author?: string) {
     query = query || this.EMPTY;
     author = author || this.EMPTY;
-    const gensQueryUrl = this.getGensQueryURL(query, author);
+    const gensQueryUrl = NpmCommand.getGensQueryURL(query, author);
 
     try {
-      const cachedGens = await this.getInstalledGens();
-      const res: any = await npmFetch.json(gensQueryUrl);
+      const cachedGens = this.getInstalledGens();
+      const res: any = await json(gensQueryUrl);
       const filteredGenerators = _.map(_.get(res, "objects"), (gen) => {
         const genName = gen.package.name;
-        gen.state = _.includes(cachedGens, genName)
-          ? GenState.installed
-          : GenState.notInstalled;
+        gen.state = _.includes(cachedGens, genName) ? GenState.installed : GenState.notInstalled;
         gen.disabledToHandle = false;
         const handlingState = this.getHandlingState(genName);
         if (handlingState) {
@@ -203,57 +150,33 @@ export class ExploreGens {
   private showAndLogError(messagePrefix: string, error: any) {
     const errorMessage = error.toString();
     this.logger.error(errorMessage);
-    this.vscode.window.showErrorMessage(`${messagePrefix}: ${errorMessage}`);
-  }
-
-  private getGensQueryURL(query: string, recommended: string) {
-    return encodeURI(
-      `${this.SEARCH_QUERY_PREFIX} ${query} ${recommended} ${this.SEARCH_QUERY_SUFFIX}`
-    );
+    vscode.window.showErrorMessage(`${messagePrefix}: ${errorMessage}`);
   }
 
   private getRecommendedQuery() {
-    const recommended: string[] =
-      this.getWsConfig().get(this.SEARCH_QUERY) || [];
+    const recommended: string[] = this.getWsConfig().get(this.SEARCH_QUERY) || [];
     return _.uniq(recommended);
   }
 
-  private getGeneratorsLocationParams() {
-    const location = ExploreGens.getInstallationLocation(this.getWsConfig());
-    return _.isEmpty(location) ? "-g" : `--prefix ${location}`;
-  }
-
-  private async exec(arg: string) {
-    return util.promisify(cp.exec)(arg);
-  }
-
   private notifyGeneratorsChange() {
-    try {
-      return this.vscode.commands.executeCommand(
-        "yeomanUI._notifyGeneratorsChange"
-      );
-    } catch (error) {
-      this.showAndLogError(error.message, error);
-    }
+    return vscode.commands.executeCommand("yeomanUI._notifyGeneratorsChange");
   }
 
-  private async install(gen: any) {
+  public async install(gen: any) {
     const genName = gen.package.name;
+
     this.addToHandled(genName, GenState.installing);
     const installingMessage = messages.installing(genName);
-    const statusbarMessage = this.vscode.window.setStatusBarMessage(
-      installingMessage
-    );
+    const statusbarMessage = vscode.window.setStatusBarMessage(installingMessage);
 
     try {
+      await NpmCommand.checkAccessAndSetGeneratorsPath();
       this.logger.debug(installingMessage);
       this.updateBeingHandledGenerator(genName, GenState.installing);
-      const locationParams = this.getGeneratorsLocationParams();
-      const installCommand = this.getNpmInstallCommand(locationParams, genName);
-      await this.exec(installCommand);
+      await NpmCommand.install(genName);
       const successMessage = messages.installed(genName);
       this.logger.debug(successMessage);
-      this.vscode.window.showInformationMessage(successMessage);
+      vscode.window.showInformationMessage(successMessage);
       this.updateBeingHandledGenerator(genName, GenState.installed);
       await this.notifyGeneratorsChange();
     } catch (error) {
@@ -270,22 +193,15 @@ export class ExploreGens {
     const genName = gen.package.name;
     this.addToHandled(genName, GenState.uninstalling);
     const uninstallingMessage = messages.uninstalling(genName);
-    const statusbarMessage = this.vscode.window.setStatusBarMessage(
-      uninstallingMessage
-    );
+    const statusbarMessage = vscode.window.setStatusBarMessage(uninstallingMessage);
 
     try {
       this.logger.debug(uninstallingMessage);
       this.updateBeingHandledGenerator(genName, GenState.uninstalling);
-      const locationParams = this.getGeneratorsLocationParams();
-      const uninstallCommand = this.getNpmUninstallCommand(
-        locationParams,
-        genName
-      );
-      await this.exec(uninstallCommand);
+      await NpmCommand.uninstall(genName);
       const successMessage = messages.uninstalled(genName);
       this.logger.debug(successMessage);
-      this.vscode.window.showInformationMessage(successMessage);
+      vscode.window.showInformationMessage(successMessage);
       this.updateBeingHandledGenerator(genName, GenState.notInstalled);
       await this.notifyGeneratorsChange();
     } catch (error) {
@@ -298,26 +214,28 @@ export class ExploreGens {
     }
   }
 
-  private async update(locationParams: string, genName: string) {
+  private async update(genName: string): Promise<string | undefined> {
     this.addToHandled(genName, GenState.updating);
 
     try {
       this.logger.debug(messages.updating(genName));
       this.updateBeingHandledGenerator(genName, GenState.updating);
-      const installCommand = this.getNpmInstallCommand(locationParams, genName);
-      await this.exec(installCommand);
+      await NpmCommand.install(genName);
       this.logger.debug(messages.updated(genName));
       this.updateBeingHandledGenerator(genName, GenState.installed);
     } catch (error) {
-      this.showAndLogError(messages.failed_to_update(genName), error);
       this.updateBeingHandledGenerator(genName, GenState.notInstalled);
+      this.logger.error(error);
+      return genName;
     } finally {
       this.removeFromHandled(genName);
     }
   }
 
-  private async updateBeingHandledGenerator(genName: string, state: GenState) {
-    this.rpc.invoke("updateBeingHandledGenerator", [genName, state]);
+  private updateBeingHandledGenerator(genName: string, state: GenState) {
+    if (this.rpc) {
+      void this.rpc.invoke("updateBeingHandledGenerator", [genName, state]);
+    }
   }
 
   private addToHandled(genName: string, state: GenState) {
@@ -338,27 +256,8 @@ export class ExploreGens {
     return _.get(gen, "state");
   }
 
-  private async isInstalled(gen: any) {
-    const installedGens: string[] = await this.getInstalledGens();
+  private isInstalled(gen: any) {
+    const installedGens: string[] = this.getInstalledGens();
     return _.includes(installedGens, gen.package.name);
-  }
-
-  private getNpmInstallCommand(locationParams: string, genName: string) {
-    return `${this.NPM} install ${locationParams} ${genName}@latest`;
-  }
-
-  private getNpmUninstallCommand(locationParams: string, genName: string) {
-    return `${this.NPM} uninstall ${locationParams} ${genName}`;
-  }
-
-  private async getNpmPaths() {
-    const customLocation = ExploreGens.getInstallationLocation(
-      this.getWsConfig()
-    );
-    if (_.isEmpty(customLocation)) {
-      return this.getNpmGlobalPath();
-    }
-
-    return [path.join(customLocation, envUtils.NODE_MODULES)];
   }
 }

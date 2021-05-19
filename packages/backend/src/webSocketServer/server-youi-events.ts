@@ -9,12 +9,8 @@ export class ServerYouiEvents implements YouiEvents {
     this.rpc = rpc;
   }
 
-  executeCommand(id: string, ...args: any[]): Thenable<any> {
-    return;
-  }
-
-  getWsConfig(config: string): any {
-    return null;
+  executeCommand(): Thenable<any> {
+    return Promise.resolve();
   }
 
   getAppWizard(): AppWizard {
@@ -22,30 +18,18 @@ export class ServerYouiEvents implements YouiEvents {
   }
 
   selectFolder(): void {
-    this.rpc.invoke("selectOutputFolder");
+    void this.rpc.invoke("selectOutputFolder");
   }
 
-  doGeneratorDone(
-    suceeded: boolean,
-    message: string,
-    selectedWorkspace: string,
-    type: string,
-    targetPath = ""
-  ): void {
-    this.rpc.invoke("generatorDone", [
-      suceeded,
-      message,
-      selectedWorkspace,
-      type,
-      targetPath,
-    ]);
+  doGeneratorDone(suceeded: boolean, message: string, selectedWorkspace: string, type: string, targetPath = ""): void {
+    void this.rpc.invoke("generatorDone", [suceeded, message, selectedWorkspace, type, targetPath]);
   }
 
   public doGeneratorInstall(): void {
-    this.rpc.invoke("generatorInstall");
+    void this.rpc.invoke("generatorInstall");
   }
 
-  public showProgress(message?: string): void {
-    this.rpc.invoke("showProgress");
+  public showProgress(): void {
+    void this.rpc.invoke("showProgress");
   }
 }

@@ -10,7 +10,6 @@ export interface YouiEvents {
   ): void;
   doGeneratorInstall(): void;
   showProgress(message?: string): void;
-  getWsConfig(config: string): any;
   getAppWizard(): AppWizard;
   executeCommand(id: string, ...args: any[]): Thenable<any>;
 }

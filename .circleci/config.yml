@@ -21,24 +21,6 @@ jobs:
           environment:
             COVERALLS_SERVICE_NAME: circle-ci
             COVERALLS_GIT_BRANCH: ${CIRCLE_BRANCH}
-
-  build-node12:
-    docker:
-      - image: circleci/node:12
-    working_directory: ~/repo
-    steps:
-      - checkout
-      - run: yarn
-      - run: yarn run ci
-
-  build-node10:
-    docker:
-      - image: circleci/node:10
-    working_directory: ~/repo
-    steps:
-      - checkout
-      - run: yarn
-      - run: yarn run ci
   
   compliance:
     docker:
@@ -105,8 +87,6 @@ workflows:
   version: 2
   voter:
     jobs:
-      - build-node10
-      - build-node12
       - build-node14
       - compliance
   release:

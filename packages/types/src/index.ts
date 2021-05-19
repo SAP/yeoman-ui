@@ -5,15 +5,15 @@ export abstract class AppWizard {
   abstract showInformation(message: string, type: MessageType): void;
 
   public static create(genOptions: any = {}): AppWizard {
+    class EmptyAppWizard extends AppWizard {
+      showProgress(): void {}
+      showWarning(): void {}
+      showError(): void {}
+      showInformation(): void {}
+    }
+
     return genOptions.appWizard ? genOptions.appWizard : new EmptyAppWizard();
   }
-}
-
-class EmptyAppWizard extends AppWizard {
-  showProgress(message?: string): void {}
-  showWarning(message: string, type: MessageType): void {}
-  showError(message: string, type: MessageType): void {}
-  showInformation(message: string, type: MessageType): void {}
 }
 
 export enum Severity {
@@ -30,7 +30,7 @@ export enum MessageType {
 export class Prompts {
   private callback: any;
 
-  constructor(private items: IPrompt[] = []) {}
+  constructor(private readonly items: IPrompt[] = []) {}
 
   public splice(start: number, deleteCount: number, items: IPrompt[]) {
     if (items) {

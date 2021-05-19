@@ -1,8 +1,8 @@
-import * as WebSocket from "ws";
+import { Server } from "ws";
 import { RpcExtensionWebSockets } from "@sap-devx/webview-rpc/out.ext/rpc-extension-ws";
 import { IChildLogger } from "@vscode-logging/logger";
 import { ExploreGens } from "../exploregens";
-import { getConsoleWarnLogger } from "../logger/logger-wrapper";
+import { getConsoleWarnLogger } from "../logger/console-logger";
 
 class ExploreGensWebSocketServer {
   private rpc: RpcExtensionWebSockets;
@@ -12,7 +12,7 @@ class ExploreGensWebSocketServer {
     // web socket server
     const port = process.env.PORT ? Number.parseInt(process.env.PORT) : 8082;
 
-    const wss = new WebSocket.Server({ port: port }, () => {
+    const wss = new Server({ port: port }, () => {
       console.log("started websocket server");
     });
     wss.on("listening", () => {
@@ -25,66 +25,10 @@ class ExploreGensWebSocketServer {
 
     wss.on("connection", (ws) => {
       console.log("exploregens: new ws connection");
+      const childLogger: IChildLogger = getConsoleWarnLogger();
+      this.rpc = new RpcExtensionWebSockets(ws, childLogger);
 
-      this.rpc = new RpcExtensionWebSockets(ws, getConsoleWarnLogger());
-      //TODO: Use RPC to send it to the browser log (as a collapsed pannel in Vue)
-      const childLogger = {
-        debug: () => {
-          /* do nothing */
-        },
-        error: () => {
-          /* do nothing */
-        },
-        fatal: () => {
-          /* do nothing */
-        },
-        warn: () => {
-          /* do nothing */
-        },
-        info: () => {
-          /* do nothing */
-        },
-        trace: () => {
-          /* do nothing */
-        },
-        getChildLogger: () => {
-          return {} as IChildLogger;
-        },
-      };
-      const context = {
-        globalState: {
-          get: () => true,
-          update: () => true,
-        },
-      };
-      const vscode = {
-        window: {
-          showErrorMessage: () => true,
-          showInformationMessage: () => true,
-          setStatusBarMessage: () => {
-            return {
-              dispose: () => true,
-            };
-          },
-        },
-        workspace: {
-          getConfiguration: () => {
-            return {
-              get: () => "",
-            };
-          },
-        },
-        commands: {
-          getCommands: async (): Promise<any[]> => [],
-        },
-      };
-
-      this.exploreGens = new ExploreGens(
-        childLogger as IChildLogger,
-        false,
-        context,
-        vscode
-      );
+      this.exploreGens = new ExploreGens(childLogger, false, context);
       this.exploreGens.init(this.rpc);
     });
   }

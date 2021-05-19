@@ -6,17 +6,9 @@ import {
   IVSCodeExtLogger,
   LogLevel,
 } from "@vscode-logging/logger";
-import {
-  listenToLogSettingsChanges,
-  logLoggerDetails,
-} from "./settings-changes-handler";
-// import {resolve} from "path";
-import {
-  getLoggingLevelSetting,
-  getSourceLocationTrackingSetting,
-} from "./settings";
+import { listenToLogSettingsChanges, logLoggerDetails } from "./settings-changes-handler";
+import { getLoggingLevelSetting, getSourceLocationTrackingSetting } from "./settings";
 
-// const PACKAGE_JSON = "package.json";
 const YEOMAN_UI_LOGGER_NAME = "yeomanui";
 const YEOMAN_UI = "Application Wizard";
 const WEBVIEW_RPC_LOGGER_NAME = "Webview Rpc";
@@ -26,8 +18,7 @@ const WEBVIEW_RPC_LOGGER_NAME = "Webview Rpc";
  * implementation.
  */
 
-export const ERROR_LOGGER_NOT_INITIALIZED =
-  "Logger has not yet been initialized!";
+export const ERROR_LOGGER_NOT_INITIALIZED = "Logger has not yet been initialized!";
 
 /**
  * @type {IVSCodeExtLogger}
@@ -51,6 +42,10 @@ export function getLogger(): IVSCodeExtLogger {
   return logger;
 }
 
+function getLibraryLogger(libraryName: string): IChildLogger {
+  return getLogger().getChildLogger({ label: libraryName });
+}
+
 export function getClassLogger(className: string): IChildLogger {
   return getLogger().getChildLogger({ label: className });
 }
@@ -61,18 +56,6 @@ export function getYeomanUILibraryLogger(): IChildLogger {
 
 export function getWebviewRpcLibraryLogger(): IChildLogger {
   return getLibraryLogger(WEBVIEW_RPC_LOGGER_NAME);
-}
-
-function getLibraryLogger(libraryName: string): IChildLogger {
-  return getLogger().getChildLogger({ label: libraryName });
-}
-
-export function createExtensionLoggerAndSubscribeToLogSettingsChanges(
-  context: vscode.ExtensionContext
-) {
-  createExtensionLogger(context);
-  // Subscribe to Logger settings changes.
-  listenToLogSettingsChanges(context);
 }
 
 export function getConsoleWarnLogger(): IChildLogger {
@@ -123,4 +106,10 @@ function createExtensionLogger(context: vscode.ExtensionContext) {
   // Update the logger-wrapper with a reference to the extLogger.
   initLoggerWrapper(extensionLogger);
   logLoggerDetails(context, logLevelSetting);
+}
+
+export function createExtensionLoggerAndSubscribeToLogSettingsChanges(context: vscode.ExtensionContext) {
+  createExtensionLogger(context);
+  // Subscribe to Logger settings changes.
+  listenToLogSettingsChanges(context);
 }
