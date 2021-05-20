@@ -319,7 +319,7 @@ export default {
     onAnswered(answers, issues) {
       const currentPrompt = this.currentPrompt;
       if (currentPrompt) {
-        this.stepValidated = currentPrompt.status === PENDING || _.isEmpty(answers) ? false : _.isNil(issues);
+        this.stepValidated = currentPrompt.status === PENDING || _.isEmpty(currentPrompt.questions) ? false : _.isNil(issues);
 
         currentPrompt.answers = answers;
         if (currentPrompt.answers.generator) {
