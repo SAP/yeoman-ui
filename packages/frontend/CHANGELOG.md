@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.2](https://github.com/SAP/yeoman-ui/compare/v1.3.1...v1.3.2) (2021-05-20)
+
+### Bug Fixes
+
+- fast clicking on next button leads to ui steps problem ([0619053](https://github.com/SAP/yeoman-ui/commit/0619053babbefab6c6b335f9681242edebc1e9ce))
+- fast clicking on next button leads to ui steps problem ([#589](https://github.com/SAP/yeoman-ui/issues/589)) ([9ea48b6](https://github.com/SAP/yeoman-ui/commit/9ea48b6251208c756b5fc471dde6278230581187))
+
 ## [1.3.1](https://github.com/SAP/yeoman-ui/compare/v1.3.0...v1.3.1) (2021-05-19)
 
 **Note:** Version bump only for package yeoman-ui-frontend
