@@ -195,7 +195,7 @@
     "fs-extra": "10.0.0",
     "humanize-string": "2.1.0",
     "npm-registry-fetch": "10.1.2",
-    "object-hash": "2.1.1",
+    "object-hash": "2.2.0",
     "strip-ansi": "6.0.0",
     "sudo-prompt": "9.2.1",
     "titleize": "2.1.0",
