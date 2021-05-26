@@ -200,7 +200,7 @@
     "sudo-prompt": "9.2.1",
     "titleize": "2.1.0",
     "ws": "7.4.6",
-    "yeoman-environment": "3.3.0",
+    "yeoman-environment": "3.4.1",
     "yeoman-ui-frontend": "^1.3.2"
   },
   "devDependencies": {
