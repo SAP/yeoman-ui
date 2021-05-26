@@ -29,8 +29,8 @@ const returnPromise = () => {
 };
 
 const configObj = { get: returnValue, update: returnValue };
-const globalStateObj = { get: returnValue, update: returnValue };
-const context = { globalState: globalStateObj };
+const globalStateObj = { get: returnValue, update: returnValue } as any;
+const context = { globalState: globalStateObj, extensionPath: "" };
 
 const Uri = {
   file: (path?: string) => {
@@ -64,6 +64,12 @@ const window = {
   showWarningMessage: returnPromise,
   withProgress: returnPromise,
   registerWebviewPanelSerializer: returnPromise,
+  createWebviewPanel: returnPromise,
+  showQuickPick: returnPromise,
+};
+
+const ViewColumn = {
+  One: 1,
 };
 
 const vscodeMock = {
@@ -72,6 +78,7 @@ const vscodeMock = {
   workspace,
   commands,
   window,
+  ViewColumn,
 };
 
 export const getVscodeMock = () => vscodeMock;

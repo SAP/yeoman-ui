@@ -15,7 +15,7 @@ export abstract class AbstractWebviewPanel {
   protected focusedKey: string;
   protected htmlFileName: string;
   protected state: any;
-  protected context: vscode.ExtensionContext;
+  protected context: Partial<vscode.ExtensionContext>;
 
   protected readonly logger: IChildLogger;
   protected disposables: vscode.Disposable[];
@@ -28,7 +28,7 @@ export abstract class AbstractWebviewPanel {
     return this.setWebviewPanel(webViewPanel, uiOptions);
   }
 
-  protected constructor(context: vscode.ExtensionContext) {
+  protected constructor(context: Partial<vscode.ExtensionContext>) {
     this.extensionPath = context.extensionPath;
     this.mediaPath = path.join(context.extensionPath, "dist", "media");
     this.htmlFileName = "index.html";
@@ -38,20 +38,28 @@ export abstract class AbstractWebviewPanel {
     this.isInBAS = !_.isEmpty(_.get(process, "env.WS_BASE_URL"));
   }
 
-  public setWebviewPanel(webviewPanel: vscode.WebviewPanel, state?: any): Promise<unknown> {
+  public setWebviewPanel(
+    webviewPanel: vscode.WebviewPanel,
+    state?: any
+  ): Promise<unknown> {
     this.webViewPanel = webviewPanel;
     this.state = state;
     return;
   }
 
-  protected createWebviewPanel(): vscode.WebviewPanel {
-    return vscode.window.createWebviewPanel(this.viewType, this.viewTitle, vscode.ViewColumn.One, {
-      // Enable javascript in the webview
-      enableScripts: true,
-      retainContextWhenHidden: true,
-      // And restrict the webview to only loading content from our extension's `media` directory.
-      localResourceRoots: [vscode.Uri.file(this.mediaPath)],
-    });
+  public createWebviewPanel(): vscode.WebviewPanel {
+    return vscode.window.createWebviewPanel(
+      this.viewType,
+      this.viewTitle,
+      vscode.ViewColumn.One,
+      {
+        // Enable javascript in the webview
+        enableScripts: true,
+        retainContextWhenHidden: true,
+        // And restrict the webview to only loading content from our extension's `media` directory.
+        localResourceRoots: [vscode.Uri.file(this.mediaPath)],
+      }
+    );
   }
 
   protected disposeWebviewPanel() {
@@ -69,7 +77,11 @@ export abstract class AbstractWebviewPanel {
     // Set the context (current panel is focused)
     this.setFocused(this.webViewPanel.active);
 
-    this.webViewPanel.onDidDispose(() => this.dispose(), null, this.disposables);
+    this.webViewPanel.onDidDispose(
+      () => this.dispose(),
+      null,
+      this.disposables
+    );
 
     // Update the content based on view changes
     this.webViewPanel.onDidChangeViewState(
@@ -82,7 +94,11 @@ export abstract class AbstractWebviewPanel {
   }
 
   protected setFocused(focusedValue: boolean) {
-    void vscode.commands.executeCommand("setContext", this.focusedKey, focusedValue);
+    void vscode.commands.executeCommand(
+      "setContext",
+      this.focusedKey,
+      focusedValue
+    );
   }
 
   private dispose() {
@@ -101,11 +117,18 @@ export abstract class AbstractWebviewPanel {
   }
 
   protected initHtmlContent(): void {
-    let indexHtml = readFileSync(path.join(this.mediaPath, this.htmlFileName), "utf8");
+    let indexHtml = readFileSync(
+      path.join(this.mediaPath, this.htmlFileName),
+      "utf8"
+    );
     if (indexHtml) {
       // Local path to main script run in the webview
-      const scriptPathOnDisk = vscode.Uri.file(path.join(this.mediaPath, path.sep));
-      const scriptUri = this.webViewPanel.webview.asWebviewUri(scriptPathOnDisk);
+      const scriptPathOnDisk = vscode.Uri.file(
+        path.join(this.mediaPath, path.sep)
+      );
+      const scriptUri = this.webViewPanel.webview.asWebviewUri(
+        scriptPathOnDisk
+      );
 
       // TODO: very fragile: assuming double quotes and src is first attribute
       // specifically, doesn't work when building vue for development (vue-cli-service build --mode development)
