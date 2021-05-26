@@ -38,31 +38,25 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   }
 
   public async loadWebviewPanel(uiOptions?: any) {
-    const genNamespaceToRun = uiOptions?.generator;
-    if (genNamespaceToRun) {
-      const generator = Env.getGenNamespaces().find((genNamespace) => genNamespace === genNamespaceToRun);
+    const genNamespace = uiOptions?.generator;
+    if (genNamespace) {
+      const generator = Env.getGenNamespaces().find((genNS) => genNS === genNamespace);
       if (!generator) {
-        try {
-          await this.tryToInstallGenerator(genNamespaceToRun);
-        } catch (error) {
-          this.logger.error(error);
-          return;
-        }
+        await this.tryToInstallGenerator(genNamespace);
       }
     }
-    //TODO: for testing
-    // await this.tryToInstallGenerator("code:app");
-    // uiOptions = {generator: "code:app"};
 
     return super.loadWebviewPanel(uiOptions);
   }
 
   private async tryToInstallGenerator(genNamespace: string) {
-    await NpmCommand.checkAccessAndSetGeneratorsPath();
-    const genFullName = Env.getGeneratorFullName(genNamespace);
-    await vscode.commands.executeCommand("exploreGenerators", {
-      package: { name: genFullName },
-    });
+    if (!this.isInBAS) {
+      await NpmCommand.checkAccessAndSetGeneratorsPath();
+      const genFullName = Env.getGeneratorFullName(genNamespace);
+      await vscode.commands.executeCommand("exploreGenerators", {
+        package: { name: genFullName },
+      });
+    }
   }
 
   public async runGenerator() {
@@ -126,7 +120,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   private installGens: any;
   private readonly output: GeneratorOutput;
 
-  public constructor(context: vscode.ExtensionContext) {
+  public constructor(context: Partial<vscode.ExtensionContext>) {
     super(context);
     this.viewType = "yeomanui";
     this.viewTitle = YeomanUIPanel.YEOMAN_UI;

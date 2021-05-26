@@ -15,7 +15,7 @@ export abstract class AbstractWebviewPanel {
   protected focusedKey: string;
   protected htmlFileName: string;
   protected state: any;
-  protected context: vscode.ExtensionContext;
+  protected context: Partial<vscode.ExtensionContext>;
 
   protected readonly logger: IChildLogger;
   protected disposables: vscode.Disposable[];
@@ -28,7 +28,7 @@ export abstract class AbstractWebviewPanel {
     return this.setWebviewPanel(webViewPanel, uiOptions);
   }
 
-  protected constructor(context: vscode.ExtensionContext) {
+  protected constructor(context: Partial<vscode.ExtensionContext>) {
     this.extensionPath = context.extensionPath;
     this.mediaPath = path.join(context.extensionPath, "dist", "media");
     this.htmlFileName = "index.html";
@@ -44,7 +44,7 @@ export abstract class AbstractWebviewPanel {
     return;
   }
 
-  protected createWebviewPanel(): vscode.WebviewPanel {
+  public createWebviewPanel(): vscode.WebviewPanel {
     return vscode.window.createWebviewPanel(this.viewType, this.viewTitle, vscode.ViewColumn.One, {
       // Enable javascript in the webview
       enableScripts: true,
