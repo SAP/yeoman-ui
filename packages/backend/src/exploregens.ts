@@ -1,5 +1,4 @@
 import * as _ from "lodash";
-import { json } from "npm-registry-fetch";
 import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { NpmCommand } from "./utils/npm";
@@ -23,8 +22,10 @@ export class ExploreGens {
   private readonly context: any;
   private isInBAS: boolean; // eslint-disable-line @typescript-eslint/prefer-readonly
 
-  private readonly GLOBAL_ACCEPT_LEGAL_NOTE = "global.exploreGens.acceptlegalNote";
-  private readonly LAST_AUTO_UPDATE_DATE = "global.exploreGens.lastAutoUpdateDate";
+  private readonly GLOBAL_ACCEPT_LEGAL_NOTE =
+    "global.exploreGens.acceptlegalNote";
+  private readonly LAST_AUTO_UPDATE_DATE =
+    "global.exploreGens.lastAutoUpdateDate";
   private readonly SEARCH_QUERY = "ApplicationWizard.searchQuery";
   private readonly AUTO_UPDATE = "ApplicationWizard.autoUpdate";
   private readonly EMPTY = "";
@@ -60,7 +61,9 @@ export class ExploreGens {
   }
 
   private isLegalNoteAccepted() {
-    return this.isInBAS ? this.context.globalState.get(this.GLOBAL_ACCEPT_LEGAL_NOTE, false) : true;
+    return this.isInBAS
+      ? this.context.globalState.get(this.GLOBAL_ACCEPT_LEGAL_NOTE, false)
+      : true;
   }
 
   private async acceptLegalNote() {
@@ -69,16 +72,16 @@ export class ExploreGens {
   }
 
   private async doGeneratorsUpdate() {
-    const lastUpdateDate = this.context.globalState.get(this.LAST_AUTO_UPDATE_DATE, 0);
-    const currentDate = Date.now();
-    if (currentDate - lastUpdateDate > this.ONE_DAY) {
-      this.context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
-      const autoUpdateEnabled = this.getWsConfig().get(this.AUTO_UPDATE, true);
-      if (autoUpdateEnabled) {
-        await NpmCommand.checkAccessAndSetGeneratorsPath();
-        await this.updateAllInstalledGenerators();
-      }
-    }
+    // const lastUpdateDate = this.context.globalState.get(this.LAST_AUTO_UPDATE_DATE, 0);
+    // const currentDate = Date.now();
+    // if (currentDate - lastUpdateDate > this.ONE_DAY) {
+    //   this.context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
+    //   const autoUpdateEnabled = this.getWsConfig().get(this.AUTO_UPDATE, true);
+    //   if (autoUpdateEnabled) {
+    //     await NpmCommand.checkAccessAndSetGeneratorsPath();
+    await this.updateAllInstalledGenerators();
+    //   }
+    // }
   }
 
   private getIsInBAS(): boolean {
@@ -101,11 +104,13 @@ export class ExploreGens {
   }
 
   private async updateAllInstalledGenerators() {
-    const installedGenerators: string[] = this.getAllInstalledGenerators();
-    if (!_.isEmpty(installedGenerators)) {
+    const gensToUpdate: string[] = await Env.getGeneratorNamesToUpdate();
+    if (!_.isEmpty(gensToUpdate)) {
       this.logger.debug(messages.auto_update_started);
-      const statusBarMessage = vscode.window.setStatusBarMessage(messages.auto_update_started);
-      const promises = _.map(installedGenerators, (genName) => this.update(genName));
+      const statusBarMessage = vscode.window.setStatusBarMessage(
+        messages.auto_update_started
+      );
+      const promises = _.map(gensToUpdate, (genName) => this.update(genName));
       const failedToUpdateGens: any[] = _.compact(await Promise.all(promises));
       if (!_.isEmpty(failedToUpdateGens)) {
         const errMessage = messages.failed_to_update_gens(failedToUpdateGens);
@@ -121,17 +126,15 @@ export class ExploreGens {
     return vscode.workspace.getConfiguration();
   }
 
-  private async getFilteredGenerators(query?: string, author?: string) {
-    query = query || this.EMPTY;
-    author = author || this.EMPTY;
-    const gensQueryUrl = NpmCommand.getGensQueryURL(query, author);
-
+  private async getFilteredGenerators(query = this.EMPTY, author = this.EMPTY) {
     try {
       const cachedGens = this.getInstalledGens();
-      const res: any = await json(gensQueryUrl);
-      const filteredGenerators = _.map(_.get(res, "objects"), (gen) => {
+      const genObjects = await NpmCommand.getGeneratorObjects(query, author);
+      const filteredGenerators = _.map(genObjects, (gen) => {
         const genName = gen.package.name;
-        gen.state = _.includes(cachedGens, genName) ? GenState.installed : GenState.notInstalled;
+        gen.state = _.includes(cachedGens, genName)
+          ? GenState.installed
+          : GenState.notInstalled;
         gen.disabledToHandle = false;
         const handlingState = this.getHandlingState(genName);
         if (handlingState) {
@@ -141,9 +144,10 @@ export class ExploreGens {
         return gen;
       });
 
-      return [filteredGenerators, res.total];
+      return [filteredGenerators, genObjects.total];
     } catch (error) {
-      this.showAndLogError(messages.failed_to_get(gensQueryUrl), error);
+      // TODO: improve error message ---> this.showAndLogError(messages.failed_to_get(gensQueryUrl), error);
+      this.showAndLogError(messages.failed_to_get(query), error);
     }
   }
 
@@ -154,7 +158,8 @@ export class ExploreGens {
   }
 
   private getRecommendedQuery() {
-    const recommended: string[] = this.getWsConfig().get(this.SEARCH_QUERY) || [];
+    const recommended: string[] =
+      this.getWsConfig().get(this.SEARCH_QUERY) || [];
     return _.uniq(recommended);
   }
 
@@ -167,7 +172,9 @@ export class ExploreGens {
 
     this.addToHandled(genName, GenState.installing);
     const installingMessage = messages.installing(genName);
-    const statusbarMessage = vscode.window.setStatusBarMessage(installingMessage);
+    const statusbarMessage = vscode.window.setStatusBarMessage(
+      installingMessage
+    );
 
     try {
       await NpmCommand.checkAccessAndSetGeneratorsPath();
@@ -193,7 +200,9 @@ export class ExploreGens {
     const genName = gen.package.name;
     this.addToHandled(genName, GenState.uninstalling);
     const uninstallingMessage = messages.uninstalling(genName);
-    const statusbarMessage = vscode.window.setStatusBarMessage(uninstallingMessage);
+    const statusbarMessage = vscode.window.setStatusBarMessage(
+      uninstallingMessage
+    );
 
     try {
       this.logger.debug(uninstallingMessage);

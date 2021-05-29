@@ -2,6 +2,7 @@ import * as _ from "lodash";
 import { homedir } from "os";
 import * as path from "path";
 import { existsSync } from "fs";
+import { readFile } from "fs-extra";
 import { isWin32, NpmCommand } from "./npm";
 import * as customLocation from "./customLocation";
 import * as Environment from "yeoman-environment";
@@ -26,11 +27,17 @@ class EnvUtil {
       const userNpmPaths = homedir()
         .split(path.sep)
         .map((part, index, parts) => {
-          const resPath = path.join(...parts.slice(0, index + 1), "node_modules");
+          const resPath = path.join(
+            ...parts.slice(0, index + 1),
+            "node_modules"
+          );
           return isWin32 ? resPath : path.join(path.sep, resPath);
         });
       // uniq and existing only paths (global npm path is always added)
-      const paths: string[] = _.union(globalNpmPaths, userNpmPaths).filter((npmPath) => existsSync(npmPath));
+      const paths: string[] = _.union(
+        globalNpmPaths,
+        userNpmPaths
+      ).filter((npmPath) => existsSync(npmPath));
       paths.push(NpmCommand.getGlobalNodeModulesPath());
       return _.uniq(paths);
     })();
@@ -49,7 +56,9 @@ class EnvUtil {
     const genShortName = Environment.namespaceToName(genNamespace);
     if (genShortName.startsWith("@")) {
       const firstSlashIndex = genShortName.indexOf("/");
-      generatorName = `${GENERATOR}${genShortName.substring(firstSlashIndex + 1)}`;
+      generatorName = `${GENERATOR}${genShortName.substring(
+        firstSlashIndex + 1
+      )}`;
     } else {
       generatorName = `${GENERATOR}${genShortName}`;
     }
@@ -62,7 +71,9 @@ class EnvUtil {
     }
   }
 
-  private _lookupGeneratorsMeta(options: any): Environment.LookupGeneratorMeta[] {
+  private _lookupGeneratorsMeta(
+    options: any
+  ): Environment.LookupGeneratorMeta[] {
     return this.createEnvInstance().lookup(options);
   }
 
@@ -77,19 +88,29 @@ class EnvUtil {
       ? []
       : this._lookupGeneratorsMeta({ npmPaths: customNpmPath });
 
-    const gensMeta = _.unionBy(customInstalledGensMeta, globallyInstalledGensMeta, "namespace");
+    const gensMeta = _.unionBy(
+      customInstalledGensMeta,
+      globallyInstalledGensMeta,
+      "namespace"
+    );
     return _.orderBy(gensMeta, ["namespace"], ["asc"]);
   }
 
-  private getGenMetadata(genNamespace: string): Environment.LookupGeneratorMeta {
+  private getGenMetadata(
+    genNamespace: string
+  ): Environment.LookupGeneratorMeta {
     this.allInstalledGensMeta = this._lookupAllGensMeta();
 
-    const genMetadata = this.allInstalledGensMeta.find((genMeta) => genMeta.namespace === genNamespace);
+    const genMetadata = this.allInstalledGensMeta.find(
+      (genMeta) => genMeta.namespace === genNamespace
+    );
     if (genMetadata) {
       return genMetadata;
     }
 
-    throw new GeneratorNotFoundError(`${genNamespace} generator metadata was not found.`);
+    throw new GeneratorNotFoundError(
+      `${genNamespace} generator metadata was not found.`
+    );
   }
 
   private genMainModules(gensMeta: Environment.LookupGeneratorMeta[]) {
@@ -101,10 +122,18 @@ class EnvUtil {
     return _.map(gensMeta, (genMeta) => genMeta.namespace);
   }
 
-  public createEnvAndGen(genNamespace: string, options: any, adapter: any): any {
+  public createEnvAndGen(
+    genNamespace: string,
+    options: any,
+    adapter: any
+  ): any {
     const meta = this.getGenMetadata(genNamespace);
     this.unloadGeneratorModules(genNamespace);
-    const env = this.createEnvInstance(undefined, { sharedOptions: { forwardErrorToEnvironment: true } }, adapter);
+    const env = this.createEnvInstance(
+      undefined,
+      { sharedOptions: { forwardErrorToEnvironment: true } },
+      adapter
+    );
     // @types/yeoman-environment bug: generatorPath is still not exposed on LookupGeneratorMeta
     env.register(_.get(meta, "generatorPath"), genNamespace, meta.packagePath);
     const gen = env.create(genNamespace, { options });
@@ -113,21 +142,64 @@ class EnvUtil {
 
   public getGeneratorsMeta(mainOnly = true): Environment.LookupGeneratorMeta[] {
     this.allInstalledGensMeta = this._lookupAllGensMeta();
-    return mainOnly ? this.genMainModules(this.allInstalledGensMeta) : this.allInstalledGensMeta;
+    return mainOnly
+      ? this.genMainModules(this.allInstalledGensMeta)
+      : this.allInstalledGensMeta;
+  }
+
+  public async getGenPackageJson(genPackagePath: string): Promise<any> {
+    const packageJsonString: string = await readFile(
+      path.join(genPackagePath, "package.json"),
+      "utf8"
+    );
+    return JSON.parse(packageJsonString);
   }
 
   public getGeneratorNamesByPath(): string[] {
-    const npmPaths = customLocation.getNodeModulesPath() ?? NpmCommand.getGlobalNodeModulesPath();
+    const npmPaths =
+      customLocation.getNodeModulesPath() ??
+      NpmCommand.getGlobalNodeModulesPath();
     const gensMeta = this._lookupGeneratorsMeta({ npmPaths });
 
-    const genFullNames = gensMeta.map((genMeta) => this.getGeneratorFullName(genMeta.namespace));
+    const genFullNames = gensMeta.map((genMeta) =>
+      this.getGeneratorFullName(genMeta.namespace)
+    );
     return _.uniq(genFullNames);
+  }
+
+  public async getGeneratorNamesToUpdate(): Promise<string[]> {
+    const npmPaths =
+      customLocation.getNodeModulesPath() ??
+      NpmCommand.getGlobalNodeModulesPath();
+    const gensMeta = this._lookupGeneratorsMeta({ npmPaths });
+
+    const genPackagePaths = _.uniq(
+      gensMeta.map((genMeta) => genMeta.packagePath)
+    );
+    const packageJsonsPromises: any[] = genPackagePaths.map(
+      async (packageJsonPath) => this.getGenPackageJson(packageJsonPath)
+    );
+    const packageJsons = await Promise.all(packageJsonsPromises);
+
+    const genToUpdatePromises = packageJsons.map((packageJson: any) => {
+      return NpmCommand.shouldBeUpdated(packageJson).then(
+        (toUpdate: boolean) => {
+          if (toUpdate) {
+            return packageJson.name;
+          }
+        }
+      );
+    });
+
+    return _.compact(await Promise.all(genToUpdatePromises));
   }
 
   public getGeneratorFullName(genNamespace: string) {
     const genName = Environment.namespaceToName(genNamespace);
     const parts = _.split(genName, "/");
-    return _.size(parts) === 1 ? `${GENERATOR}${genName}` : `${parts[0]}/${GENERATOR}${parts[1]}`;
+    return _.size(parts) === 1
+      ? `${GENERATOR}${genName}`
+      : `${parts[0]}/${GENERATOR}${parts[1]}`;
   }
 }
 
