@@ -144,10 +144,9 @@ class Command {
     return this.globalNodeModulesPath;
   }
 
-  public async getGeneratorObjects(query = "", author = "") {
+  public async getPackagesMetadata(query = "", author = "") {
     const gensQueryUrl = NpmCommand.getGensQueryURL(query, author);
-    const res: any = await npmFetch.json(gensQueryUrl);
-    return _.get(res, "objects", []);
+    return await npmFetch.json(gensQueryUrl);
   }
 
   public async getPackageJson(packagePath: string): Promise<any> {
@@ -158,7 +157,7 @@ class Command {
     return JSON.parse(packageJsonString);
   }
 
-  public async getPackageNamesToUpdate(
+  public async getPackageNamesWithOutdatedVersion(
     packagePaths: string[]
   ): Promise<string[]> {
     const packageJsonPromises: any[] = packagePaths.map((packageJsonPath) =>

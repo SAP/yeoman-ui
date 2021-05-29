@@ -49,7 +49,7 @@ export class ExploreGens {
   }
 
   private getAllInstalledGenerators(): string[] {
-    return Env.getGeneratorNamesByPath();
+    return Env.getGeneratorNames();
   }
 
   private getInstalledGens(): string[] {
@@ -107,7 +107,7 @@ export class ExploreGens {
   }
 
   private async updateAllInstalledGenerators() {
-    const gensToUpdate: string[] = await Env.getGeneratorNamesToUpdate();
+    const gensToUpdate: string[] = await Env.getGenNamesWithOutdatedVersion();
     if (!_.isEmpty(gensToUpdate)) {
       this.logger.debug(messages.auto_update_started);
       const statusBarMessage = vscode.window.setStatusBarMessage(
@@ -132,25 +132,27 @@ export class ExploreGens {
   private async getFilteredGenerators(query?: string, author?: string) {
     try {
       const cachedGens = this.getInstalledGens();
-      const genObjects = await NpmCommand.getGeneratorObjects(query, author);
-      const filteredGenerators = _.map(genObjects, (gen) => {
-        const genName = gen.package.name;
-        gen.state = _.includes(cachedGens, genName)
+      const packagesMeta: any = await NpmCommand.getPackagesMetadata(
+        query,
+        author
+      );
+      const filteredGenerators = _.map(packagesMeta.objects, (meta) => {
+        const genName = meta.package.name;
+        meta.state = _.includes(cachedGens, genName)
           ? GenState.installed
           : GenState.notInstalled;
-        gen.disabledToHandle = false;
+        meta.disabledToHandle = false;
         const handlingState = this.getHandlingState(genName);
         if (handlingState) {
-          gen.state = handlingState;
-          gen.disabledToHandle = true;
+          meta.state = handlingState;
+          meta.disabledToHandle = true;
         }
-        return gen;
+        return meta;
       });
 
-      return [filteredGenerators, genObjects.total];
+      return [filteredGenerators, packagesMeta.total];
     } catch (error) {
-      // TODO: improve error message ---> this.showAndLogError(messages.failed_to_get(gensQueryUrl), error);
-      this.showAndLogError(messages.failed_to_get(query), error);
+      this.showAndLogError(messages.failed_to_get_outdated_gens, error);
     }
   }
 

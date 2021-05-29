@@ -147,7 +147,7 @@ class EnvUtil {
       : this.allInstalledGensMeta;
   }
 
-  public getGeneratorNamesByPath(): string[] {
+  public getGeneratorNames(): string[] {
     const npmPaths =
       customLocation.getNodeModulesPath() ??
       NpmCommand.getGlobalNodeModulesPath();
@@ -159,7 +159,7 @@ class EnvUtil {
     return _.uniq(genFullNames);
   }
 
-  public getGeneratorNamesToUpdate(): Promise<string[]> {
+  public getGenNamesWithOutdatedVersion(): Promise<string[]> {
     const npmPaths =
       customLocation.getNodeModulesPath() ??
       NpmCommand.getGlobalNodeModulesPath();
@@ -168,7 +168,7 @@ class EnvUtil {
     const genPackagePaths = _.uniq(
       gensMeta.map((genMeta) => genMeta.packagePath)
     );
-    return NpmCommand.getPackageNamesToUpdate(genPackagePaths);
+    return NpmCommand.getPackageNamesWithOutdatedVersion(genPackagePaths);
   }
 
   public getGeneratorFullName(genNamespace: string) {
