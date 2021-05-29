@@ -72,16 +72,19 @@ export class ExploreGens {
   }
 
   private async doGeneratorsUpdate() {
-    // const lastUpdateDate = this.context.globalState.get(this.LAST_AUTO_UPDATE_DATE, 0);
-    // const currentDate = Date.now();
-    // if (currentDate - lastUpdateDate > this.ONE_DAY) {
-    //   this.context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
-    //   const autoUpdateEnabled = this.getWsConfig().get(this.AUTO_UPDATE, true);
-    //   if (autoUpdateEnabled) {
-    //     await NpmCommand.checkAccessAndSetGeneratorsPath();
-    await this.updateAllInstalledGenerators();
-    //   }
-    // }
+    const lastUpdateDate = this.context.globalState.get(
+      this.LAST_AUTO_UPDATE_DATE,
+      0
+    );
+    const currentDate = Date.now();
+    if (currentDate - lastUpdateDate > this.ONE_DAY) {
+      this.context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
+      const autoUpdateEnabled = this.getWsConfig().get(this.AUTO_UPDATE, true);
+      if (autoUpdateEnabled) {
+        await NpmCommand.checkAccessAndSetGeneratorsPath();
+        await this.updateAllInstalledGenerators();
+      }
+    }
   }
 
   private getIsInBAS(): boolean {
@@ -126,7 +129,7 @@ export class ExploreGens {
     return vscode.workspace.getConfiguration();
   }
 
-  private async getFilteredGenerators(query = this.EMPTY, author = this.EMPTY) {
+  private async getFilteredGenerators(query?: string, author?: string) {
     try {
       const cachedGens = this.getInstalledGens();
       const genObjects = await NpmCommand.getGeneratorObjects(query, author);

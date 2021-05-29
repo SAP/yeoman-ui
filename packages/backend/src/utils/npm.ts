@@ -4,12 +4,11 @@ import { platform } from "os";
 import * as _ from "lodash";
 import * as customLocation from "./customLocation";
 import * as sudo from "sudo-prompt";
-import { promises, constants, existsSync } from "fs";
+import { readFile, promises, constants, existsSync } from "fs-extra";
 import messages from "../messages";
 import { vscode } from "./vscodeProxy";
 import * as path from "path";
 import * as npmFetch from "npm-registry-fetch";
-import { Env } from "./env";
 
 export const isWin32 = platform() === "win32";
 const NPM = isWin32 ? "npm.cmd" : "npm";
@@ -59,31 +58,8 @@ class Command {
       : `--prefix ${customInstallationPath}`;
   }
 
-  public getGlobalNodeModulesPath(): string {
-    return this.globalNodeModulesPath;
-  }
-
-  public async execCommand(arg: string): Promise<any> {
+  private async execCommand(arg: string): Promise<any> {
     return promisify(exec)(arg);
-  }
-
-  public async getGeneratorObjects(query?: string, author?: string) {
-    const gensQueryUrl = NpmCommand.getGensQueryURL(query, author);
-    const res: any = await npmFetch.json(gensQueryUrl);
-    return _.get(res, "objects", []);
-  }
-
-  public async shouldBeUpdated(packageJson: any): Promise<boolean> {
-    const genQueryUrl = this.getSingleGenQueryURL(packageJson.name);
-    const packageObjects = await npmFetch.json(genQueryUrl);
-    const firstObject: any = _.get(packageObjects, "objects.[0]");
-    if (firstObject) {
-      const latestAvailableVersion = firstObject.package.version;
-      const currentinstalledVersion = packageJson.version;
-      return currentinstalledVersion !== latestAvailableVersion;
-    }
-
-    return false;
   }
 
   private getGensQueryURL(query: string, recommended: string): string {
@@ -96,18 +72,6 @@ class Command {
     return encodeURI(
       `${SEARCH_QUERY_PREFIX} ${query} keywords:yeoman-generator &size=1`
     );
-  }
-
-  public async install(genName: string): Promise<any> {
-    const locationParams = this.getGenLocationParams();
-    const command = `${NPM} install ${locationParams} ${genName}@latest`;
-    return this.execCommand(command);
-  }
-
-  public async uninstall(genName: string): Promise<any> {
-    const locationParams = this.getGenLocationParams();
-    const command = `${NPM} uninstall ${locationParams} ${genName}`;
-    return this.execCommand(command);
   }
 
   private async sudoExec(command: string) {
@@ -165,6 +129,62 @@ class Command {
     } finally {
       statusBarMessage.dispose();
     }
+  }
+
+  private async shouldBeUpdated(packageJson: any): Promise<boolean> {
+    const queryUrl = this.getSingleGenQueryURL(packageJson.name);
+    const npmJsModules = await npmFetch.json(queryUrl);
+    const npmJsModule: any = _.get(npmJsModules, "objects.[0]");
+    return npmJsModule
+      ? npmJsModule.package.version !== packageJson.version
+      : false;
+  }
+
+  public getGlobalNodeModulesPath(): string {
+    return this.globalNodeModulesPath;
+  }
+
+  public async getGeneratorObjects(query = "", author = "") {
+    const gensQueryUrl = NpmCommand.getGensQueryURL(query, author);
+    const res: any = await npmFetch.json(gensQueryUrl);
+    return _.get(res, "objects", []);
+  }
+
+  public async getPackageJson(packagePath: string): Promise<any> {
+    const packageJsonString: string = await readFile(
+      path.join(packagePath, "package.json"),
+      "utf8"
+    );
+    return JSON.parse(packageJsonString);
+  }
+
+  public async getPackageNamesToUpdate(
+    packagePaths: string[]
+  ): Promise<string[]> {
+    const packageJsonPromises: any[] = packagePaths.map((packageJsonPath) =>
+      this.getPackageJson(packageJsonPath)
+    );
+    const packageJsons: any[] = await Promise.all(packageJsonPromises);
+
+    const packageNameToUpdatePromises = packageJsons.map((packageJson) => {
+      return NpmCommand.shouldBeUpdated(packageJson).then((toUpdate) =>
+        toUpdate ? packageJson.name : undefined
+      );
+    });
+
+    return _.compact(await Promise.all(packageNameToUpdatePromises));
+  }
+
+  public async install(packageName: string): Promise<any> {
+    const locationParams = this.getGenLocationParams();
+    const command = `${NPM} install ${locationParams} ${packageName}@latest`;
+    return this.execCommand(command);
+  }
+
+  public async uninstall(packageName: string): Promise<any> {
+    const locationParams = this.getGenLocationParams();
+    const command = `${NPM} uninstall ${locationParams} ${packageName}`;
+    return this.execCommand(command);
   }
 
   public async checkAccessAndSetGeneratorsPath() {

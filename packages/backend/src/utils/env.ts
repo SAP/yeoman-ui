@@ -2,13 +2,13 @@ import * as _ from "lodash";
 import { homedir } from "os";
 import * as path from "path";
 import { existsSync } from "fs";
-import { readFile } from "fs-extra";
 import { isWin32, NpmCommand } from "./npm";
 import * as customLocation from "./customLocation";
 import * as Environment from "yeoman-environment";
 import TerminalAdapter = require("yeoman-environment/lib/adapter");
 
 const GENERATOR = "generator-";
+const NAMESPACE = "namespace";
 
 export class GeneratorNotFoundError extends Error {
   constructor(message: string) {
@@ -91,9 +91,9 @@ class EnvUtil {
     const gensMeta = _.unionBy(
       customInstalledGensMeta,
       globallyInstalledGensMeta,
-      "namespace"
+      NAMESPACE
     );
-    return _.orderBy(gensMeta, ["namespace"], ["asc"]);
+    return _.orderBy(gensMeta, [NAMESPACE], ["asc"]);
   }
 
   private getGenMetadata(
@@ -147,14 +147,6 @@ class EnvUtil {
       : this.allInstalledGensMeta;
   }
 
-  public async getGenPackageJson(genPackagePath: string): Promise<any> {
-    const packageJsonString: string = await readFile(
-      path.join(genPackagePath, "package.json"),
-      "utf8"
-    );
-    return JSON.parse(packageJsonString);
-  }
-
   public getGeneratorNamesByPath(): string[] {
     const npmPaths =
       customLocation.getNodeModulesPath() ??
@@ -167,7 +159,7 @@ class EnvUtil {
     return _.uniq(genFullNames);
   }
 
-  public async getGeneratorNamesToUpdate(): Promise<string[]> {
+  public getGeneratorNamesToUpdate(): Promise<string[]> {
     const npmPaths =
       customLocation.getNodeModulesPath() ??
       NpmCommand.getGlobalNodeModulesPath();
@@ -176,22 +168,7 @@ class EnvUtil {
     const genPackagePaths = _.uniq(
       gensMeta.map((genMeta) => genMeta.packagePath)
     );
-    const packageJsonsPromises: any[] = genPackagePaths.map(
-      async (packageJsonPath) => this.getGenPackageJson(packageJsonPath)
-    );
-    const packageJsons = await Promise.all(packageJsonsPromises);
-
-    const genToUpdatePromises = packageJsons.map((packageJson: any) => {
-      return NpmCommand.shouldBeUpdated(packageJson).then(
-        (toUpdate: boolean) => {
-          if (toUpdate) {
-            return packageJson.name;
-          }
-        }
-      );
-    });
-
-    return _.compact(await Promise.all(genToUpdatePromises));
+    return NpmCommand.getPackageNamesToUpdate(genPackagePaths);
   }
 
   public getGeneratorFullName(genNamespace: string) {

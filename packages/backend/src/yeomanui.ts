@@ -1,5 +1,5 @@
 import * as path from "path";
-import { readFile, mkdirs, readdir, stat } from "fs-extra";
+import { mkdirs, readdir, stat } from "fs-extra";
 import * as _ from "lodash";
 import * as inquirer from "inquirer";
 import { ReplayUtils, ReplayState } from "./replayUtils";
@@ -22,6 +22,7 @@ import { vscode, getVscode } from "./utils/vscodeProxy";
 import * as Generator from "yeoman-generator";
 import * as Environment from "yeoman-environment";
 import { Questions } from "yeoman-environment/lib/adapter";
+import { NpmCommand } from "./utils/npm";
 
 export interface IQuestionsPrompt extends IPrompt {
   questions: any[];
@@ -676,7 +677,7 @@ export class YeomanUI {
     const genPackagePath: string = genMeta.packagePath;
 
     try {
-      packageJson = await Env.getGenPackageJson(genPackagePath);
+      packageJson = await NpmCommand.getPackageJson(genPackagePath);
     } catch (error) {
       this.logError(error);
       return;
