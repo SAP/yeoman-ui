@@ -14,6 +14,7 @@ export default {
   results_out_of_total: (gensQuantity, totalGensQuantity) =>
     `Showing ${gensQuantity} out of ${totalGensQuantity} results.`,
   results: (totalGensQuantity) => `Showing ${totalGensQuantity} results.`,
+  update: "Update",
   install: "Install",
   uninstall: "Uninstall",
   installing: "Installing...",

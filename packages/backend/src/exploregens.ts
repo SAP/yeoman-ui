@@ -3,7 +3,7 @@ import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { NpmCommand } from "./utils/npm";
 import messages from "./exploreGensMessages";
-import { Env } from "./utils/env";
+import { Env, GeneratorData } from "./utils/env";
 import { vscode } from "./utils/vscodeProxy";
 
 export enum GenState {
@@ -12,13 +12,14 @@ export enum GenState {
   installing = "installing",
   notInstalled = "notInstalled",
   installed = "installed",
+  outdated = "outdated",
 }
 
 export class ExploreGens {
   private readonly logger: IChildLogger;
   private rpc: Partial<IRpc>;
   private gensBeingHandled: any[]; // eslint-disable-line @typescript-eslint/prefer-readonly
-  private cachedInstalledGenerators: string[];
+  private cachedGeneratorsDataPromise: Promise<GeneratorData[]>;
   private readonly context: any;
   private isInBAS: boolean; // eslint-disable-line @typescript-eslint/prefer-readonly
 
@@ -46,16 +47,16 @@ export class ExploreGens {
     return this.rpc.invoke("setGenQuery", [genFullName]);
   }
 
-  private getAllInstalledGenerators(): string[] {
-    return Env.getGeneratorNames();
+  private getGeneratorsData(): Promise<GeneratorData[]> {
+    return Env.getGeneratorsData();
   }
 
-  private getInstalledGens(): string[] {
-    return this.cachedInstalledGenerators;
+  private getInstalledGens(): Promise<GeneratorData[]> {
+    return this.cachedGeneratorsDataPromise;
   }
 
   private setInstalledGens() {
-    this.cachedInstalledGenerators = this.getAllInstalledGenerators();
+    this.cachedGeneratorsDataPromise = this.getGeneratorsData();
   }
 
   private isLegalNoteAccepted() {
@@ -90,13 +91,10 @@ export class ExploreGens {
 
   private initRpc(rpc: Partial<IRpc>) {
     this.rpc = rpc;
-    this.rpc.registerMethod({
-      func: this.getFilteredGenerators,
-      thisArg: this,
-    });
+    this.rpc.registerMethod({ func: this.getFilteredGenerators, thisArg: this });
+    this.rpc.registerMethod({ func: this.update, thisArg: this });
     this.rpc.registerMethod({ func: this.install, thisArg: this });
     this.rpc.registerMethod({ func: this.uninstall, thisArg: this });
-    this.rpc.registerMethod({ func: this.isInstalled, thisArg: this });
     this.rpc.registerMethod({ func: this.getRecommendedQuery, thisArg: this });
     this.rpc.registerMethod({ func: this.getIsInBAS, thisArg: this });
     this.rpc.registerMethod({ func: this.isLegalNoteAccepted, thisArg: this });
@@ -126,11 +124,18 @@ export class ExploreGens {
 
   private async getFilteredGenerators(query?: string, author?: string) {
     try {
-      const cachedGens = this.getInstalledGens();
+      const gensData: GeneratorData[] = await this.getInstalledGens();
       const packagesMeta: any = await NpmCommand.getPackagesMetadata(query, author);
       const filteredGenerators = _.map(packagesMeta.objects, (meta) => {
         const genName = meta.package.name;
-        meta.state = _.includes(cachedGens, genName) ? GenState.installed : GenState.notInstalled;
+        const installedGenData = gensData.find((genData) => genData.generatorPackageJson.name === genName);
+        meta.state = !!installedGenData ? GenState.installed : GenState.notInstalled;
+        if (
+          meta.state === GenState.installed &&
+          meta.package.version !== installedGenData.generatorPackageJson.version
+        ) {
+          meta.state = GenState.outdated;
+        }
         meta.disabledToHandle = false;
         const handlingState = this.getHandlingState(genName);
         if (handlingState) {
@@ -213,7 +218,8 @@ export class ExploreGens {
     }
   }
 
-  private async update(genName: string): Promise<string | undefined> {
+  private async update(gen: any): Promise<string | undefined> {
+    const genName = _.get(gen.package, "name", gen);
     this.addToHandled(genName, GenState.updating);
 
     try {
@@ -253,10 +259,5 @@ export class ExploreGens {
     });
 
     return _.get(gen, "state");
-  }
-
-  private isInstalled(gen: any) {
-    const installedGens: string[] = this.getInstalledGens();
-    return _.includes(installedGens, gen.package.name);
   }
 }

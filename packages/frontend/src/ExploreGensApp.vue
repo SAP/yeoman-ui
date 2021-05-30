@@ -135,7 +135,9 @@ export default {
       this.disclaimerOpened = !this.disclaimerOpened;
     },
     actionName(gen) {
-      if (gen.state === "installed") {
+      if (gen.state === "outdated") {
+        return messages.update;
+      } else if (gen.state === "installed") {
         return messages.uninstall;
       } else if (gen.state === "notInstalled") {
         return messages.install;
@@ -153,7 +155,13 @@ export default {
     },
     onAction(gen) {
       if (!gen.disabledToHandle) {
-        const action = gen.state === "installed" ? "uninstall" : "install";
+        let action = "update";
+        if (gen.state === "installed") {
+          action = "uninslall";
+        } else if (gen.state === "uninstall") {
+          action === "install";
+        }
+
         this.rpc.invoke(action, [gen]);
       }
     },
