@@ -9,6 +9,8 @@ import messages from "../messages";
 import { vscode } from "./vscodeProxy";
 import * as path from "path";
 import * as npmFetch from "npm-registry-fetch";
+import { LookupGeneratorMeta } from "yeoman-environment";
+import { getConsoleWarnLogger } from "../logger/console-logger";
 
 export const isWin32 = platform() === "win32";
 const NPM = isWin32 ? "npm.cmd" : "npm";
@@ -116,6 +118,16 @@ class Command {
     return npmJsModule ? npmJsModule.package.version !== packageJson.version : false;
   }
 
+  private async getPackageJson(packagePath: string): Promise<any | undefined> {
+    const packageJsonFilePath = path.join(packagePath, "package.json");
+    try {
+      const packageJsonString: string = await readFile(packageJsonFilePath, "utf8");
+      return JSON.parse(packageJsonString);
+    } catch (error) {
+      getConsoleWarnLogger().error(`Could not get ${packageJsonFilePath} file content. Reason: ${error}`);
+    }
+  }
+
   public getGlobalNodeModulesPath(): string {
     return this.globalNodeModulesPath;
   }
@@ -125,14 +137,13 @@ class Command {
     return await npmFetch.json(gensQueryUrl);
   }
 
-  public async getPackageJson(packagePath: string): Promise<any> {
-    const packageJsonString: string = await readFile(path.join(packagePath, "package.json"), "utf8");
-    return JSON.parse(packageJsonString);
+  public async getPackageJsons(gensMeta: LookupGeneratorMeta[]): Promise<any[]> {
+    const packageJsonPromises: any[] = gensMeta.map((genMeta) => this.getPackageJson(genMeta.packagePath));
+    return await Promise.all(packageJsonPromises);
   }
 
-  public async getPackageNamesWithOutdatedVersion(packagePaths: string[]): Promise<string[]> {
-    const packageJsonPromises: any[] = packagePaths.map((packageJsonPath) => this.getPackageJson(packageJsonPath));
-    const packageJsons: any[] = await Promise.all(packageJsonPromises);
+  public async getPackageNamesWithOutdatedVersion(gensMeta: LookupGeneratorMeta[]): Promise<string[]> {
+    const packageJsons: any[] = await this.getPackageJsons(gensMeta);
 
     const packageNameToUpdatePromises = packageJsons.map((packageJson) => {
       return NpmCommand.shouldBeUpdated(packageJson).then((toUpdate) => (toUpdate ? packageJson.name : undefined));

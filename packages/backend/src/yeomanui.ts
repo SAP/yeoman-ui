@@ -17,12 +17,11 @@ import { SWA } from "./swa-tracker/swa-tracker-wrapper";
 import { Output } from "./output";
 import { resolve } from "path";
 import { homedir } from "os";
-import { Env, GeneratorNotFoundError } from "./utils/env";
+import { Env, GeneratorData, GeneratorNotFoundError } from "./utils/env";
 import { vscode, getVscode } from "./utils/vscodeProxy";
 import * as Generator from "yeoman-generator";
 import * as Environment from "yeoman-environment";
 import { Questions } from "yeoman-environment/lib/adapter";
-import { NpmCommand } from "./utils/npm";
 
 export interface IQuestionsPrompt extends IPrompt {
   questions: any[];
@@ -172,8 +171,8 @@ export class YeomanUI {
   }
 
   private async getGeneratorsPrompt(): Promise<any> {
-    const gensMeta: Environment.GeneratorMeta[] = Env.getGeneratorsMeta();
-    const questions: any[] = await this.createGeneratorPromptQuestions(gensMeta, this.uiOptions.filter);
+    const gensData: GeneratorData[] = await Env.getGeneratorsData();
+    const questions: any[] = await this.createGeneratorPromptQuestions(gensData, this.uiOptions.filter);
 
     this.currentQuestions = questions;
     const normalizedQuestions = this.normalizeFunctions(questions);
@@ -482,9 +481,9 @@ export class YeomanUI {
     return res;
   }
 
-  private async createGeneratorPromptQuestions(gensMeta: any, genFilter: GeneratorFilter): Promise<any[]> {
-    const generatorChoicePromises = _.map(gensMeta, (genMeta) => {
-      return this.getGeneratorChoice(genMeta, genFilter);
+  private async createGeneratorPromptQuestions(gensData: GeneratorData[], genFilter: GeneratorFilter): Promise<any[]> {
+    const generatorChoicePromises = _.map(gensData, (genData) => {
+      return this.getGeneratorChoice(genData, genFilter);
     });
 
     const questions: any[] = [];
@@ -560,17 +559,9 @@ export class YeomanUI {
     return questions;
   }
 
-  private async getGeneratorChoice(genMeta: any, filter: GeneratorFilter) {
-    let packageJson: any;
-    const genPackagePath: string = genMeta.packagePath;
-
-    try {
-      packageJson = await NpmCommand.getPackageJson(genPackagePath);
-    } catch (error) {
-      this.logError(error);
-      return;
-    }
-
+  private async getGeneratorChoice(genData: GeneratorData, filter: GeneratorFilter) {
+    const packageJson = genData.generatorPackageJson;
+    const genMeta = genData.generatorMeta;
     const genFilter: GeneratorFilter = GeneratorFilter.create(_.get(packageJson, ["generator-filter"]));
     const typesHasIntersection: boolean = GeneratorFilter.hasIntersection(filter.types, genFilter.types);
     const categoriesHasIntersection: boolean = GeneratorFilter.hasIntersection(filter.categories, genFilter.categories);
@@ -583,7 +574,7 @@ export class YeomanUI {
     _.includes(genFilter.types, "tools-suite") && this.generaorsToIgnoreArray.push(genMeta.namespace);
 
     if (typesHasIntersection && categoriesHasIntersection) {
-      return this.createGeneratorChoice(genMeta.namespace, genPackagePath, packageJson);
+      return this.createGeneratorChoice(genMeta.namespace, genMeta.packagePath, packageJson);
     }
   }
 

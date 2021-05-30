@@ -10,6 +10,11 @@ import TerminalAdapter = require("yeoman-environment/lib/adapter");
 const GENERATOR = "generator-";
 const NAMESPACE = "namespace";
 
+export type GeneratorData = {
+  generatorMeta: Environment.LookupGeneratorMeta;
+  generatorPackageJson: any;
+};
+
 export class GeneratorNotFoundError extends Error {
   constructor(message: string) {
     super(message);
@@ -99,6 +104,11 @@ class EnvUtil {
     return this.lookupGensMeta({ npmPaths: npmInstallationPaths });
   }
 
+  private getGeneratorsMeta(mainOnly = true): Environment.LookupGeneratorMeta[] {
+    this.allInstalledGensMeta = this.lookupAllGensMeta();
+    return mainOnly ? this.genMainGensMeta(this.allInstalledGensMeta) : this.allInstalledGensMeta;
+  }
+
   public getAllGeneratorNamespaces(): string[] {
     const gensMeta: Environment.LookupGeneratorMeta[] = this.getGeneratorsMeta(false);
     return _.map(gensMeta, (genMeta) => genMeta.namespace);
@@ -118,9 +128,18 @@ class EnvUtil {
     return { env, gen };
   }
 
-  public getGeneratorsMeta(mainOnly = true): Environment.LookupGeneratorMeta[] {
-    this.allInstalledGensMeta = this.lookupAllGensMeta();
-    return mainOnly ? this.genMainGensMeta(this.allInstalledGensMeta) : this.allInstalledGensMeta;
+  public async getGeneratorsData(mainOnly = true): Promise<GeneratorData[]> {
+    const gensMeta: Environment.LookupGeneratorMeta[] = this.getGeneratorsMeta(mainOnly);
+    const packageJsons = await NpmCommand.getPackageJsons(gensMeta);
+
+    const gensData = packageJsons.map((generatorPackageJson: any | undefined, index: number) => {
+      if (generatorPackageJson) {
+        const generatorMeta = gensMeta[index];
+        return { generatorMeta, generatorPackageJson };
+      }
+    });
+
+    return _.compact(gensData);
   }
 
   public getGeneratorNames(): string[] {
@@ -131,8 +150,7 @@ class EnvUtil {
 
   public getGeneratorNamesWithOutdatedVersion(): Promise<string[]> {
     const gensMeta: Environment.LookupGeneratorMeta[] = this.getGensMetaByInstallationPath();
-    const genPackagePaths = _.uniq(gensMeta.map((genMeta) => genMeta.packagePath));
-    return NpmCommand.getPackageNamesWithOutdatedVersion(genPackagePaths);
+    return NpmCommand.getPackageNamesWithOutdatedVersion(gensMeta);
   }
 
   public getGeneratorFullName(genNamespace: string): string {
