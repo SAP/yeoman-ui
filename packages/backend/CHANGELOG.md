@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.4](https://github.com/SAP/yeoman-ui/compare/v1.3.3...v1.3.4) (2021-05-30)
+
+### Bug Fixes
+
+- only outdated generators should be updated ([#605](https://github.com/SAP/yeoman-ui/issues/605)) ([25adce5](https://github.com/SAP/yeoman-ui/commit/25adce508c654ac760ee6cd5d75a582919894bfb))
+
 ## [1.3.3](https://github.com/SAP/yeoman-ui/compare/v1.3.2...v1.3.3) (2021-05-26)
 
 ### Bug Fixes
