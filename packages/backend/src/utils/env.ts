@@ -63,7 +63,7 @@ class EnvUtil {
     }
   }
 
-  private _lookupGeneratorsMeta(options: any): Environment.LookupGeneratorMeta[] {
+  private _lookupGeneratorsMeta(options?: Environment.LookupOptions): Environment.LookupGeneratorMeta[] {
     return this.createEnvInstance().lookup(options);
   }
 
@@ -76,7 +76,7 @@ class EnvUtil {
     const customNpmPath = customLocation.getNodeModulesPath();
     const customInstalledGensMeta = _.isEmpty(customNpmPath)
       ? []
-      : this._lookupGeneratorsMeta({ npmPaths: customNpmPath });
+      : this._lookupGeneratorsMeta({ npmPaths: [customNpmPath] });
 
     const gensMeta = _.unionBy(customInstalledGensMeta, globallyInstalledGensMeta, NAMESPACE);
     return _.orderBy(gensMeta, [NAMESPACE], ["asc"]);
@@ -95,6 +95,11 @@ class EnvUtil {
 
   private genMainModules(gensMeta: Environment.LookupGeneratorMeta[]) {
     return gensMeta.filter((genMeta) => genMeta.namespace.endsWith(":app"));
+  }
+
+  private getGensMetaByInstallationPath(): Environment.LookupGeneratorMeta[] {
+    const npmInstallationPaths = customLocation.getNodeModulesPath() ?? NpmCommand.getGlobalNodeModulesPath();
+    return this._lookupGeneratorsMeta({ npmPaths: [npmInstallationPaths] });
   }
 
   public getGenNamespaces(): string[] {
@@ -118,22 +123,18 @@ class EnvUtil {
   }
 
   public getGeneratorNames(): string[] {
-    const npmPaths = customLocation.getNodeModulesPath() ?? NpmCommand.getGlobalNodeModulesPath();
-    const gensMeta = this._lookupGeneratorsMeta({ npmPaths });
-
+    const gensMeta: Environment.LookupGeneratorMeta[] = this.getGensMetaByInstallationPath();
     const genFullNames = gensMeta.map((genMeta) => this.getGeneratorFullName(genMeta.namespace));
     return _.uniq(genFullNames);
   }
 
   public getGenNamesWithOutdatedVersion(): Promise<string[]> {
-    const npmPaths = customLocation.getNodeModulesPath() ?? NpmCommand.getGlobalNodeModulesPath();
-    const gensMeta = this._lookupGeneratorsMeta({ npmPaths });
-
+    const gensMeta: Environment.LookupGeneratorMeta[] = this.getGensMetaByInstallationPath();
     const genPackagePaths = _.uniq(gensMeta.map((genMeta) => genMeta.packagePath));
     return NpmCommand.getPackageNamesWithOutdatedVersion(genPackagePaths);
   }
 
-  public getGeneratorFullName(genNamespace: string) {
+  public getGeneratorFullName(genNamespace: string): string {
     const genName = Environment.namespaceToName(genNamespace);
     const parts = _.split(genName, "/");
     return _.size(parts) === 1 ? `${GENERATOR}${genName}` : `${parts[0]}/${GENERATOR}${parts[1]}`;

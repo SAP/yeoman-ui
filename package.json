@@ -53,7 +53,7 @@
   },
   "lint-staged": {
     "*.{js,ts,json,md,vue}": [
-      "prettier --write"
+      "prettier --write --print-width 120"
     ],
     "*.{ts,js,vue}": [
       "eslint --fix --max-warnings=0 --ignore-pattern=!.*"
