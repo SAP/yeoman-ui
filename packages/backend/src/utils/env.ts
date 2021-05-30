@@ -10,6 +10,11 @@ import TerminalAdapter = require("yeoman-environment/lib/adapter");
 const GENERATOR = "generator-";
 const NAMESPACE = "namespace";
 
+export type EnvGen = {
+  env: Environment<Environment.Options>;
+  gen: any;
+};
+
 export type GeneratorData = {
   generatorMeta: Environment.LookupGeneratorMeta;
   generatorPackageJson: any;
@@ -114,7 +119,7 @@ class EnvUtil {
     return _.map(gensMeta, (genMeta) => genMeta.namespace);
   }
 
-  public createEnvAndGen(genNamespace: string, options: any, adapter: any): any {
+  public createEnvAndGen(genNamespace: string, options: any, adapter: any): EnvGen {
     const meta: Environment.LookupGeneratorMeta = this.getGenMetadata(genNamespace);
     this.unloadGeneratorModules(genNamespace);
     const env: Environment<Environment.Options> = this.createEnvInstance(

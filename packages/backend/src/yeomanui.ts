@@ -17,7 +17,7 @@ import { SWA } from "./swa-tracker/swa-tracker-wrapper";
 import { Output } from "./output";
 import { resolve } from "path";
 import { homedir } from "os";
-import { Env, GeneratorData, GeneratorNotFoundError } from "./utils/env";
+import { Env, EnvGen, GeneratorData, GeneratorNotFoundError } from "./utils/env";
 import { vscode, getVscode } from "./utils/vscodeProxy";
 import * as Generator from "yeoman-generator";
 import * as Environment from "yeoman-environment";
@@ -224,16 +224,16 @@ export class YeomanUI {
         appWizard: this.youiEvents.getAppWizard(),
       };
 
-      const { env, gen } = Env.createEnvAndGen(generatorNamespace, options, this.youiAdapter);
+      const envGen: EnvGen = Env.createEnvAndGen(generatorNamespace, options, this.youiAdapter);
 
       // check if generator defined a helper function called setPromptsCallback()
-      const setPromptsCallback = _.get(gen, "setPromptsCallback");
+      const setPromptsCallback = _.get(envGen.gen, "setPromptsCallback");
       if (setPromptsCallback) {
         setPromptsCallback(this.setPromptList.bind(this));
       }
 
       this.promptCount = 0;
-      this.gen = gen as Generator;
+      this.gen = envGen.gen as Generator;
       // do not add second parameter with value true
       // some generators rely on fact that this.env.cwd and
       // the current working directory is changed.
@@ -243,9 +243,9 @@ export class YeomanUI {
       // handles generator install step if exists
       this.onGenInstall(this.gen);
       // handles generator errors
-      this.handleErrors(env, this.gen, generatorNamespace);
+      this.handleErrors(envGen.env, this.gen, generatorNamespace);
 
-      await env.runGenerator(gen);
+      await envGen.env.runGenerator(envGen.gen);
       if (!this.errorThrown) {
         // Without resolve this code worked only for absolute paths without / at the end.
         // Generator can put a relative path, path including . and .. and / at the end.
