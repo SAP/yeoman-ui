@@ -1,5 +1,5 @@
 import * as path from "path";
-import { readFile, mkdirs, readdir, stat } from "fs-extra";
+import { mkdirs, readdir, stat } from "fs-extra";
 import * as _ from "lodash";
 import * as inquirer from "inquirer";
 import { ReplayUtils, ReplayState } from "./replayUtils";
@@ -17,7 +17,7 @@ import { SWA } from "./swa-tracker/swa-tracker-wrapper";
 import { Output } from "./output";
 import { resolve } from "path";
 import { homedir } from "os";
-import { Env, GeneratorNotFoundError } from "./utils/env";
+import { Env, EnvGen, GeneratorData, GeneratorNotFoundError } from "./utils/env";
 import { vscode, getVscode } from "./utils/vscodeProxy";
 import * as Generator from "yeoman-generator";
 import * as Environment from "yeoman-environment";
@@ -171,8 +171,8 @@ export class YeomanUI {
   }
 
   private async getGeneratorsPrompt(): Promise<any> {
-    const gensMeta: Environment.GeneratorMeta[] = Env.getGeneratorsMeta();
-    const questions: any[] = await this.createGeneratorPromptQuestions(gensMeta, this.uiOptions.filter);
+    const gensData: GeneratorData[] = await Env.getGeneratorsData();
+    const questions: any[] = await this.createGeneratorPromptQuestions(gensData, this.uiOptions.filter);
 
     this.currentQuestions = questions;
     const normalizedQuestions = this.normalizeFunctions(questions);
@@ -224,16 +224,16 @@ export class YeomanUI {
         appWizard: this.youiEvents.getAppWizard(),
       };
 
-      const { env, gen } = Env.createEnvAndGen(generatorNamespace, options, this.youiAdapter);
+      const envGen: EnvGen = Env.createEnvAndGen(generatorNamespace, options, this.youiAdapter);
 
       // check if generator defined a helper function called setPromptsCallback()
-      const setPromptsCallback = _.get(gen, "setPromptsCallback");
+      const setPromptsCallback = _.get(envGen.gen, "setPromptsCallback");
       if (setPromptsCallback) {
         setPromptsCallback(this.setPromptList.bind(this));
       }
 
       this.promptCount = 0;
-      this.gen = gen as Generator;
+      this.gen = envGen.gen as Generator;
       // do not add second parameter with value true
       // some generators rely on fact that this.env.cwd and
       // the current working directory is changed.
@@ -243,9 +243,9 @@ export class YeomanUI {
       // handles generator install step if exists
       this.onGenInstall(this.gen);
       // handles generator errors
-      this.handleErrors(env, this.gen, generatorNamespace);
+      this.handleErrors(envGen.env, this.gen, generatorNamespace);
 
-      await env.runGenerator(gen);
+      await envGen.env.runGenerator(envGen.gen);
       if (!this.errorThrown) {
         // Without resolve this code worked only for absolute paths without / at the end.
         // Generator can put a relative path, path including . and .. and / at the end.
@@ -481,9 +481,9 @@ export class YeomanUI {
     return res;
   }
 
-  private async createGeneratorPromptQuestions(gensMeta: any, genFilter: GeneratorFilter): Promise<any[]> {
-    const generatorChoicePromises = _.map(gensMeta, (genMeta) => {
-      return this.getGeneratorChoice(genMeta, genFilter);
+  private async createGeneratorPromptQuestions(gensData: GeneratorData[], genFilter: GeneratorFilter): Promise<any[]> {
+    const generatorChoicePromises = _.map(gensData, (genData) => {
+      return this.getGeneratorChoice(genData, genFilter);
     });
 
     const questions: any[] = [];
@@ -559,17 +559,9 @@ export class YeomanUI {
     return questions;
   }
 
-  private async getGeneratorChoice(genMeta: any, filter: GeneratorFilter) {
-    let packageJson: any;
-    const genPackagePath: string = genMeta.packagePath;
-
-    try {
-      packageJson = await this.getGenPackageJson(genPackagePath);
-    } catch (error) {
-      this.logError(error);
-      return;
-    }
-
+  private async getGeneratorChoice(genData: GeneratorData, filter: GeneratorFilter) {
+    const packageJson = genData.generatorPackageJson;
+    const genMeta = genData.generatorMeta;
     const genFilter: GeneratorFilter = GeneratorFilter.create(_.get(packageJson, ["generator-filter"]));
     const typesHasIntersection: boolean = GeneratorFilter.hasIntersection(filter.types, genFilter.types);
     const categoriesHasIntersection: boolean = GeneratorFilter.hasIntersection(filter.categories, genFilter.categories);
@@ -582,7 +574,7 @@ export class YeomanUI {
     _.includes(genFilter.types, "tools-suite") && this.generaorsToIgnoreArray.push(genMeta.namespace);
 
     if (typesHasIntersection && categoriesHasIntersection) {
-      return this.createGeneratorChoice(genMeta.namespace, genPackagePath, packageJson);
+      return this.createGeneratorChoice(genMeta.namespace, genMeta.packagePath, packageJson);
     }
   }
 
@@ -613,11 +605,6 @@ export class YeomanUI {
       image: genImageUrl,
       isToolsSuiteType: isToolsSuiteType,
     };
-  }
-
-  private async getGenPackageJson(genPackagePath: string): Promise<any> {
-    const packageJsonString: string = await readFile(path.join(genPackagePath, "package.json"), "utf8");
-    return JSON.parse(packageJsonString);
   }
 
   /**

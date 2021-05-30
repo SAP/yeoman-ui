@@ -1,5 +1,4 @@
 import * as _ from "lodash";
-import { json } from "npm-registry-fetch";
 import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { NpmCommand } from "./utils/npm";
@@ -48,7 +47,7 @@ export class ExploreGens {
   }
 
   private getAllInstalledGenerators(): string[] {
-    return Env.getGeneratorNamesByPath();
+    return Env.getGeneratorNames();
   }
 
   private getInstalledGens(): string[] {
@@ -69,15 +68,19 @@ export class ExploreGens {
   }
 
   private async doGeneratorsUpdate() {
-    const lastUpdateDate = this.context.globalState.get(this.LAST_AUTO_UPDATE_DATE, 0);
-    const currentDate = Date.now();
-    if (currentDate - lastUpdateDate > this.ONE_DAY) {
-      this.context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
-      const autoUpdateEnabled = this.getWsConfig().get(this.AUTO_UPDATE, true);
-      if (autoUpdateEnabled) {
-        await NpmCommand.checkAccessAndSetGeneratorsPath();
-        await this.updateAllInstalledGenerators();
+    try {
+      const lastUpdateDate = this.context.globalState.get(this.LAST_AUTO_UPDATE_DATE, 0);
+      const currentDate = Date.now();
+      if (currentDate - lastUpdateDate > this.ONE_DAY) {
+        this.context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
+        const autoUpdateEnabled = this.getWsConfig().get(this.AUTO_UPDATE, true);
+        if (autoUpdateEnabled) {
+          await NpmCommand.checkAccessAndSetGeneratorsPath();
+          await this.updateAllInstalledGenerators();
+        }
       }
+    } catch (error) {
+      this.showAndLogError("Update Failure", error);
     }
   }
 
@@ -101,11 +104,11 @@ export class ExploreGens {
   }
 
   private async updateAllInstalledGenerators() {
-    const installedGenerators: string[] = this.getAllInstalledGenerators();
-    if (!_.isEmpty(installedGenerators)) {
+    const gensToUpdate: string[] = await Env.getGeneratorNamesWithOutdatedVersion();
+    if (!_.isEmpty(gensToUpdate)) {
       this.logger.debug(messages.auto_update_started);
       const statusBarMessage = vscode.window.setStatusBarMessage(messages.auto_update_started);
-      const promises = _.map(installedGenerators, (genName) => this.update(genName));
+      const promises = _.map(gensToUpdate, (genName) => this.update(genName));
       const failedToUpdateGens: any[] = _.compact(await Promise.all(promises));
       if (!_.isEmpty(failedToUpdateGens)) {
         const errMessage = messages.failed_to_update_gens(failedToUpdateGens);
@@ -122,28 +125,24 @@ export class ExploreGens {
   }
 
   private async getFilteredGenerators(query?: string, author?: string) {
-    query = query || this.EMPTY;
-    author = author || this.EMPTY;
-    const gensQueryUrl = NpmCommand.getGensQueryURL(query, author);
-
     try {
       const cachedGens = this.getInstalledGens();
-      const res: any = await json(gensQueryUrl);
-      const filteredGenerators = _.map(_.get(res, "objects"), (gen) => {
-        const genName = gen.package.name;
-        gen.state = _.includes(cachedGens, genName) ? GenState.installed : GenState.notInstalled;
-        gen.disabledToHandle = false;
+      const packagesMeta: any = await NpmCommand.getPackagesMetadata(query, author);
+      const filteredGenerators = _.map(packagesMeta.objects, (meta) => {
+        const genName = meta.package.name;
+        meta.state = _.includes(cachedGens, genName) ? GenState.installed : GenState.notInstalled;
+        meta.disabledToHandle = false;
         const handlingState = this.getHandlingState(genName);
         if (handlingState) {
-          gen.state = handlingState;
-          gen.disabledToHandle = true;
+          meta.state = handlingState;
+          meta.disabledToHandle = true;
         }
-        return gen;
+        return meta;
       });
 
-      return [filteredGenerators, res.total];
+      return [filteredGenerators, packagesMeta.total];
     } catch (error) {
-      this.showAndLogError(messages.failed_to_get(gensQueryUrl), error);
+      this.showAndLogError(messages.failed_to_get_outdated_gens, error);
     }
   }
 

@@ -10,5 +10,5 @@ export default {
   installed: (genName: string) => `${genName} has been installed.`,
   updating: (genName: string) => `Updating to the latest version of ${genName}...`,
   updated: (genName: string) => `${genName} has been updated.`,
-  failed_to_get: (gensQueryUrl: string) => `Could not get generators with the queryUrl ${gensQueryUrl}`,
+  failed_to_get_outdated_gens: `Could not get generator names with outdated version`,
 };
