@@ -132,7 +132,7 @@ class Command {
     return this.globalNodeModulesPath;
   }
 
-  public async getPackagesMetadata(query = "", author = "") {
+  public async getPackagesMetadata(query = "", author = ""): Promise<any> {
     const gensQueryUrl = NpmCommand.getGensQueryURL(query, author);
     return await npmFetch.json(gensQueryUrl);
   }
