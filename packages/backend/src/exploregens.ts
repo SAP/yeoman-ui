@@ -100,7 +100,7 @@ export class ExploreGens {
   }
 
   private async updateAllInstalledGenerators() {
-    const gensToUpdate: string[] = await Env.getGenNamesWithOutdatedVersion();
+    const gensToUpdate: string[] = await Env.getGeneratorNamesWithOutdatedVersion();
     if (!_.isEmpty(gensToUpdate)) {
       this.logger.debug(messages.auto_update_started);
       const statusBarMessage = vscode.window.setStatusBarMessage(messages.auto_update_started);
