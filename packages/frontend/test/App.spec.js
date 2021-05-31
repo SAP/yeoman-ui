@@ -575,27 +575,6 @@ describe("App.vue", () => {
       resolveSpy.mockRestore();
     });
 
-    it.skip("resolve method throws an exception", () => {
-      wrapper = initComponent(App, {});
-
-      wrapper.vm.resolve = () => {
-        throw new Error("test_error");
-      };
-      wrapper.vm.reject = jest.fn();
-      const rejectSpy = jest.spyOn(wrapper.vm, "reject");
-      wrapper.vm.promptIndex = 1;
-      wrapper.vm.stepValidated = true;
-      wrapper.vm.prompts = [{}, {}];
-      wrapper.vm.rpc = {
-        invoke: () => new Promise((resolve) => setTimeout(() => resolve(), 300)),
-      };
-
-      wrapper.vm.next();
-
-      expect(rejectSpy).toHaveBeenCalledWith(new Error("test_error"));
-      rejectSpy.mockRestore();
-    });
-
     it("resolve method exists", () => {
       wrapper = initComponent(App, {});
 

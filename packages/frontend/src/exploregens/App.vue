@@ -90,8 +90,8 @@ const ALL_GENS = "All";
 import * as _ from "lodash";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
-import messages from "./exploreGensMessages";
-import utils from "./utils";
+import messages from "./messages";
+import utils from "../utils";
 
 export default {
   name: "exploregens",
@@ -126,16 +126,19 @@ export default {
 
       return this.messages.results(this.total);
     },
-    debouncedGenFilterChange() {
-      return _.debounce(this.getFilteredGenerators, 200);
-    },
   },
   methods: {
+    debouncedGenFilterChange() {
+      return _.debounce(this.getFilteredGenerators.bind(this), 200);
+    },
+
     onDisclaimer() {
       this.disclaimerOpened = !this.disclaimerOpened;
     },
     actionName(gen) {
-      if (gen.state === "installed") {
+      if (gen.state === "outdated") {
+        return messages.update;
+      } else if (gen.state === "installed") {
         return messages.uninstall;
       } else if (gen.state === "notInstalled") {
         return messages.install;
@@ -152,26 +155,27 @@ export default {
       return gen.state === "installed" ? "#585858" : "primary";
     },
     onAction(gen) {
-      if (!gen.disabledToHandle) {
-        const action = gen.state === "installed" ? "uninstall" : "install";
-        this.rpc.invoke(action, [gen]);
-      }
+      const action = gen.action.toLowerCase();
+      this.rpc.invoke(action, [gen]);
     },
-    onQueryChange() {
-      this.debouncedGenFilterChange();
+    onQueryChange: function () {
+      //TODO: use debounce this.debouncedGenFilterChange();
+      this.getFilteredGenerators();
     },
     isInVsCode() {
       return typeof acquireVsCodeApi !== "undefined";
     },
-    async getFilteredGenerators() {
+    getFilteredGenerators: function () {
       const recommended = this.recommended === ALL_GENS ? "" : this.recommended;
-      const res = await this.rpc.invoke("getFilteredGenerators", [this.query, recommended]);
-      this.gens = _.map(res[0], (gen) => {
-        gen.action = this.actionName(gen);
-        gen.color = this.actionColor(gen);
-        return gen;
+      const that = this;
+      return this.rpc.invoke("getFilteredGenerators", [this.query, recommended]).then(function (res) {
+        that.gens = _.map(res[0], (gen) => {
+          gen.action = that.actionName(gen);
+          gen.color = that.actionColor(gen);
+          return gen;
+        });
+        that.total = res[1];
       });
-      this.total = res[1];
     },
     async getRecommendedQuery() {
       this.items = await this.rpc.invoke("getRecommendedQuery");

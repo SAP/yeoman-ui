@@ -59,6 +59,7 @@ export abstract class AbstractWebviewPanel {
     const displayedPanel = this.webViewPanel;
     if (displayedPanel) {
       this.dispose();
+      this.webViewPanel = null;
     }
   }
 

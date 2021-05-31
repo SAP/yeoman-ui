@@ -1,6 +1,6 @@
 import Vue from "vue";
-import ExploreGensApp from "./ExploreGensApp";
-import vuetify from "./plugins/vuetify";
+import ExploreGensApp from "./App";
+import vuetify from "../plugins/vuetify";
 
 Vue.config.productionTip = false;
 
