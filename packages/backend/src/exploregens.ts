@@ -27,7 +27,6 @@ export class ExploreGens {
   private readonly LAST_AUTO_UPDATE_DATE = "global.exploreGens.lastAutoUpdateDate";
   private readonly SEARCH_QUERY = "ApplicationWizard.searchQuery";
   private readonly AUTO_UPDATE = "ApplicationWizard.autoUpdate";
-  private readonly EMPTY = "";
   private readonly ONE_DAY = 1000 * 60 * 60 * 24;
 
   constructor(logger: IChildLogger, isInBAS: boolean, context?: any) {

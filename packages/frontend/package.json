@@ -14,7 +14,6 @@
     "coverage": "vue-cli-service test:unit",
     "coverage:copy": "shx mkdir -p ../../coverage && shx cp -u ./coverage/lcov.info ../../coverage/lcov_frontend.info",
     "serve": "vue-cli-service serve",
-    "serve-eg": "vue-cli-service serve --exploregens",
     "test": "vue-cli-service test:unit"
   },
   "browserslist": [

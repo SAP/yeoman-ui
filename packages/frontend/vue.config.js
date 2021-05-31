@@ -1,42 +1,32 @@
-const _ = require("lodash");
-const path = require("path");
-
-const INDEX_HTML = "index.html";
-let pagePath = _.get(process, "argv[3]", "");
-if (!_.isEmpty(pagePath)) {
-  pagePath = pagePath.substr(2);
-}
-
 module.exports = {
   runtimeCompiler: true,
-  publicPath: _.isEmpty(pagePath) ? path.join(".") : path.join(".", pagePath),
   transpileDependencies: ["vuetify"],
   productionSourceMap: false,
   configureWebpack: {
     devtool: "source-map",
   },
   pages: {
-    index: {
+    youi: {
       // entry for the page
-      entry: path.join("src", "main.js"),
+      entry: "src/youi/main.js",
       // the source template
-      template: path.join("public", INDEX_HTML),
+      template: "public/youi/index.html",
       // output as dist/index.html
-      filename: INDEX_HTML,
+      filename: `index.html`,
       // chunks to include on this page, by default includes
       // extracted common chunks and vendor chunks.
-      chunks: ["chunk-vendors", "chunk-common", "index"],
+      chunks: ["chunk-vendors", "chunk-common", "youi"],
     },
-    exploreGensIndex: {
+    exploregens: {
       // entry for the page
-      entry: path.join("src", "exploreGensMain.js"),
+      entry: "src/exploregens/main.js",
       // the source template
-      template: path.join("public", path.join("exploregens", INDEX_HTML)),
+      template: "public/exploregens/index.html",
       // output as dist/exploregens/index.html
-      filename: pagePath === "exploregens" ? INDEX_HTML : path.join("exploregens", INDEX_HTML),
+      filename: `eg/index.html`,
       // chunks to include on this page, by default includes
       // extracted common chunks and vendor chunks.
-      chunks: ["chunk-vendors", "chunk-common", "exploreGensIndex"],
+      chunks: ["chunk-vendors", "chunk-common", "exploregens"],
     },
   },
 };
