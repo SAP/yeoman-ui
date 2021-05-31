@@ -68,19 +68,15 @@ export class ExploreGens {
   }
 
   private async doGeneratorsUpdate() {
-    try {
-      const lastUpdateDate = this.context.globalState.get(this.LAST_AUTO_UPDATE_DATE, 0);
-      const currentDate = Date.now();
-      if (currentDate - lastUpdateDate > this.ONE_DAY) {
-        this.context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
-        const autoUpdateEnabled = this.getWsConfig().get(this.AUTO_UPDATE, true);
-        if (autoUpdateEnabled) {
-          await NpmCommand.checkAccessAndSetGeneratorsPath();
-          await this.updateAllInstalledGenerators();
-        }
+    const lastUpdateDate = this.context.globalState.get(this.LAST_AUTO_UPDATE_DATE, 0);
+    const currentDate = Date.now();
+    if (currentDate - lastUpdateDate > this.ONE_DAY) {
+      this.context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
+      const autoUpdateEnabled = this.getWsConfig().get(this.AUTO_UPDATE, true);
+      if (autoUpdateEnabled) {
+        await NpmCommand.checkAccessAndSetGeneratorsPath();
+        await this.updateAllInstalledGenerators();
       }
-    } catch (error) {
-      this.showAndLogError("Update Failure", error);
     }
   }
 
@@ -125,6 +121,7 @@ export class ExploreGens {
     try {
       const gensData: GeneratorData[] = await this.getInstalledGens();
       const packagesMeta: any = await NpmCommand.getPackagesMetadata(query, author);
+      //TODO: move this logic to npm or env util
       const filteredGenerators = _.map(packagesMeta.objects, (meta) => {
         const genName = meta.package.name;
         const installedGenData = gensData.find((genData) => genData.generatorPackageJson.name === genName);

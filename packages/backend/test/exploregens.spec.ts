@@ -176,14 +176,20 @@ describe("exploregens unit test", () => {
     });
   });
 
-  describe.skip("getFilteredGenerators", () => {
+  describe("getFilteredGenerators", () => {
     it("query and recommended parameters are empty strings", async () => {
       const expectedResult = {
         objects: [{ package: { name: "generator-aa" } }, { package: { name: "generator-bb" } }],
         total: 5,
       };
       npmUtilsMock.expects("getPackagesMetadata").resolves(expectedResult);
-      //exploregens["cachedGeneratorsDataPromise"] = Promise.resolve(["generator-bb"]};
+      envUtilsMock.expects("getGeneratorsData").resolves([
+        {
+          generatorMeta: {},
+          generatorPackageJson: { name: "generator-bb" },
+        },
+      ]);
+      exploregens["setInstalledGens"]();
       const res = await exploregens["getFilteredGenerators"]();
       expect(res).to.be.deep.equal([expectedResult.objects, expectedResult.total]);
       expect(res[0][0].disabledToHandle).to.be.false;
@@ -199,7 +205,13 @@ describe("exploregens unit test", () => {
       };
       npmUtilsMock.expects("getPackagesMetadata").resolves(expectedResult);
       exploregens["gensBeingHandled"] = [{ name: "generator-aa", state: GenState.updating }];
-      // exploregens["cachedGeneratorsDataPromise"] = Promise.resolve(["generator-aa"]};
+      envUtilsMock.expects("getGeneratorsData").resolves([
+        {
+          generatorMeta: {},
+          generatorPackageJson: { name: "generator-aa" },
+        },
+      ]);
+      exploregens["setInstalledGens"]();
       const res = await exploregens["getFilteredGenerators"]("test of query");
       expect(res[0]).to.be.deep.equal(expectedResult.objects);
       expect(res[1]).to.be.equal(expectedResult.total);
@@ -221,7 +233,7 @@ describe("exploregens unit test", () => {
       await exploregens["doGeneratorsUpdate"]();
     });
 
-    it.skip("generators auto update is true and getGeneratorNamesWithOutdatedVersion returns empty array", async () => {
+    it("generators auto update is true and getGeneratorNamesWithOutdatedVersion returns empty array", async () => {
       globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
       loggerMock.expects("debug").never();
       globalStateMock.expects("update").withArgs(exploregens["LAST_AUTO_UPDATE_DATE"]);
@@ -231,7 +243,7 @@ describe("exploregens unit test", () => {
       await exploregens["doGeneratorsUpdate"]();
     });
 
-    it.skip("generators auto update is true and getGeneratorNamesWithOutdatedVersion returns a generators list", async () => {
+    it("generators auto update is true and getGeneratorNamesWithOutdatedVersion returns a generators list", async () => {
       globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
       workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(true);
       NpmCommand["isInBAS"] = true;
@@ -241,7 +253,8 @@ describe("exploregens unit test", () => {
       loggerMock.expects("debug").withExactArgs(messages.updated("generator-aa"));
       loggerMock.expects("debug").withExactArgs(messages.updated("@sap/generator-bb"));
       npmUtilsMock.expects("install").twice().resolves();
-      envUtilsMock.expects("getGeneratorNamesWithOutdatedVersion").returns(["generator-aa", "@sap/generator-bb"]);
+      envUtilsMock.expects("getGeneratorNamesWithOutdatedVersion").resolves(["generator-aa", "@sap/generator-bb"]);
+      envUtilsMock.expects("getGeneratorsData").resolves([{}, {}]);
       rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["generator-aa", GenState.updating]);
       rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["@sap/generator-bb", GenState.updating]);
       rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["generator-aa", GenState.installed]);
@@ -259,14 +272,15 @@ describe("exploregens unit test", () => {
       await exploregens["doGeneratorsUpdate"]();
     });
 
-    it.skip("generators auto update is true and getGeneratorNamesWithOutdatedVersion returns a generators list, update fails", async () => {
+    it("generators auto update is true and getGeneratorNamesWithOutdatedVersion returns a generators list, update fails", async () => {
       const errorMessage = `update failure.`;
       globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
       workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(true);
       NpmCommand["isInBAS"] = true;
       loggerMock.expects("debug").withExactArgs(messages.auto_update_started);
       loggerMock.expects("debug").withExactArgs(messages.updating("generator-aa"));
-      envUtilsMock.expects("getGeneratorNamesWithOutdatedVersion").returns(["generator-aa"]);
+      envUtilsMock.expects("getGeneratorNamesWithOutdatedVersion").resolves(["generator-aa"]);
+      envUtilsMock.expects("getGeneratorsData").resolves([{}]);
       npmUtilsMock.expects("install").withExactArgs("generator-aa").throws(errorMessage);
       rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["generator-aa", GenState.updating]);
       rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["generator-aa", GenState.notInstalled]);
