@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-import { NpmCommand } from "./utils/npm";
+import { NpmCommand, PackagesData } from "./utils/npm";
 import messages from "./exploreGensMessages";
 import { Env, GeneratorData } from "./utils/env";
 import { vscode } from "./utils/vscodeProxy";
@@ -118,33 +118,26 @@ export class ExploreGens {
   }
 
   private async getFilteredGenerators(query?: string, author?: string) {
-    try {
-      const gensData: GeneratorData[] = await this.getInstalledGens();
-      const packagesMeta: any = await NpmCommand.getPackagesMetadata(query, author);
-      //TODO: move this logic to npm or env util
-      const filteredGenerators = _.map(packagesMeta.objects, (meta) => {
-        const genName = meta.package.name;
-        const installedGenData = gensData.find((genData) => genData.generatorPackageJson.name === genName);
-        meta.state = !!installedGenData ? GenState.installed : GenState.notInstalled;
-        if (
-          meta.state === GenState.installed &&
-          meta.package.version !== installedGenData.generatorPackageJson.version
-        ) {
-          meta.state = GenState.outdated;
-        }
-        meta.disabledToHandle = false;
-        const handlingState = this.getHandlingState(genName);
-        if (handlingState) {
-          meta.state = handlingState;
-          meta.disabledToHandle = true;
-        }
-        return meta;
-      });
+    const gensData: GeneratorData[] = await this.getInstalledGens();
+    const packagesData: PackagesData = await NpmCommand.getPackagesData(query, author);
+    //TODO: move this logic to npm or env util
+    const filteredGenerators = _.map(packagesData.packages, (meta) => {
+      const genName = meta.package.name;
+      const installedGenData = gensData.find((genData) => genData.generatorPackageJson.name === genName);
+      meta.state = !!installedGenData ? GenState.installed : GenState.notInstalled;
+      if (meta.state === GenState.installed && meta.package.version !== installedGenData.generatorPackageJson.version) {
+        meta.state = GenState.outdated;
+      }
+      meta.disabledToHandle = false;
+      const handlingState = this.getHandlingState(genName);
+      if (handlingState) {
+        meta.state = handlingState;
+        meta.disabledToHandle = true;
+      }
+      return meta;
+    });
 
-      return [filteredGenerators, packagesMeta.total];
-    } catch (error) {
-      this.showAndLogError(messages.failed_to_get_outdated_gens, error);
-    }
+    return [filteredGenerators, packagesData.total];
   }
 
   private showAndLogError(messagePrefix: string, error: any) {

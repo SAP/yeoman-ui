@@ -12,6 +12,11 @@ import * as npmFetch from "npm-registry-fetch";
 import { LookupGeneratorMeta } from "yeoman-environment";
 import { getConsoleWarnLogger } from "../logger/console-logger";
 
+export type PackagesData = {
+  packages: any[];
+  total: number;
+};
+
 export const isWin32 = platform() === "win32";
 const NPM = isWin32 ? "npm.cmd" : "npm";
 
@@ -132,9 +137,10 @@ class Command {
     return this.globalNodeModulesPath;
   }
 
-  public async getPackagesMetadata(query = "", author = ""): Promise<any> {
+  public async getPackagesData(query = "", author = ""): Promise<PackagesData> {
     const gensQueryUrl = NpmCommand.getGensQueryURL(query, author);
-    return await npmFetch.json(gensQueryUrl);
+    const queryResult: any = await npmFetch.json(gensQueryUrl);
+    return { packages: _.get(queryResult, "objects", []), total: queryResult.total };
   }
 
   public async getPackageJsons(gensMeta: LookupGeneratorMeta[]): Promise<any[]> {

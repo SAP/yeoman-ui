@@ -178,11 +178,11 @@ describe("exploregens unit test", () => {
 
   describe("getFilteredGenerators", () => {
     it("query and recommended parameters are empty strings", async () => {
-      const expectedResult = {
-        objects: [{ package: { name: "generator-aa" } }, { package: { name: "generator-bb" } }],
+      const packagesData = {
+        packages: [{ package: { name: "generator-aa" } }, { package: { name: "generator-bb" } }],
         total: 5,
       };
-      npmUtilsMock.expects("getPackagesMetadata").resolves(expectedResult);
+      npmUtilsMock.expects("getPackagesData").resolves(packagesData);
       envUtilsMock.expects("getGeneratorsData").resolves([
         {
           generatorMeta: {},
@@ -190,8 +190,8 @@ describe("exploregens unit test", () => {
         },
       ]);
       exploregens["setInstalledGens"]();
-      const res = await exploregens["getFilteredGenerators"]();
-      expect(res).to.be.deep.equal([expectedResult.objects, expectedResult.total]);
+      const res: any = await exploregens["getFilteredGenerators"]();
+      expect(res).to.be.deep.equal([packagesData.packages, packagesData.total]);
       expect(res[0][0].disabledToHandle).to.be.false;
       expect(res[0][1].disabledToHandle).to.be.false;
       expect(res[0][0].state).to.be.equal(GenState.notInstalled);
@@ -199,11 +199,11 @@ describe("exploregens unit test", () => {
     });
 
     it("a generator is updating", async () => {
-      const expectedResult = {
-        objects: [{ package: { name: "generator-aa" } }],
+      const packagesData = {
+        packages: [{ package: { name: "generator-aa" } }],
         total: 1,
       };
-      npmUtilsMock.expects("getPackagesMetadata").resolves(expectedResult);
+      npmUtilsMock.expects("getPackagesData").resolves(packagesData);
       exploregens["gensBeingHandled"] = [{ name: "generator-aa", state: GenState.updating }];
       envUtilsMock.expects("getGeneratorsData").resolves([
         {
@@ -212,9 +212,9 @@ describe("exploregens unit test", () => {
         },
       ]);
       exploregens["setInstalledGens"]();
-      const res = await exploregens["getFilteredGenerators"]("test of query");
-      expect(res[0]).to.be.deep.equal(expectedResult.objects);
-      expect(res[1]).to.be.equal(expectedResult.total);
+      const res: any = await exploregens["getFilteredGenerators"]("test of query");
+      expect(res[0]).to.be.deep.equal(packagesData.packages);
+      expect(res[1]).to.be.equal(packagesData.total);
       expect(res[0][0].disabledToHandle).to.be.true;
       expect(res[0][0].state).to.be.equal(GenState.updating);
     });
