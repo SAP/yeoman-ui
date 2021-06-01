@@ -1,5 +1,5 @@
 import Vue from "vue";
-import App from "../App";
+import YoUiApp from "./App";
 
 import vuetify from "../plugins/vuetify";
 import "@sap-devx/inquirer-gui/dist/form.css";
@@ -13,5 +13,5 @@ Vue.config.productionTip = false;
 
 new Vue({
   vuetify,
-  render: (h) => h(App),
+  render: (h) => h(YoUiApp),
 }).$mount("#app");

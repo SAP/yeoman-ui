@@ -128,10 +128,6 @@ export default {
     },
   },
   methods: {
-    debouncedGenFilterChange() {
-      return _.debounce(this.getFilteredGenerators.bind(this), 200);
-    },
-
     onDisclaimer() {
       this.disclaimerOpened = !this.disclaimerOpened;
     },
@@ -159,21 +155,24 @@ export default {
       this.rpc.invoke(action, [gen]);
     },
     onQueryChange() {
-      //TODO: use debounce this.debouncedGenFilterChange();
-      this.getFilteredGenerators();
+      const debouncer = _.debounce(this.getFilteredGenerators, 200);
+      debouncer();
     },
     isInVsCode() {
       return typeof acquireVsCodeApi !== "undefined";
     },
     async getFilteredGenerators() {
       const recommended = this.recommended === ALL_GENS ? "" : this.recommended;
-      const packagesData = await this.rpc.invoke("getFilteredGenerators", [this.query, recommended]);
+      console.log("query - " + this.query);
+      const packagesData = await this.rpc.invoke("getFilteredGenerators", [_.get(this, "query", ""), recommended]);
       this.gens = _.map(packagesData.packages, (gen) => {
         gen.action = this.actionName(gen);
         gen.color = this.actionColor(gen);
         return gen;
       });
       this.total = packagesData.total;
+      console.log("gens - " + this.gens);
+      console.log("total - " + this.total);
     },
     async getRecommendedQuery() {
       this.items = await this.rpc.invoke("getRecommendedQuery");

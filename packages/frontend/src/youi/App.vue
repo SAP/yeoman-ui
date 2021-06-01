@@ -95,11 +95,11 @@
 <script>
 import Vue from "vue";
 import Loading from "vue-loading-overlay";
-import Header from "./components/Header.vue";
-import Navigation from "./components/Navigation.vue";
-import Done from "./components/Done.vue";
-import Info from "./components/Info.vue";
-import PromptInfo from "./components/PromptInfo.vue";
+import Header from "../components/Header.vue";
+import Navigation from "../components/Navigation.vue";
+import Done from "../components/Done.vue";
+import Info from "../components/Info.vue";
+import PromptInfo from "../components/PromptInfo.vue";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import * as _ from "lodash";
@@ -109,7 +109,7 @@ import LoginPlugin from "@sap-devx/inquirer-gui-login-plugin";
 import TilesPlugin from "@sap-devx/inquirer-gui-tiles-plugin";
 import LabelPlugin from "@sap-devx/inquirer-gui-label-plugin";
 import { Severity } from "@sap-devx/yeoman-ui-types";
-import utils from "./utils";
+import utils from "../utils";
 
 const FUNCTION = "__Function";
 const PENDING = "pending";
@@ -622,7 +622,7 @@ export default {
 };
 </script>
 <style scoped>
-@import "./../node_modules/vue-loading-overlay/dist/vue-loading.css";
+@import "./../../node_modules/vue-loading-overlay/dist/vue-loading.css";
 .consoleClassVisible {
   visibility: visible;
 }

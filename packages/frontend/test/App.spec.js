@@ -1,5 +1,5 @@
 import { initComponent, destroy } from "./Utils";
-import App from "../src/App.vue";
+import App from "../src/youi/App";
 import Vue from "vue";
 import Vuetify from "vuetify";
 import { WebSocket } from "mock-socket";
