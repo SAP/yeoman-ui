@@ -56,6 +56,8 @@ class Command {
   }
 
   private getGensQueryURL(query: string, recommended: string): string {
+    query = query || "";
+    recommended = recommended || "";
     return encodeURI(`${SEARCH_QUERY_PREFIX} ${query} ${recommended} ${SEARCH_QUERY_SUFFIX}`);
   }
 
