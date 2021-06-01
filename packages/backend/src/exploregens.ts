@@ -120,7 +120,7 @@ export class ExploreGens {
   private async getFilteredGenerators(query?: string, author?: string) {
     const gensData: GeneratorData[] = await this.getInstalledGens();
     const packagesData: PackagesData = await NpmCommand.getPackagesData(query, author);
-    //TODO: move this logic to npm or env util
+
     const filteredGenerators = _.map(packagesData.packages, (meta) => {
       const genName = meta.package.name;
       const installedGenData = gensData.find((genData) => genData.generatorPackageJson.name === genName);
@@ -155,12 +155,16 @@ export class ExploreGens {
     return vscode.commands.executeCommand("yeomanUI._notifyGeneratorsChange");
   }
 
+  private setStatusBarMessage(message: string) {
+    return vscode.window.setStatusBarMessage(message);
+  }
+
   public async install(gen: any) {
     const genName = gen.package.name;
 
     this.addToHandled(genName, GenState.installing);
     const installingMessage = messages.installing(genName);
-    const statusbarMessage = vscode.window.setStatusBarMessage(installingMessage);
+    const statusbarMessage = this.setStatusBarMessage(installingMessage);
 
     try {
       await NpmCommand.checkAccessAndSetGeneratorsPath();
@@ -176,9 +180,7 @@ export class ExploreGens {
       this.showAndLogError(messages.failed_to_install(genName), error);
       this.updateBeingHandledGenerator(genName, GenState.notInstalled);
     } finally {
-      this.removeFromHandled(genName);
-      this.setInstalledGens();
-      statusbarMessage.dispose();
+      this.finalizeGenerator(genName, statusbarMessage);
     }
   }
 
@@ -186,7 +188,7 @@ export class ExploreGens {
     const genName = gen.package.name;
     this.addToHandled(genName, GenState.uninstalling);
     const uninstallingMessage = messages.uninstalling(genName);
-    const statusbarMessage = vscode.window.setStatusBarMessage(uninstallingMessage);
+    const statusbarMessage = this.setStatusBarMessage(uninstallingMessage);
 
     try {
       this.logger.debug(uninstallingMessage);
@@ -201,18 +203,18 @@ export class ExploreGens {
       this.showAndLogError(messages.failed_to_uninstall(genName), error);
       this.updateBeingHandledGenerator(genName, GenState.installed);
     } finally {
-      this.removeFromHandled(genName);
-      this.setInstalledGens();
-      statusbarMessage.dispose();
+      this.finalizeGenerator(genName, statusbarMessage);
     }
   }
 
   private async update(gen: any, isAutoUpdate = false): Promise<string | undefined> {
     const genName = _.get(gen.package, "name", gen);
     this.addToHandled(genName, GenState.updating);
+    const updatingMessage = messages.updating(genName);
+    const statusbarMessage = isAutoUpdate ? undefined : this.setStatusBarMessage(updatingMessage);
 
     try {
-      this.logger.debug(messages.updating(genName));
+      this.logger.debug(updatingMessage);
       this.updateBeingHandledGenerator(genName, GenState.updating);
       await NpmCommand.install(genName);
       this.logger.debug(messages.updated(genName));
@@ -222,11 +224,18 @@ export class ExploreGens {
       if (isAutoUpdate) {
         this.logger.error(error);
         return genName;
-      } else {
-        this.showAndLogError(messages.failed_to_update(genName), error);
       }
+      this.showAndLogError(messages.failed_to_update(genName), error);
     } finally {
-      this.removeFromHandled(genName);
+      this.finalizeGenerator(genName, statusbarMessage);
+    }
+  }
+
+  private finalizeGenerator(genName: string, statusbarMessage: any) {
+    this.removeFromHandled(genName);
+    this.setInstalledGens();
+    if (statusbarMessage) {
+      statusbarMessage.dispose();
     }
   }
 

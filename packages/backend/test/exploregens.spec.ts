@@ -8,6 +8,7 @@ import { NpmCommand } from "../src/utils/npm";
 import { Env, GeneratorData } from "../src/utils/env";
 import { IChildLogger } from "@vscode-logging/logger";
 import { ExploreGens, GenState } from "../src/exploregens";
+import { resolve } from "path";
 
 describe("exploregens unit test", () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -78,6 +79,12 @@ describe("exploregens unit test", () => {
     expect(res).to.be.true;
   });
 
+  it("setGenFilter", async () => {
+    const genFullName = "generator-code";
+    rpcMock.expects("invoke").withExactArgs("setGenQuery", [genFullName]).resolves();
+    await exploregens["setGenFilter"](genFullName);
+  });
+
   describe("isLegalNoteAccepted", () => {
     it("is in BAS, legal note is accepted", async () => {
       exploregens["isInBAS"] = true;
@@ -126,6 +133,49 @@ describe("exploregens unit test", () => {
     envUtilsMock.expects("getGeneratorsData").resolves();
 
     exploregens["init"](rpc);
+  });
+
+  describe("update", () => {
+    const gen: any = {
+      package: {
+        name: "gen-test",
+      },
+    };
+    const genName = gen.package.name;
+
+    it("successfully updated", async () => {
+      loggerMock.expects("debug").withExactArgs(messages.updating(genName));
+      loggerMock.expects("debug").withExactArgs(messages.updated(genName));
+      rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, GenState.updating]);
+      rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, GenState.installed]);
+      npmUtilsMock.expects("install").resolves();
+      windowMock
+        .expects("setStatusBarMessage")
+        .withExactArgs(messages.updating(genName))
+        .returns({ dispose: () => "" });
+      await exploregens["update"](gen);
+    });
+
+    it("an error is thrown", async () => {
+      const errorMessage = "npm install failed";
+
+      loggerMock.expects("debug").withExactArgs(messages.updating(genName));
+      loggerMock.expects("error").withExactArgs(errorMessage);
+      rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, GenState.updating]);
+      rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, GenState.notInstalled]);
+      npmUtilsMock.expects("install").throws(errorMessage);
+
+      windowMock
+        .expects("showErrorMessage")
+        .withExactArgs(messages.failed_to_update(genName) + `: ${errorMessage}`)
+        .resolves();
+      windowMock
+        .expects("setStatusBarMessage")
+        .withExactArgs(messages.updating(genName))
+        .returns({ dispose: () => "" });
+
+      await exploregens["update"](gen);
+    });
   });
 
   describe("install", () => {
@@ -179,14 +229,14 @@ describe("exploregens unit test", () => {
   describe("getFilteredGenerators", () => {
     it("query and recommended parameters are empty strings", async () => {
       const packagesData = {
-        packages: [{ package: { name: "generator-aa" } }, { package: { name: "generator-bb" } }],
+        packages: [{ package: { name: "generator-aa" } }, { package: { name: "generator-bb", version: "1.2.0" } }],
         total: 5,
       };
       npmUtilsMock.expects("getPackagesData").resolves(packagesData);
       envUtilsMock.expects("getGeneratorsData").resolves([
         {
           generatorMeta: {},
-          generatorPackageJson: { name: "generator-bb" },
+          generatorPackageJson: { name: "generator-bb", version: "1.0.0" },
         },
       ]);
       exploregens["setInstalledGens"]();
@@ -195,7 +245,7 @@ describe("exploregens unit test", () => {
       expect(res[0][0].disabledToHandle).to.be.false;
       expect(res[0][1].disabledToHandle).to.be.false;
       expect(res[0][0].state).to.be.equal(GenState.notInstalled);
-      expect(res[0][1].state).to.be.equal(GenState.installed);
+      expect(res[0][1].state).to.be.equal(GenState.outdated);
     });
 
     it("a generator is updating", async () => {
@@ -254,7 +304,7 @@ describe("exploregens unit test", () => {
       loggerMock.expects("debug").withExactArgs(messages.updated("@sap/generator-bb"));
       npmUtilsMock.expects("install").twice().resolves();
       envUtilsMock.expects("getGeneratorNamesWithOutdatedVersion").resolves(["generator-aa", "@sap/generator-bb"]);
-      envUtilsMock.expects("getGeneratorsData").resolves([{}, {}]);
+      envUtilsMock.expects("getGeneratorsData").thrice().resolves([{}, {}]);
       rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["generator-aa", GenState.updating]);
       rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["@sap/generator-bb", GenState.updating]);
       rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["generator-aa", GenState.installed]);
@@ -280,7 +330,7 @@ describe("exploregens unit test", () => {
       loggerMock.expects("debug").withExactArgs(messages.auto_update_started);
       loggerMock.expects("debug").withExactArgs(messages.updating("generator-aa"));
       envUtilsMock.expects("getGeneratorNamesWithOutdatedVersion").resolves(["generator-aa"]);
-      envUtilsMock.expects("getGeneratorsData").resolves([{}]);
+      envUtilsMock.expects("getGeneratorsData").twice().resolves([{}]);
       npmUtilsMock.expects("install").withExactArgs("generator-aa").throws(errorMessage);
       rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["generator-aa", GenState.updating]);
       rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", ["generator-aa", GenState.notInstalled]);
