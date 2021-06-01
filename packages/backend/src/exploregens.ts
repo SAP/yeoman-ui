@@ -68,15 +68,19 @@ export class ExploreGens {
   }
 
   private async doGeneratorsUpdate() {
-    const lastUpdateDate = this.context.globalState.get(this.LAST_AUTO_UPDATE_DATE, 0);
-    const currentDate = Date.now();
-    if (currentDate - lastUpdateDate > this.ONE_DAY) {
-      this.context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
-      const autoUpdateEnabled = this.getWsConfig().get(this.AUTO_UPDATE, true);
-      if (autoUpdateEnabled) {
-        await NpmCommand.checkAccessAndSetGeneratorsPath();
-        await this.updateAllInstalledGenerators();
+    try {
+      const lastUpdateDate = this.context.globalState.get(this.LAST_AUTO_UPDATE_DATE, 0);
+      const currentDate = Date.now();
+      if (currentDate - lastUpdateDate > this.ONE_DAY) {
+        this.context.globalState.update(this.LAST_AUTO_UPDATE_DATE, currentDate);
+        const autoUpdateEnabled = this.getWsConfig().get(this.AUTO_UPDATE, true);
+        if (autoUpdateEnabled) {
+          await NpmCommand.checkAccessAndSetGeneratorsPath();
+          await this.updateAllInstalledGenerators();
+        }
       }
+    } catch (error) {
+      this.showAndLogError("Auto Update Failure", error);
     }
   }
 

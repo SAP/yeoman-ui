@@ -350,6 +350,18 @@ describe("exploregens unit test", () => {
 
       await exploregens["doGeneratorsUpdate"]();
     });
+
+    it("generators auto update is true and getGeneratorNamesWithOutdatedVersion throws an error", async () => {
+      globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
+      globalStateMock.expects("update").withArgs(exploregens["LAST_AUTO_UPDATE_DATE"]);
+      workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(true);
+      NpmCommand["isInBAS"] = false;
+      const expectedErrorMessage = "Error: Action cancelled";
+      loggerMock.expects("error").withExactArgs(expectedErrorMessage);
+      npmUtilsMock.expects("checkAccessAndSetGeneratorsPath").throws(new Error("Action cancelled"));
+      windowMock.expects("showErrorMessage").withExactArgs(`Auto Update Failure: ${expectedErrorMessage}`).resolves();
+      await exploregens["doGeneratorsUpdate"]();
+    });
   });
 
   describe("getInstalledGens", () => {
