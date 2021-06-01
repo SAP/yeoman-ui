@@ -125,7 +125,7 @@ export class ExploreGens {
     return vscode.workspace.getConfiguration();
   }
 
-  private async getFilteredGenerators(query: string, recommended: string): Promise<PackagesData> {
+  private async getFilteredGenerators(query?: string, recommended?: string): Promise<PackagesData> {
     const gensData: GeneratorData[] = await this.getInstalledGens();
     const packagesData: PackagesData = await NpmCommand.getPackagesData(query, recommended);
 
