@@ -158,24 +158,22 @@ export default {
       const action = gen.action.toLowerCase();
       this.rpc.invoke(action, [gen]);
     },
-    onQueryChange: function () {
+    onQueryChange() {
       //TODO: use debounce this.debouncedGenFilterChange();
       this.getFilteredGenerators();
     },
     isInVsCode() {
       return typeof acquireVsCodeApi !== "undefined";
     },
-    getFilteredGenerators: function () {
+    async getFilteredGenerators() {
       const recommended = this.recommended === ALL_GENS ? "" : this.recommended;
-      const that = this;
-      return this.rpc.invoke("getFilteredGenerators", [this.query, recommended]).then(function (res) {
-        that.gens = _.map(res[0], (gen) => {
-          gen.action = that.actionName(gen);
-          gen.color = that.actionColor(gen);
-          return gen;
-        });
-        that.total = res[1];
+      const packagesData = await this.rpc.invoke("getFilteredGenerators", [this.query, recommended]);
+      this.gens = _.map(packagesData.packages, (gen) => {
+        gen.action = this.actionName(gen);
+        gen.color = this.actionColor(gen);
+        return gen;
       });
+      this.total = packagesData.total;
     },
     async getRecommendedQuery() {
       this.items = await this.rpc.invoke("getRecommendedQuery");

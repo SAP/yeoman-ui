@@ -6,6 +6,10 @@ import messages from "./exploreGensMessages";
 import { Env, GeneratorData } from "./utils/env";
 import { vscode } from "./utils/vscodeProxy";
 
+type Disposable = {
+  dispose(): void;
+};
+
 export enum GenState {
   uninstalling = "uninstalling",
   updating = "updating",
@@ -104,7 +108,7 @@ export class ExploreGens {
     const gensToUpdate: string[] = await Env.getGeneratorNamesWithOutdatedVersion();
     if (!_.isEmpty(gensToUpdate)) {
       this.logger.debug(messages.auto_update_started);
-      const statusBarMessage = vscode.window.setStatusBarMessage(messages.auto_update_started);
+      const statusBarMessage = this.setStatusBarMessage(messages.auto_update_started);
       const promises = _.map(gensToUpdate, (genName) => this.update(genName, true));
       const failedToUpdateGens: any[] = _.compact(await Promise.all(promises));
       if (!_.isEmpty(failedToUpdateGens)) {
@@ -113,7 +117,7 @@ export class ExploreGens {
       }
       this.setInstalledGens();
       statusBarMessage.dispose();
-      vscode.window.setStatusBarMessage(messages.auto_update_finished, 10000);
+      this.setStatusBarMessage(messages.auto_update_finished, 10000);
     }
   }
 
@@ -121,7 +125,7 @@ export class ExploreGens {
     return vscode.workspace.getConfiguration();
   }
 
-  private async getFilteredGenerators(query?: string, author?: string) {
+  private async getFilteredGenerators(query?: string, author?: string): Promise<PackagesData> {
     const gensData: GeneratorData[] = await this.getInstalledGens();
     const packagesData: PackagesData = await NpmCommand.getPackagesData(query, author);
 
@@ -141,7 +145,7 @@ export class ExploreGens {
       return meta;
     });
 
-    return [filteredGenerators, packagesData.total];
+    return { packages: filteredGenerators, total: packagesData.total };
   }
 
   private showAndLogError(messagePrefix: string, error: any) {
@@ -159,8 +163,8 @@ export class ExploreGens {
     return vscode.commands.executeCommand("yeomanUI._notifyGeneratorsChange");
   }
 
-  private setStatusBarMessage(message: string) {
-    return vscode.window.setStatusBarMessage(message);
+  private setStatusBarMessage(message: string, timeout?: number): Disposable {
+    return vscode.window.setStatusBarMessage(message, timeout);
   }
 
   public async install(gen: any) {

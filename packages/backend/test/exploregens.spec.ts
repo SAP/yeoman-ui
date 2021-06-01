@@ -4,7 +4,7 @@ import { expect } from "chai";
 import { createSandbox, SinonSandbox, SinonMock } from "sinon";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import messages from "../src/exploreGensMessages";
-import { NpmCommand } from "../src/utils/npm";
+import { NpmCommand, PackagesData } from "../src/utils/npm";
 import { Env, GeneratorData } from "../src/utils/env";
 import { IChildLogger } from "@vscode-logging/logger";
 import { ExploreGens, GenState } from "../src/exploregens";
@@ -151,8 +151,12 @@ describe("exploregens unit test", () => {
       npmUtilsMock.expects("install").resolves();
       windowMock
         .expects("setStatusBarMessage")
-        .withExactArgs(messages.updating(genName))
-        .returns({ dispose: () => "" });
+        .withArgs(messages.updating(genName))
+        .returns({
+          dispose: () => {
+            return;
+          },
+        });
       await exploregens["update"](gen);
     });
 
@@ -171,8 +175,12 @@ describe("exploregens unit test", () => {
         .resolves();
       windowMock
         .expects("setStatusBarMessage")
-        .withExactArgs(messages.updating(genName))
-        .returns({ dispose: () => "" });
+        .withArgs(messages.updating(genName))
+        .returns({
+          dispose: () => {
+            return;
+          },
+        });
 
       await exploregens["update"](gen);
     });
@@ -198,8 +206,12 @@ describe("exploregens unit test", () => {
       windowMock.expects("showInformationMessage").withExactArgs(messages.installed(genName)).resolves();
       windowMock
         .expects("setStatusBarMessage")
-        .withExactArgs(messages.installing(genName))
-        .returns({ dispose: () => "" });
+        .withArgs(messages.installing(genName))
+        .returns({
+          dispose: () => {
+            return;
+          },
+        });
       await exploregens["install"](gen);
     });
 
@@ -219,8 +231,12 @@ describe("exploregens unit test", () => {
         .resolves();
       windowMock
         .expects("setStatusBarMessage")
-        .withExactArgs(messages.installing(genName))
-        .returns({ dispose: () => "" });
+        .withArgs(messages.installing(genName))
+        .returns({
+          dispose: () => {
+            return;
+          },
+        });
 
       await exploregens["install"](gen);
     });
@@ -228,7 +244,7 @@ describe("exploregens unit test", () => {
 
   describe("getFilteredGenerators", () => {
     it("query and recommended parameters are empty strings", async () => {
-      const packagesData = {
+      const packagesData: PackagesData = {
         packages: [{ package: { name: "generator-aa" } }, { package: { name: "generator-bb", version: "1.2.0" } }],
         total: 5,
       };
@@ -240,16 +256,16 @@ describe("exploregens unit test", () => {
         },
       ]);
       exploregens["setInstalledGens"]();
-      const res: any = await exploregens["getFilteredGenerators"]();
-      expect(res).to.be.deep.equal([packagesData.packages, packagesData.total]);
-      expect(res[0][0].disabledToHandle).to.be.false;
-      expect(res[0][1].disabledToHandle).to.be.false;
-      expect(res[0][0].state).to.be.equal(GenState.notInstalled);
-      expect(res[0][1].state).to.be.equal(GenState.outdated);
+      const res: PackagesData = await exploregens["getFilteredGenerators"]();
+      expect(res).to.be.deep.equal(packagesData);
+      expect(res.packages[0].disabledToHandle).to.be.false;
+      expect(res.packages[1].disabledToHandle).to.be.false;
+      expect(res.packages[0].state).to.be.equal(GenState.notInstalled);
+      expect(res.packages[1].state).to.be.equal(GenState.outdated);
     });
 
     it("a generator is updating", async () => {
-      const packagesData = {
+      const packagesData: PackagesData = {
         packages: [{ package: { name: "generator-aa" } }],
         total: 1,
       };
@@ -262,11 +278,10 @@ describe("exploregens unit test", () => {
         },
       ]);
       exploregens["setInstalledGens"]();
-      const res: any = await exploregens["getFilteredGenerators"]("test of query");
-      expect(res[0]).to.be.deep.equal(packagesData.packages);
-      expect(res[1]).to.be.equal(packagesData.total);
-      expect(res[0][0].disabledToHandle).to.be.true;
-      expect(res[0][0].state).to.be.equal(GenState.updating);
+      const res: PackagesData = await exploregens["getFilteredGenerators"]("test of query");
+      expect(res).to.be.deep.equal(packagesData);
+      expect(res.packages[0].disabledToHandle).to.be.true;
+      expect(res.packages[0].state).to.be.equal(GenState.updating);
     });
   });
 
@@ -312,12 +327,20 @@ describe("exploregens unit test", () => {
       globalStateMock.expects("update").withArgs(exploregens["LAST_AUTO_UPDATE_DATE"]);
       windowMock
         .expects("setStatusBarMessage")
-        .withExactArgs(messages.auto_update_started)
-        .returns({ dispose: () => "" });
+        .withArgs(messages.auto_update_started)
+        .returns({
+          dispose: () => {
+            return;
+          },
+        });
       windowMock
         .expects("setStatusBarMessage")
         .withExactArgs(messages.auto_update_finished, 10000)
-        .returns({ dispose: () => "" });
+        .returns({
+          dispose: () => {
+            return;
+          },
+        });
 
       await exploregens["doGeneratorsUpdate"]();
     });
@@ -341,12 +364,20 @@ describe("exploregens unit test", () => {
         .resolves();
       windowMock
         .expects("setStatusBarMessage")
-        .withExactArgs(messages.auto_update_started)
-        .returns({ dispose: () => "" });
+        .withArgs(messages.auto_update_started)
+        .returns({
+          dispose: () => {
+            return;
+          },
+        });
       windowMock
         .expects("setStatusBarMessage")
-        .withExactArgs(messages.auto_update_finished, 10000)
-        .returns({ dispose: () => "" });
+        .withArgs(messages.auto_update_finished, 10000)
+        .returns({
+          dispose: () => {
+            return;
+          },
+        });
 
       await exploregens["doGeneratorsUpdate"]();
     });
@@ -406,8 +437,12 @@ describe("exploregens unit test", () => {
       windowMock.expects("showInformationMessage").withExactArgs(successMessage).resolves();
       windowMock
         .expects("setStatusBarMessage")
-        .withExactArgs(uninstallingMessage)
-        .returns({ dispose: () => "" });
+        .withArgs(uninstallingMessage)
+        .returns({
+          dispose: () => {
+            return;
+          },
+        });
       commandsMock.expects("executeCommand").withExactArgs("yeomanUI._notifyGeneratorsChange").resolves();
 
       await exploregens["uninstall"](gen);
@@ -426,8 +461,12 @@ describe("exploregens unit test", () => {
 
       windowMock
         .expects("setStatusBarMessage")
-        .withExactArgs(uninstallingMessage)
-        .returns({ dispose: () => "" });
+        .withArgs(uninstallingMessage)
+        .returns({
+          dispose: () => {
+            return;
+          },
+        });
       windowMock
         .expects("showErrorMessage")
         .withExactArgs(messages.failed_to_uninstall(genName) + `: ${errorMessage}`)

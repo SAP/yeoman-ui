@@ -13,7 +13,6 @@ class ExploreGensWebSocketServer {
     // web socket server
     const port = process.env.PORT ? Number.parseInt(process.env.PORT) : 8082;
 
-    //const wss = new WebSocket.Server({ port: port, path: "/exploregens" }, () => {
     const wss = new WebSocket.Server({ port: port }, () => {
       console.log("started websocket server");
     });
