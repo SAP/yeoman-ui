@@ -178,7 +178,7 @@ class Command {
       } else if (accessResult === this.SET_DEFAULT_LOCATION) {
         await customLocation.setDefaultPath();
       } else if (accessResult !== HAS_ACCESS) {
-        throw new Error(CANCELED); //TODO: who catches this error
+        throw new Error(CANCELED); 
       }
     }
   }
