@@ -57,7 +57,6 @@ describe("exploregens unit test", () => {
     windowMock = sandbox.mock(vscode.window);
     commandsMock = sandbox.mock(vscode.commands);
     globalStateMock.expects("get").returns(Date.now());
-    envUtilsMock.expects("getGeneratorNames").atMost(1).resolves();
     exploregens = new ExploreGens(childLogger as IChildLogger, false, _.get(vscode, "context"));
     exploregens["initRpc"](rpc);
   });
@@ -83,6 +82,12 @@ describe("exploregens unit test", () => {
     const genFullName = "generator-code";
     rpcMock.expects("invoke").withExactArgs("setGenQuery", [genFullName]).resolves();
     await exploregens["setGenFilter"](genFullName);
+  });
+
+  it("getRecommendedQuery", () => {
+    workspaceConfigMock.expects("get").withExactArgs(exploregens["SEARCH_QUERY"]).returns(["test_value", "test_value"]);
+    const res = exploregens["getRecommendedQuery"]();
+    expect(res).to.have.lengthOf(1);
   });
 
   describe("isLegalNoteAccepted", () => {

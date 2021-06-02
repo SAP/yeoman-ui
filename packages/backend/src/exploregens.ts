@@ -157,7 +157,7 @@ export class ExploreGens {
     vscode.window.showErrorMessage(`${messagePrefix}`);
   }
 
-  private getRecommendedQuery() {
+  private getRecommendedQuery(): string[] {
     const recommended: string[] = this.getWsConfig().get(this.SEARCH_QUERY) || [];
     return _.uniq(recommended);
   }

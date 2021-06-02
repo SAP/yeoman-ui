@@ -226,7 +226,7 @@ describe("yeomanui unit test", () => {
       envUtilsMock
         .expects("createEnvAndGen")
         .withArgs("test1-project:app")
-        .returns({
+        .resolves({
           env: {
             on: () => "",
             runGenerator: () => "",
@@ -257,7 +257,7 @@ describe("yeomanui unit test", () => {
       envUtilsMock
         .expects("createEnvAndGen")
         .withArgs("test4:app")
-        .returns({
+        .resolves({
           env: {
             on: () => "",
             runGenerator: () => "",

@@ -49,13 +49,13 @@ describe("YeomanUIPanel unit test", () => {
 
   describe("runGenerator", () => {
     it("generator is not choosen", async () => {
-      envUtilsMock.expects("getAllGeneratorNamespaces").returns(["gen1:test", "test:app", "code:app"]);
+      envUtilsMock.expects("getAllGeneratorNamespaces").resolves(["gen1:test", "test:app", "code:app"]);
       windowMock.expects("showQuickPick").resolves();
       await panel.runGenerator();
     });
 
     it("generator is choosen", async () => {
-      envUtilsMock.expects("getAllGeneratorNamespaces").twice().returns(["gen1:test", "test:app", "code:app"]);
+      envUtilsMock.expects("getAllGeneratorNamespaces").twice().resolves(["gen1:test", "test:app", "code:app"]);
       windowMock.expects("showQuickPick").resolves("test:app");
       await panel.runGenerator();
     });
@@ -73,13 +73,13 @@ describe("YeomanUIPanel unit test", () => {
       });
 
       it("existing generator is provided, in VSCODE", async () => {
-        envUtilsMock.expects("getAllGeneratorNamespaces").returns(["gen1:test", "test:app", "code:app"]);
+        envUtilsMock.expects("getAllGeneratorNamespaces").resolves(["gen1:test", "test:app", "code:app"]);
         npmUtilsMock.expects("checkAccessAndSetGeneratorsPath").never();
         await panel.loadWebviewPanel({ generator: "test:app" });
       });
 
       it("provided generator does not exist, in VSCODE", async () => {
-        envUtilsMock.expects("getAllGeneratorNamespaces").returns(["gen1:test", "code:app"]);
+        envUtilsMock.expects("getAllGeneratorNamespaces").resolves(["gen1:test", "code:app"]);
         npmUtilsMock.expects("checkAccessAndSetGeneratorsPath").resolves();
         commandsMock
           .expects("executeCommand")
@@ -102,13 +102,13 @@ describe("YeomanUIPanel unit test", () => {
       });
 
       it("existing generator is provided", async () => {
-        envUtilsMock.expects("getAllGeneratorNamespaces").returns(["gen1:test", "test:app", "code:app"]);
+        envUtilsMock.expects("getAllGeneratorNamespaces").resolves(["gen1:test", "test:app", "code:app"]);
         npmUtilsMock.expects("checkAccessAndSetGeneratorsPath").never();
         await panel.loadWebviewPanel({ generator: "test:app" });
       });
 
       it("provided generator does not exist", async () => {
-        envUtilsMock.expects("getAllGeneratorNamespaces").returns(["gen1:test", "code:app"]);
+        envUtilsMock.expects("getAllGeneratorNamespaces").resolves(["gen1:test", "code:app"]);
         npmUtilsMock.expects("checkAccessAndSetGeneratorsPath").never();
         await panel.loadWebviewPanel({ generator: "test:app" });
       });
