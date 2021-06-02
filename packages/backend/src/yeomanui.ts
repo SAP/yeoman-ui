@@ -224,7 +224,7 @@ export class YeomanUI {
         appWizard: this.youiEvents.getAppWizard(),
       };
 
-      const envGen: EnvGen = Env.createEnvAndGen(generatorNamespace, options, this.youiAdapter);
+      const envGen: EnvGen = await Env.createEnvAndGen(generatorNamespace, options, this.youiAdapter);
 
       // check if generator defined a helper function called setPromptsCallback()
       const setPromptsCallback = _.get(envGen.gen, "setPromptsCallback");

@@ -40,7 +40,8 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   public async loadWebviewPanel(uiOptions?: any) {
     const genNamespace = uiOptions?.generator;
     if (genNamespace) {
-      const generator = Env.getAllGeneratorNamespaces().find((genNS) => genNS === genNamespace);
+      const gensNS = await Env.getAllGeneratorNamespaces();
+      const generator = gensNS.find((genNS) => genNS === genNamespace);
       if (!generator) {
         await this.tryToInstallGenerator(genNamespace);
       }
@@ -60,7 +61,8 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   }
 
   public async runGenerator() {
-    const generator = await vscode.window.showQuickPick(Env.getAllGeneratorNamespaces());
+    const genNamespaces = await Env.getAllGeneratorNamespaces();
+    const generator = await vscode.window.showQuickPick(genNamespaces);
     if (generator) {
       return this.loadWebviewPanel({ generator });
     }

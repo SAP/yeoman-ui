@@ -27,24 +27,36 @@ export class GeneratorNotFoundError extends Error {
 }
 
 class EnvUtil {
-  private readonly existingNpmPaths: string[];
+  private existingNpmPathsPromise: Promise<string[]>;
   private allInstalledGensMeta: Environment.LookupGeneratorMeta[];
 
   constructor() {
-    // improves lookup speed by 1.5 sec
-    this.existingNpmPaths = (() => {
-      const globalNpmPaths: string[] = this.createEnvInstance().getNpmPaths();
-      const userNpmPaths = homedir()
-        .split(path.sep)
-        .map((part, index, parts) => {
-          const resPath = path.join(...parts.slice(0, index + 1), "node_modules");
-          return isWin32 ? resPath : path.join(path.sep, resPath);
-        });
-      // uniq and existing only paths (global npm path is always added)
-      const paths: string[] = _.union(globalNpmPaths, userNpmPaths).filter((npmPath: string) => existsSync(npmPath));
-      paths.push(NpmCommand.getGlobalNodeModulesPath());
-      return _.uniq(paths);
-    })();
+    this.existingNpmPathsPromise = this.getExistingNpmPath();
+  }
+
+  private getEnvNpmPath(): Promise<string[]> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // this operation takes up to 2 seconds
+        // it should be wrapped with setTimeout to provide promise like behaviour
+        resolve(this.createEnvInstance().getNpmPaths());
+      }, 5);
+    });
+  }
+
+  private async getExistingNpmPath(): Promise<string[]> {
+    const globalNpmPaths: string[] = await this.getEnvNpmPath();
+    const userNpmPaths = homedir()
+      .split(path.sep)
+      .map((part, index, parts) => {
+        const resPath = path.join(...parts.slice(0, index + 1), "node_modules");
+        return isWin32 ? resPath : path.join(path.sep, resPath);
+      });
+    // uniq and existing only paths (global npm path is always added)
+    const paths: string[] = _.union(globalNpmPaths, userNpmPaths).filter((npmPath: string) => existsSync(npmPath));
+    paths.push(await NpmCommand.getGlobalNodeModulesPath());
+
+    return _.uniq(paths);
   }
 
   private createEnvInstance(
@@ -79,8 +91,8 @@ class EnvUtil {
 
   // returns installed generators meta from global and custom installation location
   // custom installation generators have priority over global installed generators when names are identical
-  private lookupAllGensMeta(): Environment.LookupGeneratorMeta[] {
-    const globallyInstalledGensMeta = this.lookupGensMeta({ npmPaths: this.existingNpmPaths });
+  private async lookupAllGensMeta(): Promise<Environment.LookupGeneratorMeta[]> {
+    const globallyInstalledGensMeta = this.lookupGensMeta({ npmPaths: await this.existingNpmPathsPromise });
 
     const customNpmPath = customLocation.getNodeModulesPath();
     const customInstalledGensMeta = _.isEmpty(customNpmPath) ? [] : this.lookupGensMeta({ npmPaths: [customNpmPath] });
@@ -89,8 +101,8 @@ class EnvUtil {
     return _.orderBy(gensMeta, [NAMESPACE], ["asc"]);
   }
 
-  private getGenMetadata(genNamespace: string): Environment.LookupGeneratorMeta {
-    this.allInstalledGensMeta = this.lookupAllGensMeta();
+  private async getGenMetadata(genNamespace: string): Promise<Environment.LookupGeneratorMeta> {
+    this.allInstalledGensMeta = await this.lookupAllGensMeta();
 
     const genMetadata = this.allInstalledGensMeta.find((genMeta) => genMeta.namespace === genNamespace);
     if (genMetadata) {
@@ -104,23 +116,23 @@ class EnvUtil {
     return gensMeta.filter((genMeta) => genMeta.namespace.endsWith(":app"));
   }
 
-  private getGensMetaByInstallationPath(): Environment.LookupGeneratorMeta[] {
-    const npmInstallationPaths = [customLocation.getNodeModulesPath() ?? NpmCommand.getGlobalNodeModulesPath()];
+  private async getGensMetaByInstallationPath(): Promise<Environment.LookupGeneratorMeta[]> {
+    const npmInstallationPaths = [customLocation.getNodeModulesPath() ?? (await NpmCommand.getGlobalNodeModulesPath())];
     return this.lookupGensMeta({ npmPaths: npmInstallationPaths });
   }
 
-  private getGeneratorsMeta(mainOnly = true): Environment.LookupGeneratorMeta[] {
-    this.allInstalledGensMeta = this.lookupAllGensMeta();
+  private async getGeneratorsMeta(mainOnly = true): Promise<Environment.LookupGeneratorMeta[]> {
+    this.allInstalledGensMeta = await this.lookupAllGensMeta();
     return mainOnly ? this.genMainGensMeta(this.allInstalledGensMeta) : this.allInstalledGensMeta;
   }
 
-  public getAllGeneratorNamespaces(): string[] {
-    const gensMeta: Environment.LookupGeneratorMeta[] = this.getGeneratorsMeta(false);
+  public async getAllGeneratorNamespaces(): Promise<string[]> {
+    const gensMeta: Environment.LookupGeneratorMeta[] = await this.getGeneratorsMeta(false);
     return _.map(gensMeta, (genMeta) => genMeta.namespace);
   }
 
-  public createEnvAndGen(genNamespace: string, options: any, adapter: any): EnvGen {
-    const meta: Environment.LookupGeneratorMeta = this.getGenMetadata(genNamespace);
+  public async createEnvAndGen(genNamespace: string, options: any, adapter: any): Promise<EnvGen> {
+    const meta: Environment.LookupGeneratorMeta = await this.getGenMetadata(genNamespace);
     this.unloadGeneratorModules(genNamespace);
     const env: Environment<Environment.Options> = this.createEnvInstance(
       undefined,
@@ -134,7 +146,7 @@ class EnvUtil {
   }
 
   public async getGeneratorsData(mainOnly = true): Promise<GeneratorData[]> {
-    const gensMeta: Environment.LookupGeneratorMeta[] = this.getGeneratorsMeta(mainOnly);
+    const gensMeta: Environment.LookupGeneratorMeta[] = await this.getGeneratorsMeta(mainOnly);
     const packageJsons = await NpmCommand.getPackageJsons(gensMeta);
 
     const gensData = packageJsons.map((generatorPackageJson: any | undefined, index: number) => {
@@ -147,14 +159,8 @@ class EnvUtil {
     return _.compact(gensData);
   }
 
-  public getGeneratorNames(): string[] {
-    const gensMeta: Environment.LookupGeneratorMeta[] = this.getGensMetaByInstallationPath();
-    const genFullNames = gensMeta.map((genMeta) => this.getGeneratorFullName(genMeta.namespace));
-    return _.uniq(genFullNames);
-  }
-
-  public getGeneratorNamesWithOutdatedVersion(): Promise<string[]> {
-    const gensMeta: Environment.LookupGeneratorMeta[] = this.getGensMetaByInstallationPath();
+  public async getGeneratorNamesWithOutdatedVersion(): Promise<string[]> {
+    const gensMeta: Environment.LookupGeneratorMeta[] = await this.getGensMetaByInstallationPath();
     return NpmCommand.getPackageNamesWithOutdatedVersion(gensMeta);
   }
 

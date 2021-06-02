@@ -1,4 +1,4 @@
-import { exec, execSync } from "child_process";
+import { exec } from "child_process";
 import { promisify } from "util";
 import { platform } from "os";
 import * as _ from "lodash";
@@ -11,6 +11,11 @@ import * as path from "path";
 import * as npmFetch from "npm-registry-fetch";
 import { LookupGeneratorMeta } from "yeoman-environment";
 import { getConsoleWarnLogger } from "../logger/console-logger";
+
+type ExecResult = {
+  stderr: string;
+  stdout: string;
+};
 
 export type PackagesData = {
   packages: any[];
@@ -28,21 +33,13 @@ const CANCELED = "Action cancelled";
 const HAS_ACCESS = "Has Access";
 
 class Command {
-  private readonly globalNodeModulesPath;
-  private readonly globalPath;
-  private readonly CHANGE_OWNER_FOR_GLOBAL;
+  private globalNodeModulesPathPromise: Promise<string>;
   private readonly SET_DEFAULT_LOCATION;
   private isInBAS: boolean;
 
   constructor() {
-    this.globalNodeModulesPath = _.trim(execSync(`${NPM} root -g`).toString());
-
-    const nmLength = path.join(path.sep, "node_modules").length;
-    this.globalPath = this.globalNodeModulesPath.substring(0, this.globalNodeModulesPath.length - nmLength);
-
-    this.CHANGE_OWNER_FOR_GLOBAL = messages.change_owner_for_global(this.globalPath);
+    this.globalNodeModulesPathPromise = this.execCommand(`${NPM} root -g`);
     this.SET_DEFAULT_LOCATION = messages.set_default_location(customLocation.DEFAULT_LOCATION);
-
     this.isInBAS = !_.isEmpty(_.get(process, "env.WS_BASE_URL"));
   }
 
@@ -51,8 +48,14 @@ class Command {
     return _.isEmpty(customInstallationPath) ? "-g" : `--prefix ${customInstallationPath}`;
   }
 
-  private async execCommand(arg: string): Promise<any> {
-    return promisify(exec)(arg);
+  private async execCommand(arg: string): Promise<string> {
+    const result: ExecResult = await promisify(exec)(arg);
+    if (!_.isEmpty(result.stderr)) {
+      // no need to throw error, because stderr usually contains warnings
+      getConsoleWarnLogger().warn(result.stderr);
+    }
+
+    return result.stdout;
   }
 
   private getGensQueryURL(query: string, recommended: string): string {
@@ -79,18 +82,20 @@ class Command {
   }
 
   private async getAccessResult(): Promise<string> {
+    const globalNodeModulesPath = await this.getGlobalNodeModulesPath();
     // we assume that if custom path set by an user is writable
     if (_.isEmpty(customLocation.getPath())) {
-      const globalNodeModulesPathExists = existsSync(this.globalNodeModulesPath);
+      const globalNodeModulesPathExists = existsSync(globalNodeModulesPath);
       if (!globalNodeModulesPathExists) {
-        return Promise.reject(`${this.globalNodeModulesPath} does not exist`);
+        return Promise.reject(`${globalNodeModulesPath} does not exist`);
       }
-      const isWritable = await this.isPathWritable(this.globalNodeModulesPath);
+      const isWritable = await this.isPathWritable(globalNodeModulesPath);
       if (!isWritable) {
+        const globalPath = await this.getGlobalPath();
         return vscode.window.showInformationMessage(
-          messages.no_write_access(this.globalPath),
+          messages.no_write_access(globalPath),
           { modal: true },
-          this.CHANGE_OWNER_FOR_GLOBAL,
+          messages.change_owner_for_global(globalPath),
           this.SET_DEFAULT_LOCATION
         );
       }
@@ -107,10 +112,12 @@ class Command {
   }
 
   private async grantAccessForGlobalNodeModulesPath() {
+    const globalNodeModulesPath = await this.getGlobalNodeModulesPath();
     const changeOwnerCommand = isWin32
-      ? `icacls ${this.globalNodeModulesPath} /grant Users:(OI)(CI)F`
-      : `chown -R $USER ${this.globalNodeModulesPath}`;
-    const statusBarMessage = vscode.window.setStatusBarMessage(messages.changing_owner_permissions(this.globalPath));
+      ? `icacls ${globalNodeModulesPath} /grant Users:(OI)(CI)F`
+      : `chown -R $USER ${globalNodeModulesPath}`;
+    const globalPath = await this.getGlobalPath();
+    const statusBarMessage = vscode.window.setStatusBarMessage(messages.changing_owner_permissions(globalPath));
     try {
       await this.sudoExec(changeOwnerCommand);
     } finally {
@@ -135,8 +142,15 @@ class Command {
     }
   }
 
-  public getGlobalNodeModulesPath(): string {
-    return this.globalNodeModulesPath;
+  private async getGlobalPath(): Promise<string> {
+    const globalNodeModulesPath = await this.getGlobalNodeModulesPath();
+    const nmLength = path.join(path.sep, "node_modules").length;
+    return globalNodeModulesPath.substring(0, globalNodeModulesPath.length - nmLength);
+  }
+
+  public async getGlobalNodeModulesPath(): Promise<string> {
+    const globalNodeModulesPath: string = await this.globalNodeModulesPathPromise;
+    return _.trim(globalNodeModulesPath.toString());
   }
 
   public async getPackagesData(query = "", author = ""): Promise<PackagesData> {
@@ -175,7 +189,8 @@ class Command {
   public async checkAccessAndSetGeneratorsPath() {
     if (!this.isInBAS) {
       const accessResult = await this.getAccessResult();
-      if (accessResult === this.CHANGE_OWNER_FOR_GLOBAL) {
+      const globalPath = await this.getGlobalPath();
+      if (accessResult === messages.change_owner_for_global(globalPath)) {
         await this.grantAccessForGlobalNodeModulesPath();
       } else if (accessResult === this.SET_DEFAULT_LOCATION) {
         await customLocation.setDefaultPath();
