@@ -55,7 +55,7 @@ class Command {
       getConsoleWarnLogger().warn(result.stderr);
     }
 
-    return result.stdout;
+    return _.trim(result.stdout);
   }
 
   private getGensQueryURL(query: string, recommended: string): string {
@@ -144,13 +144,12 @@ class Command {
 
   private async getGlobalPath(): Promise<string> {
     const globalNodeModulesPath = await this.getGlobalNodeModulesPath();
-    const nmLength = path.join(path.sep, "node_modules").length;
-    return globalNodeModulesPath.substring(0, globalNodeModulesPath.length - nmLength);
+    const globalPathArray = _.split(globalNodeModulesPath, path.join(path.sep, "node_modules"), 1);
+    return _.get(globalPathArray, "[0]");
   }
 
-  public async getGlobalNodeModulesPath(): Promise<string> {
-    const globalNodeModulesPath: string = await this.globalNodeModulesPathPromise;
-    return _.trim(globalNodeModulesPath.toString());
+  public getGlobalNodeModulesPath(): Promise<string> {
+    return this.globalNodeModulesPathPromise;
   }
 
   public async getPackagesData(query = "", author = ""): Promise<PackagesData> {

@@ -40,7 +40,7 @@ class EnvUtil {
         // this operation takes up to 2 seconds
         // it should be wrapped with setTimeout to provide promise like behaviour
         resolve(this.createEnvInstance().getNpmPaths());
-      }, 5);
+      }, 1);
     });
   }
 
