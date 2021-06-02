@@ -163,7 +163,6 @@ export default {
     },
     async getFilteredGenerators() {
       const recommended = this.recommended === ALL_GENS ? "" : this.recommended;
-      console.log("query - " + this.query);
       const packagesData = await this.rpc.invoke("getFilteredGenerators", [_.get(this, "query", ""), recommended]);
       this.gens = _.map(packagesData.packages, (gen) => {
         gen.action = this.actionName(gen);
@@ -171,8 +170,6 @@ export default {
         return gen;
       });
       this.total = packagesData.total;
-      console.log("gens - " + this.gens);
-      console.log("total - " + this.total);
     },
     async getRecommendedQuery() {
       this.items = await this.rpc.invoke("getRecommendedQuery");

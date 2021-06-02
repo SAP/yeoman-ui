@@ -168,11 +168,7 @@ describe("exploregens unit test", () => {
       rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, GenState.updating]);
       rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, GenState.notInstalled]);
       npmUtilsMock.expects("install").throws(errorMessage);
-
-      windowMock
-        .expects("showErrorMessage")
-        .withExactArgs(messages.failed_to_update(genName) + `: ${errorMessage}`)
-        .resolves();
+      windowMock.expects("showErrorMessage").withExactArgs(messages.failed_to_update(genName)).resolves();
       windowMock
         .expects("setStatusBarMessage")
         .withArgs(messages.updating(genName))
@@ -217,18 +213,13 @@ describe("exploregens unit test", () => {
 
     it("an error is thrown", async () => {
       const errorMessage = "npm install failed";
-
       loggerMock.expects("debug").withExactArgs(messages.installing(genName));
       loggerMock.expects("error").withExactArgs(errorMessage);
       rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, GenState.installing]);
       rpcMock.expects("invoke").withExactArgs("updateBeingHandledGenerator", [genName, GenState.notInstalled]);
       npmUtilsMock.expects("checkAccessAndSetGeneratorsPath").resolves();
       npmUtilsMock.expects("install").throws(errorMessage);
-
-      windowMock
-        .expects("showErrorMessage")
-        .withExactArgs(messages.failed_to_install(genName) + `: ${errorMessage}`)
-        .resolves();
+      windowMock.expects("showErrorMessage").withExactArgs(messages.failed_to_install(genName)).resolves();
       windowMock
         .expects("setStatusBarMessage")
         .withArgs(messages.installing(genName))
@@ -360,7 +351,7 @@ describe("exploregens unit test", () => {
       globalStateMock.expects("update").withArgs(exploregens["LAST_AUTO_UPDATE_DATE"]);
       windowMock
         .expects("showErrorMessage")
-        .withExactArgs(`Update Failure: ${messages.failed_to_update_gens(["generator-aa"])}`)
+        .withExactArgs(messages.failed_to_update_gens(["generator-aa"]))
         .resolves();
       windowMock
         .expects("setStatusBarMessage")
@@ -390,7 +381,7 @@ describe("exploregens unit test", () => {
       const expectedErrorMessage = "Error: Action cancelled";
       loggerMock.expects("error").withExactArgs(expectedErrorMessage);
       npmUtilsMock.expects("checkAccessAndSetGeneratorsPath").throws(new Error("Action cancelled"));
-      windowMock.expects("showErrorMessage").withExactArgs(`Auto Update Failure: ${expectedErrorMessage}`).resolves();
+      windowMock.expects("showErrorMessage").withExactArgs(messages.failed_to_update_gens()).resolves();
       await exploregens["doGeneratorsUpdate"]();
     });
   });
@@ -467,10 +458,7 @@ describe("exploregens unit test", () => {
             return;
           },
         });
-      windowMock
-        .expects("showErrorMessage")
-        .withExactArgs(messages.failed_to_uninstall(genName) + `: ${errorMessage}`)
-        .resolves();
+      windowMock.expects("showErrorMessage").withExactArgs(messages.failed_to_uninstall(genName)).resolves();
 
       await exploregens["uninstall"](gen);
     });

@@ -84,7 +84,7 @@ export class ExploreGens {
         }
       }
     } catch (error) {
-      this.showAndLogError("Auto Update Failure", error);
+      this.showAndLogError(messages.failed_to_update_gens(), error);
     }
   }
 
@@ -113,7 +113,7 @@ export class ExploreGens {
       const failedToUpdateGens: any[] = _.compact(await Promise.all(promises));
       if (!_.isEmpty(failedToUpdateGens)) {
         const errMessage = messages.failed_to_update_gens(failedToUpdateGens);
-        this.showAndLogError("Update Failure", errMessage);
+        this.showAndLogError(errMessage);
       }
       this.setInstalledGens();
       statusBarMessage.dispose();
@@ -148,10 +148,13 @@ export class ExploreGens {
     return { packages: filteredGenerators, total: packagesData.total };
   }
 
-  private showAndLogError(messagePrefix: string, error: any) {
-    const errorMessage = error.toString();
-    this.logger.error(errorMessage);
-    vscode.window.showErrorMessage(`${messagePrefix}: ${errorMessage}`);
+  private showAndLogError(messagePrefix: string, error?: Error) {
+    if (error) {
+      const errorMessage = error.toString();
+      this.logger.error(errorMessage);
+    }
+
+    vscode.window.showErrorMessage(`${messagePrefix}`);
   }
 
   private getRecommendedQuery() {
