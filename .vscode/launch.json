@@ -9,7 +9,7 @@
       "type": "node",
       "request": "launch",
       "name": "Run ExploreGens websocket server",
-      "program": "${workspaceFolder}/packages/backend/src/webSocketServer/exploreGensIndex.ts",
+      "program": "${workspaceFolder}/packages/backend/src/webSocketServer/exploregens.ts",
       "outFiles": ["${workspaceFolder}/packages/backend/dist/**/*.js"],
       "env": {
         "PORT": "8082"
@@ -19,8 +19,8 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Run websocket server",
-      "program": "${workspaceFolder}/packages/backend/src/webSocketServer/index.ts",
+      "name": "Run YoUi websocket server",
+      "program": "${workspaceFolder}/packages/backend/src/webSocketServer/youi.ts",
       "outFiles": ["${workspaceFolder}/packages/backend/dist/**/*.js"],
       "env": {
         "PORT": "8081"
