@@ -12,6 +12,8 @@ import * as npmFetch from "npm-registry-fetch";
 import { LookupGeneratorMeta } from "yeoman-environment";
 import { getConsoleWarnLogger } from "../logger/console-logger";
 
+const promisifiedExec = promisify(exec);
+
 type ExecResult = {
   stderr: string;
   stdout: string;
@@ -49,13 +51,18 @@ class Command {
   }
 
   private async execCommand(arg: string): Promise<string> {
-    const result: ExecResult = await promisify(exec)(arg);
-    if (!_.isEmpty(result.stderr)) {
-      // no need to throw error, because stderr usually contains warnings
-      getConsoleWarnLogger().warn(result.stderr);
-    }
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        void promisifiedExec(arg).then((result: ExecResult) => {
+          if (!_.isEmpty(result.stderr)) {
+            // no need to throw error, because stderr usually contains warnings
+            getConsoleWarnLogger().warn(result.stderr);
+          }
 
-    return _.trim(result.stdout);
+          resolve(_.trim(result.stdout));
+        });
+      }, 1);
+    });
   }
 
   private getGensQueryURL(query: string, recommended: string): string {
