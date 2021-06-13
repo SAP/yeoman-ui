@@ -148,9 +148,13 @@ export class ExploreGens {
     return { packages: filteredGenerators, total: packagesData.total };
   }
 
+  private getErrorMessage(error: Error): string {
+    return _.get(error, "stack", _.get(error, "message", error.toString()));
+  }
+
   private showAndLogError(messagePrefix: string, error?: Error) {
     if (error) {
-      const errorMessage = error.toString();
+      const errorMessage = this.getErrorMessage(error);
       this.logger.error(errorMessage);
     }
 
@@ -233,7 +237,7 @@ export class ExploreGens {
     } catch (error) {
       this.updateBeingHandledGenerator(genName, GenState.notInstalled);
       if (isAutoUpdate) {
-        this.logger.error(error);
+        this.logger.error(this.getErrorMessage(error));
         return genName;
       }
       this.showAndLogError(messages.failed_to_update(genName), error);
@@ -251,8 +255,14 @@ export class ExploreGens {
   }
 
   private updateBeingHandledGenerator(genName: string, state: GenState) {
-    if (this.rpc) {
-      void this.rpc.invoke("updateBeingHandledGenerator", [genName, state]);
+    try {
+      if (this.rpc) {
+        void this.rpc.invoke("updateBeingHandledGenerator", [genName, state]);
+      }
+    } catch (error) {
+      // error could happen in case that panel was closed by an user but action is still in progress
+      // in this case webview is already disposed
+      this.logger.debug(this.getErrorMessage(error));
     }
   }
 
