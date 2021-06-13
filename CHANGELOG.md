@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.2](https://github.com/SAP/yeoman-ui/compare/v1.4.1...v1.4.2) (2021-06-13)
+
+### Bug Fixes
+
+- notification error displayed after closing Explore and Install Gens pane ([a77040c](https://github.com/SAP/yeoman-ui/commit/a77040ccb9834329b60d63654f3d92526c7e0615))
+
 ## [1.4.1](https://github.com/SAP/yeoman-ui/compare/v1.4.0...v1.4.1) (2021-06-02)
 
 **Note:** Version bump only for package root
