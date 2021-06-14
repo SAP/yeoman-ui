@@ -8,6 +8,7 @@ import { AppWizard } from "@sap-devx/yeoman-ui-types";
 import { YouiAdapter } from "../src/youi-adapter";
 import { YeomanUI } from "../src/yeomanui";
 import messages from "../src/messages";
+import { YoUiFlowPromise, ResolveType, RejectType } from "../src/utils/promise";
 
 describe("YouiAdapter", () => {
   class TestEvents implements YouiEvents {
@@ -83,6 +84,10 @@ describe("YouiAdapter", () => {
   };
 
   const youiEvents = new TestEvents();
+  let yoUiPromise: YoUiFlowPromise;
+  void new Promise((resolve: ResolveType, reject: RejectType) => {
+    yoUiPromise = { resolve, reject };
+  });
 
   const yeomanUi: YeomanUI = new YeomanUI(
     rpc,
@@ -90,7 +95,8 @@ describe("YouiAdapter", () => {
     outputChannel,
     testLogger,
     { filter: GeneratorFilter.create(), messages },
-    undefined
+    undefined,
+    yoUiPromise
   );
 
   describe("#prompt()", () => {

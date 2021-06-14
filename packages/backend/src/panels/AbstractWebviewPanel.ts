@@ -22,10 +22,10 @@ export abstract class AbstractWebviewPanel {
   protected isInBAS: boolean;
   protected rpc: RpcExtension;
 
-  public loadWebviewPanel(uiOptions?: any): Promise<any> {
+  public loadWebviewPanel(uiOptions?: any) {
     this.disposeWebviewPanel();
     const webViewPanel = this.createWebviewPanel();
-    return this.setWebviewPanel(webViewPanel, uiOptions);
+    void this.setWebviewPanel(webViewPanel, uiOptions);
   }
 
   protected constructor(context: Partial<vscode.ExtensionContext>) {
@@ -38,10 +38,9 @@ export abstract class AbstractWebviewPanel {
     this.isInBAS = !_.isEmpty(_.get(process, "env.WS_BASE_URL"));
   }
 
-  public setWebviewPanel(webviewPanel: vscode.WebviewPanel, state?: any): Promise<unknown> {
+  public setWebviewPanel(webviewPanel: vscode.WebviewPanel, state?: unknown) {
     this.webViewPanel = webviewPanel;
     this.state = state;
-    return;
   }
 
   public createWebviewPanel(): vscode.WebviewPanel {
@@ -86,7 +85,7 @@ export abstract class AbstractWebviewPanel {
     void vscode.commands.executeCommand("setContext", this.focusedKey, focusedValue);
   }
 
-  private dispose() {
+  protected dispose() {
     this.setFocused(false);
 
     // Clean up our resources

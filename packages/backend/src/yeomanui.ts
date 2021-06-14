@@ -22,6 +22,7 @@ import { vscode, getVscode } from "./utils/vscodeProxy";
 import * as Generator from "yeoman-generator";
 import * as Environment from "yeoman-environment";
 import { Questions } from "yeoman-environment/lib/adapter";
+import { YoUiFlowPromise } from "src/utils/promise";
 
 export interface IQuestionsPrompt extends IPrompt {
   questions: any[];
@@ -63,7 +64,7 @@ export class YeomanUI {
   private readonly generaorsToIgnoreArray: string[];
   private forceNewWorkspace: boolean;
 
-  private readonly panelPromise: PromiseFunctions;
+  private readonly yoUiPromise: YoUiFlowPromise;
 
   private readonly TARGET_FOLDER_CONFIG_PROP = "ApplicationWizard.TargetFolder";
   private readonly SELECTED_WORKSPACE_CONFIG_PROP = "ApplicationWizard.Workspace";
@@ -75,11 +76,11 @@ export class YeomanUI {
     logger: IChildLogger,
     uiOptions: any,
     outputPath: string = YeomanUI.PROJECTS,
-    panelPromise?: PromiseFunctions
+    yoUiPromise: YoUiFlowPromise
   ) {
     this.rpc = rpc;
 
-    this.panelPromise = panelPromise ?? { resolve: () => "", reject: () => "" };
+    this.yoUiPromise = yoUiPromise;
     this.generatorName = "";
     this.replayUtils = new ReplayUtils();
     this.youiEvents = youiEvents;
@@ -252,13 +253,13 @@ export class YeomanUI {
         const dirsAfter = await this.getChildDirectories(resolve(this.getCwd(), this.gen.destinationRoot()));
         this.onGeneratorSuccess(generatorNamespace, dirsBefore, dirsAfter);
       }
-      this.panelPromise.resolve(generatorNamespace);
+      this.yoUiPromise.resolve();
     } catch (error) {
       if (error instanceof GeneratorNotFoundError) {
         vscode.window.showErrorMessage(error.message);
       }
       this.onGeneratorFailure(generatorNamespace, this.getErrorWithAdditionalInfo(error, "runGenerator()"));
-      this.panelPromise.reject(error);
+      this.yoUiPromise.reject(error);
     }
   }
 
