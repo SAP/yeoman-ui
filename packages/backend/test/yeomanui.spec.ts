@@ -1,7 +1,7 @@
 import { vscode } from "./mockUtil";
 import { createSandbox, SinonSandbox, SinonMock } from "sinon";
 const datauri = require("datauri"); // eslint-disable-line @typescript-eslint/no-var-requires
-import * as fs from "fs";
+import * as fsPromises from "fs/promises";
 import { expect } from "chai";
 import * as _ from "lodash";
 import * as path from "path";
@@ -139,7 +139,7 @@ describe("yeomanui unit test", () => {
   beforeEach(() => {
     envUtilsMock = sandbox.mock(Env);
     appWizardMock = sandbox.mock(appWizard);
-    fsPromisesMock = sandbox.mock(fs.promises);
+    fsPromisesMock = sandbox.mock(fsPromises);
     datauriMock = sandbox.mock(datauri);
     rpcMock = sandbox.mock(rpc);
     loggerMock = sandbox.mock(testLogger);

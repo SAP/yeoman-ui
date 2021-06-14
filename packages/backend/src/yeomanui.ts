@@ -1,5 +1,5 @@
 import * as path from "path";
-import * as fs from "fs";
+import * as fsPromises from "fs/promises";
 import * as _ from "lodash";
 import * as inquirer from "inquirer";
 import { ReplayUtils, ReplayState } from "./replayUtils";
@@ -185,9 +185,9 @@ export class YeomanUI {
     const result = { targetFolderPath: folderPath, childDirs };
 
     try {
-      for (const file of await fs.promises.readdir(folderPath)) {
+      for (const file of await fsPromises.readdir(folderPath)) {
         const resourcePath: string = path.join(folderPath, file);
-        if ((await fs.promises.stat(resourcePath)).isDirectory()) {
+        if ((await fsPromises.stat(resourcePath)).isDirectory()) {
           result.childDirs.push(resourcePath);
         }
       }
@@ -213,7 +213,7 @@ export class YeomanUI {
         this.setCwd(targetFolderProp);
       }
       const targetFolder = this.getCwd();
-      await fs.promises.mkdir(targetFolder, { recursive: true });
+      await fsPromises.mkdir(targetFolder, { recursive: true });
       const dirsBefore = await this.getChildDirectories(targetFolder);
 
       const options = {
