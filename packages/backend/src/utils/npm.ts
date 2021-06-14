@@ -46,10 +46,8 @@ class Command {
   }
 
   private setGlobalNodeModulesPath() {
-    void this.execCommand(`${NPM} root -g`).then((globalNodeModulesPath: string) => {
-      this.globalNodeModulesPathPromise = fs.promises
-        .mkdir(globalNodeModulesPath, { recursive: true })
-        .then(() => globalNodeModulesPath);
+    this.globalNodeModulesPathPromise = this.execCommand(`${NPM} root -g`).then((globalNodeModulesPath: string) => {
+      return fs.promises.mkdir(globalNodeModulesPath, { recursive: true }).then(() => globalNodeModulesPath);
     });
   }
 
