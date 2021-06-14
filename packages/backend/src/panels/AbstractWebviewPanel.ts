@@ -14,7 +14,7 @@ export abstract class AbstractWebviewPanel {
   protected webViewPanel: vscode.WebviewPanel;
   protected focusedKey: string;
   protected htmlFileName: string;
-  protected state: any;
+  protected state: unknown;
   protected context: Partial<vscode.ExtensionContext>;
 
   protected readonly logger: IChildLogger;

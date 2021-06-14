@@ -29,7 +29,7 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
     this.exploreGens = new ExploreGens(this.logger, this.isInBAS, this.context);
   }
 
-  public async loadWebviewPanel(uiOptions?: any) {
+  public async loadWebviewPanel(uiOptions?: unknown) {
     if (this.webViewPanel && _.isNil(uiOptions)) {
       this.webViewPanel.reveal();
     } else {
