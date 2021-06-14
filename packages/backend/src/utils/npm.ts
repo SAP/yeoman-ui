@@ -40,9 +40,17 @@ class Command {
   private isInBAS: boolean;
 
   constructor() {
-    this.globalNodeModulesPathPromise = this.execCommand(`${NPM} root -g`);
+    this.setGlobalNodeModulesPath();
     this.SET_DEFAULT_LOCATION = messages.set_default_location(customLocation.DEFAULT_LOCATION);
     this.isInBAS = !_.isEmpty(_.get(process, "env.WS_BASE_URL"));
+  }
+
+  private setGlobalNodeModulesPath() {
+    void this.execCommand(`${NPM} root -g`).then((globalNodeModulesPath: string) => {
+      this.globalNodeModulesPathPromise = fs.promises
+        .mkdir(globalNodeModulesPath, { recursive: true })
+        .then(() => globalNodeModulesPath);
+    });
   }
 
   private getGenLocationParams(): string {
@@ -151,10 +159,8 @@ class Command {
     return _.get(globalPathArray, "[0]");
   }
 
-  public async getGlobalNodeModulesPath(): Promise<string> {
-    const globalNodeModulesPath: string = await this.globalNodeModulesPathPromise;
-    await fs.promises.mkdir(globalNodeModulesPath, { recursive: true });
-    return globalNodeModulesPath;
+  public getGlobalNodeModulesPath(): Promise<string> {
+    return this.globalNodeModulesPathPromise;
   }
 
   public async getPackagesData(query = "", author = ""): Promise<PackagesData> {
