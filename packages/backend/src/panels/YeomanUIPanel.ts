@@ -64,7 +64,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
       }
     }
 
-    super.loadWebviewPanel(uiOptions);
+    await super.loadWebviewPanel(uiOptions);
 
     return this.yoUiCommandPromise;
   }
@@ -87,10 +87,10 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
     }
   }
 
-  public setWebviewPanel(webViewPanel: vscode.WebviewPanel, uiOptions?: unknown) {
+  public async setWebviewPanel(webViewPanel: vscode.WebviewPanel, uiOptions?: unknown): Promise<void> {
     this.setYoUiPromises();
 
-    super.setWebviewPanel(webViewPanel);
+    await super.setWebviewPanel(webViewPanel);
 
     this.messages = _.assign({}, backendMessages, _.get(uiOptions, "messages", {}));
     const filter = GeneratorFilter.create(_.get(uiOptions, "filter"));

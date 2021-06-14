@@ -22,10 +22,10 @@ export abstract class AbstractWebviewPanel {
   protected isInBAS: boolean;
   protected rpc: RpcExtension;
 
-  public loadWebviewPanel(uiOptions?: any) {
+  public async loadWebviewPanel(uiOptions?: unknown): Promise<void> {
     this.disposeWebviewPanel();
     const webViewPanel = this.createWebviewPanel();
-    this.setWebviewPanel(webViewPanel, uiOptions);
+    await this.setWebviewPanel(webViewPanel, uiOptions);
   }
 
   protected constructor(context: Partial<vscode.ExtensionContext>) {
@@ -38,9 +38,10 @@ export abstract class AbstractWebviewPanel {
     this.isInBAS = !_.isEmpty(_.get(process, "env.WS_BASE_URL"));
   }
 
-  public setWebviewPanel(webviewPanel: vscode.WebviewPanel, state?: unknown) {
+  public setWebviewPanel(webviewPanel: vscode.WebviewPanel, state?: unknown): Promise<void> {
     this.webViewPanel = webviewPanel;
     this.state = state;
+    return;
   }
 
   public createWebviewPanel(): vscode.WebviewPanel {
