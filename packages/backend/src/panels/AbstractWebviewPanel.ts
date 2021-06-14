@@ -25,7 +25,7 @@ export abstract class AbstractWebviewPanel {
   public loadWebviewPanel(uiOptions?: any) {
     this.disposeWebviewPanel();
     const webViewPanel = this.createWebviewPanel();
-    void this.setWebviewPanel(webViewPanel, uiOptions);
+    this.setWebviewPanel(webViewPanel, uiOptions);
   }
 
   protected constructor(context: Partial<vscode.ExtensionContext>) {

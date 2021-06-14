@@ -119,9 +119,9 @@ describe("yeomanui unit test", () => {
     appendLine: () => "",
     show: () => "",
   };
-  let yoUiPromise: YoUiFlowPromise;
+  let yoUiFlowPromise: YoUiFlowPromise;
   void new Promise((resolve: ResolveType, reject: RejectType) => {
-    yoUiPromise = { resolve, reject };
+    yoUiFlowPromise = { resolve, reject };
   });
   const youiEvents = new TestEvents();
   const yeomanUi: YeomanUI = new YeomanUI(
@@ -131,7 +131,7 @@ describe("yeomanui unit test", () => {
     testLogger,
     { filter: GeneratorFilter.create(), messages },
     undefined,
-    yoUiPromise
+    yoUiFlowPromise
   );
 
   before(() => {
@@ -717,7 +717,7 @@ describe("yeomanui unit test", () => {
       testLogger,
       {},
       "testpathbefore",
-      yoUiPromise
+      yoUiFlowPromise
     );
     expect(yeomanUiInstance["getCwd"]()).equal("testpathbefore");
     yeomanUiInstance["setCwd"]("testpathafter");
@@ -735,7 +735,7 @@ describe("yeomanui unit test", () => {
       testLogger,
       {},
       undefined,
-      yoUiPromise
+      yoUiFlowPromise
     );
     const projectsPath = path.join(homedir(), "projects");
     expect(yeomanUiInstance["getCwd"]()).equal(projectsPath);
@@ -749,7 +749,7 @@ describe("yeomanui unit test", () => {
       testLogger,
       null,
       undefined,
-      yoUiPromise
+      yoUiFlowPromise
     );
     const errorInfo = "Error Info";
     const res = yeomanUiInstance["getErrorInfo"](errorInfo);
@@ -789,7 +789,7 @@ describe("yeomanui unit test", () => {
       testLogger,
       {},
       undefined,
-      yoUiPromise
+      yoUiFlowPromise
     );
     const env: Environment = Environment.createEnv();
     const envMock = sandbox.mock(env);
@@ -815,7 +815,7 @@ describe("yeomanui unit test", () => {
       testLogger,
       {},
       undefined,
-      yoUiPromise
+      yoUiFlowPromise
     );
     const gen: any = { on: () => "" };
 
@@ -849,7 +849,7 @@ describe("yeomanui unit test", () => {
       testLogger,
       {},
       undefined,
-      yoUiPromise
+      yoUiFlowPromise
     );
     swaTrackerWrapperMock.expects("updateExploreAndInstallGeneratorsLinkClicked");
     commandsMock.expects("executeCommand").withExactArgs("exploreGenerators").resolves();
@@ -864,7 +864,7 @@ describe("yeomanui unit test", () => {
       testLogger,
       GeneratorFilter.create(),
       undefined,
-      yoUiPromise
+      yoUiFlowPromise
     );
     const gen: any = { on: () => "" };
     const genMock = sandbox.mock(gen);
@@ -890,7 +890,7 @@ describe("yeomanui unit test", () => {
         testLogger,
         GeneratorFilter.create(),
         undefined,
-        yoUiPromise
+        yoUiFlowPromise
       );
       const questions = [{ name: "q1" }];
       const response = await yeomanUiInstance.showPrompt(questions);
@@ -924,7 +924,7 @@ describe("yeomanui unit test", () => {
         testLogger,
         GeneratorFilter.create(),
         undefined,
-        yoUiPromise
+        yoUiFlowPromise
       );
       yeomanUiInstance["runGenerator"] = (): Promise<any> => {
         return Promise.resolve();
@@ -1117,7 +1117,7 @@ describe("yeomanui unit test", () => {
         testLogger,
         GeneratorFilter.create(),
         undefined,
-        yoUiPromise
+        yoUiFlowPromise
       );
 
       yeomanUiInstance["addCustomQuestionEventHandlers"](questions);
@@ -1142,7 +1142,7 @@ describe("yeomanui unit test", () => {
         testLogger,
         GeneratorFilter.create(),
         undefined,
-        yoUiPromise
+        yoUiFlowPromise
       );
       yeomanUiInstance.registerCustomQuestionEventHandler("questionType", "testEvent", testEventFunction);
       yeomanUiInstance["currentQuestions"] = [{ name: "question1", guiType: "questionType" }];
@@ -1158,7 +1158,7 @@ describe("yeomanui unit test", () => {
         testLogger,
         GeneratorFilter.create(),
         undefined,
-        yoUiPromise
+        yoUiFlowPromise
       );
       yeomanUiInstance["currentQuestions"] = [
         {
@@ -1180,7 +1180,7 @@ describe("yeomanui unit test", () => {
         testLogger,
         GeneratorFilter.create(),
         undefined,
-        yoUiPromise
+        yoUiFlowPromise
       );
       const response = await yeomanUiInstance["evaluateMethod"](null, "question1", "method1");
       expect(response).to.be.undefined;
@@ -1194,7 +1194,7 @@ describe("yeomanui unit test", () => {
         testLogger,
         GeneratorFilter.create(),
         undefined,
-        yoUiPromise
+        yoUiFlowPromise
       );
       yeomanUiInstance["gen"] = Object.create({});
       yeomanUiInstance["gen"].options = {};
@@ -1222,7 +1222,7 @@ describe("yeomanui unit test", () => {
         testLogger,
         GeneratorFilter.create(),
         undefined,
-        yoUiPromise
+        yoUiFlowPromise
       );
       yeomanUiInstance["gen"] = Object.create({});
       yeomanUiInstance["gen"].options = {};

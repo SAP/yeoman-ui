@@ -38,9 +38,9 @@ class YeomanUIWebSocketServer {
       const serverOutput = new ServerOutput(this.rpc, true);
       const youiEvents: YouiEvents = new ServerYouiEvents(this.rpc);
 
-      let yoUiPromise: YoUiFlowPromise;
+      let yoUiFlowPromise: YoUiFlowPromise;
       void new Promise((resolve: ResolveType, reject: RejectType) => {
-        yoUiPromise = { resolve, reject };
+        yoUiFlowPromise = { resolve, reject };
       });
 
       this.yeomanui = new YeomanUI(
@@ -50,7 +50,7 @@ class YeomanUIWebSocketServer {
         childLogger,
         { filter: GeneratorFilter.create(), messages: backendMessages },
         undefined,
-        yoUiPromise
+        yoUiFlowPromise
       );
       this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.mockFolderDialog.bind(this));
     });

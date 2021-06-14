@@ -84,9 +84,9 @@ describe("YouiAdapter", () => {
   };
 
   const youiEvents = new TestEvents();
-  let yoUiPromise: YoUiFlowPromise;
+  let yoUiFlowPromise: YoUiFlowPromise;
   void new Promise((resolve: ResolveType, reject: RejectType) => {
-    yoUiPromise = { resolve, reject };
+    yoUiFlowPromise = { resolve, reject };
   });
 
   const yeomanUi: YeomanUI = new YeomanUI(
@@ -96,7 +96,7 @@ describe("YouiAdapter", () => {
     testLogger,
     { filter: GeneratorFilter.create(), messages },
     undefined,
-    yoUiPromise
+    yoUiFlowPromise
   );
 
   describe("#prompt()", () => {

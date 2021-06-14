@@ -64,7 +64,7 @@ export class YeomanUI {
   private readonly generaorsToIgnoreArray: string[];
   private forceNewWorkspace: boolean;
 
-  private readonly yoUiPromise: YoUiFlowPromise;
+  private readonly yoUiFlowPromise: YoUiFlowPromise;
 
   private readonly TARGET_FOLDER_CONFIG_PROP = "ApplicationWizard.TargetFolder";
   private readonly SELECTED_WORKSPACE_CONFIG_PROP = "ApplicationWizard.Workspace";
@@ -76,11 +76,11 @@ export class YeomanUI {
     logger: IChildLogger,
     uiOptions: any,
     outputPath: string = YeomanUI.PROJECTS,
-    yoUiPromise: YoUiFlowPromise
+    yoUiFlowPromise: YoUiFlowPromise
   ) {
     this.rpc = rpc;
 
-    this.yoUiPromise = yoUiPromise;
+    this.yoUiFlowPromise = yoUiFlowPromise;
     this.generatorName = "";
     this.replayUtils = new ReplayUtils();
     this.youiEvents = youiEvents;
@@ -253,13 +253,11 @@ export class YeomanUI {
         const dirsAfter = await this.getChildDirectories(resolve(this.getCwd(), this.gen.destinationRoot()));
         this.onGeneratorSuccess(generatorNamespace, dirsBefore, dirsAfter);
       }
-      this.yoUiPromise.resolve();
     } catch (error) {
       if (error instanceof GeneratorNotFoundError) {
         vscode.window.showErrorMessage(error.message);
       }
       this.onGeneratorFailure(generatorNamespace, this.getErrorWithAdditionalInfo(error, "runGenerator()"));
-      this.yoUiPromise.reject(error);
     }
   }
 
@@ -452,6 +450,7 @@ export class YeomanUI {
     SWA.updateGeneratorEnded(generatorName, true, this.logger);
     this.youiEvents.doGeneratorDone(true, message, selectedWorkspace, type, targetFolderPath);
     this.setInitialProcessDir();
+    this.yoUiFlowPromise.resolve();
   }
 
   private onGeneratorFailure(generatorName: string, error: any) {
@@ -461,6 +460,7 @@ export class YeomanUI {
     SWA.updateGeneratorEnded(generatorName, false, this.logger, errorMessage);
     this.youiEvents.doGeneratorDone(false, errorMessage, "", "files");
     this.setInitialProcessDir();
+    this.yoUiFlowPromise.reject(error);
   }
 
   private onGenInstall(gen: any) {

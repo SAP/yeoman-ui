@@ -39,19 +39,19 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   }
 
   private setYoUiPromises() {
-    this.yoUiPanelFlowPromise = new Promise((resolve: ResolveType, reject: RejectType) => {
-      this.yoUiPromise = { resolve, reject };
+    this.yoUiCommandPromise = new Promise((resolve: ResolveType, reject: RejectType) => {
+      this.yoUiFlowPromise = { resolve, reject };
     });
   }
 
   private cleanYoUiPromises() {
-    if (this.yoUiPromise) {
+    if (this.yoUiFlowPromise) {
       // resolves promise in case panel is closed manually by an user
       // it is save to call resolve several times on same promise
-      this.yoUiPromise.resolve();
+      this.yoUiFlowPromise.resolve();
     }
-    this.yoUiPanelFlowPromise = null;
-    this.yoUiPromise = null;
+    this.yoUiCommandPromise = null;
+    this.yoUiFlowPromise = null;
   }
 
   public async loadWebviewPanel(uiOptions?: any): Promise<void> {
@@ -66,7 +66,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 
     super.loadWebviewPanel(uiOptions);
 
-    return this.yoUiPanelFlowPromise;
+    return this.yoUiCommandPromise;
   }
 
   private async tryToInstallGenerator(genNamespace: string) {
@@ -122,7 +122,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
         data: _.get(uiOptions, "data"),
       },
       outputPath,
-      this.yoUiPromise
+      this.yoUiFlowPromise
     );
     this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
     this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
@@ -132,8 +132,8 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   private messages: any;
   private installGens: any;
   private readonly output: GeneratorOutput;
-  private yoUiPanelFlowPromise: Promise<void>;
-  private yoUiPromise: YoUiFlowPromise;
+  private yoUiCommandPromise: Promise<void>;
+  private yoUiFlowPromise: YoUiFlowPromise;
 
   public constructor(context: Partial<vscode.ExtensionContext>) {
     super(context);
