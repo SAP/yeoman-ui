@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.4](https://github.com/SAP/yeoman-ui/compare/v1.4.3...v1.4.4) (2021-06-14)
+
+### Bug Fixes
+
+- installation fails when global npm modules path does not exist ([#616](https://github.com/SAP/yeoman-ui/issues/616)) ([ddec402](https://github.com/SAP/yeoman-ui/commit/ddec4021875f42c3dd0acd2934878b6188ecaa9a))
+
 ## [1.4.3](https://github.com/SAP/yeoman-ui/compare/v1.4.1...v1.4.3) (2021-06-13)
 
 ### Bug Fixes
