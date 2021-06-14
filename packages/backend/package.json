@@ -162,13 +162,7 @@
     }
   },
   "activationEvents": [
-    "*",
-    "onCommand:loadYeomanUI",
-    "onCommand:yeomanUI._notifyGeneratorsChange",
-    "onWebviewPanel:yeomanui",
-    "onCommand:exploreGenerators",
-    "onWebviewPanel:exploreGens",
-    "onWebviewPanel:runGenerator"
+    "*"
   ],
   "husky": {
     "hooks": {
