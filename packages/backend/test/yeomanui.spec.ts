@@ -1,7 +1,7 @@
 import { vscode } from "./mockUtil";
 import { createSandbox, SinonSandbox, SinonMock } from "sinon";
 const datauri = require("datauri"); // eslint-disable-line @typescript-eslint/no-var-requires
-import * as fsextra from "fs-extra";
+import { promises } from "fs";
 import { expect } from "chai";
 import * as _ from "lodash";
 import * as path from "path";
@@ -20,7 +20,7 @@ import Environment = require("yeoman-environment");
 describe("yeomanui unit test", () => {
   let sandbox: SinonSandbox;
   let appWizardMock: SinonMock;
-  let fsExtraMock: SinonMock;
+  let fsPromisesMock: SinonMock;
   let datauriMock: SinonMock;
   let loggerMock: SinonMock;
   let swaTrackerWrapperMock: SinonMock;
@@ -30,8 +30,6 @@ describe("yeomanui unit test", () => {
   let workspaceMock: SinonMock;
   let commandsMock: SinonMock;
   let wsConfigMock: SinonMock;
-  const UTF8 = "utf8";
-  const PACKAGE_JSON = "package.json";
 
   const choiceMessage =
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
@@ -141,7 +139,7 @@ describe("yeomanui unit test", () => {
   beforeEach(() => {
     envUtilsMock = sandbox.mock(Env);
     appWizardMock = sandbox.mock(appWizard);
-    fsExtraMock = sandbox.mock(fsextra);
+    fsPromisesMock = sandbox.mock(promises);
     datauriMock = sandbox.mock(datauri);
     rpcMock = sandbox.mock(rpc);
     loggerMock = sandbox.mock(testLogger);
@@ -157,7 +155,7 @@ describe("yeomanui unit test", () => {
     commandsMock.verify();
     wsConfigMock.verify();
     appWizardMock.verify();
-    fsExtraMock.verify();
+    fsPromisesMock.verify();
     datauriMock.verify();
     rpcMock.verify();
     loggerMock.verify();
@@ -172,7 +170,7 @@ describe("yeomanui unit test", () => {
     expect(res.childDirs).is.not.empty;
 
     const errorMessage = "readdir failure";
-    fsExtraMock.expects("readdir").throws(new Error(errorMessage));
+    fsPromisesMock.expects("readdir").throws(new Error(errorMessage));
     const resFail = await yeomanUi["getChildDirectories"](homedir());
     expect(resFail.childDirs).is.empty;
   });

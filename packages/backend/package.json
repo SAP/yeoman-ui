@@ -162,13 +162,7 @@
     }
   },
   "activationEvents": [
-    "*",
-    "onCommand:loadYeomanUI",
-    "onCommand:yeomanUI._notifyGeneratorsChange",
-    "onWebviewPanel:yeomanui",
-    "onCommand:exploreGenerators",
-    "onWebviewPanel:exploreGens",
-    "onWebviewPanel:runGenerator"
+    "*"
   ],
   "husky": {
     "hooks": {
@@ -192,7 +186,6 @@
     "@vscode-logging/logger": "1.2.3",
     "chalk": "4.1.1",
     "datauri": "3.0.0",
-    "fs-extra": "10.0.0",
     "humanize-string": "2.1.0",
     "npm-registry-fetch": "11.0.0",
     "object-hash": "2.2.0",
@@ -204,7 +197,6 @@
     "yeoman-ui-frontend": "^1.4.0"
   },
   "devDependencies": {
-    "@types/fs-extra": "^9.0.6",
     "@types/inquirer": "7.3.1",
     "@types/lodash": "^4.14.170",
     "@types/node": "^14.14.44",

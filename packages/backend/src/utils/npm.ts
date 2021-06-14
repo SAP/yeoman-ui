@@ -4,7 +4,7 @@ import { platform } from "os";
 import * as _ from "lodash";
 import * as customLocation from "./customLocation";
 import * as sudo from "sudo-prompt";
-import { readFile, promises, constants, existsSync } from "fs-extra";
+import * as fs from "fs";
 import messages from "../messages";
 import { vscode } from "./vscodeProxy";
 import * as path from "path";
@@ -40,9 +40,15 @@ class Command {
   private isInBAS: boolean;
 
   constructor() {
-    this.globalNodeModulesPathPromise = this.execCommand(`${NPM} root -g`);
+    this.setGlobalNodeModulesPath();
     this.SET_DEFAULT_LOCATION = messages.set_default_location(customLocation.DEFAULT_LOCATION);
     this.isInBAS = !_.isEmpty(_.get(process, "env.WS_BASE_URL"));
+  }
+
+  private setGlobalNodeModulesPath() {
+    this.globalNodeModulesPathPromise = this.execCommand(`${NPM} root -g`).then((globalNodeModulesPath: string) => {
+      return fs.promises.mkdir(globalNodeModulesPath, { recursive: true }).then(() => globalNodeModulesPath);
+    });
   }
 
   private getGenLocationParams(): string {
@@ -89,13 +95,9 @@ class Command {
   }
 
   private async getAccessResult(): Promise<string> {
-    const globalNodeModulesPath = await this.getGlobalNodeModulesPath();
-    // we assume that if custom path set by an user is writable
+    // we assume that if custom path set by an user it is writable
     if (_.isEmpty(customLocation.getPath())) {
-      const globalNodeModulesPathExists = existsSync(globalNodeModulesPath);
-      if (!globalNodeModulesPathExists) {
-        return Promise.reject(`${globalNodeModulesPath} does not exist`);
-      }
+      const globalNodeModulesPath = await this.getGlobalNodeModulesPath();
       const isWritable = await this.isPathWritable(globalNodeModulesPath);
       if (!isWritable) {
         const globalPath = await this.getGlobalPath();
@@ -112,8 +114,8 @@ class Command {
   }
 
   private isPathWritable(path: string): Promise<boolean> {
-    return promises
-      .access(path, constants.W_OK)
+    return fs.promises
+      .access(path, fs.constants.W_OK)
       .then(() => true)
       .catch(() => false);
   }
@@ -142,7 +144,7 @@ class Command {
   private async getPackageJson(packagePath: string): Promise<any | undefined> {
     const packageJsonFilePath = path.join(packagePath, "package.json");
     try {
-      const packageJsonString: string = await readFile(packageJsonFilePath, "utf8");
+      const packageJsonString: string = await fs.promises.readFile(packageJsonFilePath, "utf8");
       return JSON.parse(packageJsonString);
     } catch (error) {
       getConsoleWarnLogger().error(`Could not get ${packageJsonFilePath} file content. Reason: ${error}`);
