@@ -8,6 +8,7 @@ import { AppWizard } from "@sap-devx/yeoman-ui-types";
 import { YouiAdapter } from "../src/youi-adapter";
 import { YeomanUI } from "../src/yeomanui";
 import messages from "../src/messages";
+import { createFlowPromise } from "../src/utils/promise";
 
 describe("YouiAdapter", () => {
   class TestEvents implements YouiEvents {
@@ -90,7 +91,8 @@ describe("YouiAdapter", () => {
     outputChannel,
     testLogger,
     { filter: GeneratorFilter.create(), messages },
-    undefined
+    undefined,
+    createFlowPromise<void>().state
   );
 
   describe("#prompt()", () => {

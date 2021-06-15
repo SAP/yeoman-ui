@@ -22,6 +22,7 @@ import { vscode, getVscode } from "./utils/vscodeProxy";
 import * as Generator from "yeoman-generator";
 import * as Environment from "yeoman-environment";
 import { Questions } from "yeoman-environment/lib/adapter";
+import { State } from "./utils/promise";
 
 export interface IQuestionsPrompt extends IPrompt {
   questions: any[];
@@ -63,7 +64,7 @@ export class YeomanUI {
   private readonly generaorsToIgnoreArray: string[];
   private forceNewWorkspace: boolean;
 
-  private readonly panelPromise: PromiseFunctions;
+  private readonly flowState: State<void>;
 
   private readonly TARGET_FOLDER_CONFIG_PROP = "ApplicationWizard.TargetFolder";
   private readonly SELECTED_WORKSPACE_CONFIG_PROP = "ApplicationWizard.Workspace";
@@ -75,11 +76,11 @@ export class YeomanUI {
     logger: IChildLogger,
     uiOptions: any,
     outputPath: string = YeomanUI.PROJECTS,
-    panelPromise?: PromiseFunctions
+    flowState: State<void>
   ) {
     this.rpc = rpc;
 
-    this.panelPromise = panelPromise ?? { resolve: () => "", reject: () => "" };
+    this.flowState = flowState;
     this.generatorName = "";
     this.replayUtils = new ReplayUtils();
     this.youiEvents = youiEvents;
@@ -252,13 +253,11 @@ export class YeomanUI {
         const dirsAfter = await this.getChildDirectories(resolve(this.getCwd(), this.gen.destinationRoot()));
         this.onGeneratorSuccess(generatorNamespace, dirsBefore, dirsAfter);
       }
-      this.panelPromise.resolve(generatorNamespace);
     } catch (error) {
       if (error instanceof GeneratorNotFoundError) {
         vscode.window.showErrorMessage(error.message);
       }
       this.onGeneratorFailure(generatorNamespace, this.getErrorWithAdditionalInfo(error, "runGenerator()"));
-      this.panelPromise.reject(error);
     }
   }
 
@@ -451,6 +450,7 @@ export class YeomanUI {
     SWA.updateGeneratorEnded(generatorName, true, this.logger);
     this.youiEvents.doGeneratorDone(true, message, selectedWorkspace, type, targetFolderPath);
     this.setInitialProcessDir();
+    this.flowState.resolve();
   }
 
   private onGeneratorFailure(generatorName: string, error: any) {
@@ -460,6 +460,7 @@ export class YeomanUI {
     SWA.updateGeneratorEnded(generatorName, false, this.logger, errorMessage);
     this.youiEvents.doGeneratorDone(false, errorMessage, "", "files");
     this.setInitialProcessDir();
+    this.flowState.reject(error);
   }
 
   private onGenInstall(gen: any) {
