@@ -7,14 +7,24 @@ import { getWebviewRpcLibraryLogger } from "../logger/logger-wrapper";
 import _ = require("lodash");
 
 export class ExploreGensPanel extends AbstractWebviewPanel {
-  public async setWebviewPanel(webviewPanel: vscode.WebviewPanel, uiOptions?: any) {
+  public setWebviewPanel(webviewPanel: vscode.WebviewPanel, uiOptions?: unknown) {
     super.setWebviewPanel(webviewPanel);
     this.rpc = new RpcExtension(webviewPanel.webview, getWebviewRpcLibraryLogger());
     this.exploreGens.init(this.rpc);
     this.initWebviewPanel();
-    if (uiOptions?.package?.name) {
-      await this.exploreGens.setGenFilter(uiOptions.package.name);
-      await this.exploreGens.install(uiOptions);
+    void this.installGenOnPanelOpenIfNeeded(uiOptions);
+  }
+
+  private async installGenOnPanelOpenIfNeeded(uiOptions?: unknown) {
+    const genFullName = _.get(uiOptions, "package.name");
+    if (genFullName) {
+      try {
+        await this.exploreGens.setGenFilter(genFullName);
+        await this.exploreGens.install(uiOptions);
+        this.flowPromise.state.resolve();
+      } catch (error) {
+        this.flowPromise.state.reject(error);
+      }
     }
   }
 
@@ -29,11 +39,11 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
     this.exploreGens = new ExploreGens(this.logger, this.isInBAS, this.context);
   }
 
-  public loadWebviewPanel(uiOptions?: unknown) {
+  public async loadWebviewPanel(uiOptions?: unknown) {
     if (this.webViewPanel && _.isNil(uiOptions)) {
       this.webViewPanel.reveal();
     } else {
-      return super.loadWebviewPanel(uiOptions);
+      await super.loadWebviewPanel(uiOptions);
     }
   }
 }
