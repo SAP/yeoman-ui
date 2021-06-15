@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.5](https://github.com/SAP/yeoman-ui/compare/v1.4.4...v1.4.5) (2021-06-15)
+
+### Bug Fixes
+
+- on reload panel is empty ([#617](https://github.com/SAP/yeoman-ui/issues/617)) ([f8f359a](https://github.com/SAP/yeoman-ui/commit/f8f359a6b41de0308a10b9efdd1e1594bbdb1705))
+
 ## [1.4.4](https://github.com/SAP/yeoman-ui/compare/v1.4.3...v1.4.4) (2021-06-14)
 
 ### Bug Fixes
