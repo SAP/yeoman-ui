@@ -22,7 +22,7 @@ import { vscode, getVscode } from "./utils/vscodeProxy";
 import * as Generator from "yeoman-generator";
 import * as Environment from "yeoman-environment";
 import { Questions } from "yeoman-environment/lib/adapter";
-import { YoUiFlowPromise } from "src/utils/promise";
+import { State } from "./utils/promise";
 
 export interface IQuestionsPrompt extends IPrompt {
   questions: any[];
@@ -64,7 +64,7 @@ export class YeomanUI {
   private readonly generaorsToIgnoreArray: string[];
   private forceNewWorkspace: boolean;
 
-  private readonly yoUiFlowPromise: YoUiFlowPromise;
+  private readonly flowState: State<void>;
 
   private readonly TARGET_FOLDER_CONFIG_PROP = "ApplicationWizard.TargetFolder";
   private readonly SELECTED_WORKSPACE_CONFIG_PROP = "ApplicationWizard.Workspace";
@@ -76,11 +76,11 @@ export class YeomanUI {
     logger: IChildLogger,
     uiOptions: any,
     outputPath: string = YeomanUI.PROJECTS,
-    yoUiFlowPromise: YoUiFlowPromise
+    flowState: State<void>
   ) {
     this.rpc = rpc;
 
-    this.yoUiFlowPromise = yoUiFlowPromise;
+    this.flowState = flowState;
     this.generatorName = "";
     this.replayUtils = new ReplayUtils();
     this.youiEvents = youiEvents;
@@ -450,7 +450,7 @@ export class YeomanUI {
     SWA.updateGeneratorEnded(generatorName, true, this.logger);
     this.youiEvents.doGeneratorDone(true, message, selectedWorkspace, type, targetFolderPath);
     this.setInitialProcessDir();
-    this.yoUiFlowPromise.resolve();
+    this.flowState.resolve();
   }
 
   private onGeneratorFailure(generatorName: string, error: any) {
@@ -460,7 +460,7 @@ export class YeomanUI {
     SWA.updateGeneratorEnded(generatorName, false, this.logger, errorMessage);
     this.youiEvents.doGeneratorDone(false, errorMessage, "", "files");
     this.setInitialProcessDir();
-    this.yoUiFlowPromise.reject(error);
+    this.flowState.reject(error);
   }
 
   private onGenInstall(gen: any) {

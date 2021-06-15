@@ -8,7 +8,7 @@ import { IChildLogger } from "@vscode-logging/logger";
 import { YouiEvents } from "../youi-events";
 import { GeneratorFilter } from "../filter";
 import { getConsoleWarnLogger } from "../logger/console-logger";
-import { RejectType, ResolveType, YoUiFlowPromise } from "src/utils/promise";
+import { createFlowPromise } from "../utils/promise";
 
 class YeomanUIWebSocketServer {
   private rpc: RpcExtensionWebSockets | undefined;
@@ -38,11 +38,6 @@ class YeomanUIWebSocketServer {
       const serverOutput = new ServerOutput(this.rpc, true);
       const youiEvents: YouiEvents = new ServerYouiEvents(this.rpc);
 
-      let yoUiFlowPromise: YoUiFlowPromise;
-      void new Promise((resolve: ResolveType, reject: RejectType) => {
-        yoUiFlowPromise = { resolve, reject };
-      });
-
       this.yeomanui = new YeomanUI(
         this.rpc,
         youiEvents,
@@ -50,7 +45,7 @@ class YeomanUIWebSocketServer {
         childLogger,
         { filter: GeneratorFilter.create(), messages: backendMessages },
         undefined,
-        yoUiFlowPromise
+        createFlowPromise<void>().state
       );
       this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.mockFolderDialog.bind(this));
     });

@@ -8,7 +8,7 @@ import _ = require("lodash");
 
 export class ExploreGensPanel extends AbstractWebviewPanel {
   public async setWebviewPanel(webviewPanel: vscode.WebviewPanel, uiOptions?: any) {
-    await super.setWebviewPanel(webviewPanel);
+    super.setWebviewPanel(webviewPanel);
     this.rpc = new RpcExtension(webviewPanel.webview, getWebviewRpcLibraryLogger());
     this.exploreGens.init(this.rpc);
     this.initWebviewPanel();
@@ -29,11 +29,11 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
     this.exploreGens = new ExploreGens(this.logger, this.isInBAS, this.context);
   }
 
-  public async loadWebviewPanel(uiOptions?: unknown) {
+  public loadWebviewPanel(uiOptions?: unknown) {
     if (this.webViewPanel && _.isNil(uiOptions)) {
       this.webViewPanel.reveal();
     } else {
-      await super.loadWebviewPanel(uiOptions);
+      return super.loadWebviewPanel(uiOptions);
     }
   }
 }

@@ -5,6 +5,7 @@ import { readFileSync } from "fs";
 import { IChildLogger } from "@vscode-logging/logger";
 import { getClassLogger } from "../logger/logger-wrapper";
 import { RpcExtension } from "@sap-devx/webview-rpc/out.ext/rpc-extension";
+import { createFlowPromise, FlowPromise } from "../utils/promise";
 
 export abstract class AbstractWebviewPanel {
   public viewType: string;
@@ -21,11 +22,15 @@ export abstract class AbstractWebviewPanel {
   protected disposables: vscode.Disposable[];
   protected isInBAS: boolean;
   protected rpc: RpcExtension;
+  protected flowPromise: FlowPromise<void>;
 
-  public async loadWebviewPanel(uiOptions?: unknown): Promise<void> {
+  public loadWebviewPanel(uiOptions?: unknown): Promise<void> {
     this.disposeWebviewPanel();
+
     const webViewPanel = this.createWebviewPanel();
-    await this.setWebviewPanel(webViewPanel, uiOptions);
+    this.setWebviewPanel(webViewPanel, uiOptions);
+
+    return this.flowPromise.promise;
   }
 
   protected constructor(context: Partial<vscode.ExtensionContext>) {
@@ -38,10 +43,10 @@ export abstract class AbstractWebviewPanel {
     this.isInBAS = !_.isEmpty(_.get(process, "env.WS_BASE_URL"));
   }
 
-  public setWebviewPanel(webviewPanel: vscode.WebviewPanel, state?: unknown): Promise<void> {
+  public setWebviewPanel(webviewPanel: vscode.WebviewPanel, state?: unknown) {
+    this.flowPromise = createFlowPromise<void>();
     this.webViewPanel = webviewPanel;
     this.state = state;
-    return;
   }
 
   public createWebviewPanel(): vscode.WebviewPanel {
@@ -86,6 +91,15 @@ export abstract class AbstractWebviewPanel {
     void vscode.commands.executeCommand("setContext", this.focusedKey, focusedValue);
   }
 
+  private cleanFlowPromise() {
+    if (this.flowPromise) {
+      // resolves promise in case panel is closed manually by an user
+      // it is save to call resolve several times on same promise
+      this.flowPromise.state.resolve();
+    }
+    this.flowPromise = null;
+  }
+
   protected dispose() {
     this.setFocused(false);
 
@@ -99,6 +113,8 @@ export abstract class AbstractWebviewPanel {
         x.dispose();
       }
     }
+
+    this.cleanFlowPromise();
   }
 
   protected initHtmlContent(): void {

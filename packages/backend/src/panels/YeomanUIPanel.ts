@@ -13,7 +13,6 @@ import { Env } from "../utils/env";
 import { getWebviewRpcLibraryLogger } from "../logger/logger-wrapper";
 import { homedir } from "os";
 import { NpmCommand } from "../utils/npm";
-import { RejectType, ResolveType, YoUiFlowPromise } from "src/utils/promise";
 
 export class YeomanUIPanel extends AbstractWebviewPanel {
   public static YEOMAN_UI = "Application Wizard";
@@ -38,22 +37,6 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
     }
   }
 
-  private setYoUiPromises() {
-    this.yoUiCommandPromise = new Promise((resolve: ResolveType, reject: RejectType) => {
-      this.yoUiFlowPromise = { resolve, reject };
-    });
-  }
-
-  private cleanYoUiPromises() {
-    if (this.yoUiFlowPromise) {
-      // resolves promise in case panel is closed manually by an user
-      // it is save to call resolve several times on same promise
-      this.yoUiFlowPromise.resolve();
-    }
-    this.yoUiCommandPromise = null;
-    this.yoUiFlowPromise = null;
-  }
-
   public async loadWebviewPanel(uiOptions?: any): Promise<void> {
     const genNamespace = uiOptions?.generator;
     if (genNamespace) {
@@ -64,9 +47,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
       }
     }
 
-    await super.loadWebviewPanel(uiOptions);
-
-    return this.yoUiCommandPromise;
+    return super.loadWebviewPanel(uiOptions);
   }
 
   private async tryToInstallGenerator(genNamespace: string) {
@@ -87,10 +68,8 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
     }
   }
 
-  public async setWebviewPanel(webViewPanel: vscode.WebviewPanel, uiOptions?: unknown): Promise<void> {
-    this.setYoUiPromises();
-
-    await super.setWebviewPanel(webViewPanel);
+  public setWebviewPanel(webViewPanel: vscode.WebviewPanel, uiOptions?: unknown) {
+    super.setWebviewPanel(webViewPanel);
 
     this.messages = _.assign({}, backendMessages, _.get(uiOptions, "messages", {}));
     const filter = GeneratorFilter.create(_.get(uiOptions, "filter"));
@@ -122,7 +101,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
         data: _.get(uiOptions, "data"),
       },
       outputPath,
-      this.yoUiFlowPromise
+      this.flowPromise.state
     );
     this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
     this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
@@ -132,8 +111,6 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   private messages: any;
   private installGens: any;
   private readonly output: GeneratorOutput;
-  private yoUiCommandPromise: Promise<void>;
-  private yoUiFlowPromise: YoUiFlowPromise;
 
   public constructor(context: Partial<vscode.ExtensionContext>) {
     super(context);
@@ -182,11 +159,6 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   public disposeWebviewPanel() {
     super.disposeWebviewPanel();
     this.yeomanui = null;
-  }
-
-  public dispose() {
-    super.dispose();
-    this.cleanYoUiPromises();
   }
 
   public initWebviewPanel() {
