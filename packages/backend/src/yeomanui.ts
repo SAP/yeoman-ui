@@ -490,9 +490,8 @@ export class YeomanUI {
     const questions: any[] = [];
 
     let selectedWorkspaceConfig;
-
     const currentPath = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
-    if (!currentPath || YeomanUI.PROJECTS.toLowerCase() === currentPath.toLowerCase()) {
+    if (!currentPath) {
       this.forceNewWorkspace = true;
       selectedWorkspaceConfig = this.uiOptions.messages.open_in_a_new_workspace;
     } else {
