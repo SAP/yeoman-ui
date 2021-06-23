@@ -520,7 +520,7 @@ module.exports = class extends Generator {
         name: "password",
         message: "GitHub password",
         mask: "*",
-        validate: this._requireLetterAndNumber,
+        validate: this._requireLetterAndNumber.bind(this),
         when: (response) => {
           if (_.isNil(this._getOption("password"))) {
             return this._getAnswer("email", response) !== "root";
