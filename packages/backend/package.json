@@ -37,7 +37,7 @@
     "coverage": "nyc mocha",
     "coverage:copy": "shx mkdir -p ../../coverage && shx cp -u ./coverage/lcov.info ../../coverage/lcov_backend.info",
     "frontend:copy": "npm-run-all clean:frontend && shx cp -r ../frontend/dist/. ./dist/media/",
-    "package": "vsce package  --yarn",
+    "package": "vsce package --yarn .",
     "test": "mocha",
     "webpack": "webpack --mode development",
     "webpack-dev:watch": "webpack --mode development --watch",
@@ -213,7 +213,7 @@
     "string-replace-loader": "3.0.2",
     "ts-loader": "^9.2.3",
     "ts-node": "^9.1.1",
-    "vsce": "^1.93.0",
+    "vsce": "1.83.0",
     "webpack": "5.40.0",
     "webpack-cli": "4.7.2"
   },
