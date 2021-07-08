@@ -4,6 +4,7 @@ import { AbstractWebviewPanel } from "./panels/AbstractWebviewPanel";
 import { YeomanUIPanel } from "./panels/YeomanUIPanel";
 import { ExploreGensPanel } from "./panels/ExploreGensPanel";
 import { SWA } from "./swa-tracker/swa-tracker-wrapper";
+import * as shellJsHelper from "./utils/shellJsHelper";
 
 let extContext: vscode.ExtensionContext;
 let yeomanUIPanel: YeomanUIPanel;
@@ -23,6 +24,8 @@ function registerWebviewPanelSerializer(abstractPanel: AbstractWebviewPanel) {
 
 export function activate(context: vscode.ExtensionContext) {
   extContext = context;
+
+  shellJsHelper.applyExecWorkaround();
 
   try {
     createExtensionLoggerAndSubscribeToLogSettingsChanges(extContext);
