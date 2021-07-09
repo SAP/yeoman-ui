@@ -23,10 +23,13 @@ export abstract class AbstractWebviewPanel {
   protected isInBAS: boolean;
   protected rpc: RpcExtension;
   protected flowPromise: FlowPromise<void>;
+  protected viewColumn: vscode.ViewColumn;
 
-  public loadWebviewPanel(uiOptions?: unknown): Promise<void> {
+  public loadWebviewPanel(uiOptions?: any): Promise<void> {
     this.disposeWebviewPanel();
-
+    if (uiOptions?.viewColumn in vscode.ViewColumn) {
+      this.viewColumn = uiOptions.viewColumn;
+    }
     const webViewPanel = this.createWebviewPanel();
     this.setWebviewPanel(webViewPanel, uiOptions);
 
@@ -41,6 +44,7 @@ export abstract class AbstractWebviewPanel {
     this.disposables = [];
     this.context = context;
     this.isInBAS = !_.isEmpty(_.get(process, "env.WS_BASE_URL"));
+    this.viewColumn = vscode.ViewColumn.One;
   }
 
   public setWebviewPanel(webviewPanel: vscode.WebviewPanel, state?: unknown) {
@@ -50,7 +54,7 @@ export abstract class AbstractWebviewPanel {
   }
 
   public createWebviewPanel(): vscode.WebviewPanel {
-    return vscode.window.createWebviewPanel(this.viewType, this.viewTitle, vscode.ViewColumn.One, {
+    return vscode.window.createWebviewPanel(this.viewType, this.viewTitle, this.viewColumn, {
       // Enable javascript in the webview
       enableScripts: true,
       retainContextWhenHidden: true,

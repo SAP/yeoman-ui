@@ -70,6 +70,7 @@ const window = {
 
 const ViewColumn = {
   One: 1,
+  Two: 2,
 };
 
 const vscodeMock = {
