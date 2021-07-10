@@ -6,6 +6,7 @@ import * as _ from "lodash";
 import * as extension from "../src/extension";
 import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { SWA } from "../src/swa-tracker/swa-tracker-wrapper";
+import * as shellJsWorkarounds from "../src/utils/shellJsWorkarounds";
 
 describe("extension unit test", () => {
   let sandbox: SinonSandbox;
@@ -48,7 +49,13 @@ describe("extension unit test", () => {
       swaTrackerWrapperMock.expects("createSWATracker");
       windowMock.expects("registerWebviewPanelSerializer").withArgs("yeomanui");
       windowMock.expects("registerWebviewPanelSerializer").withArgs("exploreGens");
+
+      const applySpy = sandbox.spy(shellJsWorkarounds, "apply");
+
       extension.activate(testContext);
+
+      expect(applySpy.calledOnce).to.be.true;
+      applySpy.restore();
 
       const oRegisteredCommands = vscode.commands.getCommands();
       expect(_.get(oRegisteredCommands, "loadYeomanUI")).to.be.not.undefined;
