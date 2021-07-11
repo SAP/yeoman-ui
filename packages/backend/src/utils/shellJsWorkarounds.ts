@@ -1,6 +1,6 @@
 const Module = require("module");
 
-// Replaces shelljs.exec method when first parameter starts with "git config" command
+// Replaces shelljs.exec method when execResult is undefined
 // https://github.com/shelljs/shelljs/wiki/Electron-compatibility
 
 export const apply = function () {
@@ -8,7 +8,7 @@ export const apply = function () {
   Module.prototype.require = function (...requireArgs: any[]) {
     if (requireArgs?.[0] === "shelljs") {
       const shellJsModule = originalRequire.apply(this, requireArgs);
-      applyExecWorkarounds(shellJsModule);
+      applyExecWorkaround(shellJsModule);
       return shellJsModule;
     }
 
@@ -16,16 +16,12 @@ export const apply = function () {
   };
 };
 
-function applyExecWorkarounds(shellJsModule: any) {
+function applyExecWorkaround(shellJsModule: any) {
   if (shellJsModule.exec) {
     const originalExec = shellJsModule.exec;
     shellJsModule.exec = function (...execArgs: any[]) {
-      const firstArg = execArgs?.[0];
-      if (typeof firstArg === "string" && firstArg.trim().toLowerCase().startsWith("git config")) {
-        return { stdout: "" };
-      }
-      return originalExec.apply(originalExec, execArgs);
+      // if execResult is defined then return it, otherwise return the workaround
+      return originalExec.apply(originalExec, execArgs) ?? { stdout: "" };
     };
   }
-  return shellJsModule;
 }
