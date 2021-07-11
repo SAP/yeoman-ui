@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/SAP/yeoman-ui/compare/v1.4.5...v1.5.0) (2021-07-11)
+
+### Features
+
+- replace shelljs.exec with empty function on git operation ([#643](https://github.com/SAP/yeoman-ui/issues/643)) ([07dbdf9](https://github.com/SAP/yeoman-ui/commit/07dbdf98cb3e73451f56be21734a047e467b2700))
+
 ## [1.4.5](https://github.com/SAP/yeoman-ui/compare/v1.4.4...v1.4.5) (2021-06-15)
 
 ### Bug Fixes
