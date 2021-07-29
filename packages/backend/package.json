@@ -210,11 +210,11 @@
     "copy-webpack-plugin": "^9.0.0",
     "lcov-result-merger": "3.1.0",
     "sinon": "^11.1.1",
-    "string-replace-loader": "3.0.2",
+    "string-replace-loader": "3.0.3",
     "ts-loader": "^9.2.3",
     "ts-node": "^9.1.1",
     "vsce": "1.83.0",
-    "webpack": "5.40.0",
+    "webpack": "5.47.0",
     "webpack-cli": "4.7.2"
   },
   "engines": {
