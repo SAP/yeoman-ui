@@ -197,7 +197,7 @@
     "yeoman-ui-frontend": "^1.4.0"
   },
   "devDependencies": {
-    "@types/inquirer": "7.3.2",
+    "@types/inquirer": "7.3.3",
     "@types/lodash": "^4.14.170",
     "@types/node": "^14.14.44",
     "@types/npm-registry-fetch": "^8.0.0",
