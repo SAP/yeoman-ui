@@ -192,7 +192,7 @@
     "strip-ansi": "6.0.0",
     "sudo-prompt": "9.2.1",
     "titleize": "2.1.0",
-    "ws": "7.5.0",
+    "ws": "8.0.0",
     "yeoman-environment": "3.3.0",
     "yeoman-ui-frontend": "^1.4.0"
   },
