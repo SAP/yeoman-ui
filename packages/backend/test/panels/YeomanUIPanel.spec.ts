@@ -78,6 +78,12 @@ describe("YeomanUIPanel unit test", () => {
         void panel.loadWebviewPanel({ generator: "test:app" });
       });
 
+      it("existing generator is provided with viewColumn parameter, in VSCODE", () => {
+        envUtilsMock.expects("getAllGeneratorNamespaces").resolves(["gen1:test", "test:app", "code:app"]);
+        npmUtilsMock.expects("checkAccessAndSetGeneratorsPath").never();
+        void panel.loadWebviewPanel({ generator: "test:app", viewColumn: vscode.ViewColumn.Two });
+      });
+
       it("provided generator does not exist, in VSCODE", () => {
         envUtilsMock.expects("getAllGeneratorNamespaces").resolves(["gen1:test", "code:app"]);
         npmUtilsMock.expects("checkAccessAndSetGeneratorsPath").resolves();
@@ -105,6 +111,12 @@ describe("YeomanUIPanel unit test", () => {
         envUtilsMock.expects("getAllGeneratorNamespaces").resolves(["gen1:test", "test:app", "code:app"]);
         npmUtilsMock.expects("checkAccessAndSetGeneratorsPath").never();
         void panel.loadWebviewPanel({ generator: "test:app" });
+      });
+
+      it("existing generator is provided with viewColumn parameter, in VSCODE", () => {
+        envUtilsMock.expects("getAllGeneratorNamespaces").resolves(["gen1:test", "test:app", "code:app"]);
+        npmUtilsMock.expects("checkAccessAndSetGeneratorsPath").never();
+        void panel.loadWebviewPanel({ generator: "test:app", viewColumn: vscode.ViewColumn.Two });
       });
 
       it("provided generator does not exist", () => {
