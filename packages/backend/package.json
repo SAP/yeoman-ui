@@ -37,7 +37,7 @@
     "coverage": "nyc mocha",
     "coverage:copy": "shx mkdir -p ../../coverage && shx cp -u ./coverage/lcov.info ../../coverage/lcov_backend.info",
     "frontend:copy": "npm-run-all clean:frontend && shx cp -r ../frontend/dist/. ./dist/media/",
-    "package": "vsce package --yarn .",
+    "package": "vsce package --yarn",
     "test": "mocha",
     "webpack": "webpack --mode development",
     "webpack-dev:watch": "webpack --mode development --watch",
@@ -203,7 +203,7 @@
     "@types/npm-registry-fetch": "^8.0.0",
     "@types/object-hash": "^2.1.0",
     "@types/sinon": "^10.0.2",
-    "@types/vscode": "^1.46.0",
+    "@types/vscode": "^1.50.0",
     "@types/webpack-env": "1.16.0",
     "@types/ws": "^7.4.5",
     "@types/yeoman-environment": "^2.10.3",
@@ -213,12 +213,12 @@
     "string-replace-loader": "3.0.3",
     "ts-loader": "^9.2.3",
     "ts-node": "^9.1.1",
-    "vsce": "1.83.0",
+    "vsce": "^1.96.1",
     "webpack": "5.47.0",
     "webpack-cli": "4.7.2"
   },
   "engines": {
-    "vscode": "^1.46.0"
+    "vscode": "^1.50.0"
   },
   "icon": "Wizard_logo.png"
 }
