@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://github.com/SAP/yeoman-ui/compare/v1.5.0...v1.6.0) (2021-07-29)
+
+### Features
+
+- open yeoman ui in split mode ([#648](https://github.com/SAP/yeoman-ui/issues/648)) ([23c6849](https://github.com/SAP/yeoman-ui/commit/23c684914bc80c17550a85f4d5069dd1a17819b3))
+
 # [1.5.0](https://github.com/SAP/yeoman-ui/compare/v1.4.5...v1.5.0) (2021-07-11)
 
 ### Features
