@@ -204,7 +204,7 @@
     "@types/object-hash": "^2.1.0",
     "@types/sinon": "^10.0.2",
     "@types/vscode": "^1.50.0",
-    "@types/webpack-env": "1.16.0",
+    "@types/webpack-env": "1.16.2",
     "@types/ws": "^7.4.5",
     "@types/yeoman-environment": "^2.10.3",
     "copy-webpack-plugin": "^9.0.0",
