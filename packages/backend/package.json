@@ -214,7 +214,7 @@
     "ts-loader": "^9.2.3",
     "ts-node": "^9.1.1",
     "vsce": "^1.96.1",
-    "webpack": "5.47.0",
+    "webpack": "5.47.1",
     "webpack-cli": "4.7.2"
   },
   "engines": {
