@@ -15,17 +15,31 @@
     "test": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "@ag-grid-community/all-modules": "^24.1.0",
+    "@ag-grid-community/client-side-row-model": "^24.1.0",
+    "@ag-grid-community/core": "^24.1.0",
+    "@ag-grid-community/vue": "^24.1.0",
+    "@fortawesome/fontawesome-svg-core": "^1.2.32",
+    "@fortawesome/free-solid-svg-icons": "^5.15.1",
+    "@fortawesome/vue-fontawesome": "^2.0.0",
     "@mdi/font": "5.5.55",
-    "@osla/inquirer-gui": "1.0.0",
+    "@osla/inquirer-gui": "1.0.2",
     "@sap-devx/inquirer-gui-file-browser-plugin": "0.0.5",
     "@sap-devx/inquirer-gui-folder-browser-plugin": "0.0.3",
     "@sap-devx/inquirer-gui-login-plugin": "0.0.4",
     "@sap-devx/inquirer-gui-tiles-plugin": "0.0.8",
+    "@vue/reactivity": "^3.0.0",
+    "ag-grid-community": "^24.1.0",
+    "ag-grid-vue": "^24.1.0",
     "core-js": "3.6.5",
     "lodash": "4.17.20",
     "material-design-icons-iconfont": "6.1.0",
+    "numeral": "^2.0.6",
     "vue": "2.6.12",
+    "vue-class-component": "^7.2.6",
     "vue-loading-overlay": "3.3.0",
+    "vue-property-decorator": "^9.0.2",
+    "vue2-datepicker": "^3.7.0",
     "vuetify": "2.3.10"
   },
   "devDependencies": {
@@ -67,7 +81,9 @@
       "plugin:vue/essential",
       "eslint:recommended"
     ],
-    "rules": {},
+    "rules": {
+      "no-console": "off"
+    },
     "parserOptions": {
       "parser": "babel-eslint"
     }

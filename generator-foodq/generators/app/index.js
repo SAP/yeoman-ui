@@ -1,31 +1,31 @@
-var Generator = require('yeoman-generator');
-var chalkPipe = require('chalk-pipe');
-var Inquirer = require('inquirer');
-var path = require('path');
-var _ = require('lodash');
-var types = require('@sap-devx/yeoman-ui-types');
-const Datauri = require('datauri/sync');
-const DEFAULT_IMAGE = require("./images/defaultImage");
+var Generator=require('yeoman-generator');
+var chalkPipe=require('chalk-pipe');
+var Inquirer=require('inquirer');
+var path=require('path');
+var _=require('lodash');
+var types=require('@sap-devx/yeoman-ui-types');
+const Datauri=require('datauri/sync');
+const DEFAULT_IMAGE=require("./images/defaultImage");
 
-module.exports = class extends Generator {
-  constructor(args, opts) {
+module.exports=class extends Generator {
+  constructor (args, opts) {
     super(args, opts);
 
-    this.vscode = opts.vscode;
+    this.vscode=opts.vscode;
 
-    this.setPromptsCallback = fn => {
+    this.setPromptsCallback=fn => {
       if (this.prompts) {
         this.prompts.setCallback(fn);
       }
     };
 
-    var prompts = [
-      {name: "Basic Information", description: "Provide basic information to receive personalized service."},
-      {name: "Main Dishes", description: "Select a main dish from the list."},
-      {name: "Desserts", description: "How would you like to end your meal?"},
-      {name: "Registration", description: "Thank you for your interest in our resturant.\nPlease enter credentials to register.\n(It should not take you more than 1 minute.)"}
+    var prompts=[
+      { name: "Basic Information", description: "Provide basic information to receive personalized service." },
+      { name: "Main Dishes", description: "Select a main dish from the list." },
+      { name: "Desserts", description: "How would you like to end your meal?" },
+      { name: "Registration", description: "Thank you for your interest in our resturant.\nPlease enter credentials to register.\n(It should not take you more than 1 minute.)" }
     ];
-    this.prompts = new types.Prompts(prompts);
+    this.prompts=new types.Prompts(prompts);
 
     this.option('babel');
   }
@@ -42,8 +42,13 @@ module.exports = class extends Generator {
     this.composeWith(require.resolve("../app2"), { prompts: this.prompts });
   }
 
+  async sleep(fn, par) {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(fn(par)), 0);
+    })
+  }
   async prompting() {
-    let prompts = [
+    let prompts=[
       {
         type: "confirm",
         name: "hungry",
@@ -54,13 +59,144 @@ module.exports = class extends Generator {
         type: "confirm",
         name: "confirmHungry",
         message: (answers) => {
-          return `You said you are ${(answers.hungry ? '' : 'not ')}hungry. Is this correct?`;
+          return `You said you are ${(answers.hungry? '':'not ')}hungry. Is this correct?`;
         },
         store: true,
         validate: (value, answers) => {
-          return (value === true ? true : "You must be hungry");
+          return (value===true? true:"You must be hungry");
         },
       },
+      {
+        type: "input",
+        name: "birthday",
+        message: "Birthday",
+        default: '2020-10-01',
+        guiOptions: {
+          type: "date",
+          hint: "Enter Birthday",
+          format:
+          {
+            dateFormat: "YYYY.DD.MM"
+          }
+        },
+        validate: (value, answers) => {
+          console.log(value);
+        },
+      },
+
+
+      // data grid test prompt
+      {
+        type: "input",
+        name: "packageNames",
+        message: "Enter packages",
+        store: true,
+        default: [
+          {
+            name: "default adinsure",
+          }
+        ],
+        validate: (value, answers) => {
+          console.log(value);
+          return value.length>0? true:"Must have at least 1 row entered.";
+        },
+        dynamicData: async (column, index) => {
+          return await this.sleep(() => {
+            return {
+              column,
+              index,
+              data: [
+                {
+                  value: 1,
+                  text: "Text 1"
+                },
+                {
+                  value: 2,
+                  text: "Text 2"
+                },
+                {
+                  value: 3,
+                  text: "Text 3"
+                },
+                {
+                  value: 4,
+                  text: "Text 4"
+                }
+              ]
+            };
+          });
+        },
+        dynamicData2: async (column, index) => {
+          return await this.sleep(() => {
+            return {
+              column,
+              index,
+              data: ['x', 'y', 'z']
+            };
+          });
+        },
+        guiOptions: {
+          type: "data-grid",
+          hint: "Enter package names",
+          columns: [
+            {
+              header: "Package Name",
+              field: "name",
+              editable: true,
+              dataType: "string",
+            },
+            {
+              header: "Integer",
+              field: "integer",
+              dataType: "integer",
+
+            },
+            {
+              header: "Number",
+              field: "number",
+              dataType: "number",
+              format: {
+                formatString: '0,0.00',
+              }
+            },
+            {
+              header: "Date",
+              field: "date",
+              dataType: "string",
+              dataFormat: "date",
+              format:
+              {
+                formatString: "YYYY.DD.MM"
+              }
+            },
+            {
+              header: "Dynamic data",
+              field: "dynamicField",
+              dataType: "string",
+              valueProperty: "value",
+              displayProperty: "text",
+              enumProvider: 'dynamicData',
+            },
+            // {
+            //   header: "Dynamic data",
+            //   field: "dynamicField",
+            //   dataType: "boolean",
+            // },
+            {
+              header: "Test",
+              field: "test",
+              enumProvider: 'dynamicData2',
+            },
+            // {
+            //   header: "Dropdown",
+            //   field: "dropdown",
+            //   enum: ["Yes", "No", "Maybe"],
+            // }
+          ]
+        },
+      },
+
+
       {
         type: 'input',
         name: 'fav_color',
@@ -69,46 +205,46 @@ module.exports = class extends Generator {
           hint: "Our recommendation is green"
         },
         when: (response) => {
-		      this.log(response.hungry);
+          this.log(response.hungry);
           return response.hungry;
         },
         validate: (value, answers) => {
-          this.fav_color = value;
-          return (value.length > 1 ? true : "Enter at least 2 characters");
+          this.fav_color=value;
+          return (value.length>1? true:"Enter at least 2 characters");
         },
         transformer: function (color, answers, flags) {
-          const text = chalkPipe(color)(color);
+          const text=chalkPipe(color)(color);
           if (flags.isFinal) {
-            return text + '!';
+            return text+'!';
           }
           return text;
         }
       },
       {
         default: (answers) => {
-          return (answers.fav_color === "green" ? "11" : answers.fav_color === "red" ? "44" : "5");
+          return (answers.fav_color==="green"? "11":answers.fav_color==="red"? "44":"5");
         },
         validate: (value, answers) => {
-          return (value > 10 ? true : "Enter a number > 10");
+          return (value>10? true:"Enter a number > 10");
         },
         type: "number",
         name: "number",
         message: "How many times have you been in this resturant?",
         guiOptions: {
           hint: "We hope you have been in our resturant many times",
-		  applyDefaultWhenDirty: true,
-		  mandatory: true
+          applyDefaultWhenDirty: true,
+          mandatory: true
         },
       },
       {
         when: async response => {
           this.log(response.hungry);
-          const that = this;
+          const that=this;
           return new Promise((resolve) => {
             that.log(`Purposely delaying response for 2 seconds...`);
             setTimeout(() => {
               resolve(response.hungry);
-            }, 2000);
+            }, 0); // }, 2000);
           });
         },
         type: "checkbox",
@@ -127,9 +263,9 @@ module.exports = class extends Generator {
       }
     ];
 
-    this.answers = await this.prompt(prompts);
+    this.answers=await this.prompt(prompts);
 
-    prompts = [
+    prompts=[
       {
         name: "food",
         type: "list",
@@ -139,23 +275,23 @@ module.exports = class extends Generator {
         },
         choices: [
           { value: "junk-food", name: "Junk Food", description: "It is the best food, but long term, junk food can increase the risk of a heart attack.", homepage: "https://www.betterhealthsolutions.org/junk-food-ruining-body/", image: this._getImage(path.join(this.sourceRoot(), "../images/junk-food.jpg")) },
-          { value: "jerk-chicken", name: "Pulled Jerk Chicken", description: "A slow cooked pulled chicken.", image: this._getImage(path.join(this.sourceRoot(), "../images/jerk-chicken.jpeg"))},
-          { value: "lasagna", name: "Lasagna", description: "Layers of creamy ricotta, spinach, and tomato sauce, topped with Parmesan and mozzarella cheese. ", image: this._getImage(path.join(this.sourceRoot(), "../images/lasagna.jpeg"))},
-          { value: "steak", name: "Rib Eye Steak", description: "Super traditional big rib eye with baked potatos.", image: this._getImage(path.join(this.sourceRoot(), "../images/steak.jpg"))},
+          { value: "jerk-chicken", name: "Pulled Jerk Chicken", description: "A slow cooked pulled chicken.", image: this._getImage(path.join(this.sourceRoot(), "../images/jerk-chicken.jpeg")) },
+          { value: "lasagna", name: "Lasagna", description: "Layers of creamy ricotta, spinach, and tomato sauce, topped with Parmesan and mozzarella cheese. ", image: this._getImage(path.join(this.sourceRoot(), "../images/lasagna.jpeg")) },
+          { value: "steak", name: "Rib Eye Steak", description: "Super traditional big rib eye with baked potatos.", image: this._getImage(path.join(this.sourceRoot(), "../images/steak.jpg")) },
           { value: "spaghetti", name: "Spaghetti Carbonara", description: "Classic spaghetti alla carbonara, made with pancetta and Italian-style bacon.", homepage: "https://www.allrecipes.com/recipe/11973/spaghetti-carbonara-ii/", image: DEFAULT_IMAGE },
         ],
         default: "junk-food"
       }
     ];
 
-    this.answers_main_dish = await this.prompt(prompts);
+    this.answers_main_dish=await this.prompt(prompts);
 
     // currently not supported:
-    const ui = new Inquirer.ui.BottomBar();
+    const ui=new Inquirer.ui.BottomBar();
 
     ui.updateBottomBar("This is written to the bottom bar");
 
-    prompts = [
+    prompts=[
       {
         when: () => {
           return this.answers.confirmHungry;
@@ -174,7 +310,7 @@ module.exports = class extends Generator {
         name: "dessert",
         message: "Which desserts would you like?",
         validate: (answer) => {
-          if (answer.length < 1) {
+          if (answer.length<1) {
             return 'You must choose at least one dessert.'
           }
           return true
@@ -216,7 +352,7 @@ module.exports = class extends Generator {
         name: 'enjoy',
         message: 'Did you enjoy your meal?',
         default: (answers) => {
-          return (answers.hungerLevel === "A bit hungry" ? "ok" : "michelin");
+          return (answers.hungerLevel==="A bit hungry"? "ok":"michelin");
         },
         choices: [
           { name: 'Not at all', value: 'no' },
@@ -224,7 +360,7 @@ module.exports = class extends Generator {
           { name: 'Three Michelin stars', value: 'michelin' },
         ],
         validate: (answer) => {
-          if (answer === 'no') {
+          if (answer==='no') {
             return "That's not a possible option."
           }
           return true
@@ -235,7 +371,7 @@ module.exports = class extends Generator {
         name: 'comments',
         message: 'Comments',
         validate: function (text) {
-          if (!text || text.split('\n').length < 2) {
+          if (!text||text.split('\n').length<2) {
             return 'Must be at least 2 lines.';
           }
           return true;
@@ -243,12 +379,12 @@ module.exports = class extends Generator {
       }
     ];
 
-    const answers = await this.prompt(prompts);
+    const answers=await this.prompt(prompts);
 
-    this.answers = Object.assign({}, this.answers, answers);
+    this.answers=Object.assign({}, this.answers, answers);
     this.log("Hunger level", this.answers.hungerLevel);
 
-    prompts = [
+    prompts=[
       {
         type: 'rawlist',
         guiOptions: {
@@ -285,45 +421,45 @@ module.exports = class extends Generator {
           }
         ],
         validate: (value, answers) => {
-          return (value !== 'private' ? true : "private repository is not supported");
+          return (value!=='private'? true:"private repository is not supported");
         },
       },
       {
         guiOptions: {
-		  hint: "Enter your user name",
-		  mandatory: true
+          hint: "Enter your user name",
+          mandatory: true
         },
         name: "email",
         message: "GitHub user name",
         store: true,
         validate: (value, answers) => {
-          return (value.length > 0 ? true : "Mandatory field");
+          return (value.length>0? true:"Mandatory field");
         }
       },
       {
         type: "password",
         guiOptions: {
           type: "login",
-		  hint: "Enter your password",
-		  mandatory: true
+          hint: "Enter your password",
+          mandatory: true
         },
         name: "password",
         message: "GitHub password",
         mask: '*',
         validate: this._requireLetterAndNumber,
         when: (response) => {
-          return response.email !== "root";
+          return response.email!=="root";
         }
       }
     ];
 
-    const answers_login = await this.prompt(prompts);
-    this.answers = Object.assign({}, this.answers, answers_login);
+    const answers_login=await this.prompt(prompts);
+    this.answers=Object.assign({}, this.answers, answers_login);
     this.log("Email", this.answers.email);
   }
 
   _requireLetterAndNumber(value) {
-    if (/\w/.test(value) && /\d/.test(value)) {
+    if (/\w/.test(value)&&/\d/.test(value)) {
       return true;
     }
 
@@ -333,9 +469,9 @@ module.exports = class extends Generator {
   _getImage(imagePath) {
     let image;
     try {
-      image = Datauri(imagePath).content;
+      image=Datauri(imagePath).content;
     } catch (error) {
-      image = DEFAULT_IMAGE;
+      image=DEFAULT_IMAGE;
       this.log("Error", error);
     }
     return image;
@@ -344,12 +480,12 @@ module.exports = class extends Generator {
   configuring() {
     this.log('in configuring');
     this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "answers_main_dish.food", "")));
-    this.log('destinationRoot: ' + this.destinationRoot());
+    this.log('destinationRoot: '+this.destinationRoot());
   }
 
   writing() {
     if (_.get(this.log, "showProgress")) {
-        this.log.showProgress("FoodQ is generating.");
+      this.log.showProgress("FoodQ is generating.");
     }
     this.log('in writing');
     this.fs.copyTpl(this.templatePath('index.html'),
@@ -378,7 +514,7 @@ module.exports = class extends Generator {
       this.destinationPath('README.md')
     );
 
-    const pkgJson = {
+    const pkgJson={
       devDependencies: {
         eslint: '^3.15.0'
       },
@@ -396,7 +532,7 @@ module.exports = class extends Generator {
 
   end() {
     this.log('in end');
-    const showInformationMessage = _.get(this.vscode, "window.showInformationMessage");
+    const showInformationMessage=_.get(this.vscode, "window.showInformationMessage");
     if (showInformationMessage) {
       showInformationMessage("FoodQ ended");
     }
