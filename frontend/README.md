@@ -1,5 +1,7 @@
 # Yeoman UI Frontend
 
+>**IMPORTANT**: Use Node v10 (works with 10.24.1) and 'npm` (not Yarn !) to build frontend part.
+
 ## Project setup
 ```
 npm install
