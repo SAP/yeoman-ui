@@ -48,18 +48,45 @@ module.exports=class extends Generator {
     })
   }
   async prompting() {
-    let prompts=[
+    let prompts = [
+      {
+        type: "list",
+        name: "mTest",
+        message: "Multiple test",
+        multiple: true,
+        choices: [
+          { name: "USA", value: 1 },
+          { name: "Germany", value: 2 },
+          { name: "China", value: 3 },
+          { name: "Israel", value: 4 },
+        ],
+        messageStyle: {
+          bold: true,
+          underline: true,
+          italic: true
+        },
+        default: [4, 1]
+      },
       {
         type: "confirm",
         name: "hungry",
-        message: "Are you hungry?",
-        store: true
+        message: "Are you hungrydddd?",
+        store: true,
+        guiOptions: {
+          mandatory: true
+        },
+        messageStyle: {
+          bold: true
+        },
       },
       {
         type: "confirm",
         name: "confirmHungry",
         message: (answers) => {
           return `You said you are ${(answers.hungry? '':'not ')}hungry. Is this correct?`;
+        },
+        messageStyle: {
+          italic: true
         },
         store: true,
         validate: (value, answers) => {
@@ -71,6 +98,9 @@ module.exports=class extends Generator {
         name: "birthday",
         message: "Birthday",
         default: '2020-10-01',
+        messageStyle: {
+          underline: true
+        },
         guiOptions: {
           type: "date",
           hint: "Enter Birthday",
@@ -91,6 +121,7 @@ module.exports=class extends Generator {
         name: "packageNames",
         message: "Enter packages",
         store: true,
+        isMandatory: true,
         default: [
           {
             name: "default adinsure",
@@ -138,6 +169,7 @@ module.exports=class extends Generator {
         guiOptions: {
           type: "data-grid",
           hint: "Enter package names",
+          mandatory: true,
           columns: [
             {
               header: "Package Name",
@@ -207,11 +239,7 @@ module.exports=class extends Generator {
         when: (response) => {
           this.log(response.hungry);
           return response.hungry;
-        },
-        validate: (value, answers) => {
-          this.fav_color=value;
-          return (value.length>1? true:"Enter at least 2 characters");
-        },
+        }
         transformer: function (color, answers, flags) {
           const text=chalkPipe(color)(color);
           if (flags.isFinal) {

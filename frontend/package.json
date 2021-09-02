@@ -23,7 +23,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.15.1",
     "@fortawesome/vue-fontawesome": "^2.0.0",
     "@mdi/font": "5.5.55",
-    "@osla/inquirer-gui": "1.0.2",
+    "@osla/inquirer-gui": "1.0.3",
     "@sap-devx/inquirer-gui-file-browser-plugin": "0.0.5",
     "@sap-devx/inquirer-gui-folder-browser-plugin": "0.0.3",
     "@sap-devx/inquirer-gui-login-plugin": "0.0.4",
