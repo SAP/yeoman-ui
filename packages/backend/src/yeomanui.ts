@@ -87,7 +87,6 @@ export class YeomanUI {
     this.logger = logger;
     this.output = output;
     this.outputPath = outputPath;
-    this.rpc.setResponseTimeout(3600000);
     this.rpc.registerMethod({
       func: this.receiveIsWebviewReady,
       thisArg: this,
