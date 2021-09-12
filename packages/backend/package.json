@@ -109,7 +109,7 @@
             "Open the project in a multi-root workspace",
             "Create the project and close it for future use"
           ],
-          "default": "Open the project in a new workspace",
+          "default": "Open the project in a multi-root workspace",
           "description": "Define the preferred behavior upon project creation.",
           "scope": "resource"
         },
