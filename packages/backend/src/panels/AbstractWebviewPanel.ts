@@ -36,7 +36,7 @@ export abstract class AbstractWebviewPanel {
     return this.flowPromise.promise;
   }
 
-  public constructor(context: Partial<vscode.ExtensionContext>) {
+  protected constructor(context: Partial<vscode.ExtensionContext>) {
     this.extensionPath = context.extensionPath;
     this.mediaPath = join(context.extensionPath, "dist", "media");
     this.htmlFileName = "index.html";
