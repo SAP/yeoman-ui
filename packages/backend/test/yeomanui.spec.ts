@@ -653,7 +653,7 @@ describe("yeomanui unit test", () => {
       expect(test3Choice.homepage).to.be.equal("");
     });
 
-    it("generator with type project and YeomanUI.PROJECTS != currentPath", async () => {
+    it("generator with type project", async () => {
       envUtilsMock.expects("getGeneratorsData").resolves(gensMeta.slice(0, 1));
       _.set(vscode, "workspace.workspaceFolders", [
         { uri: { fsPath: "rootFolderPath" } },
