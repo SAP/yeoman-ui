@@ -72,7 +72,7 @@ describe("extension commands unit test", () => {
     expect(res).to.be.undefined;
   });
 
-  it("yeomanUIPanel_loadYeomanUI_Command", async () => {
+  it("call loadWebviewPanel, toggleOutput and notifyGeneratorsChange commands", async () => {
     ExtCommands["context"] = testContext;
     ExtCommands["yeomanUIPanel"] = undefined;
 
@@ -86,13 +86,17 @@ describe("extension commands unit test", () => {
       onDidChangeViewState: () => "",
       webview: { onDidReceiveMessage: () => "" },
     });
-    windowMock.expects("createOutputChannel").returns({});
+    windowMock.expects("createOutputChannel").returns({ show: () => "" });
     fsMock.expects("readFileSync");
     commandsMock.expects("executeCommand").withArgs("setContext").resolves();
     flowPromiseMock.expects("createFlowPromise").returns({ undefined });
 
     // yeomanUIPanel is undefined
     await ExtCommands["yeomanUIPanel_loadYeomanUI_Command"]();
+
+    await ExtCommands["yeomanUIPanel_toggleOutput_Command"]();
+
+    await ExtCommands["yeomanUIPanel_notifyGeneratorsChange_Command"]();
   });
 
   it.skip("exploreGenerators_Command", async () => {

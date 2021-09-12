@@ -18,7 +18,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   public static YEOMAN_UI = "Application Wizard";
 
   public toggleOutput() {
-    this.output.show();
+    this.output?.show();
   }
 
   public notifyGeneratorsChange(args?: any[]) {
