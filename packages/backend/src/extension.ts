@@ -1,16 +1,13 @@
-import { ExtensionContext, window } from "vscode";
+import { ExtensionContext } from "vscode";
 import { createExtensionLoggerAndSubscribeToLogSettingsChanges, getLogger } from "./logger/logger-wrapper";
 import { SWA } from "./swa-tracker/swa-tracker-wrapper";
 import * as shellJsWorkarounds from "./utils/shellJsWorkarounds";
-import { Commands } from "./commands";
-
-let commands: Commands;
+import { ExtCommands } from "./extCommands";
 
 export function activate(context: ExtensionContext) {
-  const before = Date.now();
   shellJsWorkarounds.apply();
 
-  //void import("./utils/env");
+  void import("./utils/env");
 
   try {
     createExtensionLoggerAndSubscribeToLogSettingsChanges(context);
@@ -20,12 +17,5 @@ export function activate(context: ExtensionContext) {
     return;
   }
 
-  commands = new Commands(context);
-  commands.registerAndSubscribeCommands();
-  const after = Date.now();
-  void window.showInformationMessage(`activation - ${after - before}`);
-}
-
-export function deactivate() {
-  commands = null;
+  ExtCommands.registerAndSubscribeCommands(context);
 }

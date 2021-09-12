@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import * as path from "path";
-import * as _ from "lodash";
+import { join, sep } from "path";
+import { isEmpty, get } from "lodash";
 import { readFileSync } from "fs";
 import { IChildLogger } from "@vscode-logging/logger";
 import { getClassLogger } from "../logger/logger-wrapper";
@@ -36,14 +36,14 @@ export abstract class AbstractWebviewPanel {
     return this.flowPromise.promise;
   }
 
-  protected constructor(context: Partial<vscode.ExtensionContext>) {
+  public constructor(context: Partial<vscode.ExtensionContext>) {
     this.extensionPath = context.extensionPath;
-    this.mediaPath = path.join(context.extensionPath, "dist", "media");
+    this.mediaPath = join(context.extensionPath, "dist", "media");
     this.htmlFileName = "index.html";
     this.logger = getClassLogger("AbstractWebviewPanel");
     this.disposables = [];
     this.context = context;
-    this.isInBAS = !_.isEmpty(_.get(process, "env.WS_BASE_URL"));
+    this.isInBAS = !isEmpty(get(process, "env.WS_BASE_URL"));
     this.viewColumn = vscode.ViewColumn.One;
   }
 
@@ -99,7 +99,7 @@ export abstract class AbstractWebviewPanel {
     if (this.flowPromise) {
       // resolves promise in case panel is closed manually by an user
       // it is safe to call resolve several times on same promise
-      this.flowPromise.state.resolve();
+      this.flowPromise.state?.resolve();
     }
     this.flowPromise = null;
   }
@@ -122,10 +122,10 @@ export abstract class AbstractWebviewPanel {
   }
 
   protected initHtmlContent(): void {
-    let indexHtml = readFileSync(path.join(this.mediaPath, this.htmlFileName), "utf8");
+    let indexHtml = readFileSync(join(this.mediaPath, this.htmlFileName), "utf8");
     if (indexHtml) {
       // Local path to main script run in the webview
-      const scriptPathOnDisk = vscode.Uri.file(path.join(this.mediaPath, path.sep));
+      const scriptPathOnDisk = vscode.Uri.file(join(this.mediaPath, sep));
       const scriptUri = this.webViewPanel.webview.asWebviewUri(scriptPathOnDisk);
 
       // TODO: very fragile: assuming double quotes and src is first attribute

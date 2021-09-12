@@ -1,12 +1,13 @@
 import { ExtensionContext, commands, window, WebviewPanel } from "vscode";
 
-export class Commands {
-  private yeomanUIPanel: any;
+class Commands {
   private exploreGensPanel: any;
+  private yeomanUIPanel: any;
+  private context: ExtensionContext;
 
-  constructor(private context: ExtensionContext) {}
+  public registerAndSubscribeCommands(context: ExtensionContext) {
+    this.context = context;
 
-  public registerAndSubscribeCommands() {
     this.registerAndSubscribeCommand("runGenerator", this.yeomanUIPanel_runGeneratorCommand.bind(this));
 
     this.registerAndSubscribeCommand("loadYeomanUI", this.yeomanUIPanel_loadYeomanUI_Command.bind(this));
@@ -26,39 +27,38 @@ export class Commands {
   }
 
   private async yeomanUIPanel_runGeneratorCommand() {
-    return (await this.getPanel()).runGenerator();
+    return (await this.getYeomanUIPanel()).runGenerator();
   }
 
-  private async yeomanUIPanel_loadYeomanUI_Command(uiOptions: any) {
-    return (await this.getPanel()).loadWebviewPanel(uiOptions);
+  private async yeomanUIPanel_loadYeomanUI_Command(uiOptions?: any) {
+    return (await this.getYeomanUIPanel()).loadWebviewPanel(uiOptions);
   }
 
   private async yeomanUIPanel_toggleOutput_Command() {
-    return (await this.getPanel()).toggleOutput();
+    return (await this.getYeomanUIPanel()).toggleOutput();
   }
 
-  private async yeomanUIPanel_notifyGeneratorsChange_Command(uiOptions: any) {
-    return (await this.getPanel()).notifyGeneratorsChange(uiOptions);
+  private async yeomanUIPanel_notifyGeneratorsChange_Command(uiOptions?: any) {
+    return (await this.getYeomanUIPanel()).notifyGeneratorsChange(uiOptions);
   }
 
-  private async exploreGenerators_Command(uiOptions: any) {
-    return (await this.getPanel(false)).loadWebviewPanel(uiOptions);
+  private async exploreGenerators_Command(uiOptions?: any) {
+    return (await this.getExploreGensPanel()).loadWebviewPanel(uiOptions);
   }
 
-  // dynamic loading
-  private async getPanel(isYeomanPanel = true): Promise<any> {
-    if (isYeomanPanel) {
-      if (!this.yeomanUIPanel) {
-        const { YeomanUIPanel } = await import(`./panels/YeomanUIPanel`);
-        this.yeomanUIPanel = new YeomanUIPanel(this.context);
-        this.registerWebviewPanelSerializer(this.yeomanUIPanel);
-      }
-
-      return this.yeomanUIPanel;
+  private async getYeomanUIPanel() {
+    if (!this.yeomanUIPanel) {
+      const { YeomanUIPanel } = await import("./panels/YeomanUIPanel");
+      this.yeomanUIPanel = new YeomanUIPanel(this.context);
+      this.registerWebviewPanelSerializer(this.yeomanUIPanel);
     }
 
+    return this.yeomanUIPanel;
+  }
+
+  private async getExploreGensPanel() {
     if (!this.exploreGensPanel) {
-      const { ExploreGensPanel } = await import(`./panels/ExploreGensPanel`);
+      const { ExploreGensPanel } = await import("./panels/ExploreGensPanel");
       this.exploreGensPanel = new ExploreGensPanel(this.context);
       this.registerWebviewPanelSerializer(this.exploreGensPanel);
     }
@@ -74,3 +74,5 @@ export class Commands {
     });
   }
 }
+
+export const ExtCommands = new Commands();
