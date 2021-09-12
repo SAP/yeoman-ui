@@ -491,12 +491,12 @@ export class YeomanUI {
     let selectedWorkspaceConfig;
 
     const currentPath = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
-    if (!currentPath || YeomanUI.PROJECTS.toLowerCase() === currentPath.toLowerCase()) {
-      this.forceNewWorkspace = true;
-      selectedWorkspaceConfig = this.uiOptions.messages.open_in_a_new_workspace;
-    } else {
+    if (currentPath) {
       this.forceNewWorkspace = false;
       selectedWorkspaceConfig = this.wsGet(this.SELECTED_WORKSPACE_CONFIG_PROP);
+    } else {
+      this.forceNewWorkspace = true;
+      selectedWorkspaceConfig = this.uiOptions.messages.open_in_a_new_workspace;
     }
 
     if (_.includes(genFilter.types, GeneratorType.project)) {
