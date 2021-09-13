@@ -5,12 +5,13 @@ import { AbstractWebviewPanel } from "./AbstractWebviewPanel";
 import { RpcExtension } from "@sap-devx/webview-rpc/out.ext/rpc-extension";
 import { getWebviewRpcLibraryLogger } from "../logger/logger-wrapper";
 import { get, isNil } from "lodash";
+import * as messages from "../messages";
 
 export class ExploreGensPanel extends AbstractWebviewPanel {
   public constructor(context: Partial<ExtensionContext>) {
     super(context);
     this.viewType = "exploreGens";
-    this.viewTitle = "Explore and Install Generators";
+    this.viewTitle = messages.default.explore_gens_title;
     this.focusedKey = "exploreGens.Focused";
     this.htmlFileName = join("exploregens", "index.html");
     this.exploreGens = new ExploreGens(this.logger, this.isInBAS, this.context);

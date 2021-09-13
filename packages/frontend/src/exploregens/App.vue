@@ -87,7 +87,13 @@
 <script>
 const ALL_GENS = "All";
 
-import * as _ from "lodash";
+import _size from "lodash/size";
+import _get from "lodash/get";
+import _debounce from "lodash/debounce";
+import _map from "lodash/map";
+import _find from "lodash/find";
+import _includes from "lodash/includes";
+import _forEach from "lodash/forEach";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import messages from "./messages";
@@ -115,11 +121,11 @@ export default {
       return this.disclaimerOpened ? this.messages.hide_disclaimer : this.messages.view_disclaimer;
     },
     refineSearch() {
-      const gensQuantity = _.size(this.gens);
+      const gensQuantity = _size(this.gens);
       return !(this.total === gensQuantity);
     },
     searchResults() {
-      const gensQuantity = _.size(this.gens);
+      const gensQuantity = _size(this.gens);
       if (this.refineSearch) {
         return this.messages.results_out_of_total(gensQuantity, this.total);
       }
@@ -155,7 +161,7 @@ export default {
       this.rpc.invoke(action, [gen]);
     },
     onQueryChange() {
-      const debouncer = _.debounce(this.getFilteredGenerators, 200);
+      const debouncer = _debounce(this.getFilteredGenerators, 200);
       debouncer();
     },
     isInVsCode() {
@@ -163,8 +169,8 @@ export default {
     },
     async getFilteredGenerators() {
       const recommended = this.recommended === ALL_GENS ? "" : this.recommended;
-      const packagesData = await this.rpc.invoke("getFilteredGenerators", [_.get(this, "query", ""), recommended]);
-      this.gens = _.map(packagesData.packages, (gen) => {
+      const packagesData = await this.rpc.invoke("getFilteredGenerators", [_get(this, "query", ""), recommended]);
+      this.gens = _map(packagesData.packages, (gen) => {
         gen.action = this.actionName(gen);
         gen.color = this.actionColor(gen);
         return gen;
@@ -189,12 +195,12 @@ export default {
       this.onQueryChange();
     },
     async updateBeingHandledGenerator(genName, genState) {
-      const gen = _.find(this.gens, (gen) => {
+      const gen = _find(this.gens, (gen) => {
         return gen.package.name === genName;
       });
 
       if (gen) {
-        gen.disabledToHandle = _.includes(["uninstalling", "installing", "updating"], genState);
+        gen.disabledToHandle = _includes(["uninstalling", "installing", "updating"], genState);
         gen.state = genState;
         gen.action = this.actionName(gen);
         gen.color = this.actionColor(gen);
@@ -212,7 +218,7 @@ export default {
     initRpc(rpc) {
       this.rpc = rpc;
       const functions = ["updateBeingHandledGenerator", "setGenQuery"];
-      _.forEach(functions, (funcName) => {
+      _forEach(functions, (funcName) => {
         this.rpc.registerMethod({
           func: this[funcName],
           thisArg: this,
