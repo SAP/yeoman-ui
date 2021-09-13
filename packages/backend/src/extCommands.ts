@@ -1,13 +1,15 @@
 import { ExtensionContext, commands, window, WebviewPanel } from "vscode";
 
-class Commands {
+export class ExtCommands {
   private exploreGensPanel: any;
   private yeomanUIPanel: any;
   private context: ExtensionContext;
 
-  public registerAndSubscribeCommands(context: ExtensionContext) {
+  constructor(context: ExtensionContext) {
     this.context = context;
+  }
 
+  public registerAndSubscribeCommands() {
     this.registerAndSubscribeCommand("runGenerator", this.yeomanUIPanel_runGenerator_Command.bind(this));
 
     this.registerAndSubscribeCommand("loadYeomanUI", this.yeomanUIPanel_loadYeomanUI_Command.bind(this));
@@ -46,33 +48,21 @@ class Commands {
     return (await this.getExploreGensPanel()).loadWebviewPanel(uiOptions);
   }
 
-  private async getYeomanUIPanel() {
+  public async getYeomanUIPanel() {
     if (!this.yeomanUIPanel) {
       const { YeomanUIPanel } = await import("./panels/YeomanUIPanel");
       this.yeomanUIPanel = new YeomanUIPanel(this.context);
-      this.registerWebviewPanelSerializer(this.yeomanUIPanel);
     }
 
     return this.yeomanUIPanel;
   }
 
-  private async getExploreGensPanel() {
+  public async getExploreGensPanel() {
     if (!this.exploreGensPanel) {
       const { ExploreGensPanel } = await import("./panels/ExploreGensPanel");
       this.exploreGensPanel = new ExploreGensPanel(this.context);
-      this.registerWebviewPanelSerializer(this.exploreGensPanel);
     }
 
     return this.exploreGensPanel;
   }
-
-  private registerWebviewPanelSerializer(panel: any) {
-    window.registerWebviewPanelSerializer(panel.viewType, {
-      async deserializeWebviewPanel(webViewPanel: WebviewPanel, state?: unknown) {
-        await Promise.resolve(panel.setWebviewPanel(webViewPanel, state));
-      },
-    });
-  }
 }
-
-export const ExtCommands = new Commands();

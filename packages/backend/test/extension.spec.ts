@@ -5,11 +5,13 @@ import { ExtCommands } from "../src/extCommands";
 import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { SWA } from "../src/swa-tracker/swa-tracker-wrapper";
 import * as shellJsWorkarounds from "../src/utils/shellJsWorkarounds";
+import { vscode } from "./mockUtil";
 
 describe("extension unit test", () => {
   let sandbox: SinonSandbox;
   let extCommandsMock: SinonMock;
   let loggerWrapperMock: SinonMock;
+  let windowMock: SinonMock;
   let swaTrackerWrapperMock: SinonMock;
   const testContext: any = {
     subscriptions: [],
@@ -28,12 +30,14 @@ describe("extension unit test", () => {
     loggerWrapperMock = sandbox.mock(loggerWrapper);
     swaTrackerWrapperMock = sandbox.mock(SWA);
     extCommandsMock = sandbox.mock(ExtCommands);
+    windowMock = sandbox.mock(vscode.window);
   });
 
   afterEach(() => {
     loggerWrapperMock.verify();
     swaTrackerWrapperMock.verify();
     extCommandsMock.verify();
+    windowMock.verify();
   });
 
   describe("activate", () => {
@@ -43,7 +47,8 @@ describe("extension unit test", () => {
       swaTrackerWrapperMock.expects("createSWATracker");
 
       const applySpy = sandbox.spy(shellJsWorkarounds, "apply");
-      extCommandsMock.expects("registerAndSubscribeCommands").withExactArgs(testContext);
+      windowMock.expects("registerWebviewPanelSerializer").withArgs("yeomanui");
+      windowMock.expects("registerWebviewPanelSerializer").withArgs("exploreGens");
 
       extension.activate(testContext);
 
@@ -59,5 +64,9 @@ describe("extension unit test", () => {
       consoleMock.expects("error").withExactArgs("Extension activation failed.", "activation error");
       extension.activate(null);
     });
+  });
+
+  it("deactivate", () => {
+    extension.deactivate();
   });
 });

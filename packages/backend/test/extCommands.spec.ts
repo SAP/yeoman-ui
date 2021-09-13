@@ -36,7 +36,7 @@ describe("extension commands unit test", () => {
   it("registerAndSubscribeCommands", () => {
     const oRegisteredCommands: any = vscode.commands.getCommands();
 
-    ExtCommands.registerAndSubscribeCommands(testContext);
+    new ExtCommands(testContext).registerAndSubscribeCommands();
 
     expect(get(oRegisteredCommands, "loadYeomanUI")).to.be.not.undefined;
     expect(get(oRegisteredCommands, "yeomanUI.toggleOutput")).to.be.not.undefined;
@@ -49,12 +49,12 @@ describe("extension commands unit test", () => {
     const exploreGensPanelMock = {
       loadWebviewPanel: () => "",
     };
-
-    ExtCommands["exploreGensPanel"] = exploreGensPanelMock;
+    const extCommands = new ExtCommands(testContext);
+    extCommands["exploreGensPanel"] = exploreGensPanelMock;
 
     const loadWebviewPanelSpy = sandbox.spy(exploreGensPanelMock, "loadWebviewPanel");
 
-    await ExtCommands["exploreGenerators_Command"]();
+    await extCommands["exploreGenerators_Command"]();
 
     expect(loadWebviewPanelSpy.called).to.be.true;
   });
@@ -67,17 +67,18 @@ describe("extension commands unit test", () => {
       notifyGeneratorsChange: () => "",
     };
 
-    ExtCommands["yeomanUIPanel"] = yeomanUIPanelMock;
+    const extCommands = new ExtCommands(testContext);
+    extCommands["yeomanUIPanel"] = yeomanUIPanelMock;
 
     const runGeneratorSpy = sandbox.spy(yeomanUIPanelMock, "runGenerator");
     const loadWebviewPanelSpy = sandbox.spy(yeomanUIPanelMock, "loadWebviewPanel");
     const toggleOutputSpy = sandbox.spy(yeomanUIPanelMock, "toggleOutput");
     const notifyGeneratorsChangeSpy = sandbox.spy(yeomanUIPanelMock, "notifyGeneratorsChange");
 
-    await ExtCommands["yeomanUIPanel_loadYeomanUI_Command"]();
-    await ExtCommands["yeomanUIPanel_toggleOutput_Command"]();
-    await ExtCommands["yeomanUIPanel_notifyGeneratorsChange_Command"]();
-    await ExtCommands["yeomanUIPanel_runGenerator_Command"]();
+    await extCommands["yeomanUIPanel_loadYeomanUI_Command"]();
+    await extCommands["yeomanUIPanel_toggleOutput_Command"]();
+    await extCommands["yeomanUIPanel_notifyGeneratorsChange_Command"]();
+    await extCommands["yeomanUIPanel_runGenerator_Command"]();
 
     expect(runGeneratorSpy.called).to.be.true;
     expect(loadWebviewPanelSpy.called).to.be.true;
@@ -86,31 +87,31 @@ describe("extension commands unit test", () => {
   });
 
   it("getYeomanUIPanel", async () => {
-    ExtCommands["context"] = testContext;
-    ExtCommands["yeomanUIPanel"] = undefined;
+    const extCommands = new ExtCommands(testContext);
+    extCommands["yeomanUIPanel"] = undefined;
 
     loggerWrapperMock.expects("getClassLogger");
-    windowMock.expects("registerWebviewPanelSerializer").withArgs("yeomanui");
+    // windowMock.expects("registerWebviewPanelSerializer").withArgs("yeomanui");
 
     // yeomanUIPanel is undefined
-    const yeomanUIPanel_firstTime = await ExtCommands["getYeomanUIPanel"]();
+    const yeomanUIPanel_firstTime = await extCommands["getYeomanUIPanel"]();
     // yeomanUIPanel should be already defined
-    const yeomanUIPanel_secondTime = await ExtCommands["getYeomanUIPanel"]();
+    const yeomanUIPanel_secondTime = await extCommands["getYeomanUIPanel"]();
 
     expect(yeomanUIPanel_firstTime).to.be.equal(yeomanUIPanel_secondTime);
   });
 
   it("getExploreGensPanel", async () => {
-    ExtCommands["context"] = testContext;
-    ExtCommands["exploreGensPanel"] = undefined;
+    const extCommands = new ExtCommands(testContext);
+    extCommands["exploreGensPanel"] = undefined;
 
     loggerWrapperMock.expects("getClassLogger");
-    windowMock.expects("registerWebviewPanelSerializer").withArgs("exploreGens");
+    // windowMock.expects("registerWebviewPanelSerializer").withArgs("exploreGens");
 
     // exploreGensPanel is undefined
-    const exploreGensPanel_firstTime = await ExtCommands["getExploreGensPanel"]();
+    const exploreGensPanel_firstTime = await extCommands["getExploreGensPanel"]();
     // exploreGensPanel should be already defined
-    const exploreGensPanel_secondTime = await ExtCommands["getExploreGensPanel"]();
+    const exploreGensPanel_secondTime = await extCommands["getExploreGensPanel"]();
 
     expect(exploreGensPanel_firstTime).to.be.equal(exploreGensPanel_secondTime);
   });
