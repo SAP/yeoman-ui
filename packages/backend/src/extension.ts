@@ -25,7 +25,6 @@ export function activate(context: ExtensionContext) {
 
   extCommands.registerAndSubscribeCommands();
 
-  const before = Date.now();
   window.registerWebviewPanelSerializer("yeomanui", {
     async deserializeWebviewPanel(webViewPanel: WebviewPanel, state?: unknown) {
       (await extCommands.getYeomanUIPanel()).setWebviewPanel(webViewPanel, state);
@@ -37,8 +36,6 @@ export function activate(context: ExtensionContext) {
       (await extCommands.getExploreGensPanel()).setWebviewPanel(webViewPanel, state);
     },
   });
-  const after = Date.now();
-  console.log(after - before);
 }
 
 export function deactivate() {
