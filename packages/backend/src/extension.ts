@@ -7,6 +7,8 @@ import { ExtCommands } from "./extCommands";
 export function activate(context: ExtensionContext) {
   shellJsWorkarounds.apply();
 
+  // performs first time lookup of installed generators
+  // runs in background
   void import("./utils/env");
 
   try {
