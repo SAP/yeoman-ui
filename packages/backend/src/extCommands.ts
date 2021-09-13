@@ -8,7 +8,7 @@ class Commands {
   public registerAndSubscribeCommands(context: ExtensionContext) {
     this.context = context;
 
-    this.registerAndSubscribeCommand("runGenerator", this.yeomanUIPanel_runGeneratorCommand.bind(this));
+    this.registerAndSubscribeCommand("runGenerator", this.yeomanUIPanel_runGenerator_Command.bind(this));
 
     this.registerAndSubscribeCommand("loadYeomanUI", this.yeomanUIPanel_loadYeomanUI_Command.bind(this));
 
@@ -26,7 +26,7 @@ class Commands {
     this.context.subscriptions.push(commands.registerCommand(cId, cAction));
   }
 
-  private async yeomanUIPanel_runGeneratorCommand() {
+  private async yeomanUIPanel_runGenerator_Command() {
     return (await this.getYeomanUIPanel()).runGenerator();
   }
 

@@ -4,17 +4,11 @@ import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { expect } from "chai";
 import { createSandbox, SinonSandbox, SinonMock } from "sinon";
 import { ExtCommands } from "../src/extCommands";
-import * as flowPromise from "../src/utils/promise";
-import * as fs from "fs";
 
 describe("extension commands unit test", () => {
   let sandbox: SinonSandbox;
-  let commandsMock: SinonMock;
   let windowMock: SinonMock;
-  let workspaceMock: SinonMock;
   let loggerWrapperMock: SinonMock;
-  let fsMock: SinonMock;
-  let flowPromiseMock: SinonMock;
 
   const testContext: any = {
     subscriptions: [],
@@ -30,21 +24,13 @@ describe("extension commands unit test", () => {
   });
 
   beforeEach(() => {
-    workspaceMock = sandbox.mock(vscode.workspace);
-    commandsMock = sandbox.mock(vscode.commands);
     windowMock = sandbox.mock(vscode.window);
     loggerWrapperMock = sandbox.mock(loggerWrapper);
-    fsMock = sandbox.mock(fs);
-    flowPromiseMock = sandbox.mock(flowPromise);
   });
 
   afterEach(() => {
-    commandsMock.verify();
     windowMock.verify();
     loggerWrapperMock.verify();
-    workspaceMock.verify();
-    fsMock.verify();
-    flowPromiseMock.verify();
   });
 
   it("registerAndSubscribeCommands", () => {
@@ -59,68 +45,73 @@ describe("extension commands unit test", () => {
     expect(get(oRegisteredCommands, "runGenerator")).to.be.not.undefined;
   });
 
-  it("yeomanUIPanel_runGeneratorCommand", async () => {
-    ExtCommands["context"] = testContext;
+  it("call ExploreGensPanel commands", async () => {
+    const exploreGensPanelMock = {
+      loadWebviewPanel: () => "",
+    };
 
-    loggerWrapperMock.expects("getClassLogger");
-    windowMock.expects("registerWebviewPanelSerializer").withArgs("yeomanui");
-    windowMock.expects("showQuickPick");
-    workspaceMock.expects("getConfiguration").returns({ get: () => "", set: () => "" });
+    ExtCommands["exploreGensPanel"] = exploreGensPanelMock;
 
-    const res = await ExtCommands["yeomanUIPanel_runGeneratorCommand"]();
+    const loadWebviewPanelSpy = sandbox.spy(exploreGensPanelMock, "loadWebviewPanel");
 
-    expect(res).to.be.undefined;
+    await ExtCommands["exploreGenerators_Command"]();
+
+    expect(loadWebviewPanelSpy.called).to.be.true;
   });
 
-  it("call loadWebviewPanel, toggleOutput and notifyGeneratorsChange commands", async () => {
+  it("call YeomanUIPanel commands", async () => {
+    const yeomanUIPanelMock = {
+      runGenerator: () => "",
+      loadWebviewPanel: () => "",
+      toggleOutput: () => "",
+      notifyGeneratorsChange: () => "",
+    };
+
+    ExtCommands["yeomanUIPanel"] = yeomanUIPanelMock;
+
+    const runGeneratorSpy = sandbox.spy(yeomanUIPanelMock, "runGenerator");
+    const loadWebviewPanelSpy = sandbox.spy(yeomanUIPanelMock, "loadWebviewPanel");
+    const toggleOutputSpy = sandbox.spy(yeomanUIPanelMock, "toggleOutput");
+    const notifyGeneratorsChangeSpy = sandbox.spy(yeomanUIPanelMock, "notifyGeneratorsChange");
+
+    await ExtCommands["yeomanUIPanel_loadYeomanUI_Command"]();
+    await ExtCommands["yeomanUIPanel_toggleOutput_Command"]();
+    await ExtCommands["yeomanUIPanel_notifyGeneratorsChange_Command"]();
+    await ExtCommands["yeomanUIPanel_runGenerator_Command"]();
+
+    expect(runGeneratorSpy.called).to.be.true;
+    expect(loadWebviewPanelSpy.called).to.be.true;
+    expect(toggleOutputSpy.called).to.be.true;
+    expect(notifyGeneratorsChangeSpy.called).to.be.true;
+  });
+
+  it("getYeomanUIPanel", async () => {
     ExtCommands["context"] = testContext;
     ExtCommands["yeomanUIPanel"] = undefined;
 
-    // mocked methods called by YeomanUIPanel.loadWebviewPanel
-    loggerWrapperMock.expects("getClassLogger").twice();
-    loggerWrapperMock.expects("getWebviewRpcLibraryLogger");
+    loggerWrapperMock.expects("getClassLogger");
     windowMock.expects("registerWebviewPanelSerializer").withArgs("yeomanui");
-    windowMock.expects("createWebviewPanel").returns({
-      dispose: () => "",
-      onDidDispose: () => "",
-      onDidChangeViewState: () => "",
-      webview: { onDidReceiveMessage: () => "" },
-    });
-    windowMock.expects("createOutputChannel").returns({ show: () => "" });
-    fsMock.expects("readFileSync");
-    commandsMock.expects("executeCommand").withArgs("setContext").resolves();
-    flowPromiseMock.expects("createFlowPromise").returns({ undefined });
 
     // yeomanUIPanel is undefined
-    await ExtCommands["yeomanUIPanel_loadYeomanUI_Command"]();
+    const yeomanUIPanel_firstTime = await ExtCommands["getYeomanUIPanel"]();
+    // yeomanUIPanel should be already defined
+    const yeomanUIPanel_secondTime = await ExtCommands["getYeomanUIPanel"]();
 
-    await ExtCommands["yeomanUIPanel_toggleOutput_Command"]();
-
-    await ExtCommands["yeomanUIPanel_notifyGeneratorsChange_Command"]();
+    expect(yeomanUIPanel_firstTime).to.be.equal(yeomanUIPanel_secondTime);
   });
 
-  it.skip("exploreGenerators_Command", async () => {
+  it("getExploreGensPanel", async () => {
     ExtCommands["context"] = testContext;
     ExtCommands["exploreGensPanel"] = undefined;
 
-    // mocked methods called by ExploreGensPanel.loadWebviewPanel
-    loggerWrapperMock.expects("getClassLogger").twice();
+    loggerWrapperMock.expects("getClassLogger");
     windowMock.expects("registerWebviewPanelSerializer").withArgs("exploreGens");
-    windowMock.expects("createWebviewPanel").returns({
-      onDidDispose: () => "",
-      onDidChangeViewState: () => "",
-      webview: { onDidReceiveMessage: () => "" },
-    });
-    loggerWrapperMock.expects("getWebviewRpcLibraryLogger");
-    fsMock.expects("openSync").returns(null);
-    fsMock.expects("readFileSync").returns("");
-
-    //windowMock.expects("createOutputChannel").returns({});
-    //
-    // commandsMock.expects("executeCommand").withArgs("setContext").resolves();
-    // flowPromiseMock.expects("createFlowPromise").returns({undefined});
 
     // exploreGensPanel is undefined
-    await ExtCommands["exploreGenerators_Command"]();
+    const exploreGensPanel_firstTime = await ExtCommands["getExploreGensPanel"]();
+    // exploreGensPanel should be already defined
+    const exploreGensPanel_secondTime = await ExtCommands["getExploreGensPanel"]();
+
+    expect(exploreGensPanel_firstTime).to.be.equal(exploreGensPanel_secondTime);
   });
 });
