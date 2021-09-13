@@ -13,7 +13,6 @@ export const getVscode = () => {
 const filename: string = require.main.filename;
 const _isInTest = filename.includes(join("node_modules", "mocha"));
 
-//const notImplementedError = new Error("tested method is not implemented");
 const returnValue = (...args: any[]) => {
   if (_isInTest) {
     throw new Error(`tested method is not implemented ${JSON.stringify(args)}`);

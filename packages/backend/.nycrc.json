@@ -9,8 +9,7 @@
     "src/images/*.ts",
     "src/webSocketServer/*.ts",
     "src/vscode-output.ts",
-    "src/youi-adapter.ts",
-    "src/messages.ts"
+    "src/youi-adapter.ts"
   ],
   "reporter": ["lcov", "text"],
   "extension": [".ts"],
@@ -18,6 +17,6 @@
   "check-coverage": true,
   "branches": 88,
   "lines": 94,
-  "functions": 90,
-  "statements": 94
+  "functions": 88,
+  "statements": 93
 }

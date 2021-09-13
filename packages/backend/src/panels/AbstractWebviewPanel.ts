@@ -99,7 +99,7 @@ export abstract class AbstractWebviewPanel {
     if (this.flowPromise) {
       // resolves promise in case panel is closed manually by an user
       // it is safe to call resolve several times on same promise
-      this.flowPromise.state?.resolve();
+      this.flowPromise.state.resolve();
     }
     this.flowPromise = null;
   }
