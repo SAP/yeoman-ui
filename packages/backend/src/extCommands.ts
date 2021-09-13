@@ -1,4 +1,4 @@
-import { ExtensionContext, commands, window, WebviewPanel } from "vscode";
+import { ExtensionContext, commands } from "vscode";
 
 export class ExtCommands {
   private exploreGensPanel: any;
