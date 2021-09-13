@@ -13,17 +13,16 @@ export const getVscode = () => {
 const filename: string = require.main.filename;
 const _isInTest = filename.includes(join("node_modules", "mocha"));
 
-const notImplementedError = new Error("tested method is not implemented");
-const returnValue = () => {
+const returnValue = (...args: any[]) => {
   if (_isInTest) {
-    throw notImplementedError;
+    throw new Error(`tested method is not implemented ${JSON.stringify(args)}`);
   }
   return "";
 };
 
-const returnPromise = () => {
+const returnPromise = (...args: any[]) => {
   if (_isInTest) {
-    throw notImplementedError;
+    throw new Error(`tested method is not implemented ${JSON.stringify(args)}`);
   }
   return Promise.resolve();
 };
@@ -66,6 +65,7 @@ const window = {
   registerWebviewPanelSerializer: returnPromise,
   createWebviewPanel: returnPromise,
   showQuickPick: returnPromise,
+  createOutputChannel: returnValue,
 };
 
 const ViewColumn = {

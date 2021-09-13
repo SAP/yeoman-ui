@@ -102,7 +102,14 @@ import Info from "../components/Info.vue";
 import PromptInfo from "../components/PromptInfo.vue";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
-import * as _ from "lodash";
+import _size from "lodash/size";
+import _get from "lodash/get";
+import _cloneDeep from "lodash/cloneDeep";
+import _compact from "lodash/compact";
+import _find from "lodash/find";
+import _isNil from "lodash/isNil";
+import _forEach from "lodash/forEach";
+import _isEmpty from "lodash/isEmpty";
 import FileBrowserPlugin from "@sap-devx/inquirer-gui-file-browser-plugin";
 import FolderBrowserPlugin from "@sap-devx/inquirer-gui-folder-browser-plugin";
 import LoginPlugin from "@sap-devx/inquirer-gui-login-plugin";
@@ -173,10 +180,10 @@ export default {
     },
     nextButtonText() {
       if (
-        (!this.selectGeneratorPromptExists() && this.promptIndex === _.size(this.promptsInfoToDisplay) - 1) ||
+        (!this.selectGeneratorPromptExists() && this.promptIndex === _size(this.promptsInfoToDisplay) - 1) ||
         (this.selectGeneratorPromptExists() &&
           this.promptIndex > 0 &&
-          this.promptIndex === _.size(this.promptsInfoToDisplay)) ||
+          this.promptIndex === _size(this.promptsInfoToDisplay)) ||
         this.isWriting
       ) {
         return "Finish";
@@ -191,21 +198,21 @@ export default {
       );
     },
     headerTitle() {
-      const titleSuffix = _.isEmpty(this.generatorPrettyName) ? "" : ` - ${this.generatorPrettyName}`;
-      return `${_.get(this.messages, "yeoman_ui_title")}${titleSuffix}`;
+      const titleSuffix = _isEmpty(this.generatorPrettyName) ? "" : ` - ${this.generatorPrettyName}`;
+      return `${_get(this.messages, "yeoman_ui_title")}${titleSuffix}`;
     },
     currentPrompt() {
-      return _.get(this.prompts, "[" + this.promptIndex + "]");
+      return _get(this.prompts, "[" + this.promptIndex + "]");
     },
     isNoGenerators() {
-      const promptName = _.get(this.currentPrompt, "name");
-      const message = _.get(this.messages, "select_generator_name", "");
+      const promptName = _get(this.currentPrompt, "name");
+      const message = _get(this.messages, "select_generator_name", "");
       if (promptName && promptName === message) {
-        const questions = _.compact(_.get(this.currentPrompt, "questions"));
-        const generatorQuestion = _.find(questions, (question) => {
-          return _.get(question, "name") === "generator";
+        const questions = _compact(_get(this.currentPrompt, "questions"));
+        const generatorQuestion = _find(questions, (question) => {
+          return _get(question, "name") === "generator";
         });
-        return _.isEmpty(_.get(generatorQuestion, "choices"));
+        return _isEmpty(_get(generatorQuestion, "choices"));
       }
       return false;
     },
@@ -245,7 +252,7 @@ export default {
     },
     setBusyIndicator() {
       this.expectedShowBusyIndicator =
-        _.isEmpty(this.prompts) ||
+        _isEmpty(this.prompts) ||
         (this.currentPrompt &&
           (this.currentPrompt.status === PENDING || this.currentPrompt.status === EVALUATING) &&
           !this.isDone);
@@ -292,7 +299,7 @@ export default {
       }
     },
     getInProgressStepName() {
-      return this.isWriting ? _.get(this.messages, "step_is_generating") : _.get(this.messages, "step_is_pending");
+      return this.isWriting ? _get(this.messages, "step_is_generating") : _get(this.messages, "step_is_pending");
     },
     next() {
       if (this.resolve === null) {
@@ -303,7 +310,7 @@ export default {
       this.toShowPromptMessage = false;
       this.resolve(this.currentPrompt.answers);
 
-      if (this.promptIndex >= _.size(this.prompts) - 1) {
+      if (this.promptIndex >= _size(this.prompts) - 1) {
         const prompt = {
           questions: [],
           name: this.getInProgressStepName(),
@@ -320,7 +327,7 @@ export default {
       const currentPrompt = this.currentPrompt;
       if (currentPrompt) {
         this.stepValidated =
-          currentPrompt.status === PENDING || _.isEmpty(currentPrompt.questions) ? false : _.isNil(issues);
+          currentPrompt.status === PENDING || _isEmpty(currentPrompt.questions) ? false : _isNil(issues);
 
         currentPrompt.answers = answers;
         if (currentPrompt.answers.generator) {
@@ -332,29 +339,29 @@ export default {
       }
     },
     isToolsSuiteType(genName) {
-      const questions = _.compact(_.get(this.currentPrompt, "questions"));
-      const generatorQuestion = _.find(questions, (question) => {
-        return _.get(question, "name") === "generator";
+      const questions = _compact(_get(this.currentPrompt, "questions"));
+      const generatorQuestion = _find(questions, (question) => {
+        return _get(question, "name") === "generator";
       });
       if (generatorQuestion) {
-        const choices = _.compact(_.get(generatorQuestion, "choices"));
+        const choices = _compact(_get(generatorQuestion, "choices"));
         if (choices) {
-          const isToolsSuiteGen = _.find(choices, (choice) => {
-            return _.get(choice, "isToolsSuiteType") === true && _.get(choice, "value") === genName;
+          const isToolsSuiteGen = _find(choices, (choice) => {
+            return _get(choice, "isToolsSuiteType") === true && _get(choice, "value") === genName;
           });
-          return _.isEmpty(isToolsSuiteGen) === false;
+          return _isEmpty(isToolsSuiteGen) === false;
         }
       }
       return false;
     },
     selectGeneratorPromptExists() {
-      const firstPromptQuestions = _.get(this, "prompts[0].questions", []);
-      return !_.isNil(
-        _.find(firstPromptQuestions, (question) => {
+      const firstPromptQuestions = _get(this, "prompts[0].questions", []);
+      return !_isNil(
+        _find(firstPromptQuestions, (question) => {
           return (
-            _.get(question, "name") === "generator" &&
-            _.get(question, "type") === "list" &&
-            _.get(question, "guiType") === "tiles"
+            _get(question, "name") === "generator" &&
+            _get(question, "type") === "list" &&
+            _get(question, "guiType") === "tiles"
           );
         })
       );
@@ -367,7 +374,7 @@ export default {
         promptIndex = 0;
       }
       prompts = prompts || [];
-      this.promptsInfoToDisplay = _.cloneDeep(prompts);
+      this.promptsInfoToDisplay = _cloneDeep(prompts);
 
       // replace all existing prompts except 1st (generator selection) and current prompt
       // The index at which to start changing the array.
@@ -377,20 +384,20 @@ export default {
       }
 
       // The number of elements in the array to remove from startIndex
-      const deleteCount = _.size(this.prompts) - promptIndex;
+      const deleteCount = _size(this.prompts) - promptIndex;
 
       let itemsToInsert;
       if (this.selectGeneratorPromptExists() || promptIndex === 0) {
-        itemsToInsert = prompts.splice(promptIndex, _.size(prompts));
+        itemsToInsert = prompts.splice(promptIndex, _size(prompts));
       } else {
         startIndex = promptIndex + 1;
-        itemsToInsert = prompts.splice(startIndex, _.size(prompts));
+        itemsToInsert = prompts.splice(startIndex, _size(prompts));
       }
 
       this.prompts.splice(startIndex, deleteCount, ...itemsToInsert);
     },
     setPrompts(prompts) {
-      const firstIncomingPrompt = _.get(prompts, "[0]");
+      const firstIncomingPrompt = _get(prompts, "[0]");
       if (firstIncomingPrompt) {
         let startIndex = this.promptIndex;
         let deleteCount = prompts.length;
@@ -432,7 +439,7 @@ export default {
     },
 
     async updateGeneratorsPrompt(questions) {
-      const generatorsPrompt = _.get(this.prompts, "[0]");
+      const generatorsPrompt = _get(this.prompts, "[0]");
       if (generatorsPrompt) {
         generatorsPrompt.questions = questions;
       }
@@ -479,13 +486,13 @@ export default {
       let promptDescription = "";
       let promptName = "";
       if (name === "select_generator") {
-        promptDescription = _.get(this.messages, "select_generator_description");
-        promptName = _.get(this.messages, "select_generator_name");
+        promptDescription = _get(this.messages, "select_generator_description");
+        promptName = _get(this.messages, "select_generator_name");
       } else {
         const promptIndex = this.selectGeneratorPromptExists() ? this.promptIndex - 1 : this.promptIndex;
-        const promptToDisplay = _.get(this.promptsInfoToDisplay, `[${promptIndex}]`);
-        promptDescription = _.get(promptToDisplay, "description", "");
-        promptName = _.get(promptToDisplay, "name", name);
+        const promptToDisplay = _get(this.promptsInfoToDisplay, `[${promptIndex}]`);
+        promptDescription = _get(promptToDisplay, "description", "");
+        promptName = _get(promptToDisplay, "name", name);
       }
 
       const prompt = Vue.observable({
@@ -494,7 +501,7 @@ export default {
         description: promptDescription,
         answers: {},
         active: true,
-        status: _.get(this.currentPrompt, "status"),
+        status: _get(this.currentPrompt, "status"),
       });
       return prompt;
     },
@@ -558,7 +565,7 @@ export default {
         "setGenInWriting",
         "showPromptMessage",
       ];
-      _.forEach(functions, (funcName) => {
+      _forEach(functions, (funcName) => {
         this.rpc.registerMethod({
           func: this[funcName],
           thisArg: this,
@@ -570,8 +577,8 @@ export default {
     },
     async setMessagesAndSaveState() {
       const uiOptions = await this.rpc.invoke("getState");
-      this.messages = _.get(uiOptions, "messages");
-      this.isGeneric = _.get(this.messages, "panel_title") === "Template Wizard";
+      this.messages = _get(uiOptions, "messages");
+      this.isGeneric = _get(this.messages, "panel_title") === "Template Wizard";
       const vscodeApi = this.getVsCodeApi();
       if (vscodeApi) {
         vscodeApi.setState(uiOptions);
@@ -588,7 +595,7 @@ export default {
       const options = {};
       Vue.use(plugin, options);
       if (options.plugin) {
-        const registerPluginFunc = _.get(this.$refs, "form.registerPlugin");
+        const registerPluginFunc = _get(this.$refs, "form.registerPlugin");
         registerPluginFunc(options.plugin);
       }
     },

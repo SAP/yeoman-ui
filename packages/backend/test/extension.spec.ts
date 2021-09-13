@@ -1,18 +1,17 @@
-import { vscode } from "./mockUtil";
-
 import { expect } from "chai";
 import { createSandbox, SinonSandbox, SinonMock } from "sinon";
-import * as _ from "lodash";
 import * as extension from "../src/extension";
+import { ExtCommands } from "../src/extCommands";
 import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { SWA } from "../src/swa-tracker/swa-tracker-wrapper";
 import * as shellJsWorkarounds from "../src/utils/shellJsWorkarounds";
+import { vscode } from "./mockUtil";
 
 describe("extension unit test", () => {
   let sandbox: SinonSandbox;
-  let commandsMock: SinonMock;
-  let windowMock: SinonMock;
+  let extCommandsMock: SinonMock;
   let loggerWrapperMock: SinonMock;
+  let windowMock: SinonMock;
   let swaTrackerWrapperMock: SinonMock;
   const testContext: any = {
     subscriptions: [],
@@ -30,14 +29,14 @@ describe("extension unit test", () => {
   beforeEach(() => {
     loggerWrapperMock = sandbox.mock(loggerWrapper);
     swaTrackerWrapperMock = sandbox.mock(SWA);
-    commandsMock = sandbox.mock(vscode.commands);
+    extCommandsMock = sandbox.mock(ExtCommands);
     windowMock = sandbox.mock(vscode.window);
   });
 
   afterEach(() => {
     loggerWrapperMock.verify();
     swaTrackerWrapperMock.verify();
-    commandsMock.verify();
+    extCommandsMock.verify();
     windowMock.verify();
   });
 
@@ -45,23 +44,16 @@ describe("extension unit test", () => {
     it("commands registration", () => {
       loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
       loggerWrapperMock.expects("getLogger");
-      loggerWrapperMock.expects("getClassLogger").twice();
       swaTrackerWrapperMock.expects("createSWATracker");
-      windowMock.expects("registerWebviewPanelSerializer").withArgs("yeomanui");
-      windowMock.expects("registerWebviewPanelSerializer").withArgs("exploreGens");
 
       const applySpy = sandbox.spy(shellJsWorkarounds, "apply");
+      windowMock.expects("registerWebviewPanelSerializer").withArgs("yeomanui");
+      windowMock.expects("registerWebviewPanelSerializer").withArgs("exploreGens");
 
       extension.activate(testContext);
 
       expect(applySpy.calledOnce).to.be.true;
       applySpy.restore();
-
-      const oRegisteredCommands = vscode.commands.getCommands();
-      expect(_.get(oRegisteredCommands, "loadYeomanUI")).to.be.not.undefined;
-      expect(_.get(oRegisteredCommands, "yeomanUI.toggleOutput")).to.be.not.undefined;
-      expect(_.get(oRegisteredCommands, "exploreGenerators")).to.be.not.undefined;
-      expect(_.get(oRegisteredCommands, "yeomanUI._notifyGeneratorsChange")).to.be.not.undefined;
     });
 
     it("logger failure on extenion activation", () => {

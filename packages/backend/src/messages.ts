@@ -6,6 +6,7 @@ const selectWhereToOpenTheProjectQuestionHint = "Where do you want to open the p
 const artifact_generated_project = `The project has been generated`;
 
 export default {
+  explore_gens_title: "Explore and Install Generators",
   panel_title: "Template Wizard",
   generators_loading: "Loading the Yeoman generators...",
   step_is_pending: "Loading...",
