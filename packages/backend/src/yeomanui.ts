@@ -28,11 +28,6 @@ export interface IQuestionsPrompt extends IPrompt {
   questions: any[];
 }
 
-type PromiseFunctions = {
-  resolve: (value: unknown) => void;
-  reject: (value: unknown) => void;
-};
-
 export class YeomanUI {
   private static readonly defaultMessage =
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
@@ -62,7 +57,6 @@ export class YeomanUI {
   private readonly initialCwd: string;
   private readonly typesMap: Map<string, string>;
   private readonly generatorsToIgnoreArray: string[];
-  // private forceNewWorkspace: boolean;
 
   private readonly flowState: State<void>;
 
@@ -111,7 +105,6 @@ export class YeomanUI {
     this.setCwd(outputPath);
     this.typesMap = new Map();
     this.generatorsToIgnoreArray = [];
-    //this.forceNewWorkspace = false;
   }
 
   private getState() {

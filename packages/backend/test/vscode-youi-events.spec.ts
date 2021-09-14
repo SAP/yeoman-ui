@@ -216,19 +216,6 @@ describe("vscode-youi-events unit test", () => {
     events.doGeneratorInstall();
   });
 
-  it("isPredecessorOf", () => {
-    expect(events["isPredecessorOf"]("/foo", "/foo")).to.be.false;
-    expect(events["isPredecessorOf"]("/foo", "/bar")).to.be.false;
-    expect(events["isPredecessorOf"]("/foo", "/foobar")).to.be.false;
-    expect(events["isPredecessorOf"]("/foo", "/foo/bar")).to.be.true;
-    expect(events["isPredecessorOf"]("/foo", "/foo/../bar")).to.be.false;
-    expect(events["isPredecessorOf"]("/foo", "/foo/./bar")).to.be.true;
-    expect(events["isPredecessorOf"]("/bar/../foo", "/foo/bar")).to.be.true;
-    expect(events["isPredecessorOf"]("/foo", "./bar")).to.be.false;
-    expect(events["isPredecessorOf"]("C:\\Foo", "C:\\Bar")).to.be.false;
-    expect(events["isPredecessorOf"]("C:\\Foo", "D:\\Foo\\Bar")).to.be.false;
-  });
-
   describe("showProgress", () => {
     it("getAppWizard - no message received ---> show default Information message with Progress button", () => {
       const appWizard = events.getAppWizard();

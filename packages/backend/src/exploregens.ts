@@ -162,7 +162,7 @@ export class ExploreGens {
   }
 
   private getRecommendedQuery(): string[] {
-    const recommended: string[] = this.getWsConfig().get(this.SEARCH_QUERY) || [];
+    const recommended: string[] = this.getWsConfig().get(this.SEARCH_QUERY, []);
     return _.uniq(recommended);
   }
 
@@ -256,9 +256,7 @@ export class ExploreGens {
 
   private updateBeingHandledGenerator(genName: string, state: GenState) {
     try {
-      if (this.rpc) {
-        void this.rpc.invoke("updateBeingHandledGenerator", [genName, state]);
-      }
+      void this.rpc?.invoke("updateBeingHandledGenerator", [genName, state]);
     } catch (error) {
       // error could happen in case that panel was closed by an user but action is still in progress
       // in this case webview is already disposed

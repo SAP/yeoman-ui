@@ -85,7 +85,10 @@ describe("exploregens unit test", () => {
   });
 
   it("getRecommendedQuery", () => {
-    workspaceConfigMock.expects("get").withExactArgs(exploregens["SEARCH_QUERY"]).returns(["test_value", "test_value"]);
+    workspaceConfigMock
+      .expects("get")
+      .withExactArgs(exploregens["SEARCH_QUERY"], [])
+      .returns(["test_value", "test_value"]);
     const res = exploregens["getRecommendedQuery"]();
     expect(res).to.have.lengthOf(1);
   });

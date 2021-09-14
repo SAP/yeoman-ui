@@ -156,27 +156,6 @@ export class VSCodeYouiEvents implements YouiEvents {
     }
   }
 
-  /**
-   * Returns true in case probablePredecessorPath is the predecessor path of currentPath.
-   * In other words, returns true when currentPath is contained in some place in probablePredecessorPath.
-   * It can not be implemented by currentPath.contains(probablePredecessorPath), because the path can be the following for example (see tests):
-   * /home/user/projects/../projects
-   * /home/user/./projects
-   * And te pathes above are valid.
-   * So we need to use relative() of path.
-   * When relative path starts with '..', it means that the the pathes don't have a common part.
-   * Otherwise, the pathes have a common part and probablePredecessorPath is really predecessor of currentPath.
-   * The check isAbsolute() is needed for the following case (see it("on success, project path and workspace folder are Windows style ---> add to workspace button and open in new workspace button are visible"):
-   * probablePredecessorPath = "C:\\Windows" and currentPath = "D:\\Program Files".
-   *
-   * @param probablePredecessorPath
-   * @param currentPath
-   */
-  private isPredecessorOf(probablePredecessorPath: string, currentPath: string) {
-    const relativePath = relative(probablePredecessorPath, currentPath);
-    return !_.isEmpty(relativePath) && !_.startsWith(relativePath, "..") && !isAbsolute(relativePath);
-  }
-
   private showDoneMessage(
     success: boolean,
     errorMmessage: string,
