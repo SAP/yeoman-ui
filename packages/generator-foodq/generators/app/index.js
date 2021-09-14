@@ -623,4 +623,3 @@ module.exports = class extends Generator {
     this.log("FoodQ generation completed.");
   }
 };
-
