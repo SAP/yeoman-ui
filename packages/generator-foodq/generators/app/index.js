@@ -132,14 +132,14 @@ module.exports = class extends Generator {
     return _.get(this.options, `[${name}]`);
   }
 
-  async initializing() {
-    const silent = this._getOption("silent");
-    this.composeWith(require.resolve("../app2"), {
-      prompts: this.prompts,
-      appWizard: this.appWizard,
-      silent,
-    });
-  }
+  //async initializing() {
+  //const silent = this._getOption("silent");
+  // this.composeWith(require.resolve("../app2"), {
+  //   prompts: this.prompts,
+  //   appWizard: this.appWizard,
+  //   silent,
+  // });
+  //}
 
   async prompting() {
     let prompts = [

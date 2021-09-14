@@ -61,8 +61,8 @@ export class YeomanUI {
   private readonly outputPath: string;
   private readonly initialCwd: string;
   private readonly typesMap: Map<string, string>;
-  private readonly generaorsToIgnoreArray: string[];
-  private forceNewWorkspace: boolean;
+  private readonly generatorsToIgnoreArray: string[];
+  // private forceNewWorkspace: boolean;
 
   private readonly flowState: State<void>;
 
@@ -110,8 +110,8 @@ export class YeomanUI {
     this.customQuestionEventHandlers = new Map();
     this.setCwd(outputPath);
     this.typesMap = new Map();
-    this.generaorsToIgnoreArray = [];
-    this.forceNewWorkspace = false;
+    this.generatorsToIgnoreArray = [];
+    //this.forceNewWorkspace = false;
   }
 
   private getState() {
@@ -435,12 +435,10 @@ export class YeomanUI {
 
     const type: string = this.typesMap.has(generatorName) ? this.typesMap.get(generatorName) : "files";
     // For now - A Fiori project is supposed to create the project and not open it
-    const ignoreGen: boolean = this.generaorsToIgnoreArray.includes(generatorName);
+    const ignoreGen: boolean = this.generatorsToIgnoreArray.includes(generatorName);
     const selectedWorkspace: string =
       type === "files" || type === "module" || ignoreGen
         ? this.uiOptions.messages.create_and_close
-        : this.forceNewWorkspace
-        ? this.uiOptions.messages.open_in_a_new_workspace
         : this.wsGet(this.SELECTED_WORKSPACE_CONFIG_PROP);
 
     const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
@@ -488,16 +486,7 @@ export class YeomanUI {
 
     const questions: any[] = [];
 
-    let selectedWorkspaceConfig;
-
-    const currentPath = _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
-    if (currentPath) {
-      this.forceNewWorkspace = false;
-      selectedWorkspaceConfig = this.wsGet(this.SELECTED_WORKSPACE_CONFIG_PROP);
-    } else {
-      this.forceNewWorkspace = true;
-      selectedWorkspaceConfig = this.uiOptions.messages.open_in_a_new_workspace;
-    }
+    const selectedWorkspaceConfig = this.wsGet(this.SELECTED_WORKSPACE_CONFIG_PROP);
 
     if (_.includes(genFilter.types, GeneratorType.project)) {
       const defaultPath = this.wsGet(this.TARGET_FOLDER_CONFIG_PROP)
@@ -522,25 +511,23 @@ export class YeomanUI {
       };
       questions.push(targetFolderQuestion);
 
-      if (!this.forceNewWorkspace) {
-        const locationQuestion: any = {
-          type: "label",
-          guiOptions: {
-            hint: this.uiOptions.messages.select_open_workspace_question_hint,
-            link: {
-              text: "Preferences",
-              command: {
-                id: "workbench.action.openSettings",
-                params: [`ApplicationWizard.Workspace`],
-              },
+      const locationQuestion: any = {
+        type: "label",
+        guiOptions: {
+          hint: this.uiOptions.messages.select_open_workspace_question_hint,
+          link: {
+            text: "Preferences",
+            command: {
+              id: "workbench.action.openSettings",
+              params: [`ApplicationWizard.Workspace`],
             },
           },
-          name: "selectedWorkspace",
-          message: `Where do you want to open the project?`,
-          default: selectedWorkspaceConfig,
-        };
-        questions.push(locationQuestion);
-      }
+        },
+        name: "selectedWorkspace",
+        message: this.uiOptions.messages.select_open_workspace_question_hint,
+        default: selectedWorkspaceConfig,
+      };
+      questions.push(locationQuestion);
     }
 
     const generatorChoices = await Promise.all(generatorChoicePromises);
@@ -571,7 +558,7 @@ export class YeomanUI {
       ? "module"
       : "files";
     this.typesMap.set(genMeta.namespace, type);
-    _.includes(genFilter.types, "tools-suite") && this.generaorsToIgnoreArray.push(genMeta.namespace);
+    _.includes(genFilter.types, "tools-suite") && this.generatorsToIgnoreArray.push(genMeta.namespace);
 
     if (typesHasIntersection && categoriesHasIntersection) {
       return this.createGeneratorChoice(genMeta.namespace, genMeta.packagePath, packageJson);

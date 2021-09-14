@@ -203,6 +203,9 @@ export class VSCodeYouiEvents implements YouiEvents {
         vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, {
           uri: targetFolderUri,
         });
+        if (wsFoldersQuantity === 0) {
+          // TODO: create workspace file
+        }
       }
 
       return vscode.window.showInformationMessage(successInfoMessage);

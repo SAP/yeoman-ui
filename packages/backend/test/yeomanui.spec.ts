@@ -238,8 +238,8 @@ describe("yeomanui unit test", () => {
             on: () => "",
           },
         });
-
-      wsConfigMock.expects("get").withExactArgs(yeomanUi["TARGET_FOLDER_CONFIG_PROP"]);
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns({});
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.TargetFolder");
       rpcMock.expects("invoke").withArgs("showPrompt").resolves({ generator: "test1-project:app" });
       rpcMock.expects("invoke").withExactArgs("setGenInWriting", [false]).resolves();
       swaTrackerWrapperMock.expects("updateGeneratorStarted").withArgs("test1-project:app");
@@ -310,7 +310,8 @@ describe("yeomanui unit test", () => {
   it("_notifyGeneratorsChange", async () => {
     envUtilsMock.expects("getGeneratorsData").resolves();
     rpcMock.expects("invoke").withArgs("updateGeneratorsPrompt");
-    _.set(vscode, "workspace.workspaceFolders[0].uri.fsPath", undefined);
+    wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns({});
+    // _.set(vscode, "workspace.workspaceFolders[0].uri.fsPath", undefined);
     await yeomanUi._notifyGeneratorsChange();
   });
 
@@ -482,6 +483,7 @@ describe("yeomanui unit test", () => {
     });
 
     it("there are no generators", async () => {
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns({});
       envUtilsMock.expects("getGeneratorsData").resolves([]);
       const result = await yeomanUi["getGeneratorsPrompt"]();
       const generatorQuestion: any = {
@@ -501,6 +503,7 @@ describe("yeomanui unit test", () => {
     });
 
     it("get generators with type project", async () => {
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns({});
       envUtilsMock.expects("getGeneratorsData").resolves(gensMeta);
       wsConfigMock.expects("get").withExactArgs(yeomanUi["TARGET_FOLDER_CONFIG_PROP"]);
       const genFilter: GeneratorFilter = GeneratorFilter.create({
@@ -520,6 +523,7 @@ describe("yeomanui unit test", () => {
     });
 
     it("get generators with type module", async () => {
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns({});
       envUtilsMock.expects("getGeneratorsData").resolves(gensMeta);
       const genFilter = GeneratorFilter.create({ type: "module" });
       yeomanUi["uiOptions"] = { filter: genFilter, messages };
@@ -532,6 +536,7 @@ describe("yeomanui unit test", () => {
     });
 
     it("get generators all generators", async () => {
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns({});
       envUtilsMock.expects("getGeneratorsData").resolves(gensMeta);
       yeomanUi["uiOptions"] = {
         filter: GeneratorFilter.create({ type: [] }),
@@ -543,6 +548,7 @@ describe("yeomanui unit test", () => {
     });
 
     it("wrong generators filter type is provided", async () => {
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns({});
       envUtilsMock.expects("getGeneratorsData").resolves([
         {
           generatorMeta: {
@@ -569,6 +575,7 @@ describe("yeomanui unit test", () => {
     });
 
     it("get generators with type project and categories cat1 and cat2", async () => {
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns({});
       gensMeta[0].generatorPackageJson = {
         "generator-filter": { type: ["project"], categories: ["cat2"] },
         description: "test1Description",
@@ -604,6 +611,7 @@ describe("yeomanui unit test", () => {
     });
 
     it("get generators with displayName", async () => {
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns({});
       gensMeta[2].generatorPackageJson = {
         description: "test3Description",
         displayName: "3rd - Test",
@@ -627,6 +635,7 @@ describe("yeomanui unit test", () => {
     });
 
     it("get generators with homepage", async () => {
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns({});
       gensMeta[0].generatorPackageJson = {
         "generator-filter": { type: "project" },
         description: "test1Description",
@@ -667,7 +676,6 @@ describe("yeomanui unit test", () => {
       wsConfigMock.expects("get").withExactArgs(yeomanUi["TARGET_FOLDER_CONFIG_PROP"]);
       wsConfigMock.expects("get").withExactArgs(yeomanUi["SELECTED_WORKSPACE_CONFIG_PROP"]);
       await yeomanUi["getGeneratorsPrompt"]();
-      expect(yeomanUi["forceNewWorkspace"]).to.be.equals(false);
     });
 
     it("generator with type tools-suite", async () => {
@@ -688,8 +696,7 @@ describe("yeomanui unit test", () => {
         messages,
       };
       await yeomanUi["getGeneratorsPrompt"]();
-      expect(yeomanUi["forceNewWorkspace"]).to.be.equals(false);
-      expect(yeomanUi["generaorsToIgnoreArray"]).to.be.contains("test1-project:app");
+      expect(yeomanUi["generatorsToIgnoreArray"]).to.be.contains("test1-project:app");
     });
   });
 
@@ -1054,6 +1061,7 @@ describe("yeomanui unit test", () => {
     });
 
     it("onGeneratorSuccess - generator type is project", () => {
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns(open_in_new_ws);
       yeomanUi["typesMap"].clear();
       yeomanUi["typesMap"].set("foodq:app", "project");
       const beforeGen = { targetFolderPath: "testDestinationRoot" };
@@ -1061,7 +1069,6 @@ describe("yeomanui unit test", () => {
         targetFolderPath: "testDestinationRoot/generatedProject",
       };
       swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("foodq:app", true, testLogger);
-      yeomanUi["forceNewWorkspace"] = true;
       yeomanUi["onGeneratorSuccess"]("foodq:app", beforeGen, afterGen);
       expect(
         doGeneratorDoneSpy.calledWith(
@@ -1077,13 +1084,12 @@ describe("yeomanui unit test", () => {
     it("onGeneratorSuccess - Fiori generator with type project and type tools-suite", () => {
       yeomanUi["typesMap"].clear();
       yeomanUi["typesMap"].set("fiori-generator:app", "project");
-      yeomanUi["generaorsToIgnoreArray"].push("fiori-generator:app");
+      yeomanUi["generatorsToIgnoreArray"].push("fiori-generator:app");
       const beforeGen = { targetFolderPath: "testDestinationRoot" };
       const afterGen = {
         targetFolderPath: "testDestinationRoot/generatedProject",
       };
       swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("fiori-generator:app", true, testLogger);
-      yeomanUi["forceNewWorkspace"] = true;
       yeomanUi["onGeneratorSuccess"]("fiori-generator:app", beforeGen, afterGen);
       expect(
         doGeneratorDoneSpy.calledWith(
