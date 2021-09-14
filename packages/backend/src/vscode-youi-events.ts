@@ -1,13 +1,15 @@
 import * as vscode from "vscode";
-import * as _ from "lodash";
+import { isEmpty, size, isNil, get } from "lodash";
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-import { relative, isAbsolute } from "path";
+import * as fs from "fs";
+import * as path from "path";
 import { GeneratorOutput } from "./vscode-output";
 import { IChildLogger } from "@vscode-logging/logger";
 import { getClassLogger } from "./logger/logger-wrapper";
 import { getImage } from "./images/messageImages";
 import { AppWizard, MessageType, Severity } from "@sap-devx/yeoman-ui-types";
+import { YeomanUI } from "./yeomanui";
 
 class YoUiAppWizard extends AppWizard {
   constructor(private readonly events: VSCodeYouiEvents) {
@@ -110,7 +112,7 @@ export class VSCodeYouiEvents implements YouiEvents {
     const openOutput: any = this.messages.show_progress_button;
     const buttons: string[] = [];
     buttons.push(openOutput);
-    if (_.isEmpty(message)) {
+    if (isEmpty(message)) {
       message = this.messages.show_progress_message;
     }
     this.output.appendLine(message);
@@ -169,7 +171,7 @@ export class VSCodeYouiEvents implements YouiEvents {
       let targetFolderUri: vscode.Uri = null;
 
       // The correct targetFolderPath is unknown
-      if (!_.isNil(targetFolderPath)) {
+      if (!isNil(targetFolderPath)) {
         targetFolderUri = vscode.Uri.file(targetFolderPath);
       }
 
@@ -178,18 +180,52 @@ export class VSCodeYouiEvents implements YouiEvents {
       if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
         void vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
       } else if (selectedWorkspace === this.messages.add_to_workspace) {
-        const wsFoldersQuantity = _.size(vscode.workspace.workspaceFolders);
+        const wsFoldersQuantity = size(vscode.workspace.workspaceFolders);
         vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, {
           uri: targetFolderUri,
         });
         if (wsFoldersQuantity === 0) {
-          // TODO: create workspace file
+          const workspaceFileUri = this.createNewWorkspaceFileUri(targetFolderUri.fsPath);
+          void vscode.commands.executeCommand("vscode.openFolder", workspaceFileUri);
         }
       }
 
       return vscode.window.showInformationMessage(successInfoMessage);
     }
     return vscode.window.showErrorMessage(errorMmessage);
+  }
+
+  private createNewWorkspaceFileUri(targetFolderPath: string): vscode.Uri {
+    const wsFilePath = this.getUniqWrokspaceFilePath();
+    const fileContent: string = `{
+      "folders": [{
+        "path": "${targetFolderPath}"
+      }]
+    }`;
+
+    fs.writeFileSync(wsFilePath, fileContent, "utf-8");
+    return vscode.Uri.file(wsFilePath);
+  }
+
+  private createWsFilePath(counter?: number): string {
+    const defaultName = "workspace";
+    const wsFileExt = this.isInBAS ? "theia-workspace" : "code-workspace";
+    const wsFileName = this.isInBAS
+      ? get(process, "env.WORKSPACE_ID", defaultName)
+      : get(process, "env.USERNAME", defaultName);
+    const counterStr = counter ? `.${counter}.` : `.`;
+    return path.join(YeomanUI["PROJECTS"], `${wsFileName}${counterStr}${wsFileExt}`);
+  }
+
+  private getUniqWrokspaceFilePath(): string {
+    let wsFilePath = this.createWsFilePath();
+
+    let counter = 0;
+    while (fs.existsSync(wsFilePath)) {
+      wsFilePath = this.createWsFilePath(++counter);
+    }
+
+    return wsFilePath;
   }
 
   private getSuccessInfoMessage(selectedWorkspace: string, type: string): string {

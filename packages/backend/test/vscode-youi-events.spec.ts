@@ -1,5 +1,4 @@
 import { vscode } from "./mockUtil";
-
 import { expect } from "chai";
 import { createSandbox, SinonSandbox, SinonMock } from "sinon";
 import * as _ from "lodash";
@@ -7,8 +6,11 @@ import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/
 import * as messages from "../src/messages";
 import { MessageType, Severity } from "@sap-devx/yeoman-ui-types";
 import { GeneratorOutput } from "../src/vscode-output";
+import { YeomanUI } from "../src/yeomanui";
 import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { VSCodeYouiEvents } from "../src/vscode-youi-events";
+const fs = require("fs");
+import * as path from "path";
 
 describe("vscode-youi-events unit test", () => {
   let events: VSCodeYouiEvents;
@@ -21,6 +23,8 @@ describe("vscode-youi-events unit test", () => {
   let generatorOutputMock: SinonMock;
   let rpcMock: SinonMock;
   let loggerMock: SinonMock;
+  let uriMock: SinonMock;
+  let fsMock: SinonMock;
 
   const testLogger = {
     debug: () => true,
@@ -92,6 +96,8 @@ describe("vscode-youi-events unit test", () => {
     generatorOutputMock = sandbox.mock(generatorOutput);
     loggerMock = sandbox.mock(testLogger);
     rpcMock = sandbox.mock(rpc);
+    uriMock = sandbox.mock(vscode.Uri);
+    fsMock = sandbox.mock(fs);
   });
 
   afterEach(() => {
@@ -103,6 +109,8 @@ describe("vscode-youi-events unit test", () => {
     generatorOutputMock.verify();
     loggerMock.verify();
     rpcMock.verify();
+    uriMock.verify();
+    fsMock.verify();
   });
 
   describe("getAppWizard", () => {
@@ -343,6 +351,27 @@ describe("vscode-youi-events unit test", () => {
       );
     });
 
+    it("on success, no workspace is opened ---> the project openned in a new multi-root workspace", () => {
+      eventsMock.expects("doClose");
+      _.set(vscode, "workspace.workspaceFolders", []);
+      windowMock
+        .expects("showInformationMessage")
+        .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
+        .resolves();
+      commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
+      workspaceMock.expects("updateWorkspaceFolders").withArgs(0, null);
+      fsMock.expects("existsSync").returns(false);
+      fsMock.expects("writeFileSync");
+      uriMock.expects("file").twice().returns({});
+      return events.doGeneratorDone(
+        true,
+        "success message",
+        "Open the project in a multi-root workspace",
+        "project",
+        "testDestinationRoot/./projectName"
+      );
+    });
+
     it("on success, module is created", () => {
       eventsMock.expects("doClose");
       _.set(vscode, "workspace.workspaceFolders", [
@@ -386,6 +415,58 @@ describe("vscode-youi-events unit test", () => {
       eventsMock.expects("doClose");
       windowMock.expects("showErrorMessage").withExactArgs("error message");
       return events.doGeneratorDone(false, "error message", createAndClose, "files");
+    });
+  });
+
+  describe("createNewWorkspaceFileUri", () => {
+    it("is in BAS, workspace file does not exist", () => {
+      events["isInBAS"] = true;
+      const targetFolerPath = "targetFolerPath";
+      const expectedWsFilePath = path.join(YeomanUI["PROJECTS"], `workspace.theia-workspace`);
+      uriMock.expects("file").withArgs(expectedWsFilePath);
+      fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
+      fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
+
+      events["createNewWorkspaceFileUri"](targetFolerPath);
+    });
+
+    it("is in BAS, workspace file exists", () => {
+      events["isInBAS"] = true;
+      const targetFolerPath = "targetFolerPath";
+
+      const existingWsFilePath = path.join(YeomanUI["PROJECTS"], `workspace.theia-workspace`);
+      fsMock.expects("existsSync").withArgs(existingWsFilePath).returns(true);
+
+      const expectedWsFilePath = path.join(YeomanUI["PROJECTS"], `workspace.1.theia-workspace`);
+      fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
+      uriMock.expects("file").withArgs(expectedWsFilePath);
+
+      events["createNewWorkspaceFileUri"](targetFolerPath);
+    });
+
+    it("is not in BAS, workspace file does not exist", () => {
+      events["isInBAS"] = false;
+      const targetFolerPath = "targetFolerPath";
+      const expectedWsFilePath = path.join(YeomanUI["PROJECTS"], `${process.env.USERNAME}.code-workspace`);
+      uriMock.expects("file").withArgs(expectedWsFilePath);
+      fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
+      fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
+
+      events["createNewWorkspaceFileUri"](targetFolerPath);
+    });
+
+    it("is not in BAS, workspace file exists", () => {
+      events["isInBAS"] = false;
+      const targetFolerPath = "targetFolerPath";
+
+      const existingWsFilePath = path.join(YeomanUI["PROJECTS"], `${process.env.USERNAME}.code-workspace`);
+      fsMock.expects("existsSync").withArgs(existingWsFilePath).returns(true);
+
+      const expectedWsFilePath = path.join(YeomanUI["PROJECTS"], `${process.env.USERNAME}.1.code-workspace`);
+      fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
+      uriMock.expects("file").withArgs(expectedWsFilePath);
+
+      events["createNewWorkspaceFileUri"](targetFolerPath);
     });
   });
 });
