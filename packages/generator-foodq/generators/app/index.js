@@ -133,12 +133,12 @@ module.exports = class extends Generator {
   }
 
   async initializing() {
-   const silent = this._getOption("silent");
-   this.composeWith(require.resolve("../app2"), {
-     prompts: this.prompts,
-     appWizard: this.appWizard,
-     silent,
-   });
+    const silent = this._getOption("silent");
+    this.composeWith(require.resolve("../app2"), {
+      prompts: this.prompts,
+      appWizard: this.appWizard,
+      silent,
+    });
   }
 
   async prompting() {
