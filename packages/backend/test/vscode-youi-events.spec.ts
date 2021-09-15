@@ -10,7 +10,7 @@ import { YeomanUI } from "../src/yeomanui";
 import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { VSCodeYouiEvents } from "../src/vscode-youi-events";
 import * as path from "path";
-const fs = require("fs");
+import * as fs from "fs";
 
 describe("vscode-youi-events unit test", () => {
   let events: VSCodeYouiEvents;

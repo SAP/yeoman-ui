@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { isEmpty, size, isNil, get } from "lodash";
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-const fs = require("fs");
+import * as fs from "fs";
 import * as path from "path";
 import { GeneratorOutput } from "./vscode-output";
 import { IChildLogger } from "@vscode-logging/logger";
