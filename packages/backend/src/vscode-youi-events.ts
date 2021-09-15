@@ -199,9 +199,12 @@ export class VSCodeYouiEvents implements YouiEvents {
     const wsFilePath = this.getUniqWorkspaceFilePath();
     const fileContent: string = `{
       "folders": [{
-        "path": "${targetFolderPath}"
-      }]
-    }`;
+        "path": "${targetFolderPath.replace(/\\/g, "/")}"
+      }],
+      "settings": {
+        "actions": []
+      }
+  }`;
 
     fs.writeFileSync(wsFilePath, fileContent);
     return vscode.Uri.file(wsFilePath);
