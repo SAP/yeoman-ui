@@ -42,6 +42,7 @@ export class VSCodeYouiEvents implements YouiEvents {
   private readonly logger: IChildLogger;
   private isInBAS: boolean; // eslint-disable-line @typescript-eslint/prefer-readonly
   private readonly appWizard: AppWizard;
+  private fs: any;
 
   constructor(rpc: IRpc, webviewPanel: vscode.WebviewPanel, messages: any, output: GeneratorOutput, isInBAS: boolean) {
     this.rpc = rpc;
@@ -51,6 +52,7 @@ export class VSCodeYouiEvents implements YouiEvents {
     this.logger = getClassLogger("VSCodeYouiEvents");
     this.isInBAS = isInBAS;
     this.appWizard = new YoUiAppWizard(this);
+    this.fs = fs;
   }
 
   public doGeneratorDone(
@@ -203,7 +205,7 @@ export class VSCodeYouiEvents implements YouiEvents {
       }]
     }`;
 
-    fs.writeFileSync(wsFilePath, fileContent, "utf-8");
+    this.fs.writeFileSync(wsFilePath, fileContent, "utf-8");
     return vscode.Uri.file(wsFilePath);
   }
 
@@ -221,7 +223,7 @@ export class VSCodeYouiEvents implements YouiEvents {
     let wsFilePath = this.createWsFilePath();
 
     let counter = 0;
-    while (fs.existsSync(wsFilePath)) {
+    while (this.fs.existsSync(wsFilePath)) {
       wsFilePath = this.createWsFilePath(++counter);
     }
 

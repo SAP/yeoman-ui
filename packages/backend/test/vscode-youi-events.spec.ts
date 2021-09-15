@@ -9,7 +9,6 @@ import { GeneratorOutput } from "../src/vscode-output";
 import { YeomanUI } from "../src/yeomanui";
 import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { VSCodeYouiEvents } from "../src/vscode-youi-events";
-const fs = require("fs");
 import * as path from "path";
 
 describe("vscode-youi-events unit test", () => {
@@ -97,7 +96,7 @@ describe("vscode-youi-events unit test", () => {
     loggerMock = sandbox.mock(testLogger);
     rpcMock = sandbox.mock(rpc);
     uriMock = sandbox.mock(vscode.Uri);
-    fsMock = sandbox.mock(fs);
+    fsMock = sandbox.mock(events["fs"]);
   });
 
   afterEach(() => {
