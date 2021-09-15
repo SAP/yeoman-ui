@@ -197,11 +197,10 @@ export class VSCodeYouiEvents implements YouiEvents {
 
   private createNewWorkspaceFile(targetFolderPath: string): vscode.Uri {
     const wsFilePath = this.getUniqWorkspaceFilePath();
-    // targetFolderPath should contain only slashes
-    // all backlsashes are replaced
+    const filePath = this.isInBAS ? `file://${targetFolderPath}` : `${targetFolderPath.replace(/\\/g, "\\\\")}`;
     const fileContent: string = `{
       "folders": [{
-        "path": "${targetFolderPath.replace(/\\/g, "/")}" 
+        "path": "${filePath}" 
       }],
       "settings": {
         "actions": []
