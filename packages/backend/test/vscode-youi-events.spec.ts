@@ -422,7 +422,7 @@ describe("vscode-youi-events unit test", () => {
     it("is in BAS, workspace file does not exist", () => {
       events["isInBAS"] = true;
       const targetFolerPath = "targetFolerPath";
-      const expectedWsFilePath = path.join(YeomanUI["PROJECTS"], `workspace.theia-workspace`);
+      const expectedWsFilePath = path.join(YeomanUI["PROJECTS"], `${events["getWsFileName"]()}.theia-workspace`);
       uriMock.expects("file").withArgs(expectedWsFilePath);
       fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
       fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
@@ -434,10 +434,11 @@ describe("vscode-youi-events unit test", () => {
       events["isInBAS"] = true;
       const targetFolerPath = "targetFolerPath";
 
-      const existingWsFilePath = path.join(YeomanUI["PROJECTS"], `workspace.theia-workspace`);
+      const wsFileName = events["getWsFileName"]();
+      const existingWsFilePath = path.join(YeomanUI["PROJECTS"], `${wsFileName}.theia-workspace`);
       fsMock.expects("existsSync").withArgs(existingWsFilePath).returns(true);
 
-      const expectedWsFilePath = path.join(YeomanUI["PROJECTS"], `workspace.1.theia-workspace`);
+      const expectedWsFilePath = path.join(YeomanUI["PROJECTS"], `${wsFileName}.1.theia-workspace`);
       fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
       fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
       uriMock.expects("file").withArgs(expectedWsFilePath);
@@ -448,7 +449,7 @@ describe("vscode-youi-events unit test", () => {
     it("is not in BAS, workspace file does not exist", () => {
       events["isInBAS"] = false;
       const targetFolerPath = "targetFolerPath";
-      const expectedWsFilePath = path.join(YeomanUI["PROJECTS"], `${process.env.USERNAME}.code-workspace`);
+      const expectedWsFilePath = path.join(YeomanUI["PROJECTS"], `${events["getWsFileName"]()}.code-workspace`);
       uriMock.expects("file").withArgs(expectedWsFilePath);
       fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
       fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
@@ -460,10 +461,11 @@ describe("vscode-youi-events unit test", () => {
       events["isInBAS"] = false;
       const targetFolerPath = "targetFolerPath";
 
-      const existingWsFilePath = path.join(YeomanUI["PROJECTS"], `${process.env.USERNAME}.code-workspace`);
+      const wsFileName = events["getWsFileName"]();
+      const existingWsFilePath = path.join(YeomanUI["PROJECTS"], `${wsFileName}.code-workspace`);
       fsMock.expects("existsSync").withArgs(existingWsFilePath).returns(true);
 
-      const expectedWsFilePath = path.join(YeomanUI["PROJECTS"], `${process.env.USERNAME}.1.code-workspace`);
+      const expectedWsFilePath = path.join(YeomanUI["PROJECTS"], `${wsFileName}.1.code-workspace`);
       fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
       fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
       uriMock.expects("file").withArgs(expectedWsFilePath);

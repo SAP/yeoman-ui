@@ -208,13 +208,15 @@ export class VSCodeYouiEvents implements YouiEvents {
   }
 
   private createWsFilePath(counter?: number): string {
-    const defaultName = "workspace";
     const wsFileExt = this.isInBAS ? "theia-workspace" : "code-workspace";
-    const wsFileName = this.isInBAS
-      ? get(process, "env.WORKSPACE_ID", defaultName)
-      : get(process, "env.USERNAME", defaultName);
+    const wsFileName = this.getWsFileName();
     const counterStr = counter ? `.${counter}.` : `.`;
     return path.join(YeomanUI["PROJECTS"], `${wsFileName}${counterStr}${wsFileExt}`);
+  }
+
+  private getWsFileName(): string {
+    const defaultName = "workspace";
+    return this.isInBAS ? get(process, "env.WORKSPACE_ID", defaultName) : get(process, "env.USERNAME", defaultName);
   }
 
   private getUniqWorkspaceFilePath(): string {
