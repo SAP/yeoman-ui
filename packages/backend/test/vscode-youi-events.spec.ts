@@ -362,7 +362,7 @@ describe("vscode-youi-events unit test", () => {
       workspaceMock.expects("updateWorkspaceFolders").withArgs(0, null);
       fsMock.expects("existsSync").returns(false);
       fsMock.expects("writeFileSync");
-      uriMock.expects("file").twice().returns({});
+      uriMock.expects("file").twice().returns({ fsPath: "testFsPath" });
       return events.doGeneratorDone(
         true,
         "success message",
