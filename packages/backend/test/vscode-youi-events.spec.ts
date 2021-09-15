@@ -10,7 +10,7 @@ import { YeomanUI } from "../src/yeomanui";
 import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { VSCodeYouiEvents } from "../src/vscode-youi-events";
 import * as path from "path";
-import * as fs from "fs";
+const fs = require("fs");
 
 describe("vscode-youi-events unit test", () => {
   let events: VSCodeYouiEvents;
@@ -360,8 +360,8 @@ describe("vscode-youi-events unit test", () => {
         .resolves();
       commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
       workspaceMock.expects("updateWorkspaceFolders").withArgs(0, null);
-      eventsMock.expects("existsSync").returns(false);
-      eventsMock.expects("writeFileSync");
+      fsMock.expects("existsSync").returns(false);
+      fsMock.expects("writeFileSync");
       uriMock.expects("file").twice().returns({});
       return events.doGeneratorDone(
         true,

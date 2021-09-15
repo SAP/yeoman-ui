@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { isEmpty, size, isNil, get } from "lodash";
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-import * as fs from "fs";
+const fs = require("fs");
 import * as path from "path";
 import { GeneratorOutput } from "./vscode-output";
 import { IChildLogger } from "@vscode-logging/logger";
@@ -203,16 +203,8 @@ export class VSCodeYouiEvents implements YouiEvents {
       }]
     }`;
 
-    this.writeFileSync(wsFilePath, fileContent);
+    fs.writeFileSync(wsFilePath, fileContent);
     return vscode.Uri.file(wsFilePath);
-  }
-
-  private writeFileSync(filePath: string, fileContent: string): void {
-    fs.writeFileSync(filePath, fileContent, "utf-8");
-  }
-
-  private existsSync(filePath: string): boolean {
-    return fs.existsSync(filePath);
   }
 
   private createWsFilePath(counter?: number): string {
@@ -229,7 +221,7 @@ export class VSCodeYouiEvents implements YouiEvents {
     let wsFilePath = this.createWsFilePath();
 
     let counter = 0;
-    while (this.existsSync(wsFilePath)) {
+    while (fs.existsSync(wsFilePath)) {
       wsFilePath = this.createWsFilePath(++counter);
     }
 
