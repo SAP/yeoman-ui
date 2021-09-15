@@ -197,6 +197,8 @@ export class VSCodeYouiEvents implements YouiEvents {
 
   private createNewWorkspaceFile(targetFolderPath: string): vscode.Uri {
     const wsFilePath = this.getUniqWorkspaceFilePath();
+    // in theia it looks like: file:///folder1/folder2/file
+    // in vscode it looks like: c:\\folder1\folder2\file
     const filePath = this.isInBAS ? `file://${targetFolderPath}` : `${targetFolderPath.replace(/\\/g, "\\\\")}`;
     const fileContent: string = `{
       "folders": [{
@@ -205,7 +207,7 @@ export class VSCodeYouiEvents implements YouiEvents {
       "settings": {
         "actions": []
       }
-  }`;
+}`;
 
     fs.writeFileSync(wsFilePath, fileContent);
     return vscode.Uri.file(wsFilePath);

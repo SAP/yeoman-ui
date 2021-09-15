@@ -311,7 +311,6 @@ describe("yeomanui unit test", () => {
     envUtilsMock.expects("getGeneratorsData").resolves();
     rpcMock.expects("invoke").withArgs("updateGeneratorsPrompt");
     wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns({});
-    // _.set(vscode, "workspace.workspaceFolders[0].uri.fsPath", undefined);
     await yeomanUi._notifyGeneratorsChange();
   });
 
