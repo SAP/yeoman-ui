@@ -42,7 +42,6 @@ export class VSCodeYouiEvents implements YouiEvents {
   private readonly logger: IChildLogger;
   private isInBAS: boolean; // eslint-disable-line @typescript-eslint/prefer-readonly
   private readonly appWizard: AppWizard;
-  private fs: any;
 
   constructor(rpc: IRpc, webviewPanel: vscode.WebviewPanel, messages: any, output: GeneratorOutput, isInBAS: boolean) {
     this.rpc = rpc;
@@ -52,7 +51,6 @@ export class VSCodeYouiEvents implements YouiEvents {
     this.logger = getClassLogger("VSCodeYouiEvents");
     this.isInBAS = isInBAS;
     this.appWizard = new YoUiAppWizard(this);
-    this.fs = fs;
   }
 
   public doGeneratorDone(
@@ -187,7 +185,7 @@ export class VSCodeYouiEvents implements YouiEvents {
           uri: targetFolderUri,
         });
         if (wsFoldersQuantity === 0) {
-          const workspaceFileUri = this.createNewWorkspaceFileUri(targetFolderUri.fsPath);
+          const workspaceFileUri = this.createNewWorkspaceFile(targetFolderUri.fsPath);
           void vscode.commands.executeCommand("vscode.openFolder", workspaceFileUri);
         }
       }
@@ -197,16 +195,24 @@ export class VSCodeYouiEvents implements YouiEvents {
     return vscode.window.showErrorMessage(errorMmessage);
   }
 
-  private createNewWorkspaceFileUri(targetFolderPath: string): vscode.Uri {
-    const wsFilePath = this.getUniqWrokspaceFilePath();
+  private createNewWorkspaceFile(targetFolderPath: string): vscode.Uri {
+    const wsFilePath = this.getUniqWorkspaceFilePath();
     const fileContent: string = `{
       "folders": [{
         "path": "${targetFolderPath}"
       }]
     }`;
 
-    this.fs.writeFileSync(wsFilePath, fileContent, "utf-8");
+    this.writeFileSync(wsFilePath, fileContent);
     return vscode.Uri.file(wsFilePath);
+  }
+
+  private writeFileSync(filePath: string, fileContent: string): void {
+    fs.writeFileSync(filePath, fileContent, "utf-8");
+  }
+
+  private existsSync(filePath: string): boolean {
+    return fs.existsSync(filePath);
   }
 
   private createWsFilePath(counter?: number): string {
@@ -219,11 +225,11 @@ export class VSCodeYouiEvents implements YouiEvents {
     return path.join(YeomanUI["PROJECTS"], `${wsFileName}${counterStr}${wsFileExt}`);
   }
 
-  private getUniqWrokspaceFilePath(): string {
+  private getUniqWorkspaceFilePath(): string {
     let wsFilePath = this.createWsFilePath();
 
     let counter = 0;
-    while (this.fs.existsSync(wsFilePath)) {
+    while (this.existsSync(wsFilePath)) {
       wsFilePath = this.createWsFilePath(++counter);
     }
 

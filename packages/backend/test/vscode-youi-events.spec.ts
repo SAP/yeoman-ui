@@ -10,6 +10,7 @@ import { YeomanUI } from "../src/yeomanui";
 import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { VSCodeYouiEvents } from "../src/vscode-youi-events";
 import * as path from "path";
+import * as fs from "fs";
 
 describe("vscode-youi-events unit test", () => {
   let events: VSCodeYouiEvents;
@@ -96,7 +97,7 @@ describe("vscode-youi-events unit test", () => {
     loggerMock = sandbox.mock(testLogger);
     rpcMock = sandbox.mock(rpc);
     uriMock = sandbox.mock(vscode.Uri);
-    fsMock = sandbox.mock(events["fs"]);
+    fsMock = sandbox.mock(fs);
   });
 
   afterEach(() => {
@@ -359,8 +360,8 @@ describe("vscode-youi-events unit test", () => {
         .resolves();
       commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
       workspaceMock.expects("updateWorkspaceFolders").withArgs(0, null);
-      fsMock.expects("existsSync").returns(false);
-      fsMock.expects("writeFileSync");
+      eventsMock.expects("existsSync").returns(false);
+      eventsMock.expects("writeFileSync");
       uriMock.expects("file").twice().returns({});
       return events.doGeneratorDone(
         true,
@@ -426,7 +427,7 @@ describe("vscode-youi-events unit test", () => {
       fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
       fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
 
-      events["createNewWorkspaceFileUri"](targetFolerPath);
+      events["createNewWorkspaceFile"](targetFolerPath);
     });
 
     it("is in BAS, workspace file exists", () => {
@@ -438,9 +439,10 @@ describe("vscode-youi-events unit test", () => {
 
       const expectedWsFilePath = path.join(YeomanUI["PROJECTS"], `workspace.1.theia-workspace`);
       fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
+      fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
       uriMock.expects("file").withArgs(expectedWsFilePath);
 
-      events["createNewWorkspaceFileUri"](targetFolerPath);
+      events["createNewWorkspaceFile"](targetFolerPath);
     });
 
     it("is not in BAS, workspace file does not exist", () => {
@@ -451,7 +453,7 @@ describe("vscode-youi-events unit test", () => {
       fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
       fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
 
-      events["createNewWorkspaceFileUri"](targetFolerPath);
+      events["createNewWorkspaceFile"](targetFolerPath);
     });
 
     it("is not in BAS, workspace file exists", () => {
@@ -463,9 +465,10 @@ describe("vscode-youi-events unit test", () => {
 
       const expectedWsFilePath = path.join(YeomanUI["PROJECTS"], `${process.env.USERNAME}.1.code-workspace`);
       fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
+      fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
       uriMock.expects("file").withArgs(expectedWsFilePath);
 
-      events["createNewWorkspaceFileUri"](targetFolerPath);
+      events["createNewWorkspaceFile"](targetFolerPath);
     });
   });
 });
