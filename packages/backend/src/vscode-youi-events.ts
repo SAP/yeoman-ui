@@ -222,7 +222,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 
   private getWsFileName(): string {
     const defaultName = "workspace";
-    return this.isInBAS ? get(process, "env.WORKSPACE_ID", defaultName) : get(process, "env.USERNAME", defaultName);
+    return get(process, this.isInBAS ? "env.WORKSPACE_ID" : "env.USERNAME", defaultName);
   }
 
   private getUniqWorkspaceFilePath(): string {
