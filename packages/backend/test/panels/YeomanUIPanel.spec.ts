@@ -4,6 +4,7 @@ import { createSandbox, SinonSandbox, SinonMock, SinonStub } from "sinon";
 import * as _ from "lodash";
 import * as YeomanUIPanel from "../../src/panels/YeomanUIPanel";
 import { Env } from "../../src/utils/env";
+import { Constants } from "../../src/utils/constants";
 import { NpmCommand } from "../../src/utils/npm";
 
 describe("YeomanUIPanel unit test", () => {
@@ -64,7 +65,7 @@ describe("YeomanUIPanel unit test", () => {
   describe("loadWebviewPanel", () => {
     describe("in VSCODE", () => {
       beforeEach(() => {
-        panel["isInBAS"] = false;
+        Constants["IS_IN_BAS"] = false;
       });
 
       it("generator is not provided, in VSCODE", () => {
@@ -99,7 +100,7 @@ describe("YeomanUIPanel unit test", () => {
 
     describe("in BAS", () => {
       beforeEach(() => {
-        panel["isInBAS"] = true;
+        Constants["IS_IN_BAS"] = true;
       });
 
       it("generator is not provided", () => {

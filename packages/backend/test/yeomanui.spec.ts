@@ -17,6 +17,7 @@ import { AppWizard, MessageType } from "@sap-devx/yeoman-ui-types";
 import { Env } from "../src/utils/env";
 import Environment = require("yeoman-environment");
 import { createFlowPromise } from "../src/utils/promise";
+import { Constants } from "../src/utils/constants";
 
 describe("yeomanui unit test", () => {
   let sandbox: SinonSandbox;
@@ -728,7 +729,7 @@ describe("yeomanui unit test", () => {
     expect(yeomanUiInstance["getCwd"]()).equal("testpathafter");
 
     yeomanUiInstance["setCwd"](undefined);
-    expect(yeomanUiInstance["getCwd"]()).equal(YeomanUI["PROJECTS"]);
+    expect(yeomanUiInstance["getCwd"]()).equal(Constants["HOMEDIR_PROJECTS"]);
   });
 
   it("defaultOutputPath", () => {
@@ -741,8 +742,8 @@ describe("yeomanui unit test", () => {
       undefined,
       flowPromise.state
     );
-    const projectsPath = path.join(homedir(), "projects");
-    expect(yeomanUiInstance["getCwd"]()).equal(projectsPath);
+
+    expect(yeomanUiInstance["getCwd"]()).equal(Constants.HOMEDIR_PROJECTS);
   });
 
   it("getErrorInfo", () => {

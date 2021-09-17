@@ -13,6 +13,7 @@ import { Env } from "../utils/env";
 import { getWebviewRpcLibraryLogger } from "../logger/logger-wrapper";
 import { homedir } from "os";
 import { NpmCommand } from "../utils/npm";
+import { Constants } from "../utils/constants";
 
 export class YeomanUIPanel extends AbstractWebviewPanel {
   public static YEOMAN_UI = "Application Wizard";
@@ -51,7 +52,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   }
 
   private async tryToInstallGenerator(genNamespace: string) {
-    if (!this.isInBAS) {
+    if (!Constants.IS_IN_BAS) {
       await NpmCommand.checkAccessAndSetGeneratorsPath();
       const genFullName = Env.getGeneratorFullName(genNamespace);
       await vscode.commands.executeCommand("exploreGenerators", {
@@ -77,17 +78,11 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 
     this.rpc = new RpcExtension(this.webViewPanel.webview, getWebviewRpcLibraryLogger());
     this.output.setChannelName(`${YeomanUIPanel.YEOMAN_UI}.${this.messages.channel_name}`);
-    const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(
-      this.rpc,
-      this.webViewPanel,
-      this.messages,
-      this.output,
-      this.isInBAS
-    );
+    const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.webViewPanel, this.messages, this.output);
 
     this.initWebviewPanel();
 
-    const outputPath = this.isInBAS ? undefined : get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
+    const outputPath = Constants.IS_IN_BAS ? undefined : get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
     this.yeomanui = new YeomanUI(
       this.rpc,
       vscodeYouiEvents,

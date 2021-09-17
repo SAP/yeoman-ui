@@ -11,6 +11,7 @@ import * as path from "path";
 import * as npmFetch from "npm-registry-fetch";
 import { LookupGeneratorMeta } from "yeoman-environment";
 import { getConsoleWarnLogger } from "../logger/console-logger";
+import { Constants } from "./constants";
 
 const promisifiedExec = promisify(exec);
 
@@ -37,12 +38,10 @@ const HAS_ACCESS = "Has Access";
 class Command {
   private globalNodeModulesPathPromise: Promise<string>;
   private readonly SET_DEFAULT_LOCATION;
-  private isInBAS: boolean;
 
   constructor() {
     this.setGlobalNodeModulesPath();
     this.SET_DEFAULT_LOCATION = messages.set_default_location(customLocation.DEFAULT_LOCATION);
-    this.isInBAS = !_.isEmpty(_.get(process, "env.WS_BASE_URL"));
   }
 
   private setGlobalNodeModulesPath() {
@@ -195,7 +194,7 @@ class Command {
   }
 
   public async checkAccessAndSetGeneratorsPath() {
-    if (!this.isInBAS) {
+    if (!Constants.IS_IN_BAS) {
       const accessResult = await this.getAccessResult();
       const globalPath = await this.getGlobalPath();
       if (accessResult === messages.change_owner_for_global(globalPath)) {

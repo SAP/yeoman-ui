@@ -16,13 +16,13 @@ import { IPrompt, MessageType } from "@sap-devx/yeoman-ui-types";
 import { SWA } from "./swa-tracker/swa-tracker-wrapper";
 import { Output } from "./output";
 import { resolve } from "path";
-import { homedir } from "os";
 import { Env, EnvGen, GeneratorData, GeneratorNotFoundError } from "./utils/env";
 import { vscode, getVscode } from "./utils/vscodeProxy";
 import * as Generator from "yeoman-generator";
 import * as Environment from "yeoman-environment";
 import { Questions } from "yeoman-environment/lib/adapter";
 import { State } from "./utils/promise";
+import { Constants } from "./utils/constants";
 
 export interface IQuestionsPrompt extends IPrompt {
   questions: any[];
@@ -32,7 +32,6 @@ export class YeomanUI {
   private static readonly defaultMessage =
     "Some quick example text of the generator description. This is a long text so that the example will look good.";
   private static readonly YEOMAN_PNG = "yeoman.png";
-  private static readonly PROJECTS: string = path.join(homedir(), "projects");
 
   private static funcReplacer(key: any, value: any) {
     return _.isFunction(value) ? "__Function" : value;
@@ -69,7 +68,7 @@ export class YeomanUI {
     output: Output,
     logger: IChildLogger,
     uiOptions: any,
-    outputPath: string = YeomanUI.PROJECTS,
+    outputPath: string = Constants.HOMEDIR_PROJECTS,
     flowState: State<void>
   ) {
     this.rpc = rpc;
@@ -345,7 +344,7 @@ export class YeomanUI {
   }
 
   private setCwd(cwd: string) {
-    this.cwd = cwd || YeomanUI.PROJECTS;
+    this.cwd = cwd || Constants.HOMEDIR_PROJECTS;
   }
 
   private getCwd(): string {

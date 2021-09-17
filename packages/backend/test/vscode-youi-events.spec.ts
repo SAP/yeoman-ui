@@ -6,10 +6,9 @@ import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/
 import * as messages from "../src/messages";
 import { MessageType, Severity } from "@sap-devx/yeoman-ui-types";
 import { GeneratorOutput } from "../src/vscode-output";
-import { YeomanUI } from "../src/yeomanui";
+import { Constants } from "../src/utils/constants";
 import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { VSCodeYouiEvents } from "../src/vscode-youi-events";
-import * as path from "path";
 import * as fs from "fs";
 
 describe("vscode-youi-events unit test", () => {
@@ -88,7 +87,7 @@ describe("vscode-youi-events unit test", () => {
     const webViewPanel: any = { dispose: () => true };
     loggerWrapperMock = sandbox.mock(loggerWrapper);
     loggerWrapperMock.expects("getClassLogger").returns(testLogger);
-    events = new VSCodeYouiEvents(rpc, webViewPanel, messages.default, generatorOutput, true);
+    events = new VSCodeYouiEvents(rpc, webViewPanel, messages.default, generatorOutput);
     windowMock = sandbox.mock(vscode.window);
     commandsMock = sandbox.mock(vscode.commands);
     workspaceMock = sandbox.mock(vscode.workspace);
@@ -116,7 +115,7 @@ describe("vscode-youi-events unit test", () => {
   describe("getAppWizard", () => {
     it("error notification message on BAS", () => {
       const message = "error notification message";
-      events["isInBAS"] = true;
+      Constants["IS_IN_BAS"] = true;
       const appWizard = events.getAppWizard();
       generatorOutputMock.expects("appendLine").withExactArgs(message);
       windowMock.expects("showErrorMessage").withExactArgs(message);
@@ -125,7 +124,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("warning notification message on BAS", () => {
       const message = "warning notification message";
-      events["isInBAS"] = true;
+      Constants["IS_IN_BAS"] = true;
       const appWizard = events.getAppWizard();
       generatorOutputMock.expects("appendLine").withExactArgs(message);
       windowMock.expects("showWarningMessage").withExactArgs(message);
@@ -134,7 +133,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("information notification message on BAS", () => {
       const message = "information notification message";
-      events["isInBAS"] = true;
+      Constants["IS_IN_BAS"] = true;
       const appWizard = events.getAppWizard();
       generatorOutputMock.expects("appendLine").withExactArgs(message);
       windowMock.expects("showInformationMessage").withExactArgs(message);
@@ -143,7 +142,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("error prompt message on BAS", () => {
       const message = "error prompt message";
-      events["isInBAS"] = true;
+      Constants["IS_IN_BAS"] = true;
       const appWizard = events.getAppWizard();
       generatorOutputMock.expects("appendLine").withExactArgs(message);
       events["getMessageImage"] = () => "errorTheia";
@@ -153,7 +152,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("warning prompt message on BAS", () => {
       const message = "warning prompt message";
-      events["isInBAS"] = true;
+      Constants["IS_IN_BAS"] = true;
       const appWizard = events.getAppWizard();
       generatorOutputMock.expects("appendLine").withExactArgs(message);
       events["getMessageImage"] = () => "warnTheia";
@@ -163,7 +162,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("information prompt message on BAS", () => {
       const message = "information prompt message";
-      events["isInBAS"] = true;
+      Constants["IS_IN_BAS"] = true;
       const appWizard = events.getAppWizard();
       generatorOutputMock.expects("appendLine").withExactArgs(message);
       events["getMessageImage"] = () => "infoTheia";
@@ -173,7 +172,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("error message with location prompt on vscode", () => {
       const message = "error prompt message";
-      events["isInBAS"] = false;
+      Constants["IS_IN_BAS"] = false;
       const appWizard = events.getAppWizard();
       events["getMessageImage"] = () => "errorVSCodeDark";
       generatorOutputMock.expects("appendLine").withExactArgs(message);
@@ -183,7 +182,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("warning message with location prompt on vscode", () => {
       const message = "warning prompt message";
-      events["isInBAS"] = false;
+      Constants["IS_IN_BAS"] = false;
       const appWizard = events.getAppWizard();
       events["getMessageImage"] = () => "warnVSCode";
       generatorOutputMock.expects("appendLine").withExactArgs(message);
@@ -193,7 +192,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("info message with location prompt on vscode", () => {
       const message = "information prompt message";
-      events["isInBAS"] = false;
+      Constants["IS_IN_BAS"] = false;
       const appWizard = events.getAppWizard();
       events["getMessageImage"] = () => "infoVSCode";
       generatorOutputMock.expects("appendLine").withExactArgs(message);
@@ -415,62 +414,6 @@ describe("vscode-youi-events unit test", () => {
       eventsMock.expects("doClose");
       windowMock.expects("showErrorMessage").withExactArgs("error message");
       return events.doGeneratorDone(false, "error message", createAndClose, "files");
-    });
-  });
-
-  describe("createNewWorkspaceFileUri", () => {
-    it("is in BAS, workspace file does not exist", () => {
-      events["isInBAS"] = true;
-      const targetFolerPath = "targetFolerPath";
-      const expectedWsFilePath = path.join(YeomanUI["PROJECTS"], `${events["getWsFileName"]()}.theia-workspace`);
-      uriMock.expects("file").withArgs(expectedWsFilePath);
-      fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
-      fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
-
-      events["createNewWorkspaceFile"](targetFolerPath);
-    });
-
-    it("is in BAS, workspace file exists", () => {
-      events["isInBAS"] = true;
-      const targetFolerPath = "targetFolerPath";
-
-      const wsFileName = events["getWsFileName"]();
-      const existingWsFilePath = path.join(YeomanUI["PROJECTS"], `${wsFileName}.theia-workspace`);
-      fsMock.expects("existsSync").withArgs(existingWsFilePath).returns(true);
-
-      const expectedWsFilePath = path.join(YeomanUI["PROJECTS"], `${wsFileName}.1.theia-workspace`);
-      fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
-      fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
-      uriMock.expects("file").withArgs(expectedWsFilePath);
-
-      events["createNewWorkspaceFile"](targetFolerPath);
-    });
-
-    it("is not in BAS, workspace file does not exist", () => {
-      events["isInBAS"] = false;
-      const targetFolerPath = "targetFolerPath";
-      const expectedWsFilePath = path.join(YeomanUI["PROJECTS"], `${events["getWsFileName"]()}.code-workspace`);
-      uriMock.expects("file").withArgs(expectedWsFilePath);
-      fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
-      fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
-
-      events["createNewWorkspaceFile"](targetFolerPath);
-    });
-
-    it("is not in BAS, workspace file exists", () => {
-      events["isInBAS"] = false;
-      const targetFolerPath = "targetFolerPath";
-
-      const wsFileName = events["getWsFileName"]();
-      const existingWsFilePath = path.join(YeomanUI["PROJECTS"], `${wsFileName}.code-workspace`);
-      fsMock.expects("existsSync").withArgs(existingWsFilePath).returns(true);
-
-      const expectedWsFilePath = path.join(YeomanUI["PROJECTS"], `${wsFileName}.1.code-workspace`);
-      fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
-      fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
-      uriMock.expects("file").withArgs(expectedWsFilePath);
-
-      events["createNewWorkspaceFile"](targetFolerPath);
     });
   });
 });

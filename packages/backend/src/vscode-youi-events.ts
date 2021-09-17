@@ -1,15 +1,13 @@
 import * as vscode from "vscode";
-import { isEmpty, size, isNil, get } from "lodash";
+import { isEmpty, size, isNil } from "lodash";
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-import * as fs from "fs";
-import * as path from "path";
 import { GeneratorOutput } from "./vscode-output";
 import { IChildLogger } from "@vscode-logging/logger";
 import { getClassLogger } from "./logger/logger-wrapper";
 import { getImage } from "./images/messageImages";
 import { AppWizard, MessageType, Severity } from "@sap-devx/yeoman-ui-types";
-import { YeomanUI } from "./yeomanui";
+import { WorkspaceFile } from "./utils/workspaceFile";
 
 class YoUiAppWizard extends AppWizard {
   constructor(private readonly events: VSCodeYouiEvents) {
@@ -40,16 +38,14 @@ export class VSCodeYouiEvents implements YouiEvents {
   private resolveFunc: any;
   public output: GeneratorOutput;
   private readonly logger: IChildLogger;
-  private isInBAS: boolean; // eslint-disable-line @typescript-eslint/prefer-readonly
   private readonly appWizard: AppWizard;
 
-  constructor(rpc: IRpc, webviewPanel: vscode.WebviewPanel, messages: any, output: GeneratorOutput, isInBAS: boolean) {
+  constructor(rpc: IRpc, webviewPanel: vscode.WebviewPanel, messages: any, output: GeneratorOutput) {
     this.rpc = rpc;
     this.webviewPanel = webviewPanel;
     this.messages = messages;
     this.output = output;
     this.logger = getClassLogger("VSCodeYouiEvents");
-    this.isInBAS = isInBAS;
     this.appWizard = new YoUiAppWizard(this);
   }
 
@@ -78,7 +74,7 @@ export class VSCodeYouiEvents implements YouiEvents {
   }
 
   private getMessageImage(state: Severity): any {
-    return getImage(state, this.isInBAS);
+    return getImage(state);
   }
 
   private showPromptMessage(message: string, state: Severity) {
@@ -185,7 +181,7 @@ export class VSCodeYouiEvents implements YouiEvents {
           uri: targetFolderUri,
         });
         if (wsFoldersQuantity === 0) {
-          const workspaceFileUri = this.createNewWorkspaceFile(targetFolderUri.fsPath);
+          const workspaceFileUri = WorkspaceFile.create(targetFolderUri.fsPath);
           void vscode.commands.executeCommand("vscode.openFolder", workspaceFileUri);
         }
       }
@@ -193,47 +189,6 @@ export class VSCodeYouiEvents implements YouiEvents {
       return vscode.window.showInformationMessage(successInfoMessage);
     }
     return vscode.window.showErrorMessage(errorMmessage);
-  }
-
-  private createNewWorkspaceFile(targetFolderPath: string): vscode.Uri {
-    const wsFilePath = this.getUniqWorkspaceFilePath();
-    // in theia it looks like: file:///folder1/folder2/file
-    // in vscode it looks like: c:\\folder1\folder2\file
-    const filePath = this.isInBAS ? `file://${targetFolderPath}` : `${targetFolderPath.replace(/\\/g, "\\\\")}`;
-    const fileContent: string = `{
-      "folders": [{
-        "path": "${filePath}" 
-      }],
-      "settings": {
-        "actions": []
-      }
-}`;
-
-    fs.writeFileSync(wsFilePath, fileContent);
-    return vscode.Uri.file(wsFilePath);
-  }
-
-  private createWsFilePath(counter?: number): string {
-    const wsFileExt = this.isInBAS ? "theia-workspace" : "code-workspace";
-    const wsFileName = this.getWsFileName();
-    const counterStr = counter ? `.${counter}.` : `.`;
-    return path.join(YeomanUI["PROJECTS"], `${wsFileName}${counterStr}${wsFileExt}`);
-  }
-
-  private getWsFileName(): string {
-    const defaultName = "workspace";
-    return get(process, this.isInBAS ? "env.WORKSPACE_ID" : "env.USERNAME", defaultName);
-  }
-
-  private getUniqWorkspaceFilePath(): string {
-    let wsFilePath = this.createWsFilePath();
-
-    let counter = 0;
-    while (fs.existsSync(wsFilePath)) {
-      wsFilePath = this.createWsFilePath(++counter);
-    }
-
-    return wsFilePath;
   }
 
   private getSuccessInfoMessage(selectedWorkspace: string, type: string): string {

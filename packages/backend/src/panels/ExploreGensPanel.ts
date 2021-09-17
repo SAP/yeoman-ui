@@ -14,7 +14,7 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
     this.viewTitle = messages.default.explore_gens_title;
     this.focusedKey = "exploreGens.Focused";
     this.htmlFileName = join("exploregens", "index.html");
-    this.exploreGens = new ExploreGens(this.logger, this.isInBAS, this.context);
+    this.exploreGens = new ExploreGens(this.logger, this.context);
   }
 
   public setWebviewPanel(webviewPanel: WebviewPanel, uiOptions?: unknown) {

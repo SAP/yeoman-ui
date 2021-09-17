@@ -29,7 +29,7 @@ class ExploreGensWebSocketServer {
       const childLogger: IChildLogger = getConsoleWarnLogger();
       this.rpc = new RpcExtensionWebSockets(ws, childLogger);
 
-      this.exploreGens = new ExploreGens(childLogger, false, vscode.context);
+      this.exploreGens = new ExploreGens(childLogger, vscode.context);
       this.exploreGens.init(this.rpc);
     });
   }
