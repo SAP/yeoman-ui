@@ -8,6 +8,7 @@ import { getClassLogger } from "./logger/logger-wrapper";
 import { getImage } from "./images/messageImages";
 import { AppWizard, MessageType, Severity } from "@sap-devx/yeoman-ui-types";
 import { WorkspaceFile } from "./utils/workspaceFile";
+import _ = require("lodash");
 
 class YoUiAppWizard extends AppWizard {
   constructor(private readonly events: VSCodeYouiEvents) {
@@ -164,23 +165,24 @@ export class VSCodeYouiEvents implements YouiEvents {
     this.resolveInstallingProgress();
 
     if (success) {
-      const targetFolderUri: vscode.Uri = vscode.Uri.file(targetFolderPath);
+      if (!_.isNil(targetFolderPath)) {
+        const targetFolderUri: vscode.Uri = vscode.Uri.file(targetFolderPath);
 
-      const successInfoMessage = this.getSuccessInfoMessage(selectedWorkspace, type);
-
-      if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
-        void vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
-      } else if (selectedWorkspace === this.messages.add_to_workspace) {
-        const wsFoldersQuantity = size(vscode.workspace.workspaceFolders);
-        vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, {
-          uri: targetFolderUri,
-        });
-        if (wsFoldersQuantity === 0) {
-          const workspaceFileUri = WorkspaceFile.create(targetFolderUri.fsPath);
-          void vscode.commands.executeCommand("vscode.openFolder", workspaceFileUri);
+        if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
+          void vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
+        } else if (selectedWorkspace === this.messages.add_to_workspace) {
+          const wsFoldersQuantity = size(vscode.workspace.workspaceFolders);
+          vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, {
+            uri: targetFolderUri,
+          });
+          if (wsFoldersQuantity === 0) {
+            const workspaceFileUri = WorkspaceFile.create(targetFolderUri.fsPath);
+            void vscode.commands.executeCommand("vscode.openFolder", workspaceFileUri);
+          }
         }
       }
 
+      const successInfoMessage = this.getSuccessInfoMessage(selectedWorkspace, type);
       return vscode.window.showInformationMessage(successInfoMessage);
     }
 
