@@ -1,7 +1,6 @@
 import { vscode } from "../mockUtil";
 import * as loggerWrapper from "../../src/logger/logger-wrapper";
 import { createSandbox, SinonSandbox, SinonMock, SinonStub } from "sinon";
-import * as _ from "lodash";
 import * as YeomanUIPanel from "../../src/panels/YeomanUIPanel";
 import { Env } from "../../src/utils/env";
 import { Constants } from "../../src/utils/constants";

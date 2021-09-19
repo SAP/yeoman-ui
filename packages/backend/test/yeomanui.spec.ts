@@ -4,7 +4,6 @@ const datauri = require("datauri"); // eslint-disable-line @typescript-eslint/no
 import { promises } from "fs";
 import { expect } from "chai";
 import * as _ from "lodash";
-import * as path from "path";
 import { YeomanUI } from "../src/yeomanui";
 import { ReplayUtils } from "../src/replayUtils";
 import { YouiEvents } from "../src/youi-events";
