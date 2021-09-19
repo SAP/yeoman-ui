@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { isEmpty, size, isNil } from "lodash";
+import { isEmpty, size } from "lodash";
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorOutput } from "./vscode-output";
