@@ -1,7 +1,7 @@
 {
   "name": "yeoman-ui",
   "displayName": "Application Wizard",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "private": true,
   "description": "Provides rich user experience for Yeoman generators.",
   "categories": [
@@ -194,7 +194,7 @@
     "titleize": "2.1.0",
     "ws": "8.0.0",
     "yeoman-environment": "3.3.0",
-    "yeoman-ui-frontend": "^1.4.0"
+    "yeoman-ui-frontend": "^1.7.0"
   },
   "devDependencies": {
     "@types/inquirer": "^7.3.3",

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.7.0](https://github.com/SAP/yeoman-ui/compare/v1.6.1...v1.7.0) (2021-09-19)
+
+### Bug Fixes
+
+- reduce activation time ([#678](https://github.com/SAP/yeoman-ui/issues/678)) ([4b34268](https://github.com/SAP/yeoman-ui/commit/4b342688f8868a15813bf6c2343b58f9f1601f59))
+- remove rpc timeout event ([#677](https://github.com/SAP/yeoman-ui/issues/677)) ([97b657b](https://github.com/SAP/yeoman-ui/commit/97b657b406e9ad19f049eb5b3619f31814761ec0))
+
+### Features
+
+- open generated project as multi root ([#680](https://github.com/SAP/yeoman-ui/issues/680)) ([5b511b9](https://github.com/SAP/yeoman-ui/commit/5b511b986b0264398131e67746462a230f1c0a6e))
+
 ## [1.6.1](https://github.com/SAP/yeoman-ui/compare/v1.6.0...v1.6.1) (2021-08-06)
 
 **Note:** Version bump only for package root
