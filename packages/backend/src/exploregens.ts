@@ -5,6 +5,7 @@ import { NpmCommand, PackagesData } from "./utils/npm";
 import messages from "./exploreGensMessages";
 import { Env, GeneratorData } from "./utils/env";
 import { vscode } from "./utils/vscodeProxy";
+import { Constants } from "./utils/constants";
 
 type Disposable = {
   dispose(): void;
@@ -25,7 +26,6 @@ export class ExploreGens {
   private gensBeingHandled: any[]; // eslint-disable-line @typescript-eslint/prefer-readonly
   private cachedGeneratorsDataPromise: Promise<GeneratorData[]>;
   private readonly context: any;
-  private isInBAS: boolean; // eslint-disable-line @typescript-eslint/prefer-readonly
 
   private readonly GLOBAL_ACCEPT_LEGAL_NOTE = "global.exploreGens.acceptlegalNote";
   private readonly LAST_AUTO_UPDATE_DATE = "global.exploreGens.lastAutoUpdateDate";
@@ -33,12 +33,11 @@ export class ExploreGens {
   private readonly AUTO_UPDATE = "ApplicationWizard.autoUpdate";
   private readonly ONE_DAY = 1000 * 60 * 60 * 24;
 
-  constructor(logger: IChildLogger, isInBAS: boolean, context?: any) {
+  constructor(logger: IChildLogger, context?: any) {
     this.context = context;
     this.logger = logger;
     this.gensBeingHandled = [];
     void this.doGeneratorsUpdate();
-    this.isInBAS = isInBAS;
   }
 
   public init(rpc: Partial<IRpc>) {
@@ -63,7 +62,7 @@ export class ExploreGens {
   }
 
   private isLegalNoteAccepted() {
-    return this.isInBAS ? this.context.globalState.get(this.GLOBAL_ACCEPT_LEGAL_NOTE, false) : true;
+    return Constants.IS_IN_BAS ? this.context.globalState.get(this.GLOBAL_ACCEPT_LEGAL_NOTE, false) : true;
   }
 
   private async acceptLegalNote() {
@@ -89,7 +88,7 @@ export class ExploreGens {
   }
 
   private getIsInBAS(): boolean {
-    return this.isInBAS;
+    return Constants.IS_IN_BAS;
   }
 
   private initRpc(rpc: Partial<IRpc>) {
@@ -162,7 +161,7 @@ export class ExploreGens {
   }
 
   private getRecommendedQuery(): string[] {
-    const recommended: string[] = this.getWsConfig().get(this.SEARCH_QUERY) || [];
+    const recommended: string[] = this.getWsConfig().get(this.SEARCH_QUERY, []);
     return _.uniq(recommended);
   }
 
@@ -256,9 +255,7 @@ export class ExploreGens {
 
   private updateBeingHandledGenerator(genName: string, state: GenState) {
     try {
-      if (this.rpc) {
-        void this.rpc.invoke("updateBeingHandledGenerator", [genName, state]);
-      }
+      void this.rpc?.invoke("updateBeingHandledGenerator", [genName, state]);
     } catch (error) {
       // error could happen in case that panel was closed by an user but action is still in progress
       // in this case webview is already disposed

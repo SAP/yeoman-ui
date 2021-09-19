@@ -49,6 +49,7 @@ module.exports = {
         "@typescript-eslint/no-unsafe-return": "off",
         "@typescript-eslint/restrict-template-expressions": "off",
         "@typescript-eslint/unbound-method": "off",
+        "@typescript-eslint/no-unused-vars": "error",
         "no-async-promise-executor": "off",
         "no-irregular-whitespace": "off",
         "prefer-rest-params": "off",

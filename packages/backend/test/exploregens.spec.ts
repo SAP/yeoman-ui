@@ -8,7 +8,7 @@ import { NpmCommand, PackagesData } from "../src/utils/npm";
 import { Env, GeneratorData } from "../src/utils/env";
 import { IChildLogger } from "@vscode-logging/logger";
 import { ExploreGens, GenState } from "../src/exploregens";
-import { resolve } from "path";
+import { Constants } from "../src/utils/constants";
 
 describe("exploregens unit test", () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -57,7 +57,7 @@ describe("exploregens unit test", () => {
     windowMock = sandbox.mock(vscode.window);
     commandsMock = sandbox.mock(vscode.commands);
     globalStateMock.expects("get").returns(Date.now());
-    exploregens = new ExploreGens(childLogger as IChildLogger, false, _.get(vscode, "context"));
+    exploregens = new ExploreGens(childLogger as IChildLogger, _.get(vscode, "context"));
     exploregens["initRpc"](rpc);
   });
 
@@ -85,21 +85,24 @@ describe("exploregens unit test", () => {
   });
 
   it("getRecommendedQuery", () => {
-    workspaceConfigMock.expects("get").withExactArgs(exploregens["SEARCH_QUERY"]).returns(["test_value", "test_value"]);
+    workspaceConfigMock
+      .expects("get")
+      .withExactArgs(exploregens["SEARCH_QUERY"], [])
+      .returns(["test_value", "test_value"]);
     const res = exploregens["getRecommendedQuery"]();
     expect(res).to.have.lengthOf(1);
   });
 
   describe("isLegalNoteAccepted", () => {
     it("is in BAS, legal note is accepted", async () => {
-      exploregens["isInBAS"] = true;
+      Constants.IS_IN_BAS = true;
       globalStateMock.expects("get").withExactArgs(exploregens["GLOBAL_ACCEPT_LEGAL_NOTE"], false).returns(true);
       const res = await exploregens["isLegalNoteAccepted"]();
       expect(res).to.be.true;
     });
 
     it("is in BAS, legal note is not accepted", async () => {
-      exploregens["isInBAS"] = true;
+      Constants.IS_IN_BAS = true;
       globalStateMock.expects("get").withExactArgs(exploregens["GLOBAL_ACCEPT_LEGAL_NOTE"], false).returns(false);
       expect(exploregens["getIsInBAS"]()).to.be.true;
       const res = await exploregens["isLegalNoteAccepted"]();
@@ -107,7 +110,7 @@ describe("exploregens unit test", () => {
     });
 
     it("is not in BAS", async () => {
-      exploregens["isInBAS"] = false;
+      Constants.IS_IN_BAS = false;
       globalStateMock.expects("get").never();
       const res = await exploregens["isLegalNoteAccepted"]();
       expect(res).to.be.true;
@@ -301,7 +304,7 @@ describe("exploregens unit test", () => {
       loggerMock.expects("debug").never();
       globalStateMock.expects("update").withArgs(exploregens["LAST_AUTO_UPDATE_DATE"]);
       workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(true);
-      NpmCommand["isInBAS"] = true;
+      Constants.IS_IN_BAS = true;
       envUtilsMock.expects("getGeneratorNamesWithOutdatedVersion").resolves([]);
       await exploregens["doGeneratorsUpdate"]();
     });
@@ -309,7 +312,7 @@ describe("exploregens unit test", () => {
     it("generators auto update is true and getGeneratorNamesWithOutdatedVersion returns a generators list", async () => {
       globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
       workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(true);
-      NpmCommand["isInBAS"] = true;
+      Constants.IS_IN_BAS = true;
       loggerMock.expects("debug").withExactArgs(messages.auto_update_started);
       loggerMock.expects("debug").withExactArgs(messages.updating("generator-aa"));
       loggerMock.expects("debug").withExactArgs(messages.updating("@sap/generator-bb"));
@@ -347,7 +350,7 @@ describe("exploregens unit test", () => {
       const errorMessage = `update failure.`;
       globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
       workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(true);
-      NpmCommand["isInBAS"] = true;
+      Constants.IS_IN_BAS = true;
       loggerMock.expects("debug").withExactArgs(messages.auto_update_started);
       loggerMock.expects("debug").withExactArgs(messages.updating("generator-aa"));
       envUtilsMock.expects("getGeneratorNamesWithOutdatedVersion").resolves(["generator-aa"]);
@@ -384,7 +387,7 @@ describe("exploregens unit test", () => {
       globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
       globalStateMock.expects("update").withArgs(exploregens["LAST_AUTO_UPDATE_DATE"]);
       workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(true);
-      NpmCommand["isInBAS"] = false;
+      Constants.IS_IN_BAS = false;
       const expectedErrorMessage = "Action cancelled";
       const error = new Error(expectedErrorMessage);
       loggerMock.expects("error").withExactArgs(error.stack);

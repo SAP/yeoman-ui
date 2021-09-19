@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
 import { join, sep } from "path";
-import { isEmpty, get } from "lodash";
 import { readFileSync } from "fs";
 import { IChildLogger } from "@vscode-logging/logger";
 import { getClassLogger } from "../logger/logger-wrapper";
@@ -20,7 +19,6 @@ export abstract class AbstractWebviewPanel {
 
   protected readonly logger: IChildLogger;
   protected disposables: vscode.Disposable[];
-  protected isInBAS: boolean;
   protected rpc: RpcExtension;
   protected flowPromise: FlowPromise<void>;
   protected viewColumn: vscode.ViewColumn;
@@ -43,7 +41,6 @@ export abstract class AbstractWebviewPanel {
     this.logger = getClassLogger("AbstractWebviewPanel");
     this.disposables = [];
     this.context = context;
-    this.isInBAS = !isEmpty(get(process, "env.WS_BASE_URL"));
     this.viewColumn = vscode.ViewColumn.One;
   }
 

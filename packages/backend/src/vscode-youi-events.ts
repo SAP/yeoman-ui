@@ -1,13 +1,13 @@
 import * as vscode from "vscode";
-import * as _ from "lodash";
+import { isEmpty, size } from "lodash";
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-import { relative, isAbsolute } from "path";
 import { GeneratorOutput } from "./vscode-output";
 import { IChildLogger } from "@vscode-logging/logger";
 import { getClassLogger } from "./logger/logger-wrapper";
 import { getImage } from "./images/messageImages";
 import { AppWizard, MessageType, Severity } from "@sap-devx/yeoman-ui-types";
+import { WorkspaceFile } from "./utils/workspaceFile";
 
 class YoUiAppWizard extends AppWizard {
   constructor(private readonly events: VSCodeYouiEvents) {
@@ -38,16 +38,14 @@ export class VSCodeYouiEvents implements YouiEvents {
   private resolveFunc: any;
   public output: GeneratorOutput;
   private readonly logger: IChildLogger;
-  private isInBAS: boolean; // eslint-disable-line @typescript-eslint/prefer-readonly
   private readonly appWizard: AppWizard;
 
-  constructor(rpc: IRpc, webviewPanel: vscode.WebviewPanel, messages: any, output: GeneratorOutput, isInBAS: boolean) {
+  constructor(rpc: IRpc, webviewPanel: vscode.WebviewPanel, messages: any, output: GeneratorOutput) {
     this.rpc = rpc;
     this.webviewPanel = webviewPanel;
     this.messages = messages;
     this.output = output;
     this.logger = getClassLogger("VSCodeYouiEvents");
-    this.isInBAS = isInBAS;
     this.appWizard = new YoUiAppWizard(this);
   }
 
@@ -76,7 +74,7 @@ export class VSCodeYouiEvents implements YouiEvents {
   }
 
   private getMessageImage(state: Severity): any {
-    return getImage(state, this.isInBAS);
+    return getImage(state);
   }
 
   private showPromptMessage(message: string, state: Severity) {
@@ -110,7 +108,7 @@ export class VSCodeYouiEvents implements YouiEvents {
     const openOutput: any = this.messages.show_progress_button;
     const buttons: string[] = [];
     buttons.push(openOutput);
-    if (_.isEmpty(message)) {
+    if (isEmpty(message)) {
       message = this.messages.show_progress_message;
     }
     this.output.appendLine(message);
@@ -156,27 +154,6 @@ export class VSCodeYouiEvents implements YouiEvents {
     }
   }
 
-  /**
-   * Returns true in case probablePredecessorPath is the predecessor path of currentPath.
-   * In other words, returns true when currentPath is contained in some place in probablePredecessorPath.
-   * It can not be implemented by currentPath.contains(probablePredecessorPath), because the path can be the following for example (see tests):
-   * /home/user/projects/../projects
-   * /home/user/./projects
-   * And te pathes above are valid.
-   * So we need to use relative() of path.
-   * When relative path starts with '..', it means that the the pathes don't have a common part.
-   * Otherwise, the pathes have a common part and probablePredecessorPath is really predecessor of currentPath.
-   * The check isAbsolute() is needed for the following case (see it("on success, project path and workspace folder are Windows style ---> add to workspace button and open in new workspace button are visible"):
-   * probablePredecessorPath = "C:\\Windows" and currentPath = "D:\\Program Files".
-   *
-   * @param probablePredecessorPath
-   * @param currentPath
-   */
-  private isPredecessorOf(probablePredecessorPath: string, currentPath: string) {
-    const relativePath = relative(probablePredecessorPath, currentPath);
-    return !_.isEmpty(relativePath) && !_.startsWith(relativePath, "..") && !isAbsolute(relativePath);
-  }
-
   private showDoneMessage(
     success: boolean,
     errorMmessage: string,
@@ -187,26 +164,26 @@ export class VSCodeYouiEvents implements YouiEvents {
     this.resolveInstallingProgress();
 
     if (success) {
-      let targetFolderUri: vscode.Uri = null;
-
-      // The correct targetFolderPath is unknown
-      if (!_.isNil(targetFolderPath)) {
-        targetFolderUri = vscode.Uri.file(targetFolderPath);
-      }
+      const targetFolderUri: vscode.Uri = vscode.Uri.file(targetFolderPath);
 
       const successInfoMessage = this.getSuccessInfoMessage(selectedWorkspace, type);
 
       if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
         void vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
       } else if (selectedWorkspace === this.messages.add_to_workspace) {
-        const wsFoldersQuantity = _.size(vscode.workspace.workspaceFolders);
+        const wsFoldersQuantity = size(vscode.workspace.workspaceFolders);
         vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, {
           uri: targetFolderUri,
         });
+        if (wsFoldersQuantity === 0) {
+          const workspaceFileUri = WorkspaceFile.create(targetFolderUri.fsPath);
+          void vscode.commands.executeCommand("vscode.openFolder", workspaceFileUri);
+        }
       }
 
       return vscode.window.showInformationMessage(successInfoMessage);
     }
+
     return vscode.window.showErrorMessage(errorMmessage);
   }
 

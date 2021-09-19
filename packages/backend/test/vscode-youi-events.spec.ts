@@ -1,5 +1,4 @@
 import { vscode } from "./mockUtil";
-
 import { expect } from "chai";
 import { createSandbox, SinonSandbox, SinonMock } from "sinon";
 import * as _ from "lodash";
@@ -7,8 +6,10 @@ import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/
 import * as messages from "../src/messages";
 import { MessageType, Severity } from "@sap-devx/yeoman-ui-types";
 import { GeneratorOutput } from "../src/vscode-output";
+import { Constants } from "../src/utils/constants";
 import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { VSCodeYouiEvents } from "../src/vscode-youi-events";
+import * as fs from "fs";
 
 describe("vscode-youi-events unit test", () => {
   let events: VSCodeYouiEvents;
@@ -21,6 +22,8 @@ describe("vscode-youi-events unit test", () => {
   let generatorOutputMock: SinonMock;
   let rpcMock: SinonMock;
   let loggerMock: SinonMock;
+  let uriMock: SinonMock;
+  let fsMock: SinonMock;
 
   const testLogger = {
     debug: () => true,
@@ -84,7 +87,7 @@ describe("vscode-youi-events unit test", () => {
     const webViewPanel: any = { dispose: () => true };
     loggerWrapperMock = sandbox.mock(loggerWrapper);
     loggerWrapperMock.expects("getClassLogger").returns(testLogger);
-    events = new VSCodeYouiEvents(rpc, webViewPanel, messages.default, generatorOutput, true);
+    events = new VSCodeYouiEvents(rpc, webViewPanel, messages.default, generatorOutput);
     windowMock = sandbox.mock(vscode.window);
     commandsMock = sandbox.mock(vscode.commands);
     workspaceMock = sandbox.mock(vscode.workspace);
@@ -92,6 +95,8 @@ describe("vscode-youi-events unit test", () => {
     generatorOutputMock = sandbox.mock(generatorOutput);
     loggerMock = sandbox.mock(testLogger);
     rpcMock = sandbox.mock(rpc);
+    uriMock = sandbox.mock(vscode.Uri);
+    fsMock = sandbox.mock(fs);
   });
 
   afterEach(() => {
@@ -103,12 +108,14 @@ describe("vscode-youi-events unit test", () => {
     generatorOutputMock.verify();
     loggerMock.verify();
     rpcMock.verify();
+    uriMock.verify();
+    fsMock.verify();
   });
 
   describe("getAppWizard", () => {
     it("error notification message on BAS", () => {
       const message = "error notification message";
-      events["isInBAS"] = true;
+      Constants["IS_IN_BAS"] = true;
       const appWizard = events.getAppWizard();
       generatorOutputMock.expects("appendLine").withExactArgs(message);
       windowMock.expects("showErrorMessage").withExactArgs(message);
@@ -117,7 +124,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("warning notification message on BAS", () => {
       const message = "warning notification message";
-      events["isInBAS"] = true;
+      Constants["IS_IN_BAS"] = true;
       const appWizard = events.getAppWizard();
       generatorOutputMock.expects("appendLine").withExactArgs(message);
       windowMock.expects("showWarningMessage").withExactArgs(message);
@@ -126,7 +133,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("information notification message on BAS", () => {
       const message = "information notification message";
-      events["isInBAS"] = true;
+      Constants["IS_IN_BAS"] = true;
       const appWizard = events.getAppWizard();
       generatorOutputMock.expects("appendLine").withExactArgs(message);
       windowMock.expects("showInformationMessage").withExactArgs(message);
@@ -135,7 +142,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("error prompt message on BAS", () => {
       const message = "error prompt message";
-      events["isInBAS"] = true;
+      Constants["IS_IN_BAS"] = true;
       const appWizard = events.getAppWizard();
       generatorOutputMock.expects("appendLine").withExactArgs(message);
       events["getMessageImage"] = () => "errorTheia";
@@ -145,7 +152,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("warning prompt message on BAS", () => {
       const message = "warning prompt message";
-      events["isInBAS"] = true;
+      Constants["IS_IN_BAS"] = true;
       const appWizard = events.getAppWizard();
       generatorOutputMock.expects("appendLine").withExactArgs(message);
       events["getMessageImage"] = () => "warnTheia";
@@ -155,7 +162,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("information prompt message on BAS", () => {
       const message = "information prompt message";
-      events["isInBAS"] = true;
+      Constants["IS_IN_BAS"] = true;
       const appWizard = events.getAppWizard();
       generatorOutputMock.expects("appendLine").withExactArgs(message);
       events["getMessageImage"] = () => "infoTheia";
@@ -165,7 +172,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("error message with location prompt on vscode", () => {
       const message = "error prompt message";
-      events["isInBAS"] = false;
+      Constants["IS_IN_BAS"] = false;
       const appWizard = events.getAppWizard();
       events["getMessageImage"] = () => "errorVSCodeDark";
       generatorOutputMock.expects("appendLine").withExactArgs(message);
@@ -175,7 +182,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("warning message with location prompt on vscode", () => {
       const message = "warning prompt message";
-      events["isInBAS"] = false;
+      Constants["IS_IN_BAS"] = false;
       const appWizard = events.getAppWizard();
       events["getMessageImage"] = () => "warnVSCode";
       generatorOutputMock.expects("appendLine").withExactArgs(message);
@@ -185,7 +192,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("info message with location prompt on vscode", () => {
       const message = "information prompt message";
-      events["isInBAS"] = false;
+      Constants["IS_IN_BAS"] = false;
       const appWizard = events.getAppWizard();
       events["getMessageImage"] = () => "infoVSCode";
       generatorOutputMock.expects("appendLine").withExactArgs(message);
@@ -214,19 +221,6 @@ describe("vscode-youi-events unit test", () => {
       })
       .resolves();
     events.doGeneratorInstall();
-  });
-
-  it("isPredecessorOf", () => {
-    expect(events["isPredecessorOf"]("/foo", "/foo")).to.be.false;
-    expect(events["isPredecessorOf"]("/foo", "/bar")).to.be.false;
-    expect(events["isPredecessorOf"]("/foo", "/foobar")).to.be.false;
-    expect(events["isPredecessorOf"]("/foo", "/foo/bar")).to.be.true;
-    expect(events["isPredecessorOf"]("/foo", "/foo/../bar")).to.be.false;
-    expect(events["isPredecessorOf"]("/foo", "/foo/./bar")).to.be.true;
-    expect(events["isPredecessorOf"]("/bar/../foo", "/foo/bar")).to.be.true;
-    expect(events["isPredecessorOf"]("/foo", "./bar")).to.be.false;
-    expect(events["isPredecessorOf"]("C:\\Foo", "C:\\Bar")).to.be.false;
-    expect(events["isPredecessorOf"]("C:\\Foo", "D:\\Foo\\Bar")).to.be.false;
   });
 
   describe("showProgress", () => {
@@ -351,6 +345,27 @@ describe("vscode-youi-events unit test", () => {
         true,
         "success message",
         openNewWorkspace,
+        "project",
+        "testDestinationRoot/./projectName"
+      );
+    });
+
+    it("on success, no workspace is opened ---> the project openned in a new multi-root workspace", () => {
+      eventsMock.expects("doClose");
+      _.set(vscode, "workspace.workspaceFolders", []);
+      windowMock
+        .expects("showInformationMessage")
+        .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
+        .resolves();
+      commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
+      workspaceMock.expects("updateWorkspaceFolders").withArgs(0, null);
+      fsMock.expects("existsSync").returns(false);
+      fsMock.expects("writeFileSync");
+      uriMock.expects("file").twice().returns({ fsPath: "testFsPath" });
+      return events.doGeneratorDone(
+        true,
+        "success message",
+        "Open the project in a multi-root workspace",
         "project",
         "testDestinationRoot/./projectName"
       );
