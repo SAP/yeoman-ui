@@ -3,7 +3,12 @@
   "include": ["src/**/*.ts"],
   "exclude": [
     "src/logger/*.ts",
-    "src/utils/*.ts",
+    "src/utils/shellJsWorkarounds.ts",
+    "src/utils/vscodeProxy.ts",
+    "src/utils/env.ts",
+    "src/utils/log.ts",
+    "src/utils/npm.ts",
+    "src/utils/customLocation.ts",
     "src/swa-tracker/*.ts",
     "src/panels/*.ts",
     "src/images/*.ts",
@@ -18,6 +23,6 @@
   "check-coverage": true,
   "branches": 89,
   "lines": 94,
-  "functions": 89,
+  "functions": 90,
   "statements": 94
 }

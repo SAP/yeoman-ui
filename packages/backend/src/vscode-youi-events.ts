@@ -164,12 +164,7 @@ export class VSCodeYouiEvents implements YouiEvents {
     this.resolveInstallingProgress();
 
     if (success) {
-      let targetFolderUri: vscode.Uri = null;
-
-      // The correct targetFolderPath is unknown
-      if (!isNil(targetFolderPath)) {
-        targetFolderUri = vscode.Uri.file(targetFolderPath);
-      }
+      const targetFolderUri: vscode.Uri = vscode.Uri.file(targetFolderPath);
 
       const successInfoMessage = this.getSuccessInfoMessage(selectedWorkspace, type);
 
@@ -188,6 +183,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 
       return vscode.window.showInformationMessage(successInfoMessage);
     }
+
     return vscode.window.showErrorMessage(errorMmessage);
   }
 
