@@ -52,7 +52,6 @@ export class YeomanUI {
   // eslint-disable-next-line @typescript-eslint/ban-types
   private readonly customQuestionEventHandlers: Map<string, Map<string, Function>>;
   private errorThrown = false;
-  private readonly outputPath: string;
   private readonly initialCwd: string;
   private readonly typesMap: Map<string, string>;
   private readonly generatorsToIgnoreArray: string[];
@@ -68,7 +67,6 @@ export class YeomanUI {
     output: Output,
     logger: IChildLogger,
     uiOptions: any,
-    outputPath: string = Constants.HOMEDIR_PROJECTS,
     flowState: State<void>
   ) {
     this.rpc = rpc;
@@ -79,7 +77,6 @@ export class YeomanUI {
     this.youiEvents = youiEvents;
     this.logger = logger;
     this.output = output;
-    this.outputPath = outputPath;
     this.rpc.registerMethod({
       func: this.receiveIsWebviewReady,
       thisArg: this,
@@ -91,7 +88,6 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.logError, thisArg: this });
     this.rpc.registerMethod({ func: this.back, thisArg: this });
     this.rpc.registerMethod({ func: this.executeCommand, thisArg: this });
-    this.rpc.registerMethod({ func: this.setCwd, thisArg: this });
     this.rpc.registerMethod({ func: this.getState, thisArg: this });
 
     this.initialCwd = process.cwd();
@@ -101,7 +97,6 @@ export class YeomanUI {
     this.promptCount = 0;
     this.currentQuestions = {};
     this.customQuestionEventHandlers = new Map();
-    this.setCwd(outputPath);
     this.typesMap = new Map();
     this.generatorsToIgnoreArray = [];
   }
@@ -190,8 +185,8 @@ export class YeomanUI {
     return result;
   }
 
-  private wsGet(key: string) {
-    return vscode.workspace.getConfiguration().get(key);
+  private wsGet(key: string): string {
+    return _.trim(vscode.workspace.getConfiguration().get(key));
   }
 
   private async runGenerator(generatorNamespace: string) {
@@ -200,10 +195,6 @@ export class YeomanUI {
     // see issue: https://github.com/yeoman/environment/issues/55
     // process.chdir() doesn't work after environment has been created
     try {
-      const targetFolderProp = this.wsGet(this.TARGET_FOLDER_CONFIG_PROP);
-      if (targetFolderProp) {
-        this.setCwd(targetFolderProp);
-      }
       const targetFolder = this.getCwd();
       await promises.mkdir(targetFolder, { recursive: true });
       const dirsBefore = await this.getChildDirectories(targetFolder);
@@ -343,12 +334,9 @@ export class YeomanUI {
     return vscode.commands.executeCommand("exploreGenerators");
   }
 
-  private setCwd(cwd: string) {
-    this.cwd = cwd || Constants.HOMEDIR_PROJECTS;
-  }
-
   private getCwd(): string {
-    return this.cwd;
+    const targetFolderProp = this.wsGet(this.TARGET_FOLDER_CONFIG_PROP);
+    return _.isEmpty(targetFolderProp) ? Constants.HOMEDIR_PROJECTS : targetFolderProp;
   }
 
   public async showPrompt(questions: Questions<any>): Promise<inquirer.Answers> {
@@ -478,12 +466,7 @@ export class YeomanUI {
 
     const questions: any[] = [];
 
-    const selectedWorkspaceConfig = this.wsGet(this.SELECTED_WORKSPACE_CONFIG_PROP);
-
     if (_.includes(genFilter.types, GeneratorType.project)) {
-      const defaultPath = this.wsGet(this.TARGET_FOLDER_CONFIG_PROP)
-        ? this.wsGet(this.TARGET_FOLDER_CONFIG_PROP)
-        : this.getCwd();
       const targetFolderQuestion: any = {
         type: "input",
         guiOptions: {
@@ -499,7 +482,7 @@ export class YeomanUI {
         },
         name: "generator.target.folder",
         message: "Specify a target folder path",
-        default: defaultPath,
+        default: this.getCwd(),
       };
       questions.push(targetFolderQuestion);
 
@@ -517,7 +500,7 @@ export class YeomanUI {
         },
         name: "selectedWorkspace",
         message: this.uiOptions.messages.select_open_workspace_question_hint,
-        default: selectedWorkspaceConfig,
+        default: this.wsGet(this.SELECTED_WORKSPACE_CONFIG_PROP),
       };
       questions.push(locationQuestion);
     }

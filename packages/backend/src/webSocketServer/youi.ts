@@ -44,7 +44,6 @@ class YeomanUIWebSocketServer {
         serverOutput,
         childLogger,
         { filter: GeneratorFilter.create(), messages: backendMessages },
-        undefined,
         createFlowPromise<void>().state
       );
       this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.mockFolderDialog.bind(this));

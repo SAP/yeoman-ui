@@ -82,7 +82,6 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 
     this.initWebviewPanel();
 
-    const outputPath = Constants.IS_IN_BAS ? undefined : get(vscode, "workspace.workspaceFolders[0].uri.fsPath");
     this.yeomanui = new YeomanUI(
       this.rpc,
       vscodeYouiEvents,
@@ -95,7 +94,6 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
         installGens: this.installGens,
         data: get(uiOptions, "data"),
       },
-      outputPath,
       this.flowPromise.state
     );
     this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));

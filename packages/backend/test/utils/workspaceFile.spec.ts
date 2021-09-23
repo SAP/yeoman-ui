@@ -32,10 +32,7 @@ describe("extension unit test", () => {
     it("is in BAS, workspace file does not exist", () => {
       Constants.IS_IN_BAS = true;
       const targetFolerPath = "targetFolerPath";
-      const expectedWsFilePath = join(
-        Constants.HOMEDIR_PROJECTS,
-        `${WorkspaceFile["getWsFileName"]()}.theia-workspace`
-      );
+      const expectedWsFilePath = join(Constants.HOMEDIR_PROJECTS, `workspace.theia-workspace`);
       uriMock.expects("file").withArgs(expectedWsFilePath);
       fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
       fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
@@ -47,11 +44,10 @@ describe("extension unit test", () => {
       Constants.IS_IN_BAS = true;
       const targetFolerPath = "targetFolerPath";
 
-      const wsFileName = WorkspaceFile["getWsFileName"]();
-      const existingWsFilePath = join(Constants.HOMEDIR_PROJECTS, `${wsFileName}.theia-workspace`);
+      const existingWsFilePath = join(Constants.HOMEDIR_PROJECTS, `workspace.theia-workspace`);
       fsMock.expects("existsSync").withArgs(existingWsFilePath).returns(true);
 
-      const expectedWsFilePath = join(Constants.HOMEDIR_PROJECTS, `${wsFileName}.1.theia-workspace`);
+      const expectedWsFilePath = join(Constants.HOMEDIR_PROJECTS, `workspace.1.theia-workspace`);
       fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
       fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
       uriMock.expects("file").withArgs(expectedWsFilePath);
@@ -62,7 +58,7 @@ describe("extension unit test", () => {
     it("is not in BAS, workspace file does not exist", () => {
       Constants.IS_IN_BAS = false;
       const targetFolerPath = "targetFolerPath";
-      const expectedWsFilePath = join(Constants.HOMEDIR_PROJECTS, `${WorkspaceFile["getWsFileName"]()}.code-workspace`);
+      const expectedWsFilePath = join(Constants.HOMEDIR_PROJECTS, `workspace.code-workspace`);
       uriMock.expects("file").withArgs(expectedWsFilePath);
       fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
       fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
@@ -74,11 +70,10 @@ describe("extension unit test", () => {
       Constants.IS_IN_BAS = false;
       const targetFolerPath = "targetFolerPath";
 
-      const wsFileName = WorkspaceFile["getWsFileName"]();
-      const existingWsFilePath = join(Constants.HOMEDIR_PROJECTS, `${wsFileName}.code-workspace`);
+      const existingWsFilePath = join(Constants.HOMEDIR_PROJECTS, `workspace.code-workspace`);
       fsMock.expects("existsSync").withArgs(existingWsFilePath).returns(true);
 
-      const expectedWsFilePath = join(Constants.HOMEDIR_PROJECTS, `${wsFileName}.1.code-workspace`);
+      const expectedWsFilePath = join(Constants.HOMEDIR_PROJECTS, `workspace.1.code-workspace`);
       fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
       fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
       uriMock.expects("file").withArgs(expectedWsFilePath);
