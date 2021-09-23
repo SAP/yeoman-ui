@@ -2,7 +2,6 @@ import { Uri } from "vscode";
 import { writeFileSync, existsSync } from "fs";
 import { join } from "path";
 import { Constants } from "./constants";
-import { get } from "lodash";
 
 class WorkspaceFileUtil {
   public create(targetFolderPath: string): Uri {
@@ -25,14 +24,8 @@ class WorkspaceFileUtil {
 
   private createWsFilePath(counter?: number): string {
     const wsFileExt = Constants.IS_IN_BAS ? "theia-workspace" : "code-workspace";
-    const wsFileName = this.getWsFileName();
     const counterStr = counter ? `.${counter}.` : `.`;
-    return join(Constants.HOMEDIR_PROJECTS, `${wsFileName}${counterStr}${wsFileExt}`);
-  }
-
-  private getWsFileName(): string {
-    const defaultName = "workspace";
-    return get(process, Constants.IS_IN_BAS ? "env.WORKSPACE_ID" : "env.USERNAME", defaultName);
+    return join(Constants.HOMEDIR_PROJECTS, `workspace${counterStr}${wsFileExt}`);
   }
 
   private getUniqWorkspaceFilePath(): string {

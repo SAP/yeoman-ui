@@ -19,6 +19,8 @@ module.exports = class extends Generator {
 
     const silent = _.get(this.options, "silent", false);
 
+    this.origDestinationRoot = this.destinationRoot();
+
     this.argument("food", {
       type: String,
       required: false,
@@ -132,14 +134,14 @@ module.exports = class extends Generator {
     return _.get(this.options, `[${name}]`);
   }
 
-  async initializing() {
-    const silent = this._getOption("silent");
-    this.composeWith(require.resolve("../app2"), {
-      prompts: this.prompts,
-      appWizard: this.appWizard,
-      silent,
-    });
-  }
+  // async initializing() {
+  //   const silent = this._getOption("silent");
+  //   this.composeWith(require.resolve("../app2"), {
+  //     prompts: this.prompts,
+  //     appWizard: this.appWizard,
+  //     silent,
+  //   });
+  // }
 
   async prompting() {
     let prompts = [
@@ -563,6 +565,7 @@ module.exports = class extends Generator {
 
   configuring() {
     this.log("FoodQ is in configuring stage.");
+
     this.destinationRoot(path.join(this.destinationRoot(), _.get(this, "answers_main_dish.food", "")));
     this.log(`Destination Root = ${this.destinationRoot()}`);
   }
@@ -621,5 +624,6 @@ module.exports = class extends Generator {
   end() {
     this.log("FoodQ completed to install dependencies.");
     this.log("FoodQ generation completed.");
+    this.log(this.destinationRoot());
   }
 };

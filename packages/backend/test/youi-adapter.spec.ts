@@ -91,7 +91,6 @@ describe("YouiAdapter", () => {
     outputChannel,
     testLogger,
     { filter: GeneratorFilter.create(), messages },
-    undefined,
     createFlowPromise<void>().state
   );
 
