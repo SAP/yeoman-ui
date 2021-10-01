@@ -278,7 +278,7 @@ describe("vscode-youi-events unit test", () => {
     expect(warningImage).to.be.not.undefined;
   });
 
-  describe("doGeneratorDone", () => {
+  describe.skip("doGeneratorDone", () => {
     const createAndClose = "Create the project and close it for future use";
     const openNewWorkspace = "Open the project in a new workspace";
     const addToWorkspace = "Open the project in a multi-root workspace";

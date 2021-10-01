@@ -175,7 +175,7 @@ export class VSCodeYouiEvents implements YouiEvents {
           vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, {
             uri: targetFolderUri,
           });
-          if (wsFoldersQuantity === 0) {
+          if (_.isNil(vscode.workspace.workspaceFile)) {
             const workspaceFileUri = WorkspaceFile.create(targetFolderUri.fsPath);
             void vscode.commands.executeCommand("vscode.openFolder", workspaceFileUri);
           }

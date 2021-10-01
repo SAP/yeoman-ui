@@ -335,8 +335,11 @@ export class YeomanUI {
   }
 
   private getCwd(): string {
-    const targetFolderProp = this.wsGet(this.TARGET_FOLDER_CONFIG_PROP);
-    return _.isEmpty(targetFolderProp) ? Constants.HOMEDIR_PROJECTS : targetFolderProp;
+    const targetFolder = Constants.IS_IN_BAS
+      ? Constants.HOMEDIR_PROJECTS
+      : _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath", Constants.HOMEDIR_PROJECTS);
+    const targetFolderConfig = this.wsGet(this.TARGET_FOLDER_CONFIG_PROP);
+    return _.isEmpty(targetFolderConfig) ? targetFolder : targetFolderConfig;
   }
 
   public async showPrompt(questions: Questions<any>): Promise<inquirer.Answers> {
