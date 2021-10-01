@@ -30,13 +30,13 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-- open yeoman ui in split mode ([#648](https://github.com/SAP/yeoman-ui/issues/648)) ([23c6849](https://github.com/SAP/yeoman-ui/commit/23c684914bc80c17550a85f4d5069dd1a17819b3))
+- open Yeoman UI in split mode ([#648](https://github.com/SAP/yeoman-ui/issues/648)) ([23c6849](https://github.com/SAP/yeoman-ui/commit/23c684914bc80c17550a85f4d5069dd1a17819b3))
 
 # [1.5.0](https://github.com/SAP/yeoman-ui/compare/v1.4.5...v1.5.0) (2021-07-11)
 
 ### Features
 
-- replace shelljs.exec with empty function on git operation ([#643](https://github.com/SAP/yeoman-ui/issues/643)) ([07dbdf9](https://github.com/SAP/yeoman-ui/commit/07dbdf98cb3e73451f56be21734a047e467b2700))
+- replace shelljs.exec with empty function on Git operation ([#643](https://github.com/SAP/yeoman-ui/issues/643)) ([07dbdf9](https://github.com/SAP/yeoman-ui/commit/07dbdf98cb3e73451f56be21734a047e467b2700))
 
 ## [1.4.5](https://github.com/SAP/yeoman-ui/compare/v1.4.4...v1.4.5) (2021-06-15)
 

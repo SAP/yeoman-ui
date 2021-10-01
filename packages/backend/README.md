@@ -2,14 +2,14 @@
 
 # Application Wizard
 
-With the Application Wizard extension, you can benefit from a rich user experience for yeoman generators. This extension allows developers to reuse existing yeoman generators and provide wizard-like experience with no development efforts.
+With the Application Wizard extension, you can benefit from a rich user experience for Yeoman generators. This extension allows developers to reuse existing Yeoman generators and provide wizard-like experience with no development efforts.
 
 ![](screenshot.png)
 
 ## Requirements
 
 - [node.js](https://www.npmjs.com/package/node) version 10 or higher.
-- [VSCode](https://code.visualstudio.com/) 1.39.2 or higher or [Theia](https://www.theia-ide.org/) 0.12 or higher.
+- [VS Code](https://code.visualstudio.com/) 1.39.2 or higher or [Theia](https://www.theia-ide.org/) 0.12 or higher.
 
 ## Installation
 
@@ -21,7 +21,7 @@ In the [Application Wizard](https://marketplace.visualstudio.com/items?itemName=
 
 1. Go to [GitHub Releases](https://github.com/sap/yeoman-ui/releases).
 2. Search for the `.vsix` archive under Assets for the specific release.
-3. Follow the instructions for installing an extension from a `.vsix` file in the [VSCode's guide](https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix).
+3. Follow the instructions for installing an extension from a `.vsix` file in the [VS Code's guide](https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix).
 
 ## Updates
 

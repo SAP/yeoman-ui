@@ -15,7 +15,7 @@ Specifically, it includes dynamic questions (`message`, `when()`, `validate()`, 
 In the terminal type:
 
 ```sh
-# install yeoman
+# install Yeoman
 npm install -g yo
 # install dependencies of this generator
 npm install

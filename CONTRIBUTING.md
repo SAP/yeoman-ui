@@ -19,7 +19,7 @@ This is managed automatically via https://cla-assistant.io/ pull request voter.
 - A [Long-Term Support version](https://nodejs.org/en/about/releases/) of node.js
 - (optional) [commitizen](https://github.com/commitizen/cz-cli#installing-the-command-line-tool) for managing commit messages.
 - [node.js](https://www.npmjs.com/package/node) version 10 or higher.
-- [VSCode](https://code.visualstudio.com/) 1.39.2 or higher or [Theia](https://www.theia-ide.org/) 0.12 or higher.
+- [VS Code](https://code.visualstudio.com/) 1.39.2 or higher or [Theia](https://www.theia-ide.org/) 0.12 or higher.
 
 ### Initial Setup
 
@@ -34,7 +34,7 @@ This project enforces the [conventional-commits][conventional_commits] commit me
 The possible commits types prefixes are limited to those defined by [conventional-commit-types][commit_types].
 This promotes a clean project history and enabled automatically generating a changelog.
 
-The commit message format will be inspected both on a git pre-commit hook
+The commit message format will be inspected both on a Git pre-commit hook
 and during the central CI build and will **fail the build** if issues are found.
 
 It is recommended to use `git cz` to construct valid conventional commit messages.
@@ -77,14 +77,14 @@ To run it do the following:
   ```
 - Open the broswer on `localhost:8080` to access the framework.
 
-#### Run the VSCode extension
+#### Run the VS Code extension
 
-- Start VSCode on your local machine, and click on open workspace. Select this repo folder.
+- Start VS Code on your local machine, and click on open workspace. Select this repo folder.
 - On the debug panel choose "Run Extension", and click on the "Run" button.
 
 #### Advanced scenarios
 
-- [Build & install the yeoman example generator](packages/generator-foodq/README.md)
+- [Build & install the Yeoman example generator](packages/generator-foodq/README.md)
 
 ### Testing
 

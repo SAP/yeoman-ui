@@ -12,14 +12,14 @@
 
 ## Description
 
-With the Application Wizard extension, you can benefit from a rich user experience for yeoman generators. This extension allows developers to reuse existing yeoman generators and provide wizard-like experience with no development efforts.
+With the Application Wizard extension, you can benefit from a rich user experience for Yeoman generators. This extension allows developers to reuse existing Yeoman generators and provide wizard-like experience with no development efforts.
 
 This npm [mono-repo][mono-repo] currently contains:
 
-- [VSCode Extension](./packages/backend) The backend part which communicates with Yeoman and the system. It runs as a VSCode extension or node.js application.
+- [VS Code Extension](./packages/backend) The backend part which communicates with Yeoman and the system. It runs as a VS Code extension or node.js application.
 - [Application Wizard UI](./packages/frontend) The Application Wizard as a standalone vue.js application.
-- [Yeoman generator sample](./packages/generator-foodq) Sample yeoman generator to show usages and test the platform.
-- [![npm-yeoman-ui-types][npm-yeoman-ui-types-image]][npm-yeoman-ui-types-url] [@sap-devx/yeoman-ui-types](./packages/types) Type signatures supposed to be used in the yeoman generators.
+- [Yeoman generator sample](./packages/generator-foodq) Sample Yeoman generator to show usages and test the platform.
+- [![npm-yeoman-ui-types][npm-yeoman-ui-types-image]][npm-yeoman-ui-types-url] [@sap-devx/yeoman-ui-types](./packages/types) Type signatures supposed to be used in the Yeoman generators.
 
 [npm-yeoman-ui-types-image]: https://img.shields.io/npm/v/@sap-devx/yeoman-ui-types.svg
 [npm-yeoman-ui-types-url]: https://www.npmjs.com/package/@sap-devx/yeoman-ui-types
