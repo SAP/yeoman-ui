@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { isEmpty, size } from "lodash";
+import { isEmpty, size, isNil } from "lodash";
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorOutput } from "./vscode-output";
@@ -8,7 +8,6 @@ import { getClassLogger } from "./logger/logger-wrapper";
 import { getImage } from "./images/messageImages";
 import { AppWizard, MessageType, Severity } from "@sap-devx/yeoman-ui-types";
 import { WorkspaceFile } from "./utils/workspaceFile";
-import _ = require("lodash");
 
 class YoUiAppWizard extends AppWizard {
   constructor(private readonly events: VSCodeYouiEvents) {
@@ -165,7 +164,7 @@ export class VSCodeYouiEvents implements YouiEvents {
     this.resolveInstallingProgress();
 
     if (success) {
-      if (!_.isNil(targetFolderPath)) {
+      if (!isNil(targetFolderPath)) {
         const targetFolderUri: vscode.Uri = vscode.Uri.file(targetFolderPath);
 
         if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
@@ -175,7 +174,7 @@ export class VSCodeYouiEvents implements YouiEvents {
           vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, {
             uri: targetFolderUri,
           });
-          if (_.isNil(vscode.workspace.workspaceFile)) {
+          if (isNil(vscode.workspace.workspaceFile)) {
             const workspaceFileUri = WorkspaceFile.create(targetFolderUri.fsPath);
             void vscode.commands.executeCommand("vscode.openFolder", workspaceFileUri);
           }
