@@ -23,6 +23,7 @@ import * as Environment from "yeoman-environment";
 import { Questions } from "yeoman-environment/lib/adapter";
 import { State } from "./utils/promise";
 import { Constants } from "./utils/constants";
+import { isEmpty } from "lodash";
 
 export interface IQuestionsPrompt extends IPrompt {
   questions: any[];
@@ -335,11 +336,14 @@ export class YeomanUI {
   }
 
   private getCwd(): string {
-    const targetFolder = Constants.IS_IN_BAS
+    const targetFolderConfig = this.wsGet(this.TARGET_FOLDER_CONFIG_PROP);
+    if (!isEmpty(targetFolderConfig)) {
+      return targetFolderConfig;
+    }
+
+    return Constants.IS_IN_BAS
       ? Constants.HOMEDIR_PROJECTS
       : _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath", Constants.HOMEDIR_PROJECTS);
-    const targetFolderConfig = this.wsGet(this.TARGET_FOLDER_CONFIG_PROP);
-    return _.isEmpty(targetFolderConfig) ? targetFolder : targetFolderConfig;
   }
 
   public async showPrompt(questions: Questions<any>): Promise<inquirer.Answers> {
