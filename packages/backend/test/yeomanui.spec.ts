@@ -705,10 +705,73 @@ describe("yeomanui unit test", () => {
     });
   });
 
-  it.skip("defaultOutputPath", () => {
+  describe("getCwd", () => {
     const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, flowPromise.state);
-    wsConfigMock.expects("get").withExactArgs(yeomanUiInstance["TARGET_FOLDER_CONFIG_PROP"]).returns("     ");
-    expect(yeomanUiInstance["getCwd"]()).equal(Constants.HOMEDIR_PROJECTS);
+
+    it("in VSCODE, target folder is undefined", () => {
+      Constants.IS_IN_BAS = false;
+      _.set(vscode, "workspace.workspaceFolders[0].uri.fsPath", undefined);
+      wsConfigMock.expects("get").withExactArgs(yeomanUiInstance["TARGET_FOLDER_CONFIG_PROP"]);
+      const res = yeomanUiInstance["getCwd"]();
+      expect(res).equal(Constants.HOMEDIR_PROJECTS);
+    });
+
+    it("in VSCODE, target folder is empty non-zero length string", () => {
+      Constants.IS_IN_BAS = false;
+      _.set(vscode, "workspace.workspaceFolders[0].uri.fsPath", undefined);
+      wsConfigMock.expects("get").withExactArgs(yeomanUiInstance["TARGET_FOLDER_CONFIG_PROP"]).returns("     ");
+      const res = yeomanUiInstance["getCwd"]();
+      expect(res).equal(Constants.HOMEDIR_PROJECTS);
+    });
+
+    it("in VSCODE, target folder is defined", () => {
+      Constants.IS_IN_BAS = false;
+      const targetFolderConfig = "/home/user/folder/folder2";
+      _.set(vscode, "workspace.workspaceFolders[0].uri.fsPath", undefined);
+      wsConfigMock
+        .expects("get")
+        .withExactArgs(yeomanUiInstance["TARGET_FOLDER_CONFIG_PROP"])
+        .returns(targetFolderConfig);
+      const res = yeomanUiInstance["getCwd"]();
+      expect(res).equal(targetFolderConfig);
+    });
+
+    it("in VSCODE, a folder is opened", () => {
+      Constants.IS_IN_BAS = false;
+      const openedVscodeFolderPath = "/home/user/folder/folder2";
+      _.set(vscode, "workspace.workspaceFolders[0].uri.fsPath", openedVscodeFolderPath);
+      wsConfigMock.expects("get").withExactArgs(yeomanUiInstance["TARGET_FOLDER_CONFIG_PROP"]);
+      const res = yeomanUiInstance["getCwd"]();
+      expect(res).equal(openedVscodeFolderPath);
+    });
+
+    it("in BAS, target folder is undefined", () => {
+      Constants.IS_IN_BAS = true;
+      _.set(vscode, "workspace.workspaceFolders[0].uri.fsPath", undefined);
+      wsConfigMock.expects("get").withExactArgs(yeomanUiInstance["TARGET_FOLDER_CONFIG_PROP"]);
+      const res = yeomanUiInstance["getCwd"]();
+      expect(res).equal(Constants.HOMEDIR_PROJECTS);
+    });
+
+    it("in BAS, target folder is empty non-zero length string", () => {
+      Constants.IS_IN_BAS = true;
+      _.set(vscode, "workspace.workspaceFolders[0].uri.fsPath", undefined);
+      wsConfigMock.expects("get").withExactArgs(yeomanUiInstance["TARGET_FOLDER_CONFIG_PROP"]).returns("     ");
+      const res = yeomanUiInstance["getCwd"]();
+      expect(res).equal(Constants.HOMEDIR_PROJECTS);
+    });
+
+    it("in BAS, target folder is defined", () => {
+      Constants.IS_IN_BAS = true;
+      _.set(vscode, "workspace.workspaceFolders[0].uri.fsPath", undefined);
+      const targetFolderConfig = "/home/user/folder/folder2";
+      wsConfigMock
+        .expects("get")
+        .withExactArgs(yeomanUiInstance["TARGET_FOLDER_CONFIG_PROP"])
+        .returns(targetFolderConfig);
+      const res = yeomanUiInstance["getCwd"]();
+      expect(res).equal(targetFolderConfig);
+    });
   });
 
   it("getErrorInfo", () => {
