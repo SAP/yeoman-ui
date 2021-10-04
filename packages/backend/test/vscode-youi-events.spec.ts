@@ -289,6 +289,7 @@ describe("vscode-youi-events unit test", () => {
         { uri: { fsPath: "rootFolderPath" } },
         { uri: { fsPath: "testRoot" } },
       ]);
+      _.set(vscode, "workspace.workspaceFile", "/workspace/file/path");
       windowMock
         .expects("showInformationMessage")
         .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
@@ -303,6 +304,7 @@ describe("vscode-youi-events unit test", () => {
         { uri: { fsPath: "rootFolderPath" } },
         { uri: { fsPath: "testDestinationRoot" } },
       ]);
+      _.set(vscode, "workspace.workspaceFile", "/workspace/file/path");
       windowMock
         .expects("showInformationMessage")
         .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
@@ -353,6 +355,7 @@ describe("vscode-youi-events unit test", () => {
     it("on success, no workspace is opened ---> the project openned in a new multi-root workspace", () => {
       eventsMock.expects("doClose");
       _.set(vscode, "workspace.workspaceFolders", []);
+      _.set(vscode, "workspace.workspaceFile", undefined);
       windowMock
         .expects("showInformationMessage")
         .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
