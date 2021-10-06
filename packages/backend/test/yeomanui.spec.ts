@@ -958,7 +958,7 @@ describe("yeomanui unit test", () => {
   describe("onGeneratorSuccess - onGeneratorFailure", () => {
     let doGeneratorDoneSpy: any;
     const create_and_close = "Create the project and close it for future use";
-    const open_in_new_ws = "Open the project in a new workspace";
+    const open_in_new_ws = "Open the project in a stand-alone folder";
 
     beforeEach(() => {
       doGeneratorDoneSpy = sandbox.spy(youiEvents, "doGeneratorDone");
