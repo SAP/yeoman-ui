@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.4](https://github.com/SAP/yeoman-ui/compare/v1.7.3...v1.7.4) (2021-10-13)
+
+### Bug Fixes
+
+- create only .code-workspace workspace file ([#687](https://github.com/SAP/yeoman-ui/issues/687)) ([d646d7a](https://github.com/SAP/yeoman-ui/commit/d646d7a27faf21ad59d06d4e3767aa6a2caa897a))
+- remove settings value from workspace file ([2ea6d10](https://github.com/SAP/yeoman-ui/commit/2ea6d10df791bf34107707319b47a544d100a822))
+
 ## [1.7.3](https://github.com/SAP/yeoman-ui/compare/v1.7.2...v1.7.3) (2021-10-06)
 
 ### Bug Fixes
