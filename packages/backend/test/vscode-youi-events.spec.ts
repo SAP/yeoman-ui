@@ -280,7 +280,7 @@ describe("vscode-youi-events unit test", () => {
 
   describe("doGeneratorDone", () => {
     const createAndClose = "Create the project and close it for future use";
-    const openNewWorkspace = "Open the project in a new workspace";
+    const openNewWorkspace = "Open the project in a stand-alone folder";
     const addToWorkspace = "Open the project in a multi-root workspace";
 
     it("on success, project path and workspace folder are Windows style ---> the project added to current workspace", () => {
@@ -332,7 +332,7 @@ describe("vscode-youi-events unit test", () => {
       );
     });
 
-    it("on success, project path parent folder is already openned in workspace ---> the project openned in a new workspace", () => {
+    it("on success, project path parent folder is already openned in workspace ---> the project openned in a stand-alone folder", () => {
       eventsMock.expects("doClose");
       _.set(vscode, "workspace.workspaceFolders", [
         { uri: { fsPath: "rootFolderPath" } },

@@ -12,10 +12,7 @@ class WorkspaceFileUtil {
     const fileContent: string = `{
       "folders": [{
         "path": "${filePath}" 
-      }],
-      "settings": {
-        "actions": []
-      }
+      }]
 }`;
 
     writeFileSync(wsFilePath, fileContent);
@@ -23,9 +20,8 @@ class WorkspaceFileUtil {
   }
 
   private createWsFilePath(counter?: number): string {
-    const wsFileExt = Constants.IS_IN_BAS ? "theia-workspace" : "code-workspace";
     const counterStr = counter ? `.${counter}.` : `.`;
-    return join(Constants.HOMEDIR_PROJECTS, `workspace${counterStr}${wsFileExt}`);
+    return join(Constants.HOMEDIR_PROJECTS, `workspace${counterStr}code-workspace`);
   }
 
   private getUniqWorkspaceFilePath(): string {
