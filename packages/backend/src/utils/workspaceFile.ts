@@ -12,7 +12,8 @@ class WorkspaceFileUtil {
     const fileContent: string = `{
       "folders": [{
         "path": "${filePath}" 
-      }]
+      }],
+      "settings": {}
 }`;
 
     writeFileSync(wsFilePath, fileContent);
