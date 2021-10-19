@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.5](https://github.com/SAP/yeoman-ui/compare/v1.7.4...v1.7.5) (2021-10-19)
+
+### Bug Fixes
+
+- add settings empty settings block to workspace file ([53ebe57](https://github.com/SAP/yeoman-ui/commit/53ebe5768652ee512619118c4ed3db22ca34616d))
+
 ## [1.7.4](https://github.com/SAP/yeoman-ui/compare/v1.7.3...v1.7.4) (2021-10-13)
 
 ### Bug Fixes
