@@ -158,14 +158,15 @@ form.inquirer-gui div.theme--light.v-input textarea {
 }
 
 form.inquirer-gui .v-card {
-  background-color: var(--vscode-editorWidget-background, #252526);
+  background-color: var(--vscode-sideBar-background, #252526);
 }
 form.inquirer-gui .v-card:hover {
+  border: 1px solid var(--vscode-sideBar-border, #0e639c);
   background-color: var(--vscode-list-hoverBackground,#2a2d2e);
 }
 form.inquirer-gui .v-card.selected {
-  border: 1px solid var(--vscode-button-background, #0e639c);
-  background-color: var(--vscode-list-hoverBackground,#2a2d2e) ;
+  border: 1px solid var(--vscode-focusBorder, #0e639c);
+  background-color: var(--vscode-sideBar-background,#2a2d2e) ;
 }
 .explore-generators-cards .v-card__title,
 .explore-generators-cards .v-card__subtitle,
