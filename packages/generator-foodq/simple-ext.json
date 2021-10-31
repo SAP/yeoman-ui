@@ -1,0 +1,24 @@
+{
+  "apiVersion": "1",
+  "name": "foodg-ext",
+  "namespace": "ext-devx-monaco",
+  "hidden": false,
+  "about": {
+    "description": "Foodq Extension",
+    "thumbnail": "-",
+    "author": "SAP(CA-WDE)",
+    "tagline": "Foodq Extension"
+  },
+  "version": "1.0.0",
+  "npmConfig": {
+    "registries": {
+      "devx-test": "https://common.repositories.sap.ondemand.com/artifactory/api/npm/devx-npm-dev/"
+    }
+  },
+  "yeomanPackages": [
+    {
+      "name": "@devx-test/generator-foodq",
+      "versionRange": "1.5.0"
+    }
+  ]
+}
