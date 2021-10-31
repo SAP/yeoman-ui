@@ -168,11 +168,25 @@ form.inquirer-gui .v-card.selected {
   border: 1px solid var(--vscode-focusBorder, #0e639c);
   background-color: var(--vscode-sideBar-background,#2a2d2e) ;
 }
+
 .explore-generators-cards .v-card__title,
 .explore-generators-cards .v-card__subtitle,
 form.inquirer-gui .v-card__title {
   color: var(--vscode-foreground, #cccccc);
 }
+
+#prompt-info-component .v-card__subtitle {
+  color: var(--vscode-editor-foreground, #32363a);
+}
+
 form.inquirer-gui .v-card > div.v-card__text {
-  color: var(--vscode-editorCodeLens-foreground, #999999);
+  color: var(--vscode-editor-foreground, #32363a);
+}
+
+.v-application header.v-app-bar.v-toolbar {
+  border-bottom: 1px solid var(--vscode-titleBar-border,#d9d9d9);
+}
+
+.v-application .right-col [role=separator].v-divider {
+  border-top: 1px solid var(--vscode-titleBar-border,#d9d9d9)!important; /* must !important other less accurate rule catches */
 }
