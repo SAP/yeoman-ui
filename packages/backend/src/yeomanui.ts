@@ -377,7 +377,7 @@ export class YeomanUI {
   }
 
   private executeCommand(id: string, ...args: any[]): void {
-    void this.youiEvents.executeCommand(id, ...args);
+    void this.youiEvents.executeCommand(id, args);
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
