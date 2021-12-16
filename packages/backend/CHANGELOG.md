@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.7](https://github.com/SAP/yeoman-ui/compare/v1.7.6...v1.7.7) (2021-12-16)
+
+### Bug Fixes
+
+- preferences link not pointing to right section in BAS setting preferences ([#696](https://github.com/SAP/yeoman-ui/issues/696)) ([8b80747](https://github.com/SAP/yeoman-ui/commit/8b807478b565168fa2daaec13c1ef382c51e3a14))
+
 ## [1.7.6](https://github.com/SAP/yeoman-ui/compare/v1.7.5...v1.7.6) (2021-10-31)
 
 **Note:** Version bump only for package yeoman-ui
