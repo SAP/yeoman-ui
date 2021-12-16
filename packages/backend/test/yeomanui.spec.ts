@@ -283,7 +283,7 @@ describe("yeomanui unit test", () => {
       const commandId = "vscode.open";
       const commandArgs = [{ fsPath: "https://en.wikipedia.org" }];
       youiEventsMock.expects("executeCommand").withExactArgs(commandId, commandArgs);
-      yeomanUi["executeCommand"](commandId, commandArgs);
+      yeomanUi["executeCommand"](commandId, ...commandArgs);
     });
   });
 
