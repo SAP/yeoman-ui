@@ -61,9 +61,9 @@ Use the following npm scripts at the repo's **root** to compile **all** the Type
 These scripts may also be available inside the sub-packages. However, it is recommended to
 use the top-level compilation scripts to avoid forgetting to (re-)compile a sub-package's dependency.
 
-#### Run the dev mode
+#### Run the yeoman framework in dev mode
 
-Dev mode allows you to run the framework in the browser, using vue cli for fast development cycles, and easy debug tools.
+Dev mode allows you to run the yeoman framework in the browser, using vue cli for fast development cycles, and easy debug tools.
 To run it do the following:
 
 - In the packages/backend folder run `webpack` or `webpack-dev:watch`, then run the server.
@@ -76,6 +76,22 @@ To run it do the following:
   yarn serve
   ```
 - Open the broswer on `localhost:8080` to access the framework.
+
+#### Run the explore generators framework in dev mode
+
+Dev mode allows you to run the explore generators framework in the browser, using vue cli for fast development cycles, and easy debug tools.
+To run it do the following:
+
+- In the packages/backend folder run `webpack` or `webpack-dev:watch`, then run the server.
+  ```bash
+  yarn webpack-dev:watch
+  yarn ws:egRun
+  ```
+- In the packages/frontend folder run `serve`
+  ```bash
+  yarn serve
+  ```
+- Open the broswer on `localhost:8080/exploregens` to access the framework.
 
 #### Run the VSCode extension
 
