@@ -41,8 +41,8 @@
     "test": "mocha",
     "webpack": "webpack --mode development",
     "webpack-dev:watch": "webpack --mode development --watch",
-    "ws:egRun": "node ./dist/src/webSocketServer/exploreGensIndex.js",
-    "ws:run": "node ./dist/src/webSocketServer/index.js"
+    "ws:egRun": "node ./dist/src/webSocketServer/exploregens.js",
+    "ws:run": "node ./dist/src/webSocketServer/youi.js"
   },
   "contributes": {
     "commands": [
