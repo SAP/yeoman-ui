@@ -67,6 +67,10 @@ div.v-select-list div.v-list div.v-list-item:not(.v-list-item--active):not(.v-li
   color: var(--vscode-input-foreground, #cccccc) !important;
 }
 
+.v-list-item__title {
+  color: var(--vscode-dropdown-foreground);
+}
+
 .v-textarea.v-input:not(.v-input--is-disabled) input{
   color: var(--vscode-input-foreground, #cccccc);
 }
