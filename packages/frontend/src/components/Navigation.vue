@@ -84,22 +84,22 @@ span.v-stepper__step__step .v-icon.v-icon {
 }
 /* Have to be important since vuetify itself define this color important */
 div.v-application div.v-stepper__step--complete span.v-stepper__step__step {
-  background: var(--vscode-editorCodeLens-foreground, #999999) !important;
+  background: var(--vscode-charts-purple, #652d90) !important;
 }
 div.v-application div.v-stepper__step--active span.v-stepper__step__step.primary {
-  background: var(--vscode-foreground, #cccccc) !important;
+  background: var(--vscode-button-hoverBackground, #1177bb) !important;
 }
 div.v-application div.v-stepper__step--inactive .v-stepper__step__step {
-  background: var(--vscode-input-background, #3c3c3c) !important;
+  background: var(--vscode-charts-blue, #3794ff) !important;
 }
 div.v-stepper div.v-stepper__step.v-stepper__step--complete div.v-stepper__label {
-  color: var(--vscode-editorCodeLens-foreground, #999999);
+  color: var(--vscode-charts-purple, #652d90);
 }
 div.v-stepper div.v-stepper__step.v-stepper__step--active div.v-stepper__label {
-  color: var(--vscode-foreground, #cccccc);
+  color: var(--vscode-button-hoverBackground, #1177bb);
 }
 div.v-stepper div.v-stepper__step.v-stepper__step--inactive div.v-stepper__label {
-  color: var(--vscode-editorCodeLens-foreground, #999999);
+  color: var(--vscode-charts-blue, #3794ff);
 }
 div.v-application div.v-stepper.v-stepper--vertical .v-stepper__content:not(:last-child) {
   transition: none;
