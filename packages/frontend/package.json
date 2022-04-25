@@ -1,7 +1,7 @@
 {
   "name": "yeoman-ui-frontend",
   "displayName": "Application Wizard Frontend",
-  "version": "1.7.6",
+  "version": "1.7.8",
   "private": true,
   "description": "Frontend for the application wizard framework",
   "license": "Apache 2.0",
