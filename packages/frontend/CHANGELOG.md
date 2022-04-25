@@ -5,14 +5,9 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [1.7.8](https://github.com/SAP/yeoman-ui/compare/v1.7.7...v1.7.8) (2022-04-25)
 
-
 ### Bug Fixes
 
-* style miss-alignments ([#701](https://github.com/SAP/yeoman-ui/issues/701)) ([78128cf](https://github.com/SAP/yeoman-ui/commit/78128cf003bad081b2e970eba901c4807c3d1173))
-
-
-
-
+- style miss-alignments ([#701](https://github.com/SAP/yeoman-ui/issues/701)) ([78128cf](https://github.com/SAP/yeoman-ui/commit/78128cf003bad081b2e970eba901c4807c3d1173))
 
 ## [1.7.6](https://github.com/SAP/yeoman-ui/compare/v1.7.5...v1.7.6) (2021-10-31)
 
