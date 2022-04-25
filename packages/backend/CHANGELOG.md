@@ -7,10 +7,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package yeoman-ui
 
-
-
-
-
 ## [1.7.7](https://github.com/SAP/yeoman-ui/compare/v1.7.6...v1.7.7) (2021-12-16)
 
 ### Bug Fixes
