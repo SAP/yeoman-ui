@@ -3,7 +3,7 @@ import { WorkspaceFile } from "../../src/utils/workspaceFile";
 import { Constants } from "../../src/utils/constants";
 import { vscode } from "../mockUtil";
 import * as fs from "fs";
-import { join } from "path";
+import { dirname, join, normalize, relative } from "path";
 
 describe("extension unit test", () => {
   let sandbox: SinonSandbox;
@@ -29,30 +29,42 @@ describe("extension unit test", () => {
   });
 
   describe("createWorkspaceFile", () => {
-    it("is not in BAS, workspace file does not exist", () => {
-      Constants.IS_IN_BAS = false;
-      const targetFolerPath = "targetFolerPath";
+    it("workspace file does not exist", () => {
+      const targetFolderPath = normalize(join(Constants.HOMEDIR_PROJECTS, "../tmp/targetFolerPath"));
       const expectedWsFilePath = join(Constants.HOMEDIR_PROJECTS, `workspace.code-workspace`);
       uriMock.expects("file").withArgs(expectedWsFilePath);
       fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
-      fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
+      const fileContent = {
+        folders: [
+          {
+            path: `${relative(dirname(expectedWsFilePath), targetFolderPath)}`,
+          },
+        ],
+        settings: {},
+      };
+      fsMock.expects("writeFileSync").withArgs(expectedWsFilePath, JSON.stringify(fileContent));
 
-      WorkspaceFile.create(targetFolerPath);
+      WorkspaceFile.create(targetFolderPath);
     });
 
-    it("is not in BAS, workspace file exists", () => {
-      Constants.IS_IN_BAS = false;
-      const targetFolerPath = "targetFolerPath";
-
+    it("workspace file exists", () => {
+      const targetFolderPath = normalize(join(Constants.HOMEDIR_PROJECTS, "../projects/tmp/targetFolerPath"));
       const existingWsFilePath = join(Constants.HOMEDIR_PROJECTS, `workspace.code-workspace`);
       fsMock.expects("existsSync").withArgs(existingWsFilePath).returns(true);
-
+      const fileContent = {
+        folders: [
+          {
+            path: `${relative(dirname(existingWsFilePath), targetFolderPath)}`,
+          },
+        ],
+        settings: {},
+      };
       const expectedWsFilePath = join(Constants.HOMEDIR_PROJECTS, `workspace.1.code-workspace`);
       fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
-      fsMock.expects("writeFileSync").withArgs(expectedWsFilePath);
+      fsMock.expects("writeFileSync").withArgs(expectedWsFilePath, JSON.stringify(fileContent));
       uriMock.expects("file").withArgs(expectedWsFilePath);
 
-      WorkspaceFile.create(targetFolerPath);
+      WorkspaceFile.create(targetFolderPath);
     });
   });
 });
