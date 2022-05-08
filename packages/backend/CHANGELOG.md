@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.9](https://github.com/SAP/yeoman-ui/compare/v1.7.7...v1.7.9) (2022-05-08)
+
+### Bug Fixes
+
+- formatting ([#702](https://github.com/SAP/yeoman-ui/issues/702)) ([ec14eee](https://github.com/SAP/yeoman-ui/commit/ec14eee9cd04a0496b68720d849665e6ce3c501e))
+- workspace file created programatically contains broken folders path in BAS based vscode ([#704](https://github.com/SAP/yeoman-ui/issues/704)) ([df7bc50](https://github.com/SAP/yeoman-ui/commit/df7bc50c73cfe5e66bb5f775c6ccc411f363ca7f))
+
 ## [1.7.8](https://github.com/SAP/yeoman-ui/compare/v1.7.7...v1.7.8) (2022-04-25)
 
 **Note:** Version bump only for package yeoman-ui
