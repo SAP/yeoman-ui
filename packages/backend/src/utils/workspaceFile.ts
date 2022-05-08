@@ -1,22 +1,20 @@
 import { Uri } from "vscode";
 import { writeFileSync, existsSync } from "fs";
-import { join } from "path";
+import { dirname, join, relative } from "path";
 import { Constants } from "./constants";
 
 class WorkspaceFileUtil {
   public create(targetFolderPath: string): Uri {
     const wsFilePath = this.getUniqWorkspaceFilePath();
-    // in theia it looks like: file:///folder1/folder2/file
-    // in vscode it looks like: c:\\folder1\folder2\file
-    const filePath = Constants.IS_IN_BAS ? `file://${targetFolderPath}` : `${targetFolderPath.replace(/\\/g, "\\\\")}`;
-    const fileContent: string = `{
-      "folders": [{
-        "path": "${filePath}" 
-      }],
-      "settings": {}
-}`;
-
-    writeFileSync(wsFilePath, fileContent);
+    const fileContent = {
+      folders: [
+        {
+          path: `${relative(dirname(wsFilePath), targetFolderPath)}`,
+        },
+      ],
+      settings: {},
+    };
+    writeFileSync(wsFilePath, JSON.stringify(fileContent));
     return Uri.file(wsFilePath);
   }
 
