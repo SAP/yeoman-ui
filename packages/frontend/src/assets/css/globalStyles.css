@@ -71,6 +71,14 @@ div.v-select-list div.v-list div.v-list-item:not(.v-list-item--active):not(.v-li
   color: var(--vscode-dropdown-foreground);
 }
 
+/* Styling for separator in <v-select> component */
+div.v-select-list  > div.v-list-item--disabled > .v-subheader{
+  text-transform: uppercase;
+  font-weight: 800;
+  font-size: 11px;
+  color: var(--vscode-foreground, #cccccc);
+}
+
 .v-textarea.v-input:not(.v-input--is-disabled) input{
   color: var(--vscode-input-foreground, #cccccc);
 }
