@@ -479,7 +479,7 @@ describe("yeomanui unit test", () => {
     });
 
     it("there are no generators", async () => {
-      envUtilsMock.expects("getGeneratorsData").resolves([]);
+      envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves([]);
       const result = await yeomanUi["getGeneratorsPrompt"]();
       const generatorQuestion: any = {
         type: "list",
@@ -499,7 +499,7 @@ describe("yeomanui unit test", () => {
 
     it("get generators with type project", async () => {
       wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns({});
-      envUtilsMock.expects("getGeneratorsData").resolves(gensMeta);
+      envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta);
       wsConfigMock.expects("get").withExactArgs(yeomanUi["TARGET_FOLDER_CONFIG_PROP"]);
       const genFilter: GeneratorFilter = GeneratorFilter.create({
         type: "project",
@@ -518,7 +518,7 @@ describe("yeomanui unit test", () => {
     });
 
     it("get generators with type module", async () => {
-      envUtilsMock.expects("getGeneratorsData").resolves(gensMeta);
+      envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta);
       const genFilter = GeneratorFilter.create({ type: "module" });
       yeomanUi["uiOptions"] = { filter: genFilter, messages };
       const result = await yeomanUi["getGeneratorsPrompt"]();
@@ -542,19 +542,22 @@ describe("yeomanui unit test", () => {
 
     it("wrong generators filter type is provided", async () => {
       wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns({});
-      envUtilsMock.expects("getGeneratorsData").resolves([
-        {
-          generatorMeta: {
-            generatorPath: "test1Path/app/index.js",
-            namespace: "test1:app",
-            packagePath: "test1Path",
+      envUtilsMock
+        .expects("getGeneratorsData")
+        .withExactArgs()
+        .resolves([
+          {
+            generatorMeta: {
+              generatorPath: "test1Path/app/index.js",
+              namespace: "test1:app",
+              packagePath: "test1Path",
+            },
+            generatorPackageJson: {
+              "generator-filter": { type: "project123" },
+              description: "test4Description",
+            },
           },
-          generatorPackageJson: {
-            "generator-filter": { type: "project123" },
-            description: "test4Description",
-          },
-        },
-      ]);
+        ]);
 
       wsConfigMock.expects("get").withExactArgs(yeomanUi["TARGET_FOLDER_CONFIG_PROP"]);
       yeomanUi["uiOptions"] = {
@@ -583,7 +586,7 @@ describe("yeomanui unit test", () => {
         "generator-filter": { type: "project", categories: ["cat1"] },
         description: "test4Description",
       };
-      envUtilsMock.expects("getGeneratorsData").resolves(gensMeta);
+      envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta);
 
       const genFilter: GeneratorFilter = GeneratorFilter.create({
         type: ["project"],
@@ -608,7 +611,7 @@ describe("yeomanui unit test", () => {
         description: "test3Description",
         displayName: "3rd - Test",
       };
-      envUtilsMock.expects("getGeneratorsData").resolves(gensMeta.slice(0, 3));
+      envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta.slice(0, 3));
 
       yeomanUi["uiOptions"] = {
         filter: GeneratorFilter.create({ type: undefined }),
@@ -638,7 +641,7 @@ describe("yeomanui unit test", () => {
         homepage: "https://myhomepage.com/ANY/generator-test2-module#readme",
       };
 
-      envUtilsMock.expects("getGeneratorsData").resolves(gensMeta.slice(0, 3));
+      envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta.slice(0, 3));
 
       yeomanUi["uiOptions"] = { filter: GeneratorFilter.create(), messages };
       const result = await yeomanUi["getGeneratorsPrompt"]();
@@ -654,7 +657,7 @@ describe("yeomanui unit test", () => {
     });
 
     it("generator with type project", async () => {
-      envUtilsMock.expects("getGeneratorsData").resolves(gensMeta.slice(0, 1));
+      envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta.slice(0, 1));
       _.set(vscode, "workspace.workspaceFolders", [
         { uri: { fsPath: "rootFolderPath" } },
         { uri: { fsPath: "testRoot" } },
@@ -674,7 +677,7 @@ describe("yeomanui unit test", () => {
         "generator-filter": { type: "tools-suite" },
         description: "test4Description",
       };
-      envUtilsMock.expects("getGeneratorsData").resolves(gensMeta.slice(0, 1));
+      envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta.slice(0, 1));
       _.set(vscode, "workspace.workspaceFolders", [
         { uri: { fsPath: "rootFolderPath" } },
         { uri: { fsPath: "testRoot" } },

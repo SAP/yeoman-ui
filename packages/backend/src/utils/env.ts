@@ -6,6 +6,8 @@ import { isWin32, NpmCommand } from "./npm";
 import * as customLocation from "./customLocation";
 import * as Environment from "yeoman-environment";
 import TerminalAdapter = require("yeoman-environment/lib/adapter");
+import { IChildLogger } from "@vscode-logging/logger";
+import { getClassLogger } from "../logger/logger-wrapper";
 
 const GENERATOR = "generator-";
 const NAMESPACE = "namespace";
@@ -27,11 +29,27 @@ export class GeneratorNotFoundError extends Error {
 }
 
 class EnvUtil {
+  private logger: IChildLogger;
   private existingNpmPathsPromise: Promise<string[]>;
   private allInstalledGensMeta: Environment.LookupGeneratorMeta[];
 
   constructor() {
-    this.existingNpmPathsPromise = this.getExistingNpmPath();
+    try {
+      this.logger = getClassLogger(EnvUtil.name);
+    } catch (e) {
+      // nothing TODO : testing scope
+    }
+    this.loadNpmPath();
+  }
+
+  public loadNpmPath(force = false) {
+    if (_.isNil(this.existingNpmPathsPromise) || force === true) {
+      this.existingNpmPathsPromise = this.getExistingNpmPath().then((paths) => {
+        this.logger?.debug("existing npm paths", { paths: paths.join(";") });
+        return paths;
+      });
+    }
+    return this;
   }
 
   private getEnvNpmPath(): Promise<string[]> {

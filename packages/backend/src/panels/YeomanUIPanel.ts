@@ -31,6 +31,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
       } else {
         yeomanUi._notifyGeneratorsInstall(this.installGens);
         if (isEmpty(this.installGens)) {
+          Env.loadNpmPath(true); // force to reload the env existing npm paths
           yeomanUi._notifyGeneratorsChange();
           this.installGens = undefined;
         }
@@ -114,11 +115,11 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   }
 
   private async showOpenFileDialog(currentPath: string): Promise<string> {
-    return await this.showOpenDialog(currentPath, true);
+    return this.showOpenDialog(currentPath, true);
   }
 
   private async showOpenFolderDialog(currentPath: string): Promise<string> {
-    return await this.showOpenDialog(currentPath, false);
+    return this.showOpenDialog(currentPath, false);
   }
 
   private async showOpenDialog(currentPath: string, canSelectFiles: boolean): Promise<string> {
