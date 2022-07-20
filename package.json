@@ -25,20 +25,20 @@
     ]
   },
   "scripts": {
-    "release:version": "lerna version",
-    "release:publish": "lerna publish from-git --yes",
     "ci": "npm-run-all coverage:clean format:validate lint:validate legal:* ci:subpackages coverage:merge",
     "ci:subpackages": "lerna run ci",
     "compile": "lerna run clean && tsc --build",
     "compile:watch": "lerna run clean && tsc --build --watch",
-    "format:fix": "prettier --print-width 120 --write \"**/*.@(js|ts|json|md|vue)\" --ignore-path=.gitignore",
-    "format:validate": "prettier --print-width 120 --check \"**/*.@(js|ts|json|md|vue)\" --ignore-path=.gitignore",
-    "lint:fix": "eslint . --ext=js,ts,vue --fix --max-warnings=0 --ignore-path=.gitignore",
-    "lint:validate": "eslint . --ext=js,ts,vue --max-warnings=0 --ignore-path=.gitignore",
     "coverage:clean": "rimraf ./coverage",
     "coverage:merge": "lcov-result-merger \"./coverage/lcov*.info\" \"./coverage/lcov.info\"",
+    "format:fix": "prettier --print-width 120 --write \"**/*.@(js|ts|json|md|vue)\" --ignore-path=.gitignore",
+    "format:validate": "prettier --print-width 120 --check \"**/*.@(js|ts|json|md|vue)\" --ignore-path=.gitignore",
+    "legal:copy": "lerna exec \"shx cp -r ../../.reuse .reuse && shx cp -r ../../LICENSES LICENSES\"",
     "legal:delete": "lerna exec \"shx rm -rf .reuse LICENSES\" || true",
-    "legal:copy": "lerna exec \"shx cp -r ../../.reuse .reuse && shx cp -r ../../LICENSES LICENSES\""
+    "lint:fix": "eslint . --ext=js,ts,vue --fix --max-warnings=0 --ignore-path=.gitignore",
+    "lint:validate": "eslint . --ext=js,ts,vue --max-warnings=0 --ignore-path=.gitignore",
+    "release:publish": "lerna publish from-git --yes",
+    "release:version": "lerna version"
   },
   "husky": {
     "hooks": {

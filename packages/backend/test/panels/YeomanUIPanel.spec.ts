@@ -5,6 +5,11 @@ import * as YeomanUIPanel from "../../src/panels/YeomanUIPanel";
 import { Env } from "../../src/utils/env";
 import { Constants } from "../../src/utils/constants";
 import { NpmCommand } from "../../src/utils/npm";
+import { YeomanUI } from "../../src/yeomanui";
+import { set } from "lodash";
+import { expect } from "chai";
+import { join } from "path";
+import { homedir } from "os";
 
 describe("YeomanUIPanel unit test", () => {
   let sandbox: SinonSandbox;
@@ -124,6 +129,129 @@ describe("YeomanUIPanel unit test", () => {
         npmUtilsMock.expects("checkAccessAndSetGeneratorsPath").never();
         void panel.loadWebviewPanel({ generator: "test:app" });
       });
+    });
+  });
+
+  describe("toggleOutput", () => {
+    let mockOutput: SinonMock;
+    beforeEach(() => {
+      mockOutput = sandbox.mock(panel["output"]);
+    });
+
+    afterEach(() => {
+      mockOutput.verify();
+    });
+
+    it("toggleOutput - output exists", () => {
+      mockOutput.expects("show").returns(undefined);
+      panel.toggleOutput();
+    });
+  });
+
+  describe("notifyGeneratorsChange", () => {
+    let mockYeomanui: SinonMock;
+    const objYeomanui: Partial<YeomanUI> = {
+      _notifyGeneratorsChange: () => Promise.resolve(),
+      _notifyGeneratorsInstall: () => Promise.resolve(),
+    };
+
+    beforeEach(() => {
+      mockYeomanui = sandbox.mock(objYeomanui);
+    });
+
+    afterEach(() => {
+      mockYeomanui.verify();
+    });
+
+    it("notifyGeneratorsChange - no args received", () => {
+      set(panel, "yeomanui", objYeomanui);
+      mockYeomanui.expects("_notifyGeneratorsChange");
+      panel.notifyGeneratorsChange();
+    });
+
+    it("notifyGeneratorsChange - args provided", () => {
+      set(panel, "yeomanui", objYeomanui);
+      const args = ["gen"];
+      mockYeomanui.expects("_notifyGeneratorsInstall").withExactArgs(args);
+      mockYeomanui.expects("_notifyGeneratorsChange").never();
+      panel.notifyGeneratorsChange(args);
+    });
+
+    it("notifyGeneratorsChange - empty args provided", () => {
+      set(panel, "yeomanui", objYeomanui);
+      const args: any[] = [];
+      mockYeomanui.expects("_notifyGeneratorsInstall").withExactArgs(args);
+      mockYeomanui.expects("_notifyGeneratorsChange");
+      envUtilsMock.expects("loadNpmPath").withExactArgs(true);
+      panel.notifyGeneratorsChange(args);
+      expect(panel["installGens"]).to.be.undefined;
+    });
+
+    it("notifyGeneratorsChange - yeomanui object does not exist on the panel", () => {
+      set(panel, "yeomanui", undefined);
+      panel.notifyGeneratorsChange();
+      expect(panel["installGens"]).to.be.undefined;
+    });
+  });
+
+  describe("showOpenDialog", () => {
+    const selected = vscode.Uri.file("selected");
+    const required = "some/path/file";
+
+    it("showOpenFileDialog", async () => {
+      const spyShowOpen = sandbox.stub(panel, <any>"showOpenDialog").returns(selected.fsPath);
+      expect(await panel["showOpenFileDialog"](required)).be.equal(selected.fsPath);
+      spyShowOpen.calledWithExactly(required, true);
+    });
+
+    it("showOpenFolderDialog", async () => {
+      const spyShowOpen = sandbox.stub(panel, <any>"showOpenDialog").returns(selected.fsPath);
+      expect(await panel["showOpenFolderDialog"](required)).be.equal(selected.fsPath);
+      spyShowOpen.calledWithExactly(required, false);
+    });
+
+    it("showOpenDialog - empty path provided, ws folder exists", async () => {
+      const canSelectFiles = true;
+      const objWs = [{ uri: { fsPath: "rootFolderPath" } }];
+      sandbox.stub(vscode.workspace, "workspaceFolders").value(objWs);
+      windowMock
+        .expects("showOpenDialog")
+        .withExactArgs({ canSelectFiles, canSelectFolders: !canSelectFiles, defaultUri: objWs[0].uri })
+        .resolves([selected]);
+      expect(await panel["showOpenDialog"]("", canSelectFiles)).to.equal(selected.fsPath);
+    });
+
+    it("showOpenDialog - empty path provided, ws folder not exists", async () => {
+      const canSelectFiles = false;
+      const objWs = [{}];
+      sandbox.stub(vscode.workspace, "workspaceFolders").value(objWs);
+      windowMock
+        .expects("showOpenDialog")
+        .withExactArgs({
+          canSelectFiles,
+          canSelectFolders: !canSelectFiles,
+          defaultUri: vscode.Uri.file(join(homedir())),
+        })
+        .resolves([selected]);
+      expect(await panel["showOpenDialog"](undefined, canSelectFiles)).to.equal(selected.fsPath);
+    });
+
+    it("showOpenDialog - path provided", async () => {
+      const canSelectFiles = false;
+      windowMock
+        .expects("showOpenDialog")
+        .withExactArgs({ canSelectFiles, canSelectFolders: !canSelectFiles, defaultUri: vscode.Uri.file(required) })
+        .resolves([selected]);
+      expect(await panel["showOpenDialog"](required, canSelectFiles)).to.equal(selected.fsPath);
+    });
+
+    it("showOpenDialog - path provided, showOpen throws error", async () => {
+      const canSelectFiles = true;
+      windowMock
+        .expects("showOpenDialog")
+        .withExactArgs({ canSelectFiles, canSelectFolders: !canSelectFiles, defaultUri: vscode.Uri.file(required) })
+        .throws(new Error("unexpected"));
+      expect(await panel["showOpenDialog"](required, canSelectFiles)).to.equal(required);
     });
   });
 });

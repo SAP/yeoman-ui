@@ -40,6 +40,7 @@ const Uri = {
 const workspace = {
   getConfiguration: () => configObj,
   updateWorkspaceFolders: returnValue,
+  workspaceFolders: [Uri.file()],
 };
 
 const oRegisteredCommands = {};
@@ -66,6 +67,9 @@ const window = {
   createWebviewPanel: returnPromise,
   showQuickPick: returnPromise,
   createOutputChannel: returnValue,
+  showOpenDialog: () => {
+    throw new Error("not implemented");
+  },
 };
 
 const ViewColumn = {
