@@ -623,7 +623,7 @@ describe("App.vue", () => {
 
       wrapper.vm.resolve = undefined;
       wrapper.vm.promptIndex = 2;
-      wrapper.vm.prompts = [{}, {}, {}];
+      wrapper.vm.prompts = [{}, {}, { questions: [] }];
 
       wrapper.vm.back();
 
@@ -681,7 +681,7 @@ describe("App.vue", () => {
 
       wrapper.vm.resolve = undefined;
       wrapper.vm.promptIndex = 3;
-      wrapper.vm.prompts = [{}, {}, {}, {}];
+      wrapper.vm.prompts = [{}, {}, {}, { questions: [] }];
 
       wrapper.vm.gotoStep(2);
 
@@ -702,7 +702,7 @@ describe("App.vue", () => {
       });
       wrapper.vm.reject = jest.fn();
       wrapper.vm.promptIndex = 3;
-      wrapper.vm.prompts = [{}, {}, {}, {}];
+      wrapper.vm.prompts = [{}, {}, {}, { questions: [] }];
       wrapper.vm.gotoStep(3);
 
       expect(wrapper.vm.rpc.invoke).toHaveBeenCalledWith("logError", [err]);
@@ -898,7 +898,7 @@ describe("App.vue", () => {
     // TODO - check the error
     it("in writing state", () => {
       wrapper = initComponent(App, {}, true);
-      wrapper.vm.prompts = [{}, {}];
+      wrapper.vm.prompts = [{}, { questions: [] }];
       wrapper.vm.promptIndex = 1;
       wrapper.vm.setGenInWriting(true);
       expect(wrapper.vm.isWriting).toBe(true);
@@ -908,7 +908,7 @@ describe("App.vue", () => {
     // TODO - check the error
     it("not in writing state", () => {
       wrapper = initComponent(App, {}, true);
-      wrapper.vm.prompts = [{}, {}];
+      wrapper.vm.prompts = [{}, { questions: [] }];
       wrapper.vm.promptIndex = 1;
       wrapper.vm.setGenInWriting(false);
       expect(wrapper.vm.isWriting).toBe(false);
