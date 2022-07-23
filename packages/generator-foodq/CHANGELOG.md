@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.11](https://github.com/SAP/yeoman-ui/compare/v1.7.9...v1.7.11) (2022-07-23)
+
+### Bug Fixes
+
+- [DEVXBUGS-10087] Application Wizard - foodq example - tile link broken ([#707](https://github.com/SAP/yeoman-ui/issues/707)) ([ffb6818](https://github.com/SAP/yeoman-ui/commit/ffb6818b6c99c9851b73eafe8ace0bc1d05df052))
+
 # [1.5.0](https://github.com/SAP/yeoman-ui/compare/v1.4.5...v1.5.0) (2021-07-11)
 
 ### Bug Fixes

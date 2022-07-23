@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.11](https://github.com/SAP/yeoman-ui/compare/v1.7.9...v1.7.11) (2022-07-23)
+
+### Bug Fixes
+
+- [DEVXBUGS-10087] Application Wizard - foodq example - tile link broken ([#707](https://github.com/SAP/yeoman-ui/issues/707)) ([ffb6818](https://github.com/SAP/yeoman-ui/commit/ffb6818b6c99c9851b73eafe8ace0bc1d05df052))
+- [DEVXBUGS-10337] project templates are not refreshed when generators installed in background ([#712](https://github.com/SAP/yeoman-ui/issues/712)) ([95c07f3](https://github.com/SAP/yeoman-ui/commit/95c07f3539a0e186d2fdb191f1dc50e959afbba0))
+- formatting ([#706](https://github.com/SAP/yeoman-ui/issues/706)) ([4f8205a](https://github.com/SAP/yeoman-ui/commit/4f8205ac9280ac4eb8c3c18b37646a03ec69fe37))
+
 ## [1.7.10](https://github.com/SAP/yeoman-ui/compare/v1.7.9...v1.7.10) (2022-05-15)
 
 **Note:** Version bump only for package root
