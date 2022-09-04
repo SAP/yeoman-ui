@@ -192,7 +192,7 @@
     "strip-ansi": "6.0.0",
     "sudo-prompt": "9.2.1",
     "titleize": "2.1.0",
-    "yeoman-environment": "3.3.0",
+    "yeoman-environment": "3.10.0",
     "yeoman-ui-frontend": "^1.7.11"
   },
   "devDependencies": {
@@ -205,7 +205,7 @@
     "@types/vscode": "^1.50.0",
     "@types/webpack-env": "^1.16.2",
     "@types/ws": "^7.4.5",
-    "@types/yeoman-environment": "^2.10.3",
+    "@types/yeoman-environment": "^2.10.8",
     "copy-webpack-plugin": "^9.0.0",
     "lcov-result-merger": "3.1.0",
     "sinon": "^11.1.1",
