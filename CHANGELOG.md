@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.1](https://github.com/SAP/yeoman-ui/compare/v1.7.11...v1.8.1) (2022-09-07)
+
+### Bug Fixes
+
+- suppot to yo-environment@3.10.0 ([#716](https://github.com/SAP/yeoman-ui/issues/716)) ([0cb8293](https://github.com/SAP/yeoman-ui/commit/0cb8293fcbf12f46da7681b89ebef85c9679550e))
+
 # [1.8.0](https://github.com/SAP/yeoman-ui/compare/v1.7.11...v1.8.0) (2022-09-07)
 
 ### Bug Fixes
