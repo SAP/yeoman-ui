@@ -14,8 +14,17 @@ const config = {
     // the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
     path: path.resolve(__dirname, "dist"),
     filename: "extension.js",
-    libraryTarget: "commonjs2",
+    library: {
+      type: "commonjs2",
+    },
     devtoolModuleFilenameTemplate: "../[resource-path]",
+  },
+  optimization: {
+    // The Default minimization options can sometimes cause JavaScript runtime errors.
+    // Also we don't actually need to minimize as much (not targeted for browser).
+    // Rather we mostly need to reduce the number of fileSystem access requests
+    // by reducing the number of files packaged inside our VSCode extensions
+    minimize: false,
   },
   externals: {
     vscode: "commonjs vscode",
@@ -86,8 +95,8 @@ const config = {
         test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]esm.js/,
         loader: "string-replace-loader",
         options: {
-          search: "import[(]pathToFileURL[(]fileToImport",
-          replace: "__non_webpack_require__(pathToFileURL(fileToImport",
+          search: "import[(]pathToFileURL",
+          replace: "__non_webpack_require__(pathToFileURL",
           flags: "g",
         },
       },
