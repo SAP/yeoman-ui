@@ -63,31 +63,31 @@ export interface IPrompt {
 /**
  * Enhanced validation messages to support embedded help urls and commands
  */
- export interface IValidationLink {
+export interface IValidationLink {
   /**
    * Validation message to be shown to the end user
    */
   message: string;
   link: {
-      /**
-       * The text associated with the help link
-       */
-      text: string;
-      /**
-       * A string base64 encoded image
-       */
-      icon?: string;
-      /**
-       * Command to be exectuted and parameters passed to the command
-       */
-      command?: {
-          id: string;
-          params: Object | string;
-      };
-      /**
-       * A http url string
-       */
-      url?: string;
+    /**
+     * The text associated with the help link
+     */
+    text: string;
+    /**
+     * A string base64 encoded image
+     */
+    icon?: string;
+    /**
+     * Command to be exectuted and parameters passed to the command
+     */
+    command?: {
+      id: string;
+      params: Object | string;
+    };
+    /**
+     * A http url string
+     */
+    url?: string;
   };
   /**
    * Provide a stringified version of the link that will be used on the CLI

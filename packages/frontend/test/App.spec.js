@@ -538,10 +538,10 @@ describe("App.vue", () => {
       id: "vscode.open",
       params: {
         a: {
-          b: 1
+          b: 1,
         },
-        c: ["2", "3"]
-      }
+        c: ["2", "3"],
+      },
     };
     const invokeSpy = jest.spyOn(wrapper.vm.rpc, "invoke");
     wrapper.vm.executeCommand(command);
