@@ -5,14 +5,9 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 # [1.9.0](https://github.com/SAP/yeoman-ui/compare/v1.8.2...v1.9.0) (2022-10-19)
 
-
 ### Features
 
-* **App.vue:** Adds support for command execution with object parameters ([#722](https://github.com/SAP/yeoman-ui/issues/722)) ([dace204](https://github.com/SAP/yeoman-ui/commit/dace204a732027abcbdc2d2a9cf5bbfe21d349fa))
-
-
-
-
+- **App.vue:** Adds support for command execution with object parameters ([#722](https://github.com/SAP/yeoman-ui/issues/722)) ([dace204](https://github.com/SAP/yeoman-ui/commit/dace204a732027abcbdc2d2a9cf5bbfe21d349fa))
 
 ## [1.3.1](https://github.com/SAP/yeoman-ui/compare/v1.3.0...v1.3.1) (2021-05-19)
 

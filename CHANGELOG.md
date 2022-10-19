@@ -5,20 +5,14 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 # [1.9.0](https://github.com/SAP/yeoman-ui/compare/v1.8.2...v1.9.0) (2022-10-19)
 
-
 ### Features
 
-* **App.vue:** Adds support for command execution with object parameters ([#722](https://github.com/SAP/yeoman-ui/issues/722)) ([dace204](https://github.com/SAP/yeoman-ui/commit/dace204a732027abcbdc2d2a9cf5bbfe21d349fa))
-
+- **App.vue:** Adds support for command execution with object parameters ([#722](https://github.com/SAP/yeoman-ui/issues/722)) ([dace204](https://github.com/SAP/yeoman-ui/commit/dace204a732027abcbdc2d2a9cf5bbfe21d349fa))
 
 ### Reverts
 
-* Revert "fix: suppot to yo-environment@3.10.0 (#716)" (#725) ([5e3829e](https://github.com/SAP/yeoman-ui/commit/5e3829ebd26ad2dc604b270deae29f317d1d6336)), closes [#716](https://github.com/SAP/yeoman-ui/issues/716) [#725](https://github.com/SAP/yeoman-ui/issues/725)
-* Revert "build: bundle minimization canceled (#717)" (#724) ([59e18d3](https://github.com/SAP/yeoman-ui/commit/59e18d3ac4aed758f5107db6ff09e924a4d116e1)), closes [#717](https://github.com/SAP/yeoman-ui/issues/717) [#724](https://github.com/SAP/yeoman-ui/issues/724)
-
-
-
-
+- Revert "fix: suppot to yo-environment@3.10.0 (#716)" (#725) ([5e3829e](https://github.com/SAP/yeoman-ui/commit/5e3829ebd26ad2dc604b270deae29f317d1d6336)), closes [#716](https://github.com/SAP/yeoman-ui/issues/716) [#725](https://github.com/SAP/yeoman-ui/issues/725)
+- Revert "build: bundle minimization canceled (#717)" (#724) ([59e18d3](https://github.com/SAP/yeoman-ui/commit/59e18d3ac4aed758f5107db6ff09e924a4d116e1)), closes [#717](https://github.com/SAP/yeoman-ui/issues/717) [#724](https://github.com/SAP/yeoman-ui/issues/724)
 
 ## [1.8.2](https://github.com/SAP/yeoman-ui/compare/v1.8.1...v1.8.2) (2022-09-07)
 
