@@ -504,7 +504,7 @@ describe("App.vue", () => {
     expect(wrapper.vm.logText).toBe("test_test_log");
   });
 
-  it("executeCommand - method", () => {
+  it("executeCommand:event - method", () => {
     wrapper = initComponent(App, {}, true);
     wrapper.vm.rpc = {
       invoke: jest.fn(),
@@ -521,6 +521,32 @@ describe("App.vue", () => {
     wrapper.vm.executeCommand(event);
 
     expect(invokeSpy).toHaveBeenCalledWith("executeCommand", ["vscode.open", ["param"]]);
+
+    invokeSpy.mockRestore();
+  });
+
+  it("executeCommand:command - method", () => {
+    wrapper = initComponent(App, {}, true);
+    wrapper.vm.rpc = {
+      invoke: jest.fn(),
+    };
+
+    /**
+     * @see {IValidationLink.link.command}
+     */
+    const command = {
+      id: "vscode.open",
+      params: {
+        a: {
+          b: 1,
+        },
+        c: ["2", "3"],
+      },
+    };
+    const invokeSpy = jest.spyOn(wrapper.vm.rpc, "invoke");
+    wrapper.vm.executeCommand(command);
+
+    expect(invokeSpy).toHaveBeenCalledWith("executeCommand", ["vscode.open", command.params]);
 
     invokeSpy.mockRestore();
   });

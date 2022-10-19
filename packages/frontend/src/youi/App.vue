@@ -266,10 +266,13 @@ export default {
         this.showBusyIndicator = false;
       }
     },
-    executeCommand(event) {
-      const command = event.target.getAttribute("command");
-      const params = event.target.getAttribute("params");
-      this.rpc.invoke("executeCommand", [command, params]);
+    executeCommand(cmdOrEvent) {
+      let command = cmdOrEvent;
+      if (cmdOrEvent.target) {
+        command.id = cmdOrEvent.target.getAttribute("command");
+        command.params = cmdOrEvent.target.getAttribute("params");
+      }
+      this.rpc.invoke("executeCommand", [command.id, command.params]);
     },
     back() {
       return this.gotoStep(1); // go 1 step back
