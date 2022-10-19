@@ -7,10 +7,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package generator-foodq
 
-
-
-
-
 ## [1.7.11](https://github.com/SAP/yeoman-ui/compare/v1.7.9...v1.7.11) (2022-07-23)
 
 ### Bug Fixes
