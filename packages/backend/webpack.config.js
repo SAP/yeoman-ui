@@ -74,24 +74,6 @@ const config = {
         },
       },
       {
-        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]esm.js/,
-        loader: "string-replace-loader",
-        options: {
-          search: "require[(]fileToImport",
-          replace: "__non_webpack_require__(fileToImport",
-          flags: "g",
-        },
-      },
-      {
-        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]esm.js/,
-        loader: "string-replace-loader",
-        options: {
-          search: "import[(]pathToFileURL[(]fileToImport",
-          replace: "__non_webpack_require__(pathToFileURL(fileToImport",
-          flags: "g",
-        },
-      },
-      {
         test: /yeoman-environment[/|\\]lib[/|\\]resolver.js/,
         loader: "string-replace-loader",
         options: {
