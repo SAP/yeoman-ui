@@ -530,7 +530,6 @@ describe("App.vue", () => {
     wrapper.vm.rpc = {
       invoke: jest.fn(),
     };
-
     /**
      * @see {IValidationLink.link.command}
      */
