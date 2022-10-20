@@ -37,7 +37,7 @@
     "legal:delete": "lerna exec \"shx rm -rf .reuse LICENSES\" || true",
     "lint:fix": "eslint . --ext=js,ts,vue --fix --max-warnings=0 --ignore-path=.gitignore",
     "lint:validate": "eslint . --ext=js,ts,vue --max-warnings=0 --ignore-path=.gitignore",
-    "release:publish": "lerna publish from-git --yes",
+    "release:publish": "lerna publish from-git --yes --no-verify-access",
     "release:version": "lerna version"
   },
   "husky": {
