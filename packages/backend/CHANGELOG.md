@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.9.1](https://github.com/SAP/yeoman-ui/compare/v1.9.0...v1.9.1) (2022-10-20)
+
+### Bug Fixes
+
+- formatting ([#728](https://github.com/SAP/yeoman-ui/issues/728)) ([e1cd479](https://github.com/SAP/yeoman-ui/commit/e1cd479a4873189da47572321dd4c6a6ffde79e5))
+
 # [1.9.0](https://github.com/SAP/yeoman-ui/compare/v1.8.2...v1.9.0) (2022-10-19)
 
 ### Reverts
