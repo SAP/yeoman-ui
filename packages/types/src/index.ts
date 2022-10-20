@@ -11,6 +11,7 @@ export abstract class AppWizard {
       showError(): void {}
       showInformation(): void {}
     }
+
     return genOptions.appWizard ? genOptions.appWizard : new EmptyAppWizard();
   }
 }
