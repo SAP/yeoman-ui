@@ -35,12 +35,3 @@ jobs:
 
       - name: Build
         run: yarn run ci
-
-      - name: Report coverage
-        # coverage should only be reported once per PR/push
-        if: matrix.node_version == '18.x'
-        # version is unpinned (should be `v1` === latest v1.x.y)
-        # see: https://github.com/coverallsapp/github-action/issues/94
-        uses: coverallsapp/github-action@1.1.3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
