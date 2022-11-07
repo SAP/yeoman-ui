@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/SAP/yeoman-ui.svg?style=svg)](https://circleci.com/gh/SAP/yeoman-ui)
+[![Continuous Integration](https://github.com/SAP/yeoman-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/SAP/yeoman-ui/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/SAP/yeoman-ui/badge.svg?branch=master)](https://coveralls.io/github/SAP/yeoman-ui?branch=master)
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/SAP/yeoman-ui.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/SAP/yeoman-ui/context:javascript)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
