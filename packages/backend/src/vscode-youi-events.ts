@@ -55,10 +55,7 @@ export class VSCodeYouiEvents implements YouiEvents {
   }
 
   public setAppWizardHeaderTitle(title: string, additionalInfo?: string): void {
-    void this.rpc.invoke("setHeaderTitle", [
-      title,
-      additionalInfo
-    ]);
+    void this.rpc.invoke("setHeaderTitle", [title, additionalInfo]);
   }
 
   public doGeneratorDone(

@@ -32,7 +32,7 @@ describe("Header.vue", () => {
     const testInfo = "test info";
     wrapper = initComponent(Header, { headerTitle: testTitle, headerInfo: testInfo });
     expect(wrapper.find("v-toolbar-title-stub").text()).toBe(testTitle);
-    expect(wrapper.find('v-tooltip-stub span').text()).toBe(testInfo);
+    expect(wrapper.find("v-tooltip-stub span").text()).toBe(testInfo);
   });
 
   test("click triggers collapseOutput method", async () => {

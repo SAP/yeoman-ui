@@ -6,7 +6,7 @@
         <template v-slot:activator="{ on, attrs }">
           <v-icon v-on="on">mdi-information-outline</v-icon>
         </template>
-       <span>{{ headerInfo }}</span>
+        <span>{{ headerInfo }}</span>
       </v-tooltip>
       <v-spacer></v-spacer>
       <v-btn v-if="isGeneric" text x-small color="primary" @click="openExploreGenerators">
@@ -50,6 +50,6 @@ header.v-app-bar.v-toolbar {
 }
 header.v-app-bar.v-toolbar .v-icon {
   padding: 9px 5px 6px;
-  opacity: .55;
+  opacity: 0.55;
 }
 </style>

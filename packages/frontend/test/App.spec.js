@@ -919,8 +919,8 @@ describe("App.vue", () => {
     });
 
     it("setHeaderTtle overrides", () => {
-      const testTitle = 'testHeaderTitle';
-      const testInfo = 'testHeaderInfo';
+      const testTitle = "testHeaderTitle";
+      const testInfo = "testHeaderInfo";
       wrapper = initComponent(App);
       wrapper.vm.setHeaderTitle(testTitle, testInfo);
       expect(wrapper.vm.headerTitle).toEqual(testTitle);

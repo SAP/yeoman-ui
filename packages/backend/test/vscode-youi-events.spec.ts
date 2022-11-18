@@ -224,8 +224,8 @@ describe("vscode-youi-events unit test", () => {
   });
 
   it("setAppWizardHeaderTitle", () => {
-    const testTitle = 'testTitle';
-    const testInfo = 'testInfo';
+    const testTitle = "testTitle";
+    const testInfo = "testInfo";
     rpcMock.expects("invoke").withExactArgs("setHeaderTitle", [testTitle, testInfo]);
     events.setAppWizardHeaderTitle(testTitle, testInfo);
   });
