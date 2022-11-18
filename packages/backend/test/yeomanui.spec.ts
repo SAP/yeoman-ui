@@ -47,7 +47,7 @@ describe("yeomanui unit test", () => {
     public showProgress(): void {
       return;
     }
-    public setHeaderTitle(title: string, additionalInfo?: string): void {
+    public setHeaderTitle(): void {
       return;
     }
   }
@@ -68,7 +68,7 @@ describe("yeomanui unit test", () => {
     public executeCommand(): Thenable<any> {
       return;
     }
-    public setAppWizardHeaderTitle(title: string, additionalInfo?: string): void {
+    public setAppWizardHeaderTitle(): void {
       return;
     }
   }

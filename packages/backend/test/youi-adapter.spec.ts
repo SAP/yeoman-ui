@@ -27,7 +27,7 @@ describe("YouiAdapter", () => {
     public executeCommand(): Thenable<any> {
       return;
     }
-    public setAppWizardHeaderTitle(title: string, additionalInfo?: string): void {
+    public setAppWizardHeaderTitle(): void {
       return;
     }
   }

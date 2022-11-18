@@ -3,7 +3,7 @@
     <v-app-bar class="elevation-0">
       <v-toolbar-title v-bind="attrs" v-on="on">{{ headerTitle }}</v-toolbar-title>
       <v-tooltip v-if="headerInfo" bottom>
-        <template v-slot:activator="{ on, attrs }">
+        <template v-slot:activator="{ on }">
           <v-icon v-on="on">mdi-information-outline</v-icon>
         </template>
         <span>{{ headerInfo }}</span>

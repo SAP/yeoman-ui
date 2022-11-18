@@ -11,7 +11,7 @@ export abstract class AppWizard {
       showWarning(): void {}
       showError(): void {}
       showInformation(): void {}
-      setHeaderTitle(title: string, additionalInfo?: string): void {}
+      setHeaderTitle(): void {}
     }
 
     return genOptions.appWizard ? genOptions.appWizard : new EmptyAppWizard();
