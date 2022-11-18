@@ -33,6 +33,11 @@ div.v-application .theme--light.v-btn.v-btn--disabled .v-icon {
   color: var(--vscode-button-foreground, #ffffff) !important;
 }
 
+div.v-application i.theme--light.v-icon {
+  font-size: 20px;
+  color: var(--vscode-foreground, #cccccc);
+}
+
 .v-application button.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined):hover {
   background-color: var(--vscode-button-hoverBackground, #1177bb);
   border-color: var(--vscode-button-hoverBackground, #1177bb);
