@@ -47,6 +47,9 @@ describe("yeomanui unit test", () => {
     public showProgress(): void {
       return;
     }
+    public setHeaderTitle(title: string, additionalInfo?: string): void {
+      return;
+    }
   }
   const appWizard: AppWizard = new TestAppWizard();
   class TestEvents implements YouiEvents {
@@ -63,6 +66,9 @@ describe("yeomanui unit test", () => {
       return;
     }
     public executeCommand(): Thenable<any> {
+      return;
+    }
+    public setAppWizardHeaderTitle(title: string, additionalInfo?: string): void {
       return;
     }
   }
@@ -237,6 +243,7 @@ describe("yeomanui unit test", () => {
             on: () => "",
           },
         });
+      rpcMock.expects("invoke").withExactArgs("setHeaderTitle", [undefined, undefined]);
       wsConfigMock.expects("get").withExactArgs("ApplicationWizard.TargetFolder").twice();
       rpcMock.expects("invoke").withArgs("showPrompt").resolves({ generator: "test1-project:app" });
       rpcMock.expects("invoke").withExactArgs("setGenInWriting", [false]).resolves();

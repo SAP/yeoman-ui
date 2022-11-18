@@ -1,7 +1,13 @@
 <template>
   <div>
     <v-app-bar class="elevation-0">
-      <v-toolbar-title>{{ headerTitle }}</v-toolbar-title>
+      <v-toolbar-title v-bind="attrs" v-on="on">{{ headerTitle }}</v-toolbar-title>
+      <v-tooltip v-if="headerInfo" bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-icon v-on="on">mdi-information-outline</v-icon>
+        </template>
+       <span>{{ headerInfo }}</span>
+      </v-tooltip>
       <v-spacer></v-spacer>
       <v-btn v-if="isGeneric" text x-small color="primary" @click="openExploreGenerators">
         <v-card-text> Explore and Install Generators... </v-card-text>
@@ -18,7 +24,7 @@
 <script>
 export default {
   name: "Header",
-  props: ["headerTitle", "stepName", "isInVsCode", "rpc", "isGeneric"],
+  props: ["headerTitle", "stepName", "isInVsCode", "rpc", "isGeneric", "headerInfo"],
   methods: {
     collapseOutput() {
       this.rpc.invoke("toggleOutput", [{}]);
@@ -41,5 +47,9 @@ header.v-app-bar.v-toolbar {
   border-bottom: 1px solid var(--vscode-editorWidget-background, #252526);
   box-shadow: none;
   background-color: var(--vscode-editor-background, #1e1e1e) !important;
+}
+header.v-app-bar.v-toolbar .v-icon {
+  padding: 9px 5px 6px;
+  opacity: .55;
 }
 </style>

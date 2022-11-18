@@ -3,6 +3,7 @@ export abstract class AppWizard {
   abstract showWarning(message: string, type: MessageType): void;
   abstract showError(message: string, type: MessageType): void;
   abstract showInformation(message: string, type: MessageType): void;
+  abstract setHeaderTitle(title: string, additionalInfo?: string): void;
 
   public static create(genOptions: any = {}): AppWizard {
     class EmptyAppWizard extends AppWizard {
@@ -10,6 +11,7 @@ export abstract class AppWizard {
       showWarning(): void {}
       showError(): void {}
       showInformation(): void {}
+      setHeaderTitle(title: string, additionalInfo?: string): void {}
     }
 
     return genOptions.appWizard ? genOptions.appWizard : new EmptyAppWizard();

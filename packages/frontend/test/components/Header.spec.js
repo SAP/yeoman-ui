@@ -17,7 +17,7 @@ describe("Header.vue", () => {
 
   test("component props", () => {
     wrapper = initComponent(Header);
-    expect(_.keys(wrapper.props())).toHaveLength(5);
+    expect(_.keys(wrapper.props())).toHaveLength(6);
   });
 
   test("generator brand", () => {
@@ -25,6 +25,14 @@ describe("Header.vue", () => {
     wrapper = initComponent(Header, { headerTitle: testGen });
     expect(wrapper.find("v-toolbar-title-stub").text()).toBe(testGen);
     expect(wrapper.find("v-icon-stub").text()).toBe("mdi-console");
+  });
+
+  test("set title and info", () => {
+    const testTitle = "test title";
+    const testInfo = "test info";
+    wrapper = initComponent(Header, { headerTitle: testTitle, headerInfo: testInfo });
+    expect(wrapper.find("v-toolbar-title-stub").text()).toBe(testTitle);
+    expect(wrapper.find('v-tooltip-stub span').text()).toBe(testInfo);
   });
 
   test("click triggers collapseOutput method", async () => {

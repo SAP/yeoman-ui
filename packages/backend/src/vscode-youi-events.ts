@@ -29,6 +29,11 @@ class YoUiAppWizard extends AppWizard {
   public showProgress(message?: string): void {
     this.events.showProgress(message);
   }
+
+  // Allows generators to update the App Wizard title
+  public setHeaderTitle(title: string, additionalInfo?: string): void {
+    this.events.setAppWizardHeaderTitle(title, additionalInfo);
+  }
 }
 
 export class VSCodeYouiEvents implements YouiEvents {
@@ -47,6 +52,13 @@ export class VSCodeYouiEvents implements YouiEvents {
     this.output = output;
     this.logger = getClassLogger("VSCodeYouiEvents");
     this.appWizard = new YoUiAppWizard(this);
+  }
+
+  public setAppWizardHeaderTitle(title: string, additionalInfo?: string): void {
+    void this.rpc.invoke("setHeaderTitle", [
+      title,
+      additionalInfo
+    ]);
   }
 
   public doGeneratorDone(
