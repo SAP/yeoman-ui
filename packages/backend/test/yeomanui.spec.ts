@@ -243,7 +243,7 @@ describe("yeomanui unit test", () => {
             on: () => "",
           },
         });
-      rpcMock.expects("invoke").withExactArgs("setHeaderTitle", [undefined, undefined]);
+      youiEventsMock.expects("setAppWizardHeaderTitle").withArgs(undefined);
       wsConfigMock.expects("get").withExactArgs("ApplicationWizard.TargetFolder").twice();
       rpcMock.expects("invoke").withArgs("showPrompt").resolves({ generator: "test1-project:app" });
       rpcMock.expects("invoke").withExactArgs("setGenInWriting", [false]).resolves();

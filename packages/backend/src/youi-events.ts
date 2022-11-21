@@ -12,4 +12,5 @@ export interface YouiEvents {
   showProgress(message?: string): void;
   getAppWizard(): AppWizard;
   executeCommand(id: string, ...args: any[]): Thenable<any>;
+  setAppWizardHeaderTitle(title: string, info?: string): void;
 }

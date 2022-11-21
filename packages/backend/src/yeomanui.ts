@@ -249,7 +249,7 @@ export class YeomanUI {
   }
 
   private resetHeaderTitle(): void {
-    void this.rpc.invoke("setHeaderTitle", [undefined, undefined]);
+    void this.youiEvents.setAppWizardHeaderTitle(undefined);
   }
 
   private setGenInWriting(gen: any) {
