@@ -4,7 +4,7 @@
       <v-toolbar-title v-bind="attrs" v-on="on">{{ headerTitle }}</v-toolbar-title>
       <v-tooltip v-if="headerInfo" bottom>
         <template v-slot:activator="{ on }">
-          <v-icon v-on="on">mdi-information-outline</v-icon>
+          <v-icon id="header-info-icon" v-on="on" >mdi-information-outline</v-icon>
         </template>
         <span>{{ headerInfo }}</span>
       </v-tooltip>
@@ -48,8 +48,8 @@ header.v-app-bar.v-toolbar {
   box-shadow: none;
   background-color: var(--vscode-editor-background, #1e1e1e) !important;
 }
-header.v-app-bar.v-toolbar .v-icon {
-  padding: 9px 5px 6px;
-  opacity: 0.55;
+#header-info-icon {
+  padding: 9px 12px 6px;
+  color: var(--vscode-notificationsInfoIcon-foreground, #5EADF2);
 }
 </style>
