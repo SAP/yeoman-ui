@@ -49,6 +49,7 @@ header.v-app-bar.v-toolbar {
   background-color: var(--vscode-editor-background, #1e1e1e) !important;
 }
 #header-info-icon {
+  font-size: 20px;
   padding: 9px 12px 6px;
   color: var(--vscode-notificationsInfoIcon-foreground, #5eadf2);
 }
