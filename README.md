@@ -4,7 +4,6 @@
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 ![GitHub license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP/yeoman-ui)](https://api.reuse.software/info/github.com/SAP/yeoman-ui)
-[![dependentbot](https://api.dependabot.com/badges/status?host=github&repo=SAP/yeoman-ui)](https://dependabot.com/)
 
 # Application Wizard
 

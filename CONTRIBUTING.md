@@ -141,8 +141,7 @@ Performing a release requires push permissions to the repository.
 - Ensure you are on the default branch and synced with origin.
 - `yarn run release:version`
 - Follow the lerna CLI instructions.
-- Track the release and tag builds on circle-ci.
-  - https://circleci.com/gh/SAP/yeoman-ui.
+- Track the build system until successful completion
 - Once the tag builds have successfully finished:
   - Inspect the npm registry to see the new sub packages versions.
   - Inspect the new github release and verify it contains the `.vsix` artifact.
