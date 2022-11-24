@@ -808,18 +808,21 @@ describe("yeomanui unit test", () => {
       };
       ReplayUtils["setDefaults"](questions, answers);
       for (const question of questions) {
-        switch (question.name) {
-          case "a":
-            expect((question as any)["answer"]).to.equal("x");
-            break;
-          case "b":
-            expect((question as any)["answer"]).to.equal("y");
-            break;
-          case "c":
-            expect((question as any)["answer"]).to.equal("z");
-            break;
-        }
+        expect((question as any)["__origAnswer"]).to.equal((<any>answers)[question.name]);
+        expect((question as any)["__ForceDefault"]).to.be.true;
       }
+    });
+
+    it("setDefaults", () => {
+      const questions = [{ name: "q1", default: "a" }, { name: "q2", default: () => "b" }, { name: "q3" }];
+      const answers = {
+        q1: "x",
+        q3: "z",
+      };
+      ReplayUtils["setDefaults"](questions, answers);
+      const question = _.find(questions, { name: "q2" });
+      expect((question as any).__origAnswer).to.be.undefined;
+      expect((question as any).__ForceDefault).to.be.undefined;
     });
   });
 
