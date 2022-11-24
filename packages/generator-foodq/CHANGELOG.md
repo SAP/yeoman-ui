@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.10.0](https://github.com/SAP/yeoman-ui/compare/v1.9.2...v1.10.0) (2022-11-24)
+
+### Features
+
+- **yeoman-ui:** provide ability to set the header title and info ([#738](https://github.com/SAP/yeoman-ui/issues/738)) ([1f68547](https://github.com/SAP/yeoman-ui/commit/1f6854763b35504c79ea1f260f2a7aa29eacbbe1))
+
 ## [1.9.2](https://github.com/SAP/yeoman-ui/compare/v1.9.1...v1.9.2) (2022-10-20)
 
 **Note:** Version bump only for package generator-foodq
