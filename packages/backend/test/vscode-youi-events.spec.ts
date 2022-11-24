@@ -223,6 +223,13 @@ describe("vscode-youi-events unit test", () => {
     events.doGeneratorInstall();
   });
 
+  it("setAppWizardHeaderTitle", () => {
+    const testTitle = "testTitle";
+    const testInfo = "testInfo";
+    rpcMock.expects("invoke").withExactArgs("setHeaderTitle", [testTitle, testInfo]);
+    events.setAppWizardHeaderTitle(testTitle, testInfo);
+  });
+
   describe("showProgress", () => {
     it("getAppWizard - no message received ---> show default Information message with Progress button", () => {
       const appWizard = events.getAppWizard();

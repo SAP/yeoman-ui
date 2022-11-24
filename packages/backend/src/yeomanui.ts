@@ -248,6 +248,10 @@ export class YeomanUI {
     process.chdir(this.initialCwd);
   }
 
+  private resetHeaderTitle(): void {
+    void this.youiEvents.setAppWizardHeaderTitle(undefined);
+  }
+
   private setGenInWriting(gen: any) {
     const genMethodName = "writing";
     const originalPrototype = Object.getPrototypeOf(gen);
@@ -313,6 +317,8 @@ export class YeomanUI {
     try {
       let generatorId: string = this.uiOptions.generator;
       if (!generatorId) {
+        // Reset current header title label, in case it has been updated by generators
+        this.resetHeaderTitle();
         const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
         await this._notifyGeneratorsInstall(this.uiOptions.installGens, true);
         const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);

@@ -917,6 +917,15 @@ describe("App.vue", () => {
       wrapper.vm.$data.messages = { yeoman_ui_title: "yeoman_ui_title" };
       expect(wrapper.vm.headerTitle).toEqual("yeoman_ui_title - testGeneratorPrettyName");
     });
+
+    it("setHeaderTtle overrides", () => {
+      const testTitle = "testHeaderTitle";
+      const testInfo = "testHeaderInfo";
+      wrapper = initComponent(App);
+      wrapper.vm.setHeaderTitle(testTitle, testInfo);
+      expect(wrapper.vm.headerTitle).toEqual(testTitle);
+      expect(wrapper.vm.headerInfo).toEqual(testInfo);
+    });
   });
 
   describe("setGenInWriting", () => {

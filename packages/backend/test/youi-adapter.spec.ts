@@ -27,6 +27,9 @@ describe("YouiAdapter", () => {
     public executeCommand(): Thenable<any> {
       return;
     }
+    public setAppWizardHeaderTitle(): void {
+      return;
+    }
   }
 
   class TestRpc implements IRpc {

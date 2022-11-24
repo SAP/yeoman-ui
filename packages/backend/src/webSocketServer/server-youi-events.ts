@@ -8,6 +8,9 @@ export class ServerYouiEvents implements YouiEvents {
   constructor(rpc: RpcCommon) {
     this.rpc = rpc;
   }
+  setAppWizardHeaderTitle(title: string, info?: string): void {
+    void this.rpc.invoke("setHeaderTitle", [title, info]);
+  }
 
   executeCommand(): Thenable<any> {
     return Promise.resolve();

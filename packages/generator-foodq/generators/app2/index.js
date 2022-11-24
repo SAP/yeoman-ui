@@ -12,6 +12,10 @@ module.exports = class extends Generator {
     this.appWizard = opts.appWizard;
     this.parentPromptsQuantity = _.size(this.prompts);
 
+    if (this.appWizard) {
+      opts.appWizard.setHeaderTitle(this.rootGeneratorName(), `Generator Version: ${this.rootGeneratorVersion()}`);
+    }
+
     this.option("silent", { type: Boolean });
     const silent = opts.silent || _.get(this.options, "silent", false);
 

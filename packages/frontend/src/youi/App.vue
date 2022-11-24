@@ -14,6 +14,7 @@
       id="header"
       v-if="prompts.length"
       :headerTitle="headerTitle"
+      :headerInfo="headerInfo"
       :stepName="promptIndex < prompts.length ? prompts[promptIndex].name : ''"
       :rpc="rpc"
       :isInVsCode="isInVsCode()"
@@ -155,6 +156,8 @@ function initialState() {
     promptMessageClass: "",
     promptMessageIcon: null,
     messageMaxLength: 100,
+    headerTitleProvided: "",
+    headerInfo: "",
   };
 }
 
@@ -198,6 +201,10 @@ export default {
       );
     },
     headerTitle() {
+      // If the header title is externally set then this overrides the default behaviour
+      if (!_isEmpty(this.headerTitleProvided)) {
+        return this.headerTitleProvided;
+      }
       const titleSuffix = _isEmpty(this.generatorPrettyName) ? "" : ` - ${this.generatorPrettyName}`;
       return `${_get(this.messages, "yeoman_ui_title")}${titleSuffix}`;
     },
@@ -293,6 +300,10 @@ export default {
         this.rpc.invoke("logError", [error]);
         this.reject(error);
       }
+    },
+    setHeaderTitle(title, info) {
+      this.headerTitleProvided = title;
+      this.headerInfo = info;
     },
     setGenInWriting(value) {
       this.isWriting = value;
@@ -567,6 +578,7 @@ export default {
         "isGeneratorsPrompt",
         "setGenInWriting",
         "showPromptMessage",
+        "setHeaderTitle",
       ];
       _forEach(functions, (funcName) => {
         this.rpc.registerMethod({
