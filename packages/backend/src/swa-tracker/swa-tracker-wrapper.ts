@@ -1,6 +1,16 @@
-import { SWATracker } from "@sap/swa-for-sapbas-vsx";
 import { IChildLogger } from "@vscode-logging/logger";
 import _ = require("lodash");
+
+export type ISWATracker = {
+  track: (eventType: string, customEvents?: string[] | undefined, numericEvents?: number[] | undefined) => void;
+};
+
+const SWA_NOOP: ISWATracker = {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- leave args for reference
+  track(eventType: string, customEvents?: string[]): void {
+    return;
+  },
+};
 
 /**
  * A Simple Wrapper to hold the state of our "singleton" (per extension) SWATracker
@@ -19,14 +29,14 @@ export class SWA {
     PREVIOUS_STEP: "One of the previous steps is clicked",
   };
 
-  private static swaTracker: SWATracker;
+  private static swaTracker: ISWATracker;
   private static startTime: number = Date.now();
 
   private static isInitialized(): boolean {
     return !_.isUndefined(SWA.swaTracker);
   }
 
-  private static initSWATracker(newSwaTracker: SWATracker) {
+  private static initSWATracker(newSwaTracker: ISWATracker) {
     SWA.swaTracker = newSwaTracker;
   }
 
@@ -36,7 +46,7 @@ export class SWA {
    *
    * @returns { SWATracker }
    */
-  public static getSWATracker(): SWATracker {
+  public static getSWATracker(): ISWATracker {
     if (SWA.isInitialized() === false) {
       return;
     }
@@ -45,31 +55,8 @@ export class SWA {
 
   public static createSWATracker(logger?: IChildLogger) {
     try {
-      const swaTracker = new SWATracker(
-        "SAPSE",
-        SWA.YEOMAN_UI,
-        // callback for error, one such callback for all the errors we receive via all the track methods
-        // error can be string (err.message) or number (response.statusCode)
-        (error: string | number) => {
-          if (logger) {
-            if (typeof error === "string") {
-              logger.error("SAP Web Analytics tracker failed to track", {
-                errorMessage: error,
-              });
-            } else if (typeof error === "number") {
-              // bug in matomo-tracker: they think that success is 200 or 30[12478], so we are rechecking here
-              if (!(error >= 200 && error <= 299) && !(error >= 300 && error <= 399)) {
-                logger.error("SAP Web Analytics tracker failed to track", {
-                  statusCode: error,
-                });
-              }
-            }
-          }
-        }
-      );
-
       // Update the swa-tracker-wrapper with a reference to the swaTracker.
-      SWA.initSWATracker(swaTracker);
+      SWA.initSWATracker(SWA_NOOP);
       if (logger) {
         logger.info(`SAP Web Analytics tracker was created for ${SWA.YEOMAN_UI}`);
       }
