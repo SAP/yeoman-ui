@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.2](https://github.com/SAP/yeoman-ui/compare/v1.10.1...v1.10.2) (2023-01-23)
+
+### Bug Fixes
+
+- [DEVXBUGS-10865] "Explore and Install Generators" page is empty ([#741](https://github.com/SAP/yeoman-ui/issues/741)) ([c7cad32](https://github.com/SAP/yeoman-ui/commit/c7cad3233f1cb4077813b0bc2d0a0ba5449a6b9c))
+
 ## [1.10.1](https://github.com/SAP/yeoman-ui/compare/v1.10.0...v1.10.1) (2022-11-24)
 
 **Note:** Version bump only for package root
