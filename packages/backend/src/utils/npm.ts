@@ -28,8 +28,9 @@ export type PackagesData = {
 export const isWin32 = platform() === "win32";
 const NPM = isWin32 ? "npm.cmd" : "npm";
 
-const NPM_REGISTRY_HOST = _.get(process, "env.NPM_CFG_REGISTRY", "http://registry.npmjs.com/");
-const SEARCH_QUERY_PREFIX = `${NPM_REGISTRY_HOST}-/v1/search?text=`;
+const regUrl = new URL(_.get(process, "env.NPM_CFG_REGISTRY", "http://registry.npmjs.com/"));
+regUrl.pathname = `-/v1/search`;
+const SEARCH_QUERY_PREFIX = `${regUrl.toString()}?text=`;
 const SEARCH_QUERY_SUFFIX = "keywords:yeoman-generator &size=25&ranking=popularity";
 
 const CANCELED = "Action cancelled";
