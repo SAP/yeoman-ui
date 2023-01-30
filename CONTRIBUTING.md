@@ -66,32 +66,34 @@ use the top-level compilation scripts to avoid forgetting to (re-)compile a sub-
 Dev mode allows you to run the yeoman framework in the browser, using vue cli for fast development cycles, and easy debug tools.
 To run it do the following:
 
-- In the packages/backend folder run `webpack` or `webpack-dev:watch`, then run the server.
+- comment out the [logger instantiating](/packages/backend/src/utils/env.ts#L38) in env.ts source file.
+- in the packages/backend folder run `webpack` or `webpack-dev:watch`, then run the server.
   ```bash
-  yarn webpack-dev:watch
+  yarn webpack
   yarn ws:run
   ```
-- In the packages/frontend folder run `serve`
+- in the packages/frontend folder run `serve`
   ```bash
   yarn serve
   ```
-- Open the broswer on `localhost:8080` to access the framework.
+- open the broswer on `localhost:8080` to access the framework.
 
 #### Run the explore generators framework in dev mode
 
 Dev mode allows you to run the explore generators framework in the browser, using vue cli for fast development cycles, and easy debug tools.
 To run it do the following:
 
-- In the packages/backend folder run `webpack` or `webpack-dev:watch`, then run the server.
+- comment out the [logger instantiating](/packages/backend/src/utils/env.ts#L38) in env.ts source file.
+- in the packages/backend folder run `webpack` or `webpack-dev:watch`, then run the server.
   ```bash
   yarn webpack-dev:watch
   yarn ws:egRun
   ```
-- In the packages/frontend folder run `serve`
+- in the packages/frontend folder run `serve`
   ```bash
   yarn serve
   ```
-- Open the broswer on `localhost:8080/exploregens` to access the framework.
+- open the broswer on `localhost:8080/exploregens` to access the framework.
 
 #### Run the VSCode extension
 
