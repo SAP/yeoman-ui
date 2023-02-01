@@ -32,17 +32,26 @@ function getTypes(filterObject?: any): string[] {
   return _.compact(_.map(types, _.trim));
 }
 
+function getHideFromWizard(filterObject?: any): boolean {
+  return _.get(filterObject, "hideFromWizard", false);
+}
+
 export class GeneratorFilter {
   public static create(filterObject?: any) {
     const categories: string[] = getCategories(filterObject);
     const types: string[] = getTypes(filterObject);
+    const hideFromWizard: boolean = getHideFromWizard(filterObject);
 
-    return new GeneratorFilter(types, categories);
+    return new GeneratorFilter(types, categories, hideFromWizard);
   }
 
   public static hasIntersection(array1: string[], array2: string[]) {
     return _.isEmpty(array1) || !_.isEmpty(_.intersection(array1, array2));
   }
 
-  private constructor(public readonly types: string[], public readonly categories: string[]) {}
+  private constructor(
+    public readonly types: string[],
+    public readonly categories: string[],
+    public readonly hideFromWizard: boolean
+  ) {}
 }

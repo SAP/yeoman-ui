@@ -504,6 +504,29 @@ describe("yeomanui unit test", () => {
       });
     });
 
+    it("generator with 'hideFromWizard' filter - should be hidden in UI", async () => {
+      const generatorQuestion: any = {
+        type: "list",
+        guiType: "tiles",
+        guiOptions: {
+          hint: yeomanUi["uiOptions"].messages.select_generator_question_hint,
+        },
+        name: "generator",
+        message: yeomanUi["uiOptions"].messages.channel_name,
+        choices: [],
+      };
+      gensMeta[0].generatorPackageJson = {
+        "generator-filter": { hideFromWizard: true, type: "project" },
+        description: "testHideFromWizard",
+      };
+      envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta.slice(0, 1));
+      const result = await yeomanUi["getGeneratorsPrompt"]();
+      expect(result).to.be.deep.equal({
+        name: "Select Generator",
+        questions: [generatorQuestion],
+      });
+    });
+
     it("get generators with type project", async () => {
       wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns({});
       envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta);

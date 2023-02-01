@@ -548,7 +548,7 @@ export class YeomanUI {
     this.typesMap.set(genMeta.namespace, type);
     _.includes(genFilter.types, "tools-suite") && this.generatorsToIgnoreArray.push(genMeta.namespace);
 
-    if (typesHasIntersection && categoriesHasIntersection) {
+    if (!genFilter.hideFromWizard && typesHasIntersection && categoriesHasIntersection) {
       return this.createGeneratorChoice(genMeta.namespace, genMeta.packagePath, packageJson);
     }
   }

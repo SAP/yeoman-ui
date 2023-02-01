@@ -60,6 +60,13 @@ describe("filter unit test", () => {
     expect(genFilter.categories).to.be.deep.equal(testCategories);
   });
 
+  it("hideFromWizard property is positive", () => {
+    const genFilter: GeneratorFilter = GeneratorFilter.create({
+      hideFromWizard: true,
+    });
+    expect(genFilter.hideFromWizard).to.be.true;
+  });
+
   it("empty spaces of each type should be removed", () => {
     const genFilter: GeneratorFilter = GeneratorFilter.create({
       types: ["  value1  ", "value2   ", "  value3", true],
