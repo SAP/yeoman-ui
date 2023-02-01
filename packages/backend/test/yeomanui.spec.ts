@@ -504,7 +504,7 @@ describe("yeomanui unit test", () => {
       });
     });
 
-    it("generator with 'hideFromWizard' filter - should be hidden in UI", async () => {
+    it("generator with 'hidden' category should not be shown'", async () => {
       const generatorQuestion: any = {
         type: "list",
         guiType: "tiles",
@@ -516,8 +516,8 @@ describe("yeomanui unit test", () => {
         choices: [],
       };
       gensMeta[0].generatorPackageJson = {
-        "generator-filter": { hideFromWizard: true, type: "project" },
-        description: "testHideFromWizard",
+        "generator-filter": { categories: ["hidden"], type: "project" },
+        description: "test hidden category",
       };
       envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta.slice(0, 1));
       const result = await yeomanUi["getGeneratorsPrompt"]();
