@@ -520,7 +520,7 @@ describe("yeomanui unit test", () => {
         questions: [generatorQuestion],
       };
 
-      it("generator should not be shown", async () => {
+      it("positive - generator should not be shown", async () => {
         gensMeta[0].generatorPackageJson = {
           "generator-filter": { categories: ["hidden"], type: "project" },
           description: "test hidden category",
@@ -537,17 +537,17 @@ describe("yeomanui unit test", () => {
         };
         envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta.slice(0, 1));
         const result = await yeomanUi["getGeneratorsPrompt"]();
-        expect(result).to.be.deep.equal(noGeneratorsResult);
+        expect(result).to.not.be.deep.equal(noGeneratorsResult);
       });
 
-      it("generator should not be shown although naming is similar", async () => {
+      it("negative - generator should not be hidden although category is similar", async () => {
         gensMeta[0].generatorPackageJson = {
           "generator-filter": { categories: ["hidden2", "hiden"], type: "project" },
           description: "test hidden category",
         };
         envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta.slice(0, 1));
         const result = await yeomanUi["getGeneratorsPrompt"]();
-        expect(result).to.be.deep.equal(noGeneratorsResult);
+        expect(result).to.not.be.deep.equal(noGeneratorsResult);
       });
     });
 
