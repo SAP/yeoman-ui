@@ -504,7 +504,7 @@ describe("yeomanui unit test", () => {
       });
     });
 
-    it("generator with 'hidden' category should not be shown'", async () => {
+    describe("generator with 'hidden' category", () => {
       const generatorQuestion: any = {
         type: "list",
         guiType: "tiles",
@@ -515,15 +515,39 @@ describe("yeomanui unit test", () => {
         message: yeomanUi["uiOptions"].messages.channel_name,
         choices: [],
       };
-      gensMeta[0].generatorPackageJson = {
-        "generator-filter": { categories: ["hidden"], type: "project" },
-        description: "test hidden category",
-      };
-      envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta.slice(0, 1));
-      const result = await yeomanUi["getGeneratorsPrompt"]();
-      expect(result).to.be.deep.equal({
+      const noGeneratorsResult = {
         name: "Select Generator",
         questions: [generatorQuestion],
+      };
+
+      it("generator should not be shown", async () => {
+        gensMeta[0].generatorPackageJson = {
+          "generator-filter": { categories: ["hidden"], type: "project" },
+          description: "test hidden category",
+        };
+        envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta.slice(0, 1));
+        const result = await yeomanUi["getGeneratorsPrompt"]();
+        expect(result).to.be.deep.equal(noGeneratorsResult);
+      });
+
+      it("generator should not be shown although there are additional categories'", async () => {
+        gensMeta[0].generatorPackageJson = {
+          "generator-filter": { categories: ["sap.cap", "hidden"], type: "project" },
+          description: "test hidden category",
+        };
+        envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta.slice(0, 1));
+        const result = await yeomanUi["getGeneratorsPrompt"]();
+        expect(result).to.be.deep.equal(noGeneratorsResult);
+      });
+
+      it("generator should not be shown although naming is similar", async () => {
+        gensMeta[0].generatorPackageJson = {
+          "generator-filter": { categories: ["hidden2", "hiden"], type: "project" },
+          description: "test hidden category",
+        };
+        envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta.slice(0, 1));
+        const result = await yeomanUi["getGeneratorsPrompt"]();
+        expect(result).to.be.deep.equal(noGeneratorsResult);
       });
     });
 
