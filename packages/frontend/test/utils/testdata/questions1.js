@@ -312,4 +312,20 @@ export default [
     answer: ["Chimay Trappist Ales", "Paulaner Salvator Doppel Bock", "Weihenstephaner Korbinian"],
     shouldShow: true,
   },
+  {
+    type: "input",
+    name: "shoudBeSkippedAsFalse",
+    message: "Should be skipped",
+    guiOptions: {
+      breadcrumb: false,
+    },
+    askAnswered: false,
+    _message: "Should be skipped since breadcrumb is false",
+    isValid: true,
+    validationMessage: "",
+    isMandatory: true,
+    isDirty: false,
+    answer: "None",
+    shouldShow: true,
+  },
 ];

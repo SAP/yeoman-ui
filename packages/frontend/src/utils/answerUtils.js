@@ -53,7 +53,7 @@ export default {
         const bcSetting = question.guiOptions?.breadcrumb;
         const answer = question.answer;
         // 'shouldShow' will only display visible prompt answers
-        if (question.shouldShow && !_isNil(answer) && !_isNil(bcSetting)) {
+        if (question.shouldShow && !_isNil(answer) && !_isNil(bcSetting) && bcSetting !== false) {
           answerLabels.push({
             label:
               typeof bcSetting === "string"
