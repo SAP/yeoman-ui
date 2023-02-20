@@ -1,4 +1,4 @@
-import { initComponent, destroy } from "../Utils";
+import { initComponent, unmount } from "../Utils";
 import Header from "../../src/components/Header.vue";
 //There are issues of importing vuetify components https://github.com/vuejs/vue-cli/issues/1584
 import _ from "lodash";
@@ -7,12 +7,12 @@ let wrapper;
 
 describe("Header.vue", () => {
   afterEach(() => {
-    destroy(wrapper);
+    unmount(wrapper);
   });
 
   test("component name", () => {
     wrapper = initComponent(Header);
-    expect(wrapper.name()).toBe("Header");
+    expect(wrapper.vm.$options.name).toBe("Header"); //Wrapper.name() is deprecated
   });
 
   test("component props", () => {

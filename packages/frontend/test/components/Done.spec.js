@@ -1,4 +1,4 @@
-import { initComponent, destroy } from "../Utils";
+import { initComponent, unmount } from "../Utils";
 import Done from "../../src/components/Done.vue";
 import _ from "lodash";
 
@@ -8,12 +8,12 @@ describe("Done.vue", () => {
   const testDoneMessage = "testDoneMessage";
 
   afterEach(() => {
-    destroy(wrapper);
+    unmount(wrapper);
   });
 
   test("component name", () => {
     wrapper = initComponent(Done);
-    expect(wrapper.name()).toBe("Done");
+    expect(wrapper.vm.$options.name).toBe("Done"); // wrapper.name() is deprecated
   });
 
   test("component props", () => {

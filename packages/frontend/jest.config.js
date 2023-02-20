@@ -5,7 +5,7 @@ module.exports = {
   collectCoverageFrom: [
     "src/**/*.{js,vue}",
     "!**/node_modules/**",
-    "!<rootDir>/src/utils.js",
+    "!<rootDir>/src/utils/utils.js",
     "!<rootDir>/src/exploregens/**",
     "!<rootDir>/src/youi/main.js",
     "!<rootDir>/src/plugins/**",

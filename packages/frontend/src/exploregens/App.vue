@@ -97,7 +97,7 @@ import _forEach from "lodash/forEach";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import messages from "./messages";
-import utils from "../utils";
+import utils from "../utils/utils";
 
 export default {
   name: "exploregens",
