@@ -16,26 +16,22 @@ describe("Breadcrumbs.vue", () => {
   });
 
   test("shows answers", async () => {
-    wrapper = initComponent(
-      Breadcrumbs,
-      { breadcrumbs: [{ label: "answerLabel1", value: "answerValue1" }] },
-      true
-    );
+    wrapper = initComponent(Breadcrumbs, { breadcrumbs: [{ label: "answerLabel1", value: "answerValue1" }] }, true);
     expect(wrapper.findAll('[data-test="breadcrumbs"]')).toHaveLength(1);
     expect(wrapper.findAll('[data-test="moreLessButton"]')).toHaveLength(0);
     // Replaces answers
     await wrapper.setProps({
       breadcrumbs: [
         { label: "answerLabel2", value: "answerValue2" },
-        { label: "answerLabel3", value: "answerValue3" }
-      ]
+        { label: "answerLabel3", value: "answerValue3" },
+      ],
     });
     const breadcrumbs = wrapper.findAll('[data-test="breadcrumbs"]');
     expect(breadcrumbs.wrappers[0].html()).toMatchInlineSnapshot(
-      `<div id="answer-0" data-test="breadcrumbs" class="answer"><span>answerLabel2: </span><span>answerValue2</span></div>`
+      `<div data-test="breadcrumbs" class="answer"><span>answerLabel2: </span><span>answerValue2</span></div>`
     );
     expect(breadcrumbs.wrappers[1].html()).toMatchInlineSnapshot(
-      `<div id="answer-1" data-test="breadcrumbs" class="answer"><span>answerLabel3: </span><span>answerValue3</span></div>`
+      `<div data-test="breadcrumbs" class="answer"><span>answerLabel3: </span><span>answerValue3</span></div>`
     );
     expect(wrapper.findAll('[data-test="moreLessButton"]')).toHaveLength(0);
   });
@@ -52,18 +48,22 @@ describe("Breadcrumbs.vue", () => {
     Object.defineProperty(answerBox.element, "clientHeight", { value: 10 });
     // Trigger recalc
     await wrapper.setProps({
-      breadcrumbs: [{ label: "answerLabel1", value: "answerValue1" }]
+      breadcrumbs: [{ label: "answerLabel1", value: "answerValue1" }],
     });
     expect(calcIsMoreSpy).toHaveBeenCalledTimes(2); // Once by v-resize, once adding answers
     const moreLess = wrapper.get('[data-test="moreLessButton"]');
-    expect(moreLess.html()).toMatchInlineSnapshot(
-      `<div data-test="moreLessButton" class="more">More...</div>`
-    );
+    expect(moreLess.html()).toMatchInlineSnapshot(`
+      <div data-test="moreLessButton" class="more">
+        More...
+      </div>
+    `);
 
     await moreLess.trigger("click");
-    expect(moreLess.html()).toMatchInlineSnapshot(
-      `<div data-test="moreLessButton" class="more">Less</div>`
-    );
+    expect(moreLess.html()).toMatchInlineSnapshot(`
+      <div data-test="moreLessButton" class="more">
+        Less
+      </div>
+    `);
     expect(answerBox.classes("show-more")).toBe(true);
 
     calcIsMoreSpy.mockRestore();

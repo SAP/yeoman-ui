@@ -165,7 +165,7 @@ function initialState() {
     messageMaxLength: 100,
     headerTitleProvided: "",
     headerInfo: "",
-    currentAnswerTexts: {} // Answer state for navigation answer history
+    currentAnswerTexts: {}, // Answer state for navigation answer history
   };
 }
 
@@ -177,7 +177,7 @@ export default {
     Done,
     Info,
     PromptInfo,
-    Loading
+    Loading,
   },
   data() {
     return initialState();

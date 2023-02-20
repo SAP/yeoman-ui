@@ -148,7 +148,7 @@ module.exports = class extends Generator {
         name: "hungry",
         message: "Are you hungry?",
         guiOptions: {
-          breadcrumb: "Hungry"
+          breadcrumb: "Hungry",
         },
         default: true,
         when: () => _.isNil(this._getOption("hungry")),
@@ -161,7 +161,7 @@ module.exports = class extends Generator {
           return `You said you are ${isHungry ? "" : "not "}hungry. Is this correct?`;
         },
         guiOptions: {
-          breadcrumb: "Really hungry"
+          breadcrumb: "Really hungry",
         },
         store: true,
         validate: (value) => {
@@ -180,7 +180,7 @@ module.exports = class extends Generator {
         message: "What's your favorite napkin color?",
         guiOptions: {
           hint: "Our recommendation is green",
-          breadcrumb: "Napkin color"
+          breadcrumb: "Napkin color",
         },
         when: (response) => {
           if (_.isNil(this._getOption("favColor"))) {
@@ -220,7 +220,7 @@ module.exports = class extends Generator {
           hint: "We hope you have been in our restaurant many times",
           applyDefaultWhenDirty: true,
           mandatory: true,
-          breadcrumb: "Restaurant visits"
+          breadcrumb: "Restaurant visits",
         },
         when: () => _.isNil(this._getOption("number")),
       },
@@ -237,8 +237,8 @@ module.exports = class extends Generator {
           return false;
         },
         type: "checkbox",
-        guiOptions: { 
-          breadcrumb: "Beer"
+        guiOptions: {
+          breadcrumb: "Beer",
         },
         name: "beers",
         message: "Which beer would you like?",

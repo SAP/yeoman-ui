@@ -11,7 +11,9 @@
         <span>{{ item.label ? item.label + ":" : "" }} </span><span>{{ item.value }}</span>
       </div>
     </div>
-    <div v-if="showMoreLess" @click="showMore = !showMore" class="more" data-test="moreLessButton">{{ showMore ? "More..." : "Less" }}</div>
+    <div v-if="showMoreLess" @click="showMore = !showMore" class="more" data-test="moreLessButton">
+      {{ showMore ? "More..." : "Less" }}
+    </div>
   </div>
 </template>
 

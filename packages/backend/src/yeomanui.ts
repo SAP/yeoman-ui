@@ -524,7 +524,7 @@ export class YeomanUI {
       guiType: "tiles",
       guiOptions: {
         hint: this.uiOptions.messages.select_generator_question_hint,
-        breadcrumb: "" // Empty string hides label for selected generator nav breadcrumb
+        breadcrumb: "", // Empty string hides label for selected generator nav breadcrumb
       },
       name: "generator",
       message: this.uiOptions.messages.select_generator_question_message,

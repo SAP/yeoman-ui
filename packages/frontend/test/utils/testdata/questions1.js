@@ -17,8 +17,8 @@ export default [
       },
       {
         name: "List choice 3",
-        value: "lc3"
-      }
+        value: "lc3",
+      },
     ],
     askAnswered: false,
     _message: "Normalised message list with string values",
@@ -33,8 +33,8 @@ export default [
       },
       {
         name: "Normalised List choice 3",
-        value: "lc3"
-      }
+        value: "lc3",
+      },
     ],
     isValid: false,
     validationMessage: "Mandatory field",
@@ -110,7 +110,7 @@ export default [
           entityName: "Customers",
           type: "NorthwindModel.Customer",
         },
-      }
+      },
     ],
     message: "Choices with object values",
     default: 0,
@@ -137,7 +137,7 @@ export default [
           entityName: "Customers",
           type: "NorthwindModel.Customer",
         },
-      }
+      },
     ],
     _default: 0,
     isValid: true,
@@ -291,7 +291,7 @@ export default [
       "Allagash White Ale",
       "St. Feuillien Blonde",
       "Houblon Chouffe Dobbelen IPA Tripel",
-      "Augustiner Hell"
+      "Augustiner Hell",
     ],
     askAnswered: false,
     _message: "Normalise msg: Which beer would you like?",
@@ -303,7 +303,7 @@ export default [
       { name: "Allagash White Ale", value: "Allagash White Ale" },
       { name: "St. Feuillien Blonde", value: "St. Feuillien Blonde" },
       { name: "Houblon Chouffe Dobbelen IPA Tripel", value: "Houblon Chouffe Dobbelen IPA Tripel" },
-      { name: "Augustiner Hell", value: "Augustiner Hell" }
+      { name: "Augustiner Hell", value: "Augustiner Hell" },
     ],
     isValid: true,
     validationMessage: "",
