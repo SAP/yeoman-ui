@@ -7,19 +7,19 @@ describe("Tests for answerUtils", () => {
     expect(breadcrumbs).toMatchInlineSnapshot(`
       Array [
         Object {
-          "label": "Normalised message list with string values",
+          "label": "Normalised Message List With String Values",
           "value": "Norlmalised List choice 2",
         },
         Object {
-          "label": "Normalised message for list of strings",
+          "label": "Normalised Message For List Of Strings",
           "value": "Normalised List choice 3",
         },
         Object {
-          "label": "Normalised message for list of numbers",
+          "label": "Normalised Message For List Of Numbers",
           "value": 3,
         },
         Object {
-          "label": "Normalised msg for choices with object values",
+          "label": "Normalised Msg For Choices With Object Values",
           "value": "Normalised Choice with object value 1",
         },
         Object {
@@ -27,15 +27,15 @@ describe("Tests for answerUtils", () => {
           "value": "Some text",
         },
         Object {
-          "label": "Normalised input message",
+          "label": "Normalised Input Message",
           "value": "A text answer",
         },
         Object {
-          "label": "File path",
+          "label": "File Path",
           "value": "/some/file/path",
         },
         Object {
-          "label": "Normalised confirm message",
+          "label": "Normalised Confirm Message",
           "value": "Yes",
         },
         Object {
