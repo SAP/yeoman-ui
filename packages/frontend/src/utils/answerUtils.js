@@ -1,16 +1,22 @@
 import _isEqual from "lodash/isEqual";
 import _startCase from "lodash/startCase";
 import _isNil from "lodash/isNil";
+import _has from "lodash/has";
 
 /**
  * Resolves the answer value to a choice label text which was provided to the UI
  */
 function getTextsForChoices(choices, answer) {
   const answerChoice = choices.find((choice) => {
-    // Choice may be a list of string values or name/value pairs
-    return _isEqual(choice.value || choice, answer);
+    // Choice may be a list of string values or name/value pairs and value may be an empty string
+    const choiceValue = _has(choice, "value") ? choice.value : choice;
+    return _isEqual(choiceValue, answer);
   });
-  return answerChoice.name || answerChoice;
+
+  if (_has(answerChoice, "name")) {
+    return answerChoice.name;
+  }
+  return !_isNil(answerChoice) ? answerChoice : "";
 }
 
 /**
@@ -46,7 +52,6 @@ export default {
    *
    */
   getLabelsForAnswers: (questions) => {
-    //console.log(`getLabelsForAnswers: questions: ${JSON.stringify(questions)}}`)
     if (questions && Array.isArray(questions)) {
       const answerLabels = [];
       questions.forEach((question) => {

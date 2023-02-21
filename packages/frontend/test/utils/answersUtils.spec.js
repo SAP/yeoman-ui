@@ -50,6 +50,14 @@ describe("Tests for answerUtils", () => {
           "label": "Choosen beer (checkboxes)",
           "value": "Chimay Trappist Ales,Paulaner Salvator Doppel Bock,Weihenstephaner Korbinian",
         },
+        Object {
+          "label": "Empty String Choice Value Test",
+          "value": "None",
+        },
+        Object {
+          "label": "Empty String Choice Test",
+          "value": "",
+        },
       ]
     `);
   });
