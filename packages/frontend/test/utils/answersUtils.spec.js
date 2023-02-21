@@ -4,6 +4,7 @@ import questions1Data from "./testdata/questions1";
 describe("Tests for answerUtils", () => {
   test("getLabelsForAnswers ", () => {
     const breadcrumbs = answerUtils.getLabelsForAnswers(questions1Data);
+
     expect(breadcrumbs).toMatchInlineSnapshot(`
       Array [
         Object {
