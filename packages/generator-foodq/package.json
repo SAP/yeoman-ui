@@ -2,7 +2,7 @@
   "name": "generator-foodq",
   "version": "1.10.5",
   "private": true,
-  "description": "A sample generator to preview all the options available when using the Yeoman-UI (updated)",
+  "description": "A sample generator to preview all the options available when using the Yeoman-UI",
   "keywords": [
     "yeoman-generator"
   ],
