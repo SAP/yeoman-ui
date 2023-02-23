@@ -12,25 +12,34 @@
         >
           {{ prompts[index - 1] ? prompts[index - 1].name : "" }}
         </v-stepper-step>
-        <v-stepper-content :step="index" :key="`${index}-content`"></v-stepper-content>
+        <v-stepper-content :step="index" :key="`${index}-content`">
+          <Breadcrumbs class="breadcrumbs" :id="`breadcrumbs-${index}`" :breadcrumbs="answers[index - 1]" />
+        </v-stepper-content>
       </template>
     </v-stepper>
   </div>
 </template>
 
 <script>
+import Breadcrumbs from "../components/Breadcrumbs.vue";
 export default {
   name: "Navigation",
-  props: ["promptIndex", "prompts"],
+  components: {
+    Breadcrumbs,
+  },
+  props: ["promptIndex", "prompts", "currentAnswers"],
   data() {
     return {
       currentStep: 1,
       steps: 1,
+      answers: [],
     };
   },
   methods: {
     getStepClass(currentStep, index) {
-      return { "step-linkable": currentStep > index };
+      return {
+        "step-linkable": currentStep > index,
+      };
     },
     gotoStep(numOfSteps) {
       // numOfSteps is number of steps to go back
@@ -48,77 +57,107 @@ export default {
     prompts(val) {
       this.steps = val.length;
     },
+    currentAnswers(val = []) {
+      if (this.answers[this.promptIndex]) {
+        if (val.length > 0) {
+          this.answers.splice(this.promptIndex, 1, val);
+        }
+      } else {
+        this.answers.push(val);
+      }
+    },
   },
 };
 </script>
 
-<style>
-div.v-stepper.v-stepper--vertical {
-  background-color: transparent;
-  box-shadow: none;
-  border-radius: 0;
-  border-image: url("../assets/dots.svg");
-}
+<style lang="scss">
 div.v-stepper div.v-stepper__step {
-  padding: 24px;
-  border-bottom: 1px solid var(--vscode-editor-background, #1e1e1e);
-}
-.v-stepper__step--complete.v-stepper__step {
-  background: var(--vscode-editor-background, #1e1e1e);
-}
-.v-stepper__step--active.v-stepper__step {
-  background: var(--vscode-editor-background, #1e1e1e);
-}
-.v-stepper__step--inactive.v-stepper__step {
-  background: var(--vscode-editor-background, #1e1e1e);
+  padding-left: 0px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  /* Step bullet  */
+  .v-stepper__step__step {
+    font-size: 0px;
+    background-color: transparent !important;
+    color: var(--vscode-editor-foreground, #616161) !important;
+    border: 1px solid;
+    height: 12px;
+    width: 12px;
+    min-width: 12px;
+    margin-right: 10px;
+    transition: 0.3s ease-in-out;
+    .v-icon.v-icon {
+      font-size: 0;
+    }
+  }
+  /* Step label */
+  .v-stepper__label {
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--vscode-editor-foreground, #616161) !important;
+    transition: 0.3s ease-in-out;
+  }
+  &--complete {
+    .v-stepper__label {
+      color: var(--vscode-textLink-foreground, #3794ff) !important;
+      text-decoration-line: underline;
+      cursor: pointer;
+      &:hover {
+        text-decoration-line: none;
+      }
+    }
+    .v-stepper__step__step {
+      background-color: var(--vscode-textLink-foreground, #3794ff) !important;
+      border: none;
+    }
+  }
+  &--active {
+    .v-stepper__step__step {
+      background-color: transparent !important;
+      border-color: var(--vscode-editor-foreground, #616161) !important;
+    }
+  }
+  &--inactive {
+    .v-stepper__label,
+    .v-stepper__step__step {
+      background-color: var(--vscode-editor-background, #252526) !important;
+    }
+    opacity: 0.4;
+  }
 }
 
-span.v-stepper__step__step {
-  font-size: 0px;
-  height: 14px;
-  min-width: 14px;
-  width: 14px;
-}
-span.v-stepper__step__step .v-icon.v-icon {
-  font-size: 0;
-}
-/* Have to be important since vuetify itself define this color important */
-div.v-application div.v-stepper__step--complete span.v-stepper__step__step {
-  background: var(--vscode-charts-purple, #652d90) !important;
-}
-div.v-application div.v-stepper__step--active span.v-stepper__step__step.primary {
-  background: var(--vscode-button-hoverBackground, #1177bb) !important;
-}
-div.v-application div.v-stepper__step--inactive .v-stepper__step__step {
-  background: var(--vscode-charts-blue, #3794ff) !important;
-}
-div.v-stepper div.v-stepper__step.v-stepper__step--complete div.v-stepper__label {
-  color: var(--vscode-charts-purple, #652d90);
-}
-div.v-stepper div.v-stepper__step.v-stepper__step--active div.v-stepper__label {
-  color: var(--vscode-button-hoverBackground, #1177bb);
-}
-div.v-stepper div.v-stepper__step.v-stepper__step--inactive div.v-stepper__label {
-  color: var(--vscode-charts-blue, #3794ff);
-}
-div.v-application div.v-stepper.v-stepper--vertical .v-stepper__content:not(:last-child) {
-  transition: none;
-  margin-left: 29px;
-  margin-top: -22px;
-  margin-bottom: -18px;
-  border-width: 0px;
-  position: relative;
-  z-index: 100;
-  mask-image: url("../assets/dots.svg");
-  mask-repeat: repeat-y;
-  mask-size: 3px;
-  background-position: left;
-  background-color: var(--vscode-editorCodeLens-foreground, #999999);
-}
-.step-linkable {
-  cursor: pointer;
-}
-.step-linkable:hover {
-  background-color: var(--vscode-list-hoverBackground, #2a2d2e);
+div.v-application {
+  div.left-col {
+    overflow-y: auto;
+  }
+  div.v-stepper.v-stepper--vertical {
+    background-color: var(--vscode-editor-background, #252526);
+    box-shadow: none;
+    padding-top: 10px;
+    .v-stepper__content {
+      margin-left: 5px;
+      margin-bottom: 0px;
+      margin-top: 0px;
+      padding-top: 0px;
+      padding-bottom: 20px;
+      padding-left: 16px;
+      transition: none;
+      &:not(:last-child) {
+        border-left: 1px solid var(--vscode-editorWidget-border, #c8c8c8);
+        transition: none;
+      }
+      &:last-child {
+        padding-left: 17px; // Adjust for border-left
+      }
+      .v-stepper__wrapper {
+        height: auto !important;
+        transition: none;
+      }
+      .breadcrumbs {
+        transition: max-height 0.3s ease-in-out;
+      }
+    }
+  }
 }
 </style>

@@ -492,6 +492,7 @@ describe("yeomanui unit test", () => {
         type: "list",
         guiType: "tiles",
         guiOptions: {
+          breadcrumb: "",
           hint: yeomanUi["uiOptions"].messages.select_generator_question_hint,
         },
         name: "generator",
@@ -520,6 +521,7 @@ describe("yeomanui unit test", () => {
             type: "list",
             guiType: "tiles",
             guiOptions: {
+              breadcrumb: "",
               hint: yeomanUi["uiOptions"].messages.select_generator_question_hint,
             },
             name: "generator",

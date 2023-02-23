@@ -23,8 +23,8 @@ export function initComponent(component, propsData, isMount) {
   return initFunction.call(this, component, props);
 }
 
-export function destroy(wrapper) {
-  if (wrapper && wrapper.destroy) {
-    wrapper.destroy();
+export function unmount(wrapper) {
+  if (wrapper && wrapper.unmount) {
+    wrapper.unmount();
   }
 }

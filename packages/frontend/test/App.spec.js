@@ -1,4 +1,4 @@
-import { initComponent, destroy } from "./Utils";
+import { initComponent, unmount } from "./Utils";
 import App from "../src/youi/App";
 import Vue from "vue";
 import Vuetify from "vuetify";
@@ -11,7 +11,7 @@ let wrapper;
 
 describe("App.vue", () => {
   afterEach(() => {
-    destroy(wrapper);
+    unmount(wrapper);
   });
 
   it("createPrompt - method", () => {

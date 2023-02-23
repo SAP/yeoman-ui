@@ -24,7 +24,13 @@
 
     <v-row class="main-row ma-0 pa-0">
       <v-col class="left-col ma-0 pa-0" cols="3">
-        <Navigation v-if="prompts.length" :promptIndex="promptIndex" :prompts="prompts" @onGotoStep="gotoStep" />
+        <Navigation
+          v-if="prompts.length"
+          :promptIndex="promptIndex"
+          :prompts="prompts"
+          @onGotoStep="gotoStep"
+          :currentAnswers="currentAnswerTexts"
+        />
       </v-col>
       <v-col cols="9" class="right-col">
         <v-row class="prompts-col">
@@ -117,7 +123,8 @@ import LoginPlugin from "@sap-devx/inquirer-gui-login-plugin";
 import TilesPlugin from "@sap-devx/inquirer-gui-tiles-plugin";
 import LabelPlugin from "@sap-devx/inquirer-gui-label-plugin";
 import { Severity } from "@sap-devx/yeoman-ui-types";
-import utils from "../utils";
+import utils from "../utils/utils";
+import answerUtils from "../utils/answerUtils";
 
 const FUNCTION = "__Function";
 const PENDING = "pending";
@@ -158,6 +165,7 @@ function initialState() {
     messageMaxLength: 100,
     headerTitleProvided: "",
     headerInfo: "",
+    currentAnswerTexts: {}, // Answer state for navigation answer history
   };
 }
 
@@ -344,6 +352,8 @@ export default {
           currentPrompt.status === PENDING || _isEmpty(currentPrompt.questions) ? false : _isNil(issues);
 
         currentPrompt.answers = answers;
+        this.currentAnswerTexts = answerUtils.getLabelsForAnswers(currentPrompt.questions);
+
         if (currentPrompt.answers.generator) {
           this.isToolsSuiteTypeGen = this.isToolsSuiteType(currentPrompt.answers.generator);
         }
@@ -660,12 +670,10 @@ div.consoleClassVisible .v-footer {
   word-wrap: break-word;
   white-space: pre-wrap;
 }
-.left-col {
-  background-color: var(--vscode-editorWidget-background, #252526);
-}
 .prompts-col {
   overflow-y: auto;
   margin: 0px;
+  padding-bottom: 20px;
 }
 .main-row,
 .prompts-col {
