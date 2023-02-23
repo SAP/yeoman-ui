@@ -58,6 +58,10 @@ describe("Tests for answerUtils", () => {
           "label": "Empty String Choice Test",
           "value": "",
         },
+        Object {
+          "label": "",
+          "value": "Some answers",
+        },
       ]
     `);
   });

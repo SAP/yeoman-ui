@@ -362,4 +362,20 @@ export default [
     shouldShow: true,
     _choices: [""],
   },
+  {
+    type: "input",
+    name: "emptyString",
+    message: "Should be included with empty label",
+    guiOptions: {
+      breadcrumb: "",
+    },
+    askAnswered: false,
+    _message: "Empty label test",
+    isValid: true,
+    validationMessage: "",
+    isMandatory: true,
+    isDirty: false,
+    answer: "Some answers",
+    shouldShow: true,
+  },
 ];
