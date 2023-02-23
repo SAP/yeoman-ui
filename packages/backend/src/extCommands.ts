@@ -1,8 +1,8 @@
 import { ExtensionContext, commands } from "vscode";
-
+import { YeomanUIPanel } from "./panels/YeomanUIPanel";
 export class ExtCommands {
   private exploreGensPanel: any;
-  private yeomanUIPanel: any;
+  private yeomanUIPanels: YeomanUIPanel[] = [];
   private context: ExtensionContext;
 
   constructor(context: ExtensionContext) {
@@ -37,24 +37,28 @@ export class ExtCommands {
   }
 
   private async yeomanUIPanel_toggleOutput_Command() {
-    return (await this.getYeomanUIPanel()).toggleOutput();
+    return (await this.getYeomanUIPanel(true))?.toggleOutput();
   }
 
   private async yeomanUIPanel_notifyGeneratorsChange_Command(uiOptions?: any) {
-    return (await this.getYeomanUIPanel()).notifyGeneratorsChange(uiOptions);
+    return (await this.getYeomanUIPanel(true))?.notifyGeneratorsChange(uiOptions);
   }
 
   private async exploreGenerators_Command(uiOptions?: any) {
     return (await this.getExploreGensPanel()).loadWebviewPanel(uiOptions);
   }
 
-  public async getYeomanUIPanel() {
-    if (!this.yeomanUIPanel) {
-      const { YeomanUIPanel } = await import("./panels/YeomanUIPanel");
-      this.yeomanUIPanel = new YeomanUIPanel(this.context);
+  public async getYeomanUIPanel(onlyActive?: boolean): Promise<YeomanUIPanel | undefined> {
+    // for 'onlyActive' returns an existing active and visible panel
+    if (onlyActive) {
+      return this.yeomanUIPanels.find(
+        (panel) => panel["webViewPanel"] && panel["webViewPanel"].active && panel["webViewPanel"].visible
+      );
     }
-
-    return this.yeomanUIPanel;
+    const { YeomanUIPanel } = await import("./panels/YeomanUIPanel");
+    const panel = new YeomanUIPanel(this.context);
+    this.yeomanUIPanels.push(panel);
+    return panel;
   }
 
   public async getExploreGensPanel() {

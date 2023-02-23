@@ -4,6 +4,7 @@ import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { expect } from "chai";
 import { createSandbox, SinonSandbox, SinonMock } from "sinon";
 import { ExtCommands } from "../src/extCommands";
+import { YeomanUIPanel } from "../src/panels/YeomanUIPanel";
 
 describe("extension commands unit test", () => {
   let sandbox: SinonSandbox;
@@ -14,6 +15,13 @@ describe("extension commands unit test", () => {
     subscriptions: [],
     extensionPath: "testExtensionpath",
   };
+
+  const yeomanUIPanelMock = <YeomanUIPanel>(<unknown>{
+    runGenerator: () => "",
+    loadWebviewPanel: () => "",
+    toggleOutput: () => "",
+    notifyGeneratorsChange: () => "",
+  });
 
   before(() => {
     sandbox = createSandbox();
@@ -60,15 +68,9 @@ describe("extension commands unit test", () => {
   });
 
   it("call YeomanUIPanel commands", async () => {
-    const yeomanUIPanelMock = {
-      runGenerator: () => "",
-      loadWebviewPanel: () => "",
-      toggleOutput: () => "",
-      notifyGeneratorsChange: () => "",
-    };
-
     const extCommands = new ExtCommands(testContext);
-    extCommands["yeomanUIPanel"] = yeomanUIPanelMock;
+    const extCommandsMock = sandbox.mock(extCommands);
+    extCommandsMock.expects("getYeomanUIPanel").atLeast(4).resolves(yeomanUIPanelMock);
 
     const runGeneratorSpy = sandbox.spy(yeomanUIPanelMock, "runGenerator");
     const loadWebviewPanelSpy = sandbox.spy(yeomanUIPanelMock, "loadWebviewPanel");
@@ -84,21 +86,58 @@ describe("extension commands unit test", () => {
     expect(loadWebviewPanelSpy.called).to.be.true;
     expect(toggleOutputSpy.called).to.be.true;
     expect(notifyGeneratorsChangeSpy.called).to.be.true;
+
+    extCommandsMock.verify();
   });
 
   it("getYeomanUIPanel", async () => {
     const extCommands = new ExtCommands(testContext);
-    extCommands["yeomanUIPanel"] = undefined;
+    extCommands["yeomanUIPanels"] = [];
 
     loggerWrapperMock.expects("getClassLogger");
-    // windowMock.expects("registerWebviewPanelSerializer").withArgs("yeomanui");
 
-    // yeomanUIPanel is undefined
-    const yeomanUIPanel_firstTime = await extCommands["getYeomanUIPanel"]();
-    // yeomanUIPanel should be already defined
-    const yeomanUIPanel_secondTime = await extCommands["getYeomanUIPanel"]();
+    const yeomanUIPanel = await extCommands["getYeomanUIPanel"]();
 
-    expect(yeomanUIPanel_firstTime).to.be.equal(yeomanUIPanel_secondTime);
+    expect(yeomanUIPanel).to.be.instanceOf(YeomanUIPanel);
+    expect(extCommands["yeomanUIPanels"]).to.be.lengthOf(1);
+    expect(yeomanUIPanel).to.be.equal(extCommands["yeomanUIPanels"][0]);
+  });
+
+  it("getYeomanUIPanel onlyActive", async () => {
+    const activeVisiblePanel = <YeomanUIPanel>(<unknown>{
+      ...yeomanUIPanelMock,
+      webViewPanel: { active: true, visible: true },
+    });
+
+    const extCommands = new ExtCommands(testContext);
+    extCommands["yeomanUIPanels"] = [activeVisiblePanel];
+
+    const panel = await extCommands["getYeomanUIPanel"](true);
+
+    expect(activeVisiblePanel).to.be.equal(panel);
+  });
+
+  it("getYeomanUIPanel onlyActive - should return undefined when invisible", async () => {
+    const invisiblePanel = <YeomanUIPanel>(<unknown>{
+      ...yeomanUIPanelMock,
+      webViewPanel: { active: true, visible: false },
+    });
+
+    const extCommands = new ExtCommands(testContext);
+    extCommands["yeomanUIPanels"] = [invisiblePanel];
+
+    const activeYeomanUIPanel = await extCommands["getYeomanUIPanel"](true);
+
+    expect(activeYeomanUIPanel).to.be.undefined;
+  });
+
+  it("getYeomanUIPanel onlyActive -  should return undefined when no webViewPanel", async () => {
+    const extCommands = new ExtCommands(testContext);
+    extCommands["yeomanUIPanels"] = [yeomanUIPanelMock];
+
+    const activeYeomanUIPanel = await extCommands["getYeomanUIPanel"](true);
+
+    expect(activeYeomanUIPanel).to.be.undefined;
   });
 
   it("getExploreGensPanel", async () => {
