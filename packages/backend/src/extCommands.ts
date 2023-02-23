@@ -1,5 +1,6 @@
 import { ExtensionContext, commands } from "vscode";
 import { YeomanUIPanel } from "./panels/YeomanUIPanel";
+
 export class ExtCommands {
   private exploreGensPanel: any;
   private yeomanUIPanels: YeomanUIPanel[] = [];
