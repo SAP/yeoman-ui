@@ -77,6 +77,7 @@ $line-height: 1.42rem; // Approximation of line height (`lh` not available)
     }
     .answer span:first-child {
       font-weight: 700;
+      text-transform: capitalize;
     }
   }
   .more {
