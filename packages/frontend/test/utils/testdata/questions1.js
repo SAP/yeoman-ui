@@ -378,4 +378,20 @@ export default [
     answer: "Some answers",
     shouldShow: true,
   },
+  {
+    type: "input",
+    name: "testStartCasing",
+    message: "",
+    guiOptions: {
+      breadcrumb: true,
+    },
+    askAnswered: false,
+    _message: "Label with numbers123 and brackets (in brackets)",
+    isValid: true,
+    validationMessage: "",
+    isMandatory: true,
+    isDirty: false,
+    answer: "Some answers",
+    shouldShow: true,
+  },
 ];

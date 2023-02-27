@@ -7,19 +7,19 @@ describe("Tests for answerUtils", () => {
     expect(breadcrumbs).toMatchInlineSnapshot(`
       Array [
         Object {
-          "label": "Normalised Message List With String Values",
+          "label": "Normalised message list with string values",
           "value": "Norlmalised List choice 2",
         },
         Object {
-          "label": "Normalised Message For List Of Strings",
+          "label": "Normalised message for list of strings",
           "value": "Normalised List choice 3",
         },
         Object {
-          "label": "Normalised Message For List Of Numbers",
+          "label": "Normalised message for list of numbers",
           "value": 3,
         },
         Object {
-          "label": "Normalised Msg For Choices With Object Values",
+          "label": "Normalised msg for choices with object values",
           "value": "Normalised Choice with object value 1",
         },
         Object {
@@ -27,15 +27,15 @@ describe("Tests for answerUtils", () => {
           "value": "Some text",
         },
         Object {
-          "label": "Normalised Input Message",
+          "label": "Normalised input message",
           "value": "A text answer",
         },
         Object {
-          "label": "File Path",
+          "label": "File path",
           "value": "/some/file/path",
         },
         Object {
-          "label": "Normalised Confirm Message",
+          "label": "Normalised confirm message",
           "value": "Yes",
         },
         Object {
@@ -51,15 +51,19 @@ describe("Tests for answerUtils", () => {
           "value": "Chimay Trappist Ales,Paulaner Salvator Doppel Bock,Weihenstephaner Korbinian",
         },
         Object {
-          "label": "Empty String Choice Value Test",
+          "label": "Empty string choice value test",
           "value": "None",
         },
         Object {
-          "label": "Empty String Choice Test",
+          "label": "Empty string choice test",
           "value": "",
         },
         Object {
           "label": "",
+          "value": "Some answers",
+        },
+        Object {
+          "label": "Label with numbers123 and brackets (in brackets)",
           "value": "Some answers",
         },
       ]
