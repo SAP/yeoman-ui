@@ -13,7 +13,11 @@
           {{ prompts[index - 1] ? prompts[index - 1].name : "" }}
         </v-stepper-step>
         <v-stepper-content :step="index" :key="`${index}-content`">
-          <Breadcrumbs class="breadcrumbs" :id="`breadcrumbs-${index}`" :breadcrumbs="answers[index - 1]" />
+          <Breadcrumbs
+            class="breadcrumbs"
+            :id="`breadcrumbs-${index}`"
+            :breadcrumbs="answers[prompts[index - 1] ? prompts[index - 1].name : undefined]"
+          />
         </v-stepper-content>
       </template>
     </v-stepper>
@@ -27,12 +31,12 @@ export default {
   components: {
     Breadcrumbs,
   },
-  props: ["promptIndex", "prompts", "currentAnswers"],
+  props: ["promptIndex", "prompts", "promptAnswers"],
   data() {
     return {
       currentStep: 1,
       steps: 1,
-      answers: [],
+      answers: {},
     };
   },
   methods: {
@@ -57,13 +61,10 @@ export default {
     prompts(val) {
       this.steps = val.length;
     },
-    currentAnswers(val = []) {
-      if (this.answers[this.promptIndex]) {
-        if (val.length > 0) {
-          this.answers.splice(this.promptIndex, 1, val);
-        }
-      } else {
-        this.answers.push(val);
+    promptAnswers(val = {}) {
+      if (val.promptName && val.answers) {
+        // Vue 2 requires a new object for reactivity to trigger updates
+        this.answers = Object.assign({}, this.answers, { [val.promptName]: val.answers });
       }
     },
   },
@@ -78,8 +79,8 @@ div.v-stepper div.v-stepper__step {
   /* Step bullet  */
   .v-stepper__step__step {
     font-size: 0px;
-    background-color: transparent !important;
-    color: var(--vscode-editor-foreground, #616161) !important;
+    background-color: transparent !important; // Required since  Vuetify `.v-application .primary` adds background-color !important
+    color: var(--vscode-editor-foreground, #616161);
     border: 1px solid;
     height: 12px;
     width: 12px;
@@ -95,12 +96,18 @@ div.v-stepper div.v-stepper__step {
     font-weight: bold;
     font-size: 14px;
     line-height: 17px;
-    color: var(--vscode-editor-foreground, #616161) !important;
+    color: var(
+      --vscode-editor-foreground,
+      #616161
+    ) !important; // Required since Vuetify adds inline color for selector: `.theme--dark.v-stepper .v-stepper__label`
     transition: 0.3s ease-in-out;
   }
   &--complete {
     .v-stepper__label {
-      color: var(--vscode-textLink-foreground, #3794ff) !important;
+      color: var(
+        --vscode-textLink-foreground,
+        #3794ff
+      ) !important; // Override Vuetifys theme specific selectors `.theme--dark.v-stepper .v-stepper__step--complete .v-stepper__label`
       text-decoration-line: underline;
       cursor: pointer;
       &:hover {
@@ -108,20 +115,29 @@ div.v-stepper div.v-stepper__step {
       }
     }
     .v-stepper__step__step {
-      background-color: var(--vscode-textLink-foreground, #3794ff) !important;
+      background-color: var(
+        --vscode-textLink-foreground,
+        #3794ff
+      ) !important; // Required since Vuetify adds background-color !important for selector `.v-application .primary`
       border: none;
     }
   }
   &--active {
     .v-stepper__step__step {
       background-color: transparent !important;
-      border-color: var(--vscode-editor-foreground, #616161) !important;
+      border-color: var(
+        --vscode-editor-foreground,
+        #616161
+      ) !important; // Required since Vuetify adds border-color !important for selector `.v-application .primary`
     }
   }
   &--inactive {
     .v-stepper__label,
     .v-stepper__step__step {
-      background-color: var(--vscode-editor-background, #252526) !important;
+      background-color: var(
+        --vscode-editor-background,
+        #252526
+      ) !important; // Override Vuetifys theme specific selector `.theme--dark.v-stepper .v-stepper__step:not(.v-stepper__step--active):not(.v-stepper__step--complete):not(.v-stepper__step--error) .v-stepper__step__step`
     }
     opacity: 0.4;
   }
@@ -151,7 +167,7 @@ div.v-application {
         padding-left: 17px; // Adjust for border-left
       }
       .v-stepper__wrapper {
-        height: auto !important;
+        height: auto !important; // Vuetify adds inline height: 0px for complete steps. A complex selector could be used instead for content adjacent to steps with specifc states (e.g. `--complete`).
         transition: none;
       }
       .breadcrumbs {

@@ -35,38 +35,49 @@ describe("Navigation.vue", () => {
     expect(wrapper.vm.currentStep).toEqual(6);
   });
 
-  test("component props - currentAnswers", async () => {
-    const currentAnswersSpy = jest.spyOn(Navigation.watch, "currentAnswers");
+  test("component props - promptAnswers", async () => {
+    const promptAnswersSpy = jest.spyOn(Navigation.watch, "promptAnswers");
     wrapper = initComponent(Navigation, { promptIndex: 0, prompts: [{ firstStep: 1 }, { secondStep: 2 }] }, true);
 
-    let firstStepAnswers = [
-      { label: "answerLabel1", value: "answerValue1" },
-      { label: "answerLabel2", value: "answerValue2" },
-    ];
+    let firstStepAnswers = {
+      promptName: "1st prompt",
+      answers: [
+        { label: "answerLabel1", value: "answerValue1" },
+        { label: "answerLabel2", value: "answerValue2" },
+      ],
+    };
 
-    await wrapper.setProps({ currentAnswers: firstStepAnswers });
-    expect(currentAnswersSpy).toHaveBeenCalledTimes(1);
-    expect(currentAnswersSpy).toHaveBeenCalledWith(firstStepAnswers, undefined);
-    expect(wrapper.vm.answers).toEqual([firstStepAnswers]);
+    await wrapper.setProps({ promptAnswers: firstStepAnswers });
+    expect(promptAnswersSpy).toHaveBeenCalledTimes(1);
+    expect(promptAnswersSpy).toHaveBeenCalledWith(firstStepAnswers, undefined);
+    expect(wrapper.vm.answers).toEqual({ [firstStepAnswers.promptName]: firstStepAnswers.answers });
 
-    firstStepAnswers = [
-      { label: "answerLabel1", value: "answerValue1" },
-      { label: "answerLabel3", value: "answerValue3" },
-    ];
+    firstStepAnswers = {
+      promptName: "1st prompt",
+      answers: [
+        { label: "answerLabel1", value: "answerValue1" },
+        { label: "answerLabel3", value: "answerValue3" },
+      ],
+    };
     // Same step, answers should be replaced
     await wrapper.setProps({
-      currentAnswers: firstStepAnswers,
+      promptAnswers: firstStepAnswers,
     });
-    expect(wrapper.vm.answers).toEqual([firstStepAnswers]);
+    expect(wrapper.vm.answers).toEqual({ [firstStepAnswers.promptName]: firstStepAnswers.answers });
 
-    // Next step, answers should be appended
-    await wrapper.setProps({ promptIndex: 1 });
-    let secondStepAnswers = [
-      { label: "answerLabel4", value: "answerValue4" },
-      { label: "answerLabel5", value: "answerValue5" },
-    ];
-    await wrapper.setProps({ currentAnswers: secondStepAnswers });
-    expect(wrapper.vm.answers).toEqual([firstStepAnswers, secondStepAnswers]);
+    // A different step, answers should be appended
+    let secondStepAnswers = {
+      promptName: "2nd prompt",
+      answers: [
+        { label: "answerLabel4", value: "answerValue4" },
+        { label: "answerLabel5", value: "answerValue5" },
+      ],
+    };
+    await wrapper.setProps({ promptAnswers: secondStepAnswers });
+    expect(wrapper.vm.answers).toEqual({
+      [firstStepAnswers.promptName]: firstStepAnswers.answers,
+      [secondStepAnswers.promptName]: secondStepAnswers.answers,
+    });
   });
 
   describe("gotoStep", () => {

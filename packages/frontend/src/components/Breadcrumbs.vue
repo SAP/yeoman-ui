@@ -81,7 +81,7 @@ $line-height: 1.42rem; // Approximation of line height (`lh` not available)
     }
   }
   .more {
-    color: var(--vscode-textLink-foreground, #3794ff) !important;
+    color: var(--vscode-textLink-foreground, #3794ff);
     text-decoration-line: underline;
     cursor: pointer;
     padding-top: 5px;
