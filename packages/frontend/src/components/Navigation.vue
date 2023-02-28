@@ -167,7 +167,7 @@ div.v-application {
         padding-left: 17px; // Adjust for border-left
       }
       .v-stepper__wrapper {
-        height: auto !important; // Vuetify adds inline height: 0px for complete steps. A complex selector could be used instead for content adjacent to steps with specifc states (e.g. `--complete`).
+        height: auto !important; // Override inline height: 0px for complete and inactive steps.
         transition: none;
       }
       .breadcrumbs {
