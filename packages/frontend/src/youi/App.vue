@@ -29,7 +29,7 @@
           :promptIndex="promptIndex"
           :prompts="prompts"
           @onGotoStep="gotoStep"
-          :currentAnswers="currentAnswerTexts"
+          :promptAnswers="currentAnswerTexts"
         />
       </v-col>
       <v-col cols="9" class="right-col">
@@ -352,7 +352,10 @@ export default {
           currentPrompt.status === PENDING || _isEmpty(currentPrompt.questions) ? false : _isNil(issues);
 
         currentPrompt.answers = answers;
-        this.currentAnswerTexts = answerUtils.getLabelsForAnswers(currentPrompt.questions);
+        this.currentAnswerTexts = {
+          promptName: currentPrompt.name,
+          answers: answerUtils.getLabelsForAnswers(currentPrompt.questions),
+        };
 
         if (currentPrompt.answers.generator) {
           this.isToolsSuiteTypeGen = this.isToolsSuiteType(currentPrompt.answers.generator);
