@@ -77,6 +77,11 @@ const ViewColumn = {
   Two: 2,
 };
 
+const EventEmitter = {
+  fire: () => {},
+  dispose: () => {},
+};
+
 const vscodeMock = {
   Uri,
   context,
@@ -84,6 +89,7 @@ const vscodeMock = {
   commands,
   window,
   ViewColumn,
+  EventEmitter,
 };
 
 export const getVscodeMock = () => vscodeMock;

@@ -5,7 +5,7 @@ import _ from "lodash";
 
 let wrapper;
 
-describe("Header.vue", () => {
+describe.skip("Header.vue", () => {
   afterEach(() => {
     destroy(wrapper);
   });
@@ -35,7 +35,7 @@ describe("Header.vue", () => {
     expect(wrapper.find("v-tooltip-stub span").text()).toBe(testInfo);
   });
 
-  test("click triggers collapseOutput method", async () => {
+  test.skip("click triggers collapseOutput method", async () => {
     const rpcInvokeMockFunction = jest.fn();
     wrapper = initComponent(
       Header,

@@ -12,7 +12,7 @@
       <v-btn v-if="isGeneric" text x-small color="primary" @click="openExploreGenerators">
         <v-card-text> Explore and Install Generators... </v-card-text>
       </v-btn>
-      <v-btn v-if="!isInVsCode" class="ma-2" icon @click="collapseOutput">
+      <v-btn v-if="isInVsCode" class="ma-2" icon @click="collapseOutput">
         <v-card-text>
           <v-icon>mdi-console</v-icon>
         </v-card-text>

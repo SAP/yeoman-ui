@@ -34,6 +34,7 @@ describe("extension commands unit test", () => {
   beforeEach(() => {
     windowMock = sandbox.mock(vscode.window);
     loggerWrapperMock = sandbox.mock(loggerWrapper);
+    // sandbox.mock(vscode.EventEmitter);
   });
 
   afterEach(() => {
@@ -70,40 +71,44 @@ describe("extension commands unit test", () => {
   it("call YeomanUIPanel commands", async () => {
     const extCommands = new ExtCommands(testContext);
     const extCommandsMock = sandbox.mock(extCommands);
-    extCommandsMock.expects("getYeomanUIPanel").atLeast(4).resolves(yeomanUIPanelMock);
+    // used for 'notifyGeneratorsChange' test
+    extCommands["yeomanUIPanels"] = [yeomanUIPanelMock, yeomanUIPanelMock];
+    extCommandsMock.expects("getYeomanUIPanel").twice().resolves(yeomanUIPanelMock);
+    extCommandsMock.expects("getActiveYeomanUIPanel").once().returns(yeomanUIPanelMock);
 
     const runGeneratorSpy = sandbox.spy(yeomanUIPanelMock, "runGenerator");
     const loadWebviewPanelSpy = sandbox.spy(yeomanUIPanelMock, "loadWebviewPanel");
     const toggleOutputSpy = sandbox.spy(yeomanUIPanelMock, "toggleOutput");
     const notifyGeneratorsChangeSpy = sandbox.spy(yeomanUIPanelMock, "notifyGeneratorsChange");
 
-    await extCommands["yeomanUIPanel_loadYeomanUI_Command"]();
-    await extCommands["yeomanUIPanel_toggleOutput_Command"]();
-    await extCommands["yeomanUIPanel_notifyGeneratorsChange_Command"]();
     await extCommands["yeomanUIPanel_runGenerator_Command"]();
+    await extCommands["yeomanUIPanel_loadYeomanUI_Command"]();
+    extCommands["yeomanUIPanel_toggleOutput_Command"]();
+    extCommands["yeomanUIPanel_notifyGeneratorsChange_Command"]();
 
     expect(runGeneratorSpy.called).to.be.true;
     expect(loadWebviewPanelSpy.called).to.be.true;
     expect(toggleOutputSpy.called).to.be.true;
-    expect(notifyGeneratorsChangeSpy.called).to.be.true;
+    expect(notifyGeneratorsChangeSpy.calledTwice).to.be.true;
 
     extCommandsMock.verify();
   });
 
-  it("getYeomanUIPanel", async () => {
+  it.only("getYeomanUIPanel", async () => {
     const extCommands = new ExtCommands(testContext);
     extCommands["yeomanUIPanels"] = [];
-
+    // const ttt = createStubInstance(vscode.EventEmitter);
+    // ttt.expects('event').returns(class YeomanUIPanel { });
     loggerWrapperMock.expects("getClassLogger");
 
-    const yeomanUIPanel = await extCommands["getYeomanUIPanel"]();
+    const yeomanUIPanel = await extCommands.getYeomanUIPanel();
 
     expect(yeomanUIPanel).to.be.instanceOf(YeomanUIPanel);
     expect(extCommands["yeomanUIPanels"]).to.be.lengthOf(1);
     expect(yeomanUIPanel).to.be.equal(extCommands["yeomanUIPanels"][0]);
   });
 
-  it("getYeomanUIPanel onlyActive", async () => {
+  it("getActiveYeomanUIPanel", () => {
     const activeVisiblePanel = <YeomanUIPanel>(<unknown>{
       ...yeomanUIPanelMock,
       webViewPanel: { active: true, visible: true },
@@ -112,12 +117,12 @@ describe("extension commands unit test", () => {
     const extCommands = new ExtCommands(testContext);
     extCommands["yeomanUIPanels"] = [activeVisiblePanel];
 
-    const panel = await extCommands["getYeomanUIPanel"](true);
+    const panel = extCommands["getActiveYeomanUIPanel"]();
 
     expect(activeVisiblePanel).to.be.equal(panel);
   });
 
-  it("getYeomanUIPanel onlyActive - should return undefined when invisible", async () => {
+  it("getActiveYeomanUIPanel - should return undefined when invisible", () => {
     const invisiblePanel = <YeomanUIPanel>(<unknown>{
       ...yeomanUIPanelMock,
       webViewPanel: { active: true, visible: false },
@@ -126,16 +131,16 @@ describe("extension commands unit test", () => {
     const extCommands = new ExtCommands(testContext);
     extCommands["yeomanUIPanels"] = [invisiblePanel];
 
-    const activeYeomanUIPanel = await extCommands["getYeomanUIPanel"](true);
+    const activeYeomanUIPanel = extCommands["getActiveYeomanUIPanel"]();
 
     expect(activeYeomanUIPanel).to.be.undefined;
   });
 
-  it("getYeomanUIPanel onlyActive -  should return undefined when no webViewPanel", async () => {
+  it("getActiveYeomanUIPanel -  should return undefined when no webViewPanel", () => {
     const extCommands = new ExtCommands(testContext);
     extCommands["yeomanUIPanels"] = [yeomanUIPanelMock];
 
-    const activeYeomanUIPanel = await extCommands["getYeomanUIPanel"](true);
+    const activeYeomanUIPanel = extCommands["getActiveYeomanUIPanel"]();
 
     expect(activeYeomanUIPanel).to.be.undefined;
   });

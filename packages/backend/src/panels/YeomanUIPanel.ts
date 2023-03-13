@@ -18,6 +18,9 @@ import { Constants } from "../utils/constants";
 export class YeomanUIPanel extends AbstractWebviewPanel {
   public static YEOMAN_UI = "Application Wizard";
 
+  protected readonly onDidWebviewPanelDisposeEmitter = new vscode.EventEmitter<void>();
+  public readonly onDidWebviewPanelDispose = this.onDidWebviewPanelDisposeEmitter.event;
+
   public toggleOutput() {
     this.output?.show();
   }
@@ -112,6 +115,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
     this.viewTitle = YeomanUIPanel.YEOMAN_UI;
     this.focusedKey = "yeomanUI.Focused";
     this.output = new GeneratorOutput();
+    this.disposables.push(this.onDidWebviewPanelDisposeEmitter);
   }
 
   private async showOpenFileDialog(currentPath: string): Promise<string> {
@@ -158,5 +162,8 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   public initWebviewPanel() {
     super.initWebviewPanel();
     this.webViewPanel.title = this.messages.panel_title;
+    this.webViewPanel.onDidDispose(() => {
+      this.onDidWebviewPanelDisposeEmitter.fire();
+    });
   }
 }
