@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.6](https://github.com/SAP/yeoman-ui/compare/v1.10.5...v1.10.6) (2023-03-13)
+
+### Bug Fixes
+
+- **frontend:** Adding/removing navigation steps causes incorrect breadcrumbs ([#750](https://github.com/SAP/yeoman-ui/issues/750)) ([f61fde2](https://github.com/SAP/yeoman-ui/commit/f61fde2185c00f30a0eeafed6c4c80d461bad3f9))
+- **frontend:** fixes start casing issue with breadcrumb labels ([#748](https://github.com/SAP/yeoman-ui/issues/748)) ([a9d26b0](https://github.com/SAP/yeoman-ui/commit/a9d26b0abc0dc050ed98c65d8be8a6422c2118ec))
+
 ## [1.10.5](https://github.com/SAP/yeoman-ui/compare/v0.0.0...v1.10.5) (2023-02-08)
 
 **Note:** Version bump only for package yeoman-ui-frontend
