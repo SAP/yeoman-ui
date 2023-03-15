@@ -14,6 +14,7 @@ import { getWebviewRpcLibraryLogger } from "../logger/logger-wrapper";
 import { homedir } from "os";
 import { NpmCommand } from "../utils/npm";
 import { Constants } from "../utils/constants";
+import { notifyGeneratorsInstallationProgress } from "../utils/generators-installation-progress";
 
 export class YeomanUIPanel extends AbstractWebviewPanel {
   public static YEOMAN_UI = "Application Wizard";
@@ -158,5 +159,6 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   public initWebviewPanel() {
     super.initWebviewPanel();
     this.webViewPanel.title = this.messages.panel_title;
+    void notifyGeneratorsInstallationProgress(this, this.webViewPanel);
   }
 }
