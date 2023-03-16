@@ -159,6 +159,6 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   public initWebviewPanel() {
     super.initWebviewPanel();
     this.webViewPanel.title = this.messages.panel_title;
-    void notifyGeneratorsInstallationProgress(this, this.webViewPanel);
+    void notifyGeneratorsInstallationProgress(this);
   }
 }

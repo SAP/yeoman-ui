@@ -1,7 +1,6 @@
 import { createSandbox, SinonMock, SinonSandbox } from "sinon";
 import * as sdk from "@sap/bas-sdk";
 import { internal, notifyGeneratorsInstallationProgress } from "../../src/utils/generators-installation-progress";
-import type { WebviewPanel } from "vscode";
 import { expect } from "chai";
 import { vscode } from "../mockUtil";
 import messages from "../../src/messages";
@@ -11,18 +10,17 @@ describe("generators installation progress - unit test", () => {
   let sandbox: SinonSandbox;
   let sdkDevspaceMock: SinonMock;
   let mockYeomanUiPanel: SinonMock;
-  let mockWebviewPanel: SinonMock;
   let windowMock: SinonMock;
   let disposeCB: Function;
 
   const objYeomanUiPanel: YeomanUIPanel = <YeomanUIPanel>(<any>{
     notifyGeneratorsChange: () => Promise.resolve(),
-  });
-  const objWebviewPanel: Partial<WebviewPanel> = {
-    onDidDispose: (cb): any => {
-      disposeCB = cb;
+    webViewPanel: {
+      onDidDispose: (cb: Function): any => {
+        disposeCB = cb;
+      },
     },
-  };
+  });
 
   before(() => {
     sandbox = createSandbox();
@@ -35,14 +33,12 @@ describe("generators installation progress - unit test", () => {
   beforeEach(() => {
     sdkDevspaceMock = sandbox.mock(sdk.devspace);
     mockYeomanUiPanel = sandbox.mock(objYeomanUiPanel);
-    mockWebviewPanel = sandbox.mock(objWebviewPanel);
     windowMock = sandbox.mock(vscode.window);
   });
 
   afterEach(() => {
     sdkDevspaceMock.verify();
     mockYeomanUiPanel.verify();
-    mockWebviewPanel.verify();
     windowMock.verify();
 
     // --- reset values:
@@ -53,14 +49,14 @@ describe("generators installation progress - unit test", () => {
 
   it("notifyGeneratorsInstallationProgress - all generators already installed", async () => {
     sdkDevspaceMock.expects("didBASGeneratorsFinishInstallation").once().resolves(true);
-    await notifyGeneratorsInstallationProgress(objYeomanUiPanel, <WebviewPanel>objWebviewPanel);
+    await notifyGeneratorsInstallationProgress(objYeomanUiPanel);
     expect(internal.retries).equals(0);
   });
 
   it("notifyGeneratorsInstallationProgress - throw error", async () => {
     sdkDevspaceMock.expects("didBASGeneratorsFinishInstallation").once().rejects("failed to read installation file");
     try {
-      await notifyGeneratorsInstallationProgress(objYeomanUiPanel, <WebviewPanel>objWebviewPanel);
+      await notifyGeneratorsInstallationProgress(objYeomanUiPanel);
     } catch (error) {
       expect(error).to.equal("failed to read installation file");
     }
@@ -75,7 +71,7 @@ describe("generators installation progress - unit test", () => {
     mockYeomanUiPanel.expects("notifyGeneratorsChange").withExactArgs(["installing generators"]).resolves();
     windowMock.expects("showErrorMessage").withExactArgs(messages.timeout_install_generators).resolves();
 
-    await notifyGeneratorsInstallationProgress(objYeomanUiPanel, <WebviewPanel>objWebviewPanel);
+    await notifyGeneratorsInstallationProgress(objYeomanUiPanel);
 
     expect(internal.retries).equals(3);
   });
@@ -95,7 +91,7 @@ describe("generators installation progress - unit test", () => {
       .resolves(true);
     const notifyGeneratorsChangeStub = sandbox.stub(objYeomanUiPanel, "notifyGeneratorsChange").resolves();
 
-    await notifyGeneratorsInstallationProgress(objYeomanUiPanel, <WebviewPanel>objWebviewPanel);
+    await notifyGeneratorsInstallationProgress(objYeomanUiPanel);
 
     expect(notifyGeneratorsChangeStub.callCount).equals(2);
     expect(notifyGeneratorsChangeStub.firstCall.args.length)
@@ -116,7 +112,7 @@ describe("generators installation progress - unit test", () => {
     sdkDevspaceMock.expects("didBASGeneratorsFinishInstallation").once().resolves(false);
     mockYeomanUiPanel.expects("notifyGeneratorsChange").withExactArgs(["installing generators"]).resolves();
 
-    await notifyGeneratorsInstallationProgress(objYeomanUiPanel, <WebviewPanel>objWebviewPanel);
+    await notifyGeneratorsInstallationProgress(objYeomanUiPanel);
 
     expect(internal.retries).equals(0);
     expect(internal.panelDisposed).to.be.false;
@@ -135,7 +131,7 @@ describe("generators installation progress - unit test", () => {
       .resolves(true);
     mockYeomanUiPanel.expects("notifyGeneratorsChange").twice().resolves();
 
-    await notifyGeneratorsInstallationProgress(objYeomanUiPanel, <WebviewPanel>objWebviewPanel);
+    await notifyGeneratorsInstallationProgress(objYeomanUiPanel);
 
     expect(internal.panelDisposed).to.be.false;
     disposeCB();

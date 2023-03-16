@@ -1,6 +1,6 @@
 import * as sdk from "@sap/bas-sdk";
 import { YeomanUIPanel } from "../panels/YeomanUIPanel";
-import { WebviewPanel, window } from "vscode";
+import { window } from "vscode";
 import messages from "../messages";
 
 // exported for test purpose
@@ -23,11 +23,8 @@ async function wait(timeout: number): Promise<void> {
 
 /** wait until installation finished or max retries or panel disposed*/
 async function waitForGeneratorsInstallation(): Promise<void> {
-  while (
-    !internal.panelDisposed &&
-    internal.retries < internal.MAX_RETRY &&
-    (await didGeneratorsFinishInstallation()) === false
-  ) {
+  // don't run in background when panel is disposed
+  while (!internal.panelDisposed && (await shouldWaitForGeneratorsInstallation())) {
     await wait(internal.DELAY_MS);
     internal.retries++;
   }
@@ -37,15 +34,20 @@ function didGeneratorsFinishInstallation(): Promise<boolean | void> {
   return sdk.devspace.didBASGeneratorsFinishInstallation().catch((err) => console.log("Error: ", err));
 }
 
-export async function notifyGeneratorsInstallationProgress(
-  yeomanUIPanel: YeomanUIPanel,
-  webviewPanel: WebviewPanel
-): Promise<void | string> {
-  if (internal.retries < internal.MAX_RETRY && (await didGeneratorsFinishInstallation()) === false) {
+async function shouldWaitForGeneratorsInstallation(): Promise<boolean> {
+  return (
+    internal.retries < internal.MAX_RETRY &&
+    // compare result to `false` is necessary in case of error returning `undefined`
+    (await didGeneratorsFinishInstallation()) === false
+  );
+}
+
+export async function notifyGeneratorsInstallationProgress(yeomanUIPanel: YeomanUIPanel): Promise<void | string> {
+  if (await shouldWaitForGeneratorsInstallation()) {
     // notify ui on generators are being installed in background (by sending any param - this will be detected as a message of "generators are being installed...")
     void yeomanUIPanel.notifyGeneratorsChange(["installing generators"]);
     // on panel disposed - stop looping in `waitForGeneratorsInstallation` function bellow
-    webviewPanel.onDidDispose(() => {
+    yeomanUIPanel["webViewPanel"].onDidDispose(() => {
       internal.panelDisposed = true;
     });
 
