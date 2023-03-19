@@ -184,6 +184,7 @@
     "@sap-devx/yeoman-ui-types": "^1.10.6",
     "@sap/swa-for-sapbas-vsx": "1.2.7",
     "@vscode-logging/logger": "1.2.3",
+    "@sap/bas-sdk": "3.2.0",
     "chalk": "4.1.2",
     "datauri": "3.0.0",
     "humanize-string": "2.1.0",

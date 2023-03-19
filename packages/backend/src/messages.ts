@@ -39,4 +39,6 @@ export default {
   no_write_access: (globalNpmPath: string) =>
     `You do not have write access to directory "${globalNpmPath}". Choose one of the following:`,
   changing_owner_permissions: (globalNpmPath: string) => `Changing permissions of "${globalNpmPath}" folder...`,
+  timeout_install_generators:
+    "Some generators were not installed. You can continue to work in SAP Business Application Studio and we will retry next time you restart the dev space.",
 };
