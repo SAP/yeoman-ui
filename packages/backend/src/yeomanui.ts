@@ -112,13 +112,13 @@ export class YeomanUI {
   }
 
   public async _notifyGeneratorsInstall(args: any[], force: boolean) {
+    this.uiOptions.installGens = _.isObject(args) && _.isEmpty(args) ? undefined : args;
     if (!_.isNil(args)) {
       const isGeneratorsPrompt: boolean = await this.rpc.invoke("isGeneratorsPrompt");
       if (isGeneratorsPrompt || force) {
         this.showGeneratorsInstallingMessage(args);
       }
     }
-    this.uiOptions.installGens = _.isObject(args) && _.isEmpty(args) ? undefined : args;
   }
 
   private showGeneratorsInstallingMessage(args: any[]) {
