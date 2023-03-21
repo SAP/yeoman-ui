@@ -2389,10 +2389,10 @@
   dependencies:
     ws "^7.2.3"
 
-"@sap/bas-sdk@3.2.0":
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/@sap/bas-sdk/-/bas-sdk-3.2.0.tgz#5e5b210b9dc60de0a7539bedc0fd076504923bc7"
-  integrity sha512-zngTwZR4BUsgHALQrVtn1yRrUTC7qlA4r+HAooxFHFWejTwm046ISBUsx8WkoWpD4+ucN4u/ReGapcTsZetMPg==
+"@sap/bas-sdk@3.2.1":
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/@sap/bas-sdk/-/bas-sdk-3.2.1.tgz#6e43be6162a22b1a27996d9ec06118470a526c30"
+  integrity sha512-iI/JEOe8L31JmN0LnJvdC9DyxkWPYN6KHWvsASAVDiZhFiJ63aTe5ph/XcDA+lMjy8pR1rm9FHzc4dpuj2TK6A==
   dependencies:
     axios "0.21.4"
     cross-spawn "^7.0.3"
