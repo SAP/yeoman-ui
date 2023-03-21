@@ -6,7 +6,7 @@ import messages from "../messages";
 // exported for test purpose
 export const internal = {
   // MAX_RETRY(150) * DELAY_MS(2000) = 5 minutes
-  MAX_RETRY: 6,
+  MAX_RETRY: 150,
   DELAY_MS: 2000,
   retries: 0,
   panelDisposed: false,
@@ -58,8 +58,8 @@ export async function notifyGeneratorsInstallationProgress(yeomanUIPanel: Yeoman
       return window.showErrorMessage(messages.timeout_install_generators);
     }
     if (!internal.panelDisposed) {
-      // notify ui on generators installation finished
-      return yeomanUIPanel.notifyGeneratorsChange([]);
+      // reset notification on generators installation finished
+      return yeomanUIPanel["rpc"].invoke("resetPromptMessage");
     }
     // reset `panelDisposed` state for next panel loading
     internal.panelDisposed = false;

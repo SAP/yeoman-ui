@@ -964,7 +964,7 @@ describe("App.vue", () => {
       wrapper = initComponent(App);
       wrapper.vm.showPromptMessage("errorMessage", 0, "image");
       expect(wrapper.vm.promptMessageToDisplay).toEqual("errorMessage");
-      expect(wrapper.vm.showPrompt).toEqual("errorMessage");
+      expect(wrapper.vm.shortPrompt).toEqual("errorMessage");
       expect(wrapper.vm.promptMessageIcon).toEqual("image");
       expect(wrapper.vm.promptMessageClass).toEqual("error-prompt-message");
     });
@@ -973,7 +973,7 @@ describe("App.vue", () => {
       wrapper = initComponent(App);
       wrapper.vm.showPromptMessage("warnMessage", 1, "image");
       expect(wrapper.vm.promptMessageToDisplay).toEqual("warnMessage");
-      expect(wrapper.vm.showPrompt).toEqual("warnMessage");
+      expect(wrapper.vm.shortPrompt).toEqual("warnMessage");
       expect(wrapper.vm.promptMessageIcon).toEqual("image");
       expect(wrapper.vm.promptMessageClass).toEqual("info-warn-prompt-message");
     });
@@ -982,7 +982,7 @@ describe("App.vue", () => {
       wrapper = initComponent(App);
       wrapper.vm.showPromptMessage("infoMessage", 2, "image");
       expect(wrapper.vm.promptMessageToDisplay).toEqual("infoMessage");
-      expect(wrapper.vm.showPrompt).toEqual("infoMessage");
+      expect(wrapper.vm.shortPrompt).toEqual("infoMessage");
       expect(wrapper.vm.promptMessageIcon).toEqual("image");
       expect(wrapper.vm.promptMessageClass).toEqual("info-warn-prompt-message");
     });
@@ -991,7 +991,7 @@ describe("App.vue", () => {
       wrapper = initComponent(App);
       wrapper.vm.showPromptMessage("infoMessage", "neta", "image");
       expect(wrapper.vm.promptMessageToDisplay).toEqual("infoMessage");
-      expect(wrapper.vm.showPrompt).toEqual("infoMessage");
+      expect(wrapper.vm.shortPrompt).toEqual("infoMessage");
       expect(wrapper.vm.promptMessageIcon).toEqual("image");
     });
 
@@ -1000,9 +1000,28 @@ describe("App.vue", () => {
       wrapper.vm.messageMaxLength = 3;
       wrapper.vm.showPromptMessage("infoMessage", 2, "image");
       expect(wrapper.vm.promptMessageToDisplay).toEqual("infoMessage");
-      expect(wrapper.vm.showPrompt).toEqual("inf...");
+      expect(wrapper.vm.shortPrompt).toEqual("inf...");
       expect(wrapper.vm.promptMessageIcon).toEqual("image");
       expect(wrapper.vm.promptMessageClass).toEqual("info-warn-prompt-message");
+    });
+  });
+
+  describe("resetPromptMessage", () => {
+    it("should reset prompt values to initial state", () => {
+      wrapper = initComponent(App);
+      wrapper.vm.promptMessageToDisplay = "test message";
+      wrapper.vm.shortPrompt = "short message...";
+      wrapper.vm.toShowPromptMessage = true;
+      wrapper.vm.promptMessageIcon = "image";
+      wrapper.vm.promptMessageClass = "message-class";
+
+      wrapper.vm.resetPromptMessage();
+
+      expect(wrapper.vm.promptMessageToDisplay).toEqual("");
+      expect(wrapper.vm.shortPrompt).toEqual("");
+      expect(wrapper.vm.toShowPromptMessage).toEqual(false);
+      expect(wrapper.vm.promptMessageIcon).toEqual(null);
+      expect(wrapper.vm.promptMessageClass).toEqual("");
     });
   });
 });

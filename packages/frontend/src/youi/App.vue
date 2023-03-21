@@ -78,7 +78,7 @@
             <img style="vertical-align: middle; padding-left: 12px" :src="promptMessageIcon" alt="" />
             <v-tooltip right :disabled="promptMessageToDisplay.length < this.messageMaxLength">
               <template v-slot:activator="{ on }">
-                <span :class="promptMessageClass" v-on="on">{{ showPrompt }}</span>
+                <span :class="promptMessageClass" v-on="on">{{ shortPrompt }}</span>
               </template>
               <span>{{ promptMessageToDisplay }}</span>
             </v-tooltip>
@@ -252,7 +252,7 @@ export default {
   methods: {
     showPromptMessage(message, type, image) {
       this.promptMessageToDisplay = message;
-      this.showPrompt =
+      this.shortPrompt =
         message.length < this.messageMaxLength ? message : message.substr(0, this.messageMaxLength) + "...";
       this.toShowPromptMessage = true;
       this.promptMessageIcon = image;
@@ -264,6 +264,14 @@ export default {
       } else if (type === Severity.warning) {
         this.promptMessageClass = "info-warn-prompt-message";
       }
+    },
+    resetPromptMessage() {
+      // reset prompt values to initial state
+      this.promptMessageToDisplay = "";
+      this.shortPrompt = "";
+      this.toShowPromptMessage = false;
+      this.promptMessageClass = "";
+      this.promptMessageIcon = null;
     },
     setBusyIndicator() {
       this.expectedShowBusyIndicator =
@@ -591,6 +599,7 @@ export default {
         "isGeneratorsPrompt",
         "setGenInWriting",
         "showPromptMessage",
+        "resetPromptMessage",
         "setHeaderTitle",
       ];
       _forEach(functions, (funcName) => {
@@ -658,30 +667,37 @@ export default {
 </script>
 <style scoped>
 @import "./../../node_modules/vue-loading-overlay/dist/vue-loading.css";
+
 .consoleClassVisible {
   visibility: visible;
 }
+
 .consoleClassHidden {
   visibility: hidden;
 }
+
 div.consoleClassVisible .v-footer {
   background-color: var(--vscode-editor-background, #1e1e1e);
   color: var(--vscode-foreground, #cccccc);
 }
+
 #logArea {
   font-family: monospace;
   word-wrap: break-word;
   white-space: pre-wrap;
 }
+
 .prompts-col {
   overflow-y: auto;
   margin: 0px;
   padding-bottom: 20px;
 }
+
 .main-row,
 .prompts-col {
   height: calc(100% - 4rem);
 }
+
 .left-col,
 .right-col,
 .right-row,
@@ -691,26 +707,32 @@ div.consoleClassVisible .v-footer {
 #QuestionTypeSelector > .col > div {
   height: 100%;
 }
+
 .right-col {
   padding: 0 !important;
 }
+
 .bottom-left-col {
   background: var(--vscode-editor-background, #1e1e1e);
   overflow: hidden;
   margin: 0px;
 }
+
 .bottom-buttons-col {
   padding: 12px;
   padding-right: 0px;
   margin: auto !important;
 }
+
 .bottom-buttons-col > .v-btn:not(:last-child) {
   margin-right: 10px !important;
 }
+
 .prompt-message {
   padding: 12px;
   margin: auto;
 }
+
 /* Error prompt message*/
 .error-prompt-message {
   font-size: 14px;
@@ -718,6 +740,7 @@ div.consoleClassVisible .v-footer {
   color: #ff5252;
   vertical-align: middle;
 }
+
 /* Info and Warning prompt message*/
 .info-warn-prompt-message {
   color: var(--vscode-editorCodeLens-foreground, #999999);
@@ -725,9 +748,11 @@ div.consoleClassVisible .v-footer {
   font-size: 14px;
   vertical-align: middle;
 }
+
 .v-divider {
   border-top: 2px solid var(--vscode-editorWidget-background, #252526) !important;
 }
+
 .theme--light.v-btn.v-btn--disabled:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
   background-color: var(--vscode-descriptionForeground, #717171) !important;
 }
