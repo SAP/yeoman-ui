@@ -98,7 +98,7 @@ To run it do the following:
 #### Run the VSCode extension
 
 - Start VSCode on your local machine, and click on open workspace. Select this repo folder.
-- On the debug panel choose "Run Extension", and click on the "Run" button.
+- On the debug panel choose `Run Extension`, and click on the `Run` button.
 
 #### Advanced scenarios
 
