@@ -62,9 +62,8 @@ export async function notifyGeneratorsInstallationProgress(yeomanUIPanel: Yeoman
       // generators didn't complete installation after 5 minutes of retries..
       return window.showErrorMessage(messages.timeout_install_generators);
     }
-    if (!internal.panelDisposed) {
-      // notify ui on generators installation finished
-      yeomanUIPanel.notifyGeneratorsChange([]);
-    }
+
+    // notify ui on generators installation finished (in case of panelDisposed - will just reset the prompt message for next time)
+    yeomanUIPanel.notifyGeneratorsChange([]);
   }
 }
