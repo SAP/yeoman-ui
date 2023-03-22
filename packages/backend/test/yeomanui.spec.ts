@@ -326,14 +326,13 @@ describe("yeomanui unit test", () => {
     });
     it("called with empty args array (install ended) and the prompt is generators", async () => {
       const args: any = [];
-      rpcMock.expects("invoke").withExactArgs("isGeneratorsPrompt").resolves(true);
-      youiEventsMock.expects("getAppWizard").returns(appWizard);
-      appWizardMock
-        .expects("showInformation")
-        .withExactArgs(yeomanUi["uiOptions"].messages.all_generators_have_been_installed, MessageType.prompt);
-      appWizardMock.expects("showWarning").never();
+      const rpcInvokeStub = sandbox.stub(rpc, "invoke").onFirstCall().resolves(true).onSecondCall().resolves();
       await yeomanUi._notifyGeneratorsInstall(args, false);
+      expect(rpcInvokeStub.callCount).to.equal(2);
+      expect(rpcInvokeStub.firstCall.args).to.deep.equal(["isGeneratorsPrompt"]);
+      expect(rpcInvokeStub.secondCall.args).to.deep.equal(["resetPromptMessage"]);
       expect(yeomanUi["uiOptions"].installGens).to.be.undefined;
+      rpcInvokeStub.restore();
     });
     it("called with args array containing generators (install started) and the prompt is generators", async () => {
       const args = [
@@ -407,13 +406,14 @@ describe("yeomanui unit test", () => {
   });
 
   describe("showGeneratorsInstallingMessage", () => {
-    it("called with empty args array (install ended)", () => {
-      youiEventsMock.expects("getAppWizard").returns(appWizard);
-      appWizardMock
-        .expects("showInformation")
-        .withExactArgs(yeomanUi["uiOptions"].messages.all_generators_have_been_installed, MessageType.prompt);
+    it("called with empty args array (install ended)", async () => {
+      const rpcInvokeStub = sandbox.stub(rpc, "invoke").onFirstCall().resolves(true).onSecondCall().resolves();
       appWizardMock.expects("showWarning").never();
-      yeomanUi["showGeneratorsInstallingMessage"]([]);
+      await yeomanUi._notifyGeneratorsInstall([], false);
+      expect(rpcInvokeStub.callCount).to.equal(2);
+      expect(rpcInvokeStub.firstCall.args).to.deep.equal(["isGeneratorsPrompt"]);
+      expect(rpcInvokeStub.secondCall.args).to.deep.equal(["resetPromptMessage"]);
+      rpcInvokeStub.restore();
     });
     it("called with args array containing generators (install started)", () => {
       youiEventsMock.expects("getAppWizard").returns(appWizard);
@@ -421,7 +421,7 @@ describe("yeomanui unit test", () => {
         .expects("showWarning")
         .withExactArgs(yeomanUi["uiOptions"].messages.generators_are_being_installed, MessageType.prompt);
       appWizardMock.expects("showInformation").never();
-      yeomanUi["showGeneratorsInstallingMessage"]([{}]);
+      void yeomanUi._notifyGeneratorsInstall([{}], true);
     });
   });
 

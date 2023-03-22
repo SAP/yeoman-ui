@@ -98,13 +98,15 @@ describe("generators installation progress - unit test", () => {
       .onCall(2)
       .resolves(true);
     const notifyGeneratorsChangeStub = sandbox.stub(objYeomanUiPanel, "notifyGeneratorsChange").resolves();
-    rpcMock.expects("invoke").withExactArgs("resetPromptMessage").resolves();
 
     await notifyGeneratorsInstallationProgress(objYeomanUiPanel);
 
-    expect(notifyGeneratorsChangeStub.callCount).equals(1);
-    expect(notifyGeneratorsChangeStub.firstCall.args.length).equals(1);
+    expect(notifyGeneratorsChangeStub.callCount).equals(2);
+    expect(notifyGeneratorsChangeStub.firstCall.args.length)
+      .equals(notifyGeneratorsChangeStub.secondCall.args.length)
+      .equals(1);
     expect(notifyGeneratorsChangeStub.firstCall.args[0]).deep.equal(["installing generators"]);
+    expect(notifyGeneratorsChangeStub.secondCall.args[0]).deep.equal([]);
     expect(internal.retries).equals(1);
 
     notifyGeneratorsChangeStub.restore();
@@ -112,16 +114,15 @@ describe("generators installation progress - unit test", () => {
 
   it("notifyGeneratorsInstallationProgress - don't loop when panel disposed", async () => {
     internal.DELAY_MS = 100;
-    internal.MAX_RETRY = 20;
+    internal.MAX_RETRY = 50;
     internal.panelDisposed = true;
 
-    sdkDevspaceMock.expects("didBASGeneratorsFinishInstallation").once().resolves(false);
-    mockYeomanUiPanel.expects("notifyGeneratorsChange").withExactArgs(["installing generators"]).resolves();
+    sdkDevspaceMock.expects("didBASGeneratorsFinishInstallation").never();
 
-    await notifyGeneratorsInstallationProgress(objYeomanUiPanel);
+    await internal.waitForGeneratorsInstallation();
 
     expect(internal.retries).equals(0);
-    expect(internal.panelDisposed).to.be.false;
+    expect(internal.panelDisposed).to.be.true;
   });
 
   it("notifyGeneratorsInstallationProgress - validate `panelDisposed` updated when panel#onDidDispose", async () => {
@@ -135,7 +136,7 @@ describe("generators installation progress - unit test", () => {
       .resolves(false)
       .onCall(1)
       .resolves(true);
-    mockYeomanUiPanel.expects("notifyGeneratorsChange").withExactArgs(["installing generators"]).resolves();
+    mockYeomanUiPanel.expects("notifyGeneratorsChange").twice().resolves();
 
     await notifyGeneratorsInstallationProgress(objYeomanUiPanel);
 

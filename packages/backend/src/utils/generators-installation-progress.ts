@@ -10,6 +10,7 @@ export const internal = {
   DELAY_MS: 2000,
   retries: 0,
   panelDisposed: false,
+  waitForGeneratorsInstallation,
 };
 
 /*
@@ -24,7 +25,7 @@ async function wait(timeout: number): Promise<void> {
 /** wait until installation finished or max retries or panel disposed*/
 async function waitForGeneratorsInstallation(): Promise<void> {
   // don't run in background when panel is disposed
-  while (!internal.panelDisposed && (await shouldWaitForGeneratorsInstallation())) {
+  while (await shouldWaitForGeneratorsInstallation()) {
     await wait(internal.DELAY_MS);
     internal.retries++;
   }
@@ -36,6 +37,7 @@ function didGeneratorsFinishInstallation(): Promise<boolean | void> {
 
 async function shouldWaitForGeneratorsInstallation(): Promise<boolean> {
   return (
+    !internal.panelDisposed &&
     internal.retries < internal.MAX_RETRY &&
     // compare result to `false` is necessary in case of error returning `undefined`
     (await didGeneratorsFinishInstallation()) === false
@@ -43,6 +45,9 @@ async function shouldWaitForGeneratorsInstallation(): Promise<boolean> {
 }
 
 export async function notifyGeneratorsInstallationProgress(yeomanUIPanel: YeomanUIPanel): Promise<void | string> {
+  // reset `panelDisposed` state for each call (each call is per webview panel creation)
+  internal.panelDisposed = false;
+
   if (await shouldWaitForGeneratorsInstallation()) {
     // notify ui on generators are being installed in background (by sending any param - this will be detected as a message of "generators are being installed...")
     void yeomanUIPanel.notifyGeneratorsChange(["installing generators"]);
@@ -58,10 +63,8 @@ export async function notifyGeneratorsInstallationProgress(yeomanUIPanel: Yeoman
       return window.showErrorMessage(messages.timeout_install_generators);
     }
     if (!internal.panelDisposed) {
-      // reset notification on generators installation finished
-      return yeomanUIPanel["rpc"].invoke("resetPromptMessage");
+      // notify ui on generators installation finished
+      yeomanUIPanel.notifyGeneratorsChange([]);
     }
-    // reset `panelDisposed` state for next panel loading
-    internal.panelDisposed = false;
   }
 }
