@@ -11,6 +11,7 @@ describe("generators installation progress - unit test", () => {
   let sdkDevspaceMock: SinonMock;
   let mockYeomanUiPanel: SinonMock;
   let windowMock: SinonMock;
+  let rpcMock: SinonMock;
   let disposeCB: Function;
 
   const objYeomanUiPanel: YeomanUIPanel = <YeomanUIPanel>(<any>{
@@ -18,6 +19,11 @@ describe("generators installation progress - unit test", () => {
     webViewPanel: {
       onDidDispose: (cb: Function): any => {
         disposeCB = cb;
+      },
+    },
+    rpc: {
+      invoke(): Promise<any> {
+        return Promise.resolve();
       },
     },
   });
@@ -34,12 +40,14 @@ describe("generators installation progress - unit test", () => {
     sdkDevspaceMock = sandbox.mock(sdk.devspace);
     mockYeomanUiPanel = sandbox.mock(objYeomanUiPanel);
     windowMock = sandbox.mock(vscode.window);
+    rpcMock = sandbox.mock(objYeomanUiPanel["rpc"]);
   });
 
   afterEach(() => {
     sdkDevspaceMock.verify();
     mockYeomanUiPanel.verify();
     windowMock.verify();
+    rpcMock.verify();
 
     // --- reset values:
     internal.retries = 0;
@@ -106,16 +114,15 @@ describe("generators installation progress - unit test", () => {
 
   it("notifyGeneratorsInstallationProgress - don't loop when panel disposed", async () => {
     internal.DELAY_MS = 100;
-    internal.MAX_RETRY = 20;
+    internal.MAX_RETRY = 50;
     internal.panelDisposed = true;
 
-    sdkDevspaceMock.expects("didBASGeneratorsFinishInstallation").once().resolves(false);
-    mockYeomanUiPanel.expects("notifyGeneratorsChange").withExactArgs(["installing generators"]).resolves();
+    sdkDevspaceMock.expects("didBASGeneratorsFinishInstallation").never();
 
-    await notifyGeneratorsInstallationProgress(objYeomanUiPanel);
+    await internal.waitForGeneratorsInstallation();
 
     expect(internal.retries).equals(0);
-    expect(internal.panelDisposed).to.be.false;
+    expect(internal.panelDisposed).to.be.true;
   });
 
   it("notifyGeneratorsInstallationProgress - validate `panelDisposed` updated when panel#onDidDispose", async () => {

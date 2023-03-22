@@ -112,25 +112,27 @@ export class YeomanUI {
   }
 
   public async _notifyGeneratorsInstall(args: any[], force: boolean) {
+    this.uiOptions.installGens = _.isObject(args) && _.isEmpty(args) ? undefined : args;
     if (!_.isNil(args)) {
       const isGeneratorsPrompt: boolean = await this.rpc.invoke("isGeneratorsPrompt");
       if (isGeneratorsPrompt || force) {
-        this.showGeneratorsInstallingMessage(args);
+        if (_.isEmpty(args)) {
+          this.hideGeneratorsInstallingMessage();
+        } else {
+          this.showGeneratorsInstallingMessage();
+        }
       }
     }
-    this.uiOptions.installGens = _.isObject(args) && _.isEmpty(args) ? undefined : args;
   }
 
-  private showGeneratorsInstallingMessage(args: any[]) {
-    if (_.isEmpty(args)) {
-      this.youiEvents
-        .getAppWizard()
-        .showInformation(this.uiOptions.messages.all_generators_have_been_installed, MessageType.prompt);
-    } else {
-      this.youiEvents
-        .getAppWizard()
-        .showWarning(this.uiOptions.messages.generators_are_being_installed, MessageType.prompt);
-    }
+  private showGeneratorsInstallingMessage() {
+    this.youiEvents
+      .getAppWizard()
+      .showWarning(this.uiOptions.messages.generators_are_being_installed, MessageType.prompt);
+  }
+
+  private hideGeneratorsInstallingMessage() {
+    void this.rpc.invoke("resetPromptMessage");
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
