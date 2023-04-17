@@ -276,16 +276,18 @@ export default {
       this.promptMessageIcon = null;
     },
     /**
-    * Set the busy indicator based on the current prompt status.
-    * If an optional boolean value is provided this will override the prompt status when determining if the busy indicator should be on or off
-    * This can be used by custom plugins to activate/deactivate the busy indicator internally
-    */
+     * Set the busy indicator based on the current prompt status.
+     * If an optional boolean value is provided this will override the prompt status when determining if the busy indicator should be on or off
+     * This can be used by custom plugins to activate/deactivate the busy indicator internally
+     */
     setBusyIndicator(showBusy) {
       this.expectedShowBusyIndicator =
-        showBusy === true || _isEmpty(this.prompts) ||
+        showBusy === true ||
+        _isEmpty(this.prompts) ||
         (this.currentPrompt &&
           (this.currentPrompt.status === PENDING || this.currentPrompt.status === EVALUATING) &&
-          !this.isDone && showBusy !== false);
+          !this.isDone &&
+          showBusy !== false);
 
       if (this.expectedShowBusyIndicator) {
         setTimeout(() => {

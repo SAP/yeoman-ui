@@ -847,9 +847,9 @@ describe("App.vue", () => {
     });
 
     it("Busy indicator can be set manually (to support custom plugin control)", async () => {
-      const sleeper = function(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-      }
+      const sleeper = function (ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      };
       wrapper = initComponent(App);
       wrapper.vm.setBusyIndicator(true);
       expect(wrapper.vm.expectedShowBusyIndicator).toBeTruthy();
@@ -864,7 +864,6 @@ describe("App.vue", () => {
 
       wrapper.vm.setBusyIndicator(false);
       expect(wrapper.vm.showBusyIndicator).toBeFalsy();
-
     });
   });
 
