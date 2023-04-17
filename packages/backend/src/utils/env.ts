@@ -7,6 +7,7 @@ import * as customLocation from "./customLocation";
 import * as Environment from "yeoman-environment";
 import TerminalAdapter = require("yeoman-environment/lib/adapter");
 import { IChildLogger } from "@vscode-logging/logger";
+import { getClassLogger } from "../logger/logger-wrapper";
 
 const GENERATOR = "generator-";
 const NAMESPACE = "namespace";
@@ -34,7 +35,7 @@ class EnvUtil {
 
   constructor() {
     try {
-      //this.logger = getClassLogger(EnvUtil.name);
+      this.logger = getClassLogger(EnvUtil.name);
     } catch (e) {
       // nothing TODO : testing scope
     }
