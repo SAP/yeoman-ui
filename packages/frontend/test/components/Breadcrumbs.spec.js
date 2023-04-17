@@ -1,5 +1,6 @@
 import { initComponent, unmount } from "../Utils";
 import Breadcrumbs from "../../src/components/Breadcrumbs.vue";
+import Vue from "vue";
 
 describe("Breadcrumbs.vue", () => {
   let wrapper;
@@ -50,6 +51,7 @@ describe("Breadcrumbs.vue", () => {
     await wrapper.setProps({
       breadcrumbs: [{ label: "answerLabel1", value: "answerValue1" }],
     });
+    await Vue.nextTick();
     expect(calcIsMoreSpy).toHaveBeenCalledTimes(2); // Once by v-resize, once adding answers
     const moreLess = wrapper.get('[data-test="moreLessButton"]');
     expect(moreLess.html()).toMatchInlineSnapshot(`

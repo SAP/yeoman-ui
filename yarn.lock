@@ -2338,6 +2338,14 @@
   dependencies:
     "@octokit/openapi-types" "^11.2.0"
 
+"@sap-devx/inquirer-gui-auto-complete-plugin@0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-auto-complete-plugin/-/inquirer-gui-auto-complete-plugin-0.0.1.tgz#d1050e9b6e023fc8da831e5a01da1d51da48f249"
+  integrity sha512-S8Bm/wtuTv2g13u7chPpPwTn2hZyaZ5QR2ZBBX9gBiGhFxvpEwYaeIvsmU0RAPSt56FXZFeughViy7WeL9XknQ==
+  dependencies:
+    strip-ansi "^6.0.0"
+    vue "^2.6.10"
+
 "@sap-devx/inquirer-gui-file-browser-plugin@0.0.5":
   version "0.0.5"
   resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-file-browser-plugin/-/inquirer-gui-file-browser-plugin-0.0.5.tgz#469dc021cab7b771d16f36199f2ce06d229a9d30"
@@ -2373,10 +2381,10 @@
   dependencies:
     vue "^2.6.10"
 
-"@sap-devx/inquirer-gui@0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui/-/inquirer-gui-0.3.0.tgz#aec200d40cc6d88381f73f773aecb5cf19229e08"
-  integrity sha512-kBNxug0cF6T/J8LrTTnh7oJ3wU1IQnZKkqmlTdoYLoYcWEXJ/ZVIKhcnzQCoR3mwE9T9XEMY4O0QEJBxDv9gTA==
+"@sap-devx/inquirer-gui@0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui/-/inquirer-gui-0.5.0.tgz#fa6cc903b301fc653f1bfba92772fa224304e3b6"
+  integrity sha512-4ldYrKyoqtgcJioCxEp+QZMDck2bQgzN/rkh9S2cKPqCJs1oEl0f6hFB1uqmkF2Te+oaK9mI1/CemwCS4BRovA==
   dependencies:
     strip-ansi "^6.0.0"
     vue "2.6.12"
@@ -2389,17 +2397,17 @@
   dependencies:
     ws "^7.2.3"
 
-"@sap/bas-sdk@3.2.1":
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/@sap/bas-sdk/-/bas-sdk-3.2.1.tgz#6e43be6162a22b1a27996d9ec06118470a526c30"
-  integrity sha512-iI/JEOe8L31JmN0LnJvdC9DyxkWPYN6KHWvsASAVDiZhFiJ63aTe5ph/XcDA+lMjy8pR1rm9FHzc4dpuj2TK6A==
+"@sap/bas-sdk@^3.2.1":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@sap/bas-sdk/-/bas-sdk-3.3.0.tgz#530ceb6157602a8077cd5c788dbfb959a00a9173"
+  integrity sha512-Z1YFYbVzTnHpV1Ayl/bxUpO3W32b6U6CozBlux7Ourut9+Ez0b1OLa5tDO27m8HJtfaR7yOuJaTzJ1jvfpHDug==
   dependencies:
-    axios "0.21.4"
+    axios "1.3.4"
     cross-spawn "^7.0.3"
     fs-extra "^11.1.0"
     lodash "4.17.21"
     url-join "^4.0.1"
-    ws "^8.5.0"
+    ws "^8.13.0"
 
 "@sap/swa-for-sapbas-vsx@1.2.7":
   version "1.2.7"
@@ -4151,12 +4159,14 @@ aws4@^1.2.1, aws4@^1.8.0:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.11.0.tgz#d61f46d83b2519250e2784daf5b09479a8b41c59"
   integrity sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==
 
-axios@0.21.4:
-  version "0.21.4"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.4.tgz#c67b90dc0568e5c1cf2b0b858c43ba28e2eda575"
-  integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
+axios@1.3.4:
+  version "1.3.4"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.3.4.tgz#f5760cefd9cfb51fd2481acf88c05f67c4523024"
+  integrity sha512-toYm+Bsyl6VC5wSkfkbbNB6ROv7KY93PEBBL6xyDczaIHasAiv4wPqQ/c4RjoQzipxRD2W5g21cOqQulZ7rHwQ==
   dependencies:
-    follow-redirects "^1.14.0"
+    follow-redirects "^1.15.0"
+    form-data "^4.0.0"
+    proxy-from-env "^1.1.0"
 
 axios@^0.21.1:
   version "0.21.1"
@@ -7703,7 +7713,7 @@ follow-redirects@^1.0.0, follow-redirects@^1.10.0:
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.1.tgz#d9114ded0a1cfdd334e164e6662ad02bfd91ff43"
   integrity sha512-HWqDgT7ZEkqRzBvc2s64vSZ/hfOceEol3ac/7tKwzuvEyWx3/4UegXh5oBOIotkGsObyk3xznnSRVADBgWSQVg==
 
-follow-redirects@^1.14.0:
+follow-redirects@^1.15.0:
   version "1.15.2"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.2.tgz#b460864144ba63f2681096f274c4e57026da2c13"
   integrity sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==
@@ -7737,6 +7747,15 @@ form-data@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/form-data/-/form-data-3.0.1.tgz#ebd53791b78356a99af9a300d4282c4d5eb9755f"
   integrity sha512-RHkBKtLWUVwd7SqRIvCZMEvAMoGUp0XU+seQiZejj0COz3RI3hWP4sCv3gZWWLjJTd7rGwcsF5eKZGii0r/hbg==
+  dependencies:
+    asynckit "^0.4.0"
+    combined-stream "^1.0.8"
+    mime-types "^2.1.12"
+
+form-data@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/form-data/-/form-data-4.0.0.tgz#93919daeaf361ee529584b9b31664dc12c9fa452"
+  integrity sha512-ETEklSGi5t0QMZuiXoA/Q6vcnxcLQP5vdugSpuAyi6SVGi2clPPp+xgEhuMaHC+zGgn31Kd235W35f7Hykkaww==
   dependencies:
     asynckit "^0.4.0"
     combined-stream "^1.0.8"
@@ -13244,6 +13263,11 @@ proxy-addr@~2.0.5:
     forwarded "~0.1.2"
     ipaddr.js "1.9.1"
 
+proxy-from-env@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/proxy-from-env/-/proxy-from-env-1.1.0.tgz#e102f16ca355424865755d2c9e8ea4f24d58c3e2"
+  integrity sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==
+
 prr@~1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/prr/-/prr-1.0.1.tgz#d3fc114ba06995a45ec6893f484ceb1d78f5f476"
@@ -16814,7 +16838,7 @@ ws@^7.0.0, ws@^7.2.3:
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.4.5.tgz#a484dd851e9beb6fdb420027e3885e8ce48986c1"
   integrity sha512-xzyu3hFvomRfXKH8vOFMU3OguG6oOvhXMo3xsGy3xWExqaM2dxBbVxuD99O7m3ZUFMvvscsZDqxfgMaRr/Nr1g==
 
-ws@^8.5.0:
+ws@^8.13.0:
   version "8.13.0"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.13.0.tgz#9a9fb92f93cf41512a0735c8f4dd09b8a1211cd0"
   integrity sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==
