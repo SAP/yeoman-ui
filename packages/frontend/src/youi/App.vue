@@ -44,6 +44,7 @@
                 :questions="currentPrompt ? currentPrompt.questions : []"
                 @parentExecuteCommand="executeCommand"
                 @answered="onAnswered"
+                @setBusyIndicator="setBusyIndicator"
               />
             </v-slide-x-transition>
             <Info
@@ -122,6 +123,7 @@ import FolderBrowserPlugin from "@sap-devx/inquirer-gui-folder-browser-plugin";
 import LoginPlugin from "@sap-devx/inquirer-gui-login-plugin";
 import TilesPlugin from "@sap-devx/inquirer-gui-tiles-plugin";
 import LabelPlugin from "@sap-devx/inquirer-gui-label-plugin";
+import AutoCompletePlugin from "@sap-devx/inquirer-gui-auto-complete-plugin";
 import { Severity } from "@sap-devx/yeoman-ui-types";
 import utils from "../utils/utils";
 import answerUtils from "../utils/answerUtils";
@@ -273,12 +275,20 @@ export default {
       this.promptMessageClass = "";
       this.promptMessageIcon = null;
     },
-    setBusyIndicator() {
+    /**
+     * Set the busy indicator based on the current prompt status.
+     * If an optional boolean value is provided this will override the prompt status when determining if the busy indicator should be on or off
+     * This can be used by custom plugins to activate/deactivate the busy indicator internally
+     */
+    setBusyIndicator(showBusy) {
       this.expectedShowBusyIndicator =
+        showBusy === true ||
         _isEmpty(this.prompts) ||
         (this.currentPrompt &&
           (this.currentPrompt.status === PENDING || this.currentPrompt.status === EVALUATING) &&
-          !this.isDone);
+          !this.isDone &&
+          showBusy !== false);
+
       if (this.expectedShowBusyIndicator) {
         setTimeout(() => {
           if (this.expectedShowBusyIndicator) {
@@ -643,6 +653,7 @@ export default {
       this.registerPlugin(LoginPlugin);
       this.registerPlugin(TilesPlugin);
       this.registerPlugin(LabelPlugin);
+      this.registerPlugin(AutoCompletePlugin);
 
       this.isInVsCode() ? (this.consoleClass = "consoleClassHidden") : (this.consoleClass = "consoleClassVisible");
     },

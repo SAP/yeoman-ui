@@ -2338,6 +2338,14 @@
   dependencies:
     "@octokit/openapi-types" "^11.2.0"
 
+"@sap-devx/inquirer-gui-auto-complete-plugin@0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-auto-complete-plugin/-/inquirer-gui-auto-complete-plugin-0.0.1.tgz#d1050e9b6e023fc8da831e5a01da1d51da48f249"
+  integrity sha512-S8Bm/wtuTv2g13u7chPpPwTn2hZyaZ5QR2ZBBX9gBiGhFxvpEwYaeIvsmU0RAPSt56FXZFeughViy7WeL9XknQ==
+  dependencies:
+    strip-ansi "^6.0.0"
+    vue "^2.6.10"
+
 "@sap-devx/inquirer-gui-file-browser-plugin@0.0.5":
   version "0.0.5"
   resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-file-browser-plugin/-/inquirer-gui-file-browser-plugin-0.0.5.tgz#469dc021cab7b771d16f36199f2ce06d229a9d30"
@@ -2373,10 +2381,10 @@
   dependencies:
     vue "^2.6.10"
 
-"@sap-devx/inquirer-gui@0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui/-/inquirer-gui-0.3.0.tgz#aec200d40cc6d88381f73f773aecb5cf19229e08"
-  integrity sha512-kBNxug0cF6T/J8LrTTnh7oJ3wU1IQnZKkqmlTdoYLoYcWEXJ/ZVIKhcnzQCoR3mwE9T9XEMY4O0QEJBxDv9gTA==
+"@sap-devx/inquirer-gui@0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui/-/inquirer-gui-0.5.0.tgz#fa6cc903b301fc653f1bfba92772fa224304e3b6"
+  integrity sha512-4ldYrKyoqtgcJioCxEp+QZMDck2bQgzN/rkh9S2cKPqCJs1oEl0f6hFB1uqmkF2Te+oaK9mI1/CemwCS4BRovA==
   dependencies:
     strip-ansi "^6.0.0"
     vue "2.6.12"

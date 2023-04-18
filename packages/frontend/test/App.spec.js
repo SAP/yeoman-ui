@@ -845,6 +845,26 @@ describe("App.vue", () => {
       expect(wrapper.vm.showBusyIndicator).toBeFalsy();
       expect(wrapper.vm.expectedShowBusyIndicator).toBeFalsy();
     });
+
+    it("Busy indicator can be set manually (to support custom plugin control)", async () => {
+      const sleeper = function (ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      };
+      wrapper = initComponent(App);
+      wrapper.vm.setBusyIndicator(true);
+      expect(wrapper.vm.expectedShowBusyIndicator).toBeTruthy();
+      // 1 second delay before busy indicator is shown
+      await sleeper(1200);
+      expect(wrapper.vm.showBusyIndicator).toBeTruthy();
+
+      // If a custom plugin function is evaluating it can explicitly cancel the busy indicator on callback
+      wrapper.vm.prompts = [{}, {}];
+      wrapper.vm.isDone = false;
+      wrapper.vm.currentPrompt.status = "evaluating";
+
+      wrapper.vm.setBusyIndicator(false);
+      expect(wrapper.vm.showBusyIndicator).toBeFalsy();
+    });
   });
 
   describe("toggleConsole - method", () => {
