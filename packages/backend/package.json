@@ -1,5 +1,5 @@
 {
-  "name": "yeoman-ui",
+  "name": "yeoman-ui", 
   "displayName": "Application Wizard",
   "version": "1.10.8",
   "private": true,
