@@ -44,7 +44,9 @@
     "ws:egRun": "node ./dist/src/webSocketServer/exploregens.js",
     "ws:run": "node ./dist/src/webSocketServer/youi.js"
   },
-  "extensionDependencies": ["SAPOSS.app-studio-toolkit"],
+  "extensionDependencies": [
+    "SAPOSS.app-studio-toolkit"
+  ],
   "contributes": {
     "commands": [
       {
