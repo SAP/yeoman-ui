@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.11.0](https://github.com/SAP/yeoman-ui/compare/v1.10.8...v1.11.0) (2023-04-19)
+
+**Note:** Version bump only for package @sap-devx/yeoman-ui-types
+
 ## [1.10.8](https://github.com/SAP/yeoman-ui/compare/v1.10.7...v1.10.8) (2023-03-22)
 
 **Note:** Version bump only for package @sap-devx/yeoman-ui-types

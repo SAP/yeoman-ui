@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.11.0](https://github.com/SAP/yeoman-ui/compare/v1.10.8...v1.11.0) (2023-04-19)
+
+### Features
+
+- **backend:** add extension dependency to toolkit ([#761](https://github.com/SAP/yeoman-ui/issues/761)) ([3b18ff1](https://github.com/SAP/yeoman-ui/commit/3b18ff1c6ebadcf300065f337d405e7ac8982fb1))
+- **frontend:** consumes latest inquirer-gui 0.5.0 ([#758](https://github.com/SAP/yeoman-ui/issues/758)) ([a8c59fd](https://github.com/SAP/yeoman-ui/commit/a8c59fd74199e330f0b4066e0d87a9a8e89410d4))
+
 ## [1.10.8](https://github.com/SAP/yeoman-ui/compare/v1.10.7...v1.10.8) (2023-03-22)
 
 ### Bug Fixes
