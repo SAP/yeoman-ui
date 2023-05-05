@@ -96,3 +96,11 @@ export interface IValidationLink {
    */
   toString(): string;
 }
+
+/**
+ * Messages with severity
+ */
+export interface IMessageSeverity {
+  message: string;
+  severity: Severity;
+}
