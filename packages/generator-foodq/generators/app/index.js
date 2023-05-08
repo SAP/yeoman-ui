@@ -182,6 +182,41 @@ module.exports = class extends Generator {
           hint: "Our recommendation is green",
           breadcrumb: "Napkin color",
         },
+        additionalMessages: (input, answers) => {
+          if (input === "warn") {
+            return {
+              message: "Some warning message",
+              severity: 1,
+            };
+          }
+          if (input === "blue" && answers["confirmHungry"] === false) {
+            return {
+              message: `Some conditional warning message (Confirm hungry: ${answers["confirmHungry"]})`,
+              severity: 1,
+            };
+          }
+          if (input === "infolong") {
+            return {
+              message:
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." +
+                "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." +
+                "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+              severity: 2,
+            };
+          }
+          if (input === "info") {
+            return {
+              message: "Some info message",
+              severity: 2,
+            };
+          }
+          if (input === "error") {
+            return {
+              message: "Some error message (consider using a validation message)",
+              severity: 0,
+            };
+          }
+        },
         when: (response) => {
           if (_.isNil(this._getOption("favColor"))) {
             const hungry = this._getAnswer("hungry", response);
