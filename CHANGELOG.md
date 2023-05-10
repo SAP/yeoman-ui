@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.12.0](https://github.com/SAP/yeoman-ui/compare/v1.11.0...v1.12.0) (2023-05-10)
+
+### Features
+
+- **frontend:** adds message with severity support via inquirer-gui ([#763](https://github.com/SAP/yeoman-ui/issues/763)) ([d5cbde3](https://github.com/SAP/yeoman-ui/commit/d5cbde326c3f567adbaafdff1aee0acbd1a0b4b7))
+
 # [1.11.0](https://github.com/SAP/yeoman-ui/compare/v1.10.8...v1.11.0) (2023-04-19)
 
 ### Features
