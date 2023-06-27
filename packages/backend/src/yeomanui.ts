@@ -61,6 +61,7 @@ export class YeomanUI {
 
   private readonly TARGET_FOLDER_CONFIG_PROP = "ApplicationWizard.TargetFolder";
   private readonly SELECTED_WORKSPACE_CONFIG_PROP = "ApplicationWizard.Workspace";
+  private onUncaughtException: (e: Error) => void;
 
   constructor(
     rpc: IRpc,
@@ -243,6 +244,8 @@ export class YeomanUI {
         vscode.window.showErrorMessage(error.message);
       }
       this.onGeneratorFailure(generatorNamespace, this.getErrorWithAdditionalInfo(error, "runGenerator()"));
+    } finally {
+      process.removeListener("uncaughtException", this.onUncaughtException);
     }
   }
 
@@ -278,9 +281,13 @@ export class YeomanUI {
       this.onGeneratorFailure(generatorName, this.getErrorWithAdditionalInfo(error, `gen.on(${errorEventName})`))
     );
 
-    process.on("uncaughtException", (error) =>
-      this.onGeneratorFailure(generatorName, this.getErrorWithAdditionalInfo(error, "process.on(uncaughtException)"))
-    );
+    // when generator "restart" is selected, re-register the "uncaughtException" listener (with the updated context variables)
+    this.onUncaughtException && process.removeListener("uncaughtException", this.onUncaughtException);
+    this.onUncaughtException = (error) => {
+      this.onGeneratorFailure(generatorName, this.getErrorWithAdditionalInfo(error, "process.on(uncaughtException)"));
+      env.emit("end", error); // forced shutdown the running
+    };
+    process.on("uncaughtException", this.onUncaughtException);
   }
 
   private getErrorWithAdditionalInfo(error: any, additionalInfo: string) {
@@ -446,13 +453,16 @@ export class YeomanUI {
   }
 
   private onGeneratorFailure(generatorName: string, error: any) {
-    this.errorThrown = true;
-    const messagePrefix = `${generatorName} generator failed`;
-    const errorMessage: string = this.logError(error, messagePrefix);
-    SWA.updateGeneratorEnded(generatorName, false, this.logger, errorMessage);
-    this.youiEvents.doGeneratorDone(false, errorMessage, "", "files");
-    this.setInitialProcessDir();
-    this.flowState.reject(error);
+    // avoid display the error multiple times due the same running
+    if (!this.errorThrown) {
+      this.errorThrown = true;
+      const messagePrefix = `${generatorName} generator failed`;
+      const errorMessage: string = this.logError(error, messagePrefix);
+      SWA.updateGeneratorEnded(generatorName, false, this.logger, errorMessage);
+      this.youiEvents.doGeneratorDone(false, errorMessage, "", "files");
+      this.setInitialProcessDir();
+      this.flowState.reject(error);
+    }
   }
 
   private onGenInstall(gen: any) {

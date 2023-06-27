@@ -918,6 +918,28 @@ describe("yeomanui unit test", () => {
     envMock.verify();
     genMock.verify();
     processMock.verify();
+    expect(yeomanUiInstance["onUncaughtException"]).to.be.ok;
+  });
+
+  it("handleErrors - when 'startOver' operation selected", () => {
+    const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, flowPromise.state);
+    yeomanUiInstance["onUncaughtException"] = () => "";
+    const onUncaughtExceptionBefore = yeomanUiInstance["onUncaughtException"];
+    const env: Environment = Environment.createEnv();
+    const envMock = sandbox.mock(env);
+    const gen = { on: () => "" };
+    const genMock = sandbox.mock(gen);
+    const processMock = sandbox.mock(process);
+    envMock.expects("on").withArgs("error");
+    genMock.expects("on").withArgs("error");
+    processMock.expects("on").withArgs("uncaughtException");
+    processMock.expects("removeListener").withArgs("uncaughtException", onUncaughtExceptionBefore);
+    yeomanUiInstance["handleErrors"](env, gen, "genName");
+    envMock.verify();
+    genMock.verify();
+    processMock.verify();
+    expect(yeomanUiInstance["onUncaughtException"]).to.be.ok;
+    expect(yeomanUiInstance["onUncaughtException"]).to.not.equal(onUncaughtExceptionBefore);
   });
 
   describe("setGenInWriting", () => {
