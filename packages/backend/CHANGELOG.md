@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.12.1](https://github.com/SAP/yeoman-ui/compare/v1.12.0...v1.12.1) (2023-06-28)
+
+### Bug Fixes
+
+- [DEVXBUGS-11232] error thrown by generator appears twice in BAS notification ([#767](https://github.com/SAP/yeoman-ui/issues/767)) ([510ddcb](https://github.com/SAP/yeoman-ui/commit/510ddcb1beb92f0ee0b715f81d9df864283a33dc))
+
 # [1.12.0](https://github.com/SAP/yeoman-ui/compare/v1.11.0...v1.12.0) (2023-05-10)
 
 ### Features
