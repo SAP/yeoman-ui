@@ -2374,17 +2374,17 @@
   dependencies:
     vue "^2.6.10"
 
-"@sap-devx/inquirer-gui-tiles-plugin@0.0.8":
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-tiles-plugin/-/inquirer-gui-tiles-plugin-0.0.8.tgz#0925ca35638f892e1b9d23fe0c123b40e4a68394"
-  integrity sha512-yaRj2Gn73UYDRG8f07iCi3Qxd8dVAOVbiSlC5MdMa2OaANwXzAnUP3slxPi77Jvtmhm0V0r2OuatLN+nAzlk7g==
+"@sap-devx/inquirer-gui-tiles-plugin@0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-tiles-plugin/-/inquirer-gui-tiles-plugin-0.1.0.tgz#b4641d392b4d2b5270c2c8380cd56280872fb256"
+  integrity sha512-ZCltEFcXNFZ244Vung659aXxTjXm9NOwfg97C7jxElkVjsSVDKW9FIyw+eMsURTx/vuWiaG0aMfYJf+UVu+Bkg==
   dependencies:
     vue "^2.6.10"
 
-"@sap-devx/inquirer-gui@0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui/-/inquirer-gui-0.6.0.tgz#57cbb4a8108137e74432d544456ee835d66419d6"
-  integrity sha512-/daSaSx6ul6+4CIslG/LDZQbldgMb+5JAmjpLmhx8DQLhsOrNxYQABJbaDFws9h0om1EcQcelXn8KbOY3alSzQ==
+"@sap-devx/inquirer-gui@0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui/-/inquirer-gui-0.8.0.tgz#5440b11c8708959088e902c2f7125eb2c6f20620"
+  integrity sha512-jiDCrQtU1cpNzzCJN21H68xgyh5AlbD2O/NhQJ5sgn6Fmem8Ofnq5F2TdF3LWR6VVfOThlafnXxYaB2nM4RX8Q==
   dependencies:
     strip-ansi "^6.0.0"
     vue "2.6.12"
