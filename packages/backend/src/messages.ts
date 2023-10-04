@@ -40,4 +40,6 @@ export default {
   changing_owner_permissions: (globalNpmPath: string) => `Changing permissions of "${globalNpmPath}" folder...`,
   timeout_install_generators:
     "Some generators were not installed. You can continue to work in SAP Business Application Studio and we will retry next time you restart the dev space.",
+  nodejs_install_not_found:
+    "Node.js installation cannot be detected. Please ensure you have installed Node.js before attempting to use Template Wizard",
 };

@@ -10,6 +10,8 @@ import { set } from "lodash";
 import { expect } from "chai";
 import { join } from "path";
 import { homedir } from "os";
+import * as getInstalled from "@sap-ux/environment-check/dist/checks/get-installed";
+import messages from "../../src/messages";
 
 describe("YeomanUIPanel unit test", () => {
   let sandbox: SinonSandbox;
@@ -21,6 +23,7 @@ describe("YeomanUIPanel unit test", () => {
   let panel: YeomanUIPanel.YeomanUIPanel;
   let setWebviewPanelStub: SinonStub;
   let createWebviewPanelStub: SinonStub;
+  let getProcessVersionsMock: SinonMock;
 
   before(() => {
     sandbox = createSandbox();
@@ -40,6 +43,7 @@ describe("YeomanUIPanel unit test", () => {
     panel = new YeomanUIPanel.YeomanUIPanel(vscode.context);
     setWebviewPanelStub = sandbox.stub(panel, "setWebviewPanel");
     createWebviewPanelStub = sandbox.stub(panel, "createWebviewPanel");
+    getProcessVersionsMock = sandbox.mock(getInstalled);
   });
 
   afterEach(() => {
@@ -53,6 +57,9 @@ describe("YeomanUIPanel unit test", () => {
   });
 
   describe("runGenerator", () => {
+    afterEach(() => {
+      getProcessVersionsMock.restore();
+    });
     it("generator is not choosen", async () => {
       envUtilsMock.expects("getAllGeneratorNamespaces").resolves(["gen1:test", "test:app", "code:app"]);
       windowMock.expects("showQuickPick").resolves();
@@ -60,6 +67,7 @@ describe("YeomanUIPanel unit test", () => {
     });
 
     it("generator is choosen", () => {
+      getProcessVersionsMock.expects("getProcessVersions").resolves({ node: "20.6.0" });
       envUtilsMock.expects("getAllGeneratorNamespaces").twice().resolves(["gen1:test", "test:app", "code:app"]);
       windowMock.expects("showQuickPick").resolves("test:app");
       void panel.runGenerator();
@@ -69,7 +77,12 @@ describe("YeomanUIPanel unit test", () => {
   describe("loadWebviewPanel", () => {
     describe("in VSCODE", () => {
       beforeEach(() => {
+        getProcessVersionsMock.expects("getProcessVersions").resolves({ node: "20.6.0" });
         Constants["IS_IN_BAS"] = false;
+      });
+
+      afterEach(() => {
+        getProcessVersionsMock.restore();
       });
 
       it("generator is not provided, in VSCODE", () => {
@@ -104,7 +117,12 @@ describe("YeomanUIPanel unit test", () => {
 
     describe("in BAS", () => {
       beforeEach(() => {
+        getProcessVersionsMock.expects("getProcessVersions").resolves({ node: "20.6.0" });
         Constants["IS_IN_BAS"] = true;
+      });
+
+      afterEach(() => {
+        getProcessVersionsMock.restore();
       });
 
       it("generator is not provided", () => {
@@ -128,6 +146,22 @@ describe("YeomanUIPanel unit test", () => {
         envUtilsMock.expects("getAllGeneratorNamespaces").resolves(["gen1:test", "code:app"]);
         npmUtilsMock.expects("checkAccessAndSetGeneratorsPath").never();
         void panel.loadWebviewPanel({ generator: "test:app" });
+      });
+    });
+
+    describe("no NodeJS installation is found in VSCode", () => {
+      beforeEach(() => {
+        getProcessVersionsMock.expects("getProcessVersions").resolves({});
+        Constants["IS_IN_BAS"] = false;
+      });
+
+      afterEach(() => {
+        getProcessVersionsMock.restore();
+      });
+
+      it("should show an error message", () => {
+        windowMock.expects("showErrorMessage").withExactArgs(messages.nodejs_install_not_found);
+        void panel.loadWebviewPanel();
       });
     });
   });
