@@ -44,7 +44,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 
   public async loadWebviewPanel(uiOptions?: any): Promise<void> {
     if ((await getProcessVersions()).node === undefined) {
-      await vscode.window.showErrorMessage(messages.nodejs_install_not_found);
+      void vscode.window.showErrorMessage(messages.nodejs_install_not_found);
     }
     const genNamespace = uiOptions?.generator;
     if (genNamespace) {
