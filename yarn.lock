@@ -2411,7 +2411,7 @@
 
 "@sap-ux/axios-extension@1.4.8":
   version "1.4.8"
-  resolved "https://int.repositories.cloud.sap/artifactory/api/npm/build-milestones-npm/@sap-ux/axios-extension/-/axios-extension-1.4.8.tgz#1cd5b380c0b824d095d0dc2d3de29ea8de5b39de"
+  resolved "https://registry.yarnpkg.com/@sap-ux/axios-extension/-/axios-extension-1.4.8.tgz#1cd5b380c0b824d095d0dc2d3de29ea8de5b39de"
   integrity sha512-gIW9/llfjgwzr6IbWWHoUk97ZGK62ub6aX4Dg99668I5TVd8FyskjuibUnWvqpxhmMcy+0vlhhzQzOejfqjHiw==
   dependencies:
     "@sap-ux/btp-utils" "0.11.9"
@@ -2427,7 +2427,7 @@
 
 "@sap-ux/btp-utils@0.11.9":
   version "0.11.9"
-  resolved "https://int.repositories.cloud.sap/artifactory/api/npm/build-milestones-npm/@sap-ux/btp-utils/-/btp-utils-0.11.9.tgz#ad8816d0102cf4af6f764de6bb9aac9d0bcf6098"
+  resolved "https://registry.yarnpkg.com/@sap-ux/btp-utils/-/btp-utils-0.11.9.tgz#ad8816d0102cf4af6f764de6bb9aac9d0bcf6098"
   integrity sha512-5BQbQ+R+30YNXsDwVes22L712dX7psJ1/b0clvccvwskQvzIT3Tim2Pwx8y35het/kH7Ix8dqnDUA+MCawnxjg==
   dependencies:
     "@sap/cf-tools" "2.1.1"
@@ -2435,7 +2435,7 @@
 
 "@sap-ux/environment-check@0.15.64":
   version "0.15.64"
-  resolved "https://int.repositories.cloud.sap/artifactory/api/npm/build-milestones-npm/@sap-ux/environment-check/-/environment-check-0.15.64.tgz#8376e660aaf49190df906c19834119ba2835610d"
+  resolved "https://registry.yarnpkg.com/@sap-ux/environment-check/-/environment-check-0.15.64.tgz#8376e660aaf49190df906c19834119ba2835610d"
   integrity sha512-Ny8jb10THmPWZffFVimgrdrsAcdiHW/vSJBUTz1uXfDSWu07MKo2COMAbKKb0+jLo4kzsweaVYrRxwN+o5I6XA==
   dependencies:
     "@sap-ux/axios-extension" "1.4.8"
@@ -2456,7 +2456,7 @@
 
 "@sap-ux/logger@0.3.8":
   version "0.3.8"
-  resolved "https://int.repositories.cloud.sap/artifactory/api/npm/build-milestones-npm/@sap-ux/logger/-/logger-0.3.8.tgz#592909722ad703e0cdf8086630603865dab473ad"
+  resolved "https://registry.yarnpkg.com/@sap-ux/logger/-/logger-0.3.8.tgz#592909722ad703e0cdf8086630603865dab473ad"
   integrity sha512-Ls/K7BpAYIb7d+rtXl9psha3Hp8lBF8mR/3hrsgWHPXadLzMMPSd7/55bXnjGHQGsJ1pl0+gNldnL7at3wHHpg==
   dependencies:
     chalk "4.1.2"
@@ -2466,7 +2466,7 @@
 
 "@sap-ux/project-access@1.13.6":
   version "1.13.6"
-  resolved "https://int.repositories.cloud.sap/artifactory/api/npm/build-milestones-npm/@sap-ux/project-access/-/project-access-1.13.6.tgz#9983bbc1a5f3d586588a3d2bbda653457c1f8ee3"
+  resolved "https://registry.yarnpkg.com/@sap-ux/project-access/-/project-access-1.13.6.tgz#9983bbc1a5f3d586588a3d2bbda653457c1f8ee3"
   integrity sha512-eLLTAHpAd+Rr+ioKcoIwt35qbgT/SHXlS54sPCgvgYUX3yRwC90SWsSrcrldh1W3K+wLkv+t7WeP7+dF96hc+A==
   dependencies:
     "@sap-ux/ui5-config" "0.19.3"
@@ -2476,7 +2476,7 @@
 
 "@sap-ux/store@0.3.14":
   version "0.3.14"
-  resolved "https://int.repositories.cloud.sap/artifactory/api/npm/build-milestones-npm/@sap-ux/store/-/store-0.3.14.tgz#10e7c6bb8bce02f3ca3d6f6e54a447556d5998cc"
+  resolved "https://registry.yarnpkg.com/@sap-ux/store/-/store-0.3.14.tgz#10e7c6bb8bce02f3ca3d6f6e54a447556d5998cc"
   integrity sha512-SJ2a3sSbDNqKP8w6gnewrELioZOZIyAOLXvt3QmCvt5bf9aFDUAGWHFQZMnyNoaGfXOvkBSsHbUhwGatVMCPmw==
   dependencies:
     "@sap-ux/logger" "0.3.8"
@@ -2489,7 +2489,7 @@
 
 "@sap-ux/ui5-config@0.19.3":
   version "0.19.3"
-  resolved "https://int.repositories.cloud.sap/artifactory/api/npm/build-milestones-npm/@sap-ux/ui5-config/-/ui5-config-0.19.3.tgz#0f5d37370c7ad6504769b607cbe9e75558f0868b"
+  resolved "https://registry.yarnpkg.com/@sap-ux/ui5-config/-/ui5-config-0.19.3.tgz#0f5d37370c7ad6504769b607cbe9e75558f0868b"
   integrity sha512-wi48pCaFH5300TrIJyI0ksLlgZ3RCxhhDf4N8kaxvAP6TR1GnrwyTCFyUy2UcXjatp0X+ZrRHaI64vPrYe1vdw==
   dependencies:
     "@sap-ux/yaml" "0.13.8"
@@ -2498,7 +2498,7 @@
 
 "@sap-ux/yaml@0.13.8":
   version "0.13.8"
-  resolved "https://int.repositories.cloud.sap/artifactory/api/npm/build-milestones-npm/@sap-ux/yaml/-/yaml-0.13.8.tgz#36c770ed377352bb430b8f6eb6324bd44b4d8363"
+  resolved "https://registry.yarnpkg.com/@sap-ux/yaml/-/yaml-0.13.8.tgz#36c770ed377352bb430b8f6eb6324bd44b4d8363"
   integrity sha512-q9gUtTOIHE+bwUU5KaUmBK3QN47OZmKCukVlnMqY3CkDx+qHHXlccwyS0ym77eMX+JerpP2FnS9VOFvnhDqn5A==
   dependencies:
     lodash "4.17.21"
