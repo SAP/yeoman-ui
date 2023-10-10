@@ -12,6 +12,8 @@ import * as npmFetch from "npm-registry-fetch";
 import { LookupGeneratorMeta } from "yeoman-environment";
 import { getConsoleWarnLogger } from "../logger/console-logger";
 import { Constants } from "./constants";
+import { spawn } from "child_process";
+import * as os from "os";
 
 const promisifiedExec = promisify(exec);
 
@@ -164,7 +166,10 @@ class Command {
   public async getPackagesData(query = "", author = ""): Promise<PackagesData> {
     const gensQueryUrl = NpmCommand.getGensQueryURL(query, author);
     const queryResult: any = await npmFetch.json(gensQueryUrl);
-    return { packages: _.get(queryResult, "objects", []), total: queryResult.total };
+    return {
+      packages: _.get(queryResult, "objects", []),
+      total: queryResult.total,
+    };
   }
 
   public async getPackageJsons(gensMeta: LookupGeneratorMeta[]): Promise<any[]> {
@@ -192,6 +197,40 @@ class Command {
     const locationParams = this.getGenLocationParams();
     const command = `${NPM} uninstall ${locationParams} ${packageName}`;
     return this.execCommand(command);
+  }
+
+  public async getNodeProcessVersions(): Promise<NodeJS.ProcessVersions> {
+    try {
+      const output = await this.spawnCommand("node", ["-p", "JSON.stringify(process.versions)"]);
+      return JSON.parse(output);
+    } catch (e) {
+      getConsoleWarnLogger().error(`Error retrieving NodeJS process versions: ${e.message}`);
+      return {} as NodeJS.ProcessVersions;
+    }
+  }
+
+  private spawnCommand(command: string, commandArgs: string[]): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const spawnOptions = /^win/.test(process.platform)
+        ? { windowsVerbatimArguments: true, shell: true, cwd: os.homedir() }
+        : { cwd: os.homedir() };
+      let output = "";
+      const spawnProcess = spawn(command, commandArgs, spawnOptions);
+      spawnProcess.stdout.on("data", (data) => {
+        const newData = data.toString();
+        output += newData;
+      });
+      spawnProcess.stderr.on("data", (data) => {
+        const newData = data.toString();
+        output += newData;
+      });
+      spawnProcess.on("exit", () => {
+        resolve(output);
+      });
+      spawnProcess.on("error", (error) => {
+        reject(error);
+      });
+    });
   }
 
   public async checkAccessAndSetGeneratorsPath() {

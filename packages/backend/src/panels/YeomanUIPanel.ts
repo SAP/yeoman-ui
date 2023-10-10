@@ -15,7 +15,6 @@ import { homedir } from "os";
 import { NpmCommand } from "../utils/npm";
 import { Constants } from "../utils/constants";
 import { notifyGeneratorsInstallationProgress } from "../utils/generators-installation-progress";
-import { getProcessVersions } from "@sap-ux/environment-check/dist/checks/get-installed";
 import messages from "../messages";
 
 export class YeomanUIPanel extends AbstractWebviewPanel {
@@ -43,8 +42,9 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   }
 
   public async loadWebviewPanel(uiOptions?: any): Promise<void> {
-    if (!Constants.IS_IN_BAS && (await getProcessVersions()).node === undefined) {
+    if (!Constants.IS_IN_BAS && (await NpmCommand.getNodeProcessVersions()).node === undefined) {
       void vscode.window.showErrorMessage(messages.nodejs_install_not_found);
+      return;
     }
     const genNamespace = uiOptions?.generator;
     if (genNamespace) {

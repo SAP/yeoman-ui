@@ -185,7 +185,6 @@
   "dependencies": {
     "@sap-devx/webview-rpc": "0.3.1",
     "@sap-devx/yeoman-ui-types": "^1.12.2",
-    "@sap-ux/environment-check": "0.15.64",
     "@sap/bas-sdk": "3.2.1",
     "@sap/swa-for-sapbas-vsx": "1.2.7",
     "@vscode-logging/logger": "1.2.3",
