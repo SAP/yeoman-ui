@@ -10,6 +10,7 @@ import { set } from "lodash";
 import { expect } from "chai";
 import { join } from "path";
 import { homedir } from "os";
+import messages from "../../src/messages";
 
 describe("YeomanUIPanel unit test", () => {
   let sandbox: SinonSandbox;
@@ -60,6 +61,7 @@ describe("YeomanUIPanel unit test", () => {
     });
 
     it("generator is choosen", () => {
+      npmUtilsMock.expects("getNodeProcessVersions").resolves({ node: "20.6.0" });
       envUtilsMock.expects("getAllGeneratorNamespaces").twice().resolves(["gen1:test", "test:app", "code:app"]);
       windowMock.expects("showQuickPick").resolves("test:app");
       void panel.runGenerator();
@@ -69,6 +71,7 @@ describe("YeomanUIPanel unit test", () => {
   describe("loadWebviewPanel", () => {
     describe("in VSCODE", () => {
       beforeEach(() => {
+        npmUtilsMock.expects("getNodeProcessVersions").resolves({ node: "20.6.0" });
         Constants["IS_IN_BAS"] = false;
       });
 
@@ -128,6 +131,18 @@ describe("YeomanUIPanel unit test", () => {
         envUtilsMock.expects("getAllGeneratorNamespaces").resolves(["gen1:test", "code:app"]);
         npmUtilsMock.expects("checkAccessAndSetGeneratorsPath").never();
         void panel.loadWebviewPanel({ generator: "test:app" });
+      });
+    });
+
+    describe("no NodeJS installation is found in VSCode", () => {
+      beforeEach(() => {
+        npmUtilsMock.expects("getNodeProcessVersions").resolves({});
+        Constants["IS_IN_BAS"] = false;
+      });
+
+      it("should show an error message", async () => {
+        windowMock.expects("showErrorMessage").withExactArgs(messages.nodejs_install_not_found);
+        await panel.loadWebviewPanel();
       });
     });
   });
