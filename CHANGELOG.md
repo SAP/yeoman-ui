@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.13.0](https://github.com/SAP/yeoman-ui/compare/v1.12.2...v1.13.0) (2023-10-15)
+
+### Features
+
+- **backend:** show error if NodeJS is not installed ([#779](https://github.com/SAP/yeoman-ui/issues/779)) ([cdba893](https://github.com/SAP/yeoman-ui/commit/cdba893e46d9c38cb260322a1bd922f8144e0486))
+
 ## [1.12.2](https://github.com/SAP/yeoman-ui/compare/v1.12.1...v1.12.2) (2023-07-23)
 
 **Note:** Version bump only for package root
