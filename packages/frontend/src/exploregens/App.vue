@@ -1,56 +1,63 @@
 <template>
   <v-app id="exploregens" class="exploregens-main explore-generators">
     <div>
-      <v-app-bar id="app-bar" dense class="pa-0 ma-0 elevation-0">
+      <v-toolbar id="app-bar" density="compact" class="pa-0 ma-0 elevation-0">
         <v-toolbar-title>{{ messages.title }}</v-toolbar-title>
-      </v-app-bar>
+      </v-toolbar>
     </div>
-    <v-card-text class="pa-2" style="font-size: 14px">{{ messages.description }}</v-card-text>
-    <v-expansion-panels v-if="isInBAS && isLegalNoteAccepted && ready" flat class="explore-generators">
-      <v-expansion-panel @click="onDisclaimer">
-        <v-expansion-panel-header class="homepage pa-2"
-          ><a style="text-decoration: underline">{{ disclaimer }}</a></v-expansion-panel-header
-        >
-        <v-expansion-panel-content>
+    <v-card-text class="pa-2" style="font-size: 14px">
+      {{ messages.description }}
+    </v-card-text>
+    <v-expansion-panels v-if="isInBAS && isLegalNoteAccepted && ready" class="explore-generators">
+      <v-expansion-panel elevation="0" class="elevation-0" @click="onDisclaimer">
+        <v-expansion-panel-title class="homepage pa-2">
+          <a class="text-blue" style="text-decoration: underline">{{ disclaimer }}</a>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
           <v-row>
             <v-col>
-              <v-card-text class="pa-0 ma-0" style="font-size: 14px">{{ messages.legal_note }}</v-card-text>
+              <v-card-text class="pa-0 ma-0" style="font-size: 14px">
+                {{ messages.legal_note }}
+              </v-card-text>
             </v-col>
           </v-row>
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
 
-    <v-row v-if="isLegalNoteAccepted && ready">
+    <v-row v-if="isLegalNoteAccepted && ready" class="pt-3">
       <v-col :cols="10">
         <v-text-field
+          v-model="query"
           class="explore-generators-search-gens"
           :label="messages.search"
-          v-model="query"
-          outlined
+          variant="outlined"
           hide-details="auto"
-          @input="onQueryChange"
           clearable
+          @update:model-value="onQueryChange"
           @click:clear="onQueryChange"
         />
       </v-col>
       <v-col :cols="2">
         <v-select
+          v-model="recommended"
           class="explore-generators-search-gens"
           hide-details="auto"
-          outlined
+          variant="outlined"
           :items="items"
-          v-model="recommended"
+          item-color="primary"
           :label="messages.recommended"
-          @change="onQueryChange"
+          @update:model-value="onQueryChange"
         />
       </v-col>
     </v-row>
 
-    <v-row class="explore-generators-search pa-2" v-if="isLegalNoteAccepted && ready">
+    <v-row v-if="isLegalNoteAccepted && ready" class="explore-generators-search pa-2">
       <v-card-title>{{ searchResults }}</v-card-title>
-      <v-icon v-if="refineSearch" color="blue">mdi-information-outline</v-icon>
-      <v-card-title class="pa-0 ml-2" v-if="refineSearch">{{ messages.refine_search }}</v-card-title>
+      <v-icon v-if="refineSearch" color="blue"> mdi-information-outline </v-icon>
+      <v-card-title v-if="refineSearch" class="pa-0 ml-2">
+        {{ messages.refine_search }}
+      </v-card-title>
     </v-row>
 
     <v-slide-x-transition v-if="isLegalNoteAccepted && ready">
@@ -59,17 +66,25 @@
           <v-card width="500" class="d-flex flex-column mx-auto" height="260" tile hover flat dark elevation="2">
             <v-card-title>{{ gen.package.name }}</v-card-title>
             <v-card-subtitle>{{ gen.package.version }}</v-card-subtitle>
-            <v-card-text min-height="70" style="overflow-y: auto">{{ gen.package.description }}</v-card-text>
-            <v-spacer></v-spacer>
+            <v-card-text min-height="70" style="overflow-y: auto">
+              {{ gen.package.description }}
+            </v-card-text>
+            <v-spacer />
             <v-card-text class="homepage">
-              <a :href="gen.package.links.npm">{{ messages.more_info }}</a>
+              <a class="text-blue" :href="gen.package.links.npm">{{ messages.more_info }}</a>
             </v-card-text>
             <v-card-actions class="pa-4">
-              <v-btn min-width="130px" :text="gen.disabledToHandle" :color="gen.color" @click="onAction(gen)">{{
-                gen.action
-              }}</v-btn>
+              <v-btn
+                variant="elevated"
+                min-width="130px"
+                :text="gen.disabledToHandle"
+                :color="gen.color"
+                @click="onAction(gen)"
+              >
+                {{ gen.action }}
+              </v-btn>
             </v-card-actions>
-            <v-progress-linear v-if="gen.disabledToHandle" indeterminate color="primary"></v-progress-linear>
+            <v-progress-linear v-if="gen.disabledToHandle" indeterminate color="primary" />
           </v-card>
         </v-col>
       </v-row>
@@ -77,8 +92,12 @@
     <div v-if="!isLegalNoteAccepted && ready">
       <v-row class="pa-2">
         <v-col>
-          <v-card-text id="legal-note" class="pa-0 ma-0" style="font-size: 14px">{{ messages.legal_note }}</v-card-text>
-          <v-btn class="mt-6" @click="onAcceptLegalNote">{{ messages.accept }}</v-btn>
+          <v-card-text id="legal-note" class="pa-0 ma-0" style="font-size: 14px">
+            {{ messages.legal_note }}
+          </v-card-text>
+          <v-btn class="mt-6" @click="onAcceptLegalNote">
+            {{ messages.accept }}
+          </v-btn>
         </v-col>
       </v-row>
     </div>
@@ -100,7 +119,7 @@ import messages from "./messages";
 import utils from "../utils/utils";
 
 export default {
-  name: "exploregens",
+  name: "YOUIExploregens",
   data() {
     return {
       items: [],
@@ -133,6 +152,16 @@ export default {
       return this.messages.results(this.total);
     },
   },
+  async created() {
+    await this.setupRpc();
+    await Promise.all([await this.setIsLegalNoteAccepted(), await this.setIsInBAS()]);
+    await Promise.all([this.getRecommendedQuery(), this.getFilteredGenerators()]);
+    this.ready = true;
+  },
+  mounted() {
+    // TODO: remove after a solution is found for DEVXBUGS-8741
+    utils.addAndRemoveClass("legal-note", "material-icons");
+  },
   methods: {
     onDisclaimer() {
       this.disclaimerOpened = !this.disclaimerOpened;
@@ -154,11 +183,11 @@ export default {
         return "primary";
       }
 
-      return gen.state === "installed" ? "#585858" : "primary";
+      return gen.state === "installed" ? "#585858" : "";
     },
     onAction(gen) {
       const action = gen.action.toLowerCase();
-      this.rpc.invoke(action, [gen]);
+      this.rpc.invoke(action, [JSON.parse(JSON.stringify(gen))]);
     },
     onQueryChange() {
       const debouncer = _debounce(this.getFilteredGenerators, 200);
@@ -242,32 +271,28 @@ export default {
       }
     },
   },
-  async created() {
-    await this.setupRpc();
-    await Promise.all([await this.setIsLegalNoteAccepted(), await this.setIsInBAS()]);
-    await Promise.all([this.getRecommendedQuery(), this.getFilteredGenerators()]);
-    this.ready = true;
-  },
-  mounted() {
-    // TODO: remove after a solution is found for DEVXBUGS-8741
-    utils.addAndRemoveClass("legal-note", "material-icons");
-  },
 };
 </script>
 <style scoped>
 .exploregens-main {
   margin: 0px 5px 5px;
 }
-.explore-generators .theme--light.v-expansion-panels .v-expansion-panel,
+.explore-generators .v-theme--light.v-expansion-panels .v-expansion-panel,
 .explore-generators-cards .v-card {
   background-color: var(--vscode-editorWidget-background, #252526);
+  max-width: 100%;
 }
-.explore-generators .v-app-bar.v-toolbar,
-.explore-generators .v-app-bar.v-toolbar .v-btn {
+.explore-generators .v-toolbar,
+.explore-generators .v-toolbar .v-btn {
   background-color: var(--vscode-editor-background, #1e1e1e);
   color: var(--vscode-foreground, #cccccc);
 }
-.explore-generators .v-app-bar.v-toolbar {
+
+.explore-generators .v-toolbar .v-btn {
+  /* Must be !important as vuetifey has !important in .text-primary */
+  color: var(--vscode-textLink-foreground, #3794ff) !important;
+}
+.explore-generators .v-toolbar {
   border-bottom: 1px solid var(--vscode-editorWidget-background, #252526);
   box-shadow: none;
   background-color: var(--vscode-editor-background, #1e1e1e) !important;
@@ -279,9 +304,9 @@ export default {
   border: 1px solid var(--vscode-button-background, #0e639c);
   background-color: var(--vscode-list-hoverBackground, #2a2d2e);
 }
-.explore-generators .theme--light.v-expansion-panels .v-expansion-panel,
+.explore-generators .v-theme--light.v-expansion-panels .v-expansion-panel,
 .explore-generators-cards .v-icon.v-icon,
-.explore-generators-cards .v-card > div.v-card__text {
+.explore-generators-cards .v-card > div.v-card-text {
   color: var(--vscode-editorCodeLens-foreground, #999999);
 }
 .explore-generators-cards {
@@ -289,11 +314,11 @@ export default {
   margin: 0px;
   height: calc(100% - 4rem);
 }
-.v-card__title {
+.v-card-title {
   word-wrap: break-word;
   word-break: normal;
 }
-.homepage.v-card__text {
+.homepage.v-card-text {
   padding-bottom: 0;
 }
 a {
@@ -302,10 +327,13 @@ a {
 .explore-generators-search-gens {
   background-color: var(--vscode-editorWidget-background, #252526);
 }
-.explore-generators-search .v-card__title {
+.explore-generators-search {
+  align-items: center;
+}
+.explore-generators-search .v-card-title {
   font-size: 14px;
 }
-.explore-generators-cards .v-card__subtitle {
+.explore-generators-cards .v-card-subtitle {
   color: var(--vscode-foreground, #cccccc) !important;
 }
 </style>

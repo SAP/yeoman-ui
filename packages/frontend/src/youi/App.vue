@@ -1,60 +1,60 @@
 <template>
   <v-app id="app" class="vld-parent">
     <loading
-      :active.sync="showBusyIndicator"
+      v-model:active="showBusyIndicator"
       :is-full-page="true"
       :height="64"
       :width="64"
       :color="isLoadingColor"
       background-color="transparent"
       loader="spinner"
-    ></loading>
+    />
 
-    <Header
-      id="header"
+    <YOUIHeader
       v-if="prompts.length"
-      :headerTitle="headerTitle"
-      :headerInfo="headerInfo"
-      :stepName="promptIndex < prompts.length ? prompts[promptIndex].name : ''"
+      id="header"
+      :header-title="headerTitle"
+      :header-info="headerInfo"
+      :step-name="promptIndex < prompts.length ? prompts[promptIndex].name : ''"
       :rpc="rpc"
-      :isInVsCode="isInVsCode()"
-      :isGeneric="isGeneric"
-      @parentShowConsole="toggleConsole"
+      :is-in-vs-code="isInVsCode()"
+      :is-generic="isGeneric"
+      @parent-show-console="toggleConsole"
     />
 
     <v-row class="main-row ma-0 pa-0">
       <v-col class="left-col ma-0 pa-0" cols="3">
-        <Navigation
+        <YOUINavigation
           v-if="prompts.length"
-          :promptIndex="promptIndex"
+          :prompt-index="promptIndex"
           :prompts="prompts"
-          @onGotoStep="gotoStep"
-          :promptAnswers="currentAnswerTexts"
+          :prompt-answers="currentAnswerTexts"
+          @on-goto-step="gotoStep"
         />
       </v-col>
       <v-col cols="9" class="right-col">
         <v-row class="prompts-col">
           <v-col>
-            <Done v-if="isDone" :doneStatus="doneStatus" :doneMessage="doneMessage" :donePath="donePath" />
+            <YOUIDone v-if="isDone" :done-status="doneStatus" :done-message="doneMessage" :done-path="donePath" />
 
-            <PromptInfo v-if="currentPrompt && !isDone" :currentPrompt="currentPrompt" />
+            <YOUIPromptInfo v-if="currentPrompt && !isDone" :current-prompt="currentPrompt" />
             <v-slide-x-transition>
               <Form
                 ref="form"
                 :questions="currentPrompt ? currentPrompt.questions : []"
-                @parentExecuteCommand="executeCommand"
+                @parent-execute-command="executeCommand"
                 @answered="onAnswered"
-                @setBusyIndicator="setBusyIndicator"
+                @set-busy-indicator="setBusyIndicator"
               />
             </v-slide-x-transition>
-            <Info
+            <YOUIInfo
               v-if="isNoGenerators"
-              :infoMessage="messages ? messages.select_generator_not_found : ``"
-              :infoUrl="'https://wwww.sap.com'"
+              :info-message="messages ? messages.select_generator_not_found : ``"
+              :info-url="'https://wwww.sap.com'"
             />
           </v-col>
         </v-row>
-        <v-divider bold></v-divider>
+        <v-divider bold />
         <v-row
           v-if="prompts.length > 0 && !isDone && showButtons"
           style="height: 4rem; margin: 0; align-items: left"
@@ -62,24 +62,25 @@
         >
           <div class="bottom-buttons-col" style="display: flex">
             <v-btn
-              id="back"
-              :disabled="promptIndex < 1 || isReplaying"
-              @click="back"
               v-show="promptIndex > 0"
+              id="back"
+              variant="elevated"
+              :disabled="promptIndex < 1 || isReplaying"
               style="min-width: 90px"
+              @click="back"
             >
-              <v-icon left>mdi-chevron-left</v-icon>{{ backButtonText }}
+              <v-icon left> mdi-chevron-left </v-icon>{{ backButtonText }}
             </v-btn>
-            <v-btn id="next" :disabled="!stepValidated" @click="next" style="min-width: 90px">
+            <v-btn id="next" :disabled="!stepValidated" style="min-width: 90px" variant="elevated" @click="next">
               {{ nextButtonText }}
-              <v-icon right v-if="nextButtonText !== `Finish`">mdi-chevron-right</v-icon>
+              <v-icon v-if="nextButtonText !== `Finish`" right> mdi-chevron-right </v-icon>
             </v-btn>
           </div>
-          <div class="prompt-message" v-if="toShowPromptMessage">
+          <div v-if="toShowPromptMessage" class="prompt-message">
             <img style="vertical-align: middle; padding-left: 12px" :src="promptMessageIcon" alt="" />
-            <v-tooltip right :disabled="promptMessageToDisplay.length < this.messageMaxLength">
-              <template v-slot:activator="{ on }">
-                <span :class="promptMessageClass" v-on="on">{{ shortPrompt }}</span>
+            <v-tooltip location="right" :disabled="promptMessageToDisplay.length < messageMaxLength">
+              <template #activator="{ props: tooltipProps }">
+                <span :class="promptMessageClass" v-bind="tooltipProps">{{ shortPrompt }}</span>
               </template>
               <span>{{ promptMessageToDisplay }}</span>
             </v-tooltip>
@@ -90,10 +91,12 @@
     </v-row>
 
     <!-- TODO Handle scroll of above content when console is visible. low priority because it is for localhost console only -->
-    <v-card :class="consoleClass" v-show="showConsole">
+    <v-card v-show="showConsole" :class="consoleClass">
       <v-footer absolute class="font-weight-medium" style="max-height: 300px; overflow-y: auto">
         <v-col class cols="12">
-          <div id="logArea" placeholder="No log entry">{{ logText }}</div>
+          <div id="logArea" placeholder="No log entry">
+            {{ logText }}
+          </div>
         </v-col>
       </v-footer>
     </v-card>
@@ -101,13 +104,13 @@
 </template>
 
 <script>
-import Vue from "vue";
+import { reactive } from "vue";
 import Loading from "vue-loading-overlay";
-import Header from "../components/Header.vue";
-import Navigation from "../components/Navigation.vue";
-import Done from "../components/Done.vue";
-import Info from "../components/Info.vue";
-import PromptInfo from "../components/PromptInfo.vue";
+import YOUIHeader from "../components/YOUIHeader.vue";
+import YOUINavigation from "../components/YOUINavigation.vue";
+import YOUIDone from "../components/YOUIDone.vue";
+import YOUIInfo from "../components/YOUIInfo.vue";
+import YOUIPromptInfo from "../components/YOUIPromptInfo.vue";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import _size from "lodash/size";
@@ -118,12 +121,6 @@ import _find from "lodash/find";
 import _isNil from "lodash/isNil";
 import _forEach from "lodash/forEach";
 import _isEmpty from "lodash/isEmpty";
-import FileBrowserPlugin from "@sap-devx/inquirer-gui-file-browser-plugin";
-import FolderBrowserPlugin from "@sap-devx/inquirer-gui-folder-browser-plugin";
-import LoginPlugin from "@sap-devx/inquirer-gui-login-plugin";
-import TilesPlugin from "@sap-devx/inquirer-gui-tiles-plugin";
-import LabelPlugin from "@sap-devx/inquirer-gui-label-plugin";
-import AutoCompletePlugin from "@sap-devx/inquirer-gui-auto-complete-plugin";
 import { Severity } from "@sap-devx/yeoman-ui-types";
 import utils from "../utils/utils";
 import answerUtils from "../utils/answerUtils";
@@ -172,14 +169,20 @@ function initialState() {
 }
 
 export default {
-  name: "app",
+  name: "App",
   components: {
-    Header,
-    Navigation,
-    Done,
-    Info,
-    PromptInfo,
+    YOUIHeader,
+    YOUINavigation,
+    YOUIDone,
+    YOUIInfo,
+    YOUIPromptInfo,
     Loading,
+  },
+  props: {
+    plugins: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return initialState();
@@ -239,6 +242,7 @@ export default {
       handler() {
         this.setBusyIndicator();
       },
+      deep: true,
     },
     "currentPrompt.status": {
       handler() {
@@ -250,6 +254,14 @@ export default {
         this.setBusyIndicator();
       },
     },
+  },
+  created() {
+    this.setupRpc();
+  },
+  mounted() {
+    this.init();
+    // TODO: remove after a solution is found for DEVXBUGS-8741
+    utils.addAndRemoveClass("header", "material-icons");
   },
   methods: {
     showPromptMessage(message, type, image) {
@@ -305,7 +317,7 @@ export default {
         command.id = cmdOrEvent.target.getAttribute("command");
         command.params = cmdOrEvent.target.getAttribute("params");
       }
-      this.rpc.invoke("executeCommand", [command.id, command.params]);
+      this.rpc.invoke("executeCommand", [command.id, JSON.parse(JSON.stringify(command.params))]);
     },
     back() {
       return this.gotoStep(1); // go 1 step back
@@ -318,7 +330,10 @@ export default {
         this.numOfSteps = numOfSteps;
         const answers = this.currentPrompt.answers;
         if (this.promptIndex - numOfSteps > 0) {
-          return this.rpc.invoke("back", [answers, numOfSteps]);
+          return this.rpc.invoke("back", [
+            answers !== undefined ? JSON.parse(JSON.stringify(answers)) : answers,
+            numOfSteps,
+          ]);
         }
 
         return this.reload();
@@ -348,7 +363,11 @@ export default {
 
       this.stepValidated = false;
       this.toShowPromptMessage = false;
-      this.resolve(this.currentPrompt.answers);
+      this.resolve(
+        this.currentPrompt.answers !== undefined
+          ? JSON.parse(JSON.stringify(this.currentPrompt.answers))
+          : this.currentPrompt.answers
+      );
 
       if (this.promptIndex >= _size(this.prompts) - 1) {
         const prompt = {
@@ -468,7 +487,11 @@ export default {
               }
 
               try {
-                return await that.rpc.invoke("evaluateMethod", [args, question.name, prop]);
+                return await that.rpc.invoke("evaluateMethod", [
+                  args !== undefined ? JSON.parse(JSON.stringify(args)) : args,
+                  question.name,
+                  prop,
+                ]);
               } catch (e) {
                 that.showBusyIndicator = false;
                 throw e;
@@ -540,7 +563,7 @@ export default {
         promptName = _get(promptToDisplay, "name", name);
       }
 
-      const prompt = Vue.observable({
+      const prompt = reactive({
         questions: questions,
         name: promptName,
         description: promptDescription,
@@ -639,21 +662,19 @@ export default {
       this.showConsole = !this.showConsole;
     },
     registerPlugin(plugin) {
-      const options = {};
-      Vue.use(plugin, options);
-      if (options.plugin) {
+      if (plugin) {
         const registerPluginFunc = _get(this.$refs, "form.registerPlugin");
-        registerPluginFunc(options.plugin);
+        registerPluginFunc(plugin);
       }
     },
     init() {
       // register custom inquirer-gui plugins
-      this.registerPlugin(FileBrowserPlugin);
-      this.registerPlugin(FolderBrowserPlugin);
-      this.registerPlugin(LoginPlugin);
-      this.registerPlugin(TilesPlugin);
-      this.registerPlugin(LabelPlugin);
-      this.registerPlugin(AutoCompletePlugin);
+
+      if (Array.isArray(this.plugins)) {
+        this.plugins.forEach((plugin) => {
+          this.registerPlugin(plugin);
+        });
+      }
 
       this.isInVsCode() ? (this.consoleClass = "consoleClassHidden") : (this.consoleClass = "consoleClassVisible");
     },
@@ -666,18 +687,10 @@ export default {
       this.displayGeneratorsPrompt();
     },
   },
-  created() {
-    this.setupRpc();
-  },
-  mounted() {
-    this.init();
-    // TODO: remove after a solution is found for DEVXBUGS-8741
-    utils.addAndRemoveClass("header", "material-icons");
-  },
 };
 </script>
 <style scoped>
-@import "./../../node_modules/vue-loading-overlay/dist/vue-loading.css";
+@import "./../../node_modules/vue-loading-overlay/dist/css/index.css";
 
 .consoleClassVisible {
   visibility: visible;
@@ -764,7 +777,7 @@ div.consoleClassVisible .v-footer {
   border-top: 2px solid var(--vscode-editorWidget-background, #252526) !important;
 }
 
-.theme--light.v-btn.v-btn--disabled:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
+.v-theme--light.v-btn.v-btn--disabled:not(.v-btn--variant-flat):not(.v-btn--variant-flat):not(.v-btn--variant-flat) {
   background-color: var(--vscode-descriptionForeground, #717171) !important;
 }
 </style>

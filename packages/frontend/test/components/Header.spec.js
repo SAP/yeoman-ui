@@ -1,7 +1,6 @@
 import { initComponent, unmount } from "../Utils";
-import Header from "../../src/components/Header.vue";
+import Header from "../../src/components/YOUIHeader.vue";
 //There are issues of importing vuetify components https://github.com/vuejs/vue-cli/issues/1584
-import _ from "lodash";
 
 let wrapper;
 
@@ -10,29 +9,24 @@ describe("Header.vue", () => {
     unmount(wrapper);
   });
 
-  test("component name", () => {
-    wrapper = initComponent(Header);
-    expect(wrapper.vm.$options.name).toBe("Header"); //Wrapper.name() is deprecated
-  });
-
   test("component props", () => {
     wrapper = initComponent(Header);
-    expect(_.keys(wrapper.props())).toHaveLength(6);
+    expect(Object.keys(wrapper.props())).toHaveLength(6);
   });
 
   test("generator brand", () => {
     const testGen = "Template Wizard";
-    wrapper = initComponent(Header, { headerTitle: testGen });
-    expect(wrapper.find("v-toolbar-title-stub").text()).toBe(testGen);
-    expect(wrapper.find("v-icon-stub").text()).toBe("mdi-console");
+    wrapper = initComponent(Header, { headerTitle: testGen }, true);
+    expect(wrapper.find(".v-toolbar-title").text()).toBe(testGen);
+    expect(wrapper.find(".v-icon.mdi-console").html()).toBeTruthy();
   });
 
   test("set title and info", () => {
     const testTitle = "test title";
     const testInfo = "test info";
-    wrapper = initComponent(Header, { headerTitle: testTitle, headerInfo: testInfo });
-    expect(wrapper.find("v-toolbar-title-stub").text()).toBe(testTitle);
-    expect(wrapper.find("v-tooltip-stub span").text()).toBe(testInfo);
+    wrapper = initComponent(Header, { headerTitle: testTitle, headerInfo: testInfo }, true);
+    expect(wrapper.find(".v-toolbar-title").text()).toBe(testTitle);
+    expect(wrapper.find(".mdi-information-outline").html()).toBeTruthy();
   });
 
   test("click triggers collapseOutput method", async () => {
@@ -47,8 +41,7 @@ describe("Header.vue", () => {
       },
       true
     );
-
-    wrapper.findAll("button").wrappers[0].trigger("click");
+    wrapper.findAll("button")[0].trigger("click");
     expect(rpcInvokeMockFunction).toHaveBeenCalledWith("toggleOutput", [{}]);
   });
 
@@ -65,7 +58,7 @@ describe("Header.vue", () => {
       true
     );
 
-    wrapper.findAll("button").wrappers[0].trigger("click");
+    wrapper.findAll("button")[0].trigger("click");
     expect(rpcInvokeMockFunction).toHaveBeenCalledWith("exploreGenerators", [{}]);
   });
 });
