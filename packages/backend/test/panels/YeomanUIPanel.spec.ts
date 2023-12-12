@@ -61,6 +61,7 @@ describe("YeomanUIPanel unit test", () => {
     });
 
     it("generator is choosen", () => {
+      npmUtilsMock.expects("checkAccessAndSetGeneratorsPath").resolves();
       npmUtilsMock.expects("getNodeProcessVersions").resolves({ node: "20.6.0" });
       envUtilsMock.expects("getAllGeneratorNamespaces").twice().resolves(["gen1:test", "test:app", "code:app"]);
       windowMock.expects("showQuickPick").resolves("test:app");
@@ -71,6 +72,7 @@ describe("YeomanUIPanel unit test", () => {
   describe("loadWebviewPanel", () => {
     describe("in VSCODE", () => {
       beforeEach(() => {
+        npmUtilsMock.expects("checkAccessAndSetGeneratorsPath").resolves();
         npmUtilsMock.expects("getNodeProcessVersions").resolves({ node: "20.6.0" });
         Constants["IS_IN_BAS"] = false;
       });
@@ -140,9 +142,10 @@ describe("YeomanUIPanel unit test", () => {
         Constants["IS_IN_BAS"] = false;
       });
 
-      it("should show an error message", async () => {
+      it("should show an error message", () => {
+        npmUtilsMock.expects("checkAccessAndSetGeneratorsPath");
         windowMock.expects("showErrorMessage").withExactArgs(messages.nodejs_install_not_found);
-        await panel.loadWebviewPanel();
+        void panel.loadWebviewPanel();
       });
     });
   });
