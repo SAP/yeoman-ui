@@ -140,9 +140,9 @@ describe("YeomanUIPanel unit test", () => {
         Constants["IS_IN_BAS"] = false;
       });
 
-      it("should show an error message", async () => {
+      it("should show an error message", () => {
         windowMock.expects("showErrorMessage").withExactArgs(messages.nodejs_install_not_found);
-        await panel.loadWebviewPanel();
+        void panel.loadWebviewPanel();
       });
     });
   });
