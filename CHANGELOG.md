@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.1](https://github.com/SAP/yeoman-ui/compare/v1.13.0...v1.13.1) (2023-12-13)
+
+### Bug Fixes
+
+- **backend:** do not block when nodejs install check fails ([#783](https://github.com/SAP/yeoman-ui/issues/783)) ([0b5c99b](https://github.com/SAP/yeoman-ui/commit/0b5c99b9b0a5d72cc17bab1168f10325f65d46fc))
+
 # [1.13.0](https://github.com/SAP/yeoman-ui/compare/v1.12.2...v1.13.0) (2023-10-15)
 
 ### Features
