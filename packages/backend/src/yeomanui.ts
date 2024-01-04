@@ -61,6 +61,7 @@ export class YeomanUI {
 
   private readonly TARGET_FOLDER_CONFIG_PROP = "ApplicationWizard.TargetFolder";
   private readonly SELECTED_WORKSPACE_CONFIG_PROP = "ApplicationWizard.Workspace";
+  private readonly HIDE_GENERATORS_PROP = "ApplicationWizard.HideGenerator";
   private onUncaughtException: (e: Error) => void;
 
   constructor(
@@ -560,7 +561,14 @@ export class YeomanUI {
       : "files";
     this.typesMap.set(genMeta.namespace, type);
     _.includes(genFilter.types, "tools-suite") && this.generatorsToIgnoreArray.push(genMeta.namespace);
-    const hidden = _.includes(genFilter.categories, "hidden");
+    let hidden = _.includes(genFilter.categories, "hidden");
+    //@bas-dev/basic-multitarget-application
+    //read the hidden generators from settings
+    const hiddenGenerators = this.wsGet(this.HIDE_GENERATORS_PROP);
+    const hiddenGeneratorsArray = hiddenGenerators.split(",");
+    if (_.includes(hiddenGeneratorsArray, genMeta.namespace.split(":")[0])) {
+      hidden = true;
+    }
     if (!hidden && typesHasIntersection && categoriesHasIntersection) {
       return this.createGeneratorChoice(genMeta.namespace, genMeta.packagePath, packageJson);
     }
