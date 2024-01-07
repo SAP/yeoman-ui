@@ -550,6 +550,25 @@ describe("yeomanui unit test", () => {
         expect(result.questions[0].choices).to.be.empty;
       });
 
+      // it.skip("generator should not be shown because of settings", async () => {
+      //   const generatorData = {
+      //     generatorMeta: {
+      //       generatorPath: "test1Path/app/index.js",
+      //       namespace: "test1-project",
+      //       packagePath: "test1Path",
+      //     },
+      //     generatorPackageJson: {
+      //       name: "@sap.koko",
+      //       description: "test hidden category",
+      //     },
+      //   };
+      //   wsConfigMock.expects("get").withExactArgs("ApplicationWizard.hiddenGenerators").returns("test1-project");
+      //   envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves([generatorData]);
+      //   const result = await yeomanUiInstance["getGeneratorsPrompt"]();
+      //   expect(result).to.be.deep.equal(noGeneratorsResult);
+      //   expect(result.questions[0].choices).to.be.empty;
+      // });
+
       it("generator should not be shown although there are additional categories'", async () => {
         const generatorData = {
           generatorMeta,
