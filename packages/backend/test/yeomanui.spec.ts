@@ -245,6 +245,7 @@ describe("yeomanui unit test", () => {
         });
       youiEventsMock.expects("setAppWizardHeaderTitle").withArgs(undefined);
       wsConfigMock.expects("get").withExactArgs("ApplicationWizard.TargetFolder").twice();
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").once();
       rpcMock.expects("invoke").withArgs("showPrompt").resolves({ generator: "test1-project:app" });
       rpcMock.expects("invoke").withExactArgs("setGenInWriting", [false]).resolves();
       swaTrackerWrapperMock.expects("updateGeneratorStarted").withArgs("test1-project:app");
@@ -314,6 +315,7 @@ describe("yeomanui unit test", () => {
 
   it("_notifyGeneratorsChange", async () => {
     envUtilsMock.expects("getGeneratorsData").resolves();
+    wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").resolves();
     rpcMock.expects("invoke").withArgs("updateGeneratorsPrompt");
     await yeomanUi._notifyGeneratorsChange();
   });
@@ -487,6 +489,7 @@ describe("yeomanui unit test", () => {
 
     it("there are no generators", async () => {
       envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves([]);
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").resolves();
       const result = await yeomanUi["getGeneratorsPrompt"]();
       const generatorQuestion: any = {
         type: "list",
@@ -536,7 +539,7 @@ describe("yeomanui unit test", () => {
         packagePath: "test1Path",
       };
 
-      it("positive - generator should not be shown", async () => {
+      it("positive - generator should not be shown because it has hidden filtered", async () => {
         const generatorData = {
           generatorMeta,
           generatorPackageJson: {
@@ -545,31 +548,32 @@ describe("yeomanui unit test", () => {
           },
         };
         envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves([generatorData]);
+        wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").returns({});
         const result = await yeomanUiInstance["getGeneratorsPrompt"]();
         expect(result).to.be.deep.equal(noGeneratorsResult);
         expect(result.questions[0].choices).to.be.empty;
       });
 
-      // it.skip("generator should not be shown because of settings", async () => {
-      //   const generatorData = {
-      //     generatorMeta: {
-      //       generatorPath: "test1Path/app/index.js",
-      //       namespace: "test1-project",
-      //       packagePath: "test1Path",
-      //     },
-      //     generatorPackageJson: {
-      //       name: "@sap.koko",
-      //       description: "test hidden category",
-      //     },
-      //   };
-      //   wsConfigMock.expects("get").withExactArgs("ApplicationWizard.hiddenGenerators").returns("test1-project");
-      //   envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves([generatorData]);
-      //   const result = await yeomanUiInstance["getGeneratorsPrompt"]();
-      //   expect(result).to.be.deep.equal(noGeneratorsResult);
-      //   expect(result.questions[0].choices).to.be.empty;
-      // });
+      it("generator should not be shown because of settings", async () => {
+        const generatorData = {
+          generatorMeta: {
+            generatorPath: "test1Path/app/index.js",
+            namespace: "test1-project",
+            packagePath: "test1Path",
+          },
+          generatorPackageJson: {
+            name: "@sap.koko",
+            description: "test hidden category",
+          },
+        };
+        wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").returns("test1-project");
+        envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves([generatorData]);
+        const result = await yeomanUiInstance["getGeneratorsPrompt"]();
+        expect(result).to.be.deep.equal(noGeneratorsResult);
+        expect(result.questions[0].choices).to.be.empty;
+      });
 
-      it("generator should not be shown although there are additional categories'", async () => {
+      it("generator with hidden filter should not be shown although there are additional categories'", async () => {
         const generatorData = {
           generatorMeta,
           generatorPackageJson: {
@@ -578,6 +582,7 @@ describe("yeomanui unit test", () => {
           },
         };
         envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves([generatorData]);
+        wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").returns({});
         const result = await yeomanUiInstance["getGeneratorsPrompt"]();
         expect(result).to.be.deep.equal(noGeneratorsResult);
         expect(result.questions[0].choices).to.be.empty;
@@ -593,6 +598,7 @@ describe("yeomanui unit test", () => {
           },
         };
         envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves([generatorData]);
+        wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").returns({});
         const result = await yeomanUiInstance["getGeneratorsPrompt"]();
         expect(result.questions[0].choices).to.have.lengthOf(1);
         const test1Choice = result.questions[0].choices[0];
@@ -603,6 +609,7 @@ describe("yeomanui unit test", () => {
 
     it("get generators with type project", async () => {
       wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns({});
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").once();
       envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta);
       wsConfigMock.expects("get").withExactArgs(yeomanUi["TARGET_FOLDER_CONFIG_PROP"]);
       const genFilter: GeneratorFilter = GeneratorFilter.create({
@@ -623,6 +630,7 @@ describe("yeomanui unit test", () => {
 
     it("get generators with type module", async () => {
       envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta);
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").resolves();
       const genFilter = GeneratorFilter.create({ type: "module" });
       yeomanUi["uiOptions"] = { filter: genFilter, messages };
       const result = await yeomanUi["getGeneratorsPrompt"]();
@@ -635,6 +643,7 @@ describe("yeomanui unit test", () => {
 
     it("get generators all generators", async () => {
       envUtilsMock.expects("getGeneratorsData").resolves(gensMeta);
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").resolves();
       yeomanUi["uiOptions"] = {
         filter: GeneratorFilter.create({ type: [] }),
         messages,
@@ -646,6 +655,7 @@ describe("yeomanui unit test", () => {
 
     it("wrong generators filter type is provided", async () => {
       wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns({});
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").resolves();
       envUtilsMock
         .expects("getGeneratorsData")
         .withExactArgs()
@@ -676,6 +686,7 @@ describe("yeomanui unit test", () => {
 
     it("get generators with type project and categories cat1 and cat2", async () => {
       wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns({});
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").returns({});
       gensMeta[0].generatorPackageJson = {
         "generator-filter": { type: ["project"], categories: ["cat2"] },
         description: "test1Description",
@@ -716,6 +727,7 @@ describe("yeomanui unit test", () => {
         displayName: "3rd - Test",
       };
       envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta.slice(0, 3));
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").returns({});
 
       yeomanUi["uiOptions"] = {
         filter: GeneratorFilter.create({ type: undefined }),
@@ -746,6 +758,7 @@ describe("yeomanui unit test", () => {
       };
 
       envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta.slice(0, 3));
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").returns({});
 
       yeomanUi["uiOptions"] = { filter: GeneratorFilter.create(), messages };
       const result = await yeomanUi["getGeneratorsPrompt"]();
@@ -773,6 +786,8 @@ describe("yeomanui unit test", () => {
       };
       wsConfigMock.expects("get").withExactArgs(yeomanUi["TARGET_FOLDER_CONFIG_PROP"]);
       wsConfigMock.expects("get").withExactArgs(yeomanUi["SELECTED_WORKSPACE_CONFIG_PROP"]);
+      wsConfigMock.expects("get").withExactArgs(yeomanUi["HIDE_GENERATORS_PROP"]);
+
       await yeomanUi["getGeneratorsPrompt"]();
     });
 
@@ -788,7 +803,7 @@ describe("yeomanui unit test", () => {
       ]);
       wsConfigMock.expects("get").withExactArgs(yeomanUi["TARGET_FOLDER_CONFIG_PROP"]);
       wsConfigMock.expects("get").withExactArgs(yeomanUi["SELECTED_WORKSPACE_CONFIG_PROP"]);
-
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").returns({});
       yeomanUi["uiOptions"] = {
         filter: GeneratorFilter.create({ type: "project" }),
         messages,
