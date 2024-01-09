@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.2](https://github.com/SAP/yeoman-ui/compare/v1.13.1...v1.13.2) (2024-01-09)
+
+### Bug Fixes
+
+- remove comma from readme ([#790](https://github.com/SAP/yeoman-ui/issues/790)) ([8376008](https://github.com/SAP/yeoman-ui/commit/83760082656340a396da467c5e7a76bb12c974e1))
+
 ## [1.13.1](https://github.com/SAP/yeoman-ui/compare/v1.13.0...v1.13.1) (2023-12-13)
 
 ### Bug Fixes
