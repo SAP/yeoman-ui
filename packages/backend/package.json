@@ -102,7 +102,7 @@
         "ApplicationWizard.HideGenerator": {
           "type": "string",
           "default": "",
-          "description": "Hide the generator from the list of generators. Generator name should be in the format of namespace:generator-name. Generators should be seperated by comma.",
+          "description": "Hide generators from the generator list. The generator name should be in the following format: namespace:generator-name. Generators must be separated by commas.",
           "scope": "resource"
         },
         "ApplicationWizard.TargetFolder": {
