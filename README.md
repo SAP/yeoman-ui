@@ -11,7 +11,7 @@
 
 ## Description
 
-With the Application Wizard extension, you can benefit from a rich user experience for yeoman generators. This extension allows developers to reuse existing yeoman generators and provide wizard-like experience with no development efforts.
+With the Application Wizard extension you can benefit from a rich user experience for yeoman generators. This extension allows developers to reuse existing yeoman generators and provide wizard-like experience with no development efforts.
 
 This npm [mono-repo][mono-repo] currently contains:
 
