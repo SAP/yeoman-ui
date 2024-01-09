@@ -99,6 +99,12 @@
           "description": "The verbosity of logging according to the following order: trace > debug > info > warn > error > fatal > off.",
           "scope": "resource"
         },
+        "ApplicationWizard.HideGenerator": {
+          "type": "string",
+          "default": "",
+          "description": "Hide generators from the generator list. The generator name should be in the following format: namespace:generator-name. Generators must be separated by commas.",
+          "scope": "resource"
+        },
         "ApplicationWizard.TargetFolder": {
           "type": "string",
           "default": "",

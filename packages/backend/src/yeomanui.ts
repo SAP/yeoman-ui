@@ -61,6 +61,7 @@ export class YeomanUI {
 
   private readonly TARGET_FOLDER_CONFIG_PROP = "ApplicationWizard.TargetFolder";
   private readonly SELECTED_WORKSPACE_CONFIG_PROP = "ApplicationWizard.Workspace";
+  private readonly HIDE_GENERATORS_PROP = "ApplicationWizard.HideGenerator";
   private onUncaughtException: (e: Error) => void;
 
   constructor(
@@ -485,8 +486,11 @@ export class YeomanUI {
   }
 
   private async createGeneratorPromptQuestions(gensData: GeneratorData[], genFilter: GeneratorFilter): Promise<any[]> {
+    //read the hidden generators from settings
+    const hiddenGenerators = this.wsGet(this.HIDE_GENERATORS_PROP);
+    const hiddenGeneratorsArray = hiddenGenerators.split(",");
     const generatorChoicePromises = _.map(gensData, (genData) => {
-      return this.getGeneratorChoice(genData, genFilter);
+      return this.getGeneratorChoice(genData, genFilter, hiddenGeneratorsArray);
     });
 
     const questions: any[] = [];
@@ -547,7 +551,7 @@ export class YeomanUI {
     return questions;
   }
 
-  private async getGeneratorChoice(genData: GeneratorData, filter: GeneratorFilter) {
+  private async getGeneratorChoice(genData: GeneratorData, filter: GeneratorFilter, hiddenGeneratorsArray: string[]) {
     const packageJson = genData.generatorPackageJson;
     const genMeta = genData.generatorMeta;
     const genFilter: GeneratorFilter = GeneratorFilter.create(_.get(packageJson, ["generator-filter"]));
@@ -560,7 +564,11 @@ export class YeomanUI {
       : "files";
     this.typesMap.set(genMeta.namespace, type);
     _.includes(genFilter.types, "tools-suite") && this.generatorsToIgnoreArray.push(genMeta.namespace);
-    const hidden = _.includes(genFilter.categories, "hidden");
+    let hidden = _.includes(genFilter.categories, "hidden");
+    // check the settings and hide generators accordingly. example: @bas-dev/basic-multitarget-application
+    if (_.includes(hiddenGeneratorsArray, genMeta.namespace.split(":")[0])) {
+      hidden = true;
+    }
     if (!hidden && typesHasIntersection && categoriesHasIntersection) {
       return this.createGeneratorChoice(genMeta.namespace, genMeta.packagePath, packageJson);
     }
