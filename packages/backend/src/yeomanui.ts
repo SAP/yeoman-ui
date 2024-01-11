@@ -488,7 +488,7 @@ export class YeomanUI {
   private async createGeneratorPromptQuestions(gensData: GeneratorData[], genFilter: GeneratorFilter): Promise<any[]> {
     //read the hidden generators from settings
     const hiddenGenerators = this.wsGet(this.HIDE_GENERATORS_PROP);
-    const hiddenGeneratorsArray = hiddenGenerators.split(",");
+    const hiddenGeneratorsArray = hiddenGenerators.split(",").map((gen) => gen.trim());
     const generatorChoicePromises = _.map(gensData, (genData) => {
       return this.getGeneratorChoice(genData, genFilter, hiddenGeneratorsArray);
     });

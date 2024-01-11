@@ -569,7 +569,7 @@ describe("yeomanui unit test", () => {
         wsConfigMock
           .expects("get")
           .withExactArgs("ApplicationWizard.HideGenerator")
-          .returns("@ns/test1-project,other:app");
+          .returns("@ns/test1-project ,  other:app ");
         envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves([generatorData]);
         const result = await yeomanUiInstance["getGeneratorsPrompt"]();
         expect(result).to.be.deep.equal(noGeneratorsResult);
