@@ -1,4 +1,4 @@
-import { ExtensionContext, commands } from "vscode";
+import { ExtensionContext, commands, window } from "vscode";
 
 export class ExtCommands {
   private exploreGensPanel: any;
@@ -29,32 +29,64 @@ export class ExtCommands {
   }
 
   private async yeomanUIPanel_runGenerator_Command() {
-    return (await this.getYeomanUIPanel()).runGenerator();
+    try {
+      return (await this.getYeomanUIPanel()).runGenerator();
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   private async yeomanUIPanel_loadYeomanUI_Command(uiOptions?: any) {
-    return (await this.getYeomanUIPanel()).loadWebviewPanel(uiOptions);
+    try {
+      return (await this.getYeomanUIPanel()).loadWebviewPanel(uiOptions);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   private async yeomanUIPanel_toggleOutput_Command() {
-    return (await this.getYeomanUIPanel()).toggleOutput();
+    return (await this.getYeomanUIPanel(false)).toggleOutput();
   }
 
   private async yeomanUIPanel_notifyGeneratorsChange_Command(uiOptions?: any) {
-    return (await this.getYeomanUIPanel()).notifyGeneratorsChange(uiOptions);
+    return (await this.getYeomanUIPanel(false)).notifyGeneratorsChange(uiOptions);
   }
 
   private async exploreGenerators_Command(uiOptions?: any) {
-    return (await this.getExploreGensPanel()).loadWebviewPanel(uiOptions);
+    try {
+      return (await this.getExploreGensPanel()).loadWebviewPanel(uiOptions);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
-  public async getYeomanUIPanel() {
+  private async isInEmptyState(): Promise<boolean> {
+    if (this.yeomanUIPanel?.yeomanui?.generatorName) {
+      if (
+        (await window.showWarningMessage(
+          `The generator ${
+            this.yeomanUIPanel.yeomanui.generatorName.split(":")[0]
+          } is not completed yet. Are you sure you want to stop it before it finished?`,
+          "Yes",
+          "No"
+        )) !== "Yes"
+      ) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public async getYeomanUIPanel(verifyEmptyState = true) {
     if (!this.yeomanUIPanel) {
       const { YeomanUIPanel } = await import("./panels/YeomanUIPanel");
       this.yeomanUIPanel = new YeomanUIPanel(this.context);
     }
-
-    return this.yeomanUIPanel;
+    if (!verifyEmptyState || (await this.isInEmptyState())) {
+      return this.yeomanUIPanel;
+    } else {
+      throw new Error("other generator is running");
+    }
   }
 
   public async getExploreGensPanel() {
