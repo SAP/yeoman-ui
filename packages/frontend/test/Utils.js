@@ -1,24 +1,33 @@
 import { mount, shallowMount } from "@vue/test-utils";
-import Vue from "vue";
-import Vuetify from "vuetify";
+import { createVuetify } from "vuetify";
+import * as components from "vuetify/lib/components/index.mjs";
+import * as directives from "vuetify/lib/directives/index.mjs";
 import Form from "@sap-devx/inquirer-gui";
-Vue.use(Vuetify);
 
-import { createLocalVue } from "@vue/test-utils";
-const localVue = createLocalVue();
+class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+global.ResizeObserver = ResizeObserver;
 
-export function initComponent(component, propsData, isMount) {
-  const vuetify = new Vuetify();
+export function initComponent(component, propsData, isMount, stubs = {}) {
+  const vuetify = new createVuetify({
+    components,
+    directives,
+  });
   const options = { vuetify };
-  Vue.use(Form, options);
 
   const initFunction = isMount === true ? mount : shallowMount;
   const props = {
-    localVue,
-    vuetify,
-    propsData: {
+    global: {
+      plugins: [vuetify, [Form, options]],
+      stubs,
+    },
+    props: {
       ...propsData,
     },
+    attachTo: document.body,
   };
   return initFunction.call(this, component, props);
 }

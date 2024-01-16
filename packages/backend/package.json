@@ -203,9 +203,11 @@
     "sudo-prompt": "9.2.1",
     "titleize": "2.1.0",
     "yeoman-environment": "3.3.0",
-    "yeoman-ui-frontend": "^1.13.2"
+    "yeoman-ui-frontend": "^1.13.2",
+    "cheerio": "^1.0.0-rc.12"
   },
   "devDependencies": {
+    "@types/cheerio": "^0.22.31",
     "@types/inquirer": "^7.3.3",
     "@types/lodash": "^4.14.170",
     "@types/node": "^14.14.44",
@@ -223,7 +225,7 @@
     "ts-loader": "^9.2.3",
     "ts-node": "^9.1.1",
     "vsce": "^1.100.1",
-    "webpack": "^5.56.0",
+    "webpack": "^5.72.0",
     "webpack-cli": "^4.8.0",
     "ws": "8.2.3"
   },

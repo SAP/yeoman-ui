@@ -1,10 +1,8 @@
-import Vue from "vue";
-import ExploreGensApp from "./App";
+import { createApp } from "vue";
+import ExploreGensApp from "./App.vue";
 import vuetify from "../plugins/vuetify";
 
-Vue.config.productionTip = false;
+const app = createApp(ExploreGensApp);
 
-new Vue({
-  vuetify,
-  render: (h) => h(ExploreGensApp),
-}).$mount("#exploregens");
+app.use(vuetify);
+app.mount("#exploregens");
