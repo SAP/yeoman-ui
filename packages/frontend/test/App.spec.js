@@ -1,10 +1,8 @@
 import { initComponent, unmount } from "./Utils";
 import App from "../src/youi/App";
-import Vue from "vue";
-import Vuetify from "vuetify";
 import { WebSocket } from "mock-socket";
+import { nextTick } from "vue";
 
-Vue.use(Vuetify);
 global.WebSocket = WebSocket;
 
 let wrapper;
@@ -17,6 +15,11 @@ describe("App.vue", () => {
   it("createPrompt - method", () => {
     wrapper = initComponent(App, {}, true);
     wrapper.vm.prompts = [{ questions: [{ name: "generator", type: "list", guiType: "tiles" }] }];
+    wrapper.vm.rpc = {
+      invoke: jest.fn().mockImplementation(async () => {
+        return { data: {} };
+      }),
+    };
     expect(wrapper.vm.createPrompt().name).toBe();
     expect(wrapper.vm.createPrompt([]).name).toBe();
     expect(wrapper.vm.createPrompt([], "name").name).toBe("name");
@@ -28,6 +31,11 @@ describe("App.vue", () => {
       wrapper = initComponent(App, {});
       wrapper.vm.prompts = [{}, {}];
       wrapper.vm.promptIndex = 1;
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       expect(wrapper.vm.currentPrompt.answers).toBeUndefined();
     });
   });
@@ -49,6 +57,11 @@ describe("App.vue", () => {
         {},
       ];
       wrapper.vm.promptIndex = 1;
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       expect(wrapper.vm.backButtonText).toEqual("Start Over");
     });
 
@@ -68,6 +81,11 @@ describe("App.vue", () => {
         {},
       ];
       wrapper.vm.promptIndex = 3;
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       expect(wrapper.vm.backButtonText).toEqual("Back");
     });
   });
@@ -94,6 +112,11 @@ describe("App.vue", () => {
         {},
       ];
       wrapper.vm.promptIndex = 0;
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       expect(wrapper.vm.nextButtonText).toEqual("Start");
     });
 
@@ -101,6 +124,11 @@ describe("App.vue", () => {
       wrapper = initComponent(App, {});
       wrapper.vm.promptsInfoToDisplay = [{}, {}, {}];
       wrapper.vm.promptIndex = 1;
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       expect(wrapper.vm.nextButtonText).toEqual("Next");
     });
 
@@ -108,6 +136,11 @@ describe("App.vue", () => {
       wrapper = initComponent(App, {});
       wrapper.vm.promptsInfoToDisplay = [{}, {}, {}];
       wrapper.vm.promptIndex = 2;
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       expect(wrapper.vm.nextButtonText).toEqual("Finish");
     });
   });
@@ -117,6 +150,11 @@ describe("App.vue", () => {
       wrapper = initComponent(App, {});
       wrapper.vm.prompts = [];
       wrapper.vm.promptIndex = -1;
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       wrapper.vm.updateGeneratorsPrompt();
       expect(wrapper.vm.prompts).toHaveLength(0);
     });
@@ -125,6 +163,11 @@ describe("App.vue", () => {
       wrapper = initComponent(App, {});
       wrapper.vm.prompts = [{}];
       wrapper.vm.promptIndex = 1;
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       wrapper.vm.updateGeneratorsPrompt([{}]);
       expect(wrapper.vm.prompts[0].questions).toHaveLength(1);
     });
@@ -134,6 +177,11 @@ describe("App.vue", () => {
     it("promptIndex = 0, selectGeneratorPromptExists = true", () => {
       wrapper = initComponent(App, {}, true);
       wrapper.vm.promptIndex = 0;
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       wrapper.vm.selectGeneratorPromptExists = () => true;
       const result = wrapper.vm.isGeneratorsPrompt();
       expect(result).toBeTruthy();
@@ -141,6 +189,11 @@ describe("App.vue", () => {
     it("promptIndex = 0, selectGeneratorPromptExists = false", () => {
       wrapper = initComponent(App, {}, true);
       wrapper.vm.promptIndex = 0;
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       wrapper.vm.selectGeneratorPromptExists = () => false;
       const result = wrapper.vm.isGeneratorsPrompt();
       expect(result).toBeFalsy();
@@ -148,6 +201,11 @@ describe("App.vue", () => {
     it("promptIndex > 0, selectGeneratorPromptExists = true", () => {
       wrapper = initComponent(App, {}, true);
       wrapper.vm.promptIndex = 1;
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       wrapper.vm.selectGeneratorPromptExists = () => true;
       const result = wrapper.vm.isGeneratorsPrompt();
       expect(result).toBeFalsy();
@@ -165,6 +223,11 @@ describe("App.vue", () => {
     it("no generators", () => {
       wrapper = initComponent(App, {}, true);
       wrapper.vm.promptIndex = 0;
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       wrapper.vm.prompts = [{ name: "Select Generator", questions: [{ choices: [] }] }];
       wrapper.vm.$data.messages = { select_generator_name: "Select Generator" };
       expect(wrapper.vm.isNoGenerators).toBeTruthy();
@@ -173,6 +236,11 @@ describe("App.vue", () => {
     it("generators exist", () => {
       wrapper = initComponent(App, {}, true);
       wrapper.vm.promptIndex = 0;
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       wrapper.vm.prompts = [
         {
           name: "Select Generator",
@@ -186,6 +254,11 @@ describe("App.vue", () => {
     it("generators exist question.name != 'generator'", () => {
       wrapper = initComponent(App, {}, true);
       wrapper.vm.promptIndex = 0;
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       wrapper.vm.prompts = [{ name: "Select Generator", questions: [{}, { choices: [{}] }] }];
       wrapper.vm.$data.messages = { select_generator_name: "Select Generator" };
       expect(wrapper.vm.isNoGenerators).toBeTruthy();
@@ -194,6 +267,11 @@ describe("App.vue", () => {
     it("prompt name != generators", () => {
       wrapper = initComponent(App, {}, true);
       wrapper.vm.promptIndex = 0;
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       wrapper.vm.prompts = [{ name: "Prompt Name", questions: [{ choices: [{}] }] }];
       wrapper.vm.$data.messages = { select_generator_name: "Select Generator" };
       expect(wrapper.vm.isNoGenerators).toBeFalsy();
@@ -205,6 +283,11 @@ describe("App.vue", () => {
       wrapper = initComponent(App);
       wrapper.vm.prompts = [{}, {}];
       wrapper.vm.promptIndex = 1;
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       wrapper.vm.currentPrompt.status = "pending";
       wrapper.vm.setPromptList([]);
 
@@ -235,7 +318,11 @@ describe("App.vue", () => {
       wrapper.vm.promptIndex = 1;
       wrapper.vm.currentPrompt.status = "pending";
       wrapper.vm.setPromptList([]);
-
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       const answerFiori = {
         generator: "stam-generator",
       };
@@ -263,7 +350,11 @@ describe("App.vue", () => {
       wrapper.vm.promptIndex = 1;
       wrapper.vm.currentPrompt.status = "pending";
       wrapper.vm.setPromptList([]);
-
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       const answerFiori = {
         generator: "stam-generator",
       };
@@ -300,7 +391,7 @@ describe("App.vue", () => {
 
       const questions = [{ name: "validateQ", validate: "__Function" }];
       wrapper.vm.showPrompt(questions, "promptName");
-      await Vue.nextTick();
+      await nextTick();
 
       const response = await questions[0].validate({});
       expect(response).toBe(questions[0].name);
@@ -393,6 +484,11 @@ describe("App.vue", () => {
     it("not in vscode", () => {
       wrapper = initComponent(App, {}, true);
       wrapper.vm.isInVsCode = () => false;
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       const vscodeApi = wrapper.vm.getVsCodeApi();
       expect(vscodeApi).toBeUndefined();
     });
@@ -402,6 +498,11 @@ describe("App.vue", () => {
     it("questions are empty array", async () => {
       wrapper = initComponent(App, {}, true);
       const promise = wrapper.vm.showPrompt([], "test");
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       wrapper.vm.$data.resolve({});
       await promise;
       expect(wrapper.vm.$data.resolve).toBe(null);
@@ -498,7 +599,11 @@ describe("App.vue", () => {
   it("log - method", () => {
     wrapper = initComponent(App, {}, true);
     wrapper.vm.logText = "test_";
-
+    wrapper.vm.rpc = {
+      invoke: jest.fn().mockImplementation(async () => {
+        return { data: {} };
+      }),
+    };
     wrapper.vm.log("test_log");
 
     expect(wrapper.vm.logText).toBe("test_test_log");
@@ -669,7 +774,7 @@ describe("App.vue", () => {
       wrapper.vm.isReplaying = true;
       wrapper.vm.isWriting = true;
       wrapper.vm.showPrompt(questions, "promptName");
-      await Vue.nextTick();
+      await nextTick();
       expect(wrapper.vm.promptIndex).toBe(0);
     });
   });
@@ -870,6 +975,11 @@ describe("App.vue", () => {
   describe("toggleConsole - method", () => {
     it("showConsole property updated from toggleConsole()", () => {
       wrapper = initComponent(App, {}, true);
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       wrapper.vm.toggleConsole();
       expect(wrapper.vm.showConsole).toBeTruthy();
       wrapper.vm.toggleConsole();
@@ -896,6 +1006,19 @@ describe("App.vue", () => {
       wrapper.vm.init();
 
       expect(wrapper.vm.consoleClass).toBe("consoleClassVisible");
+    });
+
+    it("registers form plugins", () => {
+      const registerMethodSpy = jest.fn();
+      wrapper = initComponent(App, { plugins: [{}, {}, {}] }, true, {
+        Form: {
+          template: "<span />",
+          methods: {
+            registerPlugin: registerMethodSpy,
+          },
+        },
+      });
+      expect(registerMethodSpy).toHaveBeenCalledTimes(3);
     });
   });
 
@@ -952,6 +1075,11 @@ describe("App.vue", () => {
     // TODO - check the error
     it("in writing state", () => {
       wrapper = initComponent(App, {}, true);
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       wrapper.vm.prompts = [{}, { questions: [] }];
       wrapper.vm.promptIndex = 1;
       wrapper.vm.setGenInWriting(true);
@@ -962,6 +1090,11 @@ describe("App.vue", () => {
     // TODO - check the error
     it("not in writing state", () => {
       wrapper = initComponent(App, {}, true);
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       wrapper.vm.prompts = [{}, { questions: [] }];
       wrapper.vm.promptIndex = 1;
       wrapper.vm.setGenInWriting(false);
@@ -971,6 +1104,11 @@ describe("App.vue", () => {
 
     it("not in writing state, currentprompt is undefined", () => {
       wrapper = initComponent(App, {}, true);
+      wrapper.vm.rpc = {
+        invoke: jest.fn().mockImplementation(async () => {
+          return { data: {} };
+        }),
+      };
       wrapper.vm.prompts = [{}, {}];
       wrapper.vm.promptIndex = 3;
       wrapper.vm.setGenInWriting(false);
