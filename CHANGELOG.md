@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.14.0](https://github.com/SAP/yeoman-ui/compare/v1.13.2...v1.14.0) (2024-01-16)
+
+### Features
+
+- **platform:** frontend Vue 3 and Vite ([#782](https://github.com/SAP/yeoman-ui/issues/782)) ([a129035](https://github.com/SAP/yeoman-ui/commit/a1290358df9c48dfd856eb7d54e38cec31c0302c))
+
 ## [1.13.2](https://github.com/SAP/yeoman-ui/compare/v1.13.1...v1.13.2) (2024-01-09)
 
 ### Bug Fixes
