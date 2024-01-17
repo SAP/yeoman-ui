@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.14.1](https://github.com/SAP/yeoman-ui/compare/v1.14.0...v1.14.1) (2024-01-17)
+
+**Note:** Version bump only for package generator-foodq
+
 # [1.14.0](https://github.com/SAP/yeoman-ui/compare/v1.13.2...v1.14.0) (2024-01-16)
 
 **Note:** Version bump only for package generator-foodq

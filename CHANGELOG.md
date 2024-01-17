@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.14.1](https://github.com/SAP/yeoman-ui/compare/v1.14.0...v1.14.1) (2024-01-17)
+
+### Bug Fixes
+
+- already open Yeoman UI generator is closed on opening different … ([#792](https://github.com/SAP/yeoman-ui/issues/792)) ([d28b1e1](https://github.com/SAP/yeoman-ui/commit/d28b1e17d4956e86fab33978d3efdd3936fe9ffd))
+
 # [1.14.0](https://github.com/SAP/yeoman-ui/compare/v1.13.2...v1.14.0) (2024-01-16)
 
 ### Features
