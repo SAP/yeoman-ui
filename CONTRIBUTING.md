@@ -18,7 +18,6 @@ This is managed automatically via https://cla-assistant.io/ pull request voter.
 - [Yarn](https://yarnpkg.com/lang/en/docs/install/) >= 1.4.2
 - A [Long-Term Support version](https://nodejs.org/en/about/releases/) of node.js
 - (optional) [commitizen](https://github.com/commitizen/cz-cli#installing-the-command-line-tool) for managing commit messages.
-- [node.js](https://www.npmjs.com/package/node) version 10 or higher.
 - [VSCode](https://code.visualstudio.com/) 1.39.2 or higher or [Theia](https://www.theia-ide.org/) 0.12 or higher.
 
 ### Initial Setup

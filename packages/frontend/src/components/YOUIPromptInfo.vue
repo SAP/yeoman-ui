@@ -6,18 +6,24 @@
     </div>
   </div>
 </template>
-<script>
-export default {
-  name: "PromptInfo",
-  props: ["currentPrompt"],
-};
+<script setup>
+import { toRefs } from "vue";
+
+const props = defineProps({
+  currentPrompt: {
+    type: Object,
+    default: () => ({}),
+  },
+});
+
+const { currentPrompt } = toRefs(props);
 </script>
 
 <style scoped>
-.v-card__title {
+.v-card-title {
   color: var(--vscode-foreground, #cccccc);
 }
-.v-card__subtitle {
+.v-card-subtitle {
   color: var(--vscode-editorCodeLens-foreground, #999999);
   white-space: pre-wrap;
 }

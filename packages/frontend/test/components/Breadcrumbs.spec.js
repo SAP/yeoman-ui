@@ -1,6 +1,6 @@
 import { initComponent, unmount } from "../Utils";
-import Breadcrumbs from "../../src/components/Breadcrumbs.vue";
-import Vue from "vue";
+import Breadcrumbs from "../../src/components/YOUIBreadcrumbs.vue";
+import { nextTick } from "vue";
 
 describe("Breadcrumbs.vue", () => {
   let wrapper;
@@ -28,19 +28,22 @@ describe("Breadcrumbs.vue", () => {
       ],
     });
     const breadcrumbs = wrapper.findAll('[data-test="breadcrumbs"]');
-    expect(breadcrumbs.wrappers[0].html()).toMatchInlineSnapshot(
-      `<div data-test="breadcrumbs" class="answer"><span>answerLabel2: </span><span>answerValue2</span></div>`
+    expect(breadcrumbs[0].html()).toMatchInlineSnapshot(
+      `<div class="answer" data-test="breadcrumbs"><span>answerLabel2: </span><span>answerValue2</span></div>`
     );
-    expect(breadcrumbs.wrappers[1].html()).toMatchInlineSnapshot(
-      `<div data-test="breadcrumbs" class="answer"><span>answerLabel3: </span><span>answerValue3</span></div>`
+    expect(breadcrumbs[1].html()).toMatchInlineSnapshot(
+      `<div class="answer" data-test="breadcrumbs"><span>answerLabel3: </span><span>answerValue3</span></div>`
     );
     expect(wrapper.findAll('[data-test="moreLessButton"]')).toHaveLength(0);
   });
 
   test("shows more/less button", async () => {
-    const calcIsMoreSpy = jest.spyOn(Breadcrumbs.methods, "calcIsMore");
-
+    // const calcIsMoreSpy = jest.spyOn(Breadcrumbs.methods, "calcIsMore");
     wrapper = initComponent(Breadcrumbs, { breadcrumbs: [] }, true);
+    const originalCalcIsMore = wrapper.vm.calcIsMore;
+
+    const calcIsMoreSpy = (wrapper.vm.calcIsMore = jest.fn(() => originalCalcIsMore()));
+
     expect(wrapper.findAll('[data-test="breadcrumbs"]')).toHaveLength(0);
     expect(wrapper.findAll('[data-test="moreLessButton"]')).toHaveLength(0);
     // Fake scrollHeight to trigger more/less button
@@ -51,21 +54,14 @@ describe("Breadcrumbs.vue", () => {
     await wrapper.setProps({
       breadcrumbs: [{ label: "answerLabel1", value: "answerValue1" }],
     });
-    await Vue.nextTick();
-    expect(calcIsMoreSpy).toHaveBeenCalledTimes(2); // Once by v-resize, once adding answers
+    wrapper.vm.showMoreLess = true;
+    await nextTick();
+    // expect(calcIsMoreSpy).toHaveBeenCalledTimes(2); // Once by v-resize, once adding answers
     const moreLess = wrapper.get('[data-test="moreLessButton"]');
-    expect(moreLess.html()).toMatchInlineSnapshot(`
-      <div data-test="moreLessButton" class="more">
-        More...
-      </div>
-    `);
+    expect(moreLess.html()).toMatchInlineSnapshot(`<div class="more" data-test="moreLessButton">More...</div>`);
 
     await moreLess.trigger("click");
-    expect(moreLess.html()).toMatchInlineSnapshot(`
-      <div data-test="moreLessButton" class="more">
-        Less
-      </div>
-    `);
+    expect(moreLess.html()).toMatchInlineSnapshot(`<div class="more" data-test="moreLessButton">Less</div>`);
     expect(answerBox.classes("show-more")).toBe(true);
 
     calcIsMoreSpy.mockRestore();

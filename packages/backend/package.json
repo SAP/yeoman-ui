@@ -1,7 +1,7 @@
 {
   "name": "yeoman-ui",
   "displayName": "Application Wizard",
-  "version": "1.13.2",
+  "version": "1.14.0",
   "private": true,
   "description": "Provides rich user experience for Yeoman generators.",
   "categories": [
@@ -190,11 +190,12 @@
   },
   "dependencies": {
     "@sap-devx/webview-rpc": "0.3.1",
-    "@sap-devx/yeoman-ui-types": "^1.13.2",
+    "@sap-devx/yeoman-ui-types": "^1.14.0",
     "@sap/bas-sdk": "3.2.1",
     "@sap/swa-for-sapbas-vsx": "1.2.7",
     "@vscode-logging/logger": "1.2.3",
     "chalk": "4.1.2",
+    "cheerio": "^1.0.0-rc.12",
     "datauri": "3.0.0",
     "humanize-string": "2.1.0",
     "npm-registry-fetch": "11.0.0",
@@ -203,9 +204,10 @@
     "sudo-prompt": "9.2.1",
     "titleize": "2.1.0",
     "yeoman-environment": "3.3.0",
-    "yeoman-ui-frontend": "^1.13.2"
+    "yeoman-ui-frontend": "^1.14.0"
   },
   "devDependencies": {
+    "@types/cheerio": "^0.22.31",
     "@types/inquirer": "^7.3.3",
     "@types/lodash": "^4.14.170",
     "@types/node": "^14.14.44",
@@ -223,7 +225,7 @@
     "ts-loader": "^9.2.3",
     "ts-node": "^9.1.1",
     "vsce": "^1.100.1",
-    "webpack": "^5.56.0",
+    "webpack": "^5.72.0",
     "webpack-cli": "^4.8.0",
     "ws": "8.2.3"
   },
