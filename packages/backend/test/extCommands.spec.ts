@@ -86,19 +86,94 @@ describe("extension commands unit test", () => {
     expect(notifyGeneratorsChangeSpy.called).to.be.true;
   });
 
-  it("getYeomanUIPanel", async () => {
+  it("call YeomanUIPanel commands - when yeomanUIPanel is in invalid state", async () => {
+    const yeomanUIPanelMock = {
+      runGenerator: () => "",
+      loadWebviewPanel: () => "",
+      toggleOutput: () => "",
+      notifyGeneratorsChange: () => "",
+    };
+
     const extCommands = new ExtCommands(testContext);
-    extCommands["yeomanUIPanel"] = undefined;
+    sandbox.stub(extCommands, "getYeomanUIPanel").callsFake((verifyEmptyState = true) => {
+      if (verifyEmptyState) {
+        throw new Error("yeomanUIPanel is in invalid state");
+      }
+      return Promise.resolve(yeomanUIPanelMock);
+    });
 
-    loggerWrapperMock.expects("getClassLogger");
-    // windowMock.expects("registerWebviewPanelSerializer").withArgs("yeomanui");
+    const runGeneratorSpy = sandbox.spy(yeomanUIPanelMock, "runGenerator");
+    const loadWebviewPanelSpy = sandbox.spy(yeomanUIPanelMock, "loadWebviewPanel");
+    const toggleOutputSpy = sandbox.spy(yeomanUIPanelMock, "toggleOutput");
+    const notifyGeneratorsChangeSpy = sandbox.spy(yeomanUIPanelMock, "notifyGeneratorsChange");
 
-    // yeomanUIPanel is undefined
-    const yeomanUIPanel_firstTime = await extCommands["getYeomanUIPanel"]();
-    // yeomanUIPanel should be already defined
-    const yeomanUIPanel_secondTime = await extCommands["getYeomanUIPanel"]();
+    await extCommands["yeomanUIPanel_loadYeomanUI_Command"]();
+    await extCommands["yeomanUIPanel_toggleOutput_Command"]();
+    await extCommands["yeomanUIPanel_notifyGeneratorsChange_Command"]();
+    await extCommands["yeomanUIPanel_runGenerator_Command"]();
 
-    expect(yeomanUIPanel_firstTime).to.be.equal(yeomanUIPanel_secondTime);
+    expect(runGeneratorSpy.called).to.be.false;
+    expect(loadWebviewPanelSpy.called).to.be.false;
+    expect(toggleOutputSpy.called).to.be.true;
+    expect(notifyGeneratorsChangeSpy.called).to.be.true;
+  });
+
+  describe("getYeomanUIPanel", () => {
+    const extCommands = new ExtCommands(testContext);
+
+    it("getYeomanUIPanel - open twice, no generator loaded", async () => {
+      extCommands["yeomanUIPanel"] = undefined;
+
+      loggerWrapperMock.expects("getClassLogger");
+
+      // yeomanUIPanel is undefined
+      const yeomanUIPanel_firstTime = await extCommands["getYeomanUIPanel"]();
+      // yeomanUIPanel should be already defined
+      const yeomanUIPanel_secondTime = await extCommands["getYeomanUIPanel"]();
+
+      expect(yeomanUIPanel_firstTime).to.be.equal(yeomanUIPanel_secondTime);
+    });
+
+    it("getYeomanUIPanel - there is generator running, answer 'Continue'", async () => {
+      const mockYeomanui = { yeomanui: { generatorName: "test" } };
+      extCommands["yeomanUIPanel"] = mockYeomanui;
+      windowMock.expects("showWarningMessage").resolves("Continue");
+      expect(await extCommands["getYeomanUIPanel"]()).be.equal(mockYeomanui);
+    });
+
+    it("getYeomanUIPanel - there is generator running, answer 'Cancel'", async () => {
+      const mockYeomanui = { yeomanui: { generatorName: "test" } };
+      extCommands["yeomanUIPanel"] = mockYeomanui;
+      windowMock.expects("showWarningMessage").resolves("Cancel");
+      try {
+        await extCommands["getYeomanUIPanel"]();
+      } catch (e) {
+        expect(e instanceof Error).to.be.true;
+      }
+    });
+
+    it("getYeomanUIPanel - there is generator running, canceled", async () => {
+      const mockYeomanui = { yeomanui: { generatorName: "test" } };
+      extCommands["yeomanUIPanel"] = mockYeomanui;
+      windowMock.expects("showWarningMessage").resolves(undefined);
+      try {
+        await extCommands["getYeomanUIPanel"]();
+      } catch (e) {
+        expect(e instanceof Error).to.be.true;
+      }
+    });
+
+    it("getYeomanUIPanel - skip verifing empty state", async () => {
+      const mockYeomanui = { yeomanui: { generatorName: "test" } };
+      extCommands["yeomanUIPanel"] = mockYeomanui;
+      windowMock.expects("showWarningMessage").never();
+      expect(await extCommands["getYeomanUIPanel"](false)).be.equal(mockYeomanui);
+    });
+
+    it("isInEmptyState - yeomanUIPanel is undefined", async () => {
+      extCommands["yeomanUIPanel"] = undefined;
+      expect(await extCommands["isInEmptyState"]()).to.be.true;
+    });
   });
 
   it("getExploreGensPanel", async () => {
