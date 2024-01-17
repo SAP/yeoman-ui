@@ -134,17 +134,17 @@ describe("extension commands unit test", () => {
       expect(yeomanUIPanel_firstTime).to.be.equal(yeomanUIPanel_secondTime);
     });
 
-    it("getYeomanUIPanel - there is generator running, answer 'Yes'", async () => {
+    it("getYeomanUIPanel - there is generator running, answer 'Continue'", async () => {
       const mockYeomanui = { yeomanui: { generatorName: "test" } };
       extCommands["yeomanUIPanel"] = mockYeomanui;
-      windowMock.expects("showWarningMessage").resolves("Yes");
+      windowMock.expects("showWarningMessage").resolves("Continue");
       expect(await extCommands["getYeomanUIPanel"]()).be.equal(mockYeomanui);
     });
 
-    it("getYeomanUIPanel - there is generator running, answer 'No'", async () => {
+    it("getYeomanUIPanel - there is generator running, answer 'Cancel'", async () => {
       const mockYeomanui = { yeomanui: { generatorName: "test" } };
       extCommands["yeomanUIPanel"] = mockYeomanui;
-      windowMock.expects("showWarningMessage").resolves("No");
+      windowMock.expects("showWarningMessage").resolves("Cancel");
       try {
         await extCommands["getYeomanUIPanel"]();
       } catch (e) {

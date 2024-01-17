@@ -1,4 +1,5 @@
 import { ExtensionContext, commands, window } from "vscode";
+import messages from "./messages";
 
 export class ExtCommands {
   private exploreGensPanel: any;
@@ -62,14 +63,13 @@ export class ExtCommands {
 
   private async isInEmptyState(): Promise<boolean> {
     if (this.yeomanUIPanel?.yeomanui?.generatorName) {
+      const btnContinue = "Continue";
       if (
         (await window.showWarningMessage(
-          `The generator ${
-            this.yeomanUIPanel.yeomanui.generatorName.split(":")[0]
-          } is not completed yet. Are you sure you want to stop it before it finished?`,
-          "Yes",
-          "No"
-        )) !== "Yes"
+          messages.warn_another_generator_running(this.yeomanUIPanel.yeomanui.generatorName.split(":")[0]),
+          btnContinue,
+          "Cancel"
+        )) !== btnContinue
       ) {
         return false;
       }
@@ -85,7 +85,7 @@ export class ExtCommands {
     if (!verifyEmptyState || (await this.isInEmptyState())) {
       return this.yeomanUIPanel;
     } else {
-      throw new Error("other generator is running");
+      throw new Error("another generator is running");
     }
   }
 
