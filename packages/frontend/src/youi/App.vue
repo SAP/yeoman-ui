@@ -329,7 +329,10 @@ export default {
         this.isReplaying = true;
         this.numOfSteps = numOfSteps;
         const answers = this.currentPrompt.answers;
-        if (this.backButtonText == "Back") {
+        if (
+          (this.backButtonText == "Back" && numOfSteps == 1) ||
+          (numOfSteps > 1 && this.promptIndex - numOfSteps > 0)
+        ) {
           return this.rpc.invoke("back", [
             answers !== undefined ? JSON.parse(JSON.stringify(answers)) : answers,
             numOfSteps,

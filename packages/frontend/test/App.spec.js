@@ -733,6 +733,7 @@ describe("App.vue", () => {
       wrapper.vm.resolve = undefined;
       wrapper.vm.promptIndex = 1;
       wrapper.vm.prompts = [{}, {}];
+      wrapper.vm.selectGeneratorPromptExists = () => true;
 
       wrapper.vm.back();
 
@@ -791,6 +792,7 @@ describe("App.vue", () => {
       wrapper.vm.resolve = undefined;
       wrapper.vm.promptIndex = 1;
       wrapper.vm.prompts = [{}, {}];
+      wrapper.vm.selectGeneratorPromptExists = () => true;
 
       wrapper.vm.gotoStep(1);
 
