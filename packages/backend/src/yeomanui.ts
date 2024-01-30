@@ -393,7 +393,7 @@ export class YeomanUI {
     return this.runGenerator(this.generatorName);
   }
 
-  private async fromWizard(): Promise<boolean> {
+  private fromWizard(): boolean {
     if (this.uiOptions.generator) return false;
     return true;
   }

@@ -914,29 +914,29 @@ describe("yeomanui unit test", () => {
   });
 
   describe("fromWizard", () => {
-    it("from fiori generator", async () => {
+    it("from fiori generator", () => {
       const yeomanUiInstance: YeomanUI = new YeomanUI(
         rpc,
         youiEvents,
         outputChannel,
         testLogger,
-        {generator: "fiori"},
-        flowPromise.state
+        { generator: "fiori" },
+        flowPromise.state,
       );
-      const res = await yeomanUiInstance["fromWizard"]();
+      const res = yeomanUiInstance["fromWizard"]();
       expect(res).to.be.false;
     });
 
-    it("from application wizard", async () => {
+    it("from application wizard", () => {
       const yeomanUiInstance: YeomanUI = new YeomanUI(
         rpc,
         youiEvents,
         outputChannel,
         testLogger,
-        {generator: undefined},
-        flowPromise.state
+        { generator: undefined },
+        flowPromise.state,
       );
-      const res = await yeomanUiInstance["fromWizard"]();
+      const res = yeomanUiInstance["fromWizard"]();
       expect(res).to.be.true;
     });
   });

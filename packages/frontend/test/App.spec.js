@@ -722,7 +722,7 @@ describe("App.vue", () => {
   });
 
   describe("back - method", () => {
-    test("promptIndex is 0 (Select Generator)", () => {
+    test("promptIndex is 0 (Select Generator)", async () => {
       wrapper = initComponent(App, {}, true);
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation(async () => {
@@ -736,7 +736,7 @@ describe("App.vue", () => {
       wrapper.vm.promptIndex = 1;
       wrapper.vm.prompts = [{}, {}];
 
-      wrapper.vm.back();
+      await wrapper.vm.back();
 
       expect(wrapper.vm.promptIndex).toBe(0);
       expect(wrapper.vm.prompts.length).toBe(0);
@@ -827,8 +827,8 @@ describe("App.vue", () => {
       wrapper = initComponent(App, {}, true);
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation(async () => {
-            return true;
-          }),
+          return true;
+        }),
         registerMethod: jest.fn(),
       };
       const err = new Error("error");
