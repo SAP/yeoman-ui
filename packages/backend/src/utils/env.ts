@@ -80,7 +80,7 @@ class EnvUtil {
   private createEnvInstance(
     args?: string | string[],
     opts?: Environment.Options,
-    adapter?: TerminalAdapter
+    adapter?: TerminalAdapter,
   ): Environment<Environment.Options> {
     return Environment.createEnv(args, opts, adapter);
   }
@@ -155,11 +155,11 @@ class EnvUtil {
     const env: Environment<Environment.Options> = this.createEnvInstance(
       undefined,
       { sharedOptions: { forwardErrorToEnvironment: true } },
-      adapter
+      adapter,
     );
     // @types/yeoman-environment bug: generatorPath is still not exposed on LookupGeneratorMeta
     env.register(_.get(meta, "generatorPath"), genNamespace, meta.packagePath);
-    const gen = env.create(genNamespace, { options });
+    const gen = env.create(genNamespace, [], { options });
     return { env, gen };
   }
 

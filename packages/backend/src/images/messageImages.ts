@@ -30,8 +30,8 @@ export function getImage(state: Severity) {
     return Constants.IS_IN_BAS
       ? errorTheiaDark
       : _.get(vscode, "window.activeColorTheme.kind") === _.get(vscode, "ColorThemeKind.Light")
-      ? errorVSCodeLight
-      : errorVSCodeDark;
+        ? errorVSCodeLight
+        : errorVSCodeDark;
   } else if (state === Severity.warning) {
     return Constants.IS_IN_BAS ? warnTheia : warnVSCode;
   } else {

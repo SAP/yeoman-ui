@@ -37,16 +37,13 @@
     "coverage": "nyc mocha",
     "coverage:copy": "shx mkdir -p ../../coverage && shx cp -u ./coverage/lcov.info ../../coverage/lcov_backend.info",
     "frontend:copy": "npm-run-all clean:frontend && shx cp -r ../frontend/dist/. ./dist/media/",
-    "package": "vsce package --yarn",
+    "package": "vsce package --yarn --allow-star-activation --skip-license",
     "test": "mocha",
     "webpack": "webpack --mode development",
     "webpack-dev:watch": "webpack --mode development --watch",
     "ws:egRun": "node ./dist/src/webSocketServer/exploregens.js",
     "ws:run": "node ./dist/src/webSocketServer/youi.js"
   },
-  "extensionDependencies": [
-    "SAPOSS.app-studio-toolkit"
-  ],
   "contributes": {
     "commands": [
       {
@@ -189,7 +186,7 @@
     }
   },
   "dependencies": {
-    "@sap-devx/webview-rpc": "0.3.1",
+    "@sap-devx/webview-rpc": "0.4.1",
     "@sap-devx/yeoman-ui-types": "^1.14.1",
     "@sap/bas-sdk": "3.2.1",
     "@sap/swa-for-sapbas-vsx": "1.2.7",
@@ -218,17 +215,20 @@
     "@types/webpack-env": "^1.16.2",
     "@types/ws": "^7.4.5",
     "@types/yeoman-environment": "^2.10.3",
+    "@vscode/vsce": "2.23.0",
     "copy-webpack-plugin": "^9.0.0",
     "lcov-result-merger": "3.1.0",
     "sinon": "^11.1.1",
     "string-replace-loader": "3.0.3",
     "ts-loader": "^9.2.3",
     "ts-node": "^9.1.1",
-    "vsce": "^1.100.1",
     "webpack": "^5.72.0",
     "webpack-cli": "^4.8.0",
     "ws": "8.2.3"
   },
+  "extensionDependencies": [
+    "SAPOSS.app-studio-toolkit"
+  ],
   "engines": {
     "vscode": "^1.50.0"
   },

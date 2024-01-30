@@ -591,7 +591,7 @@ module.exports = class extends Generator {
     }
     this.appWizard.showWarning(
       "The password must contain at least a letter and a number",
-      types.MessageType.notification
+      types.MessageType.notification,
     );
     return "The password must contain at least a letter and a number";
   }

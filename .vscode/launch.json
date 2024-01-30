@@ -32,17 +32,9 @@
       "request": "launch",
       "name": "backend unit tests",
       "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
-      "args": [
-        "-r",
-        "ts-node/register",
-        "--timeout",
-        "999999",
-        "--colors",
-        "${workspaceFolder}/packages/backend/test/**/*.spec.ts"
-      ],
+      "args": ["--timeout", "999999", "--colors", "${workspaceFolder}/packages/backend/dist/test/**/*.spec.js"],
       "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector"
+      "internalConsoleOptions": "neverOpen"
     },
     {
       "name": "Run extension",

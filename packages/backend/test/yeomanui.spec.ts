@@ -134,7 +134,7 @@ describe("yeomanui unit test", () => {
     outputChannel,
     testLogger,
     { filter: GeneratorFilter.create(), messages },
-    flowPromise.state
+    flowPromise.state,
   );
 
   before(() => {
@@ -515,7 +515,7 @@ describe("yeomanui unit test", () => {
         outputChannel,
         testLogger,
         { filter: GeneratorFilter.create(), messages },
-        flowPromise.state
+        flowPromise.state,
       );
       const noGeneratorsResult = {
         name: "Select Generator",
@@ -906,7 +906,7 @@ describe("yeomanui unit test", () => {
       outputChannel,
       testLogger,
       null,
-      flowPromise.state
+      flowPromise.state,
     );
     const errorInfo = "Error Info";
     const res = yeomanUiInstance["getErrorInfo"](errorInfo);
@@ -1021,7 +1021,7 @@ describe("yeomanui unit test", () => {
       outputChannel,
       testLogger,
       GeneratorFilter.create(),
-      flowPromise.state
+      flowPromise.state,
     );
     const gen: any = { on: () => "" };
     const genMock = sandbox.mock(gen);
@@ -1046,7 +1046,7 @@ describe("yeomanui unit test", () => {
         outputChannel,
         testLogger,
         GeneratorFilter.create(),
-        flowPromise.state
+        flowPromise.state,
       );
       const questions = [{ name: "q1" }];
       const response = await yeomanUiInstance.showPrompt(questions);
@@ -1059,7 +1059,7 @@ describe("yeomanui unit test", () => {
 
       (rpc.invoke as (methodName: string, params: any[]) => Promise<any>) = (
         methodName: string,
-        params: any[]
+        params: any[],
       ): Promise<unknown> => {
         const questionName: string = params[0][0].name;
         if (questionName === "q1") {
@@ -1079,7 +1079,7 @@ describe("yeomanui unit test", () => {
         outputChannel,
         testLogger,
         GeneratorFilter.create(),
-        flowPromise.state
+        flowPromise.state,
       );
       yeomanUiInstance["runGenerator"] = (): Promise<any> => {
         return Promise.resolve();
@@ -1132,11 +1132,12 @@ describe("yeomanui unit test", () => {
       expect(
         doGeneratorDoneSpy.calledWith(
           true,
-          _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated", (a: string) => "")("testGenName"),
           create_and_close,
           "files",
-          "dirpath2"
-        )
+          "dirpath2",
+        ),
       ).to.be.true;
     });
 
@@ -1154,11 +1155,12 @@ describe("yeomanui unit test", () => {
       expect(
         doGeneratorDoneSpy.calledWith(
           true,
-          _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated", (a: string) => "")("testGenName"),
           create_and_close,
           "files",
-          null
-        )
+          null,
+        ),
       ).to.be.true;
     });
 
@@ -1176,11 +1178,12 @@ describe("yeomanui unit test", () => {
       expect(
         doGeneratorDoneSpy.calledWith(
           true,
-          _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated", (a: string) => "")("testGenName"),
           create_and_close,
           "files",
-          null
-        )
+          null,
+        ),
       ).to.be.true;
     });
 
@@ -1194,11 +1197,12 @@ describe("yeomanui unit test", () => {
       expect(
         doGeneratorDoneSpy.calledWith(
           true,
-          _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("testGenName"),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated", (a: string) => "")("testGenName"),
           create_and_close,
           "files",
-          "testDestinationRoot/generatedProject"
-        )
+          "testDestinationRoot/generatedProject",
+        ),
       ).to.be.true;
     });
 
@@ -1206,7 +1210,7 @@ describe("yeomanui unit test", () => {
       swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", false, testLogger);
       yeomanUi["onGeneratorFailure"]("testGenName", "testError");
       expect(
-        doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed - testError"}`, "", "files")
+        doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed - testError"}`, "", "files"),
       ).to.be.true;
     });
 
@@ -1223,11 +1227,12 @@ describe("yeomanui unit test", () => {
       expect(
         doGeneratorDoneSpy.calledWith(
           true,
-          _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("foodq:app"),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated", (a: string) => "")("foodq:app"),
           open_in_new_ws,
           "project",
-          "testDestinationRoot/generatedProject"
-        )
+          "testDestinationRoot/generatedProject",
+        ),
       ).to.be.true;
     });
 
@@ -1244,11 +1249,12 @@ describe("yeomanui unit test", () => {
       expect(
         doGeneratorDoneSpy.calledWith(
           true,
-          _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated")("fiori-generator:app"),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated", (a: string) => "")("fiori-generator:app"),
           create_and_close,
           "project",
-          "testDestinationRoot/generatedProject"
-        )
+          "testDestinationRoot/generatedProject",
+        ),
       ).to.be.true;
     });
   });
@@ -1270,7 +1276,7 @@ describe("yeomanui unit test", () => {
         outputChannel,
         testLogger,
         GeneratorFilter.create(),
-        flowPromise.state
+        flowPromise.state,
       );
 
       yeomanUiInstance["addCustomQuestionEventHandlers"](questions);
@@ -1295,7 +1301,7 @@ describe("yeomanui unit test", () => {
         testLogger,
         GeneratorFilter.create(),
 
-        flowPromise.state
+        flowPromise.state,
       );
       yeomanUiInstance.registerCustomQuestionEventHandler("questionType", "testEvent", testEventFunction);
       yeomanUiInstance["currentQuestions"] = [{ name: "question1", guiType: "questionType" }];
@@ -1310,7 +1316,7 @@ describe("yeomanui unit test", () => {
         outputChannel,
         testLogger,
         GeneratorFilter.create(),
-        flowPromise.state
+        flowPromise.state,
       );
       yeomanUiInstance["currentQuestions"] = [
         {
@@ -1331,7 +1337,7 @@ describe("yeomanui unit test", () => {
         outputChannel,
         testLogger,
         GeneratorFilter.create(),
-        flowPromise.state
+        flowPromise.state,
       );
       const response = await yeomanUiInstance["evaluateMethod"](null, "question1", "method1");
       expect(response).to.be.undefined;
@@ -1344,7 +1350,7 @@ describe("yeomanui unit test", () => {
         outputChannel,
         testLogger,
         GeneratorFilter.create(),
-        flowPromise.state
+        flowPromise.state,
       );
       yeomanUiInstance["gen"] = Object.create({});
       yeomanUiInstance["gen"].options = {};
@@ -1371,7 +1377,7 @@ describe("yeomanui unit test", () => {
         outputChannel,
         testLogger,
         GeneratorFilter.create(),
-        flowPromise.state
+        flowPromise.state,
       );
       yeomanUiInstance["gen"] = Object.create({});
       yeomanUiInstance["gen"].options = {};
