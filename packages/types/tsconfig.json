@@ -7,7 +7,7 @@
     "baseUrl": ".",
     "target": "es5",
     "esModuleInterop": true,
-    "strict": true
+    "strict": true,
   },
-  "include": ["src/**/*", "test/**/*", "api.d.ts"]
+  "include": ["src/**/*", "test/**/*", "api.d.ts"],
 }

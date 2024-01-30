@@ -65,7 +65,7 @@ export class SWA {
               }
             }
           }
-        }
+        },
       );
 
       // Update the swa-tracker-wrapper with a reference to the swaTracker.
@@ -103,7 +103,7 @@ export class SWA {
     generatorName: string,
     isSucceeded: boolean,
     logger?: IChildLogger,
-    errorMessage?: string
+    errorMessage?: string,
   ) {
     try {
       if (SWA.isInitialized()) {

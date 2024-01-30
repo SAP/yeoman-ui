@@ -335,7 +335,7 @@ describe("vscode-youi-events unit test", () => {
         "success message",
         createAndClose,
         "project",
-        "testDestinationRoot/projectName"
+        "testDestinationRoot/projectName",
       );
     });
 
@@ -355,7 +355,7 @@ describe("vscode-youi-events unit test", () => {
         "success message",
         openNewWorkspace,
         "project",
-        "testDestinationRoot/./projectName"
+        "testDestinationRoot/./projectName",
       );
     });
 
@@ -377,7 +377,7 @@ describe("vscode-youi-events unit test", () => {
         "success message",
         "Open the project in a multi-root workspace",
         "project",
-        "testDestinationRoot/./projectName"
+        "testDestinationRoot/./projectName",
       );
     });
 
@@ -393,7 +393,7 @@ describe("vscode-youi-events unit test", () => {
         "success message",
         createAndClose,
         "module",
-        "testDestinationRoot/projectName/../projectName"
+        "testDestinationRoot/projectName/../projectName",
       );
     });
 
@@ -409,7 +409,7 @@ describe("vscode-youi-events unit test", () => {
         "success message",
         createAndClose,
         "files",
-        "testDestinationRoot/projectName/../projectName"
+        "testDestinationRoot/projectName/../projectName",
       );
     });
 

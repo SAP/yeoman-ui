@@ -22,7 +22,7 @@ export function listenToLogSettingsChanges(context: vscode.ExtensionContext) {
         getLogger().changeLevel(logLevel);
         logLoggerDetails(context, logLevel);
       }
-    })
+    }),
   );
 
   // Enable responding to changes in the sourceLocationTracking setting
@@ -33,7 +33,7 @@ export function listenToLogSettingsChanges(context: vscode.ExtensionContext) {
 
         getLogger().changeSourceLocationTracking(newSourceLocationTracking);
       }
-    })
+    }),
   );
 }
 

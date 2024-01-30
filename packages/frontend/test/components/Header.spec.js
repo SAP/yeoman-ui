@@ -39,7 +39,7 @@ describe("Header.vue", () => {
         },
         isGeneric: false,
       },
-      true
+      true,
     );
     wrapper.findAll("button")[0].trigger("click");
     expect(rpcInvokeMockFunction).toHaveBeenCalledWith("toggleOutput", [{}]);
@@ -55,7 +55,7 @@ describe("Header.vue", () => {
         },
         isGeneric: true,
       },
-      true
+      true,
     );
 
     wrapper.findAll("button")[0].trigger("click");

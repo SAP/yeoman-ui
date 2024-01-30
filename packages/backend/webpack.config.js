@@ -199,6 +199,24 @@ const config = {
           flags: "g",
         },
       },
+      {
+        test: /node_modules[/|\\]ws[/|\\]lib[/|\\]buffer-util.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[(]'bufferutil",
+          replace: "__non_webpack_require__('bufferutil",
+          flags: "g",
+        },
+      },
+      {
+        test: /node_modules[/|\\]ws[/|\\]lib[/|\\]validation.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[(]'utf-8-validate",
+          replace: "__non_webpack_require__('utf-8-validate",
+          flags: "g",
+        },
+      },
     ],
   },
 };

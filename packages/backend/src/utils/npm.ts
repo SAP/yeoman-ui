@@ -107,7 +107,7 @@ class Command {
           messages.no_write_access(globalPath),
           { modal: true },
           messages.change_owner_for_global(globalPath),
-          this.SET_DEFAULT_LOCATION
+          this.SET_DEFAULT_LOCATION,
         );
       }
     }
