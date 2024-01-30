@@ -19,7 +19,7 @@ export class ExtCommands {
 
     this.registerAndSubscribeCommand(
       "yeomanUI._notifyGeneratorsChange",
-      this.yeomanUIPanel_notifyGeneratorsChange_Command.bind(this)
+      this.yeomanUIPanel_notifyGeneratorsChange_Command.bind(this),
     );
 
     this.registerAndSubscribeCommand("exploreGenerators", this.exploreGenerators_Command.bind(this));
@@ -68,7 +68,7 @@ export class ExtCommands {
         (await window.showWarningMessage(
           messages.warn_another_generator_running(this.yeomanUIPanel.yeomanui.generatorName.split(":")[0]),
           btnContinue,
-          "Cancel"
+          "Cancel",
         )) !== btnContinue
       ) {
         return false;

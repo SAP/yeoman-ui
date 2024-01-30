@@ -70,7 +70,7 @@ export class YeomanUI {
     output: Output,
     logger: IChildLogger,
     uiOptions: any,
-    flowState: State<void>
+    flowState: State<void>,
   ) {
     this.rpc = rpc;
 
@@ -114,7 +114,7 @@ export class YeomanUI {
     return this.rpc.invoke("updateGeneratorsPrompt", [generators.questions]);
   }
 
-  public async _notifyGeneratorsInstall(args: any[], force: boolean) {
+  public async _notifyGeneratorsInstall(args: any[], force: boolean = false) {
     this.uiOptions.installGens = _.isObject(args) && _.isEmpty(args) ? undefined : args;
     if (!_.isNil(args)) {
       const isGeneratorsPrompt: boolean = await this.rpc.invoke("isGeneratorsPrompt");
@@ -280,7 +280,7 @@ export class YeomanUI {
     });
 
     gen.on(errorEventName, (error: any) =>
-      this.onGeneratorFailure(generatorName, this.getErrorWithAdditionalInfo(error, `gen.on(${errorEventName})`))
+      this.onGeneratorFailure(generatorName, this.getErrorWithAdditionalInfo(error, `gen.on(${errorEventName})`)),
     );
 
     // when generator "restart" is selected, re-register the "uncaughtException" listener (with the updated context variables)
@@ -424,7 +424,7 @@ export class YeomanUI {
     if (targetFolderPathBeforeGen === targetFolderPathAfterGen) {
       const newDirs: string[] = _.difference(
         _.get(resourcesAfterGen, "childDirs"),
-        _.get(resourcesBeforeGen, "childDirs")
+        _.get(resourcesBeforeGen, "childDirs"),
       );
       if (_.size(newDirs) === 1) {
         // One folder added by generator and targetFolderPath/destinationRoot was not changed by generator.
@@ -566,8 +566,8 @@ export class YeomanUI {
     const type = _.includes(genFilter.types, GeneratorType.project)
       ? "project"
       : _.includes(genFilter.types, GeneratorType.module)
-      ? "module"
-      : "files";
+        ? "module"
+        : "files";
     this.typesMap.set(genMeta.namespace, type);
     _.includes(genFilter.types, "tools-suite") && this.generatorsToIgnoreArray.push(genMeta.namespace);
     let hidden = _.includes(genFilter.categories, "hidden");

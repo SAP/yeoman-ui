@@ -29,16 +29,21 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
     this.installGens = !yeomanUi && isEmpty(args) ? undefined : args;
     if (yeomanUi) {
       if (!this.installGens) {
-        yeomanUi._notifyGeneratorsChange();
+        void yeomanUi._notifyGeneratorsChange();
       } else {
-        yeomanUi._notifyGeneratorsInstall(this.installGens);
+        void yeomanUi._notifyGeneratorsInstall(this.installGens);
         if (isEmpty(this.installGens)) {
           Env.loadNpmPath(true); // force to reload the env existing npm paths
-          yeomanUi._notifyGeneratorsChange();
+          void yeomanUi._notifyGeneratorsChange();
           this.installGens = undefined;
         }
       }
     }
+  }
+
+  // clean up the current yeomanui instance on close panel
+  private reset() {
+    this.yeomanui = null;
   }
 
   public async loadWebviewPanel(uiOptions?: any): Promise<void> {
@@ -54,7 +59,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
       }
     }
 
-    return super.loadWebviewPanel(uiOptions);
+    return super.loadWebviewPanel(uiOptions, [{ dispose: () => this.reset() }]);
   }
 
   private async tryToInstallGenerator(genNamespace: string) {
@@ -100,7 +105,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
         installGens: this.installGens,
         data: get(uiOptions, "data"),
       },
-      this.flowPromise.state
+      this.flowPromise.state,
     );
     this.yeomanui.registerCustomQuestionEventHandler("file-browser", "getFilePath", this.showOpenFileDialog.bind(this));
     this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));

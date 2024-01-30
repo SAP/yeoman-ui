@@ -24,11 +24,12 @@ export abstract class AbstractWebviewPanel {
   protected flowPromise: FlowPromise<void>;
   protected viewColumn: vscode.ViewColumn;
 
-  public loadWebviewPanel(uiOptions?: any): Promise<void> {
+  public loadWebviewPanel(uiOptions?: any, disposables: vscode.Disposable[] = []): Promise<void> {
     this.disposeWebviewPanel();
     if (uiOptions?.viewColumn in vscode.ViewColumn) {
       this.viewColumn = uiOptions.viewColumn;
     }
+    this.disposables = disposables;
     const webViewPanel = this.createWebviewPanel();
     this.setWebviewPanel(webViewPanel, uiOptions);
 
@@ -85,7 +86,7 @@ export abstract class AbstractWebviewPanel {
         this.setFocused(this.webViewPanel.active);
       },
       null,
-      this.disposables
+      this.disposables,
     );
   }
 

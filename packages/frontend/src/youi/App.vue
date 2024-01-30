@@ -370,7 +370,7 @@ export default {
       this.resolve(
         this.currentPrompt.answers !== undefined
           ? JSON.parse(JSON.stringify(this.currentPrompt.answers))
-          : this.currentPrompt.answers
+          : this.currentPrompt.answers,
       );
 
       if (this.promptIndex >= _size(this.prompts) - 1) {
@@ -431,7 +431,7 @@ export default {
             _get(question, "type") === "list" &&
             _get(question, "guiType") === "tiles"
           );
-        })
+        }),
       );
     },
     setPromptList(prompts) {

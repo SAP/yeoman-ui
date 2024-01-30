@@ -44,5 +44,8 @@ export class GeneratorFilter {
     return _.isEmpty(array1) || !_.isEmpty(_.intersection(array1, array2));
   }
 
-  private constructor(public readonly types: string[], public readonly categories: string[]) {}
+  private constructor(
+    public readonly types: string[],
+    public readonly categories: string[],
+  ) {}
 }

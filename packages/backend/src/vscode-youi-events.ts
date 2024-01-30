@@ -63,7 +63,7 @@ export class VSCodeYouiEvents implements YouiEvents {
     message: string,
     selectedWorkspace: string,
     type: string,
-    targetFolderPath?: string
+    targetFolderPath?: string,
   ): void {
     this.doClose();
     void this.showDoneMessage(success, message, selectedWorkspace, type, targetFolderPath);
@@ -153,7 +153,7 @@ export class VSCodeYouiEvents implements YouiEvents {
         await new Promise((resolve) => {
           this.resolveFunc = resolve;
         });
-      }
+      },
     );
   }
 
@@ -168,7 +168,7 @@ export class VSCodeYouiEvents implements YouiEvents {
     errorMmessage: string,
     selectedWorkspace: string,
     type: string,
-    targetFolderPath?: string
+    targetFolderPath?: string,
   ): Thenable<any> {
     this.resolveInstallingProgress();
 

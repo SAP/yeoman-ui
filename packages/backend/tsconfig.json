@@ -10,13 +10,12 @@
     "removeComments": true,
     "experimentalDecorators": true,
     "rootDir": ".",
-    "rootDirs": ["./src", "./test"],
     "baseUrl": ".",
     "sourceMap": true,
     "target": "es6",
     "traceResolution": false,
     "declaration": true,
-    "alwaysStrict": true
+    "alwaysStrict": true,
   },
-  "include": ["src/**/*", "test/**/*", "api.d.ts"]
+  "include": ["src/**/*", "test/**/*", "api.d.ts"],
 }

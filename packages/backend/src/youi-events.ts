@@ -6,7 +6,7 @@ export interface YouiEvents {
     message: string,
     selectedWorkspace: string,
     type: string,
-    targetFolderPath?: string
+    targetFolderPath?: string,
   ): void;
   doGeneratorInstall(): void;
   showProgress(message?: string): void;

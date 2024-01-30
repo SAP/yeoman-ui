@@ -48,7 +48,7 @@ watch(
   },
   {
     flush: "post",
-  }
+  },
 );
 
 const calcIsMore = () => {

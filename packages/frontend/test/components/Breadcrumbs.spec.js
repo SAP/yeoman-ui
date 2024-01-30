@@ -29,10 +29,10 @@ describe("Breadcrumbs.vue", () => {
     });
     const breadcrumbs = wrapper.findAll('[data-test="breadcrumbs"]');
     expect(breadcrumbs[0].html()).toMatchInlineSnapshot(
-      `<div class="answer" data-test="breadcrumbs"><span>answerLabel2: </span><span>answerValue2</span></div>`
+      `<div class="answer" data-test="breadcrumbs"><span>answerLabel2: </span><span>answerValue2</span></div>`,
     );
     expect(breadcrumbs[1].html()).toMatchInlineSnapshot(
-      `<div class="answer" data-test="breadcrumbs"><span>answerLabel3: </span><span>answerValue3</span></div>`
+      `<div class="answer" data-test="breadcrumbs"><span>answerLabel3: </span><span>answerValue3</span></div>`,
     );
     expect(wrapper.findAll('[data-test="moreLessButton"]')).toHaveLength(0);
   });

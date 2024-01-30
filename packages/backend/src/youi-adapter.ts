@@ -9,7 +9,10 @@ import { Output } from "./output";
 export class YouiAdapter {
   private yeomanui: YeomanUI;
 
-  constructor(private readonly youiEvents: YouiEvents, private readonly output: Output) {}
+  constructor(
+    private readonly youiEvents: YouiEvents,
+    private readonly output: Output,
+  ) {}
 
   public log() {
     console.log(arguments);
