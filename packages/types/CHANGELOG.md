@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.14.2](https://github.com/SAP/yeoman-ui/compare/v1.14.1...v1.14.2) (2024-01-30)
+
+### Bug Fixes
+
+- reset yeomanui panel state when closing window ([#796](https://github.com/SAP/yeoman-ui/issues/796)) ([eb3ba2f](https://github.com/SAP/yeoman-ui/commit/eb3ba2fa9118b0c078f4895f37222b0ddce7713d))
+
 ## [1.14.1](https://github.com/SAP/yeoman-ui/compare/v1.14.0...v1.14.1) (2024-01-17)
 
 **Note:** Version bump only for package @sap-devx/yeoman-ui-types
