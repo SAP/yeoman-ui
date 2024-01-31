@@ -22,7 +22,7 @@
   },
   "scripts": {
     "ci": "npm-run-all clean compile",
-    "clean": "rimraf ./dist",
+    "clean": "shx rm -rf ./dist",
     "compile": "tsc -b ./tsconfig.json ./tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
     "compile:watch": "tsc -watch"
   },

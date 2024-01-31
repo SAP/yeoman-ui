@@ -10,7 +10,7 @@
     "build": "vite build",
     "build-dev": "vite build --mode development",
     "ci": "npm-run-all clean build coverage coverage:copy",
-    "clean": "rimraf ./dist ./coverage",
+    "clean": "shx rm -rf ./dist ./coverage",
     "coverage": "jest -w 1",
     "coverage:copy": "shx mkdir -p ../../coverage && shx cp -u ./coverage/lcov.info ../../coverage/lcov_frontend.info",
     "serve": "vite",
