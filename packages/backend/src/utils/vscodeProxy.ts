@@ -41,6 +41,7 @@ const workspace = {
   getConfiguration: () => configObj,
   updateWorkspaceFolders: returnValue,
   workspaceFolders: [Uri.file()],
+  workspaceFile: Uri.file(),
 };
 
 const oRegisteredCommands = {};
