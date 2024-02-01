@@ -292,11 +292,10 @@ describe("vscode-youi-events unit test", () => {
 
     it("on success, project path and workspace folder are Windows style ---> the project added to current workspace", () => {
       eventsMock.expects("doClose");
-      _.set(vscode, "workspace.workspaceFolders", [
-        { uri: { fsPath: "rootFolderPath" } },
-        { uri: { fsPath: "testRoot" } },
-      ]);
-      _.set(vscode, "workspace.workspaceFile", "/workspace/file/path");
+      sandbox
+        .stub(vscode.workspace, "workspaceFolders")
+        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testRoot" } }]);
+      sandbox.stub(vscode.workspace, "workspaceFile").value("/workspace/file/path");
       windowMock
         .expects("showInformationMessage")
         .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
@@ -307,11 +306,10 @@ describe("vscode-youi-events unit test", () => {
 
     it("on success, project path is already openned in workspace ---> the project added to current workspace", () => {
       eventsMock.expects("doClose");
-      _.set(vscode, "workspace.workspaceFolders", [
-        { uri: { fsPath: "rootFolderPath" } },
-        { uri: { fsPath: "testDestinationRoot" } },
-      ]);
-      _.set(vscode, "workspace.workspaceFile", "/workspace/file/path");
+      sandbox
+        .stub(vscode.workspace, "workspaceFolders")
+        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
+      sandbox.stub(vscode.workspace, "workspaceFile").value("/workspace/file/path");
       windowMock
         .expects("showInformationMessage")
         .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
@@ -322,10 +320,9 @@ describe("vscode-youi-events unit test", () => {
 
     it("on success, project path parent folder is already openned in workspace ---> the user changed to create and close the project for later use", () => {
       eventsMock.expects("doClose");
-      _.set(vscode, "workspace.workspaceFolders", [
-        { uri: { fsPath: "rootFolderPath" } },
-        { uri: { fsPath: "testDestinationRoot" } },
-      ]);
+      sandbox
+        .stub(vscode.workspace, "workspaceFolders")
+        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
       windowMock
         .expects("showInformationMessage")
         .withExactArgs(messages.default.artifact_generated_project_saved_for_future)
@@ -341,10 +338,9 @@ describe("vscode-youi-events unit test", () => {
 
     it("on success, project path parent folder is already openned in workspace ---> the project openned in a stand-alone folder", () => {
       eventsMock.expects("doClose");
-      _.set(vscode, "workspace.workspaceFolders", [
-        { uri: { fsPath: "rootFolderPath" } },
-        { uri: { fsPath: "testDestinationRoot" } },
-      ]);
+      sandbox
+        .stub(vscode.workspace, "workspaceFolders")
+        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
       windowMock
         .expects("showInformationMessage")
         .withExactArgs(messages.default.artifact_generated_project_open_in_a_new_workspace)
@@ -361,8 +357,8 @@ describe("vscode-youi-events unit test", () => {
 
     it("on success, no workspace is opened ---> the project openned in a new multi-root workspace", () => {
       eventsMock.expects("doClose");
-      _.set(vscode, "workspace.workspaceFolders", []);
-      _.set(vscode, "workspace.workspaceFile", undefined);
+      sandbox.stub(vscode.workspace, "workspaceFolders").value([]);
+      sandbox.stub(vscode.workspace, "workspaceFile").value(undefined);
       windowMock
         .expects("showInformationMessage")
         .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
@@ -383,10 +379,9 @@ describe("vscode-youi-events unit test", () => {
 
     it("on success, module is created", () => {
       eventsMock.expects("doClose");
-      _.set(vscode, "workspace.workspaceFolders", [
-        { uri: { fsPath: "rootFolderPath" } },
-        { uri: { fsPath: "testDestinationRoot" } },
-      ]);
+      sandbox
+        .stub(vscode.workspace, "workspaceFolders")
+        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
       windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated_module).resolves();
       return events.doGeneratorDone(
         true,
@@ -399,10 +394,12 @@ describe("vscode-youi-events unit test", () => {
 
     it("on success, not a module and not a project", () => {
       eventsMock.expects("doClose");
-      _.set(vscode, "workspace.workspaceFolders", [
-        { uri: { fsPath: "rootFolderPath" } },
-        { uri: { fsPath: "testDestinationRoot/../testDestinationRoot" } },
-      ]);
+      sandbox
+        .stub(vscode.workspace, "workspaceFolders")
+        .value([
+          { uri: { fsPath: "rootFolderPath" } },
+          { uri: { fsPath: "testDestinationRoot/../testDestinationRoot" } },
+        ]);
       windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated_files).resolves();
       return events.doGeneratorDone(
         true,
@@ -415,7 +412,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("on success with null targetFolderPath", () => {
       eventsMock.expects("doClose");
-      _.set(vscode, "workspace.workspaceFolders", [{ uri: { fsPath: "rootFolderPath" } }]);
+      sandbox.stub(vscode.workspace, "workspaceFolders").value([{ uri: { fsPath: "rootFolderPath" } }]);
       windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated_files).resolves();
       return events.doGeneratorDone(true, "success message", createAndClose, "files", null);
     });

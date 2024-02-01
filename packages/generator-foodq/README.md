@@ -16,11 +16,11 @@ In the terminal type:
 
 ```sh
 # install yeoman
-npm install -g yo
+yarn global add yo
 # install dependencies of this generator
-npm install
+yarn
 # make this generator available locally
-npm link
+yarn link
 # run this generator
 yo foodq
 ```

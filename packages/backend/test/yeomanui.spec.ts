@@ -778,10 +778,9 @@ describe("yeomanui unit test", () => {
 
     it("generator with type project", async () => {
       envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta.slice(0, 1));
-      _.set(vscode, "workspace.workspaceFolders", [
-        { uri: { fsPath: "rootFolderPath" } },
-        { uri: { fsPath: "testRoot" } },
-      ]);
+      sandbox
+        .stub(vscode.workspace, "workspaceFolders")
+        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testRoot" } }]);
 
       yeomanUi["uiOptions"] = {
         filter: GeneratorFilter.create({ type: "project" }),
@@ -800,10 +799,9 @@ describe("yeomanui unit test", () => {
         description: "test4Description",
       };
       envUtilsMock.expects("getGeneratorsData").withExactArgs().resolves(gensMeta.slice(0, 1));
-      _.set(vscode, "workspace.workspaceFolders", [
-        { uri: { fsPath: "rootFolderPath" } },
-        { uri: { fsPath: "testRoot" } },
-      ]);
+      sandbox
+        .stub(vscode.workspace, "workspaceFolders")
+        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testRoot" } }]);
       wsConfigMock.expects("get").withExactArgs(yeomanUi["TARGET_FOLDER_CONFIG_PROP"]);
       wsConfigMock.expects("get").withExactArgs(yeomanUi["SELECTED_WORKSPACE_CONFIG_PROP"]);
       wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").returns("gen1,gen2,gen3");
