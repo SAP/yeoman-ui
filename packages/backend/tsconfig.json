@@ -15,7 +15,7 @@
     "target": "es6",
     "traceResolution": false,
     "declaration": true,
-    "alwaysStrict": true,
+    "alwaysStrict": true
   },
-  "include": ["src/**/*", "test/**/*", "api.d.ts"],
+  "include": ["src/**/*", "test/**/*", "api.d.ts"]
 }
