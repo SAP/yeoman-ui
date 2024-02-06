@@ -56,7 +56,6 @@ describe("exploregens unit test", () => {
     npmUtilsMock = sandbox.mock(NpmCommand);
     windowMock = sandbox.mock(vscode.window);
     commandsMock = sandbox.mock(vscode.commands);
-    globalStateMock.expects("get").returns(Date.now());
     exploregens = new ExploreGens(childLogger as IChildLogger, _.get(vscode, "context"));
     exploregens["initRpc"](rpc);
   });
@@ -288,14 +287,8 @@ describe("exploregens unit test", () => {
 
   describe("doGeneratorsUpdate", () => {
     it("updateAllInstalledGenerators doesn't called", async () => {
+      workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(true);
       globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(Date.now());
-      await exploregens["doGeneratorsUpdate"]();
-    });
-
-    it("generators auto update is false", async () => {
-      globalStateMock.expects("get").withExactArgs(exploregens["LAST_AUTO_UPDATE_DATE"], 0).returns(100);
-      workspaceConfigMock.expects("get").withExactArgs(exploregens["AUTO_UPDATE"], true).returns(false);
-      globalStateMock.expects("update").withArgs(exploregens["LAST_AUTO_UPDATE_DATE"]);
       await exploregens["doGeneratorsUpdate"]();
     });
 
