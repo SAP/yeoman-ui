@@ -1,0 +1,55 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # Maintain dependencies for npm
+  - package-ecosystem: "npm" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    ignore:
+    - dependency-name: eslint-config-prettier
+      versions: ["8.x", "9.x"]
+    - dependency-name: "@typescript-eslint/*"
+      versions: ["6.x"]
+    - dependency-name: "chai"
+      versions: ["5.x", "6.x"]
+    - dependency-name: "mocha"
+      versions: ["9.x", "10.x"]
+    - dependency-name: "typescript"
+      versions: ["5.x"]
+    
+    directory: "/packages/backend"
+    schedule:
+      interval: "weekly"
+    ignore:
+    - dependency-name: "chalk"
+    - dependency-name: "datauri"
+    - dependency-name: "humanize-string"
+    - dependency-name: "strip-ansi"
+    - dependency-name: "object-hash"
+    - dependency-name: "titleize"
+    - dependency-name: "yeoman-environment"
+    - dependency-name: "ts-node"
+    - dependency-name: "@types/node"
+
+    directory: "/packages/frontend"
+    schedule:
+      interval: "weekly"
+
+    directory: "/packages/types"
+    schedule:
+      interval: "weekly"
+
+    directory: "/packages/generator-foodq"
+    schedule:
+      interval: "weekly"
