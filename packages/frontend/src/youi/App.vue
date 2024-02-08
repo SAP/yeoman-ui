@@ -761,7 +761,7 @@ div.consoleClassVisible .v-footer {
 .error-prompt-message {
   font-size: 14px;
   padding-left: 12px;
-  color: #ff5252;
+  color: var(--vscode-errorForeground, #ff5252);
   vertical-align: middle;
 }
 

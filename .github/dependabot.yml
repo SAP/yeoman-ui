@@ -10,6 +10,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    ignore:
+    - dependency-name: actions/checkout
 
   # Maintain dependencies for npm
   - package-ecosystem: "npm" # See documentation for possible values
@@ -53,3 +55,8 @@ updates:
     directory: "/packages/generator-foodq"
     schedule:
       interval: "weekly"
+    ignore:
+    - dependency-name: "yeoman-generator"
+    - dependency-name: "inquirer"
+    - dependency-name: "chalk-pipe"
+    - dependency-name: "datauri"
