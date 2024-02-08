@@ -179,7 +179,7 @@ class EnvUtil {
 
   public async getGeneratorNamesWithOutdatedVersion(): Promise<string[]> {
     const gensMeta: Environment.LookupGeneratorMeta[] = await this.getGensMetaByInstallationPath();
-    return NpmCommand.getPackageNamesWithOutdatedVersion(gensMeta);
+    return NpmCommand.getPackageNamesWithOutdatedVersion(this.genMainGensMeta(gensMeta));
   }
 
   public getGeneratorFullName(genNamespace: string): string {
