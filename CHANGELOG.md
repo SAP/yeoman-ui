@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.14.4](https://github.com/SAP/yeoman-ui/compare/v1.14.3...v1.14.4) (2024-02-08)
+
+### Bug Fixes
+
+- check for auto update generators only when it enabled ([#799](https://github.com/SAP/yeoman-ui/issues/799)) ([d070065](https://github.com/SAP/yeoman-ui/commit/d070065eb304d9997ddaaf744efd248d6838cfb4))
+- removing unnecessary library (yeoman-ui-frontend) - removing critical security issues ([#808](https://github.com/SAP/yeoman-ui/issues/808)) ([3d4d87d](https://github.com/SAP/yeoman-ui/commit/3d4d87d99c34a6dee0c5c796a26bf132c56d7bd9))
+
 ## [1.14.3](https://github.com/SAP/yeoman-ui/compare/v1.14.2...v1.14.3) (2024-01-31)
 
 ### Bug Fixes
