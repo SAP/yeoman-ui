@@ -102,7 +102,7 @@ div.v-select-list  > div.v-list-item--disabled > .v-subheader{
 
 /* Override error state colors on input components  */
 div.v-messages__message {
-  color: #ff5252;
+  color: var(--vscode-errorForeground, #ff5252);
 }
 /* Have to be important since vuetify itself define this color important */
 /* prevent controls from being red when thet're in error stare */
@@ -114,7 +114,7 @@ div.v-application .error--text {
 form.inquirer-gui .error-validation-text{
   font-size: 12px;
   padding-left: 0px;
-  color: #ff5252;
+  color: var(--vscode-errorForeground, #ff5252);
 }
 
 form.inquirer-gui i.v-theme--light.v-icon {
@@ -130,7 +130,7 @@ form.inquirer-gui i.v-theme--light.v-icon.mdi-radiobox-marked {
 
 .mandatory-asterisk{
   font-size: 14px;
-  color: #ff5252;
+  color: var(--vscode-errorForeground, #ff5252);
 }
 
 .v-input--has-state.error--text .v-label{
