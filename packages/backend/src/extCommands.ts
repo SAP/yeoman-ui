@@ -10,6 +10,19 @@ export class ExtCommands {
     this.context = context;
   }
 
+  // Deconstructor method
+  public dispose() {
+    if (this.yeomanUIPanel) {
+      this.yeomanUIPanel.dispose();
+      this.yeomanUIPanel = null;
+    }
+
+    if (this.exploreGensPanel) {
+      this.exploreGensPanel.dispose();
+      this.exploreGensPanel = null;
+    }
+  }
+
   public registerAndSubscribeCommands() {
     this.registerAndSubscribeCommand("runGenerator", this.yeomanUIPanel_runGenerator_Command.bind(this));
 

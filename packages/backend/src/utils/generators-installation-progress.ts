@@ -52,14 +52,15 @@ export async function notifyGeneratorsInstallationProgress(yeomanUIPanel: Yeoman
     // notify ui on generators are being installed in background (by sending any param - this will be detected as a message of "generators are being installed...")
     void yeomanUIPanel.notifyGeneratorsChange(["installing generators"]);
     // on panel disposed - stop looping in `waitForGeneratorsInstallation` function bellow
-    yeomanUIPanel["webViewPanel"].onDidDispose(() => {
-      internal.panelDisposed = true;
-    });
-
+    if (yeomanUIPanel["webViewPanel"]) {
+      yeomanUIPanel["webViewPanel"].onDidDispose(() => {
+        internal.panelDisposed = true;
+      });
+    }
     await waitForGeneratorsInstallation();
 
     if (internal.retries >= internal.MAX_RETRY) {
-      // generators didn't complete installation after 5 minutes of retries..
+      // generators didn't complete installation after 5 minutes of retries.
       return window.showErrorMessage(messages.timeout_install_generators);
     }
 

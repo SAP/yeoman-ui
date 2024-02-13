@@ -38,9 +38,9 @@ describe("vscode-youi-events unit test", () => {
   };
 
   class TestRpc implements IRpc {
-    public timeout: number;
-    public promiseCallbacks: Map<number, IPromiseCallbacks>;
-    public methods: Map<string, IMethod>;
+    public timeout: number = 0;
+    public promiseCallbacks: Map<number, IPromiseCallbacks> = new Map<number, IPromiseCallbacks>();
+    public methods: Map<string, IMethod> = new Map<string, IMethod>();
     public sendRequest(): void {
       return;
     }
@@ -414,7 +414,7 @@ describe("vscode-youi-events unit test", () => {
       eventsMock.expects("doClose");
       sandbox.stub(vscode.workspace, "workspaceFolders").value([{ uri: { fsPath: "rootFolderPath" } }]);
       windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated_files).resolves();
-      return events.doGeneratorDone(true, "success message", createAndClose, "files", null);
+      return events.doGeneratorDone(true, "success message", createAndClose, "files", undefined);
     });
 
     it("on failure", () => {

@@ -8,20 +8,20 @@ import { createFlowPromise, FlowPromise } from "../utils/promise";
 import * as cheerio from "cheerio";
 
 export abstract class AbstractWebviewPanel {
-  public viewType: string;
+  public viewType!: string;
   protected extensionPath: string;
   protected mediaPath: string;
-  protected viewTitle: string;
-  protected webViewPanel: vscode.WebviewPanel;
-  protected focusedKey: string;
+  protected viewTitle!: string;
+  protected webViewPanel: vscode.WebviewPanel | null = null;
+  protected focusedKey!: string;
   protected htmlFileName: string;
   protected state: unknown;
   protected context: Partial<vscode.ExtensionContext>;
 
   protected readonly logger: IChildLogger;
   protected disposables: vscode.Disposable[];
-  protected rpc: RpcExtension;
-  protected flowPromise: FlowPromise<void>;
+  protected rpc: RpcExtension | null = null;
+  protected flowPromise: FlowPromise<void> | null = null;
   protected viewColumn: vscode.ViewColumn;
 
   public loadWebviewPanel(uiOptions?: any, disposables: vscode.Disposable[] = []): Promise<void> {
@@ -32,13 +32,16 @@ export abstract class AbstractWebviewPanel {
     this.disposables = disposables;
     const webViewPanel = this.createWebviewPanel();
     this.setWebviewPanel(webViewPanel, uiOptions);
-
-    return this.flowPromise.promise;
+    if (this.flowPromise) {
+      return this.flowPromise.promise;
+    } else {
+      return Promise.reject(new Error("flowPromise not initialized"));
+    }
   }
 
   protected constructor(context: Partial<vscode.ExtensionContext>) {
-    this.extensionPath = context.extensionPath;
-    this.mediaPath = join(context.extensionPath, "dist", "media");
+    this.extensionPath = context.extensionPath ?? "";
+    this.mediaPath = join(context.extensionPath ?? "", "dist", "media");
     this.htmlFileName = "index.html";
     this.logger = getClassLogger("AbstractWebviewPanel");
     this.disposables = [];
@@ -74,6 +77,9 @@ export abstract class AbstractWebviewPanel {
   protected initWebviewPanel() {
     // Set the webview's initial html content
     this.initHtmlContent();
+    if (!this.webViewPanel) {
+      return;
+    }
 
     // Set the context (current panel is focused)
     this.setFocused(this.webViewPanel.active);
@@ -83,7 +89,9 @@ export abstract class AbstractWebviewPanel {
     // Update the content based on view changes
     this.webViewPanel.onDidChangeViewState(
       () => {
-        this.setFocused(this.webViewPanel.active);
+        if (this.webViewPanel) {
+          this.setFocused(this.webViewPanel.active);
+        }
       },
       null,
       this.disposables,
@@ -107,9 +115,10 @@ export abstract class AbstractWebviewPanel {
     this.setFocused(false);
 
     // Clean up our resources
-    this.webViewPanel.dispose();
-    this.webViewPanel = null;
-
+    if (this.webViewPanel) {
+      this.webViewPanel.dispose();
+      this.webViewPanel = null;
+    }
     while (this.disposables.length) {
       const x = this.disposables.pop();
       if (x) {
@@ -125,7 +134,7 @@ export abstract class AbstractWebviewPanel {
     if (indexHtml) {
       // Local path to main script run in the webview
       const scriptPathOnDisk = vscode.Uri.file(join(this.mediaPath, sep));
-      const scriptUri = this.webViewPanel.webview.asWebviewUri(scriptPathOnDisk);
+      const scriptUri = this.webViewPanel?.webview.asWebviewUri(scriptPathOnDisk) ?? "";
       const baseUrl = scriptUri.toString();
       const $ = cheerio.load(indexHtml);
 
@@ -142,6 +151,8 @@ export abstract class AbstractWebviewPanel {
       replaceAttributePaths($("[href]"), "href");
       indexHtml = $.html();
     }
-    this.webViewPanel.webview.html = indexHtml;
+    if (this.webViewPanel) {
+      this.webViewPanel.webview.html = indexHtml;
+    }
   }
 }

@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { isEmpty, size, isNil } from "lodash";
+import { size, isNil } from "lodash";
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorOutput } from "./vscode-output";
@@ -114,17 +114,15 @@ export class VSCodeYouiEvents implements YouiEvents {
   }
 
   public showProgress(message?: string): void {
+    const pvtMessage: string = message ?? this.messages.show_progress_message;
     const openOutput: any = this.messages.show_progress_button;
     const buttons: string[] = [];
     buttons.push(openOutput);
-    if (isEmpty(message)) {
-      message = this.messages.show_progress_message;
-    }
-    this.output.appendLine(message);
+    this.output.appendLine(pvtMessage);
     this.logger.debug("Showing Progress.", {
-      notificationMessage: message,
+      notificationMessage: pvtMessage,
     });
-    void vscode.window.showInformationMessage(message, ...buttons).then((selection) => {
+    void vscode.window.showInformationMessage(pvtMessage, ...buttons).then((selection) => {
       if (selection === openOutput) {
         return this.toggleOutput();
       }
@@ -139,7 +137,6 @@ export class VSCodeYouiEvents implements YouiEvents {
   private doClose(): void {
     if (this.webviewPanel) {
       this.webviewPanel.dispose();
-      this.webviewPanel = null;
     }
   }
 

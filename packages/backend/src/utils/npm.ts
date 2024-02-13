@@ -9,7 +9,7 @@ import messages from "../messages";
 import { vscode } from "./vscodeProxy";
 import * as path from "path";
 import * as npmFetch from "npm-registry-fetch";
-import { LookupGeneratorMeta } from "yeoman-environment";
+import { LookupGeneratorMeta } from "yeoman-environment/index";
 import { getConsoleWarnLogger } from "../logger/console-logger";
 import { Constants } from "./constants";
 import { spawn } from "child_process";
@@ -43,14 +43,10 @@ class Command {
   private readonly SET_DEFAULT_LOCATION;
 
   constructor() {
-    this.setGlobalNodeModulesPath();
-    this.SET_DEFAULT_LOCATION = messages.set_default_location(customLocation.DEFAULT_LOCATION);
-  }
-
-  private setGlobalNodeModulesPath() {
     this.globalNodeModulesPathPromise = this.execCommand(`${NPM} root -g`).then((globalNodeModulesPath: string) => {
       return fs.promises.mkdir(globalNodeModulesPath, { recursive: true }).then(() => globalNodeModulesPath);
     });
+    this.SET_DEFAULT_LOCATION = messages.set_default_location(customLocation.DEFAULT_LOCATION);
   }
 
   private getGenLocationParams(): string {
@@ -156,7 +152,7 @@ class Command {
   private async getGlobalPath(): Promise<string> {
     const globalNodeModulesPath = await this.getGlobalNodeModulesPath();
     const globalPathArray = _.split(globalNodeModulesPath, path.join(path.sep, "node_modules"), 1);
-    return _.get(globalPathArray, "[0]");
+    return _.get(globalPathArray, "[0]") ?? "";
   }
 
   public getGlobalNodeModulesPath(): Promise<string> {
@@ -203,7 +199,7 @@ class Command {
     try {
       const output = await this.spawnCommand("node", ["-p", "JSON.stringify(process.versions)"]);
       return JSON.parse(output);
-    } catch (e) {
+    } catch (e: any) {
       getConsoleWarnLogger().error(`Error retrieving NodeJS process versions: ${e.message}`);
       return {} as NodeJS.ProcessVersions;
     }

@@ -1,6 +1,7 @@
 import { SWATracker } from "@sap/swa-for-sapbas-vsx";
 import { IChildLogger } from "@vscode-logging/logger";
 import _ = require("lodash");
+import { ERROR_LOGGER_NOT_INITIALIZED } from "../logger/logger-wrapper";
 
 /**
  * A Simple Wrapper to hold the state of our "singleton" (per extension) SWATracker
@@ -38,7 +39,7 @@ export class SWA {
    */
   public static getSWATracker(): SWATracker {
     if (SWA.isInitialized() === false) {
-      return;
+      throw Error(ERROR_LOGGER_NOT_INITIALIZED);
     }
     return SWA.swaTracker;
   }
@@ -73,8 +74,10 @@ export class SWA {
       if (logger) {
         logger.info(`SAP Web Analytics tracker was created for ${SWA.YEOMAN_UI}`);
       }
-    } catch (error) {
-      logger.error(error);
+    } catch (error: any) {
+      if (logger) {
+        logger.error(error);
+      }
     }
   }
 
@@ -94,8 +97,10 @@ export class SWA {
           });
         }
       }
-    } catch (error) {
-      logger.error(error);
+    } catch (error: any) {
+      if (logger) {
+        logger.error(error);
+      }
     }
   }
 
@@ -132,8 +137,8 @@ export class SWA {
           });
         }
       }
-    } catch (error) {
-      logger.error(error);
+    } catch (error: any) {
+      logger?.error(error);
     }
   }
 
@@ -146,8 +151,8 @@ export class SWA {
           logger.trace("SAP Web Analytics tracker was called", { eventType });
         }
       }
-    } catch (error) {
-      logger.error(error);
+    } catch (error: any) {
+      logger?.error(error);
     }
   }
 
@@ -165,8 +170,8 @@ export class SWA {
           });
         }
       }
-    } catch (error) {
-      logger.error(error);
+    } catch (error: any) {
+      logger?.error(error);
     }
   }
 }

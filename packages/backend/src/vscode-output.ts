@@ -3,7 +3,7 @@ import stripAnsi = require("strip-ansi");
 import { Output } from "./output";
 
 export class GeneratorOutput implements Output {
-  private outputChannel: vscode.OutputChannel;
+  private outputChannel: vscode.OutputChannel | null = null;
   private outputChannels: any;
 
   constructor() {
@@ -21,14 +21,14 @@ export class GeneratorOutput implements Output {
   }
 
   public show() {
-    this.outputChannel.show();
+    if (this.outputChannel) this.outputChannel.show();
   }
 
   public append(value: string) {
-    this.outputChannel.append(stripAnsi(value));
+    if (this.outputChannel) this.outputChannel.append(stripAnsi(value));
   }
 
   public appendLine(value: string) {
-    this.outputChannel.appendLine(stripAnsi(value));
+    if (this.outputChannel) this.outputChannel.appendLine(stripAnsi(value));
   }
 }

@@ -29,7 +29,7 @@
   "main": "./dist/extension",
   "scripts": {
     "bundle": "webpack --mode production",
-    "ci": "npm-run-all clean compile coverage bundle frontend:copy package coverage:copy",
+    "ci": "npm-run-all clean compile bundle frontend:copy package coverage:copy",
     "clean": "shx rm -rf ./dist ./coverage *.vsix",
     "clean:frontend": "cd ./dist && shx rm -rf ./media",
     "compile": "tsc",
@@ -200,7 +200,7 @@
     "strip-ansi": "6.0.0",
     "sudo-prompt": "9.2.1",
     "titleize": "2.1.0",
-    "yeoman-environment": "3.3.0"
+    "yeoman-environment": "4.3.0"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.31",
@@ -213,7 +213,7 @@
     "@types/vscode": "^1.50.0",
     "@types/webpack-env": "^1.16.2",
     "@types/ws": "^7.4.5",
-    "@types/yeoman-environment": "^2.10.3",
+    "@types/yeoman-environment": "^2.10.11",
     "copy-webpack-plugin": "^12.0.2",
     "lcov-result-merger": "5.0.0",
     "sinon": "^17.0.1",

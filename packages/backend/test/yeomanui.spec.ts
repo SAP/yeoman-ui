@@ -63,19 +63,19 @@ describe("yeomanui unit test", () => {
       return;
     }
     public getAppWizard(): AppWizard {
-      return;
+      return new TestAppWizard();
     }
     public executeCommand(): Thenable<any> {
-      return;
+      return Promise.resolve(undefined);
     }
     public setAppWizardHeaderTitle(): void {
       return;
     }
   }
   class TestRpc implements IRpc {
-    public timeout: number;
-    public promiseCallbacks: Map<number, IPromiseCallbacks>;
-    public methods: Map<string, IMethod>;
+    public timeout: number = 0;
+    public promiseCallbacks: Map<number, IPromiseCallbacks> = new Map<number, IPromiseCallbacks>();
+    public methods: Map<string, IMethod> = new Map<string, IMethod>();
     public sendRequest(): void {
       return;
     }
@@ -323,7 +323,7 @@ describe("yeomanui unit test", () => {
   describe("_notifyGeneratorsInstall", () => {
     it("called without args parameter or args = undefined", async () => {
       rpcMock.expects("invoke").withExactArgs("isGeneratorsPrompt").never();
-      await yeomanUi._notifyGeneratorsInstall(undefined, false);
+      await yeomanUi._notifyGeneratorsInstall([], false);
       expect(yeomanUi["uiOptions"].installGens).to.be.undefined;
     });
     it("called with empty args array (install ended) and the prompt is generators", async () => {
@@ -941,7 +941,7 @@ describe("yeomanui unit test", () => {
 
   it("handleErrors", () => {
     const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, flowPromise.state);
-    const env: Environment = Environment.createEnv();
+    const env = Environment.createEnv();
     const envMock = sandbox.mock(env);
     const gen = { on: () => "" };
     const genMock = sandbox.mock(gen);
@@ -960,7 +960,7 @@ describe("yeomanui unit test", () => {
     const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, flowPromise.state);
     yeomanUiInstance["onUncaughtException"] = () => "";
     const onUncaughtExceptionBefore = yeomanUiInstance["onUncaughtException"];
-    const env: Environment = Environment.createEnv();
+    const env = Environment.createEnv();
     const envMock = sandbox.mock(env);
     const gen = { on: () => "" };
     const genMock = sandbox.mock(gen);
@@ -1051,7 +1051,7 @@ describe("yeomanui unit test", () => {
       expect(response.firstName).to.equal(firstName);
     });
 
-    it("with back", async () => {
+    it("with back", async (): Promise<void> => {
       const firstName = "john";
       const country = "denmark";
 
@@ -1070,6 +1070,7 @@ describe("yeomanui unit test", () => {
             country,
           });
         }
+        return Promise.resolve();
       };
       const yeomanUiInstance: YeomanUI = new YeomanUI(
         rpc,
@@ -1094,7 +1095,7 @@ describe("yeomanui unit test", () => {
 
       swaTrackerWrapperMock.expects("updateOneOfPreviousStepsClicked").withArgs("");
 
-      await yeomanUiInstance["back"](undefined, 1);
+      await yeomanUiInstance["back"]({}, 1);
       expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.true;
 
       questions = [{ name: "q1" }];
@@ -1303,7 +1304,7 @@ describe("yeomanui unit test", () => {
       );
       yeomanUiInstance.registerCustomQuestionEventHandler("questionType", "testEvent", testEventFunction);
       yeomanUiInstance["currentQuestions"] = [{ name: "question1", guiType: "questionType" }];
-      const response = await yeomanUiInstance["evaluateMethod"](null, "question1", "testEvent");
+      const response = await yeomanUiInstance["evaluateMethod"]([], "question1", "testEvent");
       expect(response).to.be.true;
     });
 
@@ -1324,7 +1325,7 @@ describe("yeomanui unit test", () => {
           },
         },
       ];
-      const response = await yeomanUiInstance["evaluateMethod"](null, "question1", "method1");
+      const response = await yeomanUiInstance["evaluateMethod"]([], "question1", "method1");
       expect(response).to.be.true;
     });
 
@@ -1337,7 +1338,7 @@ describe("yeomanui unit test", () => {
         GeneratorFilter.create(),
         flowPromise.state,
       );
-      const response = await yeomanUiInstance["evaluateMethod"](null, "question1", "method1");
+      const response = await yeomanUiInstance["evaluateMethod"]([], "question1", "method1");
       expect(response).to.be.undefined;
     });
 
@@ -1351,7 +1352,7 @@ describe("yeomanui unit test", () => {
         flowPromise.state,
       );
       yeomanUiInstance["gen"] = Object.create({});
-      yeomanUiInstance["gen"].options = {};
+      // yeomanUiInstance["gen"]?.options = {};
       yeomanUiInstance["currentQuestions"] = [
         {
           name: "question1",
@@ -1362,8 +1363,8 @@ describe("yeomanui unit test", () => {
       ];
       swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("", false);
       try {
-        await yeomanUiInstance["evaluateMethod"](null, "question1", "method1");
-      } catch (e) {
+        await yeomanUiInstance["evaluateMethod"]([], "question1", "method1");
+      } catch (e: any) {
         expect(e.toString()).to.contain("method1");
       }
     });
@@ -1377,12 +1378,11 @@ describe("yeomanui unit test", () => {
         GeneratorFilter.create(),
         flowPromise.state,
       );
-      yeomanUiInstance["gen"] = Object.create({});
-      yeomanUiInstance["gen"].options = {};
-      yeomanUiInstance["currentQuestions"] = undefined;
+      yeomanUiInstance["gen"] = undefined;
+      // yeomanUiInstance["gen"]?.options = {};
       try {
-        await yeomanUiInstance["evaluateMethod"](null, "question1", "method1");
-      } catch (e) {
+        await yeomanUiInstance["evaluateMethod"]([], "question1", "method1");
+      } catch (e: any) {
         expect(e.toString()).to.contain("method1");
       }
     });

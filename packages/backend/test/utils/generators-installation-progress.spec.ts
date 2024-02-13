@@ -52,7 +52,7 @@ describe("generators installation progress - unit test", () => {
     // --- reset values:
     internal.retries = 0;
     internal.panelDisposed = false;
-    disposeCB = undefined;
+    disposeCB = () => {};
   });
 
   it("notifyGeneratorsInstallationProgress - all generators already installed", async () => {

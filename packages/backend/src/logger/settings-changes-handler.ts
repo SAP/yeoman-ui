@@ -17,7 +17,7 @@ export function listenToLogSettingsChanges(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration(LOGGING_LEVEL_CONFIG_PROP)) {
-        const logLevel: LogLevel = vscode.workspace.getConfiguration().get(LOGGING_LEVEL_CONFIG_PROP);
+        const logLevel: LogLevel = vscode.workspace.getConfiguration().get(LOGGING_LEVEL_CONFIG_PROP) ?? "off";
 
         getLogger().changeLevel(logLevel);
         logLoggerDetails(context, logLevel);
@@ -29,7 +29,8 @@ export function listenToLogSettingsChanges(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration(SOURCE_TRACKING_CONFIG_PROP)) {
-        const newSourceLocationTracking: boolean = vscode.workspace.getConfiguration().get(SOURCE_TRACKING_CONFIG_PROP);
+        const newSourceLocationTracking: boolean =
+          vscode.workspace.getConfiguration().get(SOURCE_TRACKING_CONFIG_PROP) ?? false;
 
         getLogger().changeSourceLocationTracking(newSourceLocationTracking);
       }

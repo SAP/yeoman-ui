@@ -15,7 +15,10 @@
     "target": "es6",
     "traceResolution": false,
     "declaration": true,
-    "alwaysStrict": true
+    "alwaysStrict": true,
+    "paths": {
+      "yeoman-environment/*": ["node_modules/yeoman-environment/*"]
+    }
   },
   "include": ["src/**/*", "test/**/*", "api.d.ts"]
 }

@@ -43,7 +43,12 @@
       "runtimeExecutable": "${execPath}",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}/packages/backend"],
       "outFiles": ["${workspaceFolder}/packages/backend/dist/**/*.js"],
-      "preLaunchTask": "watch backend (webpack)"
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/packages/backend",
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+      //"preLaunchTask": "watch backend (webpack)"
     },
     {
       "name": "Test extension",

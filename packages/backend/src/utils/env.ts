@@ -4,21 +4,27 @@ import * as path from "path";
 import { existsSync } from "fs";
 import { isWin32, NpmCommand } from "./npm";
 import * as customLocation from "./customLocation";
-import * as Environment from "yeoman-environment";
-import TerminalAdapter = require("yeoman-environment/lib/adapter");
 import { IChildLogger } from "@vscode-logging/logger";
 import { getClassLogger } from "../logger/logger-wrapper";
+import {
+  Options,
+  LookupGeneratorMeta,
+  namespaceToName,
+  LookupOptions,
+  Adapter,
+  createEnv,
+} from "yeoman-environment/index";
 
 const GENERATOR = "generator-";
 const NAMESPACE = "namespace";
 
 export type EnvGen = {
-  env: Environment<Environment.Options>;
+  env: any;
   gen: any;
 };
 
 export type GeneratorData = {
-  generatorMeta: Environment.LookupGeneratorMeta;
+  generatorMeta: LookupGeneratorMeta;
   generatorPackageJson: any;
 };
 
@@ -29,9 +35,9 @@ export class GeneratorNotFoundError extends Error {
 }
 
 class EnvUtil {
-  private logger: IChildLogger;
-  private existingNpmPathsPromise: Promise<string[]>;
-  private allInstalledGensMeta: Environment.LookupGeneratorMeta[];
+  private logger!: IChildLogger;
+  private existingNpmPathsPromise!: Promise<string[]>;
+  private allInstalledGensMeta: LookupGeneratorMeta[] = [];
 
   constructor() {
     try {
@@ -43,7 +49,7 @@ class EnvUtil {
   }
 
   public loadNpmPath(force = false) {
-    if (_.isNil(this.existingNpmPathsPromise) || force === true) {
+    if (_.isNil(this.existingNpmPathsPromise) || force) {
       this.existingNpmPathsPromise = this.getExistingNpmPath().then((paths) => {
         this.logger?.debug("existing npm paths", { paths: paths.join(";") });
         return paths;
@@ -77,20 +83,17 @@ class EnvUtil {
     return _.uniq(paths);
   }
 
-  private createEnvInstance(
-    args?: string | string[],
-    opts?: Environment.Options,
-    adapter?: TerminalAdapter,
-  ): Environment<Environment.Options> {
-    return Environment.createEnv(args, opts, adapter);
+  private createEnvInstance(args?: string | string[], opts?: Options, adapter?: Adapter) {
+    return createEnv(args, opts, adapter);
   }
 
   private unloadGeneratorModules(genNamespace: string): void {
-    let generatorName;
-    const genShortName = Environment.namespaceToName(genNamespace);
+    let generatorName: string;
+    const genShortName = namespaceToName(genNamespace);
     if (genShortName.startsWith("@")) {
-      const firstSlashIndex = genShortName.indexOf("/");
-      generatorName = `${GENERATOR}${genShortName.substring(firstSlashIndex + 1)}`;
+      const firstSlashIndex: number = genShortName.indexOf("/");
+      const firstSlashIndexPlusOne: number = firstSlashIndex + 1;
+      generatorName = `${GENERATOR}${genShortName.substring(firstSlashIndexPlusOne)}`;
     } else {
       generatorName = `${GENERATOR}${genShortName}`;
     }
@@ -103,13 +106,13 @@ class EnvUtil {
     }
   }
 
-  private lookupGensMeta(options?: Environment.LookupOptions): Environment.LookupGeneratorMeta[] {
+  private lookupGensMeta(options?: LookupOptions): LookupGeneratorMeta[] {
     return this.createEnvInstance().lookup(options);
   }
 
   // returns installed generators meta from global and custom installation location
   // custom installation generators have priority over global installed generators when names are identical
-  private async lookupAllGensMeta(): Promise<Environment.LookupGeneratorMeta[]> {
+  private async lookupAllGensMeta(): Promise<LookupGeneratorMeta[]> {
     const globallyInstalledGensMeta = this.lookupGensMeta({ npmPaths: await this.existingNpmPathsPromise });
 
     const customNpmPath = customLocation.getNodeModulesPath();
@@ -119,7 +122,7 @@ class EnvUtil {
     return _.orderBy(gensMeta, [NAMESPACE], ["asc"]);
   }
 
-  private async getGenMetadata(genNamespace: string): Promise<Environment.LookupGeneratorMeta> {
+  private async getGenMetadata(genNamespace: string): Promise<LookupGeneratorMeta> {
     this.allInstalledGensMeta = await this.lookupAllGensMeta();
 
     const genMetadata = this.allInstalledGensMeta.find((genMeta) => genMeta.namespace === genNamespace);
@@ -130,41 +133,37 @@ class EnvUtil {
     throw new GeneratorNotFoundError(`${genNamespace} generator metadata was not found.`);
   }
 
-  private genMainGensMeta(gensMeta: Environment.LookupGeneratorMeta[]): Environment.LookupGeneratorMeta[] {
+  private genMainGensMeta(gensMeta: LookupGeneratorMeta[]): LookupGeneratorMeta[] {
     return gensMeta.filter((genMeta) => genMeta.namespace.endsWith(":app"));
   }
 
-  private async getGensMetaByInstallationPath(): Promise<Environment.LookupGeneratorMeta[]> {
+  private async getGensMetaByInstallationPath(): Promise<LookupGeneratorMeta[]> {
     const npmInstallationPaths = [customLocation.getNodeModulesPath() ?? (await NpmCommand.getGlobalNodeModulesPath())];
     return this.lookupGensMeta({ npmPaths: npmInstallationPaths });
   }
 
-  private async getGeneratorsMeta(mainOnly = true): Promise<Environment.LookupGeneratorMeta[]> {
+  private async getGeneratorsMeta(mainOnly = true): Promise<LookupGeneratorMeta[]> {
     this.allInstalledGensMeta = await this.lookupAllGensMeta();
     return mainOnly ? this.genMainGensMeta(this.allInstalledGensMeta) : this.allInstalledGensMeta;
   }
 
   public async getAllGeneratorNamespaces(): Promise<string[]> {
-    const gensMeta: Environment.LookupGeneratorMeta[] = await this.getGeneratorsMeta(false);
+    const gensMeta: LookupGeneratorMeta[] = await this.getGeneratorsMeta(false);
     return _.map(gensMeta, (genMeta) => genMeta.namespace);
   }
 
   public async createEnvAndGen(genNamespace: string, options: any, adapter: any): Promise<EnvGen> {
-    const meta: Environment.LookupGeneratorMeta = await this.getGenMetadata(genNamespace);
+    const meta: LookupGeneratorMeta = await this.getGenMetadata(genNamespace);
     this.unloadGeneratorModules(genNamespace);
-    const env: Environment<Environment.Options> = this.createEnvInstance(
-      undefined,
-      { sharedOptions: { forwardErrorToEnvironment: true } },
-      adapter,
-    );
+    const env = this.createEnvInstance(undefined, { sharedOptions: { forwardErrorToEnvironment: true } }, adapter);
     // @types/yeoman-environment bug: generatorPath is still not exposed on LookupGeneratorMeta
-    env.register(_.get(meta, "generatorPath"), genNamespace, meta.packagePath);
+    env.register(_.get(meta, "generatorPath") ?? "", genNamespace, meta.packagePath);
     const gen = env.create(genNamespace, { options } as any);
     return { env, gen };
   }
 
   public async getGeneratorsData(mainOnly = true): Promise<GeneratorData[]> {
-    const gensMeta: Environment.LookupGeneratorMeta[] = await this.getGeneratorsMeta(mainOnly);
+    const gensMeta: LookupGeneratorMeta[] = await this.getGeneratorsMeta(mainOnly);
     const packageJsons = await NpmCommand.getPackageJsons(gensMeta);
 
     const gensData = packageJsons.map((generatorPackageJson: any | undefined, index: number) => {
@@ -178,12 +177,12 @@ class EnvUtil {
   }
 
   public async getGeneratorNamesWithOutdatedVersion(): Promise<string[]> {
-    const gensMeta: Environment.LookupGeneratorMeta[] = await this.getGensMetaByInstallationPath();
+    const gensMeta: LookupGeneratorMeta[] = await this.getGensMetaByInstallationPath();
     return NpmCommand.getPackageNamesWithOutdatedVersion(this.genMainGensMeta(gensMeta));
   }
 
   public getGeneratorFullName(genNamespace: string): string {
-    const genName = Environment.namespaceToName(genNamespace);
+    const genName = namespaceToName(genNamespace);
     const parts = _.split(genName, "/");
     return _.size(parts) === 1 ? `${GENERATOR}${genName}` : `${parts[0]}/${GENERATOR}${parts[1]}`;
   }

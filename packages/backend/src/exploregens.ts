@@ -22,9 +22,9 @@ export enum GenState {
 
 export class ExploreGens {
   private readonly logger: IChildLogger;
-  private rpc: Partial<IRpc>;
+  private rpc: Partial<IRpc> | undefined;
   private gensBeingHandled: any[]; // eslint-disable-line @typescript-eslint/prefer-readonly
-  private cachedGeneratorsDataPromise: Promise<GeneratorData[]>;
+  private cachedGeneratorsDataPromise: Promise<GeneratorData[]> | undefined;
   private readonly context: any;
 
   private readonly GLOBAL_ACCEPT_LEGAL_NOTE = "global.exploreGens.acceptlegalNote";
@@ -46,7 +46,7 @@ export class ExploreGens {
   }
 
   public setGenFilter(genFullName: string) {
-    return this.rpc.invoke("setGenQuery", [genFullName]);
+    return this.rpc?.invoke?.("setGenQuery", [genFullName]);
   }
 
   private getGeneratorsData(): Promise<GeneratorData[]> {
@@ -54,7 +54,7 @@ export class ExploreGens {
   }
 
   private getInstalledGens(): Promise<GeneratorData[]> {
-    return this.cachedGeneratorsDataPromise;
+    return this.cachedGeneratorsDataPromise ?? Promise.resolve([]);
   }
 
   private setInstalledGens() {
@@ -82,7 +82,7 @@ export class ExploreGens {
           await this.updateAllInstalledGenerators();
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       this.showAndLogError(messages.failed_to_update_gens(), error);
     }
   }
@@ -93,14 +93,14 @@ export class ExploreGens {
 
   private initRpc(rpc: Partial<IRpc>) {
     this.rpc = rpc;
-    this.rpc.registerMethod({ func: this.getFilteredGenerators, thisArg: this });
-    this.rpc.registerMethod({ func: this.update, thisArg: this });
-    this.rpc.registerMethod({ func: this.install, thisArg: this });
-    this.rpc.registerMethod({ func: this.uninstall, thisArg: this });
-    this.rpc.registerMethod({ func: this.getRecommendedQuery, thisArg: this });
-    this.rpc.registerMethod({ func: this.getIsInBAS, thisArg: this });
-    this.rpc.registerMethod({ func: this.isLegalNoteAccepted, thisArg: this });
-    this.rpc.registerMethod({ func: this.acceptLegalNote, thisArg: this });
+    this.rpc.registerMethod?.({ func: this.getFilteredGenerators, thisArg: this });
+    this.rpc.registerMethod?.({ func: this.update, thisArg: this });
+    this.rpc.registerMethod?.({ func: this.install, thisArg: this });
+    this.rpc.registerMethod?.({ func: this.uninstall, thisArg: this });
+    this.rpc.registerMethod?.({ func: this.getRecommendedQuery, thisArg: this });
+    this.rpc.registerMethod?.({ func: this.getIsInBAS, thisArg: this });
+    this.rpc.registerMethod?.({ func: this.isLegalNoteAccepted, thisArg: this });
+    this.rpc.registerMethod?.({ func: this.acceptLegalNote, thisArg: this });
   }
 
   private async updateAllInstalledGenerators() {
@@ -132,7 +132,11 @@ export class ExploreGens {
       const genName = meta.package.name;
       const installedGenData = gensData.find((genData) => genData.generatorPackageJson.name === genName);
       meta.state = !!installedGenData ? GenState.installed : GenState.notInstalled;
-      if (meta.state === GenState.installed && meta.package.version !== installedGenData.generatorPackageJson.version) {
+      if (
+        meta.state === GenState.installed &&
+        installedGenData &&
+        meta.package.version !== installedGenData.generatorPackageJson.version
+      ) {
         meta.state = GenState.outdated;
       }
       meta.disabledToHandle = false;
@@ -190,7 +194,7 @@ export class ExploreGens {
       vscode.window.showInformationMessage(successMessage);
       this.updateBeingHandledGenerator(genName, GenState.installed);
       await this.notifyGeneratorsChange();
-    } catch (error) {
+    } catch (error: any) {
       this.showAndLogError(messages.failed_to_install(genName), error);
       this.updateBeingHandledGenerator(genName, GenState.notInstalled);
     } finally {
@@ -213,7 +217,7 @@ export class ExploreGens {
       vscode.window.showInformationMessage(successMessage);
       this.updateBeingHandledGenerator(genName, GenState.notInstalled);
       await this.notifyGeneratorsChange();
-    } catch (error) {
+    } catch (error: any) {
       this.showAndLogError(messages.failed_to_uninstall(genName), error);
       this.updateBeingHandledGenerator(genName, GenState.installed);
     } finally {
@@ -233,7 +237,7 @@ export class ExploreGens {
       await NpmCommand.install(genName);
       this.logger.debug(messages.updated(genName));
       this.updateBeingHandledGenerator(genName, GenState.installed);
-    } catch (error) {
+    } catch (error: any) {
       this.updateBeingHandledGenerator(genName, GenState.notInstalled);
       if (isAutoUpdate) {
         this.logger.error(this.getErrorMessage(error));
@@ -255,8 +259,8 @@ export class ExploreGens {
 
   private updateBeingHandledGenerator(genName: string, state: GenState) {
     try {
-      void this.rpc?.invoke("updateBeingHandledGenerator", [genName, state]);
-    } catch (error) {
+      void this.rpc?.invoke?.("updateBeingHandledGenerator", [genName, state]);
+    } catch (error: any) {
       // error could happen in case that panel was closed by an user but action is still in progress
       // in this case webview is already disposed
       this.logger.debug(this.getErrorMessage(error));

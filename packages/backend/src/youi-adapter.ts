@@ -5,6 +5,7 @@ import { isFunction, get } from "lodash";
 const chalk = require("chalk");
 import { Questions } from "yeoman-environment/lib/adapter";
 import { Output } from "./output";
+import { Answers } from "yeoman-environment/index";
 
 export class YouiAdapter {
   private yeomanui: YeomanUI;
@@ -12,7 +13,10 @@ export class YouiAdapter {
   constructor(
     private readonly youiEvents: YouiEvents,
     private readonly output: Output,
-  ) {}
+    yeomanui: YeomanUI,
+  ) {
+    this.yeomanui = yeomanui;
+  }
 
   public log() {
     console.log(arguments);
@@ -39,15 +43,18 @@ export class YouiAdapter {
    * @param {Array} questions
    * @param {Function} callback
    */
-  public async prompt<T1, T2>(questions: Questions<T1>, cb?: (res: T1) => T2): Promise<T2> {
+  public async prompt<T1 extends Answers, T2 extends Answers>(
+    questions: Questions<T1>,
+    cb?: (res: T1) => T2,
+  ): Promise<T2 | undefined> {
     if (this.yeomanui && questions) {
-      const result: any = await (this.yeomanui.showPrompt(questions) as Promise<T2>);
+      const result: any = await (this.yeomanui.showPrompt(questions) as Promise<T1>);
       if (isFunction(cb)) {
         try {
-          return await cb(result); // eslint-disable-line @typescript-eslint/await-thenable
+          return await cb(result);
         } catch (err) {
           this.youiEvents.doGeneratorDone(false, get(err, "message", "Template Wizard detected an error"), "", "files");
-          return;
+          return undefined;
         }
       }
 

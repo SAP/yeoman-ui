@@ -248,7 +248,7 @@ describe("YeomanUIPanel unit test", () => {
           defaultUri: vscode.Uri.file(join(homedir())),
         })
         .resolves([selected]);
-      expect(await panel["showOpenDialog"](undefined, canSelectFiles)).to.equal(selected.fsPath);
+      expect(await panel["showOpenDialog"]("", canSelectFiles)).to.equal(selected.fsPath);
     });
 
     it("showOpenDialog - path provided", async () => {

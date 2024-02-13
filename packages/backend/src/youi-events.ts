@@ -10,7 +10,7 @@ export interface YouiEvents {
   ): void;
   doGeneratorInstall(): void;
   showProgress(message?: string): void;
-  getAppWizard(): AppWizard;
+  getAppWizard(): AppWizard | null;
   executeCommand(id: string, ...args: any[]): Thenable<any>;
   setAppWizardHeaderTitle(title: string, info?: string): void;
 }

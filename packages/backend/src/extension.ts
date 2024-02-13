@@ -18,7 +18,7 @@ export function activate(context: ExtensionContext) {
   try {
     createExtensionLoggerAndSubscribeToLogSettingsChanges(context);
     SWA.createSWATracker(getLogger());
-  } catch (error) {
+  } catch (error: any) {
     console.error("Extension activation failed.", error.message);
     return;
   }
@@ -39,5 +39,5 @@ export function activate(context: ExtensionContext) {
 }
 
 export function deactivate() {
-  extCommands = null;
+  extCommands.dispose();
 }

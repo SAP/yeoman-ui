@@ -16,7 +16,7 @@ export class ServerYouiEvents implements YouiEvents {
     return Promise.resolve();
   }
 
-  getAppWizard(): AppWizard {
+  getAppWizard(): AppWizard | null {
     return null;
   }
 

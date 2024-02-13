@@ -22,12 +22,14 @@ const getAbsoluteCustomPath = (): string | undefined => {
   return customPath;
 };
 
-const isCustomPathExist = (customPath: string) => {
-  const exists = existsSync(customPath);
-  return exists;
+const isCustomPathExist = (customPath: string | undefined) => {
+  if (!customPath) {
+    return false;
+  }
+  return existsSync(customPath);
 };
 
-export const getPath = (): string => {
+export const getPath = (): string | undefined => {
   const customPath = getAbsoluteCustomPath();
   return isCustomPathExist(customPath) ? trim(customPath) : undefined;
 };
@@ -35,11 +37,11 @@ export const getPath = (): string => {
 export const DEFAULT_LOCATION = path.join(homedir(), ".application_wizard", "generators");
 
 export const getNodeModulesPath = (): string => {
-  const customPath: string = getPath();
-  if (!isEmpty(customPath)) {
-    const customNodeModulesPath = path.join(customPath, "node_modules");
-    return customNodeModulesPath;
+  const customPath: string | undefined = getPath();
+  if (!isEmpty(customPath) && customPath) {
+    return path.join(customPath, "node_modules");
   }
+  return "";
 };
 
 export const setDefaultPath = (): Thenable<void> => {

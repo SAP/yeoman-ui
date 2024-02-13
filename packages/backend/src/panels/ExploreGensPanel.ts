@@ -31,9 +31,9 @@ export class ExploreGensPanel extends AbstractWebviewPanel {
       try {
         await this.exploreGens.setGenFilter(genFullName);
         await this.exploreGens.install(uiOptions);
-        this.flowPromise.state.resolve();
+        if (this.flowPromise) this.flowPromise.state.resolve();
       } catch (error) {
-        this.flowPromise.state.reject(error);
+        if (this.flowPromise) this.flowPromise.state.reject(error);
       }
     }
   }

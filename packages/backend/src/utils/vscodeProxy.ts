@@ -10,7 +10,7 @@ export const getVscode = () => {
   }
 };
 
-const filename: string = require.main.filename;
+const filename: string = require.main?.filename ?? "";
 const _isInTest = filename.includes(join("node_modules", "mocha"));
 
 const returnValue = (...args: any[]) => {

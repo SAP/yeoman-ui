@@ -1,7 +1,7 @@
 <template>
   <v-app id="app" class="vld-parent">
     <loading
-      v-model:active="showBusyIndicator"
+      v-model="showBusyIndicator"
       :is-full-page="true"
       :height="64"
       :width="64"
@@ -600,7 +600,8 @@ export default {
     getVsCodeApi() {
       if (this.isInVsCode()) {
         if (!window.vscode) {
-          // eslint-disable-next-line
+          // eslint-disable-next-line eslint-comments/no-unlimited-disable
+          // eslint-disable-next-line no-undef
           window.vscode = acquireVsCodeApi();
         }
 

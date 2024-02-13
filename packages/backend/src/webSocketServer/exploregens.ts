@@ -6,8 +6,8 @@ import { getConsoleWarnLogger } from "../logger/console-logger";
 import { vscode } from "../utils/vscodeProxy";
 
 class ExploreGensWebSocketServer {
-  private rpc: RpcExtensionWebSockets;
-  private exploreGens: ExploreGens;
+  private rpc: RpcExtensionWebSockets | null = null;
+  private exploreGens: ExploreGens | null = null;
 
   init() {
     // web socket server

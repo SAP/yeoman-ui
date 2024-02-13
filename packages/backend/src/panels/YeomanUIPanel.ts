@@ -87,12 +87,18 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
     const filter = GeneratorFilter.create(get(uiOptions, "filter"));
     const generator = get(uiOptions, "generator");
 
+    if (!this.webViewPanel) {
+      return;
+    }
     this.rpc = new RpcExtension(this.webViewPanel.webview, getWebviewRpcLibraryLogger());
     this.output.setChannelName(`${YeomanUIPanel.YEOMAN_UI}.${this.messages.channel_name}`);
     const vscodeYouiEvents: YouiEvents = new VSCodeYouiEvents(this.rpc, this.webViewPanel, this.messages, this.output);
 
     this.initWebviewPanel();
 
+    if (!this.flowPromise) {
+      return;
+    }
     this.yeomanui = new YeomanUI(
       this.rpc,
       vscodeYouiEvents,
@@ -111,7 +117,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
     this.yeomanui.registerCustomQuestionEventHandler("folder-browser", "getPath", this.showOpenFolderDialog.bind(this));
   }
 
-  private yeomanui: YeomanUI;
+  private yeomanui: YeomanUI | null = null;
   private messages: any;
   private installGens: any;
   private readonly output: GeneratorOutput;
@@ -167,7 +173,9 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 
   public initWebviewPanel() {
     super.initWebviewPanel();
-    this.webViewPanel.title = this.messages.panel_title;
+    if (this.webViewPanel) {
+      this.webViewPanel.title = this.messages.panel_title;
+    }
     void notifyGeneratorsInstallationProgress(this);
   }
 }

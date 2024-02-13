@@ -6,6 +6,7 @@ import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { SWA } from "../src/swa-tracker/swa-tracker-wrapper";
 import * as shellJsWorkarounds from "../src/utils/shellJsWorkarounds";
 import { vscode } from "./mockUtil";
+import { ExtensionContext } from "vscode";
 
 describe("extension unit test", () => {
   let sandbox: SinonSandbox;
@@ -62,7 +63,7 @@ describe("extension unit test", () => {
         .expects("createExtensionLoggerAndSubscribeToLogSettingsChanges")
         .throws(new Error("activation error"));
       consoleMock.expects("error").withExactArgs("Extension activation failed.", "activation error");
-      extension.activate(null);
+      extension.activate(testContext);
     });
   });
 

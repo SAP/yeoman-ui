@@ -4,11 +4,12 @@ import { expect } from "chai";
 import { YouiEvents } from "../src/youi-events";
 import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorFilter } from "../src/filter";
-import { AppWizard } from "@sap-devx/yeoman-ui-types";
+import { AppWizard, MessageType, Severity } from "@sap-devx/yeoman-ui-types";
 import { YouiAdapter } from "../src/youi-adapter";
 import { YeomanUI } from "../src/yeomanui";
 import messages from "../src/messages";
 import { createFlowPromise } from "../src/utils/promise";
+import { VSCodeYouiEvents } from "../src/vscode-youi-events";
 
 describe("YouiAdapter", () => {
   class TestEvents implements YouiEvents {
@@ -22,20 +23,38 @@ describe("YouiAdapter", () => {
       return;
     }
     public getAppWizard(): AppWizard {
-      return;
+      return new TestAppWizard();
     }
     public executeCommand(): Thenable<any> {
-      return;
+      return Promise.resolve(null);
     }
     public setAppWizardHeaderTitle(): void {
       return;
     }
   }
 
+  class TestAppWizard extends AppWizard {
+    public showError(): void {
+      return;
+    }
+    public showWarning(): void {
+      return;
+    }
+    public showInformation(): void {
+      return;
+    }
+    public showProgress(): void {
+      return;
+    }
+    public setHeaderTitle(): void {
+      return;
+    }
+  }
+
   class TestRpc implements IRpc {
-    public timeout: number;
-    public promiseCallbacks: Map<number, IPromiseCallbacks>;
-    public methods: Map<string, IMethod>;
+    public timeout: number = 0;
+    public promiseCallbacks: Map<number, IPromiseCallbacks> = new Map<number, IPromiseCallbacks>();
+    public methods: Map<string, IMethod> = new Map<string, IMethod>();
     public sendRequest(): void {
       return;
     }
@@ -113,10 +132,9 @@ describe("YouiAdapter", () => {
         }
       };
 
-      const youiAdapter = new YouiAdapter(youiEvents, outputChannel);
-      youiAdapter.setYeomanUI(yeomanUi);
+      const youiAdapter = new YouiAdapter(youiEvents, outputChannel, yeomanUi);
       const questions = [{ name: "q1" }];
-      const response: any = await youiAdapter.prompt(questions, null);
+      const response: any = await youiAdapter.prompt(questions);
       expect(response.firstName).to.equal(firstName);
       expect(response.lastName).to.equal(lastName);
     });

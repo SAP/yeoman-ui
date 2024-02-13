@@ -18,12 +18,12 @@ import { Output } from "./output";
 import { resolve } from "path";
 import { Env, EnvGen, GeneratorData, GeneratorNotFoundError } from "./utils/env";
 import { vscode, getVscode } from "./utils/vscodeProxy";
-import * as Generator from "yeoman-generator";
-import * as Environment from "yeoman-environment";
+import * as Generator from "yeoman-generator/index";
 import { Questions } from "yeoman-environment/lib/adapter";
 import { State } from "./utils/promise";
 import { Constants } from "./utils/constants";
 import { isEmpty } from "lodash";
+import { Answers, namespaceToName } from "yeoman-environment/index";
 
 export interface IQuestionsPrompt extends IPrompt {
   questions: any[];
@@ -39,7 +39,7 @@ export class YeomanUI {
   }
 
   private uiOptions: any; // eslint-disable-line @typescript-eslint/prefer-readonly
-  private cwd: string;
+  private cwd: string = "";
   private readonly rpc: IRpc;
   private readonly youiEvents: YouiEvents;
   private readonly output: Output;
@@ -62,7 +62,7 @@ export class YeomanUI {
   private readonly TARGET_FOLDER_CONFIG_PROP = "ApplicationWizard.TargetFolder";
   private readonly SELECTED_WORKSPACE_CONFIG_PROP = "ApplicationWizard.Workspace";
   private readonly HIDE_GENERATORS_PROP = "ApplicationWizard.HideGenerator";
-  private onUncaughtException: (e: Error) => void;
+  private onUncaughtException!: (e: Error) => void;
 
   constructor(
     rpc: IRpc,
@@ -95,8 +95,7 @@ export class YeomanUI {
 
     this.initialCwd = process.cwd();
     this.uiOptions = uiOptions;
-    this.youiAdapter = new YouiAdapter(youiEvents, output);
-    this.youiAdapter.setYeomanUI(this);
+    this.youiAdapter = new YouiAdapter(youiEvents, output, this);
     this.promptCount = 0;
     this.currentQuestions = {};
     this.customQuestionEventHandlers = new Map();
@@ -128,9 +127,10 @@ export class YeomanUI {
   }
 
   private showGeneratorsInstallingMessage() {
-    this.youiEvents
-      .getAppWizard()
-      .showWarning(this.uiOptions.messages.generators_are_being_installed, MessageType.prompt);
+    const appWizard = this.youiEvents.getAppWizard();
+    if (appWizard) {
+      appWizard.showWarning(this.uiOptions.messages.generators_are_being_installed, MessageType.prompt);
+    }
   }
 
   private hideGeneratorsInstallingMessage() {
@@ -140,10 +140,11 @@ export class YeomanUI {
   // eslint-disable-next-line @typescript-eslint/ban-types
   public registerCustomQuestionEventHandler(questionType: string, methodName: string, handler: Function): void {
     // eslint-disable-next-line @typescript-eslint/ban-types
-    let entry: Map<string, Function> = this.customQuestionEventHandlers.get(questionType);
+    let entry: Map<string, Function> =
+      this.customQuestionEventHandlers.get(questionType) ?? new Map<string, Function>();
     if (entry === undefined) {
       this.customQuestionEventHandlers.set(questionType, new Map());
-      entry = this.customQuestionEventHandlers.get(questionType);
+      entry = this.customQuestionEventHandlers.get(questionType) ?? new Map<string, Function>();
     }
     entry.set(methodName, handler);
   }
@@ -236,7 +237,7 @@ export class YeomanUI {
       await envGen.env.runGenerator(envGen.gen);
       if (!this.errorThrown) {
         // Without resolve this code worked only for absolute paths without / at the end.
-        // Generator can put a relative path, path including . and .. and / at the end.
+        // Generator can put a relative path, path including . and ... and / at the end.
         const dirsAfter = await this.getChildDirectories(resolve(this.getCwd(), this.gen.destinationRoot()));
         this.onGeneratorSuccess(generatorNamespace, dirsBefore, dirsAfter);
       }
@@ -255,7 +256,7 @@ export class YeomanUI {
   }
 
   private resetHeaderTitle(): void {
-    void this.youiEvents.setAppWizardHeaderTitle(undefined);
+    void this.youiEvents.setAppWizardHeaderTitle("");
   }
 
   private setGenInWriting(gen: any) {
@@ -270,9 +271,9 @@ export class YeomanUI {
     gen.on(`method:${genMethodName}`, () => this.rpc.invoke(uiRpcMethodName, [true]));
   }
 
-  private handleErrors(env: Environment, gen: any, generatorName: string) {
+  private handleErrors(env: any, gen: any, generatorName: string) {
     const errorEventName = "error";
-    env.on(errorEventName, (error) => {
+    env.on(errorEventName, (error: any) => {
       env.removeAllListeners(errorEventName);
       this.onGeneratorFailure(generatorName, this.getErrorWithAdditionalInfo(error, `env.on(${errorEventName})`));
       env.emit(errorEventName, error);
@@ -310,14 +311,15 @@ export class YeomanUI {
         if (relevantQuestion) {
           const guiType = _.get(relevantQuestion, "guiOptions.type", relevantQuestion.guiType);
           // eslint-disable-next-line @typescript-eslint/ban-types
-          const customQuestionEventHandler: Function = this.getCustomQuestionEventHandler(guiType, methodName);
+          const customQuestionEventHandler: Function =
+            this.getCustomQuestionEventHandler(guiType, methodName) ?? new Function();
           return _.isUndefined(customQuestionEventHandler)
             ? await relevantQuestion[methodName].apply(this.gen, params)
             : await customQuestionEventHandler.apply(this.gen, params);
         }
       }
     } catch (error) {
-      const questionInfo = `Could not update method '${methodName}' in '${questionName}' question in generator '${this.gen.options.namespace}'`;
+      const questionInfo = `Could not update method '${methodName}' in '${questionName}' question in generator '${this.gen?.options.namespace}'`;
       const errorMessage = this.logError(this.getErrorWithAdditionalInfo(error, "evaluateMethod()"), questionInfo);
       this.onGeneratorFailure(this.generatorName, errorMessage);
     }
@@ -386,7 +388,7 @@ export class YeomanUI {
     return answers;
   }
 
-  private async back(partialAnswers: Environment.Answers, numOfSteps: number): Promise<void> {
+  private async back(partialAnswers: Answers, numOfSteps: number): Promise<void> {
     SWA.updateOneOfPreviousStepsClicked(this.generatorName, this.logger);
     this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
     return this.runGenerator(this.generatorName);
@@ -397,9 +399,10 @@ export class YeomanUI {
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
-  private getCustomQuestionEventHandler(questionType: string, methodName: string): Function {
+  private getCustomQuestionEventHandler(questionType: string, methodName: string): Function | undefined {
     // eslint-disable-next-line @typescript-eslint/ban-types
-    const entry: Map<string, Function> = this.customQuestionEventHandlers.get(questionType);
+    const entry: Map<string, Function> =
+      this.customQuestionEventHandlers.get(questionType) ?? new Map<string, Function>();
     if (entry !== undefined) {
       return entry.get(methodName);
     }
@@ -411,7 +414,7 @@ export class YeomanUI {
   }
 
   private onGeneratorSuccess(generatorName: string, resourcesBeforeGen?: any, resourcesAfterGen?: any) {
-    let targetFolderPath: string = null;
+    let targetFolderPath: string = "";
     // All the paths here absolute normilized paths.
     const targetFolderPathBeforeGen: string = _.get(resourcesBeforeGen, "targetFolderPath");
     const targetFolderPathAfterGen: string = _.get(resourcesAfterGen, "targetFolderPath");
@@ -436,7 +439,7 @@ export class YeomanUI {
       targetFolderPath = targetFolderPathAfterGen;
     }
 
-    const type: string = this.typesMap.has(generatorName) ? this.typesMap.get(generatorName) : "files";
+    const type: string = this.typesMap.get(generatorName) ?? "files";
     // For now - A Fiori project is supposed to create the project and not open it
     const ignoreGen: boolean = this.generatorsToIgnoreArray.includes(generatorName);
     const selectedWorkspace: string =
@@ -579,12 +582,12 @@ export class YeomanUI {
 
     try {
       genImageUrl = await datauri(path.join(genPackagePath, YeomanUI.YEOMAN_PNG));
-    } catch (error) {
+    } catch (error: any) {
       genImageUrl = defaultImage.default;
       this.logger.debug(error);
     }
 
-    const genName = Environment.namespaceToName(genNamespace);
+    const genName = namespaceToName(genNamespace);
     const genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
     const genDisplayName = _.get(packageJson, "displayName", "");
     const genPrettyName = _.isEmpty(genDisplayName) ? titleize(humanizeString(genName)) : genDisplayName;
@@ -609,7 +612,7 @@ export class YeomanUI {
    * returns a deep copy of the original questions, but replaces Function properties with a placeholder
    *
    * Functions are lost when being passed to client (using JSON.Stringify)
-   * Also functions cannot be evaluated on client)
+   * Also functions cannot be evaluated on client
    */
   private normalizeFunctions(questions: Questions<any>): Questions<any> {
     this.addCustomQuestionEventHandlers(questions);
@@ -623,6 +626,7 @@ export class YeomanUI {
 
     if (this.replayUtils.isReplaying) {
       this.replayUtils.setPrompts(promptsToDisplay);
+      return Promise.resolve();
     } else {
       return this.rpc.invoke("setPromptList", [promptsToDisplay]);
     }

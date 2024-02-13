@@ -22,7 +22,7 @@
     "chalk-pipe": "^4.0.0",
     "datauri": "^3.0.0",
     "inquirer": "^7.3.3",
-    "yeoman-generator": "^4.12.0"
+    "yeoman-generator": "7.1.1"
   },
   "generator-filter": {
     "types": [
