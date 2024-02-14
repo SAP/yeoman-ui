@@ -357,7 +357,7 @@ export class YeomanUI {
       return targetFolderConfig;
     }
 
-    return Constants.IS_IN_BAS
+    return Constants.IS_IN_BAS || Constants.IS_PERSONAL_EDITION
       ? Constants.HOMEDIR_PROJECTS
       : _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath", Constants.HOMEDIR_PROJECTS);
   }
