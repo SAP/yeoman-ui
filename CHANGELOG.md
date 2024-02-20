@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.14.6](https://github.com/SAP/yeoman-ui/compare/v1.14.5...v1.14.6) (2024-02-20)
+
+### Bug Fixes
+
+- update yarn.lock ([7fe8e62](https://github.com/SAP/yeoman-ui/commit/7fe8e622e8e2090abb84fa5008d3ceba9acd4910))
+
+## [1.14.5](https://github.com/SAP/yeoman-ui/compare/v1.14.4...v1.14.5) (2024-02-20)
+
+### Bug Fixes
+
+- adding personal-edition as part of BAS environment ([#811](https://github.com/SAP/yeoman-ui/issues/811)) ([c99b7f0](https://github.com/SAP/yeoman-ui/commit/c99b7f07c0669a9dfb33df73998b4db56bcf7ed6))
+- update yarn.lock ([70eeb1e](https://github.com/SAP/yeoman-ui/commit/70eeb1e449df3621eba19768402ca725caa6ab42))
+
 ## [1.14.4](https://github.com/SAP/yeoman-ui/compare/v1.14.3...v1.14.4) (2024-02-08)
 
 ### Bug Fixes

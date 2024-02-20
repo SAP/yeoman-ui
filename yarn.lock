@@ -2035,15 +2035,10 @@
   dependencies:
     ws "^7.2.3"
 
-"@sap-devx/yeoman-ui-types@^1.14.6":
-  version "1.14.6"
-  resolved "https://registry.yarnpkg.com/@sap-devx/yeoman-ui-types/-/yeoman-ui-types-1.14.6.tgz#1deaf9d7cfe6ffc851184de8473d600239b547e8"
-  integrity sha512-bz483G0Cp1ztQ29S/SgD1OkH5633BbDpcxMZ+PYMqBAmG/Na8lEgA3uz+LAoqBp32lX2OkRxZtI/C7v0A5Q6yg==
-
-"@sap/bas-sdk@3.7.8":
-  version "3.7.8"
-  resolved "https://registry.yarnpkg.com/@sap/bas-sdk/-/bas-sdk-3.7.8.tgz#ff5a964b447641f7fa7614e991469c5c4b550cd4"
-  integrity sha512-Yj7yquzO4q90YtjdzGkOLSsvxXVzYuFZ9dD0aslJ7DT7BOTiRV1pyNwdnd0oXzBkSKxehTuLtv/+wf7IErC/uA==
+"@sap/bas-sdk@3.7.11":
+  version "3.7.11"
+  resolved "https://registry.yarnpkg.com/@sap/bas-sdk/-/bas-sdk-3.7.11.tgz#930da5aefe521cf6812123aeb5742f64be359ec4"
+  integrity sha512-Q2FWIClL5Jlf0K/dRPF4PH+PG7qC3/zYifWjdMhk5iA4CddJY15kDE7Oo8yzn07VvSY+MQWDhWawy3YTvZCgEg==
   dependencies:
     axios "1.6.2"
     cross-spawn "^7.0.3"
