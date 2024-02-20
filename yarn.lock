@@ -2035,10 +2035,10 @@
   dependencies:
     ws "^7.2.3"
 
-"@sap/bas-sdk@3.7.8":
-  version "3.7.8"
-  resolved "https://registry.yarnpkg.com/@sap/bas-sdk/-/bas-sdk-3.7.8.tgz#ff5a964b447641f7fa7614e991469c5c4b550cd4"
-  integrity sha512-Yj7yquzO4q90YtjdzGkOLSsvxXVzYuFZ9dD0aslJ7DT7BOTiRV1pyNwdnd0oXzBkSKxehTuLtv/+wf7IErC/uA==
+"@sap/bas-sdk@3.7.11":
+  version "3.7.11"
+  resolved "https://int.repositories.cloud.sap/artifactory/api/npm/build-milestones-npm/@sap/bas-sdk/-/@sap/bas-sdk-3.7.11.tgz#930da5aefe521cf6812123aeb5742f64be359ec4"
+  integrity sha512-Q2FWIClL5Jlf0K/dRPF4PH+PG7qC3/zYifWjdMhk5iA4CddJY15kDE7Oo8yzn07VvSY+MQWDhWawy3YTvZCgEg==
   dependencies:
     axios "1.6.2"
     cross-spawn "^7.0.3"
