@@ -1974,59 +1974,59 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
-"@sap-devx/inquirer-gui-auto-complete-plugin@3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-auto-complete-plugin/-/inquirer-gui-auto-complete-plugin-3.0.1.tgz#b2b4c13937f8834abeedad9fc43c76fd4594dbb6"
-  integrity sha512-rtM3Z2nntoKmg3joYrawvuiqeYPmQRnJLcfzDjry3DmXsnzahEpv6PyfuSOaVlSdduwT9273SFj9KmoRXV5PwA==
+"@sap-devx/inquirer-gui-auto-complete-plugin@3.0.3":
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-auto-complete-plugin/-/inquirer-gui-auto-complete-plugin-3.0.3.tgz#2bf3fe36c4bb22dd1f37cb4e6af85c1b1ff1c436"
+  integrity sha512-P50qK/nLXTHVhToJS+N7dIT8oawmA2sUUkzLWZcoVoGozSLDBhepWaWnO9Qjvyp0484mEj7256Ahu8PSwZcUTA==
   dependencies:
     strip-ansi "^6.0.0"
     vite-plugin-css-injected-by-js "^3.2.0"
     vue "^3.3.4"
 
-"@sap-devx/inquirer-gui-file-browser-plugin@3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-file-browser-plugin/-/inquirer-gui-file-browser-plugin-3.0.1.tgz#980ac3b0a065ed04563826d8bea5ce060558b6b8"
-  integrity sha512-d5BCR9oRwMbv4gpvlsD83Yrbdxp/vBsIEgJ2x32o0Awo1UmotvtmtF9QoFh5qkOHwRBGeEXozmYAv55c2h8KtA==
+"@sap-devx/inquirer-gui-file-browser-plugin@3.0.3":
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-file-browser-plugin/-/inquirer-gui-file-browser-plugin-3.0.3.tgz#651c934c1602d093b55bfa305a62b9857635c7b6"
+  integrity sha512-77AbhLYEUYRb32wXW8C0H6jrAlrZWXqbOn7xFNvSjSh0OAVuAwXRr8xGCaeJjNon+zUAA9wckPFQYH2+0GE9gA==
   dependencies:
     vue "^3.3.4"
 
-"@sap-devx/inquirer-gui-folder-browser-plugin@3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-folder-browser-plugin/-/inquirer-gui-folder-browser-plugin-3.0.1.tgz#e7ab2a33a8b566f4c2383acfad273efc0f9f07f6"
-  integrity sha512-K897nDsUS4Bb+/S73fY01i+DmeevIy0V4BhPcKpH0GYRfIp20oBcugXpsTf79Uoyi3bmlqDHGMFCafeO1TJdpg==
+"@sap-devx/inquirer-gui-folder-browser-plugin@3.0.3":
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-folder-browser-plugin/-/inquirer-gui-folder-browser-plugin-3.0.3.tgz#9bfa059f8d7e0d41d4c0af7bfcd6c72de0186ecc"
+  integrity sha512-wN1sm+C6AAWL/MJGOMtnhAFggVdiPRwLNR2rg6TdbRebkKcaw7jFbOKWbVpV4m9ojgIPefVw1s/qmoMWaEtTxA==
   dependencies:
     vue "^3.3.4"
 
-"@sap-devx/inquirer-gui-label-plugin@3.0.2":
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-label-plugin/-/inquirer-gui-label-plugin-3.0.2.tgz#268d49a9700061e2a7d9d36f90cd51c091f24328"
-  integrity sha512-9NZkJ4zbDTCIGD1R4bV3/ItRJLz9sIUmJlxXnjUX80cks9EKnuV8s71HoS4YcIzAa7o94mCt9OU6HYLhtGqJPg==
+"@sap-devx/inquirer-gui-label-plugin@3.0.3":
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-label-plugin/-/inquirer-gui-label-plugin-3.0.3.tgz#493aeee204fa8e8598bb50066c9401d9113f68ad"
+  integrity sha512-tNP4MYnw1jELifndkN/buwZmUUpDQd8VKyNpXibQGD3gt9z74Emoto1H2snXkxnG9sQzfoyISXXYqd7RpY4ihA==
   dependencies:
     vue "^3.3.4"
 
-"@sap-devx/inquirer-gui-login-plugin@3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-login-plugin/-/inquirer-gui-login-plugin-3.0.1.tgz#d33ecf2e07b857c4024169575ef632102d99567a"
-  integrity sha512-mWOoxN9dsE6qmZdeCLuqh4AMuXILke1QVsQjE/XQW0tputd34WCaFM8S4SCkCVINzyD6WOZIZzgZa+ZGMMdO6w==
+"@sap-devx/inquirer-gui-login-plugin@3.0.3":
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-login-plugin/-/inquirer-gui-login-plugin-3.0.3.tgz#7d334ef84dd4aab119386c40fa72e36874cd1899"
+  integrity sha512-iR0hoLS4s6mgugk93QAwTu5j1oR6UojDxTbtjJDy+qdsqdW10qIWC3h9c5sxIJ4rNzSQ6jK0GXGbe/3eQKHdoQ==
   dependencies:
     vue "^3.3.4"
 
-"@sap-devx/inquirer-gui-tiles-plugin@3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-tiles-plugin/-/inquirer-gui-tiles-plugin-3.0.1.tgz#bdc5ea580e7e99d1632acacfe27fa89b0bb68118"
-  integrity sha512-ttL3F4IpFkS9Y7EjOWv5WNeqvPSvDzrrf3EbaFkYiErRcsv6aIDkfFpaQFWvZT+Tw/GCMi2eZSH0bGb3gv6//w==
+"@sap-devx/inquirer-gui-tiles-plugin@3.0.3":
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-tiles-plugin/-/inquirer-gui-tiles-plugin-3.0.3.tgz#e2901c053a31b0f32c350b8b62bc3605731d9503"
+  integrity sha512-iHq7QvA6JBrXlVMWq4oGfAIPXE5tiiUW+7SM3qGSOrYHBcSfU+MlDzTUVYsB4P2S7eKHzuKRpeUtzrETNIpLJg==
   dependencies:
     vue "^3.3.4"
 
-"@sap-devx/inquirer-gui@3.0.2":
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui/-/inquirer-gui-3.0.2.tgz#bbce44c6f613fe96b03e5eff7101d2629d258de7"
-  integrity sha512-wfzB/tKCYO4rXxpKXFevSEr4wp4Vo2CHh+QUKOOGgICzBTLEPgRUaC7hCHs2LRAm4QQejI3ax304IKZC1BGI+w==
+"@sap-devx/inquirer-gui@3.0.3":
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui/-/inquirer-gui-3.0.3.tgz#8c6c7da26eabe8c03d87668ee84a4dc9f2d11ba7"
+  integrity sha512-50ZFeTZ72ytQS3olovO3MzsBxUGg3pXMbUCeiyWESG7cx+wzvsyZkqymRlNRABHLAC6JUauTzCd/WtecQuGU1g==
   dependencies:
     lodash "^4.17.21"
     strip-ansi "^6.0.0"
     vue "^3.3.4"
-    vuetify "^3.3.10"
+    vuetify "^3.5.4"
 
 "@sap-devx/webview-rpc@0.4.1":
   version "0.4.1"
@@ -2034,6 +2034,11 @@
   integrity sha512-FznAh7u1qZh4VWle6wxCmXL2/qI0QigRx67jsL/Eyn7lW1e+6CO2vShond5IjS6+YKpXL7WFwK2MnU08kqqM6A==
   dependencies:
     ws "^7.2.3"
+
+"@sap-devx/yeoman-ui-types@^1.14.6":
+  version "1.14.6"
+  resolved "https://registry.yarnpkg.com/@sap-devx/yeoman-ui-types/-/yeoman-ui-types-1.14.6.tgz#1deaf9d7cfe6ffc851184de8473d600239b547e8"
+  integrity sha512-bz483G0Cp1ztQ29S/SgD1OkH5633BbDpcxMZ+PYMqBAmG/Na8lEgA3uz+LAoqBp32lX2OkRxZtI/C7v0A5Q6yg==
 
 "@sap/bas-sdk@3.7.8":
   version "3.7.8"
@@ -12913,10 +12918,15 @@ vue@^3.3.4:
     "@vue/server-renderer" "3.4.15"
     "@vue/shared" "3.4.15"
 
-vuetify@^3.3.10, vuetify@^3.4.4:
+vuetify@^3.4.4:
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.5.2.tgz#269772066dc0aafdab8f10424ee3f1bea5ea6d3b"
   integrity sha512-H/g9+8Loykt50qe9mruHkwWsAIgfQ8gO+SPTAV2uaCFmfYPSFRfu0aGcZ42iWu4bZ9ZkgswIIDaVsfnKINd8yg==
+
+vuetify@^3.5.4:
+  version "3.5.4"
+  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.5.4.tgz#f919c5194995a123815c277a95812bc230e33464"
+  integrity sha512-fHgfWMI7+z/UtbVPOezX+O1MNBOOMBW9HnKejcBIyQQ7jFRnTHbDQmbINf25FK0wrg/zkjfzyOmWWREKW39eXg==
 
 w3c-xmlserializer@^4.0.0:
   version "4.0.0"
