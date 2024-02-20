@@ -2037,7 +2037,7 @@
 
 "@sap/bas-sdk@3.7.11":
   version "3.7.11"
-  resolved "https://int.repositories.cloud.sap/artifactory/api/npm/build-milestones-npm/@sap/bas-sdk/-/@sap/bas-sdk-3.7.11.tgz#930da5aefe521cf6812123aeb5742f64be359ec4"
+  resolved "https://registry.yarnpkg.com/@sap/bas-sdk/-/bas-sdk-3.7.11.tgz#930da5aefe521cf6812123aeb5742f64be359ec4"
   integrity sha512-Q2FWIClL5Jlf0K/dRPF4PH+PG7qC3/zYifWjdMhk5iA4CddJY15kDE7Oo8yzn07VvSY+MQWDhWawy3YTvZCgEg==
   dependencies:
     axios "1.6.2"
