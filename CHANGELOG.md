@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.14.7](https://github.com/SAP/yeoman-ui/compare/v1.14.6...v1.14.7) (2024-02-20)
+
+### Bug Fixes
+
+- [DEVXBUGS-11619] allows selection of list separators causing crashes ([#814](https://github.com/SAP/yeoman-ui/issues/814)) ([4c28a62](https://github.com/SAP/yeoman-ui/commit/4c28a62c2d604ada65d05826982582e1906f2223))
+
 ## [1.14.6](https://github.com/SAP/yeoman-ui/compare/v1.14.5...v1.14.6) (2024-02-20)
 
 ### Bug Fixes
