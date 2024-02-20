@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.14.5](https://github.com/SAP/yeoman-ui/compare/v1.14.4...v1.14.5) (2024-02-20)
+
+### Bug Fixes
+
+- adding personal-edition as part of BAS environment ([#811](https://github.com/SAP/yeoman-ui/issues/811)) ([c99b7f0](https://github.com/SAP/yeoman-ui/commit/c99b7f07c0669a9dfb33df73998b4db56bcf7ed6))
+
 ## [1.14.4](https://github.com/SAP/yeoman-ui/compare/v1.14.3...v1.14.4) (2024-02-08)
 
 ### Bug Fixes
