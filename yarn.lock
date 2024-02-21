@@ -1974,10 +1974,10 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
-"@sap-devx/inquirer-gui-auto-complete-plugin@3.0.3":
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-auto-complete-plugin/-/inquirer-gui-auto-complete-plugin-3.0.3.tgz#2bf3fe36c4bb22dd1f37cb4e6af85c1b1ff1c436"
-  integrity sha512-P50qK/nLXTHVhToJS+N7dIT8oawmA2sUUkzLWZcoVoGozSLDBhepWaWnO9Qjvyp0484mEj7256Ahu8PSwZcUTA==
+"@sap-devx/inquirer-gui-auto-complete-plugin@3.0.4":
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui-auto-complete-plugin/-/inquirer-gui-auto-complete-plugin-3.0.4.tgz#6b528db363b4150e1bda75b72b32f11bcf773434"
+  integrity sha512-mwr9rO/uzFpwi90xaox7INvkBjPouZEJSGMPfgx6luZidJtkGTA3xzv3RVJZxXK+fpoZLcVlxe9uqSZ+3TwG9g==
   dependencies:
     strip-ansi "^6.0.0"
     vite-plugin-css-injected-by-js "^3.2.0"
@@ -2018,10 +2018,10 @@
   dependencies:
     vue "^3.3.4"
 
-"@sap-devx/inquirer-gui@3.0.3":
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui/-/inquirer-gui-3.0.3.tgz#8c6c7da26eabe8c03d87668ee84a4dc9f2d11ba7"
-  integrity sha512-50ZFeTZ72ytQS3olovO3MzsBxUGg3pXMbUCeiyWESG7cx+wzvsyZkqymRlNRABHLAC6JUauTzCd/WtecQuGU1g==
+"@sap-devx/inquirer-gui@3.0.4":
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui/-/inquirer-gui-3.0.4.tgz#fd2102b3db049b81f33326accb2adf117e4879de"
+  integrity sha512-NkRISVbwu0bwZYe8Ehr0noZzbyhkfELYfibC208oHeT49UhPl3mR8ofGSR0BdZwYRRqaB8rQa3bC+dvAyIbEIg==
   dependencies:
     lodash "^4.17.21"
     strip-ansi "^6.0.0"
