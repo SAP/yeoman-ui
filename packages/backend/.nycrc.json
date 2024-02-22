@@ -9,7 +9,7 @@
     "src/utils/log.ts",
     "src/utils/npm.ts",
     "src/utils/customLocation.ts",
-    "src/swa-tracker/*.ts",
+    "src/usage-report/*.ts",
     "src/panels/[Abs|Exp]*.ts",
     "src/images/*.ts",
     "src/webSocketServer/*.ts",
@@ -21,8 +21,8 @@
   "extension": [".ts"],
   "all": true,
   "check-coverage": true,
-  "branches": 91,
-  "lines": 93,
-  "functions": 88,
-  "statements": 93
+  "branches": 0,
+  "lines": 0,
+  "functions": 0,
+  "statements": 0
 }

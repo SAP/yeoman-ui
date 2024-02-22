@@ -11,7 +11,7 @@ import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/
 import { GeneratorFilter } from "../src/filter";
 import { homedir } from "os";
 import messages from "../src/messages";
-import { SWA } from "../src/swa-tracker/swa-tracker-wrapper";
+import { AnalyticsWrapper } from "../src/usage-report/usage-analytics-wrapper";
 import { AppWizard, MessageType } from "@sap-devx/yeoman-ui-types";
 import { Env } from "../src/utils/env";
 import Environment = require("yeoman-environment");
@@ -24,7 +24,7 @@ describe("yeomanui unit test", () => {
   let fsPromisesMock: SinonMock;
   let datauriMock: SinonMock;
   let loggerMock: SinonMock;
-  let swaTrackerWrapperMock: SinonMock;
+  let trackerWrapperMock: SinonMock;
   let rpcMock: SinonMock;
   let youiEventsMock: SinonMock;
   let envUtilsMock: SinonMock;
@@ -152,7 +152,7 @@ describe("yeomanui unit test", () => {
     datauriMock = sandbox.mock(datauri);
     rpcMock = sandbox.mock(rpc);
     loggerMock = sandbox.mock(testLogger);
-    swaTrackerWrapperMock = sandbox.mock(SWA);
+    trackerWrapperMock = sandbox.mock(AnalyticsWrapper);
     youiEventsMock = sandbox.mock(youiEvents);
     workspaceMock = sandbox.mock(vscode.workspace);
     commandsMock = sandbox.mock(vscode.commands);
@@ -168,7 +168,7 @@ describe("yeomanui unit test", () => {
     datauriMock.verify();
     rpcMock.verify();
     loggerMock.verify();
-    swaTrackerWrapperMock.verify();
+    trackerWrapperMock.verify();
     youiEventsMock.verify();
     envUtilsMock.verify();
   });
@@ -246,9 +246,11 @@ describe("yeomanui unit test", () => {
       youiEventsMock.expects("setAppWizardHeaderTitle").withArgs(undefined);
       wsConfigMock.expects("get").withExactArgs("ApplicationWizard.TargetFolder").twice();
       wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").once().returns("");
+      wsConfigMock.expects("get").withExactArgs("sapbas.telemetryEnabled").once().returns(true);
       rpcMock.expects("invoke").withArgs("showPrompt").resolves({ generator: "test1-project:app" });
       rpcMock.expects("invoke").withExactArgs("setGenInWriting", [false]).resolves();
-      swaTrackerWrapperMock.expects("updateGeneratorStarted").withArgs("test1-project:app");
+      trackerWrapperMock.expects("updateGeneratorStarted").once();
+      trackerWrapperMock.expects("updateGeneratorSelected").withArgs("test1-project:app");
       await yeomanUi["receiveIsWebviewReady"]();
     });
 
@@ -261,7 +263,6 @@ describe("yeomanui unit test", () => {
 
     it("single generator", async () => {
       yeomanUi["uiOptions"].generator = "test4:app";
-      swaTrackerWrapperMock.expects("updateGeneratorStarted").withArgs("test4:app");
       envUtilsMock
         .expects("createEnvAndGen")
         .withArgs("test4:app")
@@ -276,7 +277,9 @@ describe("yeomanui unit test", () => {
           },
         });
       wsConfigMock.expects("get").withExactArgs(yeomanUi["TARGET_FOLDER_CONFIG_PROP"]).twice();
+      wsConfigMock.expects("get").withExactArgs("sapbas.telemetryEnabled").once().returns(true);
       rpcMock.expects("invoke").withExactArgs("setGenInWriting", [false]).resolves();
+      trackerWrapperMock.expects("updateGeneratorSelected").withArgs("test4:app");
       await yeomanUi["receiveIsWebviewReady"]();
     });
   });
@@ -1007,7 +1010,6 @@ describe("yeomanui unit test", () => {
 
   it("exploreGenerators", () => {
     const yeomanUiInstance: YeomanUI = new YeomanUI(rpc, youiEvents, outputChannel, testLogger, {}, flowPromise.state);
-    swaTrackerWrapperMock.expects("updateExploreAndInstallGeneratorsLinkClicked");
     commandsMock.expects("executeCommand").withExactArgs("exploreGenerators").resolves();
     yeomanUiInstance["exploreGenerators"]();
   });
@@ -1092,8 +1094,6 @@ describe("yeomanui unit test", () => {
       expect(response.country).to.equal(country);
       expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.false;
 
-      swaTrackerWrapperMock.expects("updateOneOfPreviousStepsClicked").withArgs("");
-
       await yeomanUiInstance["back"](undefined, 1);
       expect(yeomanUiInstance["replayUtils"]["isReplaying"]).to.be.true;
 
@@ -1125,7 +1125,7 @@ describe("yeomanui unit test", () => {
         targetFolderPath: "testDestinationRoot",
         childDirs: ["dirparh1", "dirpath2"],
       };
-      swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
+      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", testLogger);
       yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
       expect(
         doGeneratorDoneSpy.calledWith(
@@ -1148,7 +1148,7 @@ describe("yeomanui unit test", () => {
         targetFolderPath: "testDestinationRoot",
         childDirs: ["dirparh1", "dirpath2", "dirpath3"],
       };
-      swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
+      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", testLogger);
       yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
       expect(
         doGeneratorDoneSpy.calledWith(
@@ -1171,7 +1171,7 @@ describe("yeomanui unit test", () => {
         targetFolderPath: "testDestinationRoot",
         childDirs: ["dirparh1"],
       };
-      swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
+      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", testLogger);
       yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
       expect(
         doGeneratorDoneSpy.calledWith(
@@ -1190,7 +1190,7 @@ describe("yeomanui unit test", () => {
       const afterGen = {
         targetFolderPath: "testDestinationRoot/generatedProject",
       };
-      swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", true, testLogger);
+      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", testLogger);
       yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
       expect(
         doGeneratorDoneSpy.calledWith(
@@ -1205,7 +1205,6 @@ describe("yeomanui unit test", () => {
     });
 
     it("onGeneratorFailure", () => {
-      swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", false, testLogger);
       yeomanUi["onGeneratorFailure"]("testGenName", "testError");
       expect(
         doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed - testError"}`, "", "files"),
@@ -1220,7 +1219,7 @@ describe("yeomanui unit test", () => {
       const afterGen = {
         targetFolderPath: "testDestinationRoot/generatedProject",
       };
-      swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("foodq:app", true, testLogger);
+      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("foodq:app", testLogger);
       yeomanUi["onGeneratorSuccess"]("foodq:app", beforeGen, afterGen);
       expect(
         doGeneratorDoneSpy.calledWith(
@@ -1242,7 +1241,7 @@ describe("yeomanui unit test", () => {
       const afterGen = {
         targetFolderPath: "testDestinationRoot/generatedProject",
       };
-      swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("fiori-generator:app", true, testLogger);
+      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("fiori-generator:app", testLogger);
       yeomanUi["onGeneratorSuccess"]("fiori-generator:app", beforeGen, afterGen);
       expect(
         doGeneratorDoneSpy.calledWith(
@@ -1360,7 +1359,6 @@ describe("yeomanui unit test", () => {
           },
         },
       ];
-      swaTrackerWrapperMock.expects("updateGeneratorEnded").withArgs("", false);
       try {
         await yeomanUiInstance["evaluateMethod"](null, "question1", "method1");
       } catch (e) {

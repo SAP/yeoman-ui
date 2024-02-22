@@ -13,7 +13,7 @@ import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorFilter, GeneratorType } from "./filter";
 import { IChildLogger } from "@vscode-logging/logger";
 import { IPrompt, MessageType } from "@sap-devx/yeoman-ui-types";
-import { SWA } from "./swa-tracker/swa-tracker-wrapper";
+import { AnalyticsWrapper } from "./usage-report/usage-analytics-wrapper";
 import { Output } from "./output";
 import { resolve } from "path";
 import { Env, EnvGen, GeneratorData, GeneratorNotFoundError } from "./utils/env";
@@ -208,7 +208,7 @@ export class YeomanUI {
         logger: this.logger.getChildLogger({ label: generatorNamespace }),
         vscode: getVscode(), // TODO: remove this temporary workaround once a better solution is found,
         data: this.uiOptions.data,
-        swaTracker: SWA.getSWATracker(),
+        tracker: AnalyticsWrapper.getTracker(),
         appWizard: this.youiEvents.getAppWizard(),
       };
 
@@ -331,11 +331,12 @@ export class YeomanUI {
         this.resetHeaderTitle();
         const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
         await this._notifyGeneratorsInstall(this.uiOptions.installGens, true);
+        AnalyticsWrapper.updateGeneratorStarted(this.logger);
         const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
         generatorId = response.generator;
       }
       this.replayUtils.clear();
-      SWA.updateGeneratorStarted(generatorId, this.logger);
+      AnalyticsWrapper.updateGeneratorSelected(generatorId, this.logger);
       await this.runGenerator(generatorId);
     } catch (error) {
       this.logError(error, "receiveIsWebviewReady");
@@ -347,7 +348,6 @@ export class YeomanUI {
   }
 
   private exploreGenerators() {
-    SWA.updateExploreAndInstallGeneratorsLinkClicked(this.logger);
     return vscode.commands.executeCommand("exploreGenerators");
   }
 
@@ -387,7 +387,6 @@ export class YeomanUI {
   }
 
   private async back(partialAnswers: Environment.Answers, numOfSteps: number): Promise<void> {
-    SWA.updateOneOfPreviousStepsClicked(this.generatorName, this.logger);
     this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
     return this.runGenerator(this.generatorName);
   }
@@ -447,7 +446,7 @@ export class YeomanUI {
     const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
     const generatedTemplatePath = targetFolderPath ? targetFolderPath : targetFolderPathBeforeGen;
     this.logger.debug(`done running yeomanui! ${message} You can find it at ${generatedTemplatePath}`);
-    SWA.updateGeneratorEnded(generatorName, true, this.logger);
+    AnalyticsWrapper.updateGeneratorEnded(generatorName, this.logger);
     this.youiEvents.doGeneratorDone(true, message, selectedWorkspace, type, targetFolderPath);
     this.setInitialProcessDir();
     this.flowState.resolve();
@@ -459,7 +458,6 @@ export class YeomanUI {
       this.errorThrown = true;
       const messagePrefix = `${generatorName} generator failed`;
       const errorMessage: string = this.logError(error, messagePrefix);
-      SWA.updateGeneratorEnded(generatorName, false, this.logger, errorMessage);
       this.youiEvents.doGeneratorDone(false, errorMessage, "", "files");
       this.setInitialProcessDir();
       this.flowState.reject(error);
