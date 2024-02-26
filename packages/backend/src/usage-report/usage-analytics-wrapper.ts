@@ -27,10 +27,9 @@ export class AnalyticsWrapper {
   }
 
   public static createTracker(logger?: IChildLogger) {
-    const packageJsonPath = path.join(__dirname, "..", "..", "package.json");
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
-    const vscodeExtentionFullName = `${packageJson.publisher}.${packageJson.name}`;
     try {
+      const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"));
+      const vscodeExtentionFullName = `${packageJson.publisher}.${packageJson.name}`;
       initTelemetrySettings(vscodeExtentionFullName, packageJson.version);
       if (logger) {
         logger.info(`SAP Web Analytics tracker was created for ${vscodeExtentionFullName}`);
@@ -44,6 +43,8 @@ export class AnalyticsWrapper {
     try {
       const eventName = AnalyticsWrapper.EVENT_TYPES.PROJECT_GENERATION_STARTED;
       AnalyticsWrapper.startTime = Date.now();
+
+      // If check settings = ApplicationWizard.enableSapWebAnalytics = true
 
       void AnalyticsWrapper.getTracker().report(eventName);
       if (logger) {
