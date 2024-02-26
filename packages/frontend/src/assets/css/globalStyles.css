@@ -78,8 +78,8 @@ div.v-select-list div.v-list{
 }
 
 /* Have to be important since vuetify itself define this color important */
-div.v-select-list div.v-list div.v-list-item,
-div.v-select-list div.v-list div.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled)
+div.v-autocomplete__content div.v-list div.v-list-item,
+div.v-autocomplete__content div.v-list div.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled)
 {
   color: var(--vscode-input-foreground, #cccccc) !important;
 }
@@ -89,7 +89,7 @@ div.v-select-list div.v-list div.v-list-item:not(.v-list-item--active):not(.v-li
 }
 
 /* Styling for separator in <v-select> component */
-div.v-select-list  > div.v-list-item--disabled > .v-subheader{
+div.v-autocomplete__content div.v-list div.v-list-item--disabled div.v-list-subheader {
   text-transform: uppercase;
   font-weight: 800;
   font-size: 11px;
