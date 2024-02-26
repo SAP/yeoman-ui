@@ -1,13 +1,12 @@
 import { initTelemetrySettings, BASClientFactory, BASTelemetryClient } from "@sap/swa-for-sapbas-vsx";
 import { IChildLogger } from "@vscode-logging/logger";
-const packageJson = require("../../package.json");
+import * as fs from "fs";
+import * as path from "path";
 
 /**
  * A Simple Wrapper for reporting usage analytics
  */
 export class AnalyticsWrapper {
-  private static readonly VSCODE_EXTENSION_FULL_NAME = `${packageJson.publisher}.${packageJson.name}`;
-
   // Event types used by Application Wizard
   private static readonly EVENT_TYPES = {
     PROJECT_GENERATION_STARTED: "Project generation started",
@@ -28,10 +27,13 @@ export class AnalyticsWrapper {
   }
 
   public static createTracker(logger?: IChildLogger) {
+    const packageJsonPath = path.join(__dirname, "..", "..", "package.json");
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+    const vscodeExtentionFullName = `${packageJson.publisher}.${packageJson.name}`;
     try {
-      initTelemetrySettings(AnalyticsWrapper.VSCODE_EXTENSION_FULL_NAME, packageJson.version);
+      initTelemetrySettings(vscodeExtentionFullName, packageJson.version);
       if (logger) {
-        logger.info(`SAP Web Analytics tracker was created for ${AnalyticsWrapper.VSCODE_EXTENSION_FULL_NAME}`);
+        logger.info(`SAP Web Analytics tracker was created for ${vscodeExtentionFullName}`);
       }
     } catch (error) {
       logger.error(error);
