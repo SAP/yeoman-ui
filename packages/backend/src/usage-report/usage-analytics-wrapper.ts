@@ -39,21 +39,28 @@ export class AnalyticsWrapper {
     }
   }
 
+  private static report(eventName: string, properties?: any, logger?: IChildLogger) {
+    // We want to report only if we are not in Local VSCode environment
+    if (process.env.LANDSCAPE_ENVIRONMENT) {
+      void AnalyticsWrapper.getTracker().report(eventName, properties);
+      logger?.trace("SAP Web Analytics tracker was called and start time was initialized", {
+        eventName,
+      });
+    }
+    else {
+      logger?.trace("SAP Web Analytics tracker was not called because LANDSCAPE_ENVIRONMENT is not set", {
+        eventName,
+      });
+    }
+  }
+
   public static updateGeneratorStarted(logger?: IChildLogger) {
     try {
       const eventName = AnalyticsWrapper.EVENT_TYPES.PROJECT_GENERATION_STARTED;
       AnalyticsWrapper.startTime = Date.now();
-
-      // If check settings = ApplicationWizard.enableSapWebAnalytics = true
-
-      void AnalyticsWrapper.getTracker().report(eventName);
-      if (logger) {
-        logger.trace("SAP Web Analytics tracker was called and start time was initialized", {
-          eventName,
-        });
-      }
+      AnalyticsWrapper.report(eventName, undefined, logger);
     } catch (error) {
-      logger.error(error);
+      logger?.error(error);
     }
   }
 
@@ -62,13 +69,7 @@ export class AnalyticsWrapper {
       const eventName = AnalyticsWrapper.EVENT_TYPES.PROJECT_GENERATOR_SELECTED;
       AnalyticsWrapper.startTime = Date.now();
       const properties = { generatorName };
-      void AnalyticsWrapper.getTracker().report(eventName, properties);
-      if (logger) {
-        logger.trace("SAP Web Analytics tracker was called", {
-          eventName,
-          properties,
-        });
-      }
+      AnalyticsWrapper.report(eventName, properties, logger);
     } catch (error) {
       logger.error(error);
     }
@@ -84,13 +85,7 @@ export class AnalyticsWrapper {
         generatorName,
         generationTime: generationTimeSec.toString(),
       };
-      void AnalyticsWrapper.getTracker().report(eventName, properties);
-      if (logger) {
-        logger.trace("SAP Web Analytics tracker was called", {
-          eventName,
-          properties,
-        });
-      }
+      AnalyticsWrapper.report(eventName, properties, logger);
     } catch (error) {
       logger.error(error);
     }
