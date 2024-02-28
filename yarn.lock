@@ -2190,9 +2190,10 @@
     url-join "^4.0.1"
     ws "^8.13.0"
 
-"@sap/swa-for-sapbas-vsx@file:./packages/backend/sap-swa-for-sapbas-vsx-2.0.5.tgz":
-  version "2.0.5"
-  resolved "file:./packages/backend/sap-swa-for-sapbas-vsx-2.0.5.tgz#b788e4b38183f9bc3ffacfde687565937d05c661"
+"@sap/swa-for-sapbas-vsx@2.0.4":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@sap/swa-for-sapbas-vsx/-/swa-for-sapbas-vsx-2.0.4.tgz#4954ecee3b0d549b68fcfe20f1e2130d61f93398"
+  integrity sha512-jG3PU68go30PvCtBfuzjAuWn3eY+2BNuk+v9KqbjUKYEI4ZyxucmrXTF7nrlcosUzUuKnO2//ujJ9T/IE1Wbgw==
   dependencies:
     "@sap/bas-sdk" "3.7.8"
     applicationinsights "2.9.2"

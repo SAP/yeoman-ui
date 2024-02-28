@@ -46,8 +46,7 @@ export class AnalyticsWrapper {
       logger?.trace("SAP Web Analytics tracker was called and start time was initialized", {
         eventName,
       });
-    }
-    else {
+    } else {
       logger?.trace("SAP Web Analytics tracker was not called because LANDSCAPE_ENVIRONMENT is not set", {
         eventName,
       });
