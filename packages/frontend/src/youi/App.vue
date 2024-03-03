@@ -325,6 +325,7 @@ export default {
     gotoStep(numOfSteps) {
       // go numOfSteps step back
       try {
+        this.stepValidated = false; // reset the step validation to disable the next button
         this.toShowPromptMessage = false;
         this.isReplaying = true;
         this.numOfSteps = numOfSteps;
