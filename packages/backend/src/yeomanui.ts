@@ -451,6 +451,7 @@ export class YeomanUI {
     this.youiEvents.doGeneratorDone(true, message, selectedWorkspace, type, targetFolderPath);
     this.setInitialProcessDir();
     this.flowState.resolve();
+    this.generatorName = ""; // reset generator name
   }
 
   private onGeneratorFailure(generatorName: string, error: any) {
@@ -463,6 +464,7 @@ export class YeomanUI {
       this.youiEvents.doGeneratorDone(false, errorMessage, "", "files");
       this.setInitialProcessDir();
       this.flowState.reject(error);
+      this.generatorName = ""; // reset generator name
     }
   }
 
