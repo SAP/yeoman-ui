@@ -45,7 +45,7 @@ const config = {
           replace: "__non_webpack_require__(",
           flags: "g",
         },
-      },      
+      },
       {
         test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
         loader: "string-replace-loader",
