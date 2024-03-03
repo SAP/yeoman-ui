@@ -3,7 +3,7 @@ import { createSandbox, SinonSandbox, SinonMock } from "sinon";
 import * as extension from "../src/extension";
 import { ExtCommands } from "../src/extCommands";
 import * as loggerWrapper from "../src/logger/logger-wrapper";
-import { SWA } from "../src/swa-tracker/swa-tracker-wrapper";
+import { AnalyticsWrapper } from "../src/usage-report/usage-analytics-wrapper";
 import * as shellJsWorkarounds from "../src/utils/shellJsWorkarounds";
 import { vscode } from "./mockUtil";
 
@@ -12,7 +12,7 @@ describe("extension unit test", () => {
   let extCommandsMock: SinonMock;
   let loggerWrapperMock: SinonMock;
   let windowMock: SinonMock;
-  let swaTrackerWrapperMock: SinonMock;
+  let trackerWrapperMock: SinonMock;
   const testContext: any = {
     subscriptions: [],
     extensionPath: "testExtensionpath",
@@ -28,14 +28,14 @@ describe("extension unit test", () => {
 
   beforeEach(() => {
     loggerWrapperMock = sandbox.mock(loggerWrapper);
-    swaTrackerWrapperMock = sandbox.mock(SWA);
+    trackerWrapperMock = sandbox.mock(AnalyticsWrapper);
     extCommandsMock = sandbox.mock(ExtCommands);
     windowMock = sandbox.mock(vscode.window);
   });
 
   afterEach(() => {
     loggerWrapperMock.verify();
-    swaTrackerWrapperMock.verify();
+    trackerWrapperMock.verify();
     extCommandsMock.verify();
     windowMock.verify();
   });
@@ -44,7 +44,7 @@ describe("extension unit test", () => {
     it("commands registration", () => {
       loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
       loggerWrapperMock.expects("getLogger");
-      swaTrackerWrapperMock.expects("createSWATracker");
+      trackerWrapperMock.expects("createTracker");
 
       const applySpy = sandbox.spy(shellJsWorkarounds, "apply");
       windowMock.expects("registerWebviewPanelSerializer").withArgs("yeomanui");
