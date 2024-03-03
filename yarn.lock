@@ -2149,15 +2149,15 @@
   dependencies:
     vue "^3.3.4"
 
-"@sap-devx/inquirer-gui@3.0.4":
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui/-/inquirer-gui-3.0.4.tgz#fd2102b3db049b81f33326accb2adf117e4879de"
-  integrity sha512-NkRISVbwu0bwZYe8Ehr0noZzbyhkfELYfibC208oHeT49UhPl3mR8ofGSR0BdZwYRRqaB8rQa3bC+dvAyIbEIg==
+"@sap-devx/inquirer-gui@3.0.5":
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui/-/inquirer-gui-3.0.5.tgz#056d9a742253fee3ac2bb65b3742b8e8c41ee7bb"
+  integrity sha512-SUDR0frLmYUcH7jzZ3TXuyqvTnkqKCBqwFpBFUtfHvihGx8+oHxZStAkUA0AvfUUgMvLF8wtBYmHeq3hm9Y0pQ==
   dependencies:
     lodash "^4.17.21"
     strip-ansi "^6.0.0"
     vue "^3.3.4"
-    vuetify "^3.5.4"
+    vuetify "^3.5.7"
 
 "@sap-devx/webview-rpc@0.4.1":
   version "0.4.1"
@@ -13208,10 +13208,10 @@ vue@^3.3.4:
     "@vue/server-renderer" "3.4.20"
     "@vue/shared" "3.4.20"
 
-vuetify@^3.4.4, vuetify@^3.5.4:
-  version "3.5.6"
-  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.5.6.tgz#cdf8859ab3cc746c78f703db9ec4ea26f3d54757"
-  integrity sha512-PfKSnHaSEGoz1QNHZ2sutOYwmYxtBbxAaeRy0L0qtMWLkKtxheg0he/NX+lsP11I2LevQBj2AgeBYDMZ/oPkPQ==
+vuetify@^3.5.7:
+  version "3.5.7"
+  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.5.7.tgz#9dfa027a582aa7d2211c8019c33ef7cadd66c5c0"
+  integrity sha512-BFj/puY8odRwY50pRfE1gpawnxreY8PtPb/tDw3oumxSLXhoXw8q6YLA6QUvqZrYEzcYpojxZIYhNWUky2KN1w==
 
 w3c-xmlserializer@^4.0.0:
   version "4.0.0"
