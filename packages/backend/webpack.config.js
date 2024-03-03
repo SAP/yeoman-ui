@@ -38,6 +38,33 @@ const config = {
         ],
       },
       {
+        test: /usage-report[/|\\]usage-analytics-wrapper.ts/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[(]",
+          replace: "__non_webpack_require__(",
+          flags: "g",
+        },
+      },
+      {
+        test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[.]resolve[(]",
+          replace: "__non_webpack_require__.resolve(",
+          flags: "g",
+        },
+      },
+      {
+        test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[.]resolve[(]",
+          replace: "__non_webpack_require__.resolve(",
+          flags: "g",
+        },
+      },
+      {
         test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
         loader: "string-replace-loader",
         options: {
