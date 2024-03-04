@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.15.0](https://github.com/SAP/yeoman-ui/compare/v1.14.7...v1.15.0) (2024-03-04)
+
+### Bug Fixes
+
+- [DEVXBUGS-11627] YUI prompts inputs are laggy on BAS - crashing generator ([#820](https://github.com/SAP/yeoman-ui/issues/820)) ([ba6b89e](https://github.com/SAP/yeoman-ui/commit/ba6b89ec43954ba8de240b3dc980218af0a09a70))
+
 ## [1.14.7](https://github.com/SAP/yeoman-ui/compare/v1.14.6...v1.14.7) (2024-02-20)
 
 ### Bug Fixes
