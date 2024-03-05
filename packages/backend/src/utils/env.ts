@@ -2,18 +2,15 @@ import * as _ from "lodash";
 import { homedir } from "os";
 import * as path from "path";
 import { existsSync } from "fs";
-import { isWin32, NpmCommand } from "./npm";
-import * as customLocation from "./customLocation";
+import { isWin32, NpmCommand } from "./npm.js";
+import * as customLocation from "./customLocation.js";
 import { IChildLogger } from "@vscode-logging/logger";
-import { getClassLogger } from "../logger/logger-wrapper";
+import { getClassLogger } from "../logger/logger-wrapper.js";
 import {
-  Options,
-  LookupGeneratorMeta,
-  namespaceToName,
-  LookupOptions,
-  Adapter,
   createEnv,
-} from "yeoman-environment/index";
+} from "yeoman-environment";
+import { LookupGeneratorMeta } from "@yeoman/types";
+
 
 const GENERATOR = "generator-";
 const NAMESPACE = "namespace";
@@ -83,8 +80,9 @@ class EnvUtil {
     return _.uniq(paths);
   }
 
-  private createEnvInstance(args?: string | string[], opts?: Options, adapter?: Adapter) {
-    return createEnv(args, opts, adapter);
+  private createEnvInstance(args?: string | string[], opts?: Options, adapter?: any) {
+    // return createEnv(args, opts, adapter);
+    return createEnv();
   }
 
   private unloadGeneratorModules(genNamespace: string): void {
@@ -155,7 +153,8 @@ class EnvUtil {
   public async createEnvAndGen(genNamespace: string, options: any, adapter: any): Promise<EnvGen> {
     const meta: LookupGeneratorMeta = await this.getGenMetadata(genNamespace);
     this.unloadGeneratorModules(genNamespace);
-    const env = this.createEnvInstance(undefined, { sharedOptions: { forwardErrorToEnvironment: true } }, adapter);
+    // const env = this.createEnvInstance(undefined, { sharedOptions: { forwardErrorToEnvironment: true } }, adapter);
+    const env = this.createEnvInstance(undefined, { }, adapter);
     // @types/yeoman-environment bug: generatorPath is still not exposed on LookupGeneratorMeta
     env.register(_.get(meta, "generatorPath") ?? "", genNamespace, meta.packagePath);
     const gen = env.create(genNamespace, { options } as any);

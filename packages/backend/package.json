@@ -26,7 +26,14 @@
     "name": "SAP SE"
   },
   "publisher": "SAPOS",
-  "main": "./dist/extension",
+  "main": "./dist/src/extension",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/src/extension.d.js",
+      "require": "./dist/src/extension.js"
+    }
+  },
   "scripts": {
     "bundle": "webpack --mode production",
     "ci": "npm-run-all clean compile bundle frontend:copy package coverage:copy",

@@ -92,7 +92,7 @@ export class ExtCommands {
 
   public async getYeomanUIPanel(verifyEmptyState = true) {
     if (!this.yeomanUIPanel) {
-      const { YeomanUIPanel } = await import("./panels/YeomanUIPanel");
+      const { YeomanUIPanel } = await import("./panels/YeomanUIPanel.js");
       this.yeomanUIPanel = new YeomanUIPanel(this.context);
     }
     if (!verifyEmptyState || (await this.isInEmptyState())) {
@@ -104,7 +104,7 @@ export class ExtCommands {
 
   public async getExploreGensPanel() {
     if (!this.exploreGensPanel) {
-      const { ExploreGensPanel } = await import("./panels/ExploreGensPanel");
+      const { ExploreGensPanel } = await import("./panels/ExploreGensPanel.js");
       this.exploreGensPanel = new ExploreGensPanel(this.context);
     }
 
