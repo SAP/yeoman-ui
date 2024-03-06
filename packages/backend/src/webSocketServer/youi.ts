@@ -1,14 +1,14 @@
 import * as WebSocket from "ws";
-import { RpcExtensionWebSockets } from "@sap-devx/webview-rpc/out.ext/rpc-extension-ws";
-import { YeomanUI } from "../yeomanui";
-import { ServerOutput } from "./server-output";
-import { ServerYouiEvents } from "./server-youi-events";
-import backendMessages from "../messages";
+import { RpcExtensionWebSockets } from "@sap-devx/webview-rpc/out.ext/rpc-extension-ws.js";
+import { YeomanUI } from "../yeomanui.js";
+import { ServerOutput } from "./server-output.js";
+import { ServerYouiEvents } from "./server-youi-events.js";
+import backendMessages from "../messages.js";
 import { IChildLogger } from "@vscode-logging/logger";
-import { YouiEvents } from "../youi-events";
-import { GeneratorFilter } from "../filter";
-import { getConsoleWarnLogger } from "../logger/console-logger";
-import { createFlowPromise } from "../utils/promise";
+import { YouiEvents } from "../youi-events.js";
+import { GeneratorFilter } from "../filter.js";
+import { getConsoleWarnLogger } from "../logger/console-logger.js";
+import { createFlowPromise } from "../utils/promise.js";
 
 class YeomanUIWebSocketServer {
   private rpc: RpcExtensionWebSockets | undefined;
@@ -31,7 +31,7 @@ class YeomanUIWebSocketServer {
       console.error(error);
     });
 
-    wss.on("connection", (ws) => {
+    wss.on("connection", (ws: WebSocket) => {
       console.log("new ws connection");
       const childLogger: IChildLogger = getConsoleWarnLogger();
       this.rpc = new RpcExtensionWebSockets(ws, childLogger);

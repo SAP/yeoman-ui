@@ -1,10 +1,10 @@
 import { createSandbox, SinonMock, SinonSandbox } from "sinon";
 import * as sdk from "@sap/bas-sdk";
-import { internal, notifyGeneratorsInstallationProgress } from "../../src/utils/generators-installation-progress";
+import { internal, notifyGeneratorsInstallationProgress } from "../../src/utils/generators-installation-progress.js";
 import { expect } from "chai";
-import { vscode } from "../mockUtil";
-import messages from "../../src/messages";
-import { YeomanUIPanel } from "../../src/panels/YeomanUIPanel";
+import { vscode } from "../mockUtil.js";
+import messages from "../../src/messages.js";
+import { YeomanUIPanel } from "../../src/panels/YeomanUIPanel.js";
 
 describe("generators installation progress - unit test", () => {
   let sandbox: SinonSandbox;
@@ -40,7 +40,7 @@ describe("generators installation progress - unit test", () => {
     sdkDevspaceMock = sandbox.mock(sdk.devspace);
     mockYeomanUiPanel = sandbox.mock(objYeomanUiPanel);
     windowMock = sandbox.mock(vscode.window);
-    rpcMock = sandbox.mock(objYeomanUiPanel["rpc"]);
+    // rpcMock = sandbox.mock(objYeomanUiPanel["rpc"]);
   });
 
   afterEach(() => {

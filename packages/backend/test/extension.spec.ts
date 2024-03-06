@@ -1,11 +1,11 @@
 import { expect } from "chai";
 import { createSandbox, SinonSandbox, SinonMock } from "sinon";
-import * as extension from "../src/extension";
-import { ExtCommands } from "../src/extCommands";
-import * as loggerWrapper from "../src/logger/logger-wrapper";
-import { AnalyticsWrapper } from "../src/usage-report/usage-analytics-wrapper";
-import * as shellJsWorkarounds from "../src/utils/shellJsWorkarounds";
-import { vscode } from "./mockUtil";
+import * as extension from "../src/extension.js";
+import { ExtCommands } from "../src/extCommands.js";
+import * as loggerWrapper from "../src/logger/logger-wrapper.js";
+import { AnalyticsWrapper } from "../src/usage-report/usage-analytics-wrapper.js";
+import * as shellJsWorkarounds from "../src/utils/shellJsWorkarounds.js";
+import { vscode } from "./mockUtil.js";
 import { ExtensionContext } from "vscode";
 
 describe("extension unit test", () => {

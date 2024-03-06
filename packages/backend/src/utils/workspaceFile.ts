@@ -1,7 +1,7 @@
 import { Uri } from "vscode";
 import { writeFileSync, existsSync } from "fs";
 import { dirname, join, relative } from "path";
-import { Constants } from "./constants";
+import { Constants } from "./constants.js";
 
 class WorkspaceFileUtil {
   public create(targetFolderPath: string): Uri {

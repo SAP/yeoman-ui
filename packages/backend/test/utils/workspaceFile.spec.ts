@@ -1,7 +1,7 @@
 import { createSandbox, SinonSandbox, SinonMock } from "sinon";
-import { WorkspaceFile } from "../../src/utils/workspaceFile";
-import { Constants } from "../../src/utils/constants";
-import { vscode } from "../mockUtil";
+import { WorkspaceFile } from "../../src/utils/workspaceFile.js";
+import { Constants } from "../../src/utils/constants.js";
+import { vscode } from "../mockUtil.js";
 import * as fs from "fs";
 import { dirname, join, normalize, relative } from "path";
 

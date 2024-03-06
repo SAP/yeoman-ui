@@ -1,11 +1,11 @@
-import { YeomanUI } from "./yeomanui";
-import { YouiEvents } from "./youi-events";
+import { YeomanUI } from "./yeomanui.js";
+import { YouiEvents } from "./youi-events.js";
 const yoUiLog = require("./utils/log"); // eslint-disable-line @typescript-eslint/no-var-requires
 import { isFunction, get } from "lodash";
 const chalk = require("chalk");
-import { Questions } from "yeoman-environment/lib/adapter";
-import { Output } from "./output";
-import { Answers } from "yeoman-environment/index";
+import { Questions } from "yeoman-environment/lib/adapter.js";
+import { Output } from "./output.js";
+import { Answers } from "yeoman-environment/index.js";
 
 export class YouiAdapter {
   private yeomanui: YeomanUI;

@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import stripAnsi = require("strip-ansi");
-import { Output } from "./output";
+import { Output } from "./output.js";
 
 export class GeneratorOutput implements Output {
   private outputChannel: vscode.OutputChannel | null = null;

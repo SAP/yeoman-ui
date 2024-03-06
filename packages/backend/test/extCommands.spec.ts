@@ -1,9 +1,9 @@
-import { vscode } from "./mockUtil";
+import { vscode } from "./mockUtil.js";
 import { get } from "lodash";
-import * as loggerWrapper from "../src/logger/logger-wrapper";
+import * as loggerWrapper from "../src/logger/logger-wrapper.js";
 import { expect } from "chai";
 import { createSandbox, SinonSandbox, SinonMock } from "sinon";
-import { ExtCommands } from "../src/extCommands";
+import { ExtCommands } from "../src/extCommands.js";
 
 describe("extension commands unit test", () => {
   let sandbox: SinonSandbox;

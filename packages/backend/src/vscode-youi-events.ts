@@ -1,13 +1,13 @@
 import * as vscode from "vscode";
 import { size, isNil } from "lodash";
-import { YouiEvents } from "./youi-events";
-import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-import { GeneratorOutput } from "./vscode-output";
+import { YouiEvents } from "./youi-events.js";
+import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common.js";
+import { GeneratorOutput } from "./vscode-output.js";
 import { IChildLogger } from "@vscode-logging/logger";
-import { getClassLogger } from "./logger/logger-wrapper";
-import { getImage } from "./images/messageImages";
+import { getClassLogger } from "./logger/logger-wrapper.js";
+import { getImage } from "./images/messageImages.js";
 import { AppWizard, MessageType, Severity } from "@sap-devx/yeoman-ui-types";
-import { WorkspaceFile } from "./utils/workspaceFile";
+import { WorkspaceFile } from "./utils/workspaceFile.js";
 
 class YoUiAppWizard extends AppWizard {
   constructor(private readonly events: VSCodeYouiEvents) {

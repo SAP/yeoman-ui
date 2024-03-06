@@ -2,7 +2,7 @@ import * as path from "path";
 import { existsSync, mkdirSync } from "fs";
 import { homedir } from "os";
 import { isEmpty, trim } from "lodash";
-import { vscode } from "./vscodeProxy";
+import { vscode } from "./vscodeProxy.js";
 import { execSync } from "child_process";
 
 export const GLOBAL_CONFIG_KEY = "ApplicationWizard.installationLocation";

@@ -1,5 +1,5 @@
 import { ExtensionContext, commands, window } from "vscode";
-import messages from "./messages";
+import messages from "./messages.js";
 
 export class ExtCommands {
   private exploreGensPanel: any;

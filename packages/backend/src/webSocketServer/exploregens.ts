@@ -1,9 +1,9 @@
 import * as WebSocket from "ws";
-import { RpcExtensionWebSockets } from "@sap-devx/webview-rpc/out.ext/rpc-extension-ws";
+import { RpcExtensionWebSockets } from "@sap-devx/webview-rpc/out.ext/rpc-extension-ws.js";
 import { IChildLogger } from "@vscode-logging/logger";
-import { ExploreGens } from "../exploregens";
-import { getConsoleWarnLogger } from "../logger/console-logger";
-import { vscode } from "../utils/vscodeProxy";
+import { ExploreGens } from "../exploregens.js";
+import { getConsoleWarnLogger } from "../logger/console-logger.js";
+import { vscode } from "../utils/vscodeProxy.js";
 
 class ExploreGensWebSocketServer {
   private rpc: RpcExtensionWebSockets | null = null;
@@ -24,7 +24,7 @@ class ExploreGensWebSocketServer {
       console.error(`exploregens: ${error}`);
     });
 
-    wss.on("connection", (ws) => {
+    wss.on("connection", (ws: WebSocket) => {
       console.log("exploregens: new ws connection");
       const childLogger: IChildLogger = getConsoleWarnLogger();
       this.rpc = new RpcExtensionWebSockets(ws, childLogger);

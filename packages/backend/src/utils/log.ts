@@ -1,7 +1,7 @@
 import stripAnsi = require("strip-ansi");
 import { get } from "lodash";
-import { Output } from "../output";
-import { YeomanUI } from "../yeomanui";
+import { Output } from "../output.js";
+import { YeomanUI } from "../yeomanui.js";
 
 module.exports = (output: Output, yeomanUi: YeomanUI) => {
   function pad(methodName: string) {

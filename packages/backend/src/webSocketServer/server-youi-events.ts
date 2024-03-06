@@ -1,5 +1,5 @@
-import { YouiEvents } from "../youi-events";
-import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
+import { YouiEvents } from "../youi-events.js";
+import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common.js";
 import { AppWizard } from "@sap-devx/yeoman-ui-types";
 
 export class ServerYouiEvents implements YouiEvents {

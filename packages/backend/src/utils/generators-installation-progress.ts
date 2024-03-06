@@ -1,7 +1,7 @@
 import * as sdk from "@sap/bas-sdk";
-import { YeomanUIPanel } from "../panels/YeomanUIPanel";
+import { YeomanUIPanel } from "../panels/YeomanUIPanel.js";
 import { window } from "vscode";
-import messages from "../messages";
+import messages from "../messages.js";
 
 // exported for test purpose
 export const internal = {

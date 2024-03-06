@@ -1,6 +1,6 @@
-import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
+import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common.js";
 import stripAnsi = require("strip-ansi");
-import { Output } from "../output";
+import { Output } from "../output.js";
 
 export class ServerOutput implements Output {
   private isVisible: boolean;

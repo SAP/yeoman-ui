@@ -1,15 +1,14 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import * as mocha from "mocha";
 import { expect } from "chai";
-import { YouiEvents } from "../src/youi-events";
-import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-import { GeneratorFilter } from "../src/filter";
+import { YouiEvents } from "../src/youi-events.js";
+import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common.js";
+import { GeneratorFilter } from "../src/filter.js";
 import { AppWizard, MessageType, Severity } from "@sap-devx/yeoman-ui-types";
-import { YouiAdapter } from "../src/youi-adapter";
-import { YeomanUI } from "../src/yeomanui";
-import messages from "../src/messages";
-import { createFlowPromise } from "../src/utils/promise";
-import { VSCodeYouiEvents } from "../src/vscode-youi-events";
+import { YouiAdapter } from "../src/youi-adapter.js";
+import { YeomanUI } from "../src/yeomanui.js";
+import messages from "../src/messages.js";
+import { createFlowPromise } from "../src/utils/promise.js";
 
 describe("YouiAdapter", () => {
   class TestEvents implements YouiEvents {

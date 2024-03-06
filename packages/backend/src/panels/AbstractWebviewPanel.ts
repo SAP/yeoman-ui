@@ -2,9 +2,9 @@ import * as vscode from "vscode";
 import { join, sep } from "path";
 import { readFileSync } from "fs";
 import { IChildLogger } from "@vscode-logging/logger";
-import { getClassLogger } from "../logger/logger-wrapper";
-import { RpcExtension } from "@sap-devx/webview-rpc/out.ext/rpc-extension";
-import { createFlowPromise, FlowPromise } from "../utils/promise";
+import { getClassLogger } from "../logger/logger-wrapper.js";
+import { RpcExtension } from "@sap-devx/webview-rpc/out.ext/rpc-extension.js";
+import { createFlowPromise, FlowPromise } from "../utils/promise.js";
 import * as cheerio from "cheerio";
 
 export abstract class AbstractWebviewPanel {

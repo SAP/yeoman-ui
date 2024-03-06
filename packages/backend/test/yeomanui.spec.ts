@@ -1,22 +1,22 @@
-import { vscode } from "./mockUtil";
+import { vscode } from "./mockUtil.js";
 import { createSandbox, SinonSandbox, SinonMock } from "sinon";
 const datauri = require("datauri"); // eslint-disable-line @typescript-eslint/no-var-requires
 import { promises } from "fs";
 import { expect } from "chai";
 import * as _ from "lodash";
-import { YeomanUI } from "../src/yeomanui";
-import { ReplayUtils } from "../src/replayUtils";
-import { YouiEvents } from "../src/youi-events";
-import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-import { GeneratorFilter } from "../src/filter";
+import { YeomanUI } from "../src/yeomanui.js";
+import { ReplayUtils } from "../src/replayUtils.js";
+import { YouiEvents } from "../src/youi-events.js";
+import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common.js";
+import { GeneratorFilter } from "../src/filter.js";
 import { homedir } from "os";
-import messages from "../src/messages";
-import { AnalyticsWrapper } from "../src/usage-report/usage-analytics-wrapper";
+import messages from "../src/messages.js";
+import { AnalyticsWrapper } from "../src/usage-report/usage-analytics-wrapper.js";
 import { AppWizard, MessageType } from "@sap-devx/yeoman-ui-types";
-import { Env } from "../src/utils/env";
-import Environment = require("yeoman-environment");
-import { createFlowPromise } from "../src/utils/promise";
-import { Constants } from "../src/utils/constants";
+import { Env } from "../src/utils/env.js";
+import Environment = require("yeoman-environment/index.js");
+import { createFlowPromise } from "../src/utils/promise.js";
+import { Constants } from "../src/utils/constants.js";
 
 describe("yeomanui unit test", () => {
   let sandbox: SinonSandbox;

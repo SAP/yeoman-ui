@@ -2,28 +2,28 @@ import * as path from "path";
 import { promises } from "fs";
 import * as _ from "lodash";
 import * as inquirer from "inquirer";
-import { ReplayUtils, ReplayState } from "./replayUtils";
+import { ReplayUtils, ReplayState } from "./replayUtils.js";
 const datauri = require("datauri"); // eslint-disable-line @typescript-eslint/no-var-requires
 const titleize = require("titleize"); // eslint-disable-line @typescript-eslint/no-var-requires
 const humanizeString = require("humanize-string"); // eslint-disable-line @typescript-eslint/no-var-requires
-import * as defaultImage from "./images/defaultImage";
-import { YouiAdapter } from "./youi-adapter";
-import { YouiEvents } from "./youi-events";
-import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-import { GeneratorFilter, GeneratorType } from "./filter";
+import * as defaultImage from "./images/defaultImage.js";
+import { YouiAdapter } from "./youi-adapter.js";
+import { YouiEvents } from "./youi-events.js";
+import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common.js";
+import { GeneratorFilter, GeneratorType } from "./filter.js";
 import { IChildLogger } from "@vscode-logging/logger";
 import { IPrompt, MessageType } from "@sap-devx/yeoman-ui-types";
-import { AnalyticsWrapper } from "./usage-report/usage-analytics-wrapper";
-import { Output } from "./output";
+import { AnalyticsWrapper } from "./usage-report/usage-analytics-wrapper.js";
+import { Output } from "./output.js";
 import { resolve } from "path";
-import { Env, EnvGen, GeneratorData, GeneratorNotFoundError } from "./utils/env";
-import { vscode, getVscode } from "./utils/vscodeProxy";
-import * as Generator from "yeoman-generator/index";
-import { Questions } from "yeoman-environment/lib/adapter";
-import { State } from "./utils/promise";
-import { Constants } from "./utils/constants";
+import { Env, EnvGen, GeneratorData, GeneratorNotFoundError } from "./utils/env.js";
+import { vscode, getVscode } from "./utils/vscodeProxy.js";
+import * as Generator from "yeoman-generator/index.js";
+import { Questions } from "yeoman-environment/lib/adapter.js";
+import { State } from "./utils/promise.js";
+import { Constants } from "./utils/constants.js";
 import { isEmpty } from "lodash";
-import { Answers, namespaceToName } from "yeoman-environment/index";
+import { Answers, namespaceToName } from "yeoman-environment/index.js";
 
 export interface IQuestionsPrompt extends IPrompt {
   questions: any[];

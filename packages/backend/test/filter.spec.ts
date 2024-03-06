@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import * as mocha from "mocha";
 import { expect } from "chai";
-import { GeneratorFilter } from "../src/filter";
+import { GeneratorFilter } from "../src/filter.js";
 
 describe("filter unit test", () => {
   it("categories property is not of array type", () => {

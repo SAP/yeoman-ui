@@ -1,16 +1,16 @@
-import { vscode } from "../mockUtil";
-import * as loggerWrapper from "../../src/logger/logger-wrapper";
+import { vscode } from "../mockUtil.js";
+import * as loggerWrapper from "../../src/logger/logger-wrapper.js";
 import { createSandbox, SinonSandbox, SinonMock, SinonStub } from "sinon";
-import * as YeomanUIPanel from "../../src/panels/YeomanUIPanel";
-import { Env } from "../../src/utils/env";
-import { Constants } from "../../src/utils/constants";
-import { NpmCommand } from "../../src/utils/npm";
-import { YeomanUI } from "../../src/yeomanui";
+import * as YeomanUIPanel from "../../src/panels/YeomanUIPanel.js";
+import { Env } from "../../src/utils/env.js";
+import { Constants } from "../../src/utils/constants.js";
+import { NpmCommand } from "../../src/utils/npm.js";
+import { YeomanUI } from "../../src/yeomanui.js";
 import { set } from "lodash";
 import { expect } from "chai";
 import { join } from "path";
 import { homedir } from "os";
-import messages from "../../src/messages";
+import messages from "../../src/messages.js";
 
 describe("YeomanUIPanel unit test", () => {
   let sandbox: SinonSandbox;
@@ -40,7 +40,7 @@ describe("YeomanUIPanel unit test", () => {
     loggerWrapperMock.expects("getClassLogger").withExactArgs("AbstractWebviewPanel");
     panel = new YeomanUIPanel.YeomanUIPanel(vscode.context);
     setWebviewPanelStub = sandbox.stub(panel, "setWebviewPanel");
-    createWebviewPanelStub = sandbox.stub(panel, "createWebviewPanel");
+    // createWebviewPanelStub = sandbox.stub(panel, "createWebviewPanel");
   });
 
   afterEach(() => {

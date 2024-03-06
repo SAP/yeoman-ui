@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import * as mocha from "mocha";
-import { getVscodeMock } from "../src/utils/vscodeProxy";
+import { getVscodeMock } from "../src/utils/vscodeProxy.js";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Module = require("module");

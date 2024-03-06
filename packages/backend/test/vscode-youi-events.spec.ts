@@ -1,14 +1,14 @@
-import { vscode } from "./mockUtil";
+import { vscode } from "./mockUtil.js";
 import { expect } from "chai";
 import { createSandbox, SinonSandbox, SinonMock } from "sinon";
 import * as _ from "lodash";
-import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-import * as messages from "../src/messages";
+import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common.js";
+import * as messages from "../src/messages.js";
 import { MessageType, Severity } from "@sap-devx/yeoman-ui-types";
-import { GeneratorOutput } from "../src/vscode-output";
-import { Constants } from "../src/utils/constants";
-import * as loggerWrapper from "../src/logger/logger-wrapper";
-import { VSCodeYouiEvents } from "../src/vscode-youi-events";
+import { GeneratorOutput } from "../src/vscode-output.js";
+import { Constants } from "../src/utils/constants.js";
+import * as loggerWrapper from "../src/logger/logger-wrapper.js";
+import { VSCodeYouiEvents } from "../src/vscode-youi-events.js";
 import * as fs from "fs";
 
 describe("vscode-youi-events unit test", () => {

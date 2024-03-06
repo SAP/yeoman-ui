@@ -6,11 +6,9 @@ import { isWin32, NpmCommand } from "./npm.js";
 import * as customLocation from "./customLocation.js";
 import { IChildLogger } from "@vscode-logging/logger";
 import { getClassLogger } from "../logger/logger-wrapper.js";
-import {
-  createEnv,
-} from "yeoman-environment";
+// import { createEnv } from "yeoman-environment";
 import { LookupGeneratorMeta } from "@yeoman/types";
-
+import { namespaceToName, Options, LookupOptions, createEnv } from "yeoman-environment/index.js";
 
 const GENERATOR = "generator-";
 const NAMESPACE = "namespace";
@@ -81,8 +79,7 @@ class EnvUtil {
   }
 
   private createEnvInstance(args?: string | string[], opts?: Options, adapter?: any) {
-    // return createEnv(args, opts, adapter);
-    return createEnv();
+    return createEnv(args, opts, adapter);
   }
 
   private unloadGeneratorModules(genNamespace: string): void {
@@ -105,7 +102,7 @@ class EnvUtil {
   }
 
   private lookupGensMeta(options?: LookupOptions): LookupGeneratorMeta[] {
-    return this.createEnvInstance().lookup(options);
+    return this.createEnvInstance().lookup(options) as LookupGeneratorMeta[];
   }
 
   // returns installed generators meta from global and custom installation location
@@ -150,14 +147,14 @@ class EnvUtil {
     return _.map(gensMeta, (genMeta) => genMeta.namespace);
   }
 
-  public async createEnvAndGen(genNamespace: string, options: any, adapter: any): Promise<EnvGen> {
+  public async createEnvAndGen(genNamespace: string, options: Options, adapter: any): Promise<EnvGen> {
     const meta: LookupGeneratorMeta = await this.getGenMetadata(genNamespace);
     this.unloadGeneratorModules(genNamespace);
     // const env = this.createEnvInstance(undefined, { sharedOptions: { forwardErrorToEnvironment: true } }, adapter);
-    const env = this.createEnvInstance(undefined, { }, adapter);
+    const env = this.createEnvInstance(undefined, {}, adapter);
     // @types/yeoman-environment bug: generatorPath is still not exposed on LookupGeneratorMeta
     env.register(_.get(meta, "generatorPath") ?? "", genNamespace, meta.packagePath);
-    const gen = env.create(genNamespace, { options } as any);
+    const gen = env.create(genNamespace, [], options as any);
     return { env, gen };
   }
 
