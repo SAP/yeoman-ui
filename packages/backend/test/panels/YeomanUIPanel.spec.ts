@@ -301,7 +301,11 @@ describe("YeomanUIPanel unit test", () => {
       set(panel, "cleanFlowPromise", () => {});
 
       commandsMock.expects("executeCommand").withExactArgs("setContext", "yeomanUI.Focused", false).resolves();
-      trackerWrapperMock.expects("updateGeneratorClosedManually").withArgs("generator-name", "step1", 1, 2).resolves();
+      trackerWrapperMock
+        .expects("updateGeneratorClosedManually")
+        .withArgs("generator-name", "step1", 1, 2)
+        .once()
+        .resolves();
       panel["dispose"]();
     });
   });
