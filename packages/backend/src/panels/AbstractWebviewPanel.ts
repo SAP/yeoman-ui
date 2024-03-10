@@ -7,6 +7,7 @@ import { RpcExtension } from "@sap-devx/webview-rpc/out.ext/rpc-extension";
 import { createFlowPromise, FlowPromise } from "../utils/promise";
 import * as cheerio from "cheerio";
 import { AnalyticsWrapper } from "../usage-report/usage-analytics-wrapper";
+import { get } from "lodash";
 
 export abstract class AbstractWebviewPanel {
   public viewType: string;
@@ -106,16 +107,20 @@ export abstract class AbstractWebviewPanel {
 
   protected dispose() {
     this.setFocused(false);
-    const yeomanui = (this as any).yeomanui;
-    const wizardStepName = yeomanui.gen.prompts.items[yeomanui.promptCount - 1].name;
-    // generatorName: string, wizardStepName: string, currentStep: number, totalNumOfSteps: number
-    AnalyticsWrapper.updateGeneratorClosedManually(
-      yeomanui.generatorName,
-      wizardStepName,
-      yeomanui.promptCount,
-      yeomanui.gen.prompts.items.length,
-      this.logger,
-    );
+    const yeomanui: any = get(this, "yeomanui");
+    if (yeomanui) {
+      const promptItems: any = get(yeomanui, "gen.prompts.items") ?? [];
+      const promptCount = yeomanui.promptCount;
+      const wizardStepName = promptItems[promptCount - 1].name;
+      AnalyticsWrapper.updateGeneratorClosedManually(
+        yeomanui.generatorName,
+        wizardStepName,
+        promptCount,
+        promptItems.length,
+        this.logger,
+      );
+    }
+
     // Clean up our resources
     this.webViewPanel.dispose();
     this.webViewPanel = null;
