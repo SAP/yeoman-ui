@@ -1,7 +1,7 @@
 import { Answers } from "yeoman-environment/index.js";
 import { IPrompt } from "@sap-devx/yeoman-ui-types";
 import hash from "object-hash";
-import TerminalAdapter = require("yeoman-environment/lib/adapter.js");
+import * as TerminalAdapter from "yeoman-environment/lib/adapter.js";
 
 export enum ReplayState {
   Replaying,

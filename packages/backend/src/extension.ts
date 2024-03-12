@@ -1,8 +1,8 @@
 import { ExtensionContext, window, WebviewPanel } from "vscode";
-import { createExtensionLoggerAndSubscribeToLogSettingsChanges, getLogger } from "./logger/logger-wrapper.js";
-import { AnalyticsWrapper } from "./usage-report/usage-analytics-wrapper.js";
-import * as shellJsWorkarounds from "./utils/shellJsWorkarounds.js";
-import { ExtCommands } from "./extCommands.js";
+import { createExtensionLoggerAndSubscribeToLogSettingsChanges, getLogger } from "./logger/logger-wrapper.ts";
+import { AnalyticsWrapper } from "./usage-report/usage-analytics-wrapper.ts";
+import * as shellJsWorkarounds from "./utils/shellJsWorkarounds.ts";
+import { ExtCommands } from "./extCommands.ts";
 
 let extCommands: ExtCommands;
 
@@ -13,7 +13,7 @@ export function activate(context: ExtensionContext) {
 
   // performs first time lookup of installed generators
   // runs in background
-  void import("./utils/env.js");
+  void import("./utils/env.ts");
 
   try {
     createExtensionLoggerAndSubscribeToLogSettingsChanges(context);
