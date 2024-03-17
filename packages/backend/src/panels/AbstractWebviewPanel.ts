@@ -110,15 +110,19 @@ export abstract class AbstractWebviewPanel {
     const yeomanui: any = get(this, "yeomanui");
     if (yeomanui) {
       const promptItems: any = get(yeomanui, "gen.prompts.items") ?? [];
-      const promptCount = yeomanui.promptCount;
-      const wizardStepName = promptItems[promptCount - 1].name;
-      AnalyticsWrapper.updateGeneratorClosedManually(
-        yeomanui.generatorName,
-        wizardStepName,
-        promptCount,
-        promptItems.length,
-        this.logger,
-      );
+      const currentPromptCount = yeomanui.promptCount;
+      const numOfPromopts = promptItems.length;
+      // Verify the dispose happened before the user has finished the wizard and not by clicking "Finish".
+      if (currentPromptCount <= numOfPromopts) {
+        const wizardStepName = promptItems[currentPromptCount - 1].name;
+        AnalyticsWrapper.updateGeneratorClosedManually(
+          yeomanui.generatorName,
+          wizardStepName,
+          currentPromptCount,
+          numOfPromopts,
+          this.logger,
+        );
+      }
     }
 
     // Clean up our resources
