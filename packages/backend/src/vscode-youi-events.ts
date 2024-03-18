@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { isEmpty, size, isNil } from "lodash";
+import { isEmpty, size, isNil, set } from "lodash";
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorOutput } from "./vscode-output";
@@ -8,6 +8,7 @@ import { getClassLogger } from "./logger/logger-wrapper";
 import { getImage } from "./images/messageImages";
 import { AppWizard, MessageType, Severity } from "@sap-devx/yeoman-ui-types";
 import { WorkspaceFile } from "./utils/workspaceFile";
+import { Constants } from "./utils/constants";
 
 class YoUiAppWizard extends AppWizard {
   constructor(private readonly events: VSCodeYouiEvents) {
@@ -65,6 +66,7 @@ export class VSCodeYouiEvents implements YouiEvents {
     type: string,
     targetFolderPath?: string,
   ): void {
+    set(this.webviewPanel, Constants.GENERATOR_COMPLETED, success);
     this.doClose();
     void this.showDoneMessage(success, message, selectedWorkspace, type, targetFolderPath);
   }

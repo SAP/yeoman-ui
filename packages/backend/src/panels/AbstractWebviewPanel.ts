@@ -8,6 +8,7 @@ import { createFlowPromise, FlowPromise } from "../utils/promise";
 import * as cheerio from "cheerio";
 import { AnalyticsWrapper } from "../usage-report/usage-analytics-wrapper";
 import { get } from "lodash";
+import { Constants } from "../utils/constants";
 
 export abstract class AbstractWebviewPanel {
   public viewType: string;
@@ -107,22 +108,23 @@ export abstract class AbstractWebviewPanel {
 
   protected dispose() {
     this.setFocused(false);
+    const isGeneratorCompleted = get(this.webViewPanel, Constants.GENERATOR_COMPLETED);
     const yeomanui: any = get(this, "yeomanui");
-    if (yeomanui) {
+    // Verify the dispose happened before the user has finished the wizard and not by clicking "Finish".
+    // When user clicks "Finish" the generated has ended and the success/failure result will be set in "GENERATOR_COMPLETED".
+    // If it has not been ended, "GENERATOR_COMPLETED" will be undefined.
+    if (yeomanui && isGeneratorCompleted === undefined) {
       const promptItems: any = get(yeomanui, "gen.prompts.items") ?? [];
       const currentPromptCount = yeomanui.promptCount;
       const numOfPromopts = promptItems.length;
-      // Verify the dispose happened before the user has finished the wizard and not by clicking "Finish".
-      if (currentPromptCount <= numOfPromopts) {
-        const wizardStepName = promptItems[currentPromptCount - 1].name;
-        AnalyticsWrapper.updateGeneratorClosedManually(
-          yeomanui.generatorName,
-          wizardStepName,
-          currentPromptCount,
-          numOfPromopts,
-          this.logger,
-        );
-      }
+      const wizardStepName = promptItems[currentPromptCount - 1].name;
+      AnalyticsWrapper.updateGeneratorClosedManually(
+        yeomanui.generatorName,
+        wizardStepName,
+        currentPromptCount,
+        numOfPromopts,
+        this.logger,
+      );
     }
 
     // Clean up our resources

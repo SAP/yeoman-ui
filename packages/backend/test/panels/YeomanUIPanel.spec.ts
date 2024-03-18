@@ -308,5 +308,39 @@ describe("YeomanUIPanel unit test", () => {
         .resolves();
       panel["dispose"]();
     });
+
+    it("dispose - not calling usage analytics when generation ended and user clicked finish.", () => {
+      const objYeomanui: any = {
+        generatorName: "generator-name",
+        promptCount: 1,
+        gen: {
+          prompts: {
+            items: [
+              {
+                name: "step1",
+              },
+              {
+                name: "step2",
+              },
+            ],
+          },
+        },
+      };
+      set(panel, "yeomanui", objYeomanui);
+      const webviewPanel = {
+        dispose: () => {},
+      };
+      set(webviewPanel, Constants.GENERATOR_COMPLETED, true);
+      set(panel, "webViewPanel", webviewPanel);
+      set(panel, "disposables", []);
+      set(panel, "cleanFlowPromise", () => {});
+
+      commandsMock.expects("executeCommand").withExactArgs("setContext", "yeomanUI.Focused", false).resolves();
+      trackerWrapperMock
+        .expects("updateGeneratorClosedManually")
+        .never()
+        .resolves();
+      panel["dispose"]();
+    });
   });
 });
