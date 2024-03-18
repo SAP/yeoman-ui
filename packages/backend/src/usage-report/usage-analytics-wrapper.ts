@@ -10,6 +10,7 @@ export class AnalyticsWrapper {
   private static readonly EVENT_TYPES = {
     PROJECT_GENERATION_STARTED: "Project generation started",
     PROJECT_GENERATOR_SELECTED: "Project generator selected",
+    PROJECT_GENERATOR_CLOSED: "Project generator was closed manually",
     PROJECT_GENERATED_SUCCESSFULLY: "Project generated successfully",
   };
 
@@ -81,6 +82,27 @@ export class AnalyticsWrapper {
       const properties: any = {
         generatorName,
         generationTime: generationTimeSec.toString(),
+      };
+      AnalyticsWrapper.report({ eventName, properties, logger });
+    } catch (error) {
+      logger?.error(error);
+    }
+  }
+
+  public static updateGeneratorClosedManually(
+    generatorName: string,
+    wizardStepName: string,
+    currentStep: number,
+    totalNumOfSteps: number,
+    logger?: IChildLogger,
+  ): void {
+    try {
+      const eventName = AnalyticsWrapper.EVENT_TYPES.PROJECT_GENERATOR_CLOSED;
+      const properties: any = {
+        generatorName,
+        wizardStepName,
+        currentStep,
+        totalNumOfSteps,
       };
       AnalyticsWrapper.report({ eventName, properties, logger });
     } catch (error) {

@@ -11,6 +11,7 @@ import { expect } from "chai";
 import { join } from "path";
 import { homedir } from "os";
 import messages from "../../src/messages";
+import { AnalyticsWrapper } from "../../src/usage-report/usage-analytics-wrapper";
 
 describe("YeomanUIPanel unit test", () => {
   let sandbox: SinonSandbox;
@@ -22,6 +23,7 @@ describe("YeomanUIPanel unit test", () => {
   let panel: YeomanUIPanel.YeomanUIPanel;
   let setWebviewPanelStub: SinonStub;
   let createWebviewPanelStub: SinonStub;
+  let trackerWrapperMock: SinonMock;
 
   before(() => {
     sandbox = createSandbox();
@@ -41,6 +43,7 @@ describe("YeomanUIPanel unit test", () => {
     panel = new YeomanUIPanel.YeomanUIPanel(vscode.context);
     setWebviewPanelStub = sandbox.stub(panel, "setWebviewPanel");
     createWebviewPanelStub = sandbox.stub(panel, "createWebviewPanel");
+    trackerWrapperMock = sandbox.mock(AnalyticsWrapper);
   });
 
   afterEach(() => {
@@ -49,6 +52,7 @@ describe("YeomanUIPanel unit test", () => {
     npmUtilsMock.verify();
     windowMock.verify();
     commandsMock.verify();
+    trackerWrapperMock.verify();
     setWebviewPanelStub.restore();
     createWebviewPanelStub.restore();
   });
@@ -267,6 +271,53 @@ describe("YeomanUIPanel unit test", () => {
         .withExactArgs({ canSelectFiles, canSelectFolders: !canSelectFiles, defaultUri: vscode.Uri.file(required) })
         .throws(new Error("unexpected"));
       expect(await panel["showOpenDialog"](required, canSelectFiles)).to.equal(required);
+    });
+  });
+
+  describe("dispose", () => {
+    const objYeomanui: any = {
+      generatorName: "generator-name",
+      promptCount: 1,
+      gen: {
+        prompts: {
+          items: [
+            {
+              name: "step1",
+            },
+            {
+              name: "step2",
+            },
+          ],
+        },
+      },
+    };
+
+    const webviewPanel = {
+      dispose: () => {},
+    };
+
+    beforeEach(() => {
+      set(panel, "yeomanui", objYeomanui);
+      set(panel, "webViewPanel", webviewPanel);
+      set(panel, "disposables", []);
+      set(panel, "cleanFlowPromise", () => {});
+
+      commandsMock.expects("executeCommand").withExactArgs("setContext", "yeomanUI.Focused", false).resolves();
+    });
+
+    it("dispose - calling usage analytics when panel is manually closed.", () => {
+      trackerWrapperMock
+        .expects("updateGeneratorClosedManually")
+        .withArgs("generator-name", "step1", 1, 2)
+        .once()
+        .resolves();
+      panel["dispose"]();
+    });
+
+    it("dispose - not calling usage analytics when generation ended and user clicked finish.", () => {
+      set(webviewPanel, Constants.GENERATOR_COMPLETED, true);
+      trackerWrapperMock.expects("updateGeneratorClosedManually").never().resolves();
+      panel["dispose"]();
     });
   });
 });
