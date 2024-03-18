@@ -119,7 +119,7 @@ export abstract class AbstractWebviewPanel {
       const numOfPromopts = promptItems.length;
       const wizardStepName = promptItems[currentPromptCount - 1].name;
       AnalyticsWrapper.updateGeneratorClosedManually(
-        yeomanui.generatorName,
+        yeomanui.generatorName ?? "",
         wizardStepName,
         currentPromptCount,
         numOfPromopts,
