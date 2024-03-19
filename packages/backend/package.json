@@ -200,7 +200,7 @@
     "strip-ansi": "6.0.0",
     "sudo-prompt": "9.2.1",
     "titleize": "2.1.0",
-    "yeoman-environment": "4.3.0"
+    "yeoman-environment": "4.4.0"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.31",

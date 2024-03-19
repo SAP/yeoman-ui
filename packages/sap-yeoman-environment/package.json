@@ -1,0 +1,13 @@
+{
+  "name": "sap-yeoman-environment",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "bundle": "esbuild --bundle --platform=node --format=cjs --outfile=bundle.dist.js"
+  },
+  "license": "Apache 2.0",
+  "dependencies": {
+    "yeoman-environment": "4.4.0"
+  }
+}

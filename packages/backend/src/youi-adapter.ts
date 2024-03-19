@@ -5,7 +5,7 @@ import { isFunction, get } from "lodash";
 const chalk = require("chalk");
 import { Questions } from "yeoman-environment/lib/adapter";
 import { Output } from "./output";
-import { Answers } from "yeoman-environment/index";
+import * as inquirer from "inquirer";
 
 export class YouiAdapter {
   private yeomanui: YeomanUI;
@@ -43,7 +43,7 @@ export class YouiAdapter {
    * @param {Array} questions
    * @param {Function} callback
    */
-  public async prompt<T1 extends Answers, T2 extends Answers>(
+  public async prompt<T1 extends inquirer.Answers, T2 extends inquirer.Answers>(
     questions: Questions<T1>,
     cb?: (res: T1) => T2,
   ): Promise<T2 | undefined> {

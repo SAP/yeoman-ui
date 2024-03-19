@@ -1,4 +1,4 @@
-import { Answers } from "yeoman-environment/index";
+import * as inquirer from "inquirer";
 import { IPrompt } from "@sap-devx/yeoman-ui-types";
 import * as hash from "object-hash";
 import TerminalAdapter = require("yeoman-environment/lib/adapter");
@@ -36,7 +36,7 @@ export class ReplayUtils {
     return hash(questions, { excludeKeys });
   }
 
-  private static setDefaults(questions: TerminalAdapter.Questions<any>, answers: Answers): void {
+  private static setDefaults(questions: TerminalAdapter.Questions<any>, answers: inquirer.Answers): void {
     for (const question of questions as any[]) {
       const name = question["name"];
       const answer = answers[name];
@@ -52,9 +52,9 @@ export class ReplayUtils {
   }
 
   public isReplaying: boolean = false;
-  private readonly answersCache: Map<string, Answers>;
-  private replayStack: Answers[] = [];
-  private replayQueue: Answers[] = [];
+  private readonly answersCache: Map<string, inquirer.Answers>;
+  private replayStack: inquirer.Answers[] = [];
+  private replayQueue: inquirer.Answers[] = [];
   private numOfSteps: number = 0;
   private prompts: IPrompt[] = [];
 
@@ -72,7 +72,7 @@ export class ReplayUtils {
     this.numOfSteps = 0;
   }
 
-  public start(questions: TerminalAdapter.Questions<any>, answers: Answers, numOfSteps: number): void {
+  public start(questions: TerminalAdapter.Questions<any>, answers: inquirer.Answers, numOfSteps: number): void {
     this._rememberAnswers(questions, answers);
     this.numOfSteps = numOfSteps;
     this.replayQueue = JSON.parse(JSON.stringify(this.replayStack));
@@ -84,13 +84,13 @@ export class ReplayUtils {
     this.isReplaying = false;
     this.prompts = [];
     this.replayQueue = [];
-    const answers: Answers = this.replayStack.pop() ?? {};
+    const answers: inquirer.Answers = this.replayStack.pop() ?? {};
     ReplayUtils.setDefaults(questions, answers);
     this.replayStack.splice(this.replayStack.length - this.numOfSteps + 1);
     return prompts;
   }
 
-  public next(promptCount: number, promptName: string): Answers {
+  public next(promptCount: number, promptName: string): inquirer.Answers {
     if (promptCount > this.prompts.length) {
       const prompt: IPrompt = {
         name: promptName,
@@ -106,14 +106,14 @@ export class ReplayUtils {
     this.prompts = prompts;
   }
 
-  public remember(questions: TerminalAdapter.Questions<any>, answers: Answers): void {
+  public remember(questions: TerminalAdapter.Questions<any>, answers: inquirer.Answers): void {
     this._rememberAnswers(questions, answers);
     this.replayStack.push(answers);
   }
 
   public recall(questions: TerminalAdapter.Questions<any>): void {
     const key: string = ReplayUtils.getQuestionsHash(questions);
-    const previousAnswers: Answers = this.answersCache.get(key) ?? {};
+    const previousAnswers: inquirer.Answers = this.answersCache.get(key) ?? {};
     if (previousAnswers !== undefined) {
       ReplayUtils.setDefaults(questions, previousAnswers);
     }
@@ -131,7 +131,7 @@ export class ReplayUtils {
     }
   }
 
-  private _rememberAnswers(questions: TerminalAdapter.Questions<any>, answers: Answers): void {
+  private _rememberAnswers(questions: TerminalAdapter.Questions<any>, answers: inquirer.Answers): void {
     const key: string = ReplayUtils.getQuestionsHash(questions);
     this.answersCache.set(key, answers);
   }

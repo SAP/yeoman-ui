@@ -6,14 +6,13 @@ import { isWin32, NpmCommand } from "./npm";
 import * as customLocation from "./customLocation";
 import { IChildLogger } from "@vscode-logging/logger";
 import { getClassLogger } from "../logger/logger-wrapper";
-import {
+import type {
   Options,
   LookupGeneratorMeta,
-  namespaceToName,
   LookupOptions,
-  Adapter,
-  createEnv,
+  Adapter
 } from "yeoman-environment/index";
+import { add } from '@sap-yeoman-environment';
 
 const GENERATOR = "generator-";
 const NAMESPACE = "namespace";
@@ -31,6 +30,7 @@ export type GeneratorData = {
 export class GeneratorNotFoundError extends Error {
   constructor(message: string) {
     super(message);
+    console.log(add(5, 3));
   }
 }
 
@@ -84,12 +84,13 @@ class EnvUtil {
   }
 
   private createEnvInstance(args?: string | string[], opts?: Options, adapter?: Adapter) {
-    return createEnv(args, opts, adapter);
+    const yeoman = import('yeoman-environment');
+    return yeoman.createEnv(args, opts, adapter);
   }
 
   private unloadGeneratorModules(genNamespace: string): void {
     let generatorName: string;
-    const genShortName = namespaceToName(genNamespace);
+    const genShortName = ""; //namespaceToName(genNamespace);
     if (genShortName.startsWith("@")) {
       const firstSlashIndex: number = genShortName.indexOf("/");
       const firstSlashIndexPlusOne: number = firstSlashIndex + 1;
@@ -182,7 +183,7 @@ class EnvUtil {
   }
 
   public getGeneratorFullName(genNamespace: string): string {
-    const genName = namespaceToName(genNamespace);
+    const genName = ""; //namespaceToName(genNamespace);
     const parts = _.split(genName, "/");
     return _.size(parts) === 1 ? `${GENERATOR}${genName}` : `${parts[0]}/${GENERATOR}${parts[1]}`;
   }

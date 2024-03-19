@@ -23,7 +23,7 @@ import { Questions } from "yeoman-environment/lib/adapter";
 import { State } from "./utils/promise";
 import { Constants } from "./utils/constants";
 import { isEmpty } from "lodash";
-import { Answers, namespaceToName } from "yeoman-environment/index";
+// import { namespaceToName } from "yeoman-environment/index";
 
 export interface IQuestionsPrompt extends IPrompt {
   questions: any[];
@@ -388,7 +388,7 @@ export class YeomanUI {
     return answers;
   }
 
-  private async back(partialAnswers: Answers, numOfSteps: number): Promise<void> {
+  private async back(partialAnswers: inquirer.Answers, numOfSteps: number): Promise<void> {
     this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
     return this.runGenerator(this.generatorName);
   }
@@ -587,7 +587,7 @@ export class YeomanUI {
       this.logger.debug(error);
     }
 
-    const genName = namespaceToName(genNamespace);
+    const genName = ""; //namespaceToName(genNamespace);
     const genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
     const genDisplayName = _.get(packageJson, "displayName", "");
     const genPrettyName = _.isEmpty(genDisplayName) ? titleize(humanizeString(genName)) : genDisplayName;
