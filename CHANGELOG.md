@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.16.0](https://github.com/SAP/yeoman-ui/compare/v1.15.0...v1.16.0) (2024-03-19)
+
+### Features
+
+- report closing wizard manually ([#823](https://github.com/SAP/yeoman-ui/issues/823)) ([6752634](https://github.com/SAP/yeoman-ui/commit/675263428d02c011894b41c414c6f4c4d4c3c2f8))
+
 # [1.15.0](https://github.com/SAP/yeoman-ui/compare/v1.14.7...v1.15.0) (2024-03-04)
 
 ### Bug Fixes
