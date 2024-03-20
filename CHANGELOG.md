@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.16.1](https://github.com/SAP/yeoman-ui/compare/v1.16.0...v1.16.1) (2024-03-20)
+
+### Bug Fixes
+
+- exception in dispose ([#826](https://github.com/SAP/yeoman-ui/issues/826)) ([594b874](https://github.com/SAP/yeoman-ui/commit/594b874ed232f232d382836c4a767d12ee0523d2))
+
 # [1.16.0](https://github.com/SAP/yeoman-ui/compare/v1.15.0...v1.16.0) (2024-03-19)
 
 ### Features
