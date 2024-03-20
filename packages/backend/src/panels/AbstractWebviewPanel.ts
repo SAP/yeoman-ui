@@ -114,17 +114,19 @@ export abstract class AbstractWebviewPanel {
     // When user clicks "Finish" the generated has ended and the success/failure result will be set in "GENERATOR_COMPLETED".
     // If it has not been ended, "GENERATOR_COMPLETED" will be undefined.
     if (yeomanui && isGeneratorCompleted === undefined) {
-      const promptItems: any = get(yeomanui, "gen.prompts.items") ?? [];
-      const currentPromptCount = yeomanui.promptCount;
-      const numOfPromopts = promptItems.length;
-      const wizardStepName = promptItems[currentPromptCount - 1].name;
-      AnalyticsWrapper.updateGeneratorClosedManually(
-        yeomanui.generatorName ?? "",
-        wizardStepName,
-        currentPromptCount,
-        numOfPromopts,
-        this.logger,
-      );
+      const promptItems: any = get(yeomanui, "gen.prompts.items");
+      if (promptItems) {
+        const currentPromptCount = yeomanui.promptCount;
+        const numOfPromopts = promptItems.length;
+        const wizardStepName = promptItems[currentPromptCount - 1]?.name;
+        AnalyticsWrapper.updateGeneratorClosedManually(
+          yeomanui.generatorName ?? "",
+          wizardStepName,
+          currentPromptCount,
+          numOfPromopts,
+          this.logger,
+        );
+      }
     }
 
     // Clean up our resources
