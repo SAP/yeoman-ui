@@ -331,12 +331,12 @@ export class YeomanUI {
         this.resetHeaderTitle();
         const generators: IQuestionsPrompt = await this.getGeneratorsPrompt();
         await this._notifyGeneratorsInstall(this.uiOptions.installGens, true);
-        AnalyticsWrapper.updateGeneratorStarted(this.logger);
+        AnalyticsWrapper.updateGeneratorStarted();
         const response: any = await this.rpc.invoke("showPrompt", [generators.questions, "select_generator"]);
         generatorId = response.generator;
       }
       this.replayUtils.clear();
-      AnalyticsWrapper.updateGeneratorSelected(generatorId, this.logger);
+      AnalyticsWrapper.updateGeneratorSelected(generatorId);
       await this.runGenerator(generatorId);
     } catch (error) {
       this.logError(error, "receiveIsWebviewReady");
@@ -446,7 +446,7 @@ export class YeomanUI {
     const message = this.uiOptions.messages.artifact_with_name_generated(generatorName);
     const generatedTemplatePath = targetFolderPath ? targetFolderPath : targetFolderPathBeforeGen;
     this.logger.debug(`done running yeomanui! ${message} You can find it at ${generatedTemplatePath}`);
-    AnalyticsWrapper.updateGeneratorEnded(generatorName, this.logger);
+    AnalyticsWrapper.updateGeneratorEnded(generatorName);
     this.youiEvents.doGeneratorDone(true, message, selectedWorkspace, type, targetFolderPath);
     this.setInitialProcessDir();
     this.flowState.resolve();

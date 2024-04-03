@@ -124,7 +124,6 @@ export abstract class AbstractWebviewPanel {
           wizardStepName,
           currentPromptCount,
           numOfPromopts,
-          this.logger,
         );
       }
     }

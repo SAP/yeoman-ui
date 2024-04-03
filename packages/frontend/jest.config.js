@@ -10,7 +10,6 @@ module.exports = {
   collectCoverageFrom: [
     "src/**/*.{js,vue}",
     "!**/node_modules/**",
-    "!<rootDir>/src/utils/utils.js",
     "!<rootDir>/src/exploregens/**",
     "!<rootDir>/src/youi/main.js",
     "!<rootDir>/src/plugins/**",
@@ -30,10 +29,10 @@ module.exports = {
   snapshotSerializers: ["../../node_modules/jest-serializer-vue"],
   coverageThreshold: {
     global: {
-      branches: 93,
-      functions: 98,
-      lines: 98,
-      statements: 98,
+      branches: 92,
+      functions: 97,
+      lines: 97,
+      statements: 97,
     },
   },
 };

@@ -1,5 +1,5 @@
 import { ExtensionContext, window, WebviewPanel } from "vscode";
-import { createExtensionLoggerAndSubscribeToLogSettingsChanges, getLogger } from "./logger/logger-wrapper";
+import { createExtensionLoggerAndSubscribeToLogSettingsChanges } from "./logger/logger-wrapper";
 import { AnalyticsWrapper } from "./usage-report/usage-analytics-wrapper";
 import * as shellJsWorkarounds from "./utils/shellJsWorkarounds";
 import { ExtCommands } from "./extCommands";
@@ -17,7 +17,7 @@ export function activate(context: ExtensionContext) {
 
   try {
     createExtensionLoggerAndSubscribeToLogSettingsChanges(context);
-    AnalyticsWrapper.createTracker(getLogger());
+    AnalyticsWrapper.createTracker(context);
   } catch (error) {
     console.error("Extension activation failed.", error.message);
     return;
@@ -25,17 +25,21 @@ export function activate(context: ExtensionContext) {
 
   extCommands.registerAndSubscribeCommands();
 
-  window.registerWebviewPanelSerializer("yeomanui", {
-    async deserializeWebviewPanel(webViewPanel: WebviewPanel, state?: unknown) {
-      (await extCommands.getYeomanUIPanel()).setWebviewPanel(webViewPanel, state);
-    },
-  });
+  context.subscriptions.push(
+    window.registerWebviewPanelSerializer("yeomanui", {
+      async deserializeWebviewPanel(webViewPanel: WebviewPanel, state?: unknown) {
+        (await extCommands.getYeomanUIPanel()).setWebviewPanel(webViewPanel, state);
+      },
+    }),
+  );
 
-  window.registerWebviewPanelSerializer("exploreGens", {
-    async deserializeWebviewPanel(webViewPanel: WebviewPanel, state?: unknown) {
-      (await extCommands.getExploreGensPanel()).setWebviewPanel(webViewPanel, state);
-    },
-  });
+  context.subscriptions.push(
+    window.registerWebviewPanelSerializer("exploreGens", {
+      async deserializeWebviewPanel(webViewPanel: WebviewPanel, state?: unknown) {
+        (await extCommands.getExploreGensPanel()).setWebviewPanel(webViewPanel, state);
+      },
+    }),
+  );
 }
 
 export function deactivate() {

@@ -1125,7 +1125,7 @@ describe("yeomanui unit test", () => {
         targetFolderPath: "testDestinationRoot",
         childDirs: ["dirparh1", "dirpath2"],
       };
-      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", testLogger).resolves();
+      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName").resolves();
       yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
       expect(
         doGeneratorDoneSpy.calledWith(
@@ -1148,7 +1148,7 @@ describe("yeomanui unit test", () => {
         targetFolderPath: "testDestinationRoot",
         childDirs: ["dirparh1", "dirpath2", "dirpath3"],
       };
-      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", testLogger).resolves();
+      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName").resolves();
       yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
       expect(
         doGeneratorDoneSpy.calledWith(
@@ -1171,7 +1171,7 @@ describe("yeomanui unit test", () => {
         targetFolderPath: "testDestinationRoot",
         childDirs: ["dirparh1"],
       };
-      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", testLogger).resolves();
+      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName").resolves();
       yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
       expect(
         doGeneratorDoneSpy.calledWith(
@@ -1190,7 +1190,7 @@ describe("yeomanui unit test", () => {
       const afterGen = {
         targetFolderPath: "testDestinationRoot/generatedProject",
       };
-      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName", testLogger).resolves();
+      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName").resolves();
       yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
       expect(
         doGeneratorDoneSpy.calledWith(
@@ -1219,7 +1219,7 @@ describe("yeomanui unit test", () => {
       const afterGen = {
         targetFolderPath: "testDestinationRoot/generatedProject",
       };
-      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("foodq:app", testLogger).resolves();
+      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("foodq:app").resolves();
       yeomanUi["onGeneratorSuccess"]("foodq:app", beforeGen, afterGen);
       expect(
         doGeneratorDoneSpy.calledWith(
@@ -1241,7 +1241,7 @@ describe("yeomanui unit test", () => {
       const afterGen = {
         targetFolderPath: "testDestinationRoot/generatedProject",
       };
-      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("fiori-generator:app", testLogger).resolves();
+      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("fiori-generator:app").resolves();
       yeomanUi["onGeneratorSuccess"]("fiori-generator:app", beforeGen, afterGen);
       expect(
         doGeneratorDoneSpy.calledWith(
