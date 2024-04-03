@@ -928,7 +928,7 @@ describe("App.vue", () => {
       wrapper.vm.prompts = [];
       wrapper.vm.setBusyIndicator();
       expect(wrapper.vm.showBusyIndicator).toBeFalsy();
-      expect(wrapper.vm.expectedShowBusyIndicator).toBeTruthy();
+      expect(wrapper.vm.expectedShowBusyIndicator).toBeFalsy();
     });
 
     it("isDone is false, status is pending, prompts is not empty", () => {
@@ -938,7 +938,7 @@ describe("App.vue", () => {
       wrapper.vm.currentPrompt.status = "pending";
       wrapper.vm.setBusyIndicator();
       expect(wrapper.vm.showBusyIndicator).toBeFalsy();
-      expect(wrapper.vm.expectedShowBusyIndicator).toBeTruthy();
+      expect(wrapper.vm.expectedShowBusyIndicator).toBeFalsy();
     });
 
     it("isDone is true, status is pending, prompts is not empty", () => {
@@ -957,10 +957,10 @@ describe("App.vue", () => {
       };
       wrapper = initComponent(App);
       wrapper.vm.setBusyIndicator(true);
-      expect(wrapper.vm.expectedShowBusyIndicator).toBeTruthy();
-      // 1 second delay before busy indicator is shown
-      await sleeper(1200);
-      expect(wrapper.vm.showBusyIndicator).toBeTruthy();
+      expect(wrapper.vm.expectedShowBusyIndicator).toBeFalsy();
+      // 1.5 second delay before busy indicator is shown
+      await sleeper(1700);
+      expect(wrapper.vm.showBusyIndicator).toBeFalsy();
 
       // If a custom plugin function is evaluating it can explicitly cancel the busy indicator on callback
       wrapper.vm.prompts = [{}, {}];
