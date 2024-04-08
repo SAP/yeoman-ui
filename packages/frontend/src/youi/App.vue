@@ -292,7 +292,7 @@ export default {
      * If an optional boolean value is provided this will override the prompt status when determining if the busy indicator should be on or off
      * This can be used by custom plugins to activate/deactivate the busy indicator internally
      */
-    setBusyIndicator(showBusy) {
+    setBusyIndicator: utils.debounce(function (showBusy) {
       this.expectedShowBusyIndicator =
         showBusy === true ||
         _isEmpty(this.prompts) ||
@@ -306,11 +306,11 @@ export default {
           if (this.expectedShowBusyIndicator) {
             this.showBusyIndicator = true;
           }
-        }, 1000);
+        }, 1500);
       } else {
         this.showBusyIndicator = false;
       }
-    },
+    }, 300),
     executeCommand(cmdOrEvent) {
       let command = cmdOrEvent;
       if (cmdOrEvent.target) {
