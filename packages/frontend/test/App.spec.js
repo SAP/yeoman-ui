@@ -923,10 +923,19 @@ describe("App.vue", () => {
   });
 
   describe("setBusyIndicator - method", () => {
+    beforeEach(() => {
+      jest.useFakeTimers("modern");
+    });
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
     it("prompts is empty", () => {
       wrapper = initComponent(App);
       wrapper.vm.prompts = [];
       wrapper.vm.setBusyIndicator();
+      // setBusyIndicator() triggers with 300 ms debounce delay
+      jest.advanceTimersByTime(350);
       expect(wrapper.vm.showBusyIndicator).toBeFalsy();
       expect(wrapper.vm.expectedShowBusyIndicator).toBeTruthy();
     });
@@ -937,6 +946,8 @@ describe("App.vue", () => {
       wrapper.vm.isDone = false;
       wrapper.vm.currentPrompt.status = "pending";
       wrapper.vm.setBusyIndicator();
+      // setBusyIndicator() triggers with 300 ms debounce delay
+      jest.advanceTimersByTime(350);
       expect(wrapper.vm.showBusyIndicator).toBeFalsy();
       expect(wrapper.vm.expectedShowBusyIndicator).toBeTruthy();
     });
@@ -947,27 +958,29 @@ describe("App.vue", () => {
       wrapper.vm.isDone = true;
       wrapper.vm.currentPrompt.status = "pending";
       wrapper.vm.setBusyIndicator();
+      // setBusyIndicator() triggers with 300 ms debounce delay
+      jest.advanceTimersByTime(350);
       expect(wrapper.vm.showBusyIndicator).toBeFalsy();
       expect(wrapper.vm.expectedShowBusyIndicator).toBeFalsy();
     });
 
-    it("Busy indicator can be set manually (to support custom plugin control)", async () => {
-      const sleeper = function (ms) {
-        return new Promise((resolve) => setTimeout(resolve, ms));
-      };
+    it("Busy indicator can be set manually (to support custom plugin control)", () => {
       wrapper = initComponent(App);
       wrapper.vm.setBusyIndicator(true);
+      // setBusyIndicator() triggers with 300 ms debounce delay
+      jest.advanceTimersByTime(350);
       expect(wrapper.vm.expectedShowBusyIndicator).toBeTruthy();
-      // 1 second delay before busy indicator is shown
-      await sleeper(1200);
+      // 1.5 second delay before busy indicator is shown
+      jest.advanceTimersByTime(1550);
       expect(wrapper.vm.showBusyIndicator).toBeTruthy();
 
       // If a custom plugin function is evaluating it can explicitly cancel the busy indicator on callback
       wrapper.vm.prompts = [{}, {}];
       wrapper.vm.isDone = false;
       wrapper.vm.currentPrompt.status = "evaluating";
-
       wrapper.vm.setBusyIndicator(false);
+      // setBusyIndicator() triggers with 300 ms debounce delay
+      jest.advanceTimersByTime(350);
       expect(wrapper.vm.showBusyIndicator).toBeFalsy();
     });
   });
