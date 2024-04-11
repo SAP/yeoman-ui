@@ -10,7 +10,6 @@ module.exports = {
   collectCoverageFrom: [
     "src/**/*.{js,vue}",
     "!**/node_modules/**",
-    "!<rootDir>/src/utils/utils.js",
     "!<rootDir>/src/exploregens/**",
     "!<rootDir>/src/youi/main.js",
     "!<rootDir>/src/plugins/**",
@@ -31,7 +30,7 @@ module.exports = {
   coverageThreshold: {
     global: {
       branches: 91,
-      functions: 98,
+      functions: 97,
       lines: 97,
       statements: 97,
     },

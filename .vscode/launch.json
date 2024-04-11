@@ -71,19 +71,11 @@
       "name": "frontend unit tests",
       "type": "node",
       "request": "launch",
-      "runtimeArgs": [
-        "--inspect-brk",
-        "./node_modules/@vue/cli-service/bin/vue-cli-service.js",
-        "test:unit",
-        "--runInBand"
-      ],
+      "runtimeArgs": ["--inspect-brk", "./node_modules/jest/bin/jest.js", "-w 1", "--colors"],
       "cwd": "${workspaceFolder}/packages/frontend",
-      "protocol": "inspector",
-      "disableOptimisticBPs": true,
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "outFiles": ["${workspaceFolder}/packages/frontend/src/**/*.js"],
-      "port": 9229
+      "outFiles": ["${workspaceFolder}/packages/frontend/src/**/*.js"]
     }
   ]
 }

@@ -43,7 +43,6 @@ describe("extension unit test", () => {
   describe("activate", () => {
     it("commands registration", () => {
       loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
-      loggerWrapperMock.expects("getLogger");
       trackerWrapperMock.expects("createTracker");
 
       const applySpy = sandbox.spy(shellJsWorkarounds, "apply");

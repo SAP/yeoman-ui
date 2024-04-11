@@ -37,7 +37,7 @@
     "coverage": "nyc mocha",
     "coverage:copy": "shx mkdir -p ../../coverage && shx cp -u ./coverage/lcov.info ../../coverage/lcov_backend.info",
     "frontend:copy": "npm-run-all clean:frontend && shx cp -r ../frontend/dist/. ./dist/media/",
-    "package": "vsce package --yarn --allow-star-activation",
+    "package": "vsce package --yarn",
     "test": "mocha",
     "webpack": "webpack --mode development",
     "webpack-dev:watch": "webpack --mode development --watch",
@@ -167,9 +167,7 @@
       ]
     }
   },
-  "activationEvents": [
-    "onStartupFinished"
-  ],
+  "activationEvents": [],
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
@@ -220,7 +218,7 @@
     "string-replace-loader": "3.0.3",
     "ts-loader": "^9.2.3",
     "ts-node": "^9.1.1",
-    "vsce": "2.15.0",
+    "@vscode/vsce": "2.24.0",
     "webpack": "^5.90.1",
     "webpack-cli": "^5.1.4",
     "ws": "8.2.3"
