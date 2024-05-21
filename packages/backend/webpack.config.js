@@ -10,6 +10,13 @@ const config = {
   node: { global: true },
   entry: ["./src/extension.ts"], // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
   devtool: "source-map",
+  optimization: {
+    // The Default minimization options can sometimes cause JavaScript runtime errors.
+    // Also we don't actually need to minimize as much (not targeted for browser).
+    // Rather we mostly need to reduce the number of fileSystem access requests
+    // by reducing the number of files packaged inside our VSCode extensions
+    minimize: false,
+  },
   output: {
     // the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
     path: path.resolve(__dirname, "dist"),
@@ -160,6 +167,24 @@ const config = {
         options: {
           search: "istextorbinary[.]isBinary",
           replace: "isBinary",
+          flags: "g",
+        },
+      },
+      {
+        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]esm.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[(]fileToImport",
+          replace: "__non_webpack_require__(fileToImport",
+          flags: "g",
+        },
+      },
+      {
+        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]esm.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "import[(]pathToFileURL",
+          replace: "__non_webpack_require__(pathToFileURL",
           flags: "g",
         },
       },
