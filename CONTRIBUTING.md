@@ -75,7 +75,7 @@ To run it do the following:
   ```bash
   yarn serve
   ```
-- open the broswer on `localhost:8080` to access the framework.
+- open the broswer on `http://localhost:5173/index.html` to access the framework.
 
 #### Run the explore generators framework in dev mode
 
@@ -92,7 +92,7 @@ To run it do the following:
   ```bash
   yarn serve
   ```
-- open the broswer on `localhost:8080/exploregens` to access the framework.
+- open the broswer on `http://localhost:5173/exploregens/index.html` to access the framework.
 
 #### Run the VSCode extension
 
