@@ -27,6 +27,7 @@ The initial setup is trivial:
 - clone this repo
 - `yarn`
 
+
 ### Commit Messages format.
 
 This project enforces the [conventional-commits][conventional_commits] commit message formats.
@@ -50,7 +51,15 @@ This is normally transparent as it automatically activated in a pre-commit hook 
 However, this does mean that dev flows that do not use a full dev env (e.g editing directly on github)
 may result in voter failures due to formatting errors.
 
+If you get the following error regarding formatting:
+
+![image](https://github.com/SAP/yeoman-ui/assets/9718939/0750ff0f-fe17-43f9-8fc9-8d66310828ea)
+
+you can run `yarn format:fix`.
+
 ### Compiling
+
+First time run `yarn ci` on the root level.
 
 Use the following npm scripts at the repo's **root** to compile **all** the TypeScript sub-packages.
 
@@ -59,6 +68,7 @@ Use the following npm scripts at the repo's **root** to compile **all** the Type
 
 These scripts may also be available inside the sub-packages. However, it is recommended to
 use the top-level compilation scripts to avoid forgetting to (re-)compile a sub-package's dependency.
+
 
 #### Run the yeoman framework in dev mode
 
