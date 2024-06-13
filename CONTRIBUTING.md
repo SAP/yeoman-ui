@@ -27,7 +27,6 @@ The initial setup is trivial:
 - clone this repo
 - `yarn`
 
-
 ### Commit Messages format.
 
 This project enforces the [conventional-commits][conventional_commits] commit message formats.
@@ -68,7 +67,6 @@ Use the following npm scripts at the repo's **root** to compile **all** the Type
 
 These scripts may also be available inside the sub-packages. However, it is recommended to
 use the top-level compilation scripts to avoid forgetting to (re-)compile a sub-package's dependency.
-
 
 #### Run the yeoman framework in dev mode
 
