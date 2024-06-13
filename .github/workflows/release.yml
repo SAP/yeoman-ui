@@ -25,8 +25,13 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      # Generate changelog for the current release
+      - name: Generate Changelog
+        run: npx conventional-changelog -p angular -r 1 > _CHANGELOG.md
+
       - name: Create Github Release
         uses: softprops/action-gh-release@v1
         with:
           files: packages/*/*.vsix
           fail_on_unmatched_files: true
+          body_path: _CHANGELOG.md
