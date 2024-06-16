@@ -1,7 +1,7 @@
 {
   "name": "yeoman-ui-frontend",
   "displayName": "Application Wizard Frontend",
-  "version": "1.16.4",
+  "version": "1.16.5",
   "private": true,
   "description": "Frontend for the application wizard framework",
   "license": "Apache 2.0",
@@ -68,7 +68,7 @@
     "@sap-devx/inquirer-gui-login-plugin": "3.0.3",
     "@sap-devx/inquirer-gui-tiles-plugin": "3.0.3",
     "@sap-devx/webview-rpc": "0.4.1",
-    "@sap-devx/yeoman-ui-types": "^1.16.4",
+    "@sap-devx/yeoman-ui-types": "^1.16.5",
     "core-js": "^3.8.3",
     "material-design-icons-iconfont": "6.1.0",
     "vue": "^3.3.4",
