@@ -50,7 +50,15 @@ This is normally transparent as it automatically activated in a pre-commit hook 
 However, this does mean that dev flows that do not use a full dev env (e.g editing directly on github)
 may result in voter failures due to formatting errors.
 
+If you get the following error regarding formatting:
+
+![image](https://github.com/SAP/yeoman-ui/assets/9718939/0750ff0f-fe17-43f9-8fc9-8d66310828ea)
+
+you can run `yarn format:fix`.
+
 ### Compiling
+
+First time run `yarn ci` on the root level.
 
 Use the following npm scripts at the repo's **root** to compile **all** the TypeScript sub-packages.
 
