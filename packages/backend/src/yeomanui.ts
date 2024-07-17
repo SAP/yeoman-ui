@@ -414,7 +414,7 @@ export class YeomanUI {
     // All the paths here absolute normilized paths.
     const targetFolderPathBeforeGen: string = _.get(resourcesBeforeGen, "targetFolderPath");
     const targetFolderPathAfterGen: string = _.get(resourcesAfterGen, "targetFolderPath");
-    const generatedChildDirs = "generatedChildDirs";
+    let hasNewDirs: boolean = true;
     if (targetFolderPathBeforeGen === targetFolderPathAfterGen) {
       const newDirs: string[] = _.difference(
         _.get(resourcesAfterGen, "childDirs"),
@@ -424,8 +424,8 @@ export class YeomanUI {
         // One folder added by generator and targetFolderPath/destinationRoot was not changed by generator.
         // ---> Fiori project generator flow.
         targetFolderPath = newDirs[0];
-      } else if (_.size(newDirs) > 1) {
-        targetFolderPath = generatedChildDirs;
+      } else if (_.size(newDirs) === 0) {
+        hasNewDirs = false;
       }
       //else { //_.size(newDirs) = 0 (0 folders) or _.size(newDirs) > 1 (5 folders)
       // We don't know what is the correct targetFolderPath ---> no buttons should be shown.
@@ -453,10 +453,8 @@ export class YeomanUI {
     AnalyticsWrapper.updateGeneratorEnded(generatorName);
     // Checking if targetFolderPath is null or undefined to determine toast message.
     // if no files are generated (undefined), messsage is empty
-    if (_.isNil(targetFolderPath)) {
+    if (!targetFolderPath && !hasNewDirs) {
       this.youiEvents.doGeneratorDone(false, "", selectedWorkspace, type, targetFolderPath);
-    } else if (targetFolderPath === generatedChildDirs) {
-      this.youiEvents.doGeneratorDone(true, message, selectedWorkspace, type, null);
     } else {
       this.youiEvents.doGeneratorDone(true, message, selectedWorkspace, type, targetFolderPath);
     }
