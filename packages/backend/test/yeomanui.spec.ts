@@ -1157,7 +1157,7 @@ describe("yeomanui unit test", () => {
           _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated", (a: string) => "")("testGenName"),
           create_and_close,
           "files",
-          "generatedChildDirs",
+          null,
         ),
       ).to.be.true;
     });

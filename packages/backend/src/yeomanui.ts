@@ -455,6 +455,8 @@ export class YeomanUI {
     // if no files are generated (undefined), messsage is empty
     if (_.isNil(targetFolderPath)) {
       this.youiEvents.doGeneratorDone(false, "", selectedWorkspace, type, targetFolderPath);
+    } else if (targetFolderPath === generatedChildDirs) {
+      this.youiEvents.doGeneratorDone(true, message, selectedWorkspace, type, null);
     } else {
       this.youiEvents.doGeneratorDone(true, message, selectedWorkspace, type, targetFolderPath);
     }
