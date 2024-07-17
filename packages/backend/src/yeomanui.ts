@@ -414,6 +414,7 @@ export class YeomanUI {
     // All the paths here absolute normilized paths.
     const targetFolderPathBeforeGen: string = _.get(resourcesBeforeGen, "targetFolderPath");
     const targetFolderPathAfterGen: string = _.get(resourcesAfterGen, "targetFolderPath");
+    const generatedChildDirs = "generatedChildDirs";
     if (targetFolderPathBeforeGen === targetFolderPathAfterGen) {
       const newDirs: string[] = _.difference(
         _.get(resourcesAfterGen, "childDirs"),
@@ -423,7 +424,10 @@ export class YeomanUI {
         // One folder added by generator and targetFolderPath/destinationRoot was not changed by generator.
         // ---> Fiori project generator flow.
         targetFolderPath = newDirs[0];
-      } //else { //_.size(newDirs) = 0 (0 folders) or _.size(newDirs) > 1 (5 folders)
+      } else if (_.size(newDirs) > 1) {
+        targetFolderPath = generatedChildDirs;
+      }
+      //else { //_.size(newDirs) = 0 (0 folders) or _.size(newDirs) > 1 (5 folders)
       // We don't know what is the correct targetFolderPath ---> no buttons should be shown.
       // No folder added by generator ---> Fiori module generator flow.
       // Many folders added by generator --->
@@ -447,7 +451,13 @@ export class YeomanUI {
     const generatedTemplatePath = targetFolderPath ? targetFolderPath : targetFolderPathBeforeGen;
     this.logger.debug(`done running yeomanui! ${message} You can find it at ${generatedTemplatePath}`);
     AnalyticsWrapper.updateGeneratorEnded(generatorName);
-    this.youiEvents.doGeneratorDone(true, message, selectedWorkspace, type, targetFolderPath);
+    // Checking if targetFolderPath is null or undefined to determine toast message.
+    // if no files are generated (undefined), messsage is empty
+    if (_.isNil(targetFolderPath)) {
+      this.youiEvents.doGeneratorDone(false, "", selectedWorkspace, type, targetFolderPath);
+    } else {
+      this.youiEvents.doGeneratorDone(true, message, selectedWorkspace, type, targetFolderPath);
+    }
     this.setInitialProcessDir();
     this.flowState.resolve();
     this.generatorName = ""; // reset generator name
