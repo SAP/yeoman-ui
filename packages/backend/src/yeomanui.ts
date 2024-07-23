@@ -179,8 +179,12 @@ export class YeomanUI {
     try {
       for (const file of await promises.readdir(folderPath)) {
         const resourcePath: string = path.join(folderPath, file);
-        if ((await promises.stat(resourcePath)).isDirectory()) {
-          result.childDirs.push(resourcePath);
+        try {
+          if ((await promises.stat(resourcePath)).isDirectory()) {
+            result.childDirs.push(resourcePath);
+          }
+        } catch (e) {
+          // ignore : broken soft link or access denied
         }
       }
     } catch (error) {
