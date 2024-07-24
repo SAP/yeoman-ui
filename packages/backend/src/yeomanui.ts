@@ -418,6 +418,7 @@ export class YeomanUI {
     // All the paths here absolute normilized paths.
     const targetFolderPathBeforeGen: string = _.get(resourcesBeforeGen, "targetFolderPath");
     const targetFolderPathAfterGen: string = _.get(resourcesAfterGen, "targetFolderPath");
+    let hasNewDirs: boolean = true;
     if (targetFolderPathBeforeGen === targetFolderPathAfterGen) {
       const newDirs: string[] = _.difference(
         _.get(resourcesAfterGen, "childDirs"),
@@ -427,7 +428,10 @@ export class YeomanUI {
         // One folder added by generator and targetFolderPath/destinationRoot was not changed by generator.
         // ---> Fiori project generator flow.
         targetFolderPath = newDirs[0];
-      } //else { //_.size(newDirs) = 0 (0 folders) or _.size(newDirs) > 1 (5 folders)
+      } else if (_.size(newDirs) === 0) {
+        hasNewDirs = false;
+      }
+      //else { // _.size(newDirs) > 1 (5 folders)
       // We don't know what is the correct targetFolderPath ---> no buttons should be shown.
       // No folder added by generator ---> Fiori module generator flow.
       // Many folders added by generator --->
@@ -451,7 +455,8 @@ export class YeomanUI {
     const generatedTemplatePath = targetFolderPath ? targetFolderPath : targetFolderPathBeforeGen;
     this.logger.debug(`done running yeomanui! ${message} You can find it at ${generatedTemplatePath}`);
     AnalyticsWrapper.updateGeneratorEnded(generatorName);
-    this.youiEvents.doGeneratorDone(true, message, selectedWorkspace, type, targetFolderPath);
+    // when targetFolderPath is undefined and no files are generated, send type = '' to get the empty toast message
+    this.youiEvents.doGeneratorDone(true, message, selectedWorkspace, hasNewDirs ? type : "", targetFolderPath);
     this.setInitialProcessDir();
     this.flowState.resolve();
     this.generatorName = ""; // reset generator name

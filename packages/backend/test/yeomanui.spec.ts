@@ -1179,7 +1179,7 @@ describe("yeomanui unit test", () => {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated", (a: string) => "")("testGenName"),
           create_and_close,
-          "files",
+          "",
           null,
         ),
       ).to.be.true;

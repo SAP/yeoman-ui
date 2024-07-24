@@ -193,7 +193,9 @@ export class VSCodeYouiEvents implements YouiEvents {
       }
 
       const successInfoMessage = this.getSuccessInfoMessage(selectedWorkspace, type);
-      return vscode.window.showInformationMessage(successInfoMessage);
+      return successInfoMessage // show the message only if it is not empty
+        ? vscode.window.showInformationMessage(successInfoMessage)
+        : Promise.resolve();
     }
 
     return vscode.window.showErrorMessage(errorMmessage);
@@ -211,6 +213,8 @@ export class VSCodeYouiEvents implements YouiEvents {
       }
     } else if (type === "module") {
       successInfoMessage = this.messages.artifact_generated_module;
+    } else if (type === "") {
+      successInfoMessage = ""; // do not show information message
     }
     return successInfoMessage;
   }
