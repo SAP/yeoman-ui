@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.16.6](https://github.com/SAP/yeoman-ui/compare/v1.16.5...v1.16.6) (2024-08-22)
+
+### Bug Fixes
+
+- fs access flow fixing ([#847](https://github.com/SAP/yeoman-ui/issues/847)) ([c79c3f6](https://github.com/SAP/yeoman-ui/commit/c79c3f6c4c204e990b79b1db033500ed55f72863))
+- remove show done message if no files are generated ([#846](https://github.com/SAP/yeoman-ui/issues/846)) ([eed513e](https://github.com/SAP/yeoman-ui/commit/eed513e7b8a865e535da8cf7ffbc66f735f27aa1))
+
 ## [1.16.5](https://github.com/SAP/yeoman-ui/compare/v1.16.4...v1.16.5) (2024-06-13)
 
 **Note:** Version bump only for package root
