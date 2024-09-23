@@ -39,7 +39,7 @@ export class ExtCommands {
 
   private async yeomanUIPanel_loadYeomanUI_Command(uiOptions?: any) {
     try {
-      return (await this.getYeomanUIPanel()).loadWebviewPanel(uiOptions);
+      return (await this.getYeomanUIPanel(uiOptions.showOpenGenWarning)).loadWebviewPanel(uiOptions);
     } catch (e) {
       console.log(e);
     }
