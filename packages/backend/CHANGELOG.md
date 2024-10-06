@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.16.7](https://github.com/SAP/yeoman-ui/compare/v1.16.6...v1.16.7) (2024-10-06)
+
+### Bug Fixes
+
+- **extension:** quick fix for vscode 1.94.x compatibility due to switch to ESM modules ([#853](https://github.com/SAP/yeoman-ui/issues/853)) ([823c0a5](https://github.com/SAP/yeoman-ui/commit/823c0a5ea9216c8ed80a01275bbdd8164eeac359))
+
 ## [1.16.6](https://github.com/SAP/yeoman-ui/compare/v1.16.5...v1.16.6) (2024-08-22)
 
 ### Bug Fixes
