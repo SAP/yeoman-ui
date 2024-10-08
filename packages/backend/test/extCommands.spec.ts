@@ -86,6 +86,27 @@ describe("extension commands unit test", () => {
     expect(notifyGeneratorsChangeSpy.called).to.be.true;
   });
 
+  it("call YeomanUIPanel command with uiOptions", async () => {
+    const yeomanUIPanelMock = {
+      runGenerator: () => "",
+      loadWebviewPanel: () => "",
+      toggleOutput: () => "",
+      notifyGeneratorsChange: () => "",
+      yeomanui: { generatorName: "test" },
+    };
+
+    const extCommands = new ExtCommands(testContext);
+    extCommands["yeomanUIPanel"] = yeomanUIPanelMock;
+
+    const loadWebviewPanelSpy = sandbox.spy(yeomanUIPanelMock, "loadWebviewPanel");
+
+    await extCommands["yeomanUIPanel_loadYeomanUI_Command"]({
+      showOpenGeneratorWarning: false,
+    });
+
+    expect(loadWebviewPanelSpy.called).to.be.true;
+  });
+
   it("call YeomanUIPanel commands - when yeomanUIPanel is in invalid state", async () => {
     const yeomanUIPanelMock = {
       runGenerator: () => "",
