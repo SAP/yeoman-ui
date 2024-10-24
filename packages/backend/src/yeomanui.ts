@@ -1,5 +1,5 @@
 import * as path from "path";
-import { promises } from "fs";
+import { promises, watch, statSync, FSWatcher } from "fs";
 import * as _ from "lodash";
 import * as inquirer from "inquirer";
 import { ReplayUtils, ReplayState } from "./replayUtils";
@@ -23,7 +23,6 @@ import * as Environment from "yeoman-environment";
 import { Questions } from "yeoman-environment/lib/adapter";
 import { State } from "./utils/promise";
 import { Constants } from "./utils/constants";
-import { isEmpty } from "lodash";
 
 export interface IQuestionsPrompt extends IPrompt {
   questions: any[];
@@ -172,26 +171,23 @@ export class YeomanUI {
     return { name: "Select Generator", questions: normalizedQuestions };
   }
 
-  private async getChildDirectories(folderPath: string) {
-    const childDirs: string[] = [];
-    const result = { targetFolderPath: folderPath, childDirs };
-
-    try {
-      for (const file of await promises.readdir(folderPath)) {
-        const resourcePath: string = path.join(folderPath, file);
-        try {
-          if ((await promises.stat(resourcePath)).isDirectory()) {
-            result.childDirs.push(resourcePath);
-          }
-        } catch (e) {
-          // ignore : broken soft link or access denied
+  private startWatch(folderPath: string, targetMap: Map<string, any>): FSWatcher {
+    return watch(folderPath, { recursive: true }, (eventType, filename) => {
+      try {
+        // file or directory added or removed
+        if (`rename` === eventType && filename) {
+          const fullPath = path.join(folderPath, filename);
+          const stat = statSync(fullPath);
+          targetMap.set(fullPath, {
+            isDirectory: stat.isDirectory(),
+            size: stat.size,
+            modifiedTime: stat.mtime,
+          });
         }
+      } catch (error) {
+        // ignore : broken soft link or access denied
       }
-    } catch (error) {
-      result.childDirs = [];
-    }
-
-    return result;
+    });
   }
 
   private wsGet(key: string): string {
@@ -200,13 +196,15 @@ export class YeomanUI {
 
   private async runGenerator(generatorNamespace: string) {
     this.generatorName = generatorNamespace;
+    let watcher: FSWatcher;
+    const targetFolderMap: Map<string, any> = new Map();
+    // let targetChanges: any;
     // TODO: should create and set target dir only after user has selected a generator;
     // see issue: https://github.com/yeoman/environment/issues/55
     // process.chdir() doesn't work after environment has been created
     try {
       const targetFolder = this.getCwd();
       await promises.mkdir(targetFolder, { recursive: true });
-      const dirsBefore = await this.getChildDirectories(targetFolder);
 
       const options = {
         logger: this.logger.getChildLogger({ label: generatorNamespace }),
@@ -237,12 +235,18 @@ export class YeomanUI {
       // handles generator errors
       this.handleErrors(envGen.env, this.gen, generatorNamespace);
 
+      const targetFolderAfter = resolve(this.getCwd(), this.gen.destinationRoot());
+      watcher = this.startWatch(targetFolderAfter, targetFolderMap);
+
       await envGen.env.runGenerator(envGen.gen);
       if (!this.errorThrown) {
         // Without resolve this code worked only for absolute paths without / at the end.
         // Generator can put a relative path, path including . and .. and / at the end.
-        const dirsAfter = await this.getChildDirectories(resolve(this.getCwd(), this.gen.destinationRoot()));
-        this.onGeneratorSuccess(generatorNamespace, dirsBefore, dirsAfter);
+        this.onGeneratorSuccess(
+          generatorNamespace,
+          { targetFolderPath: targetFolder },
+          { targetFolderPath: targetFolderAfter, changeMap: targetFolderMap },
+        );
       }
     } catch (error) {
       if (error instanceof GeneratorNotFoundError) {
@@ -250,7 +254,8 @@ export class YeomanUI {
       }
       this.onGeneratorFailure(generatorNamespace, this.getErrorWithAdditionalInfo(error, "runGenerator()"));
     } finally {
-      process.removeListener("uncaughtException", this.onUncaughtException);
+      this.onUncaughtException && process.removeListener("uncaughtException", this.onUncaughtException);
+      watcher?.close();
     }
   }
 
@@ -357,7 +362,7 @@ export class YeomanUI {
 
   private getCwd(): string {
     const targetFolderConfig = this.wsGet(this.TARGET_FOLDER_CONFIG_PROP);
-    if (!isEmpty(targetFolderConfig)) {
+    if (!_.isEmpty(targetFolderConfig)) {
       return targetFolderConfig;
     }
 
@@ -413,22 +418,44 @@ export class YeomanUI {
     return firstQuestionName ? _.startCase(firstQuestionName) : `Step ${this.promptCount}`;
   }
 
-  private onGeneratorSuccess(generatorName: string, resourcesBeforeGen?: any, resourcesAfterGen?: any) {
+  private onGeneratorSuccess(
+    generatorName: string,
+    resourcesBeforeGen?: { targetFolderPath: string },
+    resourcesAfterGen?: { targetFolderPath: string; changeMap: Map<string, any> },
+  ) {
+    function _getChangesStat(targetPath: string, changeMap: Map<string, any>): { folders: string[]; files: string[] } {
+      const addOrDelFiles: string[] = [];
+      const addOrDelFolders: string[] = []; // top level folders
+      for (const [filePath, fileInfo] of changeMap) {
+        if (fileInfo.isDirectory) {
+          const parts = _.compact(_.split(_.replace(filePath, targetPath, ""), path.sep));
+          if (_.size(parts) === 1) {
+            // top level folder
+            addOrDelFolders.push(parts[0]);
+          }
+        } else {
+          addOrDelFiles.push(filePath);
+        }
+      }
+      return {
+        folders: addOrDelFolders,
+        files: addOrDelFiles,
+      };
+    }
+
     let targetFolderPath: string = null;
     // All the paths here absolute normilized paths.
     const targetFolderPathBeforeGen: string = _.get(resourcesBeforeGen, "targetFolderPath");
     const targetFolderPathAfterGen: string = _.get(resourcesAfterGen, "targetFolderPath");
     let hasNewDirs: boolean = true;
     if (targetFolderPathBeforeGen === targetFolderPathAfterGen) {
-      const newDirs: string[] = _.difference(
-        _.get(resourcesAfterGen, "childDirs"),
-        _.get(resourcesBeforeGen, "childDirs"),
-      );
-      if (_.size(newDirs) === 1) {
+      const stats = _getChangesStat(targetFolderPathAfterGen, resourcesAfterGen.changeMap);
+      if (_.size(stats.folders) === 1) {
         // One folder added by generator and targetFolderPath/destinationRoot was not changed by generator.
         // ---> Fiori project generator flow.
-        targetFolderPath = newDirs[0];
-      } else if (_.size(newDirs) === 0) {
+        targetFolderPath = stats.folders[0];
+      } else if (_.size(stats.folders) === 0 && _.size(stats.files) === 0) {
+        // No files or folders added by generator.
         hasNewDirs = false;
       }
       //else { // _.size(newDirs) > 1 (5 folders)
