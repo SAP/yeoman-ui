@@ -282,6 +282,15 @@ describe("yeomanui unit test", () => {
       },
     ];
 
+    beforeEach(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      sandbox.stub(fs, "watch").value((p: string, o: any, cb: (event: string, file: string) => void) => {
+        return {
+          close: () => {},
+        };
+      });
+    });
+
     it("flow is successfull", async () => {
       envUtilsMock.expects("getGeneratorsData").resolves(gensMeta);
       envUtilsMock
