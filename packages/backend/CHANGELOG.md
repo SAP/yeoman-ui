@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.16.8](https://github.com/SAP/yeoman-ui/compare/v1.16.7...v1.16.8) (2024-11-05)
+
+### Bug Fixes
+
+- last notification does not appear after the generator has fini… ([#857](https://github.com/SAP/yeoman-ui/issues/857)) ([dd7bec6](https://github.com/SAP/yeoman-ui/commit/dd7bec6b32e17ad55ffaa79100cc1403552f2445))
+
 ## [1.16.7](https://github.com/SAP/yeoman-ui/compare/v1.16.6...v1.16.7) (2024-10-06)
 
 ### Bug Fixes
