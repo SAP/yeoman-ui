@@ -423,24 +423,26 @@ export class YeomanUI {
     resourcesBeforeGen?: { targetFolderPath: string },
     resourcesAfterGen?: { targetFolderPath: string; changeMap: Map<string, any> },
   ) {
-    function _getChangesStat(targetPath: string, changeMap: Map<string, any>): { folders: string[]; files: string[] } {
-      const addOrDelFiles: string[] = [];
-      const addOrDelFolders: string[] = []; // top level folders
+    function _getChangesStat(
+      targetPath: string,
+      changeMap: Map<string, { isDirectory: boolean }>,
+    ): { folders: string[]; files: string[] } {
+      const files: string[] = [];
+      const folders: string[] = []; // Top-level folders
+
       for (const [filePath, fileInfo] of changeMap) {
         if (fileInfo.isDirectory) {
-          const parts = _.compact(_.split(_.replace(filePath, targetPath, ""), path.sep));
-          if (_.size(parts) === 1) {
-            // top level folder
-            addOrDelFolders.push(parts[0]);
+          const relativePath = path.relative(targetPath, filePath).trim();
+          const parts = relativePath.split(path.sep).filter(Boolean);
+          if (parts.length === 1) {
+            // Top-level folder
+            folders.push(filePath);
           }
         } else {
-          addOrDelFiles.push(filePath);
+          files.push(filePath);
         }
       }
-      return {
-        folders: addOrDelFolders,
-        files: addOrDelFiles,
-      };
+      return { folders, files };
     }
 
     let targetFolderPath: string = null;
