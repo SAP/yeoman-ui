@@ -1205,7 +1205,7 @@ describe("yeomanui unit test", () => {
           _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated", (a: string) => "")("testGenName"),
           create_and_close,
           "files",
-          "dirpath1",
+          path.join(beforeGen.targetFolderPath, "dirpath1"),
         ),
       ).to.be.true;
     });
