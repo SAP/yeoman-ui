@@ -16,7 +16,7 @@ import { IPrompt, MessageType } from "@sap-devx/yeoman-ui-types";
 import { AnalyticsWrapper } from "./usage-report/usage-analytics-wrapper";
 import { Output } from "./output";
 import { resolve } from "path";
-import { Env, EnvGen, GeneratorData, GeneratorNotFoundError } from "./utils/env";
+import { AdditionalGenerator, Env, EnvGen, GeneratorData, GeneratorNotFoundError } from "./utils/env";
 import { vscode, getVscode } from "./utils/vscodeProxy";
 import * as Generator from "yeoman-generator";
 import * as Environment from "yeoman-environment";
@@ -592,6 +592,7 @@ export class YeomanUI {
   private async getGeneratorChoice(genData: GeneratorData, filter: GeneratorFilter, hiddenGeneratorsArray: string[]) {
     const packageJson = genData.generatorPackageJson;
     const genMeta = genData.generatorMeta;
+    const isAdditionalGenerator = genMeta.isAdditional;
     const genFilter: GeneratorFilter = GeneratorFilter.create(_.get(packageJson, ["generator-filter"]));
     const typesHasIntersection: boolean = GeneratorFilter.hasIntersection(filter.types, genFilter.types);
     const categoriesHasIntersection: boolean = GeneratorFilter.hasIntersection(filter.categories, genFilter.categories);
@@ -608,11 +609,11 @@ export class YeomanUI {
       hidden = true;
     }
     if (!hidden && typesHasIntersection && categoriesHasIntersection) {
-      return this.createGeneratorChoice(genMeta.namespace, genMeta.packagePath, packageJson);
+      return this.createGeneratorChoice(genMeta.namespace, genMeta.packagePath, packageJson, isAdditionalGenerator);
     }
   }
 
-  private async createGeneratorChoice(genNamespace: string, genPackagePath: string, packageJson: any): Promise<any> {
+  private async createGeneratorChoice(genNamespace: string, genPackagePath: string, packageJson: any, isAdditionalGenerator: boolean): Promise<any> {
     let genImageUrl;
 
     try {
@@ -622,9 +623,21 @@ export class YeomanUI {
       this.logger.debug(error);
     }
 
+    let genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
+    let genDisplayName = _.get(packageJson, "displayName", "");
+
+    if (isAdditionalGenerator) {
+      const additionalGenerators = _.get(packageJson, "additional_generators");
+      if (additionalGenerators) {
+        const genData: AdditionalGenerator = additionalGenerators.find((gen: AdditionalGenerator) => gen.namespace === genNamespace);
+        genMessage = genData.description;
+        genDisplayName = genData.displayName;
+      }
+
+    }
+
     const genName = Environment.namespaceToName(genNamespace);
-    const genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
-    const genDisplayName = _.get(packageJson, "displayName", "");
+
     const genPrettyName = _.isEmpty(genDisplayName) ? titleize(humanizeString(genName)) : genDisplayName;
     const genHomepage = _.get(packageJson, "homepage", "");
     const filter = _.get(packageJson, "generator-filter", undefined);
