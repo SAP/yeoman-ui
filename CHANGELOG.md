@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.16.9](https://github.com/SAP/yeoman-ui/compare/v1.16.8...v1.16.9) (2024-11-18)
+
+### Bug Fixes
+
+- [DEVXBUGS-11964] keeping the full path of modified folders instead of relative ones ([#859](https://github.com/SAP/yeoman-ui/issues/859)) ([50415d4](https://github.com/SAP/yeoman-ui/commit/50415d4b1f70210dd92211a73551322e10526fc8))
+
 ## [1.16.8](https://github.com/SAP/yeoman-ui/compare/v1.16.7...v1.16.8) (2024-11-05)
 
 ### Bug Fixes
