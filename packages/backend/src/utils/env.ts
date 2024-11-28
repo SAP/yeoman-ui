@@ -34,7 +34,7 @@ export type AdditionalGenerator = {
   description: string;
   homePage?: string;
   image?: string;
-}
+};
 
 export class GeneratorNotFoundError extends Error {
   constructor(message: string) {
@@ -150,18 +150,21 @@ class EnvUtil {
     mainGenerators.forEach((genMeta) => {
       try {
         const packageJsonPath = join(genMeta.packagePath, PACKAGE_JSON);
-        const { additional_generators }: { additional_generators: AdditionalGenerator[] } = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
-        if (additional_generators?.length)
-          additionalGenerators = [...additional_generators];
+        const { additional_generators }: { additional_generators: AdditionalGenerator[] } = JSON.parse(
+          readFileSync(packageJsonPath, "utf-8"),
+        );
+        if (additional_generators?.length) additionalGenerators = [...additional_generators];
       } catch (error) {
-        this.logger?.debug('Error occured while trying to get additional generator tiles', error);
+        this.logger?.debug("Error occured while trying to get additional generator tiles", error);
       }
     });
 
-    const additionalGeneratorsMeta = gensMeta.filter((genMeta) => additionalGenerators.find((gen) => gen.namespace === genMeta.namespace)).map((genMeta: LookupGeneratorMetaExtended) => {
-      genMeta.isAdditional = true;
-      return genMeta;
-    });
+    const additionalGeneratorsMeta = gensMeta
+      .filter((genMeta) => additionalGenerators.find((gen) => gen.namespace === genMeta.namespace))
+      .map((genMeta: LookupGeneratorMetaExtended) => {
+        genMeta.isAdditional = true;
+        return genMeta;
+      });
 
     return mainGenerators.concat(additionalGeneratorsMeta);
   }

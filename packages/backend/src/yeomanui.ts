@@ -625,7 +625,12 @@ export class YeomanUI {
     return genImageUrl;
   }
 
-  private async createGeneratorChoice(genNamespace: string, genPackagePath: string, packageJson: any, isAdditionalGenerator?: boolean): Promise<any> {
+  private async createGeneratorChoice(
+    genNamespace: string,
+    genPackagePath: string,
+    packageJson: any,
+    isAdditionalGenerator?: boolean,
+  ): Promise<any> {
     let genImageUrl = await this.getGeneratorImageUrl(genPackagePath, YeomanUI.YEOMAN_PNG);
     let genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
     let genDisplayName = _.get(packageJson, "displayName", "");
@@ -634,7 +639,9 @@ export class YeomanUI {
     if (isAdditionalGenerator) {
       const additionalGenerators = _.get(packageJson, "additional_generators");
       if (additionalGenerators) {
-        const genData: AdditionalGenerator = additionalGenerators.find((gen: AdditionalGenerator) => gen.namespace === genNamespace);
+        const genData: AdditionalGenerator = additionalGenerators.find(
+          (gen: AdditionalGenerator) => gen.namespace === genNamespace,
+        );
         genMessage = genData.description;
         genDisplayName = genData.displayName;
         genHomepage = genData?.homePage ?? genHomepage;
@@ -645,7 +652,7 @@ export class YeomanUI {
     const genName = Environment.namespaceToName(genNamespace);
 
     const genPrettyName = _.isEmpty(genDisplayName) ? titleize(humanizeString(genName)) : genDisplayName;
-    
+
     const filter = _.get(packageJson, "generator-filter", undefined);
     const isToolsSuiteType = filter ? _.includes(filter.types, "tools-suite") : false;
 
