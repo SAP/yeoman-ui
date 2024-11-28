@@ -1,25 +1,39 @@
 import * as _ from "lodash";
 import { homedir } from "os";
 import * as path from "path";
-import { existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { isWin32, NpmCommand } from "./npm";
 import * as customLocation from "./customLocation";
 import * as Environment from "yeoman-environment";
 import TerminalAdapter = require("yeoman-environment/lib/adapter");
 import { IChildLogger } from "@vscode-logging/logger";
 import { getClassLogger } from "../logger/logger-wrapper";
+import { join } from "path";
 
 const GENERATOR = "generator-";
 const NAMESPACE = "namespace";
+const PACKAGE_JSON = "package.json";
 
 export type EnvGen = {
   env: Environment<Environment.Options>;
   gen: any;
 };
 
+interface LookupGeneratorMetaExtended extends Environment.LookupGeneratorMeta {
+  isAdditional?: boolean;
+}
+
 export type GeneratorData = {
-  generatorMeta: Environment.LookupGeneratorMeta;
+  generatorMeta: LookupGeneratorMetaExtended;
   generatorPackageJson: any;
+};
+
+export type AdditionalGenerator = {
+  namespace: string;
+  displayName: string;
+  description: string;
+  homePage?: string;
+  image?: string;
 };
 
 export class GeneratorNotFoundError extends Error {
@@ -130,8 +144,29 @@ class EnvUtil {
     throw new GeneratorNotFoundError(`${genNamespace} generator metadata was not found.`);
   }
 
-  private genMainGensMeta(gensMeta: Environment.LookupGeneratorMeta[]): Environment.LookupGeneratorMeta[] {
-    return gensMeta.filter((genMeta) => genMeta.namespace.endsWith(":app"));
+  private genMainGensMeta(gensMeta: Environment.LookupGeneratorMeta[]): LookupGeneratorMetaExtended[] {
+    const mainGenerators = gensMeta.filter((genMeta) => genMeta.namespace.endsWith(":app"));
+    let additionalGenerators: AdditionalGenerator[] = [];
+    mainGenerators.forEach((genMeta) => {
+      try {
+        const packageJsonPath = join(genMeta.packagePath, PACKAGE_JSON);
+        const { additional_generators }: { additional_generators: AdditionalGenerator[] } = JSON.parse(
+          readFileSync(packageJsonPath, "utf-8"),
+        );
+        if (additional_generators?.length) additionalGenerators = [...additional_generators];
+      } catch (error) {
+        this.logger?.debug("Error occured while trying to get additional generator tiles", error);
+      }
+    });
+
+    const additionalGeneratorsMeta = gensMeta
+      .filter((genMeta) => additionalGenerators.find((gen) => gen.namespace === genMeta.namespace))
+      .map((genMeta: LookupGeneratorMetaExtended) => {
+        genMeta.isAdditional = true;
+        return genMeta;
+      });
+
+    return mainGenerators.concat(additionalGeneratorsMeta);
   }
 
   private async getGensMetaByInstallationPath(): Promise<Environment.LookupGeneratorMeta[]> {
@@ -139,7 +174,7 @@ class EnvUtil {
     return this.lookupGensMeta({ npmPaths: npmInstallationPaths });
   }
 
-  private async getGeneratorsMeta(mainOnly = true): Promise<Environment.LookupGeneratorMeta[]> {
+  private async getGeneratorsMeta(mainOnly = true): Promise<LookupGeneratorMetaExtended[]> {
     this.allInstalledGensMeta = await this.lookupAllGensMeta();
     return mainOnly ? this.genMainGensMeta(this.allInstalledGensMeta) : this.allInstalledGensMeta;
   }
@@ -164,7 +199,7 @@ class EnvUtil {
   }
 
   public async getGeneratorsData(mainOnly = true): Promise<GeneratorData[]> {
-    const gensMeta: Environment.LookupGeneratorMeta[] = await this.getGeneratorsMeta(mainOnly);
+    const gensMeta: LookupGeneratorMetaExtended[] = await this.getGeneratorsMeta(mainOnly);
     const packageJsons = await NpmCommand.getPackageJsons(gensMeta);
 
     const gensData = packageJsons.map((generatorPackageJson: any | undefined, index: number) => {
