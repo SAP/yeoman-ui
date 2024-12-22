@@ -28,11 +28,11 @@ jobs:
       # Generate changelog for the current release
       - name: Generate Changelog
         run: |
-          CHANGELOG=$(npx conventional-changelog -p angular -r 1)
+          CHANGELOG=$(npx conventional-changelog -p angular -r 2 | sed '/^# \[\]/d' | sed '/./,$!d')
           echo "changelog=$CHANGELOG" >> $GITHUB_ENV
 
       - name: Create Github Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: packages/*/*.vsix
           fail_on_unmatched_files: true
