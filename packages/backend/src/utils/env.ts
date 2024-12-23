@@ -1,16 +1,18 @@
 import * as _ from "lodash";
 import { homedir } from "os";
 import * as path from "path";
-import { existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { isWin32, NpmCommand } from "./npm";
 import * as customLocation from "./customLocation";
 import * as Environment from "yeoman-environment";
 import TerminalAdapter = require("yeoman-environment/lib/adapter");
 import { IChildLogger } from "@vscode-logging/logger";
 import { getClassLogger } from "../logger/logger-wrapper";
+import { join } from "path";
 
 const GENERATOR = "generator-";
 const NAMESPACE = "namespace";
+const PACKAGE_JSON = "package.json";
 
 export type EnvGen = {
   env: Environment<Environment.Options>;
@@ -21,6 +23,12 @@ export type GeneratorData = {
   generatorMeta: Environment.LookupGeneratorMeta;
   generatorPackageJson: any;
 };
+
+export type AdditionalGenerator = {
+  namespace: string;
+  displayName: string;
+  description: string;
+}
 
 export class GeneratorNotFoundError extends Error {
   constructor(message: string) {
@@ -131,7 +139,21 @@ class EnvUtil {
   }
 
   private genMainGensMeta(gensMeta: Environment.LookupGeneratorMeta[]): Environment.LookupGeneratorMeta[] {
-    return gensMeta.filter((genMeta) => genMeta.namespace.endsWith(":app"));
+    const mainGenerators = gensMeta.filter((genMeta) => genMeta.namespace.endsWith(":app"));
+    let additionalGenerators: AdditionalGenerator[] = [];
+    mainGenerators.forEach((genMeta) => {
+      const packageJsonPath = join(genMeta.packagePath, PACKAGE_JSON);
+      const { additional_generators }: { additional_generators: AdditionalGenerator[] } = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
+      if (additional_generators?.length)
+        additionalGenerators = [...additional_generators];
+    });
+
+    const additionalGeneratorsMeta = gensMeta.filter((genMeta) => additionalGenerators.find((gen) => gen.namespace === genMeta.namespace)).map(genMeta => {
+      genMeta.isAdditional = true;
+      return genMeta;
+    });
+
+    return mainGenerators.concat(additionalGeneratorsMeta);
   }
 
   private async getGensMetaByInstallationPath(): Promise<Environment.LookupGeneratorMeta[]> {
