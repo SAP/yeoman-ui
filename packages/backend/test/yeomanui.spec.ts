@@ -728,6 +728,88 @@ describe("yeomanui unit test", () => {
       expect(result.questions[0].choices).to.have.lengthOf(5);
     });
 
+    it("get generators all generators and additional generators", async () => {
+      const gensMeta = [
+        {
+          generatorMeta: {
+            generatorPath: "test1Path/app/index.js",
+            namespace: "test1-project:app",
+            packagePath: "test1Path",
+          },
+          generatorPackageJson: {
+            "generator-filter": { type: "project" },
+            description: "test1Description",
+          },
+        },
+        {
+          generatorMeta: {
+            generatorPath: "test2Path/app/index.js",
+            namespace: "test2-module:app",
+            packagePath: "test2Path",
+          },
+          generatorPackageJson: {
+            "generator-filter": { type: "project_test" },
+          },
+        },
+        {
+          generatorMeta: {
+            generatorPath: "test3Path/app/index.js",
+            namespace: "test3:app",
+            packagePath: "test3Path",
+          },
+          generatorPackageJson: {
+            "generator-filter": { type: "module" },
+          },
+        },
+        {
+          generatorMeta: {
+            generatorPath: "test4Path/app/index.js",
+            namespace: "test4:app",
+            packagePath: "test4Path",
+          },
+          generatorPackageJson: {
+            "generator-filter": { type: "project" },
+            description: "test4Description",
+            additional_generators: [
+              {
+                namespace: "test4:subgen",
+                description: "test 4 sub gen description",
+                displayName: "Test Sub Gen 4",
+              },
+            ],
+          },
+        },
+        {
+          generatorMeta: {
+            generatorPath: "test4Path/subgen/index.js",
+            namespace: "test4:subgen",
+            packagePath: "test4Path",
+            isAdditional: true,
+          },
+          generatorPackageJson: {
+            description: "test5Description",
+            additional_generators: [
+              {
+                namespace: "test4:subgen",
+                description: "test 4 sub gen description",
+                displayName: "Test Sub Gen 4",
+              },
+            ],
+          },
+        },
+      ];
+
+      envUtilsMock.expects("getGeneratorsData").resolves(gensMeta);
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").returns("");
+      yeomanUi["uiOptions"] = {
+        filter: GeneratorFilter.create({ type: [] }),
+        messages,
+      };
+      const result = await yeomanUi["getGeneratorsPrompt"]();
+
+      expect(result.questions[0].choices).to.have.lengthOf(5);
+    });
+
     it("wrong generators filter type is provided", async () => {
       wsConfigMock.expects("get").withExactArgs("ApplicationWizard.Workspace").returns({});
       wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").returns("");

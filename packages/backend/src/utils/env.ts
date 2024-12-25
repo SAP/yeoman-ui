@@ -22,6 +22,14 @@ export type GeneratorData = {
   generatorPackageJson: any;
 };
 
+type AdditionalGenerator = {
+  namespace: string;
+  displayName: string;
+  description: string;
+  homePage?: string;
+  image?: string;
+};
+
 export class GeneratorNotFoundError extends Error {
   constructor(message: string) {
     super(message);
@@ -173,6 +181,31 @@ class EnvUtil {
         return { generatorMeta, generatorPackageJson };
       }
     });
+
+    // lookup for additional generators
+    let additional: AdditionalGenerator[] = [];
+    gensData.forEach((genData) => {
+      additional = additional.concat(...(genData.generatorPackageJson.additional_generators ?? []));
+    });
+    // remove duplicates
+    additional = _.uniqBy(additional, "namespace");
+    // get additional generators data
+    if (additional.length) {
+      const additionalGensMeta = this.allInstalledGensMeta.filter((genMeta) =>
+        additional.find((gen) => gen.namespace === genMeta.namespace),
+      );
+      const additionalPackageJsons = await NpmCommand.getPackageJsons(additionalGensMeta);
+      const additionalGensData = additionalPackageJsons.map((generatorPackageJson: any | undefined, index: number) => {
+        if (generatorPackageJson) {
+          return {
+            generatorMeta: additionalGensMeta[index],
+            // populate additional generator properties with main generator package.json
+            generatorPackageJson: { ...generatorPackageJson, ...additional[index] },
+          };
+        }
+      });
+      gensData.push(...additionalGensData);
+    }
 
     return _.compact(gensData);
   }

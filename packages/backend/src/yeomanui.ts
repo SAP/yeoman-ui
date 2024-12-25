@@ -616,7 +616,7 @@ export class YeomanUI {
     let genImageUrl;
 
     try {
-      genImageUrl = await datauri(path.join(genPackagePath, YeomanUI.YEOMAN_PNG));
+      genImageUrl = await datauri(path.join(genPackagePath, _.get(packageJson, "image", YeomanUI.YEOMAN_PNG)));
     } catch (error) {
       genImageUrl = defaultImage.default;
       this.logger.debug(error);
