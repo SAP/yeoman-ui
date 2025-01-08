@@ -1,5 +1,5 @@
 import * as path from "path";
-import { promises, watch, statSync, FSWatcher } from "fs";
+import { promises } from "fs";
 import * as _ from "lodash";
 import * as inquirer from "inquirer";
 import { ReplayUtils, ReplayState } from "./replayUtils";
@@ -171,23 +171,26 @@ export class YeomanUI {
     return { name: "Select Generator", questions: normalizedQuestions };
   }
 
-  private startWatch(folderPath: string, targetMap: Map<string, any>): FSWatcher {
-    return watch(folderPath, { recursive: true }, (eventType, filename) => {
-      try {
-        // file or directory added or removed
-        if (`rename` === eventType && filename) {
-          const fullPath = path.join(folderPath, filename);
-          const stat = statSync(fullPath);
-          targetMap.set(fullPath, {
-            isDirectory: stat.isDirectory(),
-            size: stat.size,
-            modifiedTime: stat.mtime,
-          });
+  private async getChildDirectories(folderPath: string) {
+    const childDirs: string[] = [];
+    const result = { targetFolderPath: folderPath, childDirs };
+
+    try {
+      for (const file of await promises.readdir(folderPath)) {
+        const resourcePath: string = path.join(folderPath, file);
+        try {
+          if ((await promises.stat(resourcePath)).isDirectory()) {
+            result.childDirs.push(resourcePath);
+          }
+        } catch (e) {
+          // ignore : broken soft link or access denied
         }
-      } catch (error) {
-        // ignore : broken soft link or access denied
       }
-    });
+    } catch (error) {
+      result.childDirs = [];
+    }
+
+    return result;
   }
 
   private wsGet(key: string): string {
@@ -196,15 +199,13 @@ export class YeomanUI {
 
   private async runGenerator(generatorNamespace: string) {
     this.generatorName = generatorNamespace;
-    let watcher: FSWatcher;
-    const targetFolderMap: Map<string, any> = new Map();
-    // let targetChanges: any;
     // TODO: should create and set target dir only after user has selected a generator;
     // see issue: https://github.com/yeoman/environment/issues/55
     // process.chdir() doesn't work after environment has been created
     try {
       const targetFolder = this.getCwd();
       await promises.mkdir(targetFolder, { recursive: true });
+      const dirsBefore = await this.getChildDirectories(targetFolder);
 
       const options = {
         logger: this.logger.getChildLogger({ label: generatorNamespace }),
@@ -235,18 +236,12 @@ export class YeomanUI {
       // handles generator errors
       this.handleErrors(envGen.env, this.gen, generatorNamespace);
 
-      const targetFolderAfter = resolve(this.getCwd(), this.gen.destinationRoot());
-      watcher = this.startWatch(targetFolderAfter, targetFolderMap);
-
       await envGen.env.runGenerator(envGen.gen);
       if (!this.errorThrown) {
         // Without resolve this code worked only for absolute paths without / at the end.
         // Generator can put a relative path, path including . and .. and / at the end.
-        this.onGeneratorSuccess(
-          generatorNamespace,
-          { targetFolderPath: targetFolder },
-          { targetFolderPath: targetFolderAfter, changeMap: targetFolderMap },
-        );
+        const dirsAfter = await this.getChildDirectories(resolve(this.getCwd(), this.gen.destinationRoot()));
+        this.onGeneratorSuccess(generatorNamespace, dirsBefore, dirsAfter);
       }
     } catch (error) {
       if (error instanceof GeneratorNotFoundError) {
@@ -255,7 +250,6 @@ export class YeomanUI {
       this.onGeneratorFailure(generatorNamespace, this.getErrorWithAdditionalInfo(error, "runGenerator()"));
     } finally {
       this.onUncaughtException && process.removeListener("uncaughtException", this.onUncaughtException);
-      watcher?.close();
     }
   }
 
@@ -418,46 +412,22 @@ export class YeomanUI {
     return firstQuestionName ? _.startCase(firstQuestionName) : `Step ${this.promptCount}`;
   }
 
-  private onGeneratorSuccess(
-    generatorName: string,
-    resourcesBeforeGen?: { targetFolderPath: string },
-    resourcesAfterGen?: { targetFolderPath: string; changeMap: Map<string, any> },
-  ) {
-    function _getChangesStat(
-      targetPath: string,
-      changeMap: Map<string, { isDirectory: boolean }>,
-    ): { folders: string[]; files: string[] } {
-      const files: string[] = [];
-      const folders: string[] = []; // Top-level folders
-
-      for (const [filePath, fileInfo] of changeMap) {
-        if (fileInfo.isDirectory) {
-          const relativePath = path.relative(targetPath, filePath).trim();
-          const parts = relativePath.split(path.sep).filter(Boolean);
-          if (parts.length === 1) {
-            // Top-level folder
-            folders.push(filePath);
-          }
-        } else {
-          files.push(filePath);
-        }
-      }
-      return { folders, files };
-    }
-
+  private onGeneratorSuccess(generatorName: string, resourcesBeforeGen?: any, resourcesAfterGen?: any) {
     let targetFolderPath: string = null;
     // All the paths here absolute normilized paths.
     const targetFolderPathBeforeGen: string = _.get(resourcesBeforeGen, "targetFolderPath");
     const targetFolderPathAfterGen: string = _.get(resourcesAfterGen, "targetFolderPath");
     let hasNewDirs: boolean = true;
     if (targetFolderPathBeforeGen === targetFolderPathAfterGen) {
-      const stats = _getChangesStat(targetFolderPathAfterGen, resourcesAfterGen.changeMap);
-      if (_.size(stats.folders) === 1) {
+      const newDirs: string[] = _.difference(
+        _.get(resourcesAfterGen, "childDirs"),
+        _.get(resourcesBeforeGen, "childDirs"),
+      );
+      if (_.size(newDirs) === 1) {
         // One folder added by generator and targetFolderPath/destinationRoot was not changed by generator.
         // ---> Fiori project generator flow.
-        targetFolderPath = stats.folders[0];
-      } else if (_.size(stats.folders) === 0 && _.size(stats.files) === 0) {
-        // No files or folders added by generator.
+        targetFolderPath = newDirs[0];
+      } else if (_.size(newDirs) === 0) {
         hasNewDirs = false;
       }
       //else { // _.size(newDirs) > 1 (5 folders)

@@ -1,8 +1,7 @@
 import { vscode } from "./mockUtil";
-import { createSandbox, SinonSandbox, SinonMock, SinonStub } from "sinon";
+import { createSandbox, SinonSandbox, SinonMock } from "sinon";
 const datauri = require("datauri"); // eslint-disable-line @typescript-eslint/no-var-requires
-import * as fs from "fs";
-import * as path from "path";
+import { promises } from "fs";
 import { expect } from "chai";
 import * as _ from "lodash";
 import { YeomanUI } from "../src/yeomanui";
@@ -10,6 +9,7 @@ import { ReplayUtils } from "../src/replayUtils";
 import { YouiEvents } from "../src/youi-events";
 import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorFilter } from "../src/filter";
+import { homedir } from "os";
 import messages from "../src/messages";
 import { AnalyticsWrapper } from "../src/usage-report/usage-analytics-wrapper";
 import { AppWizard, MessageType } from "@sap-devx/yeoman-ui-types";
@@ -141,14 +141,14 @@ describe("yeomanui unit test", () => {
     sandbox = createSandbox();
   });
 
-  afterEach(() => {
+  after(() => {
     sandbox.restore();
   });
 
   beforeEach(() => {
     envUtilsMock = sandbox.mock(Env);
     appWizardMock = sandbox.mock(appWizard);
-    fsPromisesMock = sandbox.mock(fs.promises);
+    fsPromisesMock = sandbox.mock(promises);
     datauriMock = sandbox.mock(datauri);
     rpcMock = sandbox.mock(rpc);
     loggerMock = sandbox.mock(testLogger);
@@ -173,69 +173,15 @@ describe("yeomanui unit test", () => {
     envUtilsMock.verify();
   });
 
-  describe("startWatch", () => {
-    let stubStat: SinonStub;
-    let callBack: (event: string, file: string) => void;
-    const targetMap: Map<string, any> = new Map();
+  it("getChildDirectories", async () => {
+    const res = await yeomanUi["getChildDirectories"](homedir());
+    expect(res.targetFolderPath).is.not.empty;
+    expect(res.childDirs).is.not.empty;
 
-    beforeEach(() => {
-      stubStat = sandbox.stub(fs, "statSync");
-      sandbox.stub(fs, "watch").value((p: string, o: any, cb: (event: string, file: string) => void) => {
-        callBack = cb;
-        return {
-          close: () => {},
-        };
-      });
-    });
-
-    afterEach(() => {
-      targetMap.clear();
-    });
-
-    it("startWatch, entire folder content added", () => {
-      const targetPath = path.join("/", "targetRoot");
-      const folderPath = path.join("testPath");
-      const subFolderPath = path.join(folderPath, "subFolderPath");
-      const filePath = path.join(subFolderPath, "file1");
-      stubStat.withArgs(path.join(targetPath, folderPath)).returns({ isDirectory: () => true });
-      stubStat.withArgs(path.join(targetPath, subFolderPath)).returns({ isDirectory: () => true });
-      stubStat.withArgs(path.join(targetPath, filePath)).returns({ isDirectory: () => false, size: 100, mtime: 1233 });
-      expect(yeomanUi["startWatch"](targetPath, targetMap)).to.not.empty;
-      callBack("rename", folderPath);
-      callBack("rename", subFolderPath);
-      callBack("rename", filePath);
-      expect(targetMap.size).to.equal(3);
-      expect(targetMap.get(path.join(targetPath, filePath))).to.deep.equal({
-        isDirectory: false,
-        size: 100,
-        modifiedTime: 1233,
-      });
-    });
-
-    it("startWatch, 'change' event skipped", () => {
-      const targetPath = path.join("/", "targetRoot");
-      const folderPath = path.join("testPath");
-      stubStat.withArgs(path.join(targetPath, folderPath)).returns({ isDirectory: () => true });
-      expect(yeomanUi["startWatch"](targetPath, targetMap)).to.not.empty;
-      callBack("change", folderPath);
-      expect(targetMap.size).to.equal(0);
-    });
-
-    it("startWatch, 'statSync' throws exception", () => {
-      const targetPath = path.join("/", "targetRoot");
-      const folderPath = path.join("testPath");
-      stubStat.withArgs(path.join(targetPath, folderPath)).throws("statSync error");
-      expect(yeomanUi["startWatch"](targetPath, targetMap)).to.not.empty;
-      callBack("rename", folderPath);
-      expect(targetMap.size).to.equal(0);
-    });
-
-    it("startWatch, filename not provided", () => {
-      const targetPath = path.join("/", "targetRoot");
-      expect(yeomanUi["startWatch"](targetPath, targetMap)).to.not.empty;
-      callBack("rename", "");
-      expect(targetMap.size).to.equal(0);
-    });
+    const errorMessage = "readdir failure";
+    fsPromisesMock.expects("readdir").throws(new Error(errorMessage));
+    const resFail = await yeomanUi["getChildDirectories"](homedir());
+    expect(resFail.childDirs).is.empty;
   });
 
   describe("receiveIsWebviewReady", () => {
@@ -282,15 +228,6 @@ describe("yeomanui unit test", () => {
       },
     ];
 
-    beforeEach(() => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      sandbox.stub(fs, "watch").value((p: string, o: any, cb: (event: string, file: string) => void) => {
-        return {
-          close: () => {},
-        };
-      });
-    });
-
     it("flow is successfull", async () => {
       envUtilsMock.expects("getGeneratorsData").resolves(gensMeta);
       envUtilsMock
@@ -311,9 +248,9 @@ describe("yeomanui unit test", () => {
       wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").once().returns("");
       rpcMock.expects("invoke").withArgs("showPrompt").resolves({ generator: "test1-project:app" });
       rpcMock.expects("invoke").withExactArgs("setGenInWriting", [false]).resolves();
-      trackerWrapperMock.expects("updateGeneratorStarted").once().returns(undefined);
-      trackerWrapperMock.expects("updateGeneratorSelected").withArgs("test1-project:app").returns(undefined);
-      trackerWrapperMock.expects("updateGeneratorEnded").once().returns(undefined);
+      trackerWrapperMock.expects("updateGeneratorStarted").once().resolves();
+      trackerWrapperMock.expects("updateGeneratorSelected").withArgs("test1-project:app").resolves();
+      trackerWrapperMock.expects("updateGeneratorEnded").once().resolves();
       await yeomanUi["receiveIsWebviewReady"]();
     });
 
@@ -345,11 +282,11 @@ describe("yeomanui unit test", () => {
       trackerWrapperMock.expects("updateGeneratorEnded").once().resolves();
       await yeomanUi["receiveIsWebviewReady"]();
     });
+  });
 
-    it("showPrompt without questions", async () => {
-      const answers = await yeomanUi.showPrompt([]);
-      expect(answers).to.be.empty;
-    });
+  it("showPrompt without questions", async () => {
+    const answers = await yeomanUi.showPrompt([]);
+    expect(answers).to.be.empty;
   });
 
   describe("executeCommand", () => {
@@ -384,12 +321,6 @@ describe("yeomanui unit test", () => {
     wsConfigMock.expects("get").withExactArgs("ApplicationWizard.HideGenerator").returns("");
     rpcMock.expects("invoke").withArgs("updateGeneratorsPrompt");
     await yeomanUi._notifyGeneratorsChange();
-  });
-
-  it("running generator throws error and watcher does not exist", async () => {
-    wsConfigMock.expects("get").withExactArgs("ApplicationWizard.TargetFolder").throws("get error");
-    sandbox.stub(yeomanUi as any, "onGeneratorFailure").returns({});
-    await yeomanUi["runGenerator"]("test1-project:app");
   });
 
   describe("_notifyGeneratorsInstall", () => {
@@ -1258,7 +1189,6 @@ describe("yeomanui unit test", () => {
     let doGeneratorDoneSpy: any;
     const create_and_close = "Create the project and close it for future use";
     const open_in_new_ws = "Open the project in a stand-alone folder";
-    const changes = new Map();
 
     beforeEach(() => {
       doGeneratorDoneSpy = sandbox.spy(youiEvents, "doGeneratorDone");
@@ -1266,17 +1196,16 @@ describe("yeomanui unit test", () => {
 
     afterEach(() => {
       doGeneratorDoneSpy.restore();
-      changes.clear();
     });
 
     it("onGeneratorSuccess - one dir was created", () => {
       const beforeGen = {
-        targetFolderPath: path.join("/", "testDestinationRoot"),
+        targetFolderPath: "testDestinationRoot",
+        childDirs: ["dirparh1"],
       };
-      changes.set(path.join("/", "testDestinationRoot", "dirpath1"), { isDirectory: true });
       const afterGen = {
-        targetFolderPath: path.join("/", "testDestinationRoot"),
-        changeMap: changes,
+        targetFolderPath: "testDestinationRoot",
+        childDirs: ["dirparh1", "dirpath2"],
       };
       trackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName").resolves();
       yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
@@ -1287,20 +1216,19 @@ describe("yeomanui unit test", () => {
           _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated", (a: string) => "")("testGenName"),
           create_and_close,
           "files",
-          path.join(beforeGen.targetFolderPath, "dirpath1"),
+          "dirpath2",
         ),
       ).to.be.true;
     });
 
     it("onGeneratorSuccess - two dirs were created", () => {
       const beforeGen = {
-        targetFolderPath: path.join("/", "testDestinationRoot"),
+        targetFolderPath: "testDestinationRoot",
+        childDirs: ["dirparh1"],
       };
-      changes.set(path.join("/", "testDestinationRoot", "dirpath2"), { isDirectory: true });
-      changes.set(path.join("/", "testDestinationRoot", "dirpath3"), { isDirectory: true });
       const afterGen = {
-        targetFolderPath: path.join("/", "testDestinationRoot"),
-        changeMap: changes,
+        targetFolderPath: "testDestinationRoot",
+        childDirs: ["dirparh1", "dirpath2", "dirpath3"],
       };
       trackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName").resolves();
       yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
@@ -1316,13 +1244,14 @@ describe("yeomanui unit test", () => {
       ).to.be.true;
     });
 
-    it("onGeneratorSuccess - zero dirs were created and no files generated", () => {
+    it("onGeneratorSuccess - zero dirs were created", () => {
       const beforeGen = {
         targetFolderPath: "testDestinationRoot",
+        childDirs: ["dirparh1"],
       };
       const afterGen = {
         targetFolderPath: "testDestinationRoot",
-        changeMap: changes,
+        childDirs: ["dirparh1"],
       };
       trackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName").resolves();
       yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
@@ -1338,35 +1267,10 @@ describe("yeomanui unit test", () => {
       ).to.be.true;
     });
 
-    it("onGeneratorSuccess - zero dirs were created but files generated", () => {
-      const beforeGen = {
-        targetFolderPath: "testDestinationRoot",
-      };
-      changes.set(path.join("/", "testDestinationRoot", "webapp", "changes"), { isDirectory: true });
-      changes.set(path.join("/", "testDestinationRoot", "webapp", "changes", "file1"), { isDirectory: false });
-      const afterGen = {
-        targetFolderPath: "testDestinationRoot",
-        changeMap: changes,
-      };
-      trackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName").resolves();
-      yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
-      expect(
-        doGeneratorDoneSpy.calledWith(
-          true,
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated", (a: string) => "")("testGenName"),
-          create_and_close,
-          "files",
-          null,
-        ),
-      ).to.be.true;
-    });
-
     it("onGeneratorSuccess - targetFolderPath was changed by generator", () => {
       const beforeGen = { targetFolderPath: "testDestinationRoot" };
       const afterGen = {
-        targetFolderPath: path.join("/", "testDestinationRoot", "generatedProject"),
-        changeMap: changes,
+        targetFolderPath: "testDestinationRoot/generatedProject",
       };
       trackerWrapperMock.expects("updateGeneratorEnded").withArgs("testGenName").resolves();
       yeomanUi["onGeneratorSuccess"]("testGenName", beforeGen, afterGen);
@@ -1377,7 +1281,7 @@ describe("yeomanui unit test", () => {
           _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated", (a: string) => "")("testGenName"),
           create_and_close,
           "files",
-          afterGen.targetFolderPath,
+          "testDestinationRoot/generatedProject",
         ),
       ).to.be.true;
     });
@@ -1395,8 +1299,7 @@ describe("yeomanui unit test", () => {
       yeomanUi["typesMap"].set("foodq:app", "project");
       const beforeGen = { targetFolderPath: "testDestinationRoot" };
       const afterGen = {
-        targetFolderPath: path.join("testDestinationRoot", "generatedProject"),
-        changeMap: changes,
+        targetFolderPath: "testDestinationRoot/generatedProject",
       };
       trackerWrapperMock.expects("updateGeneratorEnded").withArgs("foodq:app").resolves();
       yeomanUi["onGeneratorSuccess"]("foodq:app", beforeGen, afterGen);
@@ -1407,7 +1310,7 @@ describe("yeomanui unit test", () => {
           _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated", (a: string) => "")("foodq:app"),
           open_in_new_ws,
           "project",
-          afterGen.targetFolderPath,
+          "testDestinationRoot/generatedProject",
         ),
       ).to.be.true;
     });
@@ -1419,7 +1322,6 @@ describe("yeomanui unit test", () => {
       const beforeGen = { targetFolderPath: "testDestinationRoot" };
       const afterGen = {
         targetFolderPath: "testDestinationRoot/generatedProject",
-        changeMap: changes,
       };
       trackerWrapperMock.expects("updateGeneratorEnded").withArgs("fiori-generator:app").resolves();
       yeomanUi["onGeneratorSuccess"]("fiori-generator:app", beforeGen, afterGen);
@@ -1430,7 +1332,7 @@ describe("yeomanui unit test", () => {
           _.get(yeomanUi, "uiOptions.messages.artifact_with_name_generated", (a: string) => "")("fiori-generator:app"),
           create_and_close,
           "project",
-          afterGen.targetFolderPath,
+          "testDestinationRoot/generatedProject",
         ),
       ).to.be.true;
     });
