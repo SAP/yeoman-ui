@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.17.0](https://github.com/SAP/yeoman-ui/compare/v1.16.9...v1.17.0) (2025-01-08)
+
+### Features
+
+- configuration for showing additional sub generator tiles on the main page ([#862](https://github.com/SAP/yeoman-ui/issues/862)) ([6fa1330](https://github.com/SAP/yeoman-ui/commit/6fa133008b71c0d3495e716fed54658049c78957))
+
 ## [1.16.9](https://github.com/SAP/yeoman-ui/compare/v1.16.8...v1.16.9) (2024-11-18)
 
 ### Bug Fixes
