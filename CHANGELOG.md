@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.17.1](https://github.com/SAP/yeoman-ui/compare/v1.17.0...v1.17.1) (2025-01-09)
+
+### Bug Fixes
+
+- handle multiline changelogs ([#865](https://github.com/SAP/yeoman-ui/issues/865)) ([20bc502](https://github.com/SAP/yeoman-ui/commit/20bc502ae6d9fc501af96558763e43f47696ab48))
+
 # [1.17.0](https://github.com/SAP/yeoman-ui/compare/v1.16.9...v1.17.0) (2025-01-08)
 
 ### Features
