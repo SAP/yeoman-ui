@@ -18,6 +18,20 @@ class WorkspaceFileUtil {
     return Uri.file(wsFilePath);
   }
 
+  public createUri(uriPath: string): Uri {
+    const wsFilePath = this.getUniqWorkspaceFilePath();
+    const fileContent = {
+      folders: [
+        {
+          uri: `${uriPath}`,
+        },
+      ],
+      settings: {},
+    };
+    writeFileSync(wsFilePath, JSON.stringify(fileContent));
+    return Uri.file(wsFilePath);
+  }
+
   private createWsFilePath(counter?: number): string {
     const counterStr = counter ? `.${counter}.` : `.`;
     return join(Constants.HOMEDIR_PROJECTS, `workspace${counterStr}code-workspace`);

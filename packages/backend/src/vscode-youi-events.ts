@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { isEmpty, size, isNil, set } from "lodash";
+import validator from 'validator';
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorOutput } from "./vscode-output";
@@ -9,6 +10,7 @@ import { getImage } from "./images/messageImages";
 import { AppWizard, MessageType, Severity } from "@sap-devx/yeoman-ui-types";
 import { WorkspaceFile } from "./utils/workspaceFile";
 import { Constants } from "./utils/constants";
+import { IS_URL_DEFAULT_OPTIONS } from "./utils/env";
 
 class YoUiAppWizard extends AppWizard {
   constructor(private readonly events: VSCodeYouiEvents) {
@@ -176,21 +178,22 @@ export class VSCodeYouiEvents implements YouiEvents {
 
     if (success) {
       if (!isNil(targetFolderPath)) {
-        const targetFolderUri: vscode.Uri = vscode.Uri.file(targetFolderPath);
-
-        if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
+        let targetFolderUri: vscode.Uri = vscode.Uri.file(targetFolderPath);
+        if(validator.isURL(targetFolderPath, IS_URL_DEFAULT_OPTIONS)){
+          if(selectedWorkspace === this.messages.add_to_workspace){
+            targetFolderUri = vscode.Uri.parse(targetFolderPath);
+            const createWsFunc = WorkspaceFile.createUri;
+            this.addOrCreateProjectWorkspace(targetFolderUri, createWsFunc);
+          }
+          //TODO: add a popup error if the user not in add_to_workspace mode.
+        }
+        else if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
           void vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
         } else if (selectedWorkspace === this.messages.add_to_workspace) {
-          const wsFoldersQuantity = size(vscode.workspace.workspaceFolders);
-          vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, {
-            uri: targetFolderUri,
-          });
-          if (isNil(vscode.workspace.workspaceFile)) {
-            const workspaceFileUri = WorkspaceFile.create(targetFolderUri.fsPath);
-            void vscode.commands.executeCommand("vscode.openFolder", workspaceFileUri);
-          }
-        }
+          const createWsFunc = WorkspaceFile.create;
+          this.addOrCreateProjectWorkspace(targetFolderUri, createWsFunc);
       }
+    }
 
       const successInfoMessage = this.getSuccessInfoMessage(selectedWorkspace, type);
       return successInfoMessage // show the message only if it is not empty
@@ -199,6 +202,17 @@ export class VSCodeYouiEvents implements YouiEvents {
     }
 
     return vscode.window.showErrorMessage(errorMmessage);
+  }
+
+  private addOrCreateProjectWorkspace(targetFolderUri: vscode.Uri, createWsFunc: (uriPath: string) => vscode.Uri) {
+    const wsFoldersQuantity = size(vscode.workspace.workspaceFolders);
+    vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, {
+      uri: targetFolderUri,
+    });
+    if (isNil(vscode.workspace.workspaceFile)) {
+      const workspaceFileUri = createWsFunc(targetFolderUri.fsPath);
+      void vscode.commands.executeCommand("vscode.openFolder", workspaceFileUri);
+    }
   }
 
   private getSuccessInfoMessage(selectedWorkspace: string, type: string): string {

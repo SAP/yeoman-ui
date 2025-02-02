@@ -1,6 +1,7 @@
 import * as path from "path";
 import { promises } from "fs";
 import * as _ from "lodash";
+import validator, { IsURLOptions } from 'validator';
 import * as inquirer from "inquirer";
 import { ReplayUtils, ReplayState } from "./replayUtils";
 const datauri = require("datauri"); // eslint-disable-line @typescript-eslint/no-var-requires
@@ -15,8 +16,7 @@ import { IChildLogger } from "@vscode-logging/logger";
 import { IPrompt, MessageType } from "@sap-devx/yeoman-ui-types";
 import { AnalyticsWrapper } from "./usage-report/usage-analytics-wrapper";
 import { Output } from "./output";
-import { resolve } from "path";
-import { Env, EnvGen, GeneratorData, GeneratorNotFoundError } from "./utils/env";
+import { Env, EnvGen, GeneratorData, GeneratorNotFoundError, IS_URL_DEFAULT_OPTIONS } from "./utils/env";
 import { vscode, getVscode } from "./utils/vscodeProxy";
 import * as Generator from "yeoman-generator";
 import * as Environment from "yeoman-environment";
@@ -240,7 +240,9 @@ export class YeomanUI {
       if (!this.errorThrown) {
         // Without resolve this code worked only for absolute paths without / at the end.
         // Generator can put a relative path, path including . and .. and / at the end.
-        const dirsAfter = await this.getChildDirectories(resolve(this.getCwd(), this.gen.destinationRoot()));
+        const destinationRoot = this.gen.destinationRoot();
+        const pathAfet = this.getGeneratorDestinationPath(destinationRoot, IS_URL_DEFAULT_OPTIONS)
+        const dirsAfter = await this.getChildDirectories(pathAfet);
         this.onGeneratorSuccess(generatorNamespace, dirsBefore, dirsAfter);
       }
     } catch (error) {
@@ -647,4 +649,11 @@ export class YeomanUI {
       }
     }
   }
+
+  private getGeneratorDestinationPath(destinationRoot: string, options: IsURLOptions): string {
+    return validator.isURL(destinationRoot, options) 
+      ? destinationRoot 
+      : path.resolve(process.cwd(), destinationRoot);
+  }
+  
 }
