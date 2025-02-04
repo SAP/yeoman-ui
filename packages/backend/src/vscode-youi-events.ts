@@ -8,7 +8,7 @@ import { getClassLogger } from "./logger/logger-wrapper";
 import { getImage } from "./images/messageImages";
 import { AppWizard, MessageType, Severity } from "@sap-devx/yeoman-ui-types";
 import { WorkspaceFile } from "./utils/workspaceFile";
-import { Constants } from "./utils/constants";
+import { Constants, isURL } from "./utils/constants";
 
 class YoUiAppWizard extends AppWizard {
   constructor(private readonly events: VSCodeYouiEvents) {
@@ -176,7 +176,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 
     if (success) {
       if (!isNil(targetFolderPath)) {
-        if (Constants.isURL(targetFolderPath)) {
+        if (isURL(targetFolderPath)) {
           this.addToWorkspaceUriFlow(selectedWorkspace, targetFolderPath);
         } else {
           this.addToWorkspacePathFlow(targetFolderPath, selectedWorkspace);
