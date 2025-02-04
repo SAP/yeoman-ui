@@ -9,7 +9,6 @@ import { getImage } from "./images/messageImages";
 import { AppWizard, MessageType, Severity } from "@sap-devx/yeoman-ui-types";
 import { WorkspaceFile } from "./utils/workspaceFile";
 import { Constants } from "./utils/constants";
-import { isURL } from "./utils/utils";
 
 class YoUiAppWizard extends AppWizard {
   constructor(private readonly events: VSCodeYouiEvents) {
@@ -177,18 +176,12 @@ export class VSCodeYouiEvents implements YouiEvents {
 
     if (success) {
       if (!isNil(targetFolderPath)) {
-        if (isURL(targetFolderPath)) {
+        if (Constants.isURL(targetFolderPath)) {
           this.addToWorkspaceUriFlow(selectedWorkspace, targetFolderPath);
-          return;
-        }
-        const targetFolderUri: vscode.Uri = vscode.Uri.file(targetFolderPath);
-        if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
-          void vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
-        } else if (selectedWorkspace === this.messages.add_to_workspace) {
-          this.addOrCreateProjectWorkspace(targetFolderUri, false);
+        } else {
+          this.addToWorkspacePathFlow(targetFolderPath, selectedWorkspace);
         }
       }
-
       const successInfoMessage = this.getSuccessInfoMessage(selectedWorkspace, type);
       return successInfoMessage // show the message only if it is not empty
         ? vscode.window.showInformationMessage(successInfoMessage)
@@ -198,20 +191,30 @@ export class VSCodeYouiEvents implements YouiEvents {
     return vscode.window.showErrorMessage(errorMmessage);
   }
 
+  private addToWorkspacePathFlow(targetFolderPath: string, selectedWorkspace: string) {
+    const targetFolderUri: vscode.Uri = vscode.Uri.file(targetFolderPath);
+    if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
+      void vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
+    } else if (selectedWorkspace === this.messages.add_to_workspace) {
+      this.addOrCreateProjectWorkspace(targetFolderUri);
+    }
+  }
+
   private addToWorkspaceUriFlow(selectedWorkspace: string, targetFolderPath: string) {
     if (selectedWorkspace === this.messages.add_to_workspace) {
       const targetFolderUri = vscode.Uri.parse(targetFolderPath);
       this.addOrCreateProjectWorkspace(targetFolderUri, true);
     }
+    //TODO: go over with the UX and PO what popup to show in other cases
   }
 
-  private addOrCreateProjectWorkspace(targetFolderUri: vscode.Uri, isUri: boolean) {
+  private addOrCreateProjectWorkspace(targetFolderUri: vscode.Uri, isUri?: boolean) {
     const wsFoldersQuantity = size(vscode.workspace.workspaceFolders);
     vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, {
       uri: targetFolderUri,
     });
     if (isNil(vscode.workspace.workspaceFile)) {
-      const workspaceFileUri = WorkspaceFile.createWorkspaceFile(targetFolderUri.fsPath, isUri);
+      const workspaceFileUri = WorkspaceFile.create(targetFolderUri.fsPath, isUri);
       void vscode.commands.executeCommand("vscode.openFolder", workspaceFileUri);
     }
   }

@@ -378,8 +378,14 @@ describe("vscode-youi-events unit test", () => {
     });
 
     it("on success, targetFolderPath is uri and the the project openned in a new multi-root workspace", () => {
-      const addOrCreateProjectWorkspaceSpy = sandbox.stub(events as any, "addOrCreateProjectWorkspace");
-      addOrCreateProjectWorkspaceSpy.returned(undefined);
+      sandbox.stub(vscode.workspace, "workspaceFolders").value([]);
+      sandbox.stub(vscode.workspace, "workspaceFile").value(undefined);
+      windowMock
+        .expects("showInformationMessage")
+        .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
+        .resolves();
+      commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
+      workspaceMock.expects("updateWorkspaceFolders").withArgs(0, null);
 
       events.doGeneratorDone(
         true,
@@ -388,28 +394,6 @@ describe("vscode-youi-events unit test", () => {
         "project",
         "abapdf://testDestinationRoot/projectName",
       );
-
-      expect(
-        addOrCreateProjectWorkspaceSpy.calledOnceWithExactly(
-          vscode.Uri.parse("abapdf://testDestinationRoot/projectName"),
-          true,
-        ),
-      ).to.be.true;
-    });
-
-    it("on success, targetFolderPath is uri and the the project openned in not new multi-root workspace", () => {
-      const addOrCreateProjectWorkspaceSpy = sandbox.stub(events as any, "addOrCreateProjectWorkspace");
-      addOrCreateProjectWorkspaceSpy.returned(undefined);
-
-      events.doGeneratorDone(
-        true,
-        "success message",
-        "Open the project in a stand-alone folder",
-        "project",
-        "abapdf://testDestinationRoot/projectName",
-      );
-
-      expect(addOrCreateProjectWorkspaceSpy.notCalled).to.be.true;
     });
 
     it("on success, module is created", () => {

@@ -22,7 +22,6 @@ import * as Environment from "yeoman-environment";
 import { Questions } from "yeoman-environment/lib/adapter";
 import { State } from "./utils/promise";
 import { Constants } from "./utils/constants";
-import { isURL } from "./utils/utils";
 
 export interface IQuestionsPrompt extends IPrompt {
   questions: any[];
@@ -651,6 +650,6 @@ export class YeomanUI {
   }
 
   private getGeneratorDestinationPath(destinationRoot: string): string {
-    return isURL(destinationRoot) ? destinationRoot : path.resolve(process.cwd(), destinationRoot);
+    return Constants.isURL(destinationRoot) ? destinationRoot : path.resolve(process.cwd(), destinationRoot);
   }
 }

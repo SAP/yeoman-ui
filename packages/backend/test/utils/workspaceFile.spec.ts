@@ -44,7 +44,7 @@ describe("extension unit test", () => {
       };
       fsMock.expects("writeFileSync").withArgs(expectedWsFilePath, JSON.stringify(fileContent));
 
-      WorkspaceFile.createWorkspaceFile(targetFolderPath, false);
+      WorkspaceFile.create(targetFolderPath, false);
     });
 
     it("workspace file exists", () => {
@@ -64,7 +64,7 @@ describe("extension unit test", () => {
       fsMock.expects("writeFileSync").withArgs(expectedWsFilePath, JSON.stringify(fileContent));
       uriMock.expects("file").withArgs(expectedWsFilePath);
 
-      WorkspaceFile.createWorkspaceFile(targetFolderPath, false);
+      WorkspaceFile.create(targetFolderPath, false);
     });
 
     it("workspace file does not exist with isUri true", () => {
@@ -82,7 +82,7 @@ describe("extension unit test", () => {
       };
       fsMock.expects("writeFileSync").withArgs(expectedWsFilePath, JSON.stringify(fileContent));
 
-      WorkspaceFile.createWorkspaceFile(targetFolderPath, true);
+      WorkspaceFile.create(targetFolderPath, true);
     });
 
     it("workspace file exists with isUri true", () => {
@@ -102,7 +102,7 @@ describe("extension unit test", () => {
       fsMock.expects("writeFileSync").withArgs(expectedWsFilePath, JSON.stringify(fileContent));
       uriMock.expects("file").withArgs(expectedWsFilePath);
 
-      WorkspaceFile.createWorkspaceFile(targetFolderPath, true);
+      WorkspaceFile.create(targetFolderPath, true);
     });
   });
 });
