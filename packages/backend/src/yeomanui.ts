@@ -241,7 +241,7 @@ export class YeomanUI {
         // Without resolve this code worked only for absolute paths without / at the end.
         // Generator can put a relative path, path including . and .. and / at the end.
         const destinationRoot = this.gen.destinationRoot();
-        const pathAfet = this.getGeneratorDestinationPath(destinationRoot)
+        const pathAfet = this.getGeneratorDestinationPath(destinationRoot);
         const dirsAfter = await this.getChildDirectories(pathAfet);
         this.onGeneratorSuccess(generatorNamespace, dirsBefore, dirsAfter);
       }
@@ -651,9 +651,6 @@ export class YeomanUI {
   }
 
   private getGeneratorDestinationPath(destinationRoot: string): string {
-    return isURL(destinationRoot) 
-      ? destinationRoot 
-      : path.resolve(process.cwd(), destinationRoot);
+    return isURL(destinationRoot) ? destinationRoot : path.resolve(process.cwd(), destinationRoot);
   }
-  
 }

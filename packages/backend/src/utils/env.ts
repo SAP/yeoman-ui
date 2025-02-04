@@ -36,7 +36,6 @@ export class GeneratorNotFoundError extends Error {
   }
 }
 
-
 class EnvUtil {
   private logger: IChildLogger;
   private existingNpmPathsPromise: Promise<string[]>;

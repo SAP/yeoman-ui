@@ -177,7 +177,7 @@ export class VSCodeYouiEvents implements YouiEvents {
 
     if (success) {
       if (!isNil(targetFolderPath)) {
-        if(isURL(targetFolderPath)){
+        if (isURL(targetFolderPath)) {
           this.addToWorkspaceUriFlow(selectedWorkspace, targetFolderPath);
           return;
         }
@@ -186,8 +186,8 @@ export class VSCodeYouiEvents implements YouiEvents {
           void vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
         } else if (selectedWorkspace === this.messages.add_to_workspace) {
           this.addOrCreateProjectWorkspace(targetFolderUri, false);
+        }
       }
-    }
 
       const successInfoMessage = this.getSuccessInfoMessage(selectedWorkspace, type);
       return successInfoMessage // show the message only if it is not empty

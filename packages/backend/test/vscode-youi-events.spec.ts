@@ -389,7 +389,12 @@ describe("vscode-youi-events unit test", () => {
         "abapdf://testDestinationRoot/projectName",
       );
 
-      expect(addOrCreateProjectWorkspaceSpy.calledOnceWithExactly(vscode.Uri.parse("abapdf://testDestinationRoot/projectName"), true)).to.be.true;
+      expect(
+        addOrCreateProjectWorkspaceSpy.calledOnceWithExactly(
+          vscode.Uri.parse("abapdf://testDestinationRoot/projectName"),
+          true,
+        ),
+      ).to.be.true;
     });
 
     it("on success, targetFolderPath is uri and the the project openned in not new multi-root workspace", () => {

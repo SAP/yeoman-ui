@@ -81,10 +81,10 @@ describe("extension unit test", () => {
         settings: {},
       };
       fsMock.expects("writeFileSync").withArgs(expectedWsFilePath, JSON.stringify(fileContent));
-  
+
       WorkspaceFile.createWorkspaceFile(targetFolderPath, true);
     });
-  
+
     it("workspace file exists with isUri true", () => {
       const targetFolderPath = normalize(join(Constants.HOMEDIR_PROJECTS, "../projects/tmp/targetFolerPath"));
       const existingWsFilePath = join(Constants.HOMEDIR_PROJECTS, `workspace.code-workspace`);
@@ -101,9 +101,8 @@ describe("extension unit test", () => {
       fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
       fsMock.expects("writeFileSync").withArgs(expectedWsFilePath, JSON.stringify(fileContent));
       uriMock.expects("file").withArgs(expectedWsFilePath);
-  
+
       WorkspaceFile.createWorkspaceFile(targetFolderPath, true);
     });
-
   });
 });
