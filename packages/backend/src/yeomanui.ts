@@ -1,7 +1,6 @@
 import * as path from "path";
 import { promises } from "fs";
 import * as _ from "lodash";
-import validator, { IsURLOptions } from 'validator';
 import * as inquirer from "inquirer";
 import { ReplayUtils, ReplayState } from "./replayUtils";
 const datauri = require("datauri"); // eslint-disable-line @typescript-eslint/no-var-requires
@@ -16,13 +15,14 @@ import { IChildLogger } from "@vscode-logging/logger";
 import { IPrompt, MessageType } from "@sap-devx/yeoman-ui-types";
 import { AnalyticsWrapper } from "./usage-report/usage-analytics-wrapper";
 import { Output } from "./output";
-import { Env, EnvGen, GeneratorData, GeneratorNotFoundError, IS_URL_DEFAULT_OPTIONS } from "./utils/env";
+import { Env, EnvGen, GeneratorData, GeneratorNotFoundError } from "./utils/env";
 import { vscode, getVscode } from "./utils/vscodeProxy";
 import * as Generator from "yeoman-generator";
 import * as Environment from "yeoman-environment";
 import { Questions } from "yeoman-environment/lib/adapter";
 import { State } from "./utils/promise";
 import { Constants } from "./utils/constants";
+import { isURL } from "./utils/utils";
 
 export interface IQuestionsPrompt extends IPrompt {
   questions: any[];
@@ -241,7 +241,7 @@ export class YeomanUI {
         // Without resolve this code worked only for absolute paths without / at the end.
         // Generator can put a relative path, path including . and .. and / at the end.
         const destinationRoot = this.gen.destinationRoot();
-        const pathAfet = this.getGeneratorDestinationPath(destinationRoot, IS_URL_DEFAULT_OPTIONS)
+        const pathAfet = this.getGeneratorDestinationPath(destinationRoot)
         const dirsAfter = await this.getChildDirectories(pathAfet);
         this.onGeneratorSuccess(generatorNamespace, dirsBefore, dirsAfter);
       }
@@ -650,8 +650,8 @@ export class YeomanUI {
     }
   }
 
-  private getGeneratorDestinationPath(destinationRoot: string, options: IsURLOptions): string {
-    return validator.isURL(destinationRoot, options) 
+  private getGeneratorDestinationPath(destinationRoot: string): string {
+    return isURL(destinationRoot) 
       ? destinationRoot 
       : path.resolve(process.cwd(), destinationRoot);
   }

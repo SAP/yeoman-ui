@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
 import { isEmpty, size, isNil, set } from "lodash";
-import validator from 'validator';
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorOutput } from "./vscode-output";
@@ -10,7 +9,7 @@ import { getImage } from "./images/messageImages";
 import { AppWizard, MessageType, Severity } from "@sap-devx/yeoman-ui-types";
 import { WorkspaceFile } from "./utils/workspaceFile";
 import { Constants } from "./utils/constants";
-import { IS_URL_DEFAULT_OPTIONS } from "./utils/env";
+import { isURL } from "./utils/utils";
 
 class YoUiAppWizard extends AppWizard {
   constructor(private readonly events: VSCodeYouiEvents) {
@@ -179,19 +178,14 @@ export class VSCodeYouiEvents implements YouiEvents {
     if (success) {
       if (!isNil(targetFolderPath)) {
         let targetFolderUri: vscode.Uri = vscode.Uri.file(targetFolderPath);
-        if(validator.isURL(targetFolderPath, IS_URL_DEFAULT_OPTIONS)){
-          if(selectedWorkspace === this.messages.add_to_workspace){
-            targetFolderUri = vscode.Uri.parse(targetFolderPath);
-            const createWsFunc = WorkspaceFile.createUri;
-            this.addOrCreateProjectWorkspace(targetFolderUri, createWsFunc);
-          }
-          //TODO: add a popup error if the user not in add_to_workspace mode.
+        if(isURL(targetFolderPath)){
+          this.addToWorkspaceUriFlow(selectedWorkspace, targetFolderPath);
+          return;
         }
         else if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
           void vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
         } else if (selectedWorkspace === this.messages.add_to_workspace) {
-          const createWsFunc = WorkspaceFile.create;
-          this.addOrCreateProjectWorkspace(targetFolderUri, createWsFunc);
+          this.addOrCreateProjectWorkspace(targetFolderUri, false);
       }
     }
 
@@ -204,13 +198,20 @@ export class VSCodeYouiEvents implements YouiEvents {
     return vscode.window.showErrorMessage(errorMmessage);
   }
 
-  private addOrCreateProjectWorkspace(targetFolderUri: vscode.Uri, createWsFunc: (uriPath: string) => vscode.Uri) {
+  private addToWorkspaceUriFlow(selectedWorkspace: string, targetFolderPath: string) {
+    if (selectedWorkspace === this.messages.add_to_workspace) {
+      const targetFolderUri = vscode.Uri.parse(targetFolderPath);
+      this.addOrCreateProjectWorkspace(targetFolderUri, true);
+    }
+  }
+
+  private addOrCreateProjectWorkspace(targetFolderUri: vscode.Uri, isUri: boolean) {
     const wsFoldersQuantity = size(vscode.workspace.workspaceFolders);
     vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, {
       uri: targetFolderUri,
     });
     if (isNil(vscode.workspace.workspaceFile)) {
-      const workspaceFileUri = createWsFunc(targetFolderUri.fsPath);
+      const workspaceFileUri = WorkspaceFile.createWorkspaceFile(targetFolderUri.fsPath, isUri);
       void vscode.commands.executeCommand("vscode.openFolder", workspaceFileUri);
     }
   }

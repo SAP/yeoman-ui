@@ -44,7 +44,7 @@ describe("extension unit test", () => {
       };
       fsMock.expects("writeFileSync").withArgs(expectedWsFilePath, JSON.stringify(fileContent));
 
-      WorkspaceFile.create(targetFolderPath);
+      WorkspaceFile.createWorkspaceFile(targetFolderPath, false);
     });
 
     it("workspace file exists", () => {
@@ -64,7 +64,7 @@ describe("extension unit test", () => {
       fsMock.expects("writeFileSync").withArgs(expectedWsFilePath, JSON.stringify(fileContent));
       uriMock.expects("file").withArgs(expectedWsFilePath);
 
-      WorkspaceFile.create(targetFolderPath);
+      WorkspaceFile.createWorkspaceFile(targetFolderPath, false);
     });
   });
 });

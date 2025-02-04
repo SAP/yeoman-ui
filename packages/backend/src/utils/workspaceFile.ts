@@ -4,34 +4,20 @@ import { dirname, join, relative } from "path";
 import { Constants } from "./constants";
 
 class WorkspaceFileUtil {
-  public create(targetFolderPath: string): Uri {
+
+  public createWorkspaceFile(folderPath: string, isUri: boolean): Uri {
     const wsFilePath = this.getUniqWorkspaceFilePath();
+    const folderConfig = isUri ? { uri: folderPath } : { path: relative(dirname(wsFilePath), folderPath) };
+    
     const fileContent = {
-      folders: [
-        {
-          path: `${relative(dirname(wsFilePath), targetFolderPath)}`,
-        },
-      ],
+      folders: [folderConfig],
       settings: {},
     };
+  
     writeFileSync(wsFilePath, JSON.stringify(fileContent));
     return Uri.file(wsFilePath);
   }
-
-  public createUri(uriPath: string): Uri {
-    const wsFilePath = this.getUniqWorkspaceFilePath();
-    const fileContent = {
-      folders: [
-        {
-          uri: `${uriPath}`,
-        },
-      ],
-      settings: {},
-    };
-    writeFileSync(wsFilePath, JSON.stringify(fileContent));
-    return Uri.file(wsFilePath);
-  }
-
+  
   private createWsFilePath(counter?: number): string {
     const counterStr = counter ? `.${counter}.` : `.`;
     return join(Constants.HOMEDIR_PROJECTS, `workspace${counterStr}code-workspace`);

@@ -8,7 +8,6 @@ import * as Environment from "yeoman-environment";
 import TerminalAdapter = require("yeoman-environment/lib/adapter");
 import { IChildLogger } from "@vscode-logging/logger";
 import { getClassLogger } from "../logger/logger-wrapper";
-import { IsURLOptions } from "validator";
 
 const GENERATOR = "generator-";
 const NAMESPACE = "namespace";
@@ -37,11 +36,7 @@ export class GeneratorNotFoundError extends Error {
   }
 }
 
-export const ALLWOD_GENERATOR_PROTOCOL_URL = ['abapfs', 'http', 'https', 'ftp'];
-export const IS_URL_DEFAULT_OPTIONS: IsURLOptions = { 
-          protocols: ALLWOD_GENERATOR_PROTOCOL_URL,
-          require_tld: false // Allows hostnames without a top-level domain (e.g., "QAS" instead of "QAS.com")
-};
+
 class EnvUtil {
   private logger: IChildLogger;
   private existingNpmPathsPromise: Promise<string[]>;
