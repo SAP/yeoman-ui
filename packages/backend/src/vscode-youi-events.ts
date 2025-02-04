@@ -177,12 +177,12 @@ export class VSCodeYouiEvents implements YouiEvents {
 
     if (success) {
       if (!isNil(targetFolderPath)) {
-        let targetFolderUri: vscode.Uri = vscode.Uri.file(targetFolderPath);
         if(isURL(targetFolderPath)){
           this.addToWorkspaceUriFlow(selectedWorkspace, targetFolderPath);
           return;
         }
-        else if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
+        const targetFolderUri: vscode.Uri = vscode.Uri.file(targetFolderPath);
+        if (selectedWorkspace === this.messages.open_in_a_new_workspace) {
           void vscode.commands.executeCommand("vscode.openFolder", targetFolderUri);
         } else if (selectedWorkspace === this.messages.add_to_workspace) {
           this.addOrCreateProjectWorkspace(targetFolderUri, false);

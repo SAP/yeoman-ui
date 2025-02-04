@@ -66,5 +66,44 @@ describe("extension unit test", () => {
 
       WorkspaceFile.createWorkspaceFile(targetFolderPath, false);
     });
+
+    it("workspace file does not exist with isUri true", () => {
+      const targetFolderPath = normalize(join(Constants.HOMEDIR_PROJECTS, "../tmp/targetFolerPath"));
+      const expectedWsFilePath = join(Constants.HOMEDIR_PROJECTS, `workspace.code-workspace`);
+      uriMock.expects("file").withArgs(expectedWsFilePath);
+      fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
+      const fileContent = {
+        folders: [
+          {
+            uri: targetFolderPath,
+          },
+        ],
+        settings: {},
+      };
+      fsMock.expects("writeFileSync").withArgs(expectedWsFilePath, JSON.stringify(fileContent));
+  
+      WorkspaceFile.createWorkspaceFile(targetFolderPath, true);
+    });
+  
+    it("workspace file exists with isUri true", () => {
+      const targetFolderPath = normalize(join(Constants.HOMEDIR_PROJECTS, "../projects/tmp/targetFolerPath"));
+      const existingWsFilePath = join(Constants.HOMEDIR_PROJECTS, `workspace.code-workspace`);
+      fsMock.expects("existsSync").withArgs(existingWsFilePath).returns(true);
+      const fileContent = {
+        folders: [
+          {
+            uri: targetFolderPath,
+          },
+        ],
+        settings: {},
+      };
+      const expectedWsFilePath = join(Constants.HOMEDIR_PROJECTS, `workspace.1.code-workspace`);
+      fsMock.expects("existsSync").withArgs(expectedWsFilePath).returns(false);
+      fsMock.expects("writeFileSync").withArgs(expectedWsFilePath, JSON.stringify(fileContent));
+      uriMock.expects("file").withArgs(expectedWsFilePath);
+  
+      WorkspaceFile.createWorkspaceFile(targetFolderPath, true);
+    });
+
   });
 });

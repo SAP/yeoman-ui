@@ -377,6 +377,36 @@ describe("vscode-youi-events unit test", () => {
       );
     });
 
+    it("on success, targetFolderPath is uri and the the project openned in a new multi-root workspace", () => {
+      const addOrCreateProjectWorkspaceSpy = sandbox.stub(events as any, "addOrCreateProjectWorkspace");
+      addOrCreateProjectWorkspaceSpy.returned(undefined);
+
+      events.doGeneratorDone(
+        true,
+        "success message",
+        "Open the project in a multi-root workspace",
+        "project",
+        "abapdf://testDestinationRoot/projectName",
+      );
+
+      expect(addOrCreateProjectWorkspaceSpy.calledOnceWithExactly(vscode.Uri.parse("abapdf://testDestinationRoot/projectName"), true)).to.be.true;
+    });
+
+    it("on success, targetFolderPath is uri and the the project openned in not new multi-root workspace", () => {
+      const addOrCreateProjectWorkspaceSpy = sandbox.stub(events as any, "addOrCreateProjectWorkspace");
+      addOrCreateProjectWorkspaceSpy.returned(undefined);
+
+      events.doGeneratorDone(
+        true,
+        "success message",
+        "Open the project in a stand-alone folder",
+        "project",
+        "abapdf://testDestinationRoot/projectName",
+      );
+
+      expect(addOrCreateProjectWorkspaceSpy.notCalled).to.be.true;
+    });
+
     it("on success, module is created", () => {
       eventsMock.expects("doClose");
       sandbox
