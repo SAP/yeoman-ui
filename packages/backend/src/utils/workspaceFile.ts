@@ -3,11 +3,25 @@ import { writeFileSync, existsSync } from "fs";
 import { dirname, join, relative } from "path";
 import { Constants } from "./constants";
 
-class WorkspaceFileUtil {
-  public create(folderPath: string, isUri?: boolean): Uri {
-    const wsFilePath = this.getUniqWorkspaceFilePath();
-    const folderConfig = isUri ? { uri: folderPath } : { path: relative(dirname(wsFilePath), folderPath) };
+interface FolderConfig {
+  name?: string;
+}
 
+interface FolderUriConfig extends FolderConfig {
+  uri: string;
+}
+
+interface FolderPathConfig extends FolderConfig {
+  path: string;
+}
+
+class WorkspaceFileUtil {
+  public create(targetFolderUri: Uri, name: string, isUri: boolean = false): Uri {
+    const wsFilePath = this.getUniqWorkspaceFilePath();
+    const folderConfig: FolderUriConfig | FolderPathConfig = isUri
+      ? { uri: targetFolderUri.toString() }
+      : { path: relative(dirname(wsFilePath), targetFolderUri.fsPath) };
+    folderConfig.name = name;
     const fileContent = {
       folders: [folderConfig],
       settings: {},

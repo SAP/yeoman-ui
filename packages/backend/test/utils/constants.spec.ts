@@ -3,7 +3,6 @@ import { isURL } from "../../src/utils/constants"; // Adjust the import path as 
 
 describe("constants unit testing", () => {
   describe("isURL unit testing", () => {
-
     it("should return true when given valid http URL", () => {
       const url = "http://www.example.com";
       const result = isURL(url);
