@@ -111,7 +111,7 @@
         "ApplicationWizard.Workspace": {
           "type": "string",
           "enum": [
-            "Open the project in a stand-alone folder",
+            "Open the project in a stand-alone",
             "Open the project in a multi-root workspace",
             "Create the project and close it for future use"
           ],

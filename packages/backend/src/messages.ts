@@ -20,7 +20,7 @@ export default {
   select_open_workspace_question_hint: selectWhereToOpenTheProjectQuestionHint,
   channel_name: "Generators",
   select_generator_description: `${selectGeneratorQuestionHint}.\n${selectTargetFolderQuestionHint}.`,
-  artifact_generated_project_open_in_a_new_workspace: `${artifact_generated_project} and will be opened in a stand-alone folder.`,
+  artifact_generated_project_open_in_a_new_workspace: `${artifact_generated_project} and will be opened in a stand-alone.`,
   artifact_generated_project_add_to_workspace: `${artifact_generated_project} and will be added to your workspace.`,
   artifact_generated_project_saved_for_future: `${artifact_generated_project} and will be saved for future use.`,
   artifact_generated_module: `The module has been generated.`,
@@ -29,7 +29,7 @@ export default {
   show_progress_button: "Open Output View",
   show_progress_message: "Generating...",
   add_to_workspace: "Open the project in a multi-root workspace",
-  open_in_a_new_workspace: "Open the project in a stand-alone folder",
+  open_in_a_new_workspace: "Open the project in a stand-alone",
   create_and_close: "Create the project and close it for future use",
   generators_are_being_installed: "Generators are being installed in the background...",
   set_default_location: (defaultLocation: string) => `Set generators install location to ${defaultLocation}`,
@@ -44,4 +44,5 @@ export default {
     "Node.js installation cannot be detected. Please ensure you have installed Node.js before attempting to use Template Wizard",
   warn_another_generator_running: (name: string) =>
     `You have unsaved changes in the ${name} generator. Running a new generator will make you lose these changes. Are you sure you want to continue?`,
+  bad_project_uri_config_error: "The project configuration is not valid.\nCheck that the generator created the project correctly."
 };
