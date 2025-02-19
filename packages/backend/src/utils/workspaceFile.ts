@@ -2,6 +2,7 @@ import { Uri } from "vscode";
 import { writeFileSync, existsSync } from "fs";
 import { dirname, join, relative } from "path";
 import { Constants } from "./constants";
+import messages from "../messages";
 
 export interface FolderUriConfig {
   uri: string;
@@ -16,6 +17,41 @@ export interface WsFoldersToAdd {
   uri: Uri;
   name?: string;
 }
+
+export function isUriFlow(optionalFolderUri: string): boolean {
+  return getFolderUri(optionalFolderUri) !== undefined;
+}
+
+export function getFolderUri(optionalFolderUri: string): FolderUriConfig | undefined {
+  try {  
+    const folderUri = JSON.parse(optionalFolderUri);
+    return folderUri?.uri && folderUri?.name ? folderUri : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export function getValidFolderUri(folderUri: any): FolderUriConfig {
+  if (
+    folderUri && 
+    typeof folderUri.uri === 'string' && 
+    isValidUri(folderUri.uri) && 
+    typeof folderUri.name === 'string'
+  ) {
+    return { uri: folderUri.uri, name: folderUri.name };
+  }
+  throw new Error(messages.bad_project_uri_config_error);
+}
+
+export function isValidUri(uri: string): boolean {
+  try {
+    new URL(uri);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 class WorkspaceFileUtil {
   public createWsWithPath(targetFolderUri: Uri) {
     const wsFilePath = this.getUniqWorkspaceFilePath();

@@ -7,8 +7,8 @@ import { IChildLogger } from "@vscode-logging/logger";
 import { getClassLogger } from "./logger/logger-wrapper";
 import { getImage } from "./images/messageImages";
 import { AppWizard, MessageType, Severity } from "@sap-devx/yeoman-ui-types";
-import { FolderUriConfig, WorkspaceFile, WsFoldersToAdd } from "./utils/workspaceFile";
-import { Constants, getFolderUri, getValidFolderUri, isUriFlow } from "./utils/constants";
+import { FolderUriConfig, getFolderUri, getValidFolderUri, WorkspaceFile, WsFoldersToAdd } from "./utils/workspaceFile";
+import { Constants } from "./utils/constants";
 
 class YoUiAppWizard extends AppWizard {
   constructor(private readonly events: VSCodeYouiEvents) {
