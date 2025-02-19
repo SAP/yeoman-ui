@@ -23,7 +23,7 @@ export function isUriFlow(optionalFolderUri: string): boolean {
 }
 
 export function getFolderUri(optionalFolderUri: string): FolderUriConfig | undefined {
-  try {  
+  try {
     const folderUri = JSON.parse(optionalFolderUri);
     return folderUri?.uri && folderUri?.name ? folderUri : undefined;
   } catch {
@@ -33,10 +33,10 @@ export function getFolderUri(optionalFolderUri: string): FolderUriConfig | undef
 
 export function getValidFolderUri(folderUri: any): FolderUriConfig {
   if (
-    folderUri && 
-    typeof folderUri.uri === 'string' && 
-    isValidUri(folderUri.uri) && 
-    typeof folderUri.name === 'string'
+    folderUri &&
+    typeof folderUri.uri === "string" &&
+    isValidUri(folderUri.uri) &&
+    typeof folderUri.name === "string"
   ) {
     return { uri: folderUri.uri, name: folderUri.name };
   }

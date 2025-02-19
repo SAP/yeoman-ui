@@ -44,5 +44,6 @@ export default {
     "Node.js installation cannot be detected. Please ensure you have installed Node.js before attempting to use Template Wizard",
   warn_another_generator_running: (name: string) =>
     `You have unsaved changes in the ${name} generator. Running a new generator will make you lose these changes. Are you sure you want to continue?`,
-  bad_project_uri_config_error: "The project configuration is not valid.\nCheck that the generator created the project correctly."
+  bad_project_uri_config_error:
+    "The project configuration is not valid.\nCheck that the generator created the project correctly.",
 };
