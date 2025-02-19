@@ -21,7 +21,7 @@ import * as Generator from "yeoman-generator";
 import * as Environment from "yeoman-environment";
 import { Questions } from "yeoman-environment/lib/adapter";
 import { State } from "./utils/promise";
-import { Constants, isUriFlow } from "./utils/constants";
+import { Constants } from "./utils/constants";
 import { resolve } from "path";
 
 export interface IQuestionsPrompt extends IPrompt {
