@@ -231,16 +231,20 @@ export class VSCodeYouiEvents implements YouiEvents {
   }
 
   private getUniqueProjectName(baseName: string): string {
-    const existingNames = vscode.workspace.workspaceFolders?.map((folder) => folder.name) || [];
-    if (!existingNames.includes(baseName)) return baseName;
+    const existingNames = vscode.workspace.workspaceFolders?.map(folder => folder.name) || [];
+  if (!existingNames.includes(baseName)) {
+    return baseName;
+  }
 
-    let counter = 1;
+  let counter = 1;
+  let uniqueName = `${baseName}(${counter})`;
 
-    while (existingNames.includes(`${baseName}(${counter})`)) {
-      counter++;
-    }
+  while (existingNames.includes(uniqueName)) {
+    counter++;
+    uniqueName = `${baseName}(${counter})`;
+  }
 
-    return `${baseName}(${counter})`;
+  return uniqueName;
   }
 
   private addOrCreateProjectWorkspace(wsFoldersToAdd: WsFoldersToAdd) {
