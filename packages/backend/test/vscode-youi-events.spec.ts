@@ -287,7 +287,7 @@ describe("vscode-youi-events unit test", () => {
 
   describe("doGeneratorDone", () => {
     const createAndClose = "Create the project and close it for future use";
-    const openNewWorkspace = "Open the project in a stand-alone folder";
+    const openNewWorkspace = "Open the project in a stand-alone";
     const addToWorkspace = "Open the project in a multi-root workspace";
 
     it("on success, project path and workspace folder are Windows style ---> the project added to current workspace", () => {
@@ -336,7 +336,7 @@ describe("vscode-youi-events unit test", () => {
       );
     });
 
-    it("on success, project path parent folder is already openned in workspace ---> the project openned in a stand-alone folder", () => {
+    it("on success, project path parent folder is already openned in workspace ---> the project openned in a stand-alone", () => {
       eventsMock.expects("doClose");
       sandbox
         .stub(vscode.workspace, "workspaceFolders")
@@ -374,6 +374,25 @@ describe("vscode-youi-events unit test", () => {
         "Open the project in a multi-root workspace",
         "project",
         "testDestinationRoot/./projectName",
+      );
+    });
+
+    it("on success, targetFolderPath is uri and the the project openned in a new multi-root workspace", () => {
+      sandbox.stub(vscode.workspace, "workspaceFolders").value([]);
+      sandbox.stub(vscode.workspace, "workspaceFile").value(undefined);
+      windowMock
+        .expects("showInformationMessage")
+        .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
+        .resolves();
+      commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
+      workspaceMock.expects("updateWorkspaceFolders").withArgs(0, null);
+
+      events.doGeneratorDone(
+        true,
+        "success message",
+        "Open the project in a multi-root workspace",
+        "project",
+        "abapdf://testDestinationRoot/projectName",
       );
     });
 

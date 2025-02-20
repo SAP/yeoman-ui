@@ -35,6 +35,9 @@ const Uri = {
   file: (path?: string) => {
     return { fsPath: path };
   },
+  parse: (path?: string) => {
+    return { fsPath: path };
+  },
 };
 
 const workspace = {
