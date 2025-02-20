@@ -147,6 +147,8 @@ module.exports = class extends Generator {
         type: "confirm",
         name: "hungry",
         message: "Are you hungry?",
+        labelTrue: "Yes, I am",
+        labelFalse: "No, I am not",
         guiOptions: {
           breadcrumb: "Hungry",
         },
