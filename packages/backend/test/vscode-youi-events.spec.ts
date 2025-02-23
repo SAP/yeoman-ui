@@ -11,6 +11,7 @@ import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { VSCodeYouiEvents } from "../src/vscode-youi-events";
 import * as fs from "fs";
 import { WorkspaceFile } from "../src/utils/workspaceFile";
+import sinon = require("sinon");
 
 describe("vscode-youi-events unit test", () => {
   let events: VSCodeYouiEvents;
@@ -379,6 +380,7 @@ describe("vscode-youi-events unit test", () => {
     });
 
     it("on success, targetFolder is uri and the the project openned in a new multi-root workspace", () => {
+      eventsMock.expects("doClose");
       sandbox.stub(vscode.workspace, "workspaceFolders").value([]);
       sandbox.stub(vscode.workspace, "workspaceFile").value(undefined);
       windowMock
@@ -387,6 +389,9 @@ describe("vscode-youi-events unit test", () => {
         .resolves();
       commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
       workspaceMock.expects("updateWorkspaceFolders").withArgs(0, null);
+
+      fsMock.expects("existsSync").returns(false);
+      fsMock.expects("writeFileSync");
 
       events.doGeneratorDone(
         true,
@@ -398,18 +403,43 @@ describe("vscode-youi-events unit test", () => {
     });
 
     it("on success, targetFolderPath is uri and the the project openned in a Open the project in a stand-alone", () => {
-      stub(WorkspaceFile, "createWsWithUri").returns({ fsPath: "testFsPath" } as any);
-      sandbox.stub(vscode.workspace, "workspaceFolders").value([]);
-      commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
-      windowMock
-        .expects("showInformationMessage")
-        .withExactArgs(messages.default.artifact_generated_project_open_in_a_new_workspace)
-        .resolves();
+        eventsMock.expects("doClose");
+        sandbox.stub(vscode.workspace, "workspaceFolders").value([]);
+        sandbox.stub(vscode.workspace, "workspaceFile").value(undefined);
+        windowMock
+          .expects("showInformationMessage")
+          .withExactArgs(messages.default.artifact_generated_project_open_in_a_new_workspace)
+          .resolves();
+        commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
+  
+        fsMock.expects("existsSync").returns(false);
+        fsMock.expects("writeFileSync");
 
       events.doGeneratorDone(
         true,
         "success message",
         "Open the project in a stand-alone",
+        "project",
+        '{"uri":"abapdf://testDestinationRoot","name":"projectName"}',
+      );
+    });
+
+    it("on success, targetFolderPath is uri and the the project openned in a Create the project and close it for future use", () => {
+        eventsMock.expects("doClose");
+        sandbox.stub(vscode.workspace, "workspaceFolders").value([]);
+        sandbox.stub(vscode.workspace, "workspaceFile").value(undefined);
+        windowMock
+          .expects("showInformationMessage")
+          .withExactArgs(messages.default.artifact_generated_project_saved_for_future)
+          .resolves();
+  
+        fsMock.expects("existsSync").returns(false);
+        fsMock.expects("writeFileSync");
+
+      events.doGeneratorDone(
+        true,
+        "success message",
+        "Create the project and close it for future use",
         "project",
         '{"uri":"abapdf://testDestinationRoot","name":"projectName"}',
       );
