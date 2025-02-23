@@ -1,6 +1,6 @@
 import { vscode } from "./mockUtil";
 import { expect } from "chai";
-import { createSandbox, SinonSandbox, SinonMock } from "sinon";
+import { createSandbox, SinonSandbox, SinonMock, stub } from "sinon";
 import * as _ from "lodash";
 import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import * as messages from "../src/messages";
@@ -10,6 +10,7 @@ import { Constants } from "../src/utils/constants";
 import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { VSCodeYouiEvents } from "../src/vscode-youi-events";
 import * as fs from "fs";
+import { WorkspaceFile } from "../src/utils/workspaceFile";
 
 describe("vscode-youi-events unit test", () => {
   let events: VSCodeYouiEvents;
@@ -377,7 +378,7 @@ describe("vscode-youi-events unit test", () => {
       );
     });
 
-    it("on success, targetFolderPath is uri and the the project openned in a new multi-root workspace", () => {
+    it("on success, targetFolder is uri and the the project openned in a new multi-root workspace", () => {
       sandbox.stub(vscode.workspace, "workspaceFolders").value([]);
       sandbox.stub(vscode.workspace, "workspaceFile").value(undefined);
       windowMock
@@ -392,7 +393,25 @@ describe("vscode-youi-events unit test", () => {
         "success message",
         "Open the project in a multi-root workspace",
         "project",
-        "abapdf://testDestinationRoot/projectName",
+        '{"uri":"abapdf://testDestinationRoot","name":"projectName"}'
+      );
+    });
+
+    it("on success, targetFolderPath is uri and the the project openned in a Open the project in a stand-alone", () => {
+      stub(WorkspaceFile, "createWsWithUri").returns({ fsPath: "testFsPath" } as any);
+      sandbox.stub(vscode.workspace, "workspaceFolders").value([]);
+      commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
+      windowMock
+        .expects("showInformationMessage")
+        .withExactArgs(messages.default.artifact_generated_project_open_in_a_new_workspace)
+        .resolves();
+
+      events.doGeneratorDone(
+        true,
+        "success message",
+        "Open the project in a stand-alone",
+        "project",
+       '{"uri":"abapdf://testDestinationRoot","name":"projectName"}',
       );
     });
 

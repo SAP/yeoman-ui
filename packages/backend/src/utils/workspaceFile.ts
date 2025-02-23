@@ -64,7 +64,7 @@ class WorkspaceFileUtil {
     return this.createWs(wsFilePath, folderConfig);
   }
 
-  private createWs(wsFilePath: string, folderConfig: FolderUriConfig | FolderPathConfig): Uri {
+  public createWs(wsFilePath: string, folderConfig: FolderUriConfig | FolderPathConfig): Uri {
     const fileContent = {
       folders: [folderConfig],
       settings: {},
