@@ -198,7 +198,7 @@ describe("extension unit test", () => {
           expect(result).to.be.undefined;
         });
       });
-  })
+  });
 
   describe("isUriFlow", () => {
     it("should return true when  getFolderUri is not undefined", () => {
@@ -212,7 +212,7 @@ describe("extension unit test", () => {
       const result = isUriFlow(optionalFolderUri);
       expect(result).to.be.false;
     });
-  })
+  });
 
 
 
