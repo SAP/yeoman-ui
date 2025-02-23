@@ -393,7 +393,7 @@ describe("vscode-youi-events unit test", () => {
         "success message",
         "Open the project in a multi-root workspace",
         "project",
-        '{"uri":"abapdf://testDestinationRoot","name":"projectName"}'
+        '{"uri":"abapdf://testDestinationRoot","name":"projectName"}',
       );
     });
 
@@ -411,7 +411,7 @@ describe("vscode-youi-events unit test", () => {
         "success message",
         "Open the project in a stand-alone",
         "project",
-       '{"uri":"abapdf://testDestinationRoot","name":"projectName"}',
+        '{"uri":"abapdf://testDestinationRoot","name":"projectName"}',
       );
     });
 
