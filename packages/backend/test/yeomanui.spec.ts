@@ -1468,9 +1468,8 @@ describe("yeomanui unit test", () => {
     });
   });
 
-
   describe("getGeneratorDestinationPath()", () => {
-    it("retuen the original destinationRoot when is uri flow", async () => {
+    it("retuen the original destinationRoot when is uri flow", () => {
       const yeomanUiInstance: YeomanUI = new YeomanUI(
         rpc,
         youiEvents,
@@ -1480,9 +1479,8 @@ describe("yeomanui unit test", () => {
         flowPromise.state,
       );
       const expectedDestinationPath = '{"uri":"abapdf://testDestinationRoot","name":"projectName"}';
-      const destinationPath =  yeomanUiInstance["getGeneratorDestinationPath"](expectedDestinationPath)
+      const destinationPath = yeomanUiInstance["getGeneratorDestinationPath"](expectedDestinationPath);
       expect(destinationPath).to.be.equal(expectedDestinationPath);
     });
   });
-
 });

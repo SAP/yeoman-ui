@@ -1,4 +1,4 @@
-import { createSandbox, SinonSandbox, SinonMock, stub } from "sinon";
+import { createSandbox, SinonSandbox, SinonMock } from "sinon";
 import {
   FolderUriConfig,
   getFolderUri,
@@ -65,7 +65,6 @@ describe("extension unit test", () => {
       fsMock.expects("writeFileSync").withArgs(wsFilePath, JSON.stringify({ folders: [folderConfig], settings: {} }));
 
       WorkspaceFile.createWsWithPath(targetFolderUri);
-
     });
 
     it("workspace file exists with isUri true", () => {
@@ -96,7 +95,6 @@ describe("extension unit test", () => {
       uriMock.expects("file").withArgs(expectedWsFilePath);
 
       WorkspaceFile.createWsWithUri(folderConfig); // Pass the FolderUriConfig here
-
     });
   });
 
