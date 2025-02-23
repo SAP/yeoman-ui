@@ -23,6 +23,7 @@ import { Questions } from "yeoman-environment/lib/adapter";
 import { State } from "./utils/promise";
 import { Constants } from "./utils/constants";
 import { resolve } from "path";
+import { isUriFlow } from "./utils/workspaceFile";
 
 export interface IQuestionsPrompt extends IPrompt {
   questions: any[];
