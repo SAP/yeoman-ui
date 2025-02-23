@@ -489,4 +489,34 @@ describe("vscode-youi-events unit test", () => {
       return events.doGeneratorDone(false, "error message", createAndClose, "files");
     });
   });
+
+  describe("getUniqueProjectName", () => {
+    it("should return baseName if it does not exist in workspace", () => {
+      sandbox.stub(vscode.workspace, "workspaceFolders").value([{ name: "Project1" }, { name: "Project2" }]);
+      const result = events["getUniqueProjectName"]("NewProject");
+      expect(result).to.equal("NewProject");
+    });
+  
+    it("should return baseName(1) if baseName already exists", () => {
+      sandbox.stub(vscode.workspace, "workspaceFolders").value([{ name: "Project1" }, { name: "NewProject" }]);
+      const result = events["getUniqueProjectName"]("NewProject");
+      expect(result).to.equal("NewProject(1)");
+    });
+  
+    it("should return baseName with incremented counter if multiple exist", () => {
+      sandbox.stub(vscode.workspace, "workspaceFolders").value([
+        { name: "NewProject" },
+        { name: "NewProject(1)" },
+        { name: "NewProject(2)" }
+      ]);
+      const result = events["getUniqueProjectName"]("NewProject");
+      expect(result).to.equal("NewProject(3)");
+    });
+  
+    it("should handle empty workspace folders gracefully", () => {
+      sandbox.stub(vscode.workspace, "workspaceFolders").value(undefined);
+      const result = events["getUniqueProjectName"]("UniqueProject");
+      expect(result).to.equal("UniqueProject");
+    });
+  })
 });

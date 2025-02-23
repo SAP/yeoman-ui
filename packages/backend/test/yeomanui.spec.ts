@@ -1467,4 +1467,22 @@ describe("yeomanui unit test", () => {
       }
     });
   });
+
+
+  describe("getGeneratorDestinationPath()", () => {
+    it("retuen the original destinationRoot when is uri flow", async () => {
+      const yeomanUiInstance: YeomanUI = new YeomanUI(
+        rpc,
+        youiEvents,
+        outputChannel,
+        testLogger,
+        GeneratorFilter.create(),
+        flowPromise.state,
+      );
+      const expectedDestinationPath = '{"uri":"abapdf://testDestinationRoot","name":"projectName"}';
+      const destinationPath =  yeomanUiInstance["getGeneratorDestinationPath"](expectedDestinationPath)
+      expect(destinationPath).to.be.equal(expectedDestinationPath);
+    });
+  });
+
 });

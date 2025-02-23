@@ -24,7 +24,7 @@ describe("extension unit test", () => {
     sandbox = createSandbox();
   });
 
-  after(() => {
+  afterEach(() => {
     sandbox.restore();
   });
 
@@ -57,16 +57,15 @@ describe("extension unit test", () => {
       const folderConfig = { path: relative(dirname(wsFilePath), targetFolderPath) };
 
       // Mock existsSync to return false on the first call and true on subsequent calls
-      const existsSyncMock = stub(fs, "existsSync");
-      existsSyncMock.onFirstCall().returns(false); // Simulate that the file doesn't exist initially
-      existsSyncMock.onSecondCall().returns(true); // Simulate that the file exists on the second call (forces the unique file path)
+      const existsSyncStub = sandbox.stub(fs, "existsSync");
+      existsSyncStub.onFirstCall().returns(false); // Simulate that the file doesn't exist initially
+      existsSyncStub.onSecondCall().returns(true); // Simulate that the file exists on the second call (forces the unique file path)
 
       uriMock.expects("file").withArgs(wsFilePath);
       fsMock.expects("writeFileSync").withArgs(wsFilePath, JSON.stringify({ folders: [folderConfig], settings: {} }));
 
       WorkspaceFile.createWsWithPath(targetFolderUri);
 
-      existsSyncMock.restore(); // Restore the original existsSync function
     });
 
     it("workspace file exists with isUri true", () => {
@@ -79,9 +78,9 @@ describe("extension unit test", () => {
       };
 
       // Mock existsSync to simulate file existence
-      const existsSyncMock = stub(fs, "existsSync");
-      existsSyncMock.onFirstCall().returns(true); // Simulate that workspace.code-workspace exists
-      existsSyncMock.onSecondCall().returns(false); // Simulate that workspace.1.code-workspace does not exist
+      const existsSyncStub = sandbox.stub(fs, "existsSync");
+      existsSyncStub.onFirstCall().returns(true); // Simulate that workspace.code-workspace exists
+      existsSyncStub.onSecondCall().returns(false); // Simulate that workspace.1.code-workspace does not exist
 
       const fileContent = {
         folders: [
@@ -98,7 +97,6 @@ describe("extension unit test", () => {
 
       WorkspaceFile.createWsWithUri(folderConfig); // Pass the FolderUriConfig here
 
-      existsSyncMock.restore(); // Restore the original existsSync function
     });
   });
 
