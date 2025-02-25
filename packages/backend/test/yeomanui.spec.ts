@@ -1188,7 +1188,7 @@ describe("yeomanui unit test", () => {
   describe("onGeneratorSuccess - onGeneratorFailure", () => {
     let doGeneratorDoneSpy: any;
     const create_and_close = "Create the project and close it for future use";
-    const open_in_new_ws = "Open the project in a stand-alone folder";
+    const open_in_new_ws = "Open the project in a stand-alone";
 
     beforeEach(() => {
       doGeneratorDoneSpy = sandbox.spy(youiEvents, "doGeneratorDone");
@@ -1465,6 +1465,22 @@ describe("yeomanui unit test", () => {
       } catch (e) {
         expect(e.toString()).to.contain("method1");
       }
+    });
+  });
+
+  describe("getGeneratorDestinationPath()", () => {
+    it("retuen the original destinationRoot when is uri flow", () => {
+      const yeomanUiInstance: YeomanUI = new YeomanUI(
+        rpc,
+        youiEvents,
+        outputChannel,
+        testLogger,
+        GeneratorFilter.create(),
+        flowPromise.state,
+      );
+      const expectedDestinationPath = '{"uri":"abapdf://testDestinationRoot","name":"projectName"}';
+      const destinationPath = yeomanUiInstance["getGeneratorDestinationPath"](expectedDestinationPath);
+      expect(destinationPath).to.be.equal(expectedDestinationPath);
     });
   });
 });

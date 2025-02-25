@@ -23,6 +23,7 @@ import * as Environment from "yeoman-environment";
 import { Questions } from "yeoman-environment/lib/adapter";
 import { State } from "./utils/promise";
 import { Constants } from "./utils/constants";
+import { isUriFlow } from "./utils/workspaceFile";
 
 export interface IQuestionsPrompt extends IPrompt {
   questions: any[];
@@ -240,7 +241,9 @@ export class YeomanUI {
       if (!this.errorThrown) {
         // Without resolve this code worked only for absolute paths without / at the end.
         // Generator can put a relative path, path including . and .. and / at the end.
-        const dirsAfter = await this.getChildDirectories(resolve(this.getCwd(), this.gen.destinationRoot()));
+        const destinationRoot = this.gen.destinationRoot();
+        const pathAfet = this.getGeneratorDestinationPath(destinationRoot);
+        const dirsAfter = await this.getChildDirectories(pathAfet);
         this.onGeneratorSuccess(generatorNamespace, dirsBefore, dirsAfter);
       }
     } catch (error) {
@@ -646,5 +649,9 @@ export class YeomanUI {
         });
       }
     }
+  }
+
+  private getGeneratorDestinationPath(destinationRoot: string): string {
+    return isUriFlow(destinationRoot) ? destinationRoot : resolve(this.getCwd(), this.gen.destinationRoot());
   }
 }
