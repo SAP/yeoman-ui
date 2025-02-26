@@ -1,5 +1,5 @@
-import { vscode } from "./mockUtil";
-import * as _ from "lodash";
+import { window, commands, workspace, context } from "./resources/mocks/mockVSCode";
+import _ from "lodash";
 import { expect } from "chai";
 import { createSandbox, SinonSandbox, SinonMock } from "sinon";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
@@ -43,20 +43,20 @@ describe("exploregens unit test", () => {
   };
   let exploregens: ExploreGens;
 
-  after(() => {
+  afterAll(() => {
     sandbox.restore();
   });
 
   beforeEach(() => {
     rpcMock = sandbox.mock(rpc);
     loggerMock = sandbox.mock(childLogger);
-    workspaceConfigMock = sandbox.mock(vscode.workspace.getConfiguration());
-    globalStateMock = sandbox.mock(vscode.context.globalState);
+    workspaceConfigMock = sandbox.mock(workspace.getConfiguration());
+    globalStateMock = sandbox.mock(context.globalState);
     envUtilsMock = sandbox.mock(Env);
     npmUtilsMock = sandbox.mock(NpmCommand);
-    windowMock = sandbox.mock(vscode.window);
-    commandsMock = sandbox.mock(vscode.commands);
-    exploregens = new ExploreGens(childLogger as IChildLogger, _.get(vscode, "context"));
+    windowMock = sandbox.mock(window);
+    commandsMock = sandbox.mock(commands);
+    exploregens = new ExploreGens(childLogger as IChildLogger, context);
     exploregens["initRpc"](rpc);
   });
 

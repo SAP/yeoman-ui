@@ -1,4 +1,4 @@
-import { vscode } from "../mockUtil";
+import { window, commands, workspace, Uri, context, ViewColumn } from "../resources/mocks/mockVSCode";
 import * as loggerWrapper from "../../src/logger/logger-wrapper";
 import { createSandbox, SinonSandbox, SinonMock, SinonStub } from "sinon";
 import * as YeomanUIPanel from "../../src/panels/YeomanUIPanel";
@@ -25,11 +25,11 @@ describe("YeomanUIPanel unit test", () => {
   let createWebviewPanelStub: SinonStub;
   let trackerWrapperMock: SinonMock;
 
-  before(() => {
+  beforeAll(() => {
     sandbox = createSandbox();
   });
 
-  after(() => {
+  afterAll(() => {
     sandbox.restore();
   });
 
@@ -37,10 +37,10 @@ describe("YeomanUIPanel unit test", () => {
     loggerWrapperMock = sandbox.mock(loggerWrapper);
     envUtilsMock = sandbox.mock(Env);
     npmUtilsMock = sandbox.mock(NpmCommand);
-    windowMock = sandbox.mock(vscode.window);
-    commandsMock = sandbox.mock(vscode.commands);
+    windowMock = sandbox.mock(window);
+    commandsMock = sandbox.mock(commands);
     loggerWrapperMock.expects("getClassLogger").withExactArgs("AbstractWebviewPanel");
-    panel = new YeomanUIPanel.YeomanUIPanel(vscode.context);
+    panel = new YeomanUIPanel.YeomanUIPanel(context);
     setWebviewPanelStub = sandbox.stub(panel, "setWebviewPanel");
     createWebviewPanelStub = sandbox.stub(panel, "createWebviewPanel");
     trackerWrapperMock = sandbox.mock(AnalyticsWrapper);
@@ -93,7 +93,7 @@ describe("YeomanUIPanel unit test", () => {
       it("existing generator is provided with viewColumn parameter, in VSCODE", () => {
         envUtilsMock.expects("getAllGeneratorNamespaces").resolves(["gen1:test", "test:app", "code:app"]);
         npmUtilsMock.expects("checkAccessAndSetGeneratorsPath").never();
-        void panel.loadWebviewPanel({ generator: "test:app", viewColumn: vscode.ViewColumn.Two });
+        void panel.loadWebviewPanel({ generator: "test:app", viewColumn: ViewColumn.Two });
       });
 
       it("provided generator does not exist, in VSCODE", () => {
@@ -128,7 +128,7 @@ describe("YeomanUIPanel unit test", () => {
       it("existing generator is provided with viewColumn parameter, in VSCODE", () => {
         envUtilsMock.expects("getAllGeneratorNamespaces").resolves(["gen1:test", "test:app", "code:app"]);
         npmUtilsMock.expects("checkAccessAndSetGeneratorsPath").never();
-        void panel.loadWebviewPanel({ generator: "test:app", viewColumn: vscode.ViewColumn.Two });
+        void panel.loadWebviewPanel({ generator: "test:app", viewColumn: ViewColumn.Two });
       });
 
       it("provided generator does not exist", () => {
@@ -214,7 +214,7 @@ describe("YeomanUIPanel unit test", () => {
   });
 
   describe("showOpenDialog", () => {
-    const selected = vscode.Uri.file("selected");
+    const selected = Uri.file("selected");
     const required = "some/path/file";
 
     it("showOpenFileDialog", async () => {
@@ -232,7 +232,7 @@ describe("YeomanUIPanel unit test", () => {
     it("showOpenDialog - empty path provided, ws folder exists", async () => {
       const canSelectFiles = true;
       const objWs = [{ uri: { fsPath: "rootFolderPath" } }];
-      sandbox.stub(vscode.workspace, "workspaceFolders").value(objWs);
+      sandbox.stub(workspace, "workspaceFolders").value(objWs);
       windowMock
         .expects("showOpenDialog")
         .withExactArgs({ canSelectFiles, canSelectFolders: !canSelectFiles, defaultUri: objWs[0].uri })
@@ -243,13 +243,13 @@ describe("YeomanUIPanel unit test", () => {
     it("showOpenDialog - empty path provided, ws folder not exists", async () => {
       const canSelectFiles = false;
       const objWs = [{}];
-      sandbox.stub(vscode.workspace, "workspaceFolders").value(objWs);
+      sandbox.stub(workspace, "workspaceFolders").value(objWs);
       windowMock
         .expects("showOpenDialog")
         .withExactArgs({
           canSelectFiles,
           canSelectFolders: !canSelectFiles,
-          defaultUri: vscode.Uri.file(join(homedir())),
+          defaultUri: Uri.file(join(homedir())),
         })
         .resolves([selected]);
       expect(await panel["showOpenDialog"](undefined, canSelectFiles)).to.equal(selected.fsPath);
@@ -259,7 +259,7 @@ describe("YeomanUIPanel unit test", () => {
       const canSelectFiles = false;
       windowMock
         .expects("showOpenDialog")
-        .withExactArgs({ canSelectFiles, canSelectFolders: !canSelectFiles, defaultUri: vscode.Uri.file(required) })
+        .withExactArgs({ canSelectFiles, canSelectFolders: !canSelectFiles, defaultUri: Uri.file(required) })
         .resolves([selected]);
       expect(await panel["showOpenDialog"](required, canSelectFiles)).to.equal(selected.fsPath);
     });
@@ -268,7 +268,7 @@ describe("YeomanUIPanel unit test", () => {
       const canSelectFiles = true;
       windowMock
         .expects("showOpenDialog")
-        .withExactArgs({ canSelectFiles, canSelectFolders: !canSelectFiles, defaultUri: vscode.Uri.file(required) })
+        .withExactArgs({ canSelectFiles, canSelectFolders: !canSelectFiles, defaultUri: Uri.file(required) })
         .throws(new Error("unexpected"));
       expect(await panel["showOpenDialog"](required, canSelectFiles)).to.equal(required);
     });

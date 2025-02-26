@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import * as mocha from "mocha";
-import { expect } from "chai";
+import chai from "chai";
+const { expect } = chai;
 import { GeneratorFilter } from "../src/filter";
 
 describe("filter unit test", () => {

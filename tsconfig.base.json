@@ -4,13 +4,10 @@
     "allowJs": false,
     "composite": true,
     "module": "commonjs",
-    //"lib": ["es7"],
-    //"target": "es2017",
     "declaration": true,
     "sourceMap": true,
     "moduleResolution": "Node",
     "forceConsistentCasingInFileNames": true,
-    //"strict": true,
     "skipLibCheck": true,
     "alwaysStrict": true
   },

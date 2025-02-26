@@ -1,5 +1,5 @@
-import * as vscode from "vscode";
-import stripAnsi = require("strip-ansi");
+import vscode from "vscode";
+import stripAnsi from "strip-ansi";
 import { Output } from "./output";
 
 export class GeneratorOutput implements Output {

@@ -1,4 +1,4 @@
-import * as vscode from "vscode"; // NOSONAR
+import vscode from "vscode"; // NOSONAR
 import {
   getExtensionLogger,
   getExtensionLoggerOpts,

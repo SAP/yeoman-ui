@@ -1,4 +1,4 @@
-import * as sdk from "@sap/bas-sdk";
+import sdk from "@sap/bas-sdk";
 import { YeomanUIPanel } from "../panels/YeomanUIPanel";
 import { window } from "vscode";
 import messages from "../messages";

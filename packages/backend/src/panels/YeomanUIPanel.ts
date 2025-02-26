@@ -1,6 +1,6 @@
 import { isEmpty, get, isNil, assign } from "lodash";
 import { join } from "path";
-import * as vscode from "vscode";
+import vscode from "vscode";
 import { YeomanUI } from "../yeomanui";
 import { RpcExtension } from "@sap-devx/webview-rpc/out.ext/rpc-extension";
 import { GeneratorFilter } from "../filter";
@@ -25,7 +25,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   }
 
   public notifyGeneratorsChange(args?: any[]) {
-    const yeomanUi = get(this, "yeomanui");
+    const yeomanUi: YeomanUI | undefined = get(this, "yeomanui");    
     this.installGens = !yeomanUi && isEmpty(args) ? undefined : args;
     if (yeomanUi) {
       if (!this.installGens) {

@@ -1,4 +1,4 @@
-import * as vscode from "vscode"; // NOSONAR
+import vscode from "vscode"; // NOSONAR
 import { LogLevel } from "@vscode-logging/logger";
 
 /**
@@ -23,7 +23,7 @@ export function getSourceLocationTrackingSetting(): boolean {
   return config.get(SOURCE_TRACKING_CONFIG_PROP);
 }
 
-module.exports = {
+export default {
   LOGGING_LEVEL_CONFIG_PROP,
   SOURCE_TRACKING_CONFIG_PROP,
   getLoggingLevelSetting,

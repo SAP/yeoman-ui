@@ -1,7 +1,8 @@
 import type { ExtensionContext } from "vscode";
 import { initTelemetrySettings, BASClientFactory, BASTelemetryClient } from "@sap/swa-for-sapbas-vsx";
 import { getLogger } from "../logger/logger-wrapper";
-import * as path from "path";
+import path from "path";
+import { readFileSync } from "fs";
 
 /**
  * A Simple Wrapper for reporting usage analytics
@@ -29,7 +30,9 @@ export class AnalyticsWrapper {
 
   public static createTracker(context: ExtensionContext): void {
     try {
-      const packageJson = require(path.join(context.extensionPath, "package.json"));
+     
+      const packageJsonPath = path.join(context.extensionPath, "package.json");
+      const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
       const vscodeExtentionFullName = `${packageJson.publisher}.${packageJson.name}`;
       initTelemetrySettings(vscodeExtentionFullName, packageJson.version);
       getLogger().info(`SAP Web Analytics tracker was created for ${vscodeExtentionFullName}`);

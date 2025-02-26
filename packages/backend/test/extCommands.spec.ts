@@ -1,4 +1,4 @@
-import { vscode } from "./mockUtil";
+import { window, commands } from "./resources/mocks/mockVSCode";
 import { get } from "lodash";
 import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { expect } from "chai";
@@ -15,16 +15,16 @@ describe("extension commands unit test", () => {
     extensionPath: "testExtensionpath",
   };
 
-  before(() => {
+  beforeAll(() => {
     sandbox = createSandbox();
   });
 
-  after(() => {
+  afterAll(() => {
     sandbox.restore();
   });
 
   beforeEach(() => {
-    windowMock = sandbox.mock(vscode.window);
+    windowMock = sandbox.mock(window);
     loggerWrapperMock = sandbox.mock(loggerWrapper);
   });
 
@@ -34,7 +34,7 @@ describe("extension commands unit test", () => {
   });
 
   it("registerAndSubscribeCommands", () => {
-    const oRegisteredCommands: any = vscode.commands.getCommands();
+    const oRegisteredCommands: any = commands.getCommands();
 
     new ExtCommands(testContext).registerAndSubscribeCommands();
 

@@ -1,5 +1,6 @@
 {
   "name": "yeoman-ui",
+  "type": "module",
   "displayName": "Application Wizard",
   "version": "1.17.1",
   "private": true,
@@ -26,21 +27,19 @@
     "name": "SAP SE"
   },
   "publisher": "SAPOS",
-  "main": "./dist/extension",
+  "main": "./dist/src/extension.js",
   "scripts": {
-    "bundle": "webpack --mode production",
+    "bundle": "node esbuild.js --production",
     "ci": "npm-run-all clean compile coverage bundle frontend:copy package coverage:copy",
     "clean": "shx rm -rf ./dist ./coverage *.vsix",
     "clean:frontend": "cd ./dist && shx rm -rf ./media",
     "compile": "tsc",
     "compile:watch": "tsc -watch",
-    "coverage": "nyc mocha",
+    "coverage": "nyc jest",
     "coverage:copy": "shx mkdir -p ../../coverage && shx cp -u ./coverage/lcov.info ../../coverage/lcov_backend.info",
     "frontend:copy": "npm-run-all clean:frontend && shx cp -r ../frontend/dist/. ./dist/media/",
     "package": "vsce package --yarn",
-    "test": "mocha",
-    "webpack": "webpack --mode development",
-    "webpack-dev:watch": "webpack --mode development --watch",
+    "test": "jest",
     "ws:egRun": "node ./dist/src/webSocketServer/exploregens.js",
     "ws:run": "node ./dist/src/webSocketServer/youi.js"
   },
@@ -198,36 +197,41 @@
     "strip-ansi": "6.0.0",
     "sudo-prompt": "9.2.1",
     "titleize": "2.1.0",
-    "yeoman-environment": "3.3.0"
+    "yeoman-environment": "^4.4.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@types/chai": "4.2.14",
     "@types/cheerio": "^0.22.31",
-    "@types/inquirer": "^7.3.3",
+    "@types/jest": "29.5.14",
     "@types/lodash": "^4.14.170",
     "@types/node": "^14.14.44",
     "@types/npm-registry-fetch": "^8.0.0",
     "@types/object-hash": "^2.1.0",
     "@types/sinon": "^17.0.3",
     "@types/vscode": "^1.50.0",
-    "@types/webpack-env": "^1.16.2",
     "@types/ws": "^7.4.5",
-    "@types/yeoman-environment": "^2.10.3",
     "@vscode/vsce": "2.24.0",
-    "copy-webpack-plugin": "^12.0.2",
+    "esbuild": "0.25.0",
+    "chai": "4.2.0",
+    "jest": "29.7.0",
+    "jest-environment-jsdom": "29.7.0",
     "lcov-result-merger": "5.0.0",
+    "nyc": "15.1.0",
+    "shx": "0.3.4",
     "sinon": "^17.0.1",
     "string-replace-loader": "3.0.3",
+    "ts-jest": "29.1.1",
     "ts-loader": "^9.2.3",
-    "ts-node": "^9.1.1",
-    "webpack": "^5.90.1",
-    "webpack-cli": "^5.1.4",
+    "ts-node": "10.9.2",
+    "typescript": "4.9.3",
     "ws": "8.2.3"
   },
   "extensionDependencies": [
     "SAPOSS.app-studio-toolkit"
   ],
   "engines": {
-    "vscode": "^1.50.0"
+    "vscode": "^1.96.0"
   },
   "icon": "Wizard_logo.png"
 }

@@ -1,12 +1,11 @@
-import * as path from "path";
+import path from "path";
 import { promises } from "fs";
-import * as _ from "lodash";
-import * as inquirer from "inquirer";
+import _ from "lodash";
 import { ReplayUtils, ReplayState } from "./replayUtils";
-const datauri = require("datauri"); // eslint-disable-line @typescript-eslint/no-var-requires
-const titleize = require("titleize"); // eslint-disable-line @typescript-eslint/no-var-requires
-const humanizeString = require("humanize-string"); // eslint-disable-line @typescript-eslint/no-var-requires
-import * as defaultImage from "./images/defaultImage";
+import datauri from "datauri";
+import titleize from "titleize";
+import humanizeString from "humanize-string";
+import defaultImage from "./images/defaultImage";
 import { YouiAdapter } from "./youi-adapter";
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
@@ -17,10 +16,9 @@ import { AnalyticsWrapper } from "./usage-report/usage-analytics-wrapper";
 import { Output } from "./output";
 import { resolve } from "path";
 import { Env, EnvGen, GeneratorData, GeneratorNotFoundError } from "./utils/env";
-import { vscode, getVscode } from "./utils/vscodeProxy";
-import * as Generator from "yeoman-generator";
-import * as Environment from "yeoman-environment";
-import { Questions } from "yeoman-environment/lib/adapter";
+import vscode from "vscode";
+import { EnvironmentGenerator } from "@yeoman/types";
+import { QuestionCollection, Answers } from "inquirer";
 import { State } from "./utils/promise";
 import { Constants } from "./utils/constants";
 
@@ -44,9 +42,9 @@ export class YeomanUI {
   private readonly output: Output;
   private readonly logger: IChildLogger;
   private readonly youiAdapter: YouiAdapter;
-  private gen: Generator | undefined;
+  private gen: EnvironmentGenerator | undefined;
   private promptCount: number;
-  private currentQuestions: Questions<any>;
+  private currentQuestions: QuestionCollection<any>;
   private generatorName: string;
   private readonly replayUtils: ReplayUtils;
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -209,7 +207,7 @@ export class YeomanUI {
 
       const options = {
         logger: this.logger.getChildLogger({ label: generatorNamespace }),
-        vscode: getVscode(), // TODO: remove this temporary workaround once a better solution is found,
+        vscode: vscode, // TODO: remove this temporary workaround once a better solution is found,
         data: this.uiOptions.data,
         tracker: AnalyticsWrapper.getTracker(),
         appWizard: this.youiEvents.getAppWizard(),
@@ -224,7 +222,7 @@ export class YeomanUI {
       }
 
       this.promptCount = 0;
-      this.gen = envGen.gen as Generator;
+      this.gen = envGen.gen as EnvironmentGenerator;
       // do not add second parameter with value true
       // some generators rely on fact that this.env.cwd and
       // the current working directory is changed.
@@ -239,7 +237,7 @@ export class YeomanUI {
       await envGen.env.runGenerator(envGen.gen);
       if (!this.errorThrown) {
         // Without resolve this code worked only for absolute paths without / at the end.
-        // Generator can put a relative path, path including . and .. and / at the end.
+        // Generator can put a relative path, path including . and .. and / at the end.     
         const dirsAfter = await this.getChildDirectories(resolve(this.getCwd(), this.gen.destinationRoot()));
         this.onGeneratorSuccess(generatorNamespace, dirsBefore, dirsAfter);
       }
@@ -273,9 +271,9 @@ export class YeomanUI {
     gen.on(`method:${genMethodName}`, () => this.rpc.invoke(uiRpcMethodName, [true]));
   }
 
-  private handleErrors(env: Environment, gen: any, generatorName: string) {
+  private handleErrors(env: any, gen: any, generatorName: string) {
     const errorEventName = "error";
-    env.on(errorEventName, (error) => {
+    env.on(errorEventName, (error: any) => {
       env.removeAllListeners(errorEventName);
       this.onGeneratorFailure(generatorName, this.getErrorWithAdditionalInfo(error, `env.on(${errorEventName})`));
       env.emit(errorEventName, error);
@@ -320,7 +318,7 @@ export class YeomanUI {
         }
       }
     } catch (error) {
-      const questionInfo = `Could not update method '${methodName}' in '${questionName}' question in generator '${this.gen.options.namespace}'`;
+      const questionInfo = `Could not update method '${methodName}' in '${questionName}' question in generator '${this.gen.env.namespace}'`;
       const errorMessage = this.logError(this.getErrorWithAdditionalInfo(error, "evaluateMethod()"), questionInfo);
       this.onGeneratorFailure(this.generatorName, errorMessage);
     }
@@ -365,7 +363,7 @@ export class YeomanUI {
       : _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath", Constants.HOMEDIR_PROJECTS);
   }
 
-  public async showPrompt(questions: Questions<any>): Promise<inquirer.Answers> {
+  public async showPrompt(questions: QuestionCollection<any>): Promise<Answers> {
     this.promptCount++;
     const promptName = this.getPromptName(questions);
 
@@ -379,7 +377,7 @@ export class YeomanUI {
     this.replayUtils.recall(questions);
 
     this.currentQuestions = questions;
-    const mappedQuestions: Questions<any> = this.normalizeFunctions(questions);
+    const mappedQuestions: QuestionCollection<any> = this.normalizeFunctions(questions);
     if (_.isEmpty(mappedQuestions)) {
       return {};
     }
@@ -389,7 +387,7 @@ export class YeomanUI {
     return answers;
   }
 
-  private async back(partialAnswers: Environment.Answers, numOfSteps: number): Promise<void> {
+  private async back(partialAnswers: Answers, numOfSteps: number): Promise<void> {
     this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
     return this.runGenerator(this.generatorName);
   }
@@ -407,7 +405,7 @@ export class YeomanUI {
     }
   }
 
-  private getPromptName(questions: Questions<any>): string {
+  private getPromptName(questions: QuestionCollection<any>): string {
     const firstQuestionName = _.get(questions, "[0].name");
     return firstQuestionName ? _.startCase(firstQuestionName) : `Step ${this.promptCount}`;
   }
@@ -588,11 +586,12 @@ export class YeomanUI {
     try {
       genImageUrl = await datauri(path.join(genPackagePath, _.get(packageJson, "image", YeomanUI.YEOMAN_PNG)));
     } catch (error) {
+      //@ts-ignore
       genImageUrl = defaultImage.default;
       this.logger.debug(error);
     }
 
-    const genName = Environment.namespaceToName(genNamespace);
+    const genName = Env.namespaceToName(genNamespace);
     const genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
     const genDisplayName = _.get(packageJson, "displayName", "");
     const genPrettyName = _.isEmpty(genDisplayName) ? titleize(humanizeString(genName)) : genDisplayName;
@@ -619,7 +618,7 @@ export class YeomanUI {
    * Functions are lost when being passed to client (using JSON.Stringify)
    * Also functions cannot be evaluated on client)
    */
-  private normalizeFunctions(questions: Questions<any>): Questions<any> {
+  private normalizeFunctions(questions: QuestionCollection<any>): QuestionCollection<any> {
     this.addCustomQuestionEventHandlers(questions);
     return JSON.parse(JSON.stringify(questions, YeomanUI.funcReplacer));
   }
@@ -636,7 +635,7 @@ export class YeomanUI {
     }
   }
 
-  private addCustomQuestionEventHandlers(questions: Questions<any>): void {
+  private addCustomQuestionEventHandlers(questions: QuestionCollection<any>): void {
     for (const question of questions as any[]) {
       const guiType = _.get(question, "guiOptions.type", question.guiType);
       const questionHandlers = this.customQuestionEventHandlers.get(guiType);

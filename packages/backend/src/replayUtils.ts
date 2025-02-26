@@ -1,7 +1,6 @@
-import * as Environment from "yeoman-environment";
 import { IPrompt } from "@sap-devx/yeoman-ui-types";
-import * as hash from "object-hash";
-import TerminalAdapter = require("yeoman-environment/lib/adapter");
+import hash from "object-hash";
+import { QuestionCollection, Answers } from "inquirer";
 
 export enum ReplayState {
   Replaying,
@@ -11,7 +10,7 @@ export enum ReplayState {
 
 export class ReplayUtils {
   // assuming that order of questions is consistent
-  private static getQuestionsHash(questions: TerminalAdapter.Questions<any>): string {
+  private static getQuestionsHash(questions: QuestionCollection<any>): string {
     // we need exclude members that we manipulate in setDefault() below
     // we also need to exclude members set by custom event handlers
     // instead of blacklisting member, we whitelist them based on inquirer.js docs:
@@ -36,7 +35,7 @@ export class ReplayUtils {
     return hash(questions, { excludeKeys });
   }
 
-  private static setDefaults(questions: TerminalAdapter.Questions<any>, answers: Environment.Answers): void {
+  private static setDefaults(questions: any, answers: Answers): void {
     for (const question of questions as any[]) {
       const name = question["name"];
       const answer = answers[name];
@@ -52,9 +51,9 @@ export class ReplayUtils {
   }
 
   public isReplaying: boolean;
-  private readonly answersCache: Map<string, Environment.Answers>;
-  private replayStack: Environment.Answers[];
-  private replayQueue: Environment.Answers[];
+  private readonly answersCache: Map<string, Answers>;
+  private replayStack: Answers[];
+  private replayQueue: Answers[];
   private numOfSteps: number;
   private prompts: IPrompt[];
 
@@ -72,25 +71,25 @@ export class ReplayUtils {
     this.numOfSteps = 0;
   }
 
-  public start(questions: TerminalAdapter.Questions<any>, answers: Environment.Answers, numOfSteps: number): void {
+  public start(questions: QuestionCollection<any>, answers: Answers, numOfSteps: number): void {
     this._rememberAnswers(questions, answers);
     this.numOfSteps = numOfSteps;
     this.replayQueue = JSON.parse(JSON.stringify(this.replayStack));
     this.isReplaying = true;
   }
 
-  public stop(questions: TerminalAdapter.Questions<any>): IPrompt[] {
+  public stop(questions: QuestionCollection<any>): IPrompt[] {
     const prompts = this.prompts;
     this.isReplaying = false;
     this.prompts = [];
     this.replayQueue = [];
-    const answers: Environment.Answers = this.replayStack.pop();
+    const answers: Answers = this.replayStack.pop();
     ReplayUtils.setDefaults(questions, answers);
     this.replayStack.splice(this.replayStack.length - this.numOfSteps + 1);
     return prompts;
   }
 
-  public next(promptCount: number, promptName: string): Environment.Answers {
+  public next(promptCount: number, promptName: string): Answers {
     if (promptCount > this.prompts.length) {
       const prompt: IPrompt = {
         name: promptName,
@@ -106,14 +105,14 @@ export class ReplayUtils {
     this.prompts = prompts;
   }
 
-  public remember(questions: TerminalAdapter.Questions<any>, answers: Environment.Answers): void {
+  public remember(questions: QuestionCollection<any>, answers: Answers): void {
     this._rememberAnswers(questions, answers);
     this.replayStack.push(answers);
   }
 
-  public recall(questions: TerminalAdapter.Questions<any>): void {
+  public recall(questions: QuestionCollection<any>): void {
     const key: string = ReplayUtils.getQuestionsHash(questions);
-    const previousAnswers: Environment.Answers = this.answersCache.get(key);
+    const previousAnswers: Answers = this.answersCache.get(key);
     if (previousAnswers !== undefined) {
       ReplayUtils.setDefaults(questions, previousAnswers);
     }
@@ -131,7 +130,7 @@ export class ReplayUtils {
     }
   }
 
-  private _rememberAnswers(questions: TerminalAdapter.Questions<any>, answers: Environment.Answers): void {
+  private _rememberAnswers(questions: QuestionCollection<any>, answers: Answers): void {
     const key: string = ReplayUtils.getQuestionsHash(questions);
     this.answersCache.set(key, answers);
   }

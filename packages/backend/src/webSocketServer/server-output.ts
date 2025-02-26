@@ -1,5 +1,5 @@
 import { RpcCommon } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-import stripAnsi = require("strip-ansi");
+import stripAnsi from "strip-ansi";
 import { Output } from "../output";
 
 export class ServerOutput implements Output {

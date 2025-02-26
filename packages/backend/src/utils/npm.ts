@@ -1,19 +1,19 @@
 import { exec } from "child_process";
 import { promisify } from "util";
 import { platform } from "os";
-import * as _ from "lodash";
-import * as customLocation from "./customLocation";
-import * as sudo from "sudo-prompt";
-import * as fs from "fs";
+import _ from "lodash";
+import { DEFAULT_LOCATION, getPath, setDefaultPath } from "./customLocation";
+import sudo from "sudo-prompt";
+import fs from "fs";
 import messages from "../messages";
-import { vscode } from "./vscodeProxy";
-import * as path from "path";
-import * as npmFetch from "npm-registry-fetch";
-import { LookupGeneratorMeta } from "yeoman-environment";
+import vscode from "vscode";
+import path from "path";
+import npmFetch from "npm-registry-fetch";
 import { getConsoleWarnLogger } from "../logger/console-logger";
 import { Constants } from "./constants";
 import { spawn } from "child_process";
-import * as os from "os";
+import os from "os";
+import { LookupGeneratorMeta } from "@yeoman/types";
 
 const promisifiedExec = promisify(exec);
 
@@ -44,7 +44,7 @@ class Command {
 
   constructor() {
     this.setGlobalNodeModulesPath();
-    this.SET_DEFAULT_LOCATION = messages.set_default_location(customLocation.DEFAULT_LOCATION);
+    this.SET_DEFAULT_LOCATION = messages.set_default_location(DEFAULT_LOCATION);
   }
 
   private setGlobalNodeModulesPath() {
@@ -54,7 +54,7 @@ class Command {
   }
 
   private getGenLocationParams(): string {
-    const customInstallationPath = customLocation.getPath();
+    const customInstallationPath = getPath();
     return _.isEmpty(customInstallationPath) ? "-g" : `--prefix ${customInstallationPath}`;
   }
 
@@ -98,7 +98,7 @@ class Command {
 
   private async getAccessResult(): Promise<string> {
     // we assume that if custom path set by an user it is writable
-    if (_.isEmpty(customLocation.getPath())) {
+    if (_.isEmpty(getPath())) {
       const globalNodeModulesPath = await this.getGlobalNodeModulesPath();
       const isWritable = await this.isPathWritable(globalNodeModulesPath);
       if (!isWritable) {
@@ -240,7 +240,7 @@ class Command {
       if (accessResult === messages.change_owner_for_global(globalPath)) {
         await this.grantAccessForGlobalNodeModulesPath();
       } else if (accessResult === this.SET_DEFAULT_LOCATION) {
-        await customLocation.setDefaultPath();
+        await setDefaultPath();
       } else if (accessResult !== HAS_ACCESS) {
         throw new Error(CANCELED);
       }

@@ -1,4 +1,4 @@
-import * as vscode from "vscode"; // NOSONAR
+import vscode from "vscode"; // NOSONAR
 import { getLogger } from "./logger-wrapper";
 import { LOGGING_LEVEL_CONFIG_PROP, SOURCE_TRACKING_CONFIG_PROP } from "./settings";
 import { LogLevel } from "@vscode-logging/logger";
@@ -36,8 +36,7 @@ export function listenToLogSettingsChanges(context: vscode.ExtensionContext) {
     }),
   );
 }
-
-module.exports = {
+ export default {
   listenToLogSettingsChanges,
   logLoggerDetails,
 };

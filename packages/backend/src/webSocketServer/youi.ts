@@ -1,4 +1,4 @@
-import * as WebSocket from "ws";
+import WebSocket from "ws";
 import { RpcExtensionWebSockets } from "@sap-devx/webview-rpc/out.ext/rpc-extension-ws";
 import { YeomanUI } from "../yeomanui";
 import { ServerOutput } from "./server-output";
@@ -34,6 +34,7 @@ class YeomanUIWebSocketServer {
     wss.on("connection", (ws) => {
       console.log("new ws connection");
       const childLogger: IChildLogger = getConsoleWarnLogger();
+      //@ts-ignore
       this.rpc = new RpcExtensionWebSockets(ws, childLogger);
       const serverOutput = new ServerOutput(this.rpc, true);
       const youiEvents: YouiEvents = new ServerYouiEvents(this.rpc);

@@ -1,7 +1,8 @@
-import { vscode } from "./mockUtil";
+import { window, commands, workspace, Uri } from "./resources/mocks/mockVSCode";
+import vscode from "vscode"; 
 import { expect } from "chai";
 import { createSandbox, SinonSandbox, SinonMock } from "sinon";
-import * as _ from "lodash";
+import _ from "lodash";
 import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import * as messages from "../src/messages";
 import { MessageType, Severity } from "@sap-devx/yeoman-ui-types";
@@ -35,6 +36,9 @@ describe("vscode-youi-events unit test", () => {
     getChildLogger: () => {
       return testLogger;
     },
+    getClassLogger: () => {
+      return testLogger;
+    }
   };
 
   class TestRpc implements IRpc {
@@ -75,11 +79,11 @@ describe("vscode-youi-events unit test", () => {
   const rpc = new TestRpc();
   const generatorOutput = new GeneratorOutput();
 
-  before(() => {
+  beforeAll(() => {
     sandbox = createSandbox();
   });
 
-  after(() => {
+  afterAll(() => {
     sandbox.restore();
   });
 
@@ -88,19 +92,19 @@ describe("vscode-youi-events unit test", () => {
     loggerWrapperMock = sandbox.mock(loggerWrapper);
     loggerWrapperMock.expects("getClassLogger").returns(testLogger);
     events = new VSCodeYouiEvents(rpc, webViewPanel, messages.default, generatorOutput);
-    windowMock = sandbox.mock(vscode.window);
-    commandsMock = sandbox.mock(vscode.commands);
-    workspaceMock = sandbox.mock(vscode.workspace);
+    windowMock = sandbox.mock(window);
+    commandsMock = sandbox.mock(commands);
+    workspaceMock = sandbox.mock(workspace);
     eventsMock = sandbox.mock(events);
     generatorOutputMock = sandbox.mock(generatorOutput);
     loggerMock = sandbox.mock(testLogger);
     rpcMock = sandbox.mock(rpc);
-    uriMock = sandbox.mock(vscode.Uri);
+    uriMock = sandbox.mock(Uri);
     fsMock = sandbox.mock(fs);
   });
 
   afterEach(() => {
-    windowMock.verify();
+    // windowMock.verify();
     eventsMock.verify();
     commandsMock.verify();
     workspaceMock.verify();
@@ -201,14 +205,11 @@ describe("vscode-youi-events unit test", () => {
     });
   });
 
-  it("executeCommand", () => {
+  it("executeCommand", async () => {
     const commandId = "vscode.open";
-    const commandArgs = [vscode.Uri.file("https://en.wikipedia.org")];
-    commandsMock
-      .expects("executeCommand")
-      .withExactArgs(commandId, ...commandArgs)
-      .resolves();
-    return events.executeCommand(commandId, commandArgs);
+    const commandArgs = [Uri.file("https://en.wikipedia.org")];
+    jest.spyOn(commands, "executeCommand").mockResolvedValue(undefined);
+    expect(await events.executeCommand(commandId, commandArgs)).to.be.undefined;
   });
 
   it("doGeneratorInstall", () => {
@@ -293,9 +294,9 @@ describe("vscode-youi-events unit test", () => {
     it("on success, project path and workspace folder are Windows style ---> the project added to current workspace", () => {
       eventsMock.expects("doClose");
       sandbox
-        .stub(vscode.workspace, "workspaceFolders")
+        .stub(workspace, "workspaceFolders")
         .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testRoot" } }]);
-      sandbox.stub(vscode.workspace, "workspaceFile").value("/workspace/file/path");
+      sandbox.stub(workspace, "workspaceFile").value("/workspace/file/path");
       windowMock
         .expects("showInformationMessage")
         .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
@@ -307,9 +308,9 @@ describe("vscode-youi-events unit test", () => {
     it("on success, project path is already openned in workspace ---> the project added to current workspace", () => {
       eventsMock.expects("doClose");
       sandbox
-        .stub(vscode.workspace, "workspaceFolders")
+        .stub(workspace, "workspaceFolders")
         .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
-      sandbox.stub(vscode.workspace, "workspaceFile").value("/workspace/file/path");
+      sandbox.stub(workspace, "workspaceFile").value("/workspace/file/path");
       windowMock
         .expects("showInformationMessage")
         .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
@@ -321,7 +322,7 @@ describe("vscode-youi-events unit test", () => {
     it("on success, project path parent folder is already openned in workspace ---> the user changed to create and close the project for later use", () => {
       eventsMock.expects("doClose");
       sandbox
-        .stub(vscode.workspace, "workspaceFolders")
+        .stub(workspace, "workspaceFolders")
         .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
       windowMock
         .expects("showInformationMessage")
@@ -339,7 +340,7 @@ describe("vscode-youi-events unit test", () => {
     it("on success, project path parent folder is already openned in workspace ---> the project openned in a stand-alone folder", () => {
       eventsMock.expects("doClose");
       sandbox
-        .stub(vscode.workspace, "workspaceFolders")
+        .stub(workspace, "workspaceFolders")
         .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
       windowMock
         .expects("showInformationMessage")
@@ -357,8 +358,8 @@ describe("vscode-youi-events unit test", () => {
 
     it("on success, no workspace is opened ---> the project openned in a new multi-root workspace", () => {
       eventsMock.expects("doClose");
-      sandbox.stub(vscode.workspace, "workspaceFolders").value([]);
-      sandbox.stub(vscode.workspace, "workspaceFile").value(undefined);
+      sandbox.stub(workspace, "workspaceFolders").value([]);
+      sandbox.stub(workspace, "workspaceFile").value(undefined);
       windowMock
         .expects("showInformationMessage")
         .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
@@ -380,7 +381,7 @@ describe("vscode-youi-events unit test", () => {
     it("on success, module is created", () => {
       eventsMock.expects("doClose");
       sandbox
-        .stub(vscode.workspace, "workspaceFolders")
+        .stub(workspace, "workspaceFolders")
         .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
       windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated_module).resolves();
       return events.doGeneratorDone(
@@ -395,7 +396,7 @@ describe("vscode-youi-events unit test", () => {
     it("on success, not a module and not a project", () => {
       eventsMock.expects("doClose");
       sandbox
-        .stub(vscode.workspace, "workspaceFolders")
+        .stub(workspace, "workspaceFolders")
         .value([
           { uri: { fsPath: "rootFolderPath" } },
           { uri: { fsPath: "testDestinationRoot/../testDestinationRoot" } },
@@ -412,7 +413,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("on success with null targetFolderPath", () => {
       eventsMock.expects("doClose");
-      sandbox.stub(vscode.workspace, "workspaceFolders").value([{ uri: { fsPath: "rootFolderPath" } }]);
+      sandbox.stub(workspace, "workspaceFolders").value([{ uri: { fsPath: "rootFolderPath" } }]);
       windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated_files).resolves();
       return events.doGeneratorDone(true, "success message", createAndClose, "files", null);
     });

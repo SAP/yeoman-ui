@@ -1,10 +1,10 @@
-import * as _ from "lodash";
+import _ from "lodash";
 import { IChildLogger } from "@vscode-logging/logger";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { NpmCommand, PackagesData } from "./utils/npm";
 import messages from "./exploreGensMessages";
 import { Env, GeneratorData } from "./utils/env";
-import { vscode } from "./utils/vscodeProxy";
+import vscode from "vscode";
 import { Constants } from "./utils/constants";
 
 type Disposable = {

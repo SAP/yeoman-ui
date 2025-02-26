@@ -1,5 +1,5 @@
-import * as vscode from "vscode";
-import * as _ from "lodash";
+import vscode from "vscode";
+import _ from "lodash";
 import { Severity } from "@sap-devx/yeoman-ui-types";
 import { Constants } from "../utils/constants";
 

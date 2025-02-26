@@ -1,4 +1,4 @@
-import * as vscode from "vscode";
+import vscode from "vscode";
 import { join, sep } from "path";
 import { readFileSync } from "fs";
 import { IChildLogger } from "@vscode-logging/logger";
