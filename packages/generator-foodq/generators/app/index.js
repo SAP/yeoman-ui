@@ -185,7 +185,7 @@ module.exports = class extends Generator {
         name: "diningStyle",
         message: "What’s the best way to describe your dining style?",
         orientation: "vertical",
-        choices: ["Slow Eater", "Speed Eater", "Social Eater",{ value: "Picky Eater", disabled: true}],
+        choices: ["Slow Eater", "Speed Eater", "Social Eater", { value: "Picky Eater", disabled: true }],
         default: "cat",
       },
       {
