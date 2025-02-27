@@ -178,8 +178,21 @@ module.exports = class extends Generator {
       },
       {
         type: "input",
+        guiOptions: {
+          type: "radio",
+          hint: "No picky eaters allowed—our chef takes it personally.",
+        },
+        name: "diningStyle",
+        message: "What’s the best way to describe your dining style?",
+        orientation: "vertical",
+        choices: ["Slow Eater", "Speed Eater", "Social Eater",{ value: "Picky Eater", disabled: true}],
+        default: "cat",
+      },
+      {
+        type: "input",
         name: "favColor",
         message: "What's your favorite napkin color?",
+        placeholder: "Drake's Neck Green",
         guiOptions: {
           hint: "Our recommendation is green",
           breadcrumb: "Napkin color",

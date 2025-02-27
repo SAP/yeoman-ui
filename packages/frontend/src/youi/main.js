@@ -3,6 +3,7 @@ import FileBrowserPlugin from "@sap-devx/inquirer-gui-file-browser-plugin";
 import FolderBrowserPlugin from "@sap-devx/inquirer-gui-folder-browser-plugin";
 import LoginPlugin from "@sap-devx/inquirer-gui-login-plugin";
 import TilesPlugin from "@sap-devx/inquirer-gui-tiles-plugin";
+import RadioPlugin from "@sap-devx/inquirer-gui-radio-plugin";
 import LabelPlugin from "@sap-devx/inquirer-gui-label-plugin";
 import AutoCompletePlugin from "@sap-devx/inquirer-gui-auto-complete-plugin";
 import YoUiApp from "./App.vue";
@@ -12,6 +13,7 @@ import "@sap-devx/inquirer-gui/dist/form.css";
 import "@sap-devx/inquirer-gui-auto-complete-plugin/dist/autoCompletePlugin.css";
 import "@sap-devx/inquirer-gui-label-plugin/dist/labelPlugin.css";
 import "@sap-devx/inquirer-gui-tiles-plugin/dist/tilesPlugin.css";
+import "@sap-devx/inquirer-gui-radio-plugin/dist/radioPlugin.css";
 import Form from "@sap-devx/inquirer-gui";
 
 const plugins = [];
@@ -36,6 +38,10 @@ plugins.push(options.plugin);
 
 options = {};
 app.use(TilesPlugin, options);
+plugins.push(options.plugin);
+
+options = {};
+app.use(RadioPlugin, options);
 plugins.push(options.plugin);
 
 options = {};
