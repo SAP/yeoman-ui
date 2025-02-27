@@ -322,7 +322,7 @@ export default {
     back() {
       return this.gotoStep(1); // go 1 step back
     },
-    gotoStep(numOfSteps) {
+    async gotoStep(numOfSteps) {
       // go numOfSteps step back
       try {
         this.stepValidated = false; // reset the step validation to disable the next button
@@ -330,13 +330,17 @@ export default {
         this.isReplaying = true;
         this.numOfSteps = numOfSteps;
         const answers = this.currentPrompt.answers;
-        if (this.promptIndex - numOfSteps > 0) {
+        let fromWizard = true;
+        const targetStep = this.promptIndex - numOfSteps;
+        if (targetStep === 0) {
+          fromWizard = await this.rpc.invoke("fromWizard");
+        }
+        if ((fromWizard && targetStep > 0) || (!fromWizard && targetStep === 0)) {
           return this.rpc.invoke("back", [
             answers !== undefined ? JSON.parse(JSON.stringify(answers)) : answers,
             numOfSteps,
           ]);
         }
-
         return this.reload();
       } catch (error) {
         this.rpc.invoke("logError", [error]);
