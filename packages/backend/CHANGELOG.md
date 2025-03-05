@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.18.0](https://github.com/SAP/yeoman-ui/compare/v1.17.1...v1.18.0) (2025-03-05)
+
+### Features
+
+- support workspace with URL ([#866](https://github.com/SAP/yeoman-ui/issues/866)) ([ba114f9](https://github.com/SAP/yeoman-ui/commit/ba114f9ce903258b4cec523241049cd30de3a567))
+
 ## [1.17.1](https://github.com/SAP/yeoman-ui/compare/v1.17.0...v1.17.1) (2025-01-09)
 
 **Note:** Version bump only for package yeoman-ui
