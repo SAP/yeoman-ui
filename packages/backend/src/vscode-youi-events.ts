@@ -216,14 +216,22 @@ export class VSCodeYouiEvents implements YouiEvents {
     } else if (selectedWorkspace === this.messages.add_to_workspace) {
       const targetFolderUri = vscode.Uri.parse(folderUriConfig.uri);
       const uniqueProjectName = this.getUniqueProjectName(folderUriConfig.name);
-      const wsFoldersToAdd: WsFoldersToAdd = {
-        uri: targetFolderUri,
-        name: uniqueProjectName,
-      };
-      this.addOrCreateProjectWorkspace(wsFoldersToAdd);
-      if (isNil(vscode.workspace.workspaceFile)) {
-        const workspaceFileUri = WorkspaceFile.createWsWithUri(folderUriConfig);
-        void vscode.commands.executeCommand("vscode.openFolder", workspaceFileUri);
+
+      const existingFolder = vscode.workspace.workspaceFolders?.find(folder => folder.uri.toString() === targetFolderUri.toString());
+
+      if (!existingFolder) {
+        const wsFoldersToAdd: WsFoldersToAdd = {
+          uri: targetFolderUri,
+          name: uniqueProjectName,
+        };
+        this.addOrCreateProjectWorkspace(wsFoldersToAdd);
+
+        if (isNil(vscode.workspace.workspaceFile)) {
+          const workspaceFileUri = WorkspaceFile.createWsWithUri(folderUriConfig);
+          void vscode.commands.executeCommand('vscode.openFolder', workspaceFileUri);
+        }
+      } else {
+        void vscode.commands.executeCommand('workbench.action.reloadWindow');
       }
     } else {
       WorkspaceFile.createWsWithUri(folderUriConfig);
