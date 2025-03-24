@@ -1,0 +1,10 @@
+version = 1
+SPDX-PackageName = "yeoman-ui"
+SPDX-PackageSupplier = "Tomer Epstein <tomer.epstein@sap.com>"
+SPDX-PackageDownloadLocation = "https://github.com/SAP/yeoman-ui"
+
+[[annotations]]
+path = "**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2021 SAP SE or an SAP affiliate company and yeoman-ui contributors"
+SPDX-License-Identifier = "Apache-2.0"
