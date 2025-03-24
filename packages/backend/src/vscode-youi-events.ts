@@ -215,11 +215,11 @@ export class VSCodeYouiEvents implements YouiEvents {
       void vscode.commands.executeCommand("vscode.openFolder", workspaceFileUri);
     } else if (selectedWorkspace === this.messages.add_to_workspace) {
       const targetFolderUri = vscode.Uri.parse(folderUriConfig.uri);
-      const uniqueProjectName = this.getUniqueProjectName(folderUriConfig.name);
+      
+      const workspaceNeedsReload = this.isFolderExistingInWorkspace(targetFolderUri);
 
-      const existingFolder = vscode.workspace.workspaceFolders?.find(folder => folder.uri.toString() === targetFolderUri.toString());
-
-      if (!existingFolder) {
+      if (!workspaceNeedsReload) {
+        const uniqueProjectName = this.getUniqueProjectName(folderUriConfig.name);
         const wsFoldersToAdd: WsFoldersToAdd = {
           uri: targetFolderUri,
           name: uniqueProjectName,
@@ -239,7 +239,8 @@ export class VSCodeYouiEvents implements YouiEvents {
   }
 
   private getUniqueProjectName(baseName: string): string {
-    const existingNames = vscode.workspace.workspaceFolders?.map((folder) => folder.name) || [];
+    const existingNames = this.getWorkspaceFolderNames();
+
     if (!existingNames.includes(baseName)) {
       return baseName;
     }
@@ -254,6 +255,15 @@ export class VSCodeYouiEvents implements YouiEvents {
 
     return uniqueName;
   }
+
+  private isFolderExistingInWorkspace(targetUri: vscode.Uri): boolean {
+    return vscode.workspace.workspaceFolders?.some(folder => folder.uri.toString() === targetUri.toString()) || false;
+  }
+
+  private getWorkspaceFolderNames(): string[] {
+    return vscode.workspace.workspaceFolders?.map(folder => folder.name) || [];
+  }
+
 
   private addOrCreateProjectWorkspace(wsFoldersToAdd: WsFoldersToAdd) {
     const wsFoldersQuantity = size(vscode.workspace.workspaceFolders);
