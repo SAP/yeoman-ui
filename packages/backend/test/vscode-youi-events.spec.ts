@@ -287,7 +287,7 @@ describe("vscode-youi-events unit test", () => {
 
   describe("doGeneratorDone", () => {
     const createAndClose = "Create the project and close it for future use";
-    const openNewWorkspace = "Open the project in a stand-alone folder";
+    const openNewWorkspace = "Open the project in a stand-alone";
     const addToWorkspace = "Open the project in a multi-root workspace";
 
     it("on success, project path and workspace folder are Windows style ---> the project added to current workspace", () => {
@@ -336,7 +336,7 @@ describe("vscode-youi-events unit test", () => {
       );
     });
 
-    it("on success, project path parent folder is already openned in workspace ---> the project openned in a stand-alone folder", () => {
+    it("on success, project path parent folder is already openned in workspace ---> the project openned in a stand-alone", () => {
       eventsMock.expects("doClose");
       sandbox
         .stub(vscode.workspace, "workspaceFolders")
@@ -374,6 +374,95 @@ describe("vscode-youi-events unit test", () => {
         "Open the project in a multi-root workspace",
         "project",
         "testDestinationRoot/./projectName",
+      );
+    });
+
+    it("on success, targetFolder is uri and the the project openned in a new multi-root workspace", () => {
+      eventsMock.expects("doClose");
+      sandbox.stub(vscode.workspace, "workspaceFolders").value([]);
+      sandbox.stub(vscode.workspace, "workspaceFile").value(undefined);
+      windowMock
+        .expects("showInformationMessage")
+        .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
+        .resolves();
+      commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
+      workspaceMock.expects("updateWorkspaceFolders").withArgs(0, null);
+
+      fsMock.expects("existsSync").returns(false);
+      fsMock.expects("writeFileSync");
+
+      events.doGeneratorDone(
+        true,
+        "success message",
+        "Open the project in a multi-root workspace",
+        "project",
+        '{"uri":"abapdf://testDestinationRoot","name":"projectName"}',
+      );
+    });
+
+    it("on success, targetFolder is uri and workspace needs reload --> trigger workspace refresh", () => {
+      eventsMock.expects("doClose");
+      sandbox
+        .stub(vscode.workspace, "workspaceFolders")
+        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { shema: "abapdf", fsPath: "testDestinationRoot" } }]);
+      sandbox.stub(vscode.workspace, "workspaceFile").value("/workspace/file/path");
+
+      windowMock
+        .expects("showInformationMessage")
+        .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
+        .resolves();
+
+      commandsMock.expects("executeCommand").withArgs("workbench.action.reloadWindow").resolves();
+
+      events.doGeneratorDone(
+        true,
+        "success message",
+        addToWorkspace,
+        "project",
+        '{"uri":"abapdf://testDestinationRoot","name":"projectName"}',
+      );
+    });
+
+    it("on success, targetFolderPath is uri and the the project openned in a Open the project in a stand-alone", () => {
+      eventsMock.expects("doClose");
+      sandbox.stub(vscode.workspace, "workspaceFolders").value([]);
+      sandbox.stub(vscode.workspace, "workspaceFile").value(undefined);
+      windowMock
+        .expects("showInformationMessage")
+        .withExactArgs(messages.default.artifact_generated_project_open_in_a_new_workspace)
+        .resolves();
+      commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
+
+      fsMock.expects("existsSync").returns(false);
+      fsMock.expects("writeFileSync");
+
+      events.doGeneratorDone(
+        true,
+        "success message",
+        "Open the project in a stand-alone",
+        "project",
+        '{"uri":"abapdf://testDestinationRoot","name":"projectName"}',
+      );
+    });
+
+    it("on success, targetFolderPath is uri and the the project openned in a Create the project and close it for future use", () => {
+      eventsMock.expects("doClose");
+      sandbox.stub(vscode.workspace, "workspaceFolders").value([]);
+      sandbox.stub(vscode.workspace, "workspaceFile").value(undefined);
+      windowMock
+        .expects("showInformationMessage")
+        .withExactArgs(messages.default.artifact_generated_project_saved_for_future)
+        .resolves();
+
+      fsMock.expects("existsSync").returns(false);
+      fsMock.expects("writeFileSync");
+
+      events.doGeneratorDone(
+        true,
+        "success message",
+        "Create the project and close it for future use",
+        "project",
+        '{"uri":"abapdf://testDestinationRoot","name":"projectName"}',
       );
     });
 
@@ -421,6 +510,34 @@ describe("vscode-youi-events unit test", () => {
       eventsMock.expects("doClose");
       windowMock.expects("showErrorMessage").withExactArgs("error message");
       return events.doGeneratorDone(false, "error message", createAndClose, "files");
+    });
+  });
+
+  describe("getUniqueProjectName", () => {
+    it("should return baseName if it does not exist in workspace", () => {
+      sandbox.stub(vscode.workspace, "workspaceFolders").value([{ name: "Project1" }, { name: "Project2" }]);
+      const result = events["getUniqueProjectName"]("NewProject");
+      expect(result).to.equal("NewProject");
+    });
+
+    it("should return baseName(1) if baseName already exists", () => {
+      sandbox.stub(vscode.workspace, "workspaceFolders").value([{ name: "Project1" }, { name: "NewProject" }]);
+      const result = events["getUniqueProjectName"]("NewProject");
+      expect(result).to.equal("NewProject(1)");
+    });
+
+    it("should return baseName with incremented counter if multiple exist", () => {
+      sandbox
+        .stub(vscode.workspace, "workspaceFolders")
+        .value([{ name: "NewProject" }, { name: "NewProject(1)" }, { name: "NewProject(2)" }]);
+      const result = events["getUniqueProjectName"]("NewProject");
+      expect(result).to.equal("NewProject(3)");
+    });
+
+    it("should handle empty workspace folders gracefully", () => {
+      sandbox.stub(vscode.workspace, "workspaceFolders").value(undefined);
+      const result = events["getUniqueProjectName"]("UniqueProject");
+      expect(result).to.equal("UniqueProject");
     });
   });
 });

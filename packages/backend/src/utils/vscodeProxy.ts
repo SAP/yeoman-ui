@@ -10,8 +10,8 @@ export const getVscode = () => {
   }
 };
 
-const filename: string = require.main.filename;
-const _isInTest = filename.includes(join("node_modules", "mocha"));
+const filename: string = require?.main?.filename;
+const _isInTest = filename?.includes(join("node_modules", "mocha"));
 
 const returnValue = (...args: any[]) => {
   if (_isInTest) {
@@ -33,6 +33,9 @@ const context = { globalState: globalStateObj, extensionPath: "" };
 
 const Uri = {
   file: (path?: string) => {
+    return { fsPath: path };
+  },
+  parse: (path?: string) => {
     return { fsPath: path };
   },
 };

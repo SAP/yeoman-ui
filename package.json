@@ -1,6 +1,5 @@
 {
   "name": "root",
-  "version": "0.0.0",
   "private": true,
   "workspaces": {
     "packages": [
@@ -81,6 +80,7 @@
     "@typescript-eslint/eslint-plugin": "5.28.0",
     "@typescript-eslint/parser": "5.28.0",
     "chai": "4.2.0",
+    "conventional-changelog-cli": "^5.0.0",
     "cz-conventional-changelog": "3.3.0",
     "eslint": "7.18.0",
     "eslint-config-prettier": "7.2.0",
@@ -97,5 +97,8 @@
     "prettier": "3.2.5",
     "shx": "0.3.4",
     "typescript": "~4.5.0"
+  },
+  "resolutions": {
+    "follow-redirects": "1.15.6"
   }
 }
