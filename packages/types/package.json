@@ -1,7 +1,7 @@
 {
   "name": "@sap-devx/yeoman-ui-types",
   "displayName": "yeoman-ui-types",
-  "version": "1.18.0",
+  "version": "1.19.0",
   "description": "Yeoman-UI prompt types",
   "repository": {
     "type": "git",

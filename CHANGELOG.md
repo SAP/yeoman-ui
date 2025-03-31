@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.19.0](https://github.com/SAP/yeoman-ui/compare/v1.18.0...v1.19.0) (2025-03-31)
+
+### Features
+
+- reload the workspace when regenerating remote projects ([#871](https://github.com/SAP/yeoman-ui/issues/871)) ([91e0902](https://github.com/SAP/yeoman-ui/commit/91e0902d7e05163966a34de1075f98e1860aa120))
+
 # [1.18.0](https://github.com/SAP/yeoman-ui/compare/v1.17.1...v1.18.0) (2025-03-05)
 
 ### Features
