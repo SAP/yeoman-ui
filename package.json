@@ -99,6 +99,9 @@
     "typescript": "~4.5.0"
   },
   "resolutions": {
-    "follow-redirects": "1.15.6"
+    "follow-redirects": "1.15.6",
+    "tar-fs": "2.1.2",
+    "rollup": "3.29.5",
+    "@babel/runtime": "7.27.0"
   }
 }
