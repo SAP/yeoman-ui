@@ -142,17 +142,19 @@ module.exports = class extends Generator {
   }
 
   async prompting() {
-    let debounceTimeout;
+    let validationDelayTimer;
     let prompts = [
       {
         type: "input",
         name: "name",
         message: "What is your name?",
         validate: async (value) => {
-          clearTimeout(debounceTimeout);
+          // Clear any previously scheduled validation
+          clearTimeout(validationDelayTimer);
           // eslint-disable-next-line no-undef
           return await new Promise((resolve) => {
-            debounceTimeout = setTimeout(() => {
+            // Schedule new validation after 900ms of inactivity
+            validationDelayTimer = setTimeout(() => {
               if (!value) {
                 resolve(true);
               } else if (value.charAt(0) === value.charAt(0).toUpperCase()) {
@@ -160,7 +162,7 @@ module.exports = class extends Generator {
               } else {
                 resolve("Your name must start with a capital letter!");
               }
-            }, 900); // Debounce delay in milliseconds
+            }, 900);
           });
         },
       },
