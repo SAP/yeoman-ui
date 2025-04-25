@@ -412,7 +412,6 @@ describe("App.vue", () => {
         { name: "choicesQ", choices: "__Function" },
         { name: "filterQ", filter: "__Function" },
         { name: "validateQ", validate: "__Function" },
-        { name: "whenQ6", default: "whenAnswer6", type: "confirm" },
       ];
       wrapper.vm.showPrompt(questions, "promptName");
 
