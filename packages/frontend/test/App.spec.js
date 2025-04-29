@@ -721,10 +721,12 @@ describe("App.vue", () => {
   });
 
   describe("back - method", () => {
-    test("promptIndex is 0 (Select Generator)", () => {
+    test("promptIndex is 0 (Select Generator)", async () => {
       wrapper = initComponent(App, {}, true);
       wrapper.vm.rpc = {
-        invoke: jest.fn(),
+        invoke: jest.fn().mockImplementation(async () => {
+          return true;
+        }),
         registerMethod: jest.fn(),
       };
       const invokeSpy = jest.spyOn(wrapper.vm.rpc, "invoke");
@@ -733,7 +735,7 @@ describe("App.vue", () => {
       wrapper.vm.promptIndex = 1;
       wrapper.vm.prompts = [{}, {}];
 
-      wrapper.vm.back();
+      await wrapper.vm.back();
 
       expect(wrapper.vm.promptIndex).toBe(0);
       expect(wrapper.vm.prompts.length).toBe(0);
@@ -779,23 +781,24 @@ describe("App.vue", () => {
   });
 
   describe("gotoStep - method", () => {
-    test("promptIndex is 1, goto 1 step back -> (Select Generator)", () => {
+    test("promptIndex is 1, goto 1 step back -> (Select Generator)", async () => {
       wrapper = initComponent(App, {}, true);
       wrapper.vm.rpc = {
-        invoke: jest.fn(),
+        invoke: jest.fn().mockImplementation(async () => {
+          return true;
+        }),
         registerMethod: jest.fn(),
       };
       const invokeSpy = jest.spyOn(wrapper.vm.rpc, "invoke");
-
       wrapper.vm.resolve = undefined;
       wrapper.vm.promptIndex = 1;
       wrapper.vm.prompts = [{}, {}];
 
-      wrapper.vm.gotoStep(1);
-
+      await wrapper.vm.gotoStep(1);
       expect(wrapper.vm.promptIndex).toBe(0);
       expect(wrapper.vm.prompts.length).toBe(0);
       expect(wrapper.vm.isReplaying).toBe(false);
+      expect(invokeSpy).toHaveBeenCalledWith("fromWizard");
       expect(invokeSpy).toHaveBeenCalledWith("getState");
     });
 
@@ -822,7 +825,9 @@ describe("App.vue", () => {
     test("promptIndex is 3, goto 3, exception thrown", async () => {
       wrapper = initComponent(App, {}, true);
       wrapper.vm.rpc = {
-        invoke: jest.fn(),
+        invoke: jest.fn().mockImplementation(async () => {
+          return true;
+        }),
         registerMethod: jest.fn(),
       };
       const err = new Error("error");
@@ -832,8 +837,9 @@ describe("App.vue", () => {
       wrapper.vm.reject = jest.fn();
       wrapper.vm.promptIndex = 3;
       wrapper.vm.prompts = [{}, {}, {}, { questions: [] }];
-      wrapper.vm.gotoStep(3);
-
+      await wrapper.vm.gotoStep(3);
+      expect(wrapper.vm.rpc.invoke).toHaveBeenCalledTimes(2);
+      expect(wrapper.vm.rpc.invoke).toHaveBeenCalledWith("fromWizard");
       expect(wrapper.vm.rpc.invoke).toHaveBeenCalledWith("logError", [err]);
       expect(wrapper.vm.reject).toHaveBeenCalledWith(err);
     });

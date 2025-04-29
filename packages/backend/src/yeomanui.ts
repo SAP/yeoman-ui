@@ -90,6 +90,7 @@ export class YeomanUI {
     this.rpc.registerMethod({ func: this.exploreGenerators, thisArg: this });
     this.rpc.registerMethod({ func: this.logError, thisArg: this });
     this.rpc.registerMethod({ func: this.back, thisArg: this });
+    this.rpc.registerMethod({ func: this.fromWizard, thisArg: this });
     this.rpc.registerMethod({ func: this.executeCommand, thisArg: this });
     this.rpc.registerMethod({ func: this.getState, thisArg: this });
 
@@ -395,6 +396,11 @@ export class YeomanUI {
   private async back(partialAnswers: Environment.Answers, numOfSteps: number): Promise<void> {
     this.replayUtils.start(this.currentQuestions, partialAnswers, numOfSteps);
     return this.runGenerator(this.generatorName);
+  }
+
+  private fromWizard(): boolean {
+    if (this.uiOptions.generator) return false;
+    return true;
   }
 
   private executeCommand(id: string, ...args: any[]): void {

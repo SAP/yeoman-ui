@@ -996,6 +996,34 @@ describe("yeomanui unit test", () => {
     expect(res.message).to.be.equal(errorInfo);
   });
 
+  describe("fromWizard", () => {
+    it("from fiori generator", () => {
+      const yeomanUiInstance: YeomanUI = new YeomanUI(
+        rpc,
+        youiEvents,
+        outputChannel,
+        testLogger,
+        { generator: "fiori" },
+        flowPromise.state,
+      );
+      const res = yeomanUiInstance["fromWizard"]();
+      expect(res).to.be.false;
+    });
+
+    it("from application wizard", () => {
+      const yeomanUiInstance: YeomanUI = new YeomanUI(
+        rpc,
+        youiEvents,
+        outputChannel,
+        testLogger,
+        { generator: undefined },
+        flowPromise.state,
+      );
+      const res = yeomanUiInstance["fromWizard"]();
+      expect(res).to.be.true;
+    });
+  });
+
   describe("answersUtils", () => {
     it("setDefaults", () => {
       const questions = [{ name: "q1", default: "a" }, { name: "q2", default: () => "b" }, { name: "q3" }];
