@@ -13,7 +13,7 @@ describe("App.vue", () => {
   });
 
   it("createPrompt - method", () => {
-    wrapper = initComponent(App, {}, true);
+    wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
     wrapper.vm.prompts = [{ questions: [{ name: "generator", type: "list", guiType: "tiles" }] }];
     wrapper.vm.rpc = {
       invoke: jest.fn().mockImplementation(async () => {
@@ -28,7 +28,7 @@ describe("App.vue", () => {
 
   describe("currentPrompt - computed", () => {
     it("questions are not defined", () => {
-      wrapper = initComponent(App, {});
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.prompts = [{}, {}];
       wrapper.vm.promptIndex = 1;
       wrapper.vm.rpc = {
@@ -42,7 +42,7 @@ describe("App.vue", () => {
 
   describe("backButtonText - computed", () => {
     it("promptIndex is 1", () => {
-      wrapper = initComponent(App, {});
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.prompts = [
         {
           questions: [
@@ -66,7 +66,7 @@ describe("App.vue", () => {
     });
 
     it("promptIndex is 3", () => {
-      wrapper = initComponent(App, {});
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.prompts = [
         {
           questions: [
@@ -92,7 +92,7 @@ describe("App.vue", () => {
 
   describe("nextButtonText - computed", () => {
     it("promptIndex is 0", () => {
-      wrapper = initComponent(App, {});
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.prompts = [
         {
           questions: [
@@ -121,7 +121,7 @@ describe("App.vue", () => {
     });
 
     it("promptIndex is 1", () => {
-      wrapper = initComponent(App, {});
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.promptsInfoToDisplay = [{}, {}, {}];
       wrapper.vm.promptIndex = 1;
       wrapper.vm.rpc = {
@@ -133,7 +133,7 @@ describe("App.vue", () => {
     });
 
     it("promptIndex is 2", () => {
-      wrapper = initComponent(App, {});
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.promptsInfoToDisplay = [{}, {}, {}];
       wrapper.vm.promptIndex = 2;
       wrapper.vm.rpc = {
@@ -147,7 +147,7 @@ describe("App.vue", () => {
 
   describe("updateGeneratorsPrompt - method", () => {
     it("there are no prompts", () => {
-      wrapper = initComponent(App, {});
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.prompts = [];
       wrapper.vm.promptIndex = -1;
       wrapper.vm.rpc = {
@@ -160,7 +160,7 @@ describe("App.vue", () => {
     });
 
     it("there are prompts", () => {
-      wrapper = initComponent(App, {});
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.prompts = [{}];
       wrapper.vm.promptIndex = 1;
       wrapper.vm.rpc = {
@@ -175,7 +175,7 @@ describe("App.vue", () => {
 
   describe("isGeneratorsPrompt - method", () => {
     it("promptIndex = 0, selectGeneratorPromptExists = true", () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.promptIndex = 0;
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation(async () => {
@@ -187,7 +187,7 @@ describe("App.vue", () => {
       expect(result).toBeTruthy();
     });
     it("promptIndex = 0, selectGeneratorPromptExists = false", () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.promptIndex = 0;
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation(async () => {
@@ -199,7 +199,7 @@ describe("App.vue", () => {
       expect(result).toBeFalsy();
     });
     it("promptIndex > 0, selectGeneratorPromptExists = true", () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.promptIndex = 1;
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation(async () => {
@@ -211,7 +211,7 @@ describe("App.vue", () => {
       expect(result).toBeFalsy();
     });
     it("promptIndex > 0, selectGeneratorPromptExists = false", () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.promptIndex = 1;
       wrapper.vm.selectGeneratorPromptExists = () => false;
       const result = wrapper.vm.isGeneratorsPrompt();
@@ -221,7 +221,7 @@ describe("App.vue", () => {
 
   describe("isNoGenerators - method", () => {
     it("no generators", () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.promptIndex = 0;
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation(async () => {
@@ -234,7 +234,7 @@ describe("App.vue", () => {
     });
 
     it("generators exist", () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.promptIndex = 0;
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation(async () => {
@@ -252,7 +252,7 @@ describe("App.vue", () => {
     });
 
     it("generators exist question.name != 'generator'", () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.promptIndex = 0;
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation(async () => {
@@ -265,7 +265,7 @@ describe("App.vue", () => {
     });
 
     it("prompt name != generators", () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.promptIndex = 0;
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation(async () => {
@@ -380,7 +380,7 @@ describe("App.vue", () => {
   describe("setQuestionProps - method", () => {
     // the delay ensures we call the busy indicator
     it("validate() with delay", async () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.prompts = [{}, {}];
       wrapper.vm.promptIndex = 1;
       wrapper.vm.rpc = {
@@ -398,7 +398,7 @@ describe("App.vue", () => {
     });
 
     it("set props", async () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation((methodName, question) => {
           return question[1];
@@ -412,6 +412,7 @@ describe("App.vue", () => {
         { name: "choicesQ", choices: "__Function" },
         { name: "filterQ", filter: "__Function" },
         { name: "validateQ", validate: "__Function" },
+        { name: "whenQ6", default: "whenAnswer6", type: "confirm" },
       ];
       wrapper.vm.showPrompt(questions, "promptName");
 
@@ -435,7 +436,7 @@ describe("App.vue", () => {
     });
 
     it("method that doesn't exist", async () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation(async () => {
           throw "error";
@@ -448,7 +449,7 @@ describe("App.vue", () => {
     });
 
     it("fiori project will not open in a stand-alone", async () => {
-      wrapper = initComponent(App, {});
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation((methodName, question) => {
           return question[1];
@@ -481,7 +482,7 @@ describe("App.vue", () => {
 
   describe("getVsCodeApi - method", () => {
     it("not in vscode", () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.isInVsCode = () => false;
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation(async () => {
@@ -495,7 +496,7 @@ describe("App.vue", () => {
 
   describe("showPrompt - method", () => {
     it("questions are empty array", async () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       const promise = wrapper.vm.showPrompt([], "test");
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation(async () => {
@@ -511,7 +512,7 @@ describe("App.vue", () => {
 
   describe("setMessagesAndSaveState - method", () => {
     it("vscode api exists", async () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation(async () => {
           return { data: {} };
@@ -524,7 +525,7 @@ describe("App.vue", () => {
     });
 
     it("vscode api no exists", async () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.rpc = {
         invoke: () => new Promise({ data: {} }),
       };
@@ -539,7 +540,7 @@ describe("App.vue", () => {
   });
 
   it("initRpc - method", () => {
-    wrapper = initComponent(App, {}, true);
+    wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
     wrapper.vm.rpc = {
       invoke: jest.fn(),
       registerMethod: jest.fn(),
@@ -582,7 +583,7 @@ describe("App.vue", () => {
   });
 
   it("runGenerator - method", () => {
-    wrapper = initComponent(App, {}, true);
+    wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
     wrapper.vm.rpc = {
       invoke: jest.fn(),
     };
@@ -596,7 +597,7 @@ describe("App.vue", () => {
   });
 
   it("log - method", () => {
-    wrapper = initComponent(App, {}, true);
+    wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
     wrapper.vm.logText = "test_";
     wrapper.vm.rpc = {
       invoke: jest.fn().mockImplementation(async () => {
@@ -609,7 +610,7 @@ describe("App.vue", () => {
   });
 
   it("executeCommand:event - method", () => {
-    wrapper = initComponent(App, {}, true);
+    wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
     wrapper.vm.rpc = {
       invoke: jest.fn(),
     };
@@ -630,7 +631,7 @@ describe("App.vue", () => {
   });
 
   it("executeCommand:command - method", () => {
-    wrapper = initComponent(App, {}, true);
+    wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
     wrapper.vm.rpc = {
       invoke: jest.fn(),
     };
@@ -656,7 +657,7 @@ describe("App.vue", () => {
 
   describe("next - method", () => {
     it("resolve is null", () => {
-      wrapper = initComponent(App, {});
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.promptIndex = 1;
       wrapper.vm.stepValidated = true;
       wrapper.vm.prompts = [{}, {}];
@@ -667,7 +668,7 @@ describe("App.vue", () => {
       expect(wrapper.vm.stepValidated).toBeTruthy();
     });
     it("promptIndex is greater than prompt quantity, resolve is defined", () => {
-      wrapper = initComponent(App, {});
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.resolve = jest.fn();
       wrapper.vm.reject = jest.fn();
       wrapper.vm.promptIndex = 1;
@@ -686,7 +687,7 @@ describe("App.vue", () => {
     });
 
     it("promptIndex is less than prompt length", () => {
-      wrapper = initComponent(App, {});
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.resolve = jest.fn();
       wrapper.vm.reject = jest.fn();
       wrapper.vm.promptIndex = 0;
@@ -705,7 +706,7 @@ describe("App.vue", () => {
     });
 
     it("resolve method exists", () => {
-      wrapper = initComponent(App, {});
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
 
       wrapper.vm.resolve = () => true;
       wrapper.vm.promptIndex = 1;
@@ -722,7 +723,7 @@ describe("App.vue", () => {
 
   describe("back - method", () => {
     test("promptIndex is 0 (Select Generator)", () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.rpc = {
         invoke: jest.fn(),
         registerMethod: jest.fn(),
@@ -743,7 +744,7 @@ describe("App.vue", () => {
 
     // TODO - check the error
     test("promptIndex is updated", () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.rpc = {
         invoke: jest.fn(),
         registerMethod: jest.fn(),
@@ -762,7 +763,7 @@ describe("App.vue", () => {
     });
 
     test("set props", async () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation((...args) => {
           return args[1][1];
@@ -780,7 +781,7 @@ describe("App.vue", () => {
 
   describe("gotoStep - method", () => {
     test("promptIndex is 1, goto 1 step back -> (Select Generator)", () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.rpc = {
         invoke: jest.fn(),
         registerMethod: jest.fn(),
@@ -801,7 +802,7 @@ describe("App.vue", () => {
 
     // TODO - check the error
     test("promptIndex is 3, goto 2 step back", async () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.rpc = {
         invoke: jest.fn(),
         registerMethod: jest.fn(),
@@ -820,7 +821,7 @@ describe("App.vue", () => {
     });
 
     test("promptIndex is 3, goto 3, exception thrown", async () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.rpc = {
         invoke: jest.fn(),
         registerMethod: jest.fn(),
@@ -893,7 +894,7 @@ describe("App.vue", () => {
 
   describe("generatorInstall - method", () => {
     it("status is pending", () => {
-      wrapper = initComponent(App, {});
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
 
       wrapper.vm.prompts = [{}, {}];
       wrapper.vm.promptIndex = 1;
@@ -986,7 +987,7 @@ describe("App.vue", () => {
 
   describe("toggleConsole - method", () => {
     it("showConsole property updated from toggleConsole()", () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation(async () => {
           return { data: {} };
@@ -1086,7 +1087,7 @@ describe("App.vue", () => {
   describe("setGenInWriting", () => {
     // TODO - check the error
     it("in writing state", () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation(async () => {
           return { data: {} };
@@ -1101,7 +1102,7 @@ describe("App.vue", () => {
 
     // TODO - check the error
     it("not in writing state", () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation(async () => {
           return { data: {} };
@@ -1115,7 +1116,7 @@ describe("App.vue", () => {
     });
 
     it("not in writing state, currentprompt is undefined", () => {
-      wrapper = initComponent(App, {}, true);
+      wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
       wrapper.vm.rpc = {
         invoke: jest.fn().mockImplementation(async () => {
           return { data: {} };
