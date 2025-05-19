@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app" class="vld-parent">
+  <v-app id="app" class="vld-parent" @contextmenu.prevent>
     <loading
       v-model:active="showBusyIndicator"
       :is-full-page="true"
