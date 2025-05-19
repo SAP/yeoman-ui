@@ -1,5 +1,5 @@
 <template>
-  <v-app id="exploregens" class="exploregens-main explore-generators">
+  <v-app id="exploregens" class="exploregens-main explore-generators" @contextmenu.prevent>
     <div>
       <v-toolbar id="app-bar" density="compact" class="pa-0 ma-0 elevation-0">
         <v-toolbar-title>{{ messages.title }}</v-toolbar-title>
