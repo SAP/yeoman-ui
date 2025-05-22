@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.19.3](https://github.com/SAP/yeoman-ui/compare/v1.19.2...v1.19.3) (2025-05-22)
+
+### Bug Fixes
+
+- prevent webview default `contextmenu` ([#889](https://github.com/SAP/yeoman-ui/issues/889)) ([530b577](https://github.com/SAP/yeoman-ui/commit/530b577040e06c845d98f4a72dc9fabcbba8cbae))
+- remove unnecessary comma ([1b2b8d7](https://github.com/SAP/yeoman-ui/commit/1b2b8d71adb102034fdd443c865fb9eab005cacf))
+
 ## [1.19.2](https://github.com/SAP/yeoman-ui/compare/v1.19.1...v1.19.2) (2025-05-12)
 
 **Note:** Version bump only for package root
