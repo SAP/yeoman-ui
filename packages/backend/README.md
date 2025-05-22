@@ -34,7 +34,7 @@ Open VS Code Command Palette and choose "Open Template Wizard" command to open t
 
 ## Enable usage analytics reporting from VS Code
 
-The tool collects non-personally identifiable information about your usage of the tool to improve its services. If you do not want the tool to collect your usage data, you can set the "Enable Sap Web Analytics" setting to "false". Go to File > Preferences > Settings (macOS: Code > Preferences > Settings) > Extensions > Application Wizard, and deselect the "Enable Sap Web Analytics" checkbox.
+The tool collects non-personally identifiable information about your usage of the tool to improve its services. If you do not want the tool to collect your usage data you can set the "Enable Sap Web Analytics" setting to "false". Go to File > Preferences > Settings (macOS: Code > Preferences > Settings) > Extensions > Application Wizard, and deselect the "Enable Sap Web Analytics" checkbox.
 
 ## How to obtain support
 
