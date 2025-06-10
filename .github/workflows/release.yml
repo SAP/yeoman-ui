@@ -34,7 +34,8 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        # workaround for https://github.com/softprops/action-gh-release/issues/628
+        uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631
         with:
           files: packages/*/*.vsix
           fail_on_unmatched_files: true
