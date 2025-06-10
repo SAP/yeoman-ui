@@ -2212,10 +2212,10 @@
   dependencies:
     vue "^3.3.4"
 
-"@sap-devx/inquirer-gui@3.4.2":
-  version "3.4.2"
-  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui/-/inquirer-gui-3.4.2.tgz#155201a42957f59565475ed0f22a45e269bef458"
-  integrity sha512-d12XUXvxMO2PPKghOlf9MpwerI9AbFV8ZdRt41zByXbkcF+nz4f8qkhW4xpVkq921RN0AKEav+eMXb0RoFKuig==
+"@sap-devx/inquirer-gui@3.4.5":
+  version "3.4.5"
+  resolved "https://registry.yarnpkg.com/@sap-devx/inquirer-gui/-/inquirer-gui-3.4.5.tgz#20ee8cc52cd4bac2de3c16b21c046a4430475725"
+  integrity sha512-YeE8EDQzkH3fbQZKL7knzExEScGn5w005/TGRnAVc3KS1to7zCFx18Xyjt+My4RzonXehkRBw95YZBVkCXXzYw==
   dependencies:
     "@vscode-elements/elements" "1.11.0"
     lodash "^4.17.21"
