@@ -50,6 +50,17 @@ describe("yeomanui unit test", () => {
     public setHeaderTitle(): void {
       return;
     }
+
+    public setBanner(bannerProps: {
+      text: string;
+      ariaLabel: string;
+      icon?: string;
+      iconColor?: string;
+      linkText?: string;
+      linkCommand?: string;
+    }): void {
+      return;
+    }
   }
   const appWizard: AppWizard = new TestAppWizard();
   class TestEvents implements YouiEvents {

@@ -4,6 +4,14 @@ export abstract class AppWizard {
   abstract showError(message: string, type: MessageType): void;
   abstract showInformation(message: string, type: MessageType): void;
   abstract setHeaderTitle(title: string, additionalInfo?: string): void;
+  abstract setBanner(bannerProps: {
+    text: string;
+    ariaLabel: string;
+    icon?: string;
+    iconColor?: string;
+    linkText?: string;
+    linkCommand?: string;
+  }): void;
 
   public static create(genOptions: any = {}): AppWizard {
     class EmptyAppWizard extends AppWizard {
@@ -12,6 +20,7 @@ export abstract class AppWizard {
       showError(): void {}
       showInformation(): void {}
       setHeaderTitle(): void {}
+      setBanner(): void {}
     }
 
     return genOptions.appWizard ? genOptions.appWizard : new EmptyAppWizard();

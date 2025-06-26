@@ -35,6 +35,17 @@ class YoUiAppWizard extends AppWizard {
   public setHeaderTitle(title: string, additionalInfo?: string): void {
     this.events.setAppWizardHeaderTitle(title, additionalInfo);
   }
+
+  public setBanner(bannerProps: {
+    text: string;
+    ariaLabel: string;
+    icon?: string;
+    iconColor?: string;
+    linkText?: string;
+    linkCommand?: string
+  }): void {
+    this.events.setAppWizardBanner(bannerProps);
+  }
 }
 
 export class VSCodeYouiEvents implements YouiEvents {
@@ -53,10 +64,28 @@ export class VSCodeYouiEvents implements YouiEvents {
     this.output = output;
     this.logger = getClassLogger("VSCodeYouiEvents");
     this.appWizard = new YoUiAppWizard(this);
+    this.webviewPanel.webview.onDidReceiveMessage((message) => {
+      if (message.command) {
+        // Execute the command received from the webview message
+        this.executeCommand(message.command, []);
+      }
+    });
   }
 
   public setAppWizardHeaderTitle(title: string, additionalInfo?: string): void {
     void this.rpc.invoke("setHeaderTitle", [title, additionalInfo]);
+  }
+
+  public setAppWizardBanner(bannerProps: {
+    text: string;
+    ariaLabel: string;
+    icon?: string;
+    iconColor?: string;
+    linkText?: string;
+    linkCommand?: string;
+  }): void {
+    // This method allows generators to update the App Wizard banner
+    void this.rpc.invoke("setBanner", [bannerProps]);
   }
 
   public doGeneratorDone(

@@ -30,6 +30,7 @@
   "scripts": {
     "bundle": "webpack --mode production",
     "ci": "npm-run-all clean compile coverage bundle frontend:copy package coverage:copy",
+    "ci:skip-coverage": "npm-run-all clean compile bundle frontend:copy package",
     "clean": "shx rm -rf ./dist ./coverage *.vsix",
     "clean:frontend": "cd ./dist && shx rm -rf ./media",
     "compile": "tsc",

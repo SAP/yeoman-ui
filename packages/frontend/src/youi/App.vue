@@ -36,7 +36,11 @@
         <v-row class="prompts-col">
           <v-col>
             <YOUIDone v-if="isDone" :done-status="doneStatus" :done-message="doneMessage" :done-path="donePath" />
-
+            <YOUIBanner
+              v-if="bannerProps.text && bannerProps.ariaLabel"
+              :bannerProps="bannerProps"
+              :vscode="getVsCodeApi()"
+            />
             <YOUIPromptInfo v-if="currentPrompt && !isDone" :current-prompt="currentPrompt" />
             <v-slide-x-transition>
               <Form
@@ -111,6 +115,7 @@ import YOUINavigation from "../components/YOUINavigation.vue";
 import YOUIDone from "../components/YOUIDone.vue";
 import YOUIInfo from "../components/YOUIInfo.vue";
 import YOUIPromptInfo from "../components/YOUIPromptInfo.vue";
+import YOUIBanner from "../components/YOUIBanner.vue";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import _size from "lodash/size";
@@ -165,6 +170,14 @@ function initialState() {
     headerTitleProvided: "",
     headerInfo: "",
     currentAnswerTexts: {}, // Answer state for navigation answer history
+    bannerProps: {
+      icon: "",
+      iconColor: "",
+      text: "",
+      linkText: "",
+      linkCommand: "",
+      ariaLabel: "Notification Banner"
+    }
   };
 }
 
@@ -176,6 +189,7 @@ export default {
     YOUIDone,
     YOUIInfo,
     YOUIPromptInfo,
+    YOUIBanner,
     Loading,
   },
   props: {
@@ -342,6 +356,16 @@ export default {
         this.rpc.invoke("logError", [error]);
         this.reject(error);
       }
+    },
+    setBanner({ icon, iconColor, text, linkText, linkCommand, ariaLabel }) {
+      this.bannerProps = {
+        icon,
+        iconColor,
+        text,
+        linkText,
+        linkCommand,
+        ariaLabel
+      };
     },
     setHeaderTitle(title, info) {
       this.headerTitleProvided = title;
@@ -635,6 +659,7 @@ export default {
         "showPromptMessage",
         "resetPromptMessage",
         "setHeaderTitle",
+        "setBanner",
       ];
       _forEach(functions, (funcName) => {
         this.rpc.registerMethod({

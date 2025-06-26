@@ -84,7 +84,13 @@ describe("vscode-youi-events unit test", () => {
   });
 
   beforeEach(() => {
-    const webViewPanel: any = { dispose: () => true };
+    const webViewPanel: any = { 
+      dispose: () => true,
+      webview: {
+        onDidReceiveMessage: sandbox.stub(), 
+        postMessage: sandbox.stub()
+      }
+    };
     loggerWrapperMock = sandbox.mock(loggerWrapper);
     loggerWrapperMock.expects("getClassLogger").returns(testLogger);
     events = new VSCodeYouiEvents(rpc, webViewPanel, messages.default, generatorOutput);
