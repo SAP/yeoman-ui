@@ -6,7 +6,7 @@ import { GeneratorOutput } from "./vscode-output";
 import { IChildLogger } from "@vscode-logging/logger";
 import { getClassLogger } from "./logger/logger-wrapper";
 import { getImage } from "./images/messageImages";
-import { AppWizard, MessageType, Severity } from "@sap-devx/yeoman-ui-types";
+import { AppWizard, MessageType, Severity, IBannerProps } from "@sap-devx/yeoman-ui-types";
 import { FolderUriConfig, getFolderUri, getValidFolderUri, WorkspaceFile, WsFoldersToAdd } from "./utils/workspaceFile";
 import { Constants } from "./utils/constants";
 
@@ -36,14 +36,7 @@ class YoUiAppWizard extends AppWizard {
     this.events.setAppWizardHeaderTitle(title, additionalInfo);
   }
 
-  public setBanner(bannerProps: {
-    text: string;
-    ariaLabel: string;
-    icon?: string;
-    iconColor?: string;
-    linkText?: string;
-    linkCommand?: string
-  }): void {
+  public setBanner(bannerProps: IBannerProps): void {
     this.events.setAppWizardBanner(bannerProps);
   }
 }
@@ -64,26 +57,13 @@ export class VSCodeYouiEvents implements YouiEvents {
     this.output = output;
     this.logger = getClassLogger("VSCodeYouiEvents");
     this.appWizard = new YoUiAppWizard(this);
-    this.webviewPanel.webview.onDidReceiveMessage((message) => {
-      if (message.command) {
-        // Execute the command received from the webview message
-        this.executeCommand(message.command, []);
-      }
-    });
   }
 
   public setAppWizardHeaderTitle(title: string, additionalInfo?: string): void {
     void this.rpc.invoke("setHeaderTitle", [title, additionalInfo]);
   }
 
-  public setAppWizardBanner(bannerProps: {
-    text: string;
-    ariaLabel: string;
-    icon?: string;
-    iconColor?: string;
-    linkText?: string;
-    linkCommand?: string;
-  }): void {
+  public setAppWizardBanner(bannerProps: IBannerProps): void {
     // This method allows generators to update the App Wizard banner
     void this.rpc.invoke("setBanner", [bannerProps]);
   }

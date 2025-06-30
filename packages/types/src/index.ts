@@ -4,14 +4,7 @@ export abstract class AppWizard {
   abstract showError(message: string, type: MessageType): void;
   abstract showInformation(message: string, type: MessageType): void;
   abstract setHeaderTitle(title: string, additionalInfo?: string): void;
-  abstract setBanner(bannerProps: {
-    text: string;
-    ariaLabel: string;
-    icon?: string;
-    iconColor?: string;
-    linkText?: string;
-    linkCommand?: string;
-  }): void;
+  abstract setBanner(bannerProps: IBannerProps): void;
 
   public static create(genOptions: any = {}): AppWizard {
     class EmptyAppWizard extends AppWizard {
@@ -69,6 +62,63 @@ export class Prompts {
 export interface IPrompt {
   name: string;
   description: string;
+}
+
+export interface IAction {
+  /**
+   * Command to be executed and parameters passed to the command
+   */
+  command?: {
+    id: string;
+    params?: Object | string;
+  };
+  /**
+   * The text associated with the command
+   * Clicking this text triggers the command or opens a url in new tab
+   */
+  text?: string;
+  /**
+   * A http URL string
+   */
+  url?: string;
+}
+
+export interface IBannerProps {
+  /**
+   * The main text to display in the banner
+   */
+  text: string;
+  /**
+   * Accessibility label for the banner
+   */
+  ariaLabel: string;
+  /**
+   * Determines whether the banner should be displayed
+   */
+  showBanner?: boolean;
+  /**
+   * Icon metadata, including the icon source and type
+   */
+  icon?: {
+    /**
+     * The actual icon data (e.g., Base64 string for images or icon name for Material Design icons)
+     */
+    source: string;
+    /**
+     * Specifies the type of the icon (e.g., "image" for Base64 images or "mdi" for Material Design icons)
+     */
+    type: "image" | "mdi";
+  };
+  /**
+   * Action to be triggered (common for both banner click and link click)
+   */
+  action: IAction;
+  /**
+   * Determines where the action should be triggered
+   * - `banner`: Action is triggered on banner click
+   * - `link`: Action is triggered on link click
+   */
+  triggerActionFrom: "banner" | "link";
 }
 
 /**

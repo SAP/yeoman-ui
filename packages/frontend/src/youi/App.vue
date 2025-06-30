@@ -37,9 +37,9 @@
           <v-col>
             <YOUIDone v-if="isDone" :done-status="doneStatus" :done-message="doneMessage" :done-path="donePath" />
             <YOUIBanner
-              v-if="bannerProps.text && bannerProps.ariaLabel"
+              v-if="bannerProps.showBanner && bannerProps.text && bannerProps.ariaLabel"
               :bannerProps="bannerProps"
-              :vscode="getVsCodeApi()"
+              @parent-execute-command="executeCommand"
             />
             <YOUIPromptInfo v-if="currentPrompt && !isDone" :current-prompt="currentPrompt" />
             <v-slide-x-transition>
@@ -171,12 +171,12 @@ function initialState() {
     headerInfo: "",
     currentAnswerTexts: {}, // Answer state for navigation answer history
     bannerProps: {
-      icon: "",
-      iconColor: "",
       text: "",
+      ariaLabel: "Banner",
+      icon: {},
+      action: {},
+      triggerActionFrom: "banner", 
       linkText: "",
-      linkCommand: "",
-      ariaLabel: "Notification Banner"
     }
   };
 }
@@ -331,7 +331,8 @@ export default {
         command.id = cmdOrEvent.target.getAttribute("command");
         command.params = cmdOrEvent.target.getAttribute("params");
       }
-      this.rpc.invoke("executeCommand", [command.id, JSON.parse(JSON.stringify(command.params))]);
+      const params = command.params ? JSON.parse(JSON.stringify(command.params)) : null;
+      this.rpc.invoke("executeCommand", [command.id, params]);
     },
     back() {
       return this.gotoStep(1); // go 1 step back
@@ -357,14 +358,15 @@ export default {
         this.reject(error);
       }
     },
-    setBanner({ icon, iconColor, text, linkText, linkCommand, ariaLabel }) {
+    setBanner({ icon, text, action, ariaLabel, triggerActionFrom, linkText, showBanner = false }) {
       this.bannerProps = {
-        icon,
-        iconColor,
         text,
-        linkText,
-        linkCommand,
-        ariaLabel
+        ariaLabel,
+        icon: icon ? { source: icon.source, type: icon.type } : undefined,
+        action: action ? { ...action } : undefined, 
+        triggerActionFrom: triggerActionFrom || "banner", 
+        linkText: linkText,
+        showBanner
       };
     },
     setHeaderTitle(title, info) {
