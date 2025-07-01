@@ -1,6 +1,6 @@
 import { initComponent, unmount } from "../Utils";
 import Navigation from "../../src/components/YOUINavigation.vue";
-import { nextTick, toHandlerKey } from "vue";
+import { nextTick } from "vue";
 //There are issues of importing vuetify components https://github.com/vuejs/vue-cli/issues/1584
 // import { VBtn } from 'vuetify/lib'
 

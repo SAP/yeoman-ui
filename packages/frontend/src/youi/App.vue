@@ -176,7 +176,6 @@ function initialState() {
       icon: {},
       action: {},
       triggerActionFrom: "banner",
-      linkText: "",
       showBanner: false
     },
   };
@@ -359,14 +358,13 @@ export default {
         this.reject(error);
       }
     },
-    setBanner({ icon, text, action, ariaLabel, triggerActionFrom, linkText, showBanner = false }) {
+    setBanner({ icon, text, action, ariaLabel, triggerActionFrom, showBanner = false }) {
       this.bannerProps = {
         text,
         ariaLabel,
         icon: icon ? { source: icon.source, type: icon.type } : undefined,
         action: action ? { ...action } : undefined,
         triggerActionFrom: triggerActionFrom || "banner",
-        linkText: linkText,
         showBanner
       };
     },

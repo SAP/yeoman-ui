@@ -65,10 +65,9 @@ const props = defineProps({
       ariaLabel: "Banner",
       icon: {},
       action: {},
-      triggerActionFrom: "banner",
-      linkText: "",
-    }),
-  },
+      triggerActionFrom: "banner"
+    })
+  }
 });
 
 const emit = defineEmits(["parent-execute-command"]);

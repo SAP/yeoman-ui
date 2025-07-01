@@ -12,7 +12,7 @@ import { GeneratorFilter } from "../src/filter";
 import { homedir } from "os";
 import messages from "../src/messages";
 import { AnalyticsWrapper } from "../src/usage-report/usage-analytics-wrapper";
-import { AppWizard, MessageType, IBannerProps } from "@sap-devx/yeoman-ui-types";
+import { AppWizard, MessageType } from "@sap-devx/yeoman-ui-types";
 import { Env } from "../src/utils/env";
 import Environment = require("yeoman-environment");
 import { createFlowPromise } from "../src/utils/promise";
@@ -51,7 +51,7 @@ describe("yeomanui unit test", () => {
       return;
     }
 
-    public setBanner(bannerProps: IBannerProps): void {
+    public setBanner(): void {
       return;
     }
   }
