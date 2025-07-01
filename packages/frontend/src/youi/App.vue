@@ -37,7 +37,7 @@
           <v-col>
             <YOUIDone v-if="isDone" :done-status="doneStatus" :done-message="doneMessage" :done-path="donePath" />
             <YOUIBanner
-              v-if="bannerProps.showBanner && bannerProps.text && bannerProps.ariaLabel"
+              v-if="bannerProps.text && bannerProps.ariaLabel"
               :banner-props="bannerProps"
               @parent-execute-command="executeCommand"
             />
@@ -176,7 +176,6 @@ function initialState() {
       icon: {},
       action: {},
       triggerActionFrom: "banner",
-      showBanner: false,
     },
   };
 }
@@ -358,14 +357,13 @@ export default {
         this.reject(error);
       }
     },
-    setBanner({ icon, text, action, ariaLabel, triggerActionFrom, showBanner = false }) {
+    setBanner({ icon, text, action, ariaLabel, triggerActionFrom }) {
       this.bannerProps = {
         text,
         ariaLabel,
         icon: icon ? { source: icon.source, type: icon.type } : undefined,
         action: action ? { ...action } : undefined,
         triggerActionFrom: triggerActionFrom || "banner",
-        showBanner,
       };
     },
     setHeaderTitle(title, info) {

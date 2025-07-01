@@ -15,7 +15,6 @@ describe("YOUIBanner.vue", () => {
       bannerProps: {
         text: "Test Banner",
         ariaLabel: "Test Banner Label",
-        showBanner: true,
         triggerActionFrom: "banner",
       },
     };
@@ -37,7 +36,6 @@ describe("YOUIBanner.vue", () => {
       bannerProps: {
         text: "Test Banner",
         ariaLabel: "Test Banner Label",
-        showBanner: true,
         icon: {
           source: "mdi-check-circle",
           type: "mdi",
@@ -66,7 +64,6 @@ describe("YOUIBanner.vue", () => {
       bannerProps: {
         text: "Test Banner",
         ariaLabel: "Test Banner Label",
-        showBanner: true,
         icon: {
           source:
             "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR42mP8//8/AwAI/wH+9Q4AAAAASUVORK5CYII=",
@@ -96,7 +93,6 @@ describe("YOUIBanner.vue", () => {
       bannerProps: {
         text: "Test Banner",
         ariaLabel: "Test Banner Label",
-        showBanner: true,
         triggerActionFrom: "banner",
         action: {
           command: {
@@ -126,7 +122,6 @@ describe("YOUIBanner.vue", () => {
       bannerProps: {
         text: "Test Banner",
         ariaLabel: "Test Banner Label",
-        showBanner: true,
         triggerActionFrom: "link",
         action: {
           text: "Click Me",
@@ -150,7 +145,6 @@ describe("YOUIBanner.vue", () => {
       bannerProps: {
         text: "Test Banner",
         ariaLabel: "Test Banner Label",
-        showBanner: true,
         triggerActionFrom: "link",
         action: {
           text: "Click Me",

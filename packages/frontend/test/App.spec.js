@@ -1207,14 +1207,13 @@ describe("App.vue", () => {
       }
     });
 
-    test("renders YOUIBanner when bannerProps.showBanner is true", () => {
+    test("renders YOUIBanner when bannerProps title and ariaLabel is true", () => {
       wrapper = mount(App, {
         data() {
           return {
             bannerProps: {
               text: "Test Banner",
               ariaLabel: "Test Banner Label",
-              showBanner: true,
               triggerActionFrom: "banner",
             },
           };
@@ -1229,7 +1228,6 @@ describe("App.vue", () => {
       expect(banner.props("bannerProps")).toEqual({
         text: "Test Banner",
         ariaLabel: "Test Banner Label",
-        showBanner: true,
         triggerActionFrom: "banner",
       });
 
@@ -1239,14 +1237,11 @@ describe("App.vue", () => {
       expect(bannerText.text()).toBe("Test Banner");
     });
 
-    test("does not render YOUIBanner when bannerProps.showBanner is false", () => {
+    test("does not render YOUIBanner when title and aria label is not provided", () => {
       wrapper = mount(App, {
         data() {
           return {
             bannerProps: {
-              text: "Test Banner",
-              ariaLabel: "Test Banner Label",
-              showBanner: false, // Banner should not be displayed
               triggerActionFrom: "banner",
             },
           };
@@ -1262,7 +1257,6 @@ describe("App.vue", () => {
       const bannerProps = {
         text: "Test Banner",
         ariaLabel: "Test Banner Label",
-        showBanner: true,
         icon: { source: "mdi-check-circle", type: "mdi" },
         action: { text: "Click Me", url: "https://example.com" },
         triggerActionFrom: "banner",
@@ -1283,7 +1277,6 @@ describe("App.vue", () => {
       expect(wrapper.vm.bannerProps).toEqual({
         text: "Test Banner",
         ariaLabel: "Test Banner Label",
-        showBanner: true,
         icon: { source: "mdi-check-circle", type: "mdi" },
         action: { text: "Click Me", url: "https://example.com" },
         triggerActionFrom: "banner",
