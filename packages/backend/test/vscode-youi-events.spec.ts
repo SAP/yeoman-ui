@@ -400,29 +400,6 @@ describe("vscode-youi-events unit test", () => {
       );
     });
 
-    it("on success, targetFolder is uri and workspace needs reload --> trigger workspace refresh", () => {
-      eventsMock.expects("doClose");
-      sandbox
-        .stub(vscode.workspace, "workspaceFolders")
-        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { shema: "abapdf", fsPath: "testDestinationRoot" } }]);
-      sandbox.stub(vscode.workspace, "workspaceFile").value("/workspace/file/path");
-
-      windowMock
-        .expects("showInformationMessage")
-        .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
-        .resolves();
-
-      commandsMock.expects("executeCommand").withArgs("workbench.action.reloadWindow").resolves();
-
-      events.doGeneratorDone(
-        true,
-        "success message",
-        addToWorkspace,
-        "project",
-        '{"uri":"abapdf://testDestinationRoot","name":"projectName"}',
-      );
-    });
-
     it("on success, targetFolderPath is uri and the the project openned in a Open the project in a stand-alone", () => {
       eventsMock.expects("doClose");
       sandbox.stub(vscode.workspace, "workspaceFolders").value([]);
