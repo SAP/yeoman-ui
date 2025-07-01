@@ -88,7 +88,7 @@ describe("YOUIBanner.vue", () => {
     expect(bannerIcon.attributes("src")).toBe(propsData.bannerProps.icon.source);
   });
 
-  test('emits parent-execute-command event when triggerActionFrom is "banner"', async () => {
+  test('emits parent-execute-command event when action is triggered from banner', async () => {
     const propsData = {
       bannerProps: {
         text: "Test Banner",
