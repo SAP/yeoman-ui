@@ -16,12 +16,12 @@ describe("YOUIBanner.vue", () => {
         text: "Test Banner",
         ariaLabel: "Test Banner Label",
         showBanner: true,
-        triggerActionFrom: "banner"
-      }
+        triggerActionFrom: "banner",
+      },
     };
 
     wrapper = mount(Banner, {
-      props: propsData
+      props: propsData,
     });
 
     const props = wrapper.props();
@@ -40,9 +40,9 @@ describe("YOUIBanner.vue", () => {
         showBanner: true,
         icon: {
           source: "mdi-check-circle",
-          type: "mdi"
-        }
-      }
+          type: "mdi",
+        },
+      },
     };
 
     wrapper = mount(Banner, {
@@ -70,9 +70,9 @@ describe("YOUIBanner.vue", () => {
         icon: {
           source:
             "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR42mP8//8/AwAI/wH+9Q4AAAAASUVORK5CYII=",
-          type: "image"
-        }
-      }
+          type: "image",
+        },
+      },
     };
 
     wrapper = mount(Banner, {
@@ -101,10 +101,10 @@ describe("YOUIBanner.vue", () => {
         action: {
           command: {
             id: "test.command",
-            params: { key: "value" }
-          }
-        }
-      }
+            params: { key: "value" },
+          },
+        },
+      },
     };
 
     wrapper = mount(Banner, {
@@ -130,9 +130,9 @@ describe("YOUIBanner.vue", () => {
         triggerActionFrom: "link",
         action: {
           text: "Click Me",
-          url: "https://example.com"
-        }
-      }
+          url: "https://example.com",
+        },
+      },
     };
 
     wrapper = mount(Banner, {
@@ -156,10 +156,10 @@ describe("YOUIBanner.vue", () => {
           text: "Click Me",
           command: {
             id: "test.command",
-            params: { key: "value" }
-          }
-        }
-      }
+            params: { key: "value" },
+          },
+        },
+      },
     };
 
     wrapper = mount(Banner, {

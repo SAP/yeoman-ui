@@ -237,8 +237,8 @@ describe("vscode-youi-events unit test", () => {
       showBanner: true,
       icon: { source: "mdi-check-circle", type: "mdi" },
       action: { text: "Click Me", url: "https://example.com" },
-      triggerActionFrom: "banner"
-    }
+      triggerActionFrom: "banner",
+    };
     rpcMock.expects("invoke").withExactArgs("setBanner", [bannerProps]);
     events.setAppWizardBanner(bannerProps);
   });

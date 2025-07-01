@@ -1215,10 +1215,10 @@ describe("App.vue", () => {
               text: "Test Banner",
               ariaLabel: "Test Banner Label",
               showBanner: true,
-              triggerActionFrom: "banner"
-            }
-          }
-        }
+              triggerActionFrom: "banner",
+            },
+          };
+        },
       });
 
       // Check if YOUIBanner is rendered
@@ -1230,7 +1230,7 @@ describe("App.vue", () => {
         text: "Test Banner",
         ariaLabel: "Test Banner Label",
         showBanner: true,
-        triggerActionFrom: "banner"
+        triggerActionFrom: "banner",
       });
 
       // Check if the banner text is rendered correctly
@@ -1247,10 +1247,10 @@ describe("App.vue", () => {
               text: "Test Banner",
               ariaLabel: "Test Banner Label",
               showBanner: false, // Banner should not be displayed
-              triggerActionFrom: "banner"
-            }
-          }
-        }
+              triggerActionFrom: "banner",
+            },
+          };
+        },
       });
 
       // Check if YOUIBanner is not rendered
@@ -1265,7 +1265,7 @@ describe("App.vue", () => {
         showBanner: true,
         icon: { source: "mdi-check-circle", type: "mdi" },
         action: { text: "Click Me", url: "https://example.com" },
-        triggerActionFrom: "banner"
+        triggerActionFrom: "banner",
       };
 
       wrapper = mount(App, {
@@ -1286,7 +1286,7 @@ describe("App.vue", () => {
         showBanner: true,
         icon: { source: "mdi-check-circle", type: "mdi" },
         action: { text: "Click Me", url: "https://example.com" },
-        triggerActionFrom: "banner"
+        triggerActionFrom: "banner",
       });
     });
   });

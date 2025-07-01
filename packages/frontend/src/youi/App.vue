@@ -176,7 +176,7 @@ function initialState() {
       icon: {},
       action: {},
       triggerActionFrom: "banner",
-      showBanner: false
+      showBanner: false,
     },
   };
 }
@@ -365,7 +365,7 @@ export default {
         icon: icon ? { source: icon.source, type: icon.type } : undefined,
         action: action ? { ...action } : undefined,
         triggerActionFrom: triggerActionFrom || "banner",
-        showBanner
+        showBanner,
       };
     },
     setHeaderTitle(title, info) {
