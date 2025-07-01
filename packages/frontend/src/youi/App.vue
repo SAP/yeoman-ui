@@ -175,9 +175,10 @@ function initialState() {
       ariaLabel: "Banner",
       icon: {},
       action: {},
-      triggerActionFrom: "banner", 
+      triggerActionFrom: "banner",
       linkText: "",
-    }
+      showBanner: false
+    },
   };
 }
 
@@ -363,8 +364,8 @@ export default {
         text,
         ariaLabel,
         icon: icon ? { source: icon.source, type: icon.type } : undefined,
-        action: action ? { ...action } : undefined, 
-        triggerActionFrom: triggerActionFrom || "banner", 
+        action: action ? { ...action } : undefined,
+        triggerActionFrom: triggerActionFrom || "banner",
         linkText: linkText,
         showBanner
       };

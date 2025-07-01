@@ -2,6 +2,8 @@ import { initComponent, unmount } from "./Utils";
 import App from "../src/youi/App";
 import { WebSocket } from "mock-socket";
 import { nextTick } from "vue";
+import { mount } from "@vue/test-utils";
+import YOUIBanner from "../src/components/YOUIBanner.vue";
 
 global.WebSocket = WebSocket;
 
@@ -1193,6 +1195,101 @@ describe("App.vue", () => {
       expect(wrapper.vm.toShowPromptMessage).toEqual(false);
       expect(wrapper.vm.promptMessageIcon).toEqual(null);
       expect(wrapper.vm.promptMessageClass).toEqual("");
+    });
+  });
+
+  describe("YOUIBanner Component in App.vue", () => {
+    let wrapper;
+
+    afterEach(() => {
+      if (wrapper) {
+        wrapper.unmount();
+      }
+    });
+
+    test("renders YOUIBanner when bannerProps.showBanner is true", () => {
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps: {
+              text: "Test Banner",
+              ariaLabel: "Test Banner Label",
+              showBanner: true,
+              triggerActionFrom: "banner",
+            },
+          };
+        },
+      });
+
+      // Check if YOUIBanner is rendered
+      const banner = wrapper.findComponent(YOUIBanner);
+      expect(banner.exists()).toBe(true);
+
+      // Check if props are passed correctly
+      expect(banner.props("bannerProps")).toEqual({
+        text: "Test Banner",
+        ariaLabel: "Test Banner Label",
+        showBanner: true,
+        triggerActionFrom: "banner",
+      });
+
+      // Check if the banner text is rendered correctly
+      const bannerText = banner.find(".banner-text span");
+      expect(bannerText.exists()).toBe(true);
+      expect(bannerText.text()).toBe("Test Banner");
+    });
+
+    test("does not render YOUIBanner when bannerProps.showBanner is false", () => {
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps: {
+              text: "Test Banner",
+              ariaLabel: "Test Banner Label",
+              showBanner: false, // Banner should not be displayed
+              triggerActionFrom: "banner",
+            },
+          };
+        },
+      });
+
+      // Check if YOUIBanner is not rendered
+      const banner = wrapper.findComponent(YOUIBanner);
+      expect(banner.exists()).toBe(false);
+    });
+
+    test("setBanner method updates bannerProps correctly", () => {
+      const bannerProps = {
+        text: "Test Banner",
+        ariaLabel: "Test Banner Label",
+        showBanner: true,
+        icon: { source: "mdi-check-circle", type: "mdi" },
+        action: { text: "Click Me", url: "https://example.com" },
+        triggerActionFrom: "banner",
+        linkText: "Learn More",
+      };
+
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps,
+          };
+        },
+      });
+
+      // Call setBanner method
+      wrapper.vm.setBanner(bannerProps);
+
+      // Check if bannerProps are updated correctly
+      expect(wrapper.vm.bannerProps).toEqual({
+        text: "Test Banner",
+        ariaLabel: "Test Banner Label",
+        showBanner: true,
+        icon: { source: "mdi-check-circle", type: "mdi" },
+        action: { text: "Click Me", url: "https://example.com" },
+        triggerActionFrom: "banner",
+        linkText: "Learn More",
+      });
     });
   });
 });
