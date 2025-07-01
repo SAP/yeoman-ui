@@ -38,7 +38,7 @@
             <YOUIDone v-if="isDone" :done-status="doneStatus" :done-message="doneMessage" :done-path="donePath" />
             <YOUIBanner
               v-if="bannerProps.showBanner && bannerProps.text && bannerProps.ariaLabel"
-              :bannerProps="bannerProps"
+              :banner-props="bannerProps"
               @parent-execute-command="executeCommand"
             />
             <YOUIPromptInfo v-if="currentPrompt && !isDone" :current-prompt="currentPrompt" />
