@@ -1,7 +1,11 @@
 <template>
   <!-- Banner container -->
   <v-banner
-    class="banner-container mb-6 mt-2"
+    :class="
+      bannerProps.triggerActionFrom === 'banner'
+        ? 'banner-container banner-hover mb-6 mt-2'
+        : 'banner-container mb-6 mt-2'
+    "
     role="banner"
     elevation="0"
     :aria-label="bannerProps.ariaLabel"
@@ -32,7 +36,7 @@
         <!-- Render clickable command link for "link" trigger -->
         <span
           v-if="bannerProps.triggerActionFrom === 'link' && bannerProps.action?.text && bannerProps.action?.command"
-          class="banner-link-text banner-link"
+          class="banner-link-text banner-link-hover"
         >
           <a href="javascript:void(0)" @click="triggerCommand(bannerProps.action?.command)">
             {{ bannerProps.action?.text }}
@@ -42,7 +46,7 @@
         <!-- Render clickable URL link for "link" trigger -->
         <span
           v-if="bannerProps.triggerActionFrom === 'link' && bannerProps.action?.url"
-          class="banner-link-text banner-link"
+          class="banner-link-text banner-link-hover"
         >
           <a :href="bannerProps.action?.url" target="_blank">
             {{ bannerProps.action?.text }}
@@ -83,61 +87,80 @@ const triggerCommand = (event) => {
 </script>
 
 <style lang="scss">
+// Define color variables
 $icon-background-color: #005fb8;
-$background-color: var(--vscode-sideBar-background, #2a2d2e);
+$background-color: var(--vscode-editorWidget-background, #f8f8f8);
 $focus-border-color: var(--vscode-focusBorder, $icon-background-color);
 $text-link-color: var(--vscode-textLink-foreground, $icon-background-color);
-$text-link-hover-color: var(--vscode-textLink-activeForeground, #004999);
 
+// Banner container styles
 .v-banner.banner-container {
   background-color: $background-color;
   border-radius: 3px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0px 4px 8px 0px var(--vscode-widget-shadow, rgba(0, 0, 0, 0.1)) !important;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  border: 1px solid transparent;
-  cursor: pointer;
+  border: 1px solid var(--vscode-editorWidget-border, #c8c8c8);
   height: 48px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &.banner-hover {
+    cursor: pointer;
+  }
+
+  &:hover {
+    border: 1px solid $focus-border-color;
+    box-shadow: 0px 6px 12px 0px var(--vscode-widget-shadow, rgba(0, 0, 0, 0.2)) !important;
+
+    .banner-link-text {
+      text-decoration: none;
+    }
+  }
 }
 
-.v-banner.banner-container:hover {
-  border: 1px solid $focus-border-color;
-}
-
+// Banner content styles
 .banner-content {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
+// Banner icon styles
 .banner-icon {
   display: flex;
   align-items: center;
-  font-size: inherit;
+  justify-content: center;
   background-color: $icon-background-color;
-  border-radius: 2px;
   padding: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 2px;
 }
 
+// Banner text styles
 .banner-text {
   white-space: pre-wrap;
-  color: var(--vscode-editor-foreground, #cccccc);
+  color: var(--vscode-foreground, #3b3b3b);
   font-size: 13px;
+  line-height: 1.5;
 }
 
+// Banner link text styles
 .banner-link-text {
   color: $text-link-color;
   text-decoration: underline;
   font-weight: bold;
   width: fit-content;
-}
-
-.banner-link {
   cursor: pointer;
+  transition:
+    color 0.2s ease,
+    text-decoration 0.2s ease;
+
   &:hover {
     text-decoration: none;
-    color: $text-link-hover-color;
   }
 }
 </style>

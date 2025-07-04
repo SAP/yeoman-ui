@@ -134,7 +134,7 @@ describe("YOUIBanner.vue", () => {
       props: propsData,
     });
 
-    const link = wrapper.find(".banner-link a");
+    const link = wrapper.find(".banner-link-text a");
     expect(link.exists()).toBe(true);
     expect(link.text()).toBe("Click Me");
     expect(link.attributes("href")).toBe("https://example.com");
@@ -160,7 +160,7 @@ describe("YOUIBanner.vue", () => {
       props: propsData,
     });
 
-    const link = wrapper.find(".banner-link a");
+    const link = wrapper.find(".banner-link-text a");
     expect(link.exists()).toBe(true);
     expect(link.text()).toBe("Click Me");
 

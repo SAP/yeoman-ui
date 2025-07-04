@@ -64,24 +64,53 @@ export interface IPrompt {
   description: string;
 }
 
-export interface IAction {
+/**
+ * Action where 'text' is present and links to a VS Code command.
+ */
+interface IActionWithTextAndCommand {
+  /**
+   * The display text for the action.
+   * Clicking this text triggers the associated VS Code command.
+   */
+  text: string;
+
   /**
    * Command to be executed and parameters passed to the command
    */
-  command?: {
+  command: {
     id: string;
     params?: Object | string;
   };
+
   /**
-   * The text associated with the command
-   * Clicking this text triggers the command or opens a url in new tab
+   * A URL string.
+   * This should not be present when 'command' is defined.
    */
-  text?: string;
-  /**
-   * A http URL string
-   */
-  url?: string;
+  url?: never;
 }
+
+/**
+ * Action where 'text' is present and links to a URL.
+ */
+interface IActionWithTextAndUrl {
+  /**
+   * The display text for the action.
+   * Clicking this text triggers the associated VS Code command.
+   */
+  text: string;
+
+  /**
+   * Command to be executed and parameters passed to the command
+   */
+  command?: never;
+
+  /**
+   * A URL string.
+   */
+  url: string;
+}
+
+export type IAction = IActionWithTextAndUrl | IActionWithTextAndCommand;
 
 export interface IBannerProps {
   /**
