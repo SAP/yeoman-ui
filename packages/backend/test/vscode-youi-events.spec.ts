@@ -234,7 +234,7 @@ describe("vscode-youi-events unit test", () => {
     const bannerProps: IBannerProps = {
       text: "Test Banner",
       ariaLabel: "Test Banner Label",
-      showBanner: true,
+      displayBannerForStep: "testStep",
       icon: { source: "mdi-check-circle", type: "mdi" },
       action: { text: "Click Me", url: "https://example.com" },
       triggerActionFrom: "banner",

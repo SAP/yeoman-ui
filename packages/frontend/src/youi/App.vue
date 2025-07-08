@@ -37,7 +37,7 @@
           <v-col>
             <YOUIDone v-if="isDone" :done-status="doneStatus" :done-message="doneMessage" :done-path="donePath" />
             <YOUIBanner
-              v-if="bannerProps.text && bannerProps.ariaLabel"
+              v-if="shouldDisplayBanner"
               :banner-props="bannerProps"
               @parent-execute-command="executeCommand"
             />
@@ -176,6 +176,7 @@ function initialState() {
       icon: {},
       action: {},
       triggerActionFrom: "banner",
+      displayBannerForStep: "",
     },
   };
 }
@@ -236,6 +237,16 @@ export default {
     },
     currentPrompt() {
       return _get(this.prompts, "[" + this.promptIndex + "]");
+    },
+    shouldDisplayBanner() {
+      if (this.bannerProps.displayBannerForStep) {
+        return (
+          this.bannerProps.displayBannerForStep === this.currentPrompt?.name &&
+          this.bannerProps.text &&
+          this.bannerProps.ariaLabel
+        );
+      }
+      return this.bannerProps.text && this.bannerProps.ariaLabel;
     },
     isNoGenerators() {
       const promptName = _get(this.currentPrompt, "name");
@@ -357,13 +368,14 @@ export default {
         this.reject(error);
       }
     },
-    setBanner({ icon, text, action, ariaLabel, triggerActionFrom }) {
+    setBanner({ icon, text, action, ariaLabel, triggerActionFrom, displayBannerForStep }) {
       this.bannerProps = {
+        displayBannerForStep,
         text,
         ariaLabel,
         icon: icon ? { source: icon.source, type: icon.type } : undefined,
         action: action ? { ...action } : undefined,
-        triggerActionFrom: triggerActionFrom || "banner",
+        triggerActionFrom: triggerActionFrom ?? "banner",
       };
     },
     setHeaderTitle(title, info) {

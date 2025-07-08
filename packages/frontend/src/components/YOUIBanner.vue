@@ -97,12 +97,15 @@ $text-link-color: var(--vscode-textLink-foreground, $icon-background-color);
 .v-banner.banner-container {
   background-color: $background-color;
   border-radius: 3px;
+  padding: 12px;
   box-shadow: 0px 4px 8px 0px var(--vscode-widget-shadow, rgba(0, 0, 0, 0.1)) !important;
   display: flex;
   align-items: center;
+  flex-direction: row;
   justify-content: flex-start;
+  flex-wrap: wrap;
+  height: auto;
   border: 1px solid var(--vscode-editorWidget-border, #c8c8c8);
-  height: 48px;
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
@@ -138,11 +141,19 @@ $text-link-color: var(--vscode-textLink-foreground, $icon-background-color);
   width: 24px;
   height: 24px;
   border-radius: 2px;
+  flex: none;
+
+  img,
+  v-icon {
+    object-fit: scale-down;
+    width: 100%;
+    height: 100%;
+  }
 }
 
 // Banner text styles
 .banner-text {
-  white-space: pre-wrap;
+  white-space: normal;
   color: var(--vscode-foreground, #3b3b3b);
   font-size: 13px;
   line-height: 1.5;

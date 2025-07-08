@@ -122,9 +122,10 @@ export interface IBannerProps {
    */
   ariaLabel: string;
   /**
-   * Determines whether the banner should be displayed
+   * Determines the step during which the banner should be displayed.
+   * If not provided, the banner will not be tied to a specific step and may appear globally.
    */
-  showBanner?: boolean;
+  displayBannerForStep?: string;
   /**
    * Icon metadata, including the icon source and type
    */

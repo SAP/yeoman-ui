@@ -1253,34 +1253,124 @@ describe("App.vue", () => {
       expect(banner.exists()).toBe(false);
     });
 
-    test("setBanner method updates bannerProps correctly", () => {
+    test("renders YOUIBanner when currentPrompt name matches displayBannerForStep", () => {
       const bannerProps = {
         text: "Test Banner",
+        displayBannerForStep: "Test Step",
         ariaLabel: "Test Banner Label",
         icon: { source: "mdi-check-circle", type: "mdi" },
         action: { text: "Click Me", url: "https://example.com" },
         triggerActionFrom: "banner",
       };
 
+      const currentPrompt = {
+        name: "Test Step",
+        status: "pending",
+        questions: [],
+      };
+
       wrapper = mount(App, {
+        computed: {
+          shouldDisplayBanner() {
+            // Mock the computed property to return true
+            return (
+              bannerProps.displayBannerForStep &&
+              currentPrompt.name === bannerProps.displayBannerForStep &&
+              bannerProps.text &&
+              bannerProps.ariaLabel
+            );
+          },
+        },
         data() {
           return {
             bannerProps,
+            currentPrompt,
           };
         },
       });
 
-      // Call setBanner method
       wrapper.vm.setBanner(bannerProps);
+      expect(wrapper.vm.bannerProps).toEqual(bannerProps);
 
-      // Check if bannerProps are updated correctly
-      expect(wrapper.vm.bannerProps).toEqual({
+      // Check if YOUIBanner is rendered
+      const banner = wrapper.findComponent(YOUIBanner);
+      expect(banner.exists()).toBe(true);
+    });
+
+    test("does not render YOUIBanner when currentPrompt name does not match displayBannerForStep", () => {
+      const bannerProps = {
         text: "Test Banner",
+        displayBannerForStep: "Test Step",
         ariaLabel: "Test Banner Label",
         icon: { source: "mdi-check-circle", type: "mdi" },
         action: { text: "Click Me", url: "https://example.com" },
         triggerActionFrom: "banner",
+      };
+
+      const currentPrompt = {
+        name: "some other step",
+        status: "pending",
+        questions: [],
+      };
+
+      wrapper = mount(App, {
+        computed: {
+          shouldDisplayBanner() {
+            return (
+              bannerProps.displayBannerForStep &&
+              currentPrompt.name === bannerProps.displayBannerForStep &&
+              bannerProps.text &&
+              bannerProps.ariaLabel
+            );
+          },
+        },
+        data() {
+          return {
+            bannerProps,
+            currentPrompt,
+          };
+        },
       });
+
+      wrapper.vm.setBanner(bannerProps);
+      // Check if YOUIBanner is not rendered
+      const banner = wrapper.findComponent(YOUIBanner);
+      expect(banner.exists()).toBe(false);
+    });
+
+    test("renders YOUIBanner when bannerProps title and ariaLabel is true and no displayBannerForStep is provided", () => {
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps: {
+              text: "Test Banner",
+              ariaLabel: "Test Banner Label",
+              triggerActionFrom: "banner",
+            },
+            currentPrompt: {
+              key: "Test Step",
+              status: "pending",
+              questions: [],
+            },
+          };
+        },
+      });
+
+      // Check if YOUIBanner is rendered
+      const banner = wrapper.findComponent(YOUIBanner);
+      expect(banner.exists()).toBe(true);
+
+      // Check if props are passed correctly
+      expect(banner.props("bannerProps")).toEqual({
+        text: "Test Banner",
+        ariaLabel: "Test Banner Label",
+        triggerActionFrom: "banner",
+      });
+
+      // Check if the banner text is rendered correctly
+      const bannerText = banner.find(".banner-text span");
+      expect(bannerText.exists()).toBe(true);
+      expect(bannerText.text()).toBe("Test Banner");
     });
   });
 });
