@@ -1373,4 +1373,123 @@ describe("App.vue", () => {
       expect(bannerText.text()).toBe("Test Banner");
     });
   });
+
+  describe("shouldDisplayBanner - computed", () => {
+    let wrapper;
+
+    afterEach(() => {
+      if (wrapper) {
+        wrapper.unmount();
+      }
+    });
+
+    it("returns true when displayBannerForStep matches currentPrompt name and text and ariaLabel are defined", () => {
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps: {
+              displayBannerForStep: "Test Step",
+              text: "Test Banner",
+              ariaLabel: "Test Banner Label",
+            },
+            currentPrompt: {
+              name: "Test Step",
+            },
+          };
+        },
+      });
+
+      expect(wrapper.vm.shouldDisplayBanner).toBe(true);
+    });
+
+    it("returns false when displayBannerForStep does not match currentPrompt name", () => {
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps: {
+              displayBannerForStep: "Test Step",
+              text: "Test Banner",
+              ariaLabel: "Test Banner Label",
+            },
+            currentPrompt: {
+              name: "Other Step",
+            },
+          };
+        },
+      });
+
+      expect(wrapper.vm.shouldDisplayBanner).toBe(false);
+    });
+
+    it("returns false when text is not defined", () => {
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps: {
+              displayBannerForStep: "Test Step",
+              ariaLabel: "Test Banner Label",
+            },
+            currentPrompt: {
+              name: "Test Step",
+            },
+          };
+        },
+      });
+
+      expect(wrapper.vm.shouldDisplayBanner).toBe(false);
+    });
+
+    it("returns false when ariaLabel is not defined", () => {
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps: {
+              displayBannerForStep: "Test Step",
+              text: "Test Banner",
+            },
+            currentPrompt: {
+              name: "Test Step",
+            },
+          };
+        },
+      });
+
+      expect(wrapper.vm.shouldDisplayBanner).toBe(false);
+    });
+
+    it("returns true when displayBannerForStep is not defined but text and ariaLabel are defined", () => {
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps: {
+              text: "Test Banner",
+              ariaLabel: "Test Banner Label",
+            },
+            currentPrompt: {
+              name: "Test Step",
+            },
+          };
+        },
+      });
+
+      expect(wrapper.vm.shouldDisplayBanner).toBe(true);
+    });
+
+    it("returns false when neither text nor ariaLabel are defined", () => {
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps: {
+              displayBannerForStep: "Test Step",
+            },
+            currentPrompt: {
+              name: "Test Step",
+            },
+          };
+        },
+      });
+
+      expect(wrapper.vm.shouldDisplayBanner).toBe(false);
+    });
+  });
 });

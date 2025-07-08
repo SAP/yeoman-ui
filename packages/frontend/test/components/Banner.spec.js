@@ -172,3 +172,52 @@ describe("YOUIBanner.vue", () => {
     expect(link.attributes("href")).toBe("javascript:void(0)");
   });
 });
+
+describe("YOUIBanner.vue - trigger command", () => {
+  let wrapper;
+
+  beforeEach(() => {
+    wrapper = mount(Banner, {
+      props: {
+        bannerProps: {
+          text: "Test Banner",
+          ariaLabel: "Test Banner Label",
+          icon: { type: "mdi", source: "mdi-test-icon" },
+          action: { command: "test-command", text: "Click Me" },
+          triggerActionFrom: "banner",
+        },
+      },
+    });
+  });
+
+  afterEach(() => {
+    wrapper.unmount();
+  });
+
+  it("should emit 'parent-execute-command' when the banner is clicked and triggerActionFrom is 'banner'", async () => {
+    const banner = wrapper.find(".banner-container");
+    console.log("Banner exists:", banner.exists());
+
+    await banner.trigger("click");
+
+    expect(wrapper.emitted("parent-execute-command")).toBeTruthy();
+    expect(wrapper.emitted("parent-execute-command")[0]).toEqual(["test-command"]);
+  });
+
+  it("should not emit 'parent-execute-command' when triggerActionFrom is not 'banner'", async () => {
+    await wrapper.setProps({
+      bannerProps: {
+        ...wrapper.props().bannerProps,
+        triggerActionFrom: "link",
+      },
+    });
+
+    const banner = wrapper.find(".banner-container");
+    console.log("Banner exists:", banner.exists());
+    expect(banner.exists()).toBe(true);
+
+    await banner.trigger("click");
+
+    expect(wrapper.emitted("parent-execute-command")).toBeFalsy();
+  });
+});

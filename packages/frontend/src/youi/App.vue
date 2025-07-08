@@ -242,11 +242,11 @@ export default {
       if (this.bannerProps.displayBannerForStep) {
         return (
           this.bannerProps.displayBannerForStep === this.currentPrompt?.name &&
-          this.bannerProps.text &&
-          this.bannerProps.ariaLabel
+          !!this.bannerProps.text &&
+          !!this.bannerProps.ariaLabel
         );
       }
-      return this.bannerProps.text && this.bannerProps.ariaLabel;
+      return !!this.bannerProps.text && !!this.bannerProps.ariaLabel;
     },
     isNoGenerators() {
       const promptName = _get(this.currentPrompt, "name");
