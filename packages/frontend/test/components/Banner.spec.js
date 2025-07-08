@@ -196,7 +196,6 @@ describe("YOUIBanner.vue - trigger command", () => {
 
   it("should emit 'parent-execute-command' when the banner is clicked and triggerActionFrom is 'banner'", async () => {
     const banner = wrapper.find(".banner-container");
-    console.log("Banner exists:", banner.exists());
 
     await banner.trigger("click");
 
@@ -213,7 +212,6 @@ describe("YOUIBanner.vue - trigger command", () => {
     });
 
     const banner = wrapper.find(".banner-container");
-    console.log("Banner exists:", banner.exists());
     expect(banner.exists()).toBe(true);
 
     await banner.trigger("click");
