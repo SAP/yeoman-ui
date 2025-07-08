@@ -6,7 +6,7 @@ import { GeneratorOutput } from "./vscode-output";
 import { IChildLogger } from "@vscode-logging/logger";
 import { getClassLogger } from "./logger/logger-wrapper";
 import { getImage } from "./images/messageImages";
-import { AppWizard, MessageType, Severity } from "@sap-devx/yeoman-ui-types";
+import { AppWizard, MessageType, Severity, IBannerProps } from "@sap-devx/yeoman-ui-types";
 import { FolderUriConfig, getFolderUri, getValidFolderUri, WorkspaceFile, WsFoldersToAdd } from "./utils/workspaceFile";
 import { Constants } from "./utils/constants";
 
@@ -35,6 +35,10 @@ class YoUiAppWizard extends AppWizard {
   public setHeaderTitle(title: string, additionalInfo?: string): void {
     this.events.setAppWizardHeaderTitle(title, additionalInfo);
   }
+
+  public setBanner(bannerProps: IBannerProps): void {
+    this.events.setAppWizardBanner(bannerProps);
+  }
 }
 
 export class VSCodeYouiEvents implements YouiEvents {
@@ -57,6 +61,11 @@ export class VSCodeYouiEvents implements YouiEvents {
 
   public setAppWizardHeaderTitle(title: string, additionalInfo?: string): void {
     void this.rpc.invoke("setHeaderTitle", [title, additionalInfo]);
+  }
+
+  public setAppWizardBanner(bannerProps: IBannerProps): void {
+    // This method allows generators to update the App Wizard banner
+    void this.rpc.invoke("setBanner", [bannerProps]);
   }
 
   public doGeneratorDone(

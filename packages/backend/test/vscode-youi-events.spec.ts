@@ -4,7 +4,7 @@ import { createSandbox, SinonSandbox, SinonMock } from "sinon";
 import * as _ from "lodash";
 import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import * as messages from "../src/messages";
-import { MessageType, Severity } from "@sap-devx/yeoman-ui-types";
+import { MessageType, Severity, IBannerProps } from "@sap-devx/yeoman-ui-types";
 import { GeneratorOutput } from "../src/vscode-output";
 import { Constants } from "../src/utils/constants";
 import * as loggerWrapper from "../src/logger/logger-wrapper";
@@ -228,6 +228,19 @@ describe("vscode-youi-events unit test", () => {
     const testInfo = "testInfo";
     rpcMock.expects("invoke").withExactArgs("setHeaderTitle", [testTitle, testInfo]);
     events.setAppWizardHeaderTitle(testTitle, testInfo);
+  });
+
+  it("setBanner", () => {
+    const bannerProps: IBannerProps = {
+      text: "Test Banner",
+      ariaLabel: "Test Banner Label",
+      displayBannerForStep: "testStep",
+      icon: { source: "mdi-check-circle", type: "mdi" },
+      action: { text: "Click Me", url: "https://example.com" },
+      triggerActionFrom: "banner",
+    };
+    rpcMock.expects("invoke").withExactArgs("setBanner", [bannerProps]);
+    events.setAppWizardBanner(bannerProps);
   });
 
   describe("showProgress", () => {

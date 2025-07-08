@@ -4,6 +4,7 @@ export abstract class AppWizard {
   abstract showError(message: string, type: MessageType): void;
   abstract showInformation(message: string, type: MessageType): void;
   abstract setHeaderTitle(title: string, additionalInfo?: string): void;
+  abstract setBanner(bannerProps: IBannerProps): void;
 
   public static create(genOptions: any = {}): AppWizard {
     class EmptyAppWizard extends AppWizard {
@@ -12,6 +13,7 @@ export abstract class AppWizard {
       showError(): void {}
       showInformation(): void {}
       setHeaderTitle(): void {}
+      setBanner(): void {}
     }
 
     return genOptions.appWizard ? genOptions.appWizard : new EmptyAppWizard();
@@ -60,6 +62,93 @@ export class Prompts {
 export interface IPrompt {
   name: string;
   description: string;
+}
+
+/**
+ * Action where 'text' is present and links to a VS Code command.
+ */
+interface IActionWithTextAndCommand {
+  /**
+   * The display text for the action.
+   * Clicking this text triggers the associated VS Code command.
+   */
+  text: string;
+
+  /**
+   * Command to be executed and parameters passed to the command
+   */
+  command: {
+    id: string;
+    params?: Object | string;
+  };
+
+  /**
+   * A URL string.
+   * This should not be present when 'command' is defined.
+   */
+  url?: never;
+}
+
+/**
+ * Action where 'text' is present and links to a URL.
+ */
+interface IActionWithTextAndUrl {
+  /**
+   * The display text for the action.
+   * Clicking this text triggers the associated VS Code command.
+   */
+  text: string;
+
+  /**
+   * Command to be executed and parameters passed to the command
+   */
+  command?: never;
+
+  /**
+   * A URL string.
+   */
+  url: string;
+}
+
+export type IAction = IActionWithTextAndUrl | IActionWithTextAndCommand;
+
+export interface IBannerProps {
+  /**
+   * The main text to display in the banner
+   */
+  text: string;
+  /**
+   * Accessibility label for the banner
+   */
+  ariaLabel: string;
+  /**
+   * Determines the step during which the banner should be displayed.
+   * If not provided, the banner will not be tied to a specific step and may appear globally.
+   */
+  displayBannerForStep?: string;
+  /**
+   * Icon metadata, including the icon source and type
+   */
+  icon?: {
+    /**
+     * The actual icon data (e.g., Base64 string for images or icon name for Material Design icons)
+     */
+    source: string;
+    /**
+     * Specifies the type of the icon (e.g., "image" for Base64 images or "mdi" for Material Design icons)
+     */
+    type: "image" | "mdi";
+  };
+  /**
+   * Action to be triggered (common for both banner click and link click)
+   */
+  action: IAction;
+  /**
+   * Determines where the action should be triggered
+   * - `banner`: Action is triggered on banner click
+   * - `link`: Action is triggered on link click
+   */
+  triggerActionFrom: "banner" | "link";
 }
 
 /**
