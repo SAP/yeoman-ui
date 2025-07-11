@@ -142,6 +142,24 @@ module.exports = class extends Generator {
   }
 
   async prompting() {
+    if (this.appWizard) {
+      // display banner in second step
+      this.appWizard.setBanner({
+        displayBannerForStep: "Main Dishes",
+        icon: {
+          source: this._getImage(path.join(this.sourceRoot(), "../images/junk-food.jpg")),
+          type: "image",
+        },
+        text: "Explore our chef's specials! Select your main dish and see details for each option. ",
+        action: {
+          url: "https://www.google.com/",
+          text: "Check out our menu.",
+        },
+        ariaLabel: "Main Dishes Banner",
+        triggerActionFrom: "link",
+      });
+    }
+
     let validationDelayTimer;
     let prompts = [
       {
