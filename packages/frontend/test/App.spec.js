@@ -2,6 +2,8 @@ import { initComponent, unmount } from "./Utils";
 import App from "../src/youi/App";
 import { WebSocket } from "mock-socket";
 import { nextTick } from "vue";
+import { mount } from "@vue/test-utils";
+import YOUIBanner from "../src/components/YOUIBanner.vue";
 
 global.WebSocket = WebSocket;
 
@@ -1193,6 +1195,301 @@ describe("App.vue", () => {
       expect(wrapper.vm.toShowPromptMessage).toEqual(false);
       expect(wrapper.vm.promptMessageIcon).toEqual(null);
       expect(wrapper.vm.promptMessageClass).toEqual("");
+    });
+  });
+
+  describe("YOUIBanner Component in App.vue", () => {
+    let wrapper;
+
+    afterEach(() => {
+      if (wrapper) {
+        wrapper.unmount();
+      }
+    });
+
+    test("renders YOUIBanner when bannerProps title and ariaLabel is true", () => {
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps: {
+              text: "Test Banner",
+              ariaLabel: "Test Banner Label",
+              triggerActionFrom: "banner",
+            },
+          };
+        },
+      });
+
+      // Check if YOUIBanner is rendered
+      const banner = wrapper.findComponent(YOUIBanner);
+      expect(banner.exists()).toBe(true);
+
+      // Check if props are passed correctly
+      expect(banner.props("bannerProps")).toEqual({
+        text: "Test Banner",
+        ariaLabel: "Test Banner Label",
+        triggerActionFrom: "banner",
+      });
+
+      // Check if the banner text is rendered correctly
+      const bannerText = banner.find(".banner-text span");
+      expect(bannerText.exists()).toBe(true);
+      expect(bannerText.text()).toBe("Test Banner");
+    });
+
+    test("does not render YOUIBanner when title and aria label is not provided", () => {
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps: {
+              triggerActionFrom: "banner",
+            },
+          };
+        },
+      });
+
+      // Check if YOUIBanner is not rendered
+      const banner = wrapper.findComponent(YOUIBanner);
+      expect(banner.exists()).toBe(false);
+    });
+
+    test("renders YOUIBanner when currentPrompt name matches displayBannerForStep", () => {
+      const bannerProps = {
+        text: "Test Banner",
+        displayBannerForStep: "Test Step",
+        ariaLabel: "Test Banner Label",
+        icon: { source: "mdi-check-circle", type: "mdi" },
+        action: { text: "Click Me", url: "https://example.com" },
+        triggerActionFrom: "banner",
+      };
+
+      const currentPrompt = {
+        name: "Test Step",
+        status: "pending",
+        questions: [],
+      };
+
+      wrapper = mount(App, {
+        computed: {
+          shouldDisplayBanner() {
+            // Mock the computed property to return true
+            return (
+              bannerProps.displayBannerForStep &&
+              currentPrompt.name === bannerProps.displayBannerForStep &&
+              bannerProps.text &&
+              bannerProps.ariaLabel
+            );
+          },
+        },
+        data() {
+          return {
+            bannerProps,
+            currentPrompt,
+          };
+        },
+      });
+
+      wrapper.vm.setBanner(bannerProps);
+      expect(wrapper.vm.bannerProps).toEqual(bannerProps);
+
+      // Check if YOUIBanner is rendered
+      const banner = wrapper.findComponent(YOUIBanner);
+      expect(banner.exists()).toBe(true);
+    });
+
+    test("does not render YOUIBanner when currentPrompt name does not match displayBannerForStep", () => {
+      const bannerProps = {
+        text: "Test Banner",
+        displayBannerForStep: "Test Step",
+        ariaLabel: "Test Banner Label",
+        icon: { source: "mdi-check-circle", type: "mdi" },
+        action: { text: "Click Me", url: "https://example.com" },
+        triggerActionFrom: "banner",
+      };
+
+      const currentPrompt = {
+        name: "some other step",
+        status: "pending",
+        questions: [],
+      };
+
+      wrapper = mount(App, {
+        computed: {
+          shouldDisplayBanner() {
+            return (
+              bannerProps.displayBannerForStep &&
+              currentPrompt.name === bannerProps.displayBannerForStep &&
+              bannerProps.text &&
+              bannerProps.ariaLabel
+            );
+          },
+        },
+        data() {
+          return {
+            bannerProps,
+            currentPrompt,
+          };
+        },
+      });
+
+      wrapper.vm.setBanner(bannerProps);
+      // Check if YOUIBanner is not rendered
+      const banner = wrapper.findComponent(YOUIBanner);
+      expect(banner.exists()).toBe(false);
+    });
+
+    test("renders YOUIBanner when bannerProps title and ariaLabel is true and no displayBannerForStep is provided", () => {
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps: {
+              text: "Test Banner",
+              ariaLabel: "Test Banner Label",
+              triggerActionFrom: "banner",
+            },
+            currentPrompt: {
+              key: "Test Step",
+              status: "pending",
+              questions: [],
+            },
+          };
+        },
+      });
+
+      // Check if YOUIBanner is rendered
+      const banner = wrapper.findComponent(YOUIBanner);
+      expect(banner.exists()).toBe(true);
+
+      // Check if props are passed correctly
+      expect(banner.props("bannerProps")).toEqual({
+        text: "Test Banner",
+        ariaLabel: "Test Banner Label",
+        triggerActionFrom: "banner",
+      });
+
+      // Check if the banner text is rendered correctly
+      const bannerText = banner.find(".banner-text span");
+      expect(bannerText.exists()).toBe(true);
+      expect(bannerText.text()).toBe("Test Banner");
+    });
+  });
+
+  describe("shouldDisplayBanner - computed", () => {
+    let wrapper;
+
+    afterEach(() => {
+      if (wrapper) {
+        wrapper.unmount();
+      }
+    });
+
+    it("returns true when displayBannerForStep matches currentPrompt name and text and ariaLabel are defined", () => {
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps: {
+              displayBannerForStep: "Test Step",
+              text: "Test Banner",
+              ariaLabel: "Test Banner Label",
+            },
+            currentPrompt: {
+              name: "Test Step",
+            },
+          };
+        },
+      });
+
+      expect(wrapper.vm.shouldDisplayBanner).toBe(true);
+    });
+
+    it("returns false when displayBannerForStep does not match currentPrompt name", () => {
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps: {
+              displayBannerForStep: "Test Step",
+              text: "Test Banner",
+              ariaLabel: "Test Banner Label",
+            },
+            currentPrompt: {
+              name: "Other Step",
+            },
+          };
+        },
+      });
+
+      expect(wrapper.vm.shouldDisplayBanner).toBe(false);
+    });
+
+    it("returns false when text is not defined", () => {
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps: {
+              displayBannerForStep: "Test Step",
+              ariaLabel: "Test Banner Label",
+            },
+            currentPrompt: {
+              name: "Test Step",
+            },
+          };
+        },
+      });
+
+      expect(wrapper.vm.shouldDisplayBanner).toBe(false);
+    });
+
+    it("returns false when ariaLabel is not defined", () => {
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps: {
+              displayBannerForStep: "Test Step",
+              text: "Test Banner",
+            },
+            currentPrompt: {
+              name: "Test Step",
+            },
+          };
+        },
+      });
+
+      expect(wrapper.vm.shouldDisplayBanner).toBe(false);
+    });
+
+    it("returns true when displayBannerForStep is not defined but text and ariaLabel are defined", () => {
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps: {
+              text: "Test Banner",
+              ariaLabel: "Test Banner Label",
+            },
+            currentPrompt: {
+              name: "Test Step",
+            },
+          };
+        },
+      });
+
+      expect(wrapper.vm.shouldDisplayBanner).toBe(true);
+    });
+
+    it("returns false when neither text nor ariaLabel are defined", () => {
+      wrapper = mount(App, {
+        data() {
+          return {
+            bannerProps: {
+              displayBannerForStep: "Test Step",
+            },
+            currentPrompt: {
+              name: "Test Step",
+            },
+          };
+        },
+      });
+
+      expect(wrapper.vm.shouldDisplayBanner).toBe(false);
     });
   });
 });
