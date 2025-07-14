@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.20.0](https://github.com/SAP/yeoman-ui/compare/v1.19.6...v1.20.0) (2025-07-14)
+
+### Features
+
+- introduce new wizard logo ([#894](https://github.com/SAP/yeoman-ui/issues/894)) ([3f68e96](https://github.com/SAP/yeoman-ui/commit/3f68e96c05251b12c76fee50077d71565ef80601))
+
 ## [1.19.6](https://github.com/SAP/yeoman-ui/compare/v1.19.5...v1.19.6) (2025-07-09)
 
 ### Reverts
