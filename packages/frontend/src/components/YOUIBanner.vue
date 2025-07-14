@@ -79,7 +79,7 @@ const { bannerProps } = toRefs(props);
 
 /**
  * Trigger the command action and emit the event to the parent component
- * @param {Object} event - The event object
+ * @param {Object} event - Event object
  */
 const triggerCommand = (event) => {
   emit("parent-execute-command", event);
