@@ -50,6 +50,10 @@ describe("yeomanui unit test", () => {
     public setHeaderTitle(): void {
       return;
     }
+
+    public setBanner(): void {
+      return;
+    }
   }
   const appWizard: AppWizard = new TestAppWizard();
   class TestEvents implements YouiEvents {

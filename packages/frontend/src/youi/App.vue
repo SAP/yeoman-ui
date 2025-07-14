@@ -36,7 +36,11 @@
         <v-row class="prompts-col">
           <v-col>
             <YOUIDone v-if="isDone" :done-status="doneStatus" :done-message="doneMessage" :done-path="donePath" />
-
+            <YOUIBanner
+              v-if="shouldDisplayBanner"
+              :banner-props="bannerProps"
+              @parent-execute-command="executeCommand"
+            />
             <YOUIPromptInfo v-if="currentPrompt && !isDone" :current-prompt="currentPrompt" />
             <v-slide-x-transition>
               <Form
@@ -111,6 +115,7 @@ import YOUINavigation from "../components/YOUINavigation.vue";
 import YOUIDone from "../components/YOUIDone.vue";
 import YOUIInfo from "../components/YOUIInfo.vue";
 import YOUIPromptInfo from "../components/YOUIPromptInfo.vue";
+import YOUIBanner from "../components/YOUIBanner.vue";
 import { RpcBrowser } from "@sap-devx/webview-rpc/out.browser/rpc-browser";
 import { RpcBrowserWebSockets } from "@sap-devx/webview-rpc/out.browser/rpc-browser-ws";
 import _size from "lodash/size";
@@ -165,6 +170,14 @@ function initialState() {
     headerTitleProvided: "",
     headerInfo: "",
     currentAnswerTexts: {}, // Answer state for navigation answer history
+    bannerProps: {
+      text: "",
+      ariaLabel: "Banner",
+      icon: {},
+      action: {},
+      triggerActionFrom: "banner",
+      displayBannerForStep: "",
+    },
   };
 }
 
@@ -176,6 +189,7 @@ export default {
     YOUIDone,
     YOUIInfo,
     YOUIPromptInfo,
+    YOUIBanner,
     Loading,
   },
   props: {
@@ -223,6 +237,16 @@ export default {
     },
     currentPrompt() {
       return _get(this.prompts, "[" + this.promptIndex + "]");
+    },
+    shouldDisplayBanner() {
+      if (this.bannerProps.displayBannerForStep) {
+        return (
+          this.bannerProps.displayBannerForStep === this.currentPrompt?.name &&
+          !!this.bannerProps.text &&
+          !!this.bannerProps.ariaLabel
+        );
+      }
+      return !!this.bannerProps.text && !!this.bannerProps.ariaLabel;
     },
     isNoGenerators() {
       const promptName = _get(this.currentPrompt, "name");
@@ -317,7 +341,8 @@ export default {
         command.id = cmdOrEvent.target.getAttribute("command");
         command.params = cmdOrEvent.target.getAttribute("params");
       }
-      this.rpc.invoke("executeCommand", [command.id, JSON.parse(JSON.stringify(command.params))]);
+      const params = command.params ? JSON.parse(JSON.stringify(command.params)) : null;
+      this.rpc.invoke("executeCommand", [command.id, params]);
     },
     back() {
       return this.gotoStep(1); // go 1 step back
@@ -342,6 +367,16 @@ export default {
         this.rpc.invoke("logError", [error]);
         this.reject(error);
       }
+    },
+    setBanner({ icon, text, action, ariaLabel, triggerActionFrom, displayBannerForStep }) {
+      this.bannerProps = {
+        displayBannerForStep,
+        text,
+        ariaLabel,
+        icon: icon ? { source: icon.source, type: icon.type } : undefined,
+        action: action ? { ...action } : undefined,
+        triggerActionFrom: triggerActionFrom ?? "banner",
+      };
     },
     setHeaderTitle(title, info) {
       this.headerTitleProvided = title;
@@ -635,6 +670,7 @@ export default {
         "showPromptMessage",
         "resetPromptMessage",
         "setHeaderTitle",
+        "setBanner",
       ];
       _forEach(functions, (funcName) => {
         this.rpc.registerMethod({
