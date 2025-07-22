@@ -1292,9 +1292,7 @@ describe("yeomanui unit test", () => {
 
     it("onGeneratorFailure", () => {
       yeomanUi["onGeneratorFailure"]("testGenName", "testError");
-      expect(
-        doGeneratorDoneSpy.calledWith(false, `{"message":"testGenName generator failed - testError"}`, "", "files"),
-      ).to.be.true;
+      expect(doGeneratorDoneSpy.calledWith(false, "testGenName generator failed - testError", "", "files")).to.be.true;
     });
 
     it("onGeneratorSuccess - generator type is project", () => {

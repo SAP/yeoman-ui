@@ -466,15 +466,18 @@ export class YeomanUI {
 
   private onGeneratorFailure(generatorName: string, error: any) {
     // avoid display the error multiple times due the same running
-    if (!this.errorThrown) {
-      this.errorThrown = true;
-      const messagePrefix = `${generatorName} generator failed`;
-      const errorMessage: string = this.logError(error, messagePrefix);
-      this.youiEvents.doGeneratorDone(false, errorMessage, "", "files");
-      this.setInitialProcessDir();
-      this.flowState.reject(error);
-      this.generatorName = ""; // reset generator name
+    if (this.errorThrown) {
+      return;
     }
+
+    this.errorThrown = true;
+    const messagePrefix = `${generatorName} generator failed`;
+    const errorMsg = error?.message || error;
+    this.logError(error, messagePrefix);
+    this.youiEvents.doGeneratorDone(false, `${messagePrefix} - ${errorMsg}`, "", "files");
+    this.setInitialProcessDir();
+    this.flowState.reject(error);
+    this.generatorName = ""; // reset generator name
   }
 
   private onGenInstall(gen: any) {
