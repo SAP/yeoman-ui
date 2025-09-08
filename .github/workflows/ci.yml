@@ -24,7 +24,7 @@ jobs:
     steps:
       # using `v1` because of: https://github.com/actions/checkout/issues/246
       - uses: actions/checkout@v1
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node_version }}
 
