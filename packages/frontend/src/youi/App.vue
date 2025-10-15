@@ -23,7 +23,7 @@
     />
 
     <v-row class="main-row ma-0 pa-0">
-      <v-col class="left-col ma-0 pa-0" cols="3">
+      <v-col class="left-col ma-0" cols="3">
         <YOUINavigation
           v-if="prompts.length"
           :prompt-index="promptIndex"
