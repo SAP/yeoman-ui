@@ -72,7 +72,7 @@
     "@babel/runtime": "7.27.0",
     "follow-redirects": "1.15.6",
     "rollup": "3.29.5",
-    "tar-fs": "2.1.2"
+    "tar-fs": "2.1.4"
   },
   "dependencies": {
     "@sap-devx/webview-rpc": "0.4.1",
