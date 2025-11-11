@@ -81,6 +81,12 @@ const ViewColumn = {
   Two: 2,
 };
 
+const ProgressLocation = {
+  SourceControl: 1,
+  Window: 10,
+  Notification: 15,
+};
+
 const vscodeMock = {
   Uri,
   context,
@@ -88,6 +94,7 @@ const vscodeMock = {
   commands,
   window,
   ViewColumn,
+  ProgressLocation,
 };
 
 export const getVscodeMock = () => vscodeMock;

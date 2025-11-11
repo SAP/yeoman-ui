@@ -1,3 +1,5 @@
+// Use CommonJS style import for 'module' to retain original types
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const Module = require("module");
 
 // Replaces shelljs.exec method when execResult is undefined

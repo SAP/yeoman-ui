@@ -12,10 +12,15 @@
     "rootDir": ".",
     "baseUrl": ".",
     "sourceMap": true,
-    "target": "es6",
+    "target": "ES2020",
     "traceResolution": false,
     "declaration": true,
-    "alwaysStrict": true
+    "alwaysStrict": true,
+    "module": "ES2020",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
-  "include": ["src/**/*", "test/**/*", "api.d.ts"]
+  "include": ["src/**/*", "api.d.ts"],
+  "exclude": ["test/**/*"]
 }

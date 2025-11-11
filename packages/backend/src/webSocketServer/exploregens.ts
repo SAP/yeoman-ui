@@ -27,7 +27,8 @@ class ExploreGensWebSocketServer {
     wss.on("connection", (ws) => {
       console.log("exploregens: new ws connection");
       const childLogger: IChildLogger = getConsoleWarnLogger();
-      this.rpc = new RpcExtensionWebSockets(ws, childLogger);
+  // @ts-ignore WebSocket type incompatibility under ESM build
+  this.rpc = new RpcExtensionWebSockets(ws as any, childLogger);
 
       this.exploreGens = new ExploreGens(childLogger, vscode.context);
       this.exploreGens.init(this.rpc);

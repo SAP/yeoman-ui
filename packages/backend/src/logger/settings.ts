@@ -23,9 +23,4 @@ export function getSourceLocationTrackingSetting(): boolean {
   return config.get(SOURCE_TRACKING_CONFIG_PROP);
 }
 
-module.exports = {
-  LOGGING_LEVEL_CONFIG_PROP,
-  SOURCE_TRACKING_CONFIG_PROP,
-  getLoggingLevelSetting,
-  getSourceLocationTrackingSetting,
-};
+// Converted to ESM: named exports used directly

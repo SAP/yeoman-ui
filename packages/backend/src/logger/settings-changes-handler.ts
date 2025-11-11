@@ -37,7 +37,4 @@ export function listenToLogSettingsChanges(context: vscode.ExtensionContext) {
   );
 }
 
-module.exports = {
-  listenToLogSettingsChanges,
-  logLoggerDetails,
-};
+// Converted to ESM: direct exports already defined above

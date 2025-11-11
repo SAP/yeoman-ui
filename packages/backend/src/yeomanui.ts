@@ -3,9 +3,9 @@ import { promises } from "fs";
 import * as _ from "lodash";
 import * as inquirer from "inquirer";
 import { ReplayUtils, ReplayState } from "./replayUtils";
-const datauri = require("datauri"); // eslint-disable-line @typescript-eslint/no-var-requires
-const titleize = require("titleize"); // eslint-disable-line @typescript-eslint/no-var-requires
-const humanizeString = require("humanize-string"); // eslint-disable-line @typescript-eslint/no-var-requires
+import datauri from "datauri";
+import titleize from "titleize";
+import humanizeString from "humanize-string";
 import * as defaultImage from "./images/defaultImage";
 import { YouiAdapter } from "./youi-adapter";
 import { YouiEvents } from "./youi-events";
@@ -20,6 +20,8 @@ import { Env, EnvGen, GeneratorData, GeneratorNotFoundError } from "./utils/env"
 import { vscode, getVscode } from "./utils/vscodeProxy";
 import * as Generator from "yeoman-generator";
 import * as Environment from "yeoman-environment";
+// @ts-ignore incomplete types
+const EnvironmentAny: any = Environment as any;
 import { Questions } from "yeoman-environment/lib/adapter";
 import { State } from "./utils/promise";
 import { Constants } from "./utils/constants";
@@ -598,7 +600,7 @@ export class YeomanUI {
       this.logger.debug(error);
     }
 
-    const genName = Environment.namespaceToName(genNamespace);
+  const genName = EnvironmentAny.namespaceToName(genNamespace);
     const genMessage = _.get(packageJson, "description", YeomanUI.defaultMessage);
     const genDisplayName = _.get(packageJson, "displayName", "");
     const genPrettyName = _.isEmpty(genDisplayName) ? titleize(humanizeString(genName)) : genDisplayName;

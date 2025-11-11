@@ -34,7 +34,8 @@ class YeomanUIWebSocketServer {
     wss.on("connection", (ws) => {
       console.log("new ws connection");
       const childLogger: IChildLogger = getConsoleWarnLogger();
-      this.rpc = new RpcExtensionWebSockets(ws, childLogger);
+  // @ts-ignore WebSocket type incompatibility under ESM build
+  this.rpc = new RpcExtensionWebSockets(ws as any, childLogger);
       const serverOutput = new ServerOutput(this.rpc, true);
       const youiEvents: YouiEvents = new ServerYouiEvents(this.rpc);
 
