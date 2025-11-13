@@ -5,7 +5,7 @@ import { existsSync } from "fs";
 import { isWin32, NpmCommand } from "./npm";
 import * as customLocation from "./customLocation";
 import * as Environment from "yeoman-environment";
-import TerminalAdapter = require("yeoman-environment/lib/adapter");
+import TerminalAdapter from "yeoman-environment/lib/adapter";
 import { IChildLogger } from "@vscode-logging/logger";
 import { getClassLogger } from "../logger/logger-wrapper";
 
@@ -90,12 +90,14 @@ class EnvUtil {
     opts?: Environment.Options,
     adapter?: TerminalAdapter,
   ): Environment<Environment.Options> {
-    return Environment.createEnv(args, opts, adapter);
+  // @ts-ignore createEnv is available at runtime; types are incomplete
+  return (Environment as any).createEnv(args, opts, adapter);
   }
 
   private unloadGeneratorModules(genNamespace: string): void {
     let generatorName;
-    const genShortName = Environment.namespaceToName(genNamespace);
+  // @ts-ignore namespaceToName exists at runtime
+  const genShortName = (Environment as any).namespaceToName(genNamespace) as string;
     if (genShortName.startsWith("@")) {
       const firstSlashIndex = genShortName.indexOf("/");
       generatorName = `${GENERATOR}${genShortName.substring(firstSlashIndex + 1)}`;
@@ -103,7 +105,8 @@ class EnvUtil {
       generatorName = `${GENERATOR}${genShortName}`;
     }
 
-    const keys = Object.keys(require.cache);
+  // @ts-ignore require cache available in CJS context when bundled
+  const keys = Object.keys(require.cache);
     for (const key of keys) {
       if (key.includes(generatorName)) {
         delete require.cache[key];
@@ -216,7 +219,8 @@ class EnvUtil {
   }
 
   public getGeneratorFullName(genNamespace: string): string {
-    const genName = Environment.namespaceToName(genNamespace);
+  // @ts-ignore namespaceToName exists at runtime
+  const genName = (Environment as any).namespaceToName(genNamespace) as string;
     const parts = _.split(genName, "/");
     return _.size(parts) === 1 ? `${GENERATOR}${genName}` : `${parts[0]}/${GENERATOR}${parts[1]}`;
   }

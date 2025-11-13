@@ -25,18 +25,18 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   }
 
   public notifyGeneratorsChange(args?: any[]) {
-    const yeomanUi = get(this, "yeomanui");
+    const yeomanUi = this.yeomanui;
     this.installGens = !yeomanUi && isEmpty(args) ? undefined : args;
     if (yeomanUi) {
-      if (!this.installGens) {
+      if (!isEmpty(this.installGens)) {
         void yeomanUi._notifyGeneratorsChange();
       } else {
         void yeomanUi._notifyGeneratorsInstall(this.installGens);
-        if (isEmpty(this.installGens)) {
-          Env.loadNpmPath(true); // force to reload the env existing npm paths
+      }
+      if (isEmpty(this.installGens)) {
+        setTimeout(() => {
           void yeomanUi._notifyGeneratorsChange();
-          this.installGens = undefined;
-        }
+        }, 500);
       }
     }
   }

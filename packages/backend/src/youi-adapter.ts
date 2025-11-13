@@ -1,8 +1,8 @@
 import { YeomanUI } from "./yeomanui";
 import { YouiEvents } from "./youi-events";
-const yoUiLog = require("./utils/log"); // eslint-disable-line @typescript-eslint/no-var-requires
+import createLog from "./utils/log";
 import { isFunction, get } from "lodash";
-const chalk = require("chalk");
+import chalk from "chalk";
 import { Questions } from "yeoman-environment/lib/adapter";
 import { Output } from "./output";
 
@@ -20,7 +20,7 @@ export class YouiAdapter {
 
   public setYeomanUI(yeomanui: YeomanUI) {
     this.yeomanui = yeomanui;
-    this.log = yoUiLog(this.output, this.yeomanui);
+    this.log = createLog(this.output, this.yeomanui);
   }
 
   get colorDiffAdded() {

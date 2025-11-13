@@ -1,67 +1,74 @@
-import { expect } from "chai";
-import { createSandbox, SinonSandbox, SinonMock } from "sinon";
+import { vi, beforeEach, afterEach, describe, it, expect } from "vitest";
 import * as extension from "../src/extension";
-import { ExtCommands } from "../src/extCommands";
-import * as loggerWrapper from "../src/logger/logger-wrapper";
 import { AnalyticsWrapper } from "../src/usage-report/usage-analytics-wrapper";
 import * as shellJsWorkarounds from "../src/utils/shellJsWorkarounds";
 import { vscode } from "./mockUtil";
+import * as loggerWrapper from "../src/logger/logger-wrapper";
+
+// Mock the logger wrapper module
+vi.mock("../src/logger/logger-wrapper", () => ({
+  createExtensionLoggerAndSubscribeToLogSettingsChanges: vi.fn(),
+  getLogger: vi.fn(() => ({
+    info: vi.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    trace: vi.fn(),
+    getChildLogger: vi.fn()
+  })),
+  getClassLogger: vi.fn(() => ({
+    info: vi.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    trace: vi.fn(),
+    getChildLogger: vi.fn()
+  }))
+}));
 
 describe("extension unit test", () => {
-  let sandbox: SinonSandbox;
-  let extCommandsMock: SinonMock;
-  let loggerWrapperMock: SinonMock;
-  let windowMock: SinonMock;
-  let trackerWrapperMock: SinonMock;
   const testContext: any = {
     subscriptions: [],
     extensionPath: "testExtensionpath",
   };
 
-  before(() => {
-    sandbox = createSandbox();
-  });
-
-  after(() => {
-    sandbox.restore();
-  });
-
   beforeEach(() => {
-    loggerWrapperMock = sandbox.mock(loggerWrapper);
-    trackerWrapperMock = sandbox.mock(AnalyticsWrapper);
-    extCommandsMock = sandbox.mock(ExtCommands);
-    windowMock = sandbox.mock(vscode.window);
+    // Clear all mocks before each test
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    loggerWrapperMock.verify();
-    trackerWrapperMock.verify();
-    extCommandsMock.verify();
-    windowMock.verify();
+    // Restore all mocks after each test
+    vi.restoreAllMocks();
   });
 
   describe("activate", () => {
     it("commands registration", () => {
-      loggerWrapperMock.expects("createExtensionLoggerAndSubscribeToLogSettingsChanges");
-      trackerWrapperMock.expects("createTracker");
-
-      const applySpy = sandbox.spy(shellJsWorkarounds, "apply");
-      windowMock.expects("registerWebviewPanelSerializer").withArgs("yeomanui");
-      windowMock.expects("registerWebviewPanelSerializer").withArgs("exploreGens");
+      const createLoggerMock = vi.mocked(loggerWrapper.createExtensionLoggerAndSubscribeToLogSettingsChanges);
+      const createTrackerSpy = vi.spyOn(AnalyticsWrapper, "createTracker").mockImplementation(() => {});
+      const applySpy = vi.spyOn(shellJsWorkarounds, "apply").mockImplementation(() => {});
+      const registerWebviewSpy = vi.spyOn(vscode.window, "registerWebviewPanelSerializer").mockImplementation(() => Promise.resolve());
 
       extension.activate(testContext);
 
-      expect(applySpy.calledOnce).to.be.true;
-      applySpy.restore();
+      expect(applySpy).toHaveBeenCalledOnce();
+      expect(registerWebviewSpy).toHaveBeenCalledTimes(2);
+      expect(createTrackerSpy).toHaveBeenCalled();
+      expect(createLoggerMock).toHaveBeenCalled();
     });
 
     it("logger failure on extenion activation", () => {
-      const consoleMock = sandbox.mock(console);
-      loggerWrapperMock
-        .expects("createExtensionLoggerAndSubscribeToLogSettingsChanges")
-        .throws(new Error("activation error"));
-      consoleMock.expects("error").withExactArgs("Extension activation failed.", "activation error");
-      extension.activate(null);
+      const createLoggerMock = vi.mocked(loggerWrapper.createExtensionLoggerAndSubscribeToLogSettingsChanges);
+      createLoggerMock.mockImplementation(() => {
+        throw new Error("activation error");
+      });
+      
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      
+      extension.activate(testContext);
+      
+      expect(consoleSpy).toHaveBeenCalledWith("Extension activation failed.", "activation error");
+      expect(createLoggerMock).toHaveBeenCalled();
     });
   });
 
