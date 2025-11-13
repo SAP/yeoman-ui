@@ -1,233 +1,295 @@
-import { vscode } from "./mockUtil";
-import { expect } from "chai";
-import { createSandbox, SinonSandbox, SinonMock } from "sinon";
-import * as _ from "lodash";
-import { IMethod, IPromiseCallbacks, IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
-import * as messages from "../src/messages";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import * as vscode from "vscode";
+import { VSCodeYouiEvents } from "../src/vscode-youi-events.js";
 import { MessageType, Severity, IBannerProps } from "@sap-devx/yeoman-ui-types";
-import { GeneratorOutput } from "../src/vscode-output";
-import { Constants } from "../src/utils/constants";
-import * as loggerWrapper from "../src/logger/logger-wrapper";
-import { VSCodeYouiEvents } from "../src/vscode-youi-events";
+import { Constants } from "../src/utils/constants.js";
+import * as messages from "../src/messages.js";
 import * as fs from "fs";
+
+// Mock all dependencies
+vi.mock("vscode", () => ({
+  Uri: {
+    file: vi.fn((path) => ({ fsPath: path, scheme: "file" })),
+    parse: vi.fn((uri) => ({ fsPath: uri, scheme: "file" }))
+  },
+  window: {
+    showErrorMessage: vi.fn(),
+    showWarningMessage: vi.fn(),
+    showInformationMessage: vi.fn(),
+    withProgress: vi.fn(),
+    activeColorTheme: {
+      kind: 1 // Light theme
+    }
+  },
+  commands: {
+    executeCommand: vi.fn()
+  },
+  workspace: {
+    workspaceFolders: undefined,
+    workspaceFile: undefined,
+    updateWorkspaceFolders: vi.fn()
+  },
+  ProgressLocation: {
+    Notification: 15
+  },
+  ColorThemeKind: {
+    Light: 1,
+    Dark: 2,
+    HighContrast: 3
+  }
+}));
+
+vi.mock("../src/vscode-output.js", () => ({
+  GeneratorOutput: class MockGeneratorOutput {
+    appendLine = vi.fn();
+    show = vi.fn();
+  }
+}));
+
+vi.mock("../src/logger/logger-wrapper.js", () => ({
+  getClassLogger: vi.fn(() => ({
+    debug: vi.fn(),
+    trace: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
+  }))
+}));
+
+vi.mock("../src/utils/constants.js", () => ({
+  Constants: {
+    IS_IN_BAS: false,
+    HOMEDIR_PROJECTS: "/mock/home/projects"
+  }
+}));
+
+vi.mock("../src/messages.js", () => ({
+  default: {
+    show_progress_message: "Generating...",
+    show_progress_button: "Show Output",
+    open_in_a_new_workspace: "Open in new workspace",
+    add_to_workspace: "Add to workspace",
+    artifact_generated_files: "Files generated successfully",
+    artifact_generated_project_add_to_workspace: "Project added to workspace",
+    artifact_generated_project_open_in_a_new_workspace: "Project opened in new workspace",
+    artifact_generated_project_saved_for_future: "Project saved for future use",
+    artifact_generated_module: "Module generated successfully"
+  }
+}));
+
+vi.mock("fs", () => ({
+  existsSync: vi.fn(),
+  writeFileSync: vi.fn()
+}));
 
 describe("vscode-youi-events unit test", () => {
   let events: VSCodeYouiEvents;
-  let sandbox: SinonSandbox;
-  let windowMock: SinonMock;
-  let commandsMock: SinonMock;
-  let workspaceMock: SinonMock;
-  let eventsMock: SinonMock;
-  let loggerWrapperMock: SinonMock;
-  let generatorOutputMock: SinonMock;
-  let rpcMock: SinonMock;
-  let loggerMock: SinonMock;
-  let uriMock: SinonMock;
-  let fsMock: SinonMock;
+  let mockRpc: any;
+  let mockWebviewPanel: any;
+  let mockGeneratorOutput: any;
 
   const testLogger = {
-    debug: () => true,
-    error: () => true,
-    fatal: () => true,
-    warn: () => true,
-    info: () => true,
-    trace: () => true,
-    getChildLogger: () => {
-      return testLogger;
-    },
+    debug: vi.fn(),
+    error: vi.fn(),
+    fatal: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    trace: vi.fn(),
+    getChildLogger: vi.fn(() => testLogger)
   };
 
-  class TestRpc implements IRpc {
-    public timeout: number;
-    public promiseCallbacks: Map<number, IPromiseCallbacks>;
-    public methods: Map<string, IMethod>;
-    public sendRequest(): void {
-      return;
-    }
-    public sendResponse(): void {
-      return;
-    }
-    public setResponseTimeout(): void {
-      return;
-    }
-    public registerMethod(): void {
-      return;
-    }
-    public unregisterMethod(): void {
-      return;
-    }
-    public listLocalMethods(): string[] {
-      return [];
-    }
-    public handleResponse(): void {
-      return;
-    }
-    public listRemoteMethods(): Promise<string[]> {
-      return Promise.resolve([]);
-    }
-    public invoke(): Promise<any> {
-      return Promise.resolve();
-    }
-    public handleRequest(): Promise<void> {
-      return Promise.resolve();
-    }
+  class TestRpc {
+    public timeout: number = 5000;
+    public promiseCallbacks: Map<number, any> = new Map();
+    public methods: Map<string, any> = new Map();
+    public sendRequest = vi.fn();
+    public sendResponse = vi.fn();
+    public setResponseTimeout = vi.fn();
+    public registerMethod = vi.fn();
+    public unregisterMethod = vi.fn();
+    public listLocalMethods = vi.fn(() => []);
+    public handleResponse = vi.fn();
+    public listRemoteMethods = vi.fn(() => Promise.resolve([]));
+    public invoke = vi.fn(() => Promise.resolve());
+    public handleRequest = vi.fn(() => Promise.resolve());
   }
-  const rpc = new TestRpc();
-  const generatorOutput = new GeneratorOutput();
-
-  before(() => {
-    sandbox = createSandbox();
-  });
-
-  after(() => {
-    sandbox.restore();
-  });
 
   beforeEach(() => {
-    const webViewPanel: any = { dispose: () => true };
-    loggerWrapperMock = sandbox.mock(loggerWrapper);
-    loggerWrapperMock.expects("getClassLogger").returns(testLogger);
-    events = new VSCodeYouiEvents(rpc, webViewPanel, messages.default, generatorOutput);
-    windowMock = sandbox.mock(vscode.window);
-    commandsMock = sandbox.mock(vscode.commands);
-    workspaceMock = sandbox.mock(vscode.workspace);
-    eventsMock = sandbox.mock(events);
-    generatorOutputMock = sandbox.mock(generatorOutput);
-    loggerMock = sandbox.mock(testLogger);
-    rpcMock = sandbox.mock(rpc);
-    uriMock = sandbox.mock(vscode.Uri);
-    fsMock = sandbox.mock(fs);
+    vi.clearAllMocks();
+
+    // Setup mock objects
+    mockRpc = new TestRpc();
+    mockWebviewPanel = { dispose: vi.fn() };
+    mockGeneratorOutput = {
+      appendLine: vi.fn(),
+      show: vi.fn()
+    };
+    
+    // Create events instance
+    events = new VSCodeYouiEvents(mockRpc, mockWebviewPanel, messages.default, mockGeneratorOutput);
   });
 
   afterEach(() => {
-    windowMock.verify();
-    eventsMock.verify();
-    commandsMock.verify();
-    workspaceMock.verify();
-    loggerWrapperMock.verify();
-    generatorOutputMock.verify();
-    loggerMock.verify();
-    rpcMock.verify();
-    uriMock.verify();
-    fsMock.verify();
+    vi.resetAllMocks();
   });
 
   describe("getAppWizard", () => {
     it("error notification message on BAS", () => {
       const message = "error notification message";
-      Constants["IS_IN_BAS"] = true;
+      vi.mocked(Constants).IS_IN_BAS = true;
+      
       const appWizard = events.getAppWizard();
-      generatorOutputMock.expects("appendLine").withExactArgs(message);
-      windowMock.expects("showErrorMessage").withExactArgs(message);
+      const showErrorSpy = vi.spyOn(vscode.window, "showErrorMessage");
+      const appendLineSpy = vi.spyOn(mockGeneratorOutput, "appendLine");
+      
       appWizard.showError(message, MessageType.notification);
+      
+      expect(appendLineSpy).toHaveBeenCalledWith(message);
+      expect(showErrorSpy).toHaveBeenCalledWith(message);
     });
 
     it("warning notification message on BAS", () => {
       const message = "warning notification message";
-      Constants["IS_IN_BAS"] = true;
+      vi.mocked(Constants).IS_IN_BAS = true;
+      
       const appWizard = events.getAppWizard();
-      generatorOutputMock.expects("appendLine").withExactArgs(message);
-      windowMock.expects("showWarningMessage").withExactArgs(message);
+      const showWarningSpy = vi.spyOn(vscode.window, "showWarningMessage");
+      const appendLineSpy = vi.spyOn(mockGeneratorOutput, "appendLine");
+      
       appWizard.showWarning(message, MessageType.notification);
+      
+      expect(appendLineSpy).toHaveBeenCalledWith(message);
+      expect(showWarningSpy).toHaveBeenCalledWith(message);
     });
 
     it("information notification message on BAS", () => {
       const message = "information notification message";
-      Constants["IS_IN_BAS"] = true;
+      vi.mocked(Constants).IS_IN_BAS = true;
+      
       const appWizard = events.getAppWizard();
-      generatorOutputMock.expects("appendLine").withExactArgs(message);
-      windowMock.expects("showInformationMessage").withExactArgs(message);
+      const showInfoSpy = vi.spyOn(vscode.window, "showInformationMessage");
+      const appendLineSpy = vi.spyOn(mockGeneratorOutput, "appendLine");
+      
       appWizard.showInformation(message, MessageType.notification);
+      
+      expect(appendLineSpy).toHaveBeenCalledWith(message);
+      expect(showInfoSpy).toHaveBeenCalledWith(message);
     });
 
     it("error prompt message on BAS", () => {
       const message = "error prompt message";
-      Constants["IS_IN_BAS"] = true;
+      vi.mocked(Constants).IS_IN_BAS = true;
+      
       const appWizard = events.getAppWizard();
-      generatorOutputMock.expects("appendLine").withExactArgs(message);
-      events["getMessageImage"] = () => "errorTheia";
-      rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.error, "errorTheia"]);
+      const appendLineSpy = vi.spyOn(mockGeneratorOutput, "appendLine");
+      vi.spyOn(events as any, "getMessageImage").mockReturnValue("errorTheia");
+      
       appWizard.showError(message, MessageType.prompt);
+      
+      expect(appendLineSpy).toHaveBeenCalledWith(message);
+      expect(mockRpc.invoke).toHaveBeenCalledWith("showPromptMessage", [message, Severity.error, "errorTheia"]);
     });
 
     it("warning prompt message on BAS", () => {
       const message = "warning prompt message";
-      Constants["IS_IN_BAS"] = true;
+      vi.mocked(Constants).IS_IN_BAS = true;
+      
       const appWizard = events.getAppWizard();
-      generatorOutputMock.expects("appendLine").withExactArgs(message);
-      events["getMessageImage"] = () => "warnTheia";
-      rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.warning, "warnTheia"]);
+      const appendLineSpy = vi.spyOn(mockGeneratorOutput, "appendLine");
+      vi.spyOn(events as any, "getMessageImage").mockReturnValue("warnTheia");
+      
       appWizard.showWarning(message, MessageType.prompt);
+      
+      expect(appendLineSpy).toHaveBeenCalledWith(message);
+      expect(mockRpc.invoke).toHaveBeenCalledWith("showPromptMessage", [message, Severity.warning, "warnTheia"]);
     });
 
     it("information prompt message on BAS", () => {
       const message = "information prompt message";
-      Constants["IS_IN_BAS"] = true;
+      vi.mocked(Constants).IS_IN_BAS = true;
+      
       const appWizard = events.getAppWizard();
-      generatorOutputMock.expects("appendLine").withExactArgs(message);
-      events["getMessageImage"] = () => "infoTheia";
-      rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.information, "infoTheia"]);
+      const appendLineSpy = vi.spyOn(mockGeneratorOutput, "appendLine");
+      vi.spyOn(events as any, "getMessageImage").mockReturnValue("infoTheia");
+      
       appWizard.showInformation(message, MessageType.prompt);
+      
+      expect(appendLineSpy).toHaveBeenCalledWith(message);
+      expect(mockRpc.invoke).toHaveBeenCalledWith("showPromptMessage", [message, Severity.information, "infoTheia"]);
     });
 
     it("error message with location prompt on vscode", () => {
       const message = "error prompt message";
-      Constants["IS_IN_BAS"] = false;
+      vi.mocked(Constants).IS_IN_BAS = false;
+      
       const appWizard = events.getAppWizard();
-      events["getMessageImage"] = () => "errorVSCodeDark";
-      generatorOutputMock.expects("appendLine").withExactArgs(message);
-      rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.error, "errorVSCodeDark"]);
+      const appendLineSpy = vi.spyOn(mockGeneratorOutput, "appendLine");
+      vi.spyOn(events as any, "getMessageImage").mockReturnValue("errorVSCodeDark");
+      
       appWizard.showError(message, MessageType.prompt);
+      
+      expect(appendLineSpy).toHaveBeenCalledWith(message);
+      expect(mockRpc.invoke).toHaveBeenCalledWith("showPromptMessage", [message, Severity.error, "errorVSCodeDark"]);
     });
 
     it("warning message with location prompt on vscode", () => {
       const message = "warning prompt message";
-      Constants["IS_IN_BAS"] = false;
+      vi.mocked(Constants).IS_IN_BAS = false;
+      
       const appWizard = events.getAppWizard();
-      events["getMessageImage"] = () => "warnVSCode";
-      generatorOutputMock.expects("appendLine").withExactArgs(message);
-      rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.warning, "warnVSCode"]);
+      const appendLineSpy = vi.spyOn(mockGeneratorOutput, "appendLine");
+      vi.spyOn(events as any, "getMessageImage").mockReturnValue("warnVSCode");
+      
       appWizard.showWarning(message, MessageType.prompt);
+      
+      expect(appendLineSpy).toHaveBeenCalledWith(message);
+      expect(mockRpc.invoke).toHaveBeenCalledWith("showPromptMessage", [message, Severity.warning, "warnVSCode"]);
     });
 
     it("info message with location prompt on vscode", () => {
       const message = "information prompt message";
-      Constants["IS_IN_BAS"] = false;
+      vi.mocked(Constants).IS_IN_BAS = false;
+      
       const appWizard = events.getAppWizard();
-      events["getMessageImage"] = () => "infoVSCode";
-      generatorOutputMock.expects("appendLine").withExactArgs(message);
-      rpcMock.expects("invoke").withExactArgs("showPromptMessage", [message, Severity.information, "infoVSCode"]);
+      const appendLineSpy = vi.spyOn(mockGeneratorOutput, "appendLine");
+      vi.spyOn(events as any, "getMessageImage").mockReturnValue("infoVSCode");
+      
       appWizard.showInformation(message, MessageType.prompt);
+      
+      expect(appendLineSpy).toHaveBeenCalledWith(message);
+      expect(mockRpc.invoke).toHaveBeenCalledWith("showPromptMessage", [message, Severity.information, "infoVSCode"]);
     });
   });
 
-  it("executeCommand", () => {
+  it("executeCommand", async () => {
     const commandId = "vscode.open";
     const commandArgs = [vscode.Uri.file("https://en.wikipedia.org")];
-    commandsMock
-      .expects("executeCommand")
-      .withExactArgs(commandId, ...commandArgs)
-      .resolves();
-    return events.executeCommand(commandId, commandArgs);
+    const executeCommandSpy = vi.spyOn(vscode.commands, "executeCommand").mockResolvedValue(undefined);
+    
+    await events.executeCommand(commandId, commandArgs);
+    
+    expect(executeCommandSpy).toHaveBeenCalledWith(commandId, ...commandArgs);
   });
 
   it("doGeneratorInstall", () => {
-    _.set(vscode, "ProgressLocation.Notification", 15);
-    windowMock
-      .expects("withProgress")
-      .withArgs({
-        location: 15,
-        title: "Installing dependencies...",
-      })
-      .resolves();
+    const withProgressSpy = vi.spyOn(vscode.window, "withProgress").mockResolvedValue(undefined);
+    vi.spyOn(mockWebviewPanel, "dispose");
+    
     events.doGeneratorInstall();
+    
+    expect(withProgressSpy).toHaveBeenCalledWith({
+      location: 15,
+      title: "Installing dependencies..."
+    }, expect.any(Function));
   });
 
   it("setAppWizardHeaderTitle", () => {
     const testTitle = "testTitle";
     const testInfo = "testInfo";
-    rpcMock.expects("invoke").withExactArgs("setHeaderTitle", [testTitle, testInfo]);
+    
     events.setAppWizardHeaderTitle(testTitle, testInfo);
+    
+    expect(mockRpc.invoke).toHaveBeenCalledWith("setHeaderTitle", [testTitle, testInfo]);
   });
 
   it("setBanner", () => {
@@ -237,297 +299,299 @@ describe("vscode-youi-events unit test", () => {
       displayBannerForStep: "testStep",
       icon: { source: "mdi-check-circle", type: "mdi" },
       action: { text: "Click Me", url: "https://example.com" },
-      triggerActionFrom: "banner",
+      triggerActionFrom: "banner"
     };
-    rpcMock.expects("invoke").withExactArgs("setBanner", [bannerProps]);
+    
     events.setAppWizardBanner(bannerProps);
+    
+    expect(mockRpc.invoke).toHaveBeenCalledWith("setBanner", [bannerProps]);
   });
 
   describe("showProgress", () => {
     it("getAppWizard - no message received ---> show default Information message with Progress button", () => {
       const appWizard = events.getAppWizard();
-      loggerMock.expects("debug");
-      generatorOutputMock.expects("appendLine");
-      windowMock
-        .expects("showInformationMessage")
-        .withExactArgs(messages.default.show_progress_message, messages.default.show_progress_button)
-        .resolves();
+      const showInfoSpy = vi.spyOn(vscode.window, "showInformationMessage").mockResolvedValue(undefined);
+      const appendLineSpy = vi.spyOn(mockGeneratorOutput, "appendLine");
+      
       appWizard.showProgress();
+      
+      expect(appendLineSpy).toHaveBeenCalled();
+      expect(showInfoSpy).toHaveBeenCalledWith(
+        messages.default.show_progress_message,
+        messages.default.show_progress_button
+      );
     });
 
     it("no message received ---> show default Information message with Progress button", () => {
-      loggerMock.expects("debug");
-      generatorOutputMock.expects("appendLine");
-      windowMock
-        .expects("showInformationMessage")
-        .withExactArgs(messages.default.show_progress_message, messages.default.show_progress_button)
-        .resolves();
+      const showInfoSpy = vi.spyOn(vscode.window, "showInformationMessage").mockResolvedValue(undefined);
+      const appendLineSpy = vi.spyOn(mockGeneratorOutput, "appendLine");
+      
       events.showProgress();
+      
+      expect(appendLineSpy).toHaveBeenCalled();
+      expect(showInfoSpy).toHaveBeenCalledWith(
+        messages.default.show_progress_message,
+        messages.default.show_progress_button
+      );
     });
 
     it("message received ---> show Information message with received message and Progress button", () => {
       const message = "Generating generator";
-      loggerMock.expects("debug");
-      generatorOutputMock.expects("appendLine");
-      windowMock
-        .expects("showInformationMessage")
-        .withExactArgs(message, messages.default.show_progress_button)
-        .resolves();
+      const showInfoSpy = vi.spyOn(vscode.window, "showInformationMessage").mockResolvedValue(undefined);
+      const appendLineSpy = vi.spyOn(mockGeneratorOutput, "appendLine");
+      
       events.showProgress(message);
+      
+      expect(appendLineSpy).toHaveBeenCalled();
+      expect(showInfoSpy).toHaveBeenCalledWith(message, messages.default.show_progress_button);
     });
 
-    it("Progress button pressed ---> show Output", () => {
-      loggerMock.expects("debug");
-      loggerMock.expects("trace");
-      generatorOutputMock.expects("appendLine");
-      windowMock
-        .expects("showInformationMessage")
-        .withExactArgs(messages.default.show_progress_message, messages.default.show_progress_button)
-        .resolves(messages.default.show_progress_button);
-      generatorOutputMock.expects("show");
+    it("Progress button pressed ---> show Output", async () => {
+      const showInfoSpy = vi.spyOn(vscode.window, "showInformationMessage")
+        .mockResolvedValue(messages.default.show_progress_button as any);
+      const appendLineSpy = vi.spyOn(mockGeneratorOutput, "appendLine");
+      const showSpy = vi.spyOn(mockGeneratorOutput, "show");
+      
       events.showProgress();
+      
+      // Wait for the promise to resolve
+      await new Promise(resolve => setTimeout(resolve, 0));
+      
+      expect(appendLineSpy).toHaveBeenCalled();
+      expect(showInfoSpy).toHaveBeenCalledWith(
+        messages.default.show_progress_message,
+        messages.default.show_progress_button
+      );
+      expect(showSpy).toHaveBeenCalled();
     });
   });
 
   it("getMessageImage", () => {
-    const errorImage = events["getMessageImage"](Severity.error);
-    expect(errorImage).to.be.not.undefined;
-    const infoImage = events["getMessageImage"](Severity.information);
-    expect(infoImage).to.be.not.undefined;
-    const warningImage = events["getMessageImage"](Severity.warning);
-    expect(warningImage).to.be.not.undefined;
+    const errorImage = (events as any).getMessageImage(Severity.error);
+    expect(errorImage).toBeDefined();
+    const infoImage = (events as any).getMessageImage(Severity.information);
+    expect(infoImage).toBeDefined();
+    const warningImage = (events as any).getMessageImage(Severity.warning);
+    expect(warningImage).toBeDefined();
   });
 
   describe("doGeneratorDone", () => {
     const createAndClose = "Create the project and close it for future use";
-    const openNewWorkspace = "Open the project in a stand-alone";
-    const addToWorkspace = "Open the project in a multi-root workspace";
+
+    beforeEach(() => {
+      vi.spyOn(events as any, "doClose").mockImplementation(() => {});
+    });
 
     it("on success, project path and workspace folder are Windows style ---> the project added to current workspace", () => {
-      eventsMock.expects("doClose");
-      sandbox
-        .stub(vscode.workspace, "workspaceFolders")
-        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testRoot" } }]);
-      sandbox.stub(vscode.workspace, "workspaceFile").value("/workspace/file/path");
-      windowMock
-        .expects("showInformationMessage")
-        .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
-        .resolves();
-      workspaceMock.expects("updateWorkspaceFolders").withArgs(2, null).resolves();
-      return events.doGeneratorDone(true, "success message", addToWorkspace, "project", "testDestinationRoot");
+      vi.mocked(vscode.workspace).workspaceFolders = [
+        { uri: { fsPath: "rootFolderPath" } }, 
+        { uri: { fsPath: "testRoot" } }
+      ] as any;
+      vi.mocked(vscode.workspace).workspaceFile = "/workspace/file/path" as any;
+      
+      const showInfoSpy = vi.spyOn(vscode.window, "showInformationMessage").mockResolvedValue(undefined);
+      const updateWorkspaceSpy = vi.spyOn(vscode.workspace, "updateWorkspaceFolders").mockResolvedValue(true);
+      
+      events.doGeneratorDone(true, "success message", messages.default.add_to_workspace, "project", "testDestinationRoot");
+      
+      expect(showInfoSpy).toHaveBeenCalledWith(messages.default.artifact_generated_project_add_to_workspace);
+      expect(updateWorkspaceSpy).toHaveBeenCalledWith(2, null, expect.any(Object));
     });
 
     it("on success, project path is already openned in workspace ---> the project added to current workspace", () => {
-      eventsMock.expects("doClose");
-      sandbox
-        .stub(vscode.workspace, "workspaceFolders")
-        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
-      sandbox.stub(vscode.workspace, "workspaceFile").value("/workspace/file/path");
-      windowMock
-        .expects("showInformationMessage")
-        .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
-        .resolves();
-      workspaceMock.expects("updateWorkspaceFolders").withArgs(2, null).resolves();
-      return events.doGeneratorDone(true, "success message", addToWorkspace, "project", "testDestinationRoot");
+      vi.mocked(vscode.workspace).workspaceFolders = [
+        { uri: { fsPath: "rootFolderPath" } }, 
+        { uri: { fsPath: "testDestinationRoot" } }
+      ] as any;
+      vi.mocked(vscode.workspace).workspaceFile = "/workspace/file/path" as any;
+      
+      const showInfoSpy = vi.spyOn(vscode.window, "showInformationMessage").mockResolvedValue(undefined);
+      const updateWorkspaceSpy = vi.spyOn(vscode.workspace, "updateWorkspaceFolders").mockResolvedValue(true);
+      
+      events.doGeneratorDone(true, "success message", messages.default.add_to_workspace, "project", "testDestinationRoot");
+      
+      expect(showInfoSpy).toHaveBeenCalledWith(messages.default.artifact_generated_project_add_to_workspace);
+      expect(updateWorkspaceSpy).toHaveBeenCalledWith(2, null, expect.any(Object));
     });
 
     it("on success, project path parent folder is already openned in workspace ---> the user changed to create and close the project for later use", () => {
-      eventsMock.expects("doClose");
-      sandbox
-        .stub(vscode.workspace, "workspaceFolders")
-        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
-      windowMock
-        .expects("showInformationMessage")
-        .withExactArgs(messages.default.artifact_generated_project_saved_for_future)
-        .resolves();
-      return events.doGeneratorDone(
-        true,
-        "success message",
-        createAndClose,
-        "project",
-        "testDestinationRoot/projectName",
-      );
+      vi.mocked(vscode.workspace).workspaceFolders = [
+        { uri: { fsPath: "rootFolderPath" } }, 
+        { uri: { fsPath: "testDestinationRoot" } }
+      ] as any;
+      
+      const showInfoSpy = vi.spyOn(vscode.window, "showInformationMessage").mockResolvedValue(undefined);
+      
+      events.doGeneratorDone(true, "success message", createAndClose, "project", "testDestinationRoot/projectName");
+      
+      expect(showInfoSpy).toHaveBeenCalledWith(messages.default.artifact_generated_project_saved_for_future);
     });
 
     it("on success, project path parent folder is already openned in workspace ---> the project openned in a stand-alone", () => {
-      eventsMock.expects("doClose");
-      sandbox
-        .stub(vscode.workspace, "workspaceFolders")
-        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
-      windowMock
-        .expects("showInformationMessage")
-        .withExactArgs(messages.default.artifact_generated_project_open_in_a_new_workspace)
-        .resolves();
-      commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
-      return events.doGeneratorDone(
-        true,
-        "success message",
-        openNewWorkspace,
-        "project",
-        "testDestinationRoot/./projectName",
-      );
+      vi.mocked(vscode.workspace).workspaceFolders = [
+        { uri: { fsPath: "rootFolderPath" } }, 
+        { uri: { fsPath: "testDestinationRoot" } }
+      ] as any;
+      
+      const showInfoSpy = vi.spyOn(vscode.window, "showInformationMessage").mockResolvedValue(undefined);
+      const executeCommandSpy = vi.spyOn(vscode.commands, "executeCommand").mockResolvedValue(undefined);
+      
+      events.doGeneratorDone(true, "success message", messages.default.open_in_a_new_workspace, "project", "testDestinationRoot/./projectName");
+      
+      expect(showInfoSpy).toHaveBeenCalledWith(messages.default.artifact_generated_project_open_in_a_new_workspace);
+      expect(executeCommandSpy).toHaveBeenCalledWith("vscode.openFolder", expect.any(Object));
     });
 
     it("on success, no workspace is opened ---> the project openned in a new multi-root workspace", () => {
-      eventsMock.expects("doClose");
-      sandbox.stub(vscode.workspace, "workspaceFolders").value([]);
-      sandbox.stub(vscode.workspace, "workspaceFile").value(undefined);
-      windowMock
-        .expects("showInformationMessage")
-        .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
-        .resolves();
-      commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
-      workspaceMock.expects("updateWorkspaceFolders").withArgs(0, null);
-      fsMock.expects("existsSync").returns(false);
-      fsMock.expects("writeFileSync");
-      uriMock.expects("file").twice().returns({ fsPath: "testFsPath" });
-      return events.doGeneratorDone(
-        true,
-        "success message",
-        "Open the project in a multi-root workspace",
-        "project",
-        "testDestinationRoot/./projectName",
-      );
+      vi.mocked(vscode.workspace).workspaceFolders = [];
+      vi.mocked(vscode.workspace).workspaceFile = undefined;
+      
+      const showInfoSpy = vi.spyOn(vscode.window, "showInformationMessage").mockResolvedValue(undefined);
+      vi.spyOn(vscode.commands, "executeCommand").mockResolvedValue(undefined);
+      const updateWorkspaceSpy = vi.spyOn(vscode.workspace, "updateWorkspaceFolders").mockResolvedValue(true);
+      const existsSyncSpy = vi.spyOn(fs, "existsSync").mockReturnValue(false);
+      const writeFileSyncSpy = vi.spyOn(fs, "writeFileSync").mockImplementation(() => {});
+      const fileSpy = vi.spyOn(vscode.Uri, "file").mockReturnValue({ fsPath: "testFsPath" } as any);
+      
+      events.doGeneratorDone(true, "success message", messages.default.add_to_workspace, "project", "testDestinationRoot/./projectName");
+      
+      expect(showInfoSpy).toHaveBeenCalledWith(messages.default.artifact_generated_project_add_to_workspace);
+      expect(updateWorkspaceSpy).toHaveBeenCalledWith(0, null, expect.any(Object));
+      expect(existsSyncSpy).toHaveBeenCalled();
+      expect(writeFileSyncSpy).toHaveBeenCalled();
+      expect(fileSpy).toHaveBeenCalledTimes(2);
     });
 
     it("on success, targetFolder is uri and the the project openned in a new multi-root workspace", () => {
-      eventsMock.expects("doClose");
-      sandbox.stub(vscode.workspace, "workspaceFolders").value([]);
-      sandbox.stub(vscode.workspace, "workspaceFile").value(undefined);
-      windowMock
-        .expects("showInformationMessage")
-        .withExactArgs(messages.default.artifact_generated_project_add_to_workspace)
-        .resolves();
-      commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
-      workspaceMock.expects("updateWorkspaceFolders").withArgs(0, null);
-
-      fsMock.expects("existsSync").returns(false);
-      fsMock.expects("writeFileSync");
-
-      events.doGeneratorDone(
-        true,
-        "success message",
-        "Open the project in a multi-root workspace",
-        "project",
-        '{"uri":"abapdf://testDestinationRoot","name":"projectName"}',
-      );
+      vi.mocked(vscode.workspace).workspaceFolders = [];
+      vi.mocked(vscode.workspace).workspaceFile = undefined;
+      
+      const showInfoSpy = vi.spyOn(vscode.window, "showInformationMessage").mockResolvedValue(undefined);
+      vi.spyOn(vscode.commands, "executeCommand").mockResolvedValue(undefined);
+      const updateWorkspaceSpy = vi.spyOn(vscode.workspace, "updateWorkspaceFolders").mockResolvedValue(true);
+      const existsSyncSpy = vi.spyOn(fs, "existsSync").mockReturnValue(false);
+      const writeFileSyncSpy = vi.spyOn(fs, "writeFileSync").mockImplementation(() => {});
+      
+      events.doGeneratorDone(true, "success message", messages.default.add_to_workspace, "project", '{"uri":"abapdf://testDestinationRoot","name":"projectName"}');
+      
+      expect(showInfoSpy).toHaveBeenCalledWith(messages.default.artifact_generated_project_add_to_workspace);
+      expect(updateWorkspaceSpy).toHaveBeenCalled();
+      expect(existsSyncSpy).toHaveBeenCalled();
+      expect(writeFileSyncSpy).toHaveBeenCalled();
     });
 
     it("on success, targetFolderPath is uri and the the project openned in a Open the project in a stand-alone", () => {
-      eventsMock.expects("doClose");
-      sandbox.stub(vscode.workspace, "workspaceFolders").value([]);
-      sandbox.stub(vscode.workspace, "workspaceFile").value(undefined);
-      windowMock
-        .expects("showInformationMessage")
-        .withExactArgs(messages.default.artifact_generated_project_open_in_a_new_workspace)
-        .resolves();
-      commandsMock.expects("executeCommand").withArgs("vscode.openFolder").resolves();
-
-      fsMock.expects("existsSync").returns(false);
-      fsMock.expects("writeFileSync");
-
-      events.doGeneratorDone(
-        true,
-        "success message",
-        "Open the project in a stand-alone",
-        "project",
-        '{"uri":"abapdf://testDestinationRoot","name":"projectName"}',
-      );
+      vi.mocked(vscode.workspace).workspaceFolders = [];
+      vi.mocked(vscode.workspace).workspaceFile = undefined;
+      
+      const showInfoSpy = vi.spyOn(vscode.window, "showInformationMessage").mockResolvedValue(undefined);
+      const executeCommandSpy = vi.spyOn(vscode.commands, "executeCommand").mockResolvedValue(undefined);
+      const existsSyncSpy = vi.spyOn(fs, "existsSync").mockReturnValue(false);
+      const writeFileSyncSpy = vi.spyOn(fs, "writeFileSync").mockImplementation(() => {});
+      
+      events.doGeneratorDone(true, "success message", messages.default.open_in_a_new_workspace, "project", '{"uri":"abapdf://testDestinationRoot","name":"projectName"}');
+      
+      expect(showInfoSpy).toHaveBeenCalledWith(messages.default.artifact_generated_project_open_in_a_new_workspace);
+      expect(executeCommandSpy).toHaveBeenCalledWith("vscode.openFolder", expect.any(Object));
+      expect(existsSyncSpy).toHaveBeenCalled();
+      expect(writeFileSyncSpy).toHaveBeenCalled();
     });
 
     it("on success, targetFolderPath is uri and the the project openned in a Create the project and close it for future use", () => {
-      eventsMock.expects("doClose");
-      sandbox.stub(vscode.workspace, "workspaceFolders").value([]);
-      sandbox.stub(vscode.workspace, "workspaceFile").value(undefined);
-      windowMock
-        .expects("showInformationMessage")
-        .withExactArgs(messages.default.artifact_generated_project_saved_for_future)
-        .resolves();
-
-      fsMock.expects("existsSync").returns(false);
-      fsMock.expects("writeFileSync");
-
-      events.doGeneratorDone(
-        true,
-        "success message",
-        "Create the project and close it for future use",
-        "project",
-        '{"uri":"abapdf://testDestinationRoot","name":"projectName"}',
-      );
+      vi.mocked(vscode.workspace).workspaceFolders = [];
+      vi.mocked(vscode.workspace).workspaceFile = undefined;
+      
+      const showInfoSpy = vi.spyOn(vscode.window, "showInformationMessage").mockResolvedValue(undefined);
+      const existsSyncSpy = vi.spyOn(fs, "existsSync").mockReturnValue(false);
+      const writeFileSyncSpy = vi.spyOn(fs, "writeFileSync").mockImplementation(() => {});
+      
+      events.doGeneratorDone(true, "success message", createAndClose, "project", '{"uri":"abapdf://testDestinationRoot","name":"projectName"}');
+      
+      expect(showInfoSpy).toHaveBeenCalledWith(messages.default.artifact_generated_project_saved_for_future);
+      expect(existsSyncSpy).toHaveBeenCalled();
+      expect(writeFileSyncSpy).toHaveBeenCalled();
     });
 
     it("on success, module is created", () => {
-      eventsMock.expects("doClose");
-      sandbox
-        .stub(vscode.workspace, "workspaceFolders")
-        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
-      windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated_module).resolves();
-      return events.doGeneratorDone(
-        true,
-        "success message",
-        createAndClose,
-        "module",
-        "testDestinationRoot/projectName/../projectName",
-      );
+      vi.mocked(vscode.workspace).workspaceFolders = [
+        { uri: { fsPath: "rootFolderPath" } }, 
+        { uri: { fsPath: "testDestinationRoot" } }
+      ] as any;
+      
+      const showInfoSpy = vi.spyOn(vscode.window, "showInformationMessage").mockResolvedValue(undefined);
+      
+      events.doGeneratorDone(true, "success message", createAndClose, "module", "testDestinationRoot/projectName/../projectName");
+      
+      expect(showInfoSpy).toHaveBeenCalledWith(messages.default.artifact_generated_module);
     });
 
     it("on success, not a module and not a project", () => {
-      eventsMock.expects("doClose");
-      sandbox
-        .stub(vscode.workspace, "workspaceFolders")
-        .value([
-          { uri: { fsPath: "rootFolderPath" } },
-          { uri: { fsPath: "testDestinationRoot/../testDestinationRoot" } },
-        ]);
-      windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated_files).resolves();
-      return events.doGeneratorDone(
-        true,
-        "success message",
-        createAndClose,
-        "files",
-        "testDestinationRoot/projectName/../projectName",
-      );
+      vi.mocked(vscode.workspace).workspaceFolders = [
+        { uri: { fsPath: "rootFolderPath" } },
+        { uri: { fsPath: "testDestinationRoot/../testDestinationRoot" } }
+      ] as any;
+      
+      const showInfoSpy = vi.spyOn(vscode.window, "showInformationMessage").mockResolvedValue(undefined);
+      
+      events.doGeneratorDone(true, "success message", createAndClose, "files", "testDestinationRoot/projectName/../projectName");
+      
+      expect(showInfoSpy).toHaveBeenCalledWith(messages.default.artifact_generated_files);
     });
 
     it("on success with null targetFolderPath", () => {
-      eventsMock.expects("doClose");
-      sandbox.stub(vscode.workspace, "workspaceFolders").value([{ uri: { fsPath: "rootFolderPath" } }]);
-      windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated_files).resolves();
-      return events.doGeneratorDone(true, "success message", createAndClose, "files", null);
+      vi.mocked(vscode.workspace).workspaceFolders = [{ uri: { fsPath: "rootFolderPath" } }] as any;
+      
+      const showInfoSpy = vi.spyOn(vscode.window, "showInformationMessage").mockResolvedValue(undefined);
+      
+      events.doGeneratorDone(true, "success message", createAndClose, "files", undefined);
+      
+      expect(showInfoSpy).toHaveBeenCalledWith(messages.default.artifact_generated_files);
     });
 
     it("on failure", () => {
-      eventsMock.expects("doClose");
-      windowMock.expects("showErrorMessage").withExactArgs("error message");
-      return events.doGeneratorDone(false, "error message", createAndClose, "files");
+      const showErrorSpy = vi.spyOn(vscode.window, "showErrorMessage").mockResolvedValue(undefined);
+      
+      events.doGeneratorDone(false, "error message", createAndClose, "files");
+      
+      expect(showErrorSpy).toHaveBeenCalledWith("error message");
     });
   });
 
   describe("getUniqueProjectName", () => {
     it("should return baseName if it does not exist in workspace", () => {
-      sandbox.stub(vscode.workspace, "workspaceFolders").value([{ name: "Project1" }, { name: "Project2" }]);
-      const result = events["getUniqueProjectName"]("NewProject");
-      expect(result).to.equal("NewProject");
+      vi.mocked(vscode.workspace).workspaceFolders = [{ name: "Project1" }, { name: "Project2" }] as any;
+      
+      const result = (events as any).getUniqueProjectName("NewProject");
+      
+      expect(result).toBe("NewProject");
     });
 
     it("should return baseName(1) if baseName already exists", () => {
-      sandbox.stub(vscode.workspace, "workspaceFolders").value([{ name: "Project1" }, { name: "NewProject" }]);
-      const result = events["getUniqueProjectName"]("NewProject");
-      expect(result).to.equal("NewProject(1)");
+      vi.mocked(vscode.workspace).workspaceFolders = [{ name: "Project1" }, { name: "NewProject" }] as any;
+      
+      const result = (events as any).getUniqueProjectName("NewProject");
+      
+      expect(result).toBe("NewProject(1)");
     });
 
     it("should return baseName with incremented counter if multiple exist", () => {
-      sandbox
-        .stub(vscode.workspace, "workspaceFolders")
-        .value([{ name: "NewProject" }, { name: "NewProject(1)" }, { name: "NewProject(2)" }]);
-      const result = events["getUniqueProjectName"]("NewProject");
-      expect(result).to.equal("NewProject(3)");
+      vi.mocked(vscode.workspace).workspaceFolders = [
+        { name: "NewProject" }, 
+        { name: "NewProject(1)" }, 
+        { name: "NewProject(2)" }
+      ] as any;
+      
+      const result = (events as any).getUniqueProjectName("NewProject");
+      
+      expect(result).toBe("NewProject(3)");
     });
 
     it("should handle empty workspace folders gracefully", () => {
-      sandbox.stub(vscode.workspace, "workspaceFolders").value(undefined);
-      const result = events["getUniqueProjectName"]("UniqueProject");
-      expect(result).to.equal("UniqueProject");
+      vi.mocked(vscode.workspace).workspaceFolders = undefined;
+      
+      const result = (events as any).getUniqueProjectName("UniqueProject");
+      
+      expect(result).toBe("UniqueProject");
     });
   });
 });

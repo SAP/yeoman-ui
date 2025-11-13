@@ -1,6 +1,6 @@
 import { vscode } from "./mockUtil";
 import { createSandbox, SinonSandbox, SinonMock } from "sinon";
-const datauri = require("datauri"); // eslint-disable-line @typescript-eslint/no-var-requires
+import datauri from "datauri";
 import { promises } from "fs";
 import { expect } from "chai";
 import * as _ from "lodash";
@@ -14,7 +14,7 @@ import messages from "../src/messages";
 import { AnalyticsWrapper } from "../src/usage-report/usage-analytics-wrapper";
 import { AppWizard, MessageType } from "@sap-devx/yeoman-ui-types";
 import { Env } from "../src/utils/env";
-import Environment = require("yeoman-environment");
+import * as Environment from "yeoman-environment";
 import { createFlowPromise } from "../src/utils/promise";
 import { Constants } from "../src/utils/constants";
 
