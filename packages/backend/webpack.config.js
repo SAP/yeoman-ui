@@ -47,11 +47,48 @@ const config = {
         },
       },
       {
+        test: /yeoman-environment[/|\\]lib[/|\\]namespace.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "namespace && namespace[.]constructor && namespace[.]constructor[.]name === 'YeomanNamespace'",
+          replace:
+            "namespace && namespace.constructor && (namespace.constructor.name === 'YeomanNamespace' || namespace.constructor.name === 'e' || (namespace._original && namespace.unscoped && namespace.generator !== undefined))",
+          flags: "g",
+        },
+      },
+      {
         test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
         loader: "string-replace-loader",
         options: {
           search: "require[.]resolve[(]",
           replace: "__non_webpack_require__.resolve(",
+          flags: "g",
+        },
+      },
+      {
+        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]esm.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[(]",
+          replace: "__non_webpack_require__(",
+          flags: "g",
+        },
+      },
+      {
+        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]esm.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "return import[(]",
+          replace: "return new Function('specifier', 'return import(specifier)')(",
+          flags: "g",
+        },
+      },
+      {
+        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]esm.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "pathToFileURL[(]fileToImport[)][)]",
+          replace: "pathToFileURL(fileToImport).href)",
           flags: "g",
         },
       },
