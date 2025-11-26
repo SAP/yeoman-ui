@@ -47,16 +47,6 @@ const config = {
         },
       },
       {
-        test: /yeoman-environment[/|\\]lib[/|\\]namespace.js/,
-        loader: "string-replace-loader",
-        options: {
-          search: "namespace && namespace[.]constructor && namespace[.]constructor[.]name === 'YeomanNamespace'",
-          replace:
-            "namespace && namespace.constructor && (namespace.constructor.name === 'YeomanNamespace' || namespace.constructor.name === 'e' || (namespace._original && namespace.unscoped && namespace.generator !== undefined))",
-          flags: "g",
-        },
-      },
-      {
         test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
         loader: "string-replace-loader",
         options: {
@@ -65,6 +55,8 @@ const config = {
           flags: "g",
         },
       },
+      // We replace require() with __non_webpack_require__() to bypass webpack's module resolution and use
+      // Node's native require at runtime, allowing dynamic loading of generators installed globally or locally.
       {
         test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]esm.js/,
         loader: "string-replace-loader",
@@ -74,21 +66,18 @@ const config = {
           flags: "g",
         },
       },
+      // ESM (ES Module) dynamic import workaround for bundled context:
+      // Webpack processes dynamic import() calls at build time, converting them to webpack's chunk loading system.
+      // However, yeoman-environment's esm.js needs to use native Node.js dynamic import() at runtime to load
+      // external .mjs generator files from the file system (not bundled).
+      // We wrap import() in a Function constructor to hide it from webpack's static analysis, forcing it to
+      // use the native import() at runtime. This is similar to __non_webpack_require__ but for ESM modules.
       {
         test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]esm.js/,
         loader: "string-replace-loader",
         options: {
           search: "return import[(]",
           replace: "return new Function('specifier', 'return import(specifier)')(",
-          flags: "g",
-        },
-      },
-      {
-        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]esm.js/,
-        loader: "string-replace-loader",
-        options: {
-          search: "pathToFileURL[(]fileToImport[)][)]",
-          replace: "pathToFileURL(fileToImport).href)",
           flags: "g",
         },
       },
@@ -262,6 +251,24 @@ const config = {
           replace: "__non_webpack_require__('utf-8-validate",
           flags: "g",
         },
+      },
+    ],
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [
+      (compiler) => {
+        const TerserPlugin = require("terser-webpack-plugin");
+        new TerserPlugin({
+          terserOptions: {
+            keep_classnames: true,
+            keep_fnames: true,
+            mangle: {
+              keep_classnames: true,
+              keep_fnames: true,
+            },
+          },
+        }).apply(compiler);
       },
     ],
   },
