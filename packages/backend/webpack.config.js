@@ -4,6 +4,13 @@
 
 const path = require("path");
 
+/**
+ * Investigate the usage of "import(/webpackIgnore: true / 'ignored-module.js');"
+ * https://webpack.js.org/api/module-methods/#magic-comments
+ * This will become relevant once we move to the newer versions of yeoman-evnironment
+ * that require the migration to ESM modules of the yeoman-ui.
+ */
+
 /**@type {import('webpack').Configuration}*/
 const config = {
   target: "node", // vscode extensions run in a Node.js-context 📖 -> https://webpack.js.org/configuration/node/
@@ -255,10 +262,10 @@ const config = {
     ],
   },
   optimization: {
-    minimize: true,
     minimizer: [
       (compiler) => {
         const TerserPlugin = require("terser-webpack-plugin");
+        // Required for ESM generator support: keep_classnames and keep_fnames prevent mangling that breaks dynamic ESM imports
         new TerserPlugin({
           terserOptions: {
             keep_classnames: true,
