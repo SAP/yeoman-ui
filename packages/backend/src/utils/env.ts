@@ -167,7 +167,13 @@ class EnvUtil {
     );
     // @types/yeoman-environment bug: generatorPath is still not exposed on LookupGeneratorMeta
     env.register(_.get(meta, "generatorPath"), genNamespace, meta.packagePath);
-    const gen = env.create(genNamespace, { options } as any);
+    let gen: any = env.create(genNamespace, { options } as any);
+
+    // Handle async generator creation (ESM modules)
+    if (gen && typeof gen.then === "function") {
+      gen = await gen;
+    }
+
     return { env, gen };
   }
 
