@@ -1,6 +1,6 @@
 {
   "name": "generator-foodq",
-  "version": "1.20.4",
+  "version": "1.20.5",
   "private": true,
   "description": "A sample generator to preview all the options available when using the Yeoman-UI",
   "keywords": [
@@ -18,7 +18,7 @@
     "yeoman.png"
   ],
   "dependencies": {
-    "@sap-devx/yeoman-ui-types": "^1.20.4",
+    "@sap-devx/yeoman-ui-types": "^1.20.5",
     "chalk-pipe": "^4.0.0",
     "datauri": "^3.0.0",
     "inquirer": "^7.3.3",
