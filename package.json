@@ -21,7 +21,9 @@
       "**/material-design-icons-iconfont",
       "**/material-design-icons-iconfont/**",
       "**/@sap-devx",
-      "**/@sap-devx/**"
+      "**/@sap-devx/**",
+      "**/lerna",
+      "**/lerna/**"
     ]
   },
   "scripts": {
@@ -101,7 +103,7 @@
     "eslint-plugin-vue": "^7.3.0",
     "glob": "^7.1.6",
     "husky": "9.0.10",
-    "lerna": "8.1.2",
+    "lerna": "9.0.3",
     "lint-staged": "15.2.2",
     "make-dir": "4.0.0",
     "mocha": "8.2.1",
