@@ -4,6 +4,13 @@
 
 const path = require("path");
 
+/**
+ * Investigate the usage of "import(/webpackIgnore: true / 'ignored-module.js');"
+ * https://webpack.js.org/api/module-methods/#magic-comments
+ * This will become relevant once we move to the newer versions of yeoman-evnironment
+ * that require the migration to ESM modules of the yeoman-ui.
+ */
+
 /**@type {import('webpack').Configuration}*/
 const config = {
   target: "node", // vscode extensions run in a Node.js-context 📖 -> https://webpack.js.org/configuration/node/
@@ -52,6 +59,32 @@ const config = {
         options: {
           search: "require[.]resolve[(]",
           replace: "__non_webpack_require__.resolve(",
+          flags: "g",
+        },
+      },
+      // We replace require() with __non_webpack_require__() to bypass webpack's module resolution and use
+      // Node's native require at runtime, allowing dynamic loading of generators installed globally or locally.
+      {
+        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]esm.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[(]",
+          replace: "__non_webpack_require__(",
+          flags: "g",
+        },
+      },
+      // ESM (ES Module) dynamic import workaround for bundled context:
+      // Webpack processes dynamic import() calls at build time, converting them to webpack's chunk loading system.
+      // However, yeoman-environment's esm.js needs to use native Node.js dynamic import() at runtime to load
+      // external .mjs generator files from the file system (not bundled).
+      // We wrap import() in a Function constructor to hide it from webpack's static analysis, forcing it to
+      // use the native import() at runtime. This is similar to __non_webpack_require__ but for ESM modules.
+      {
+        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]esm.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "return import[(]",
+          replace: "return new Function('specifier', 'return import(specifier)')(",
           flags: "g",
         },
       },
@@ -225,6 +258,24 @@ const config = {
           replace: "__non_webpack_require__('utf-8-validate",
           flags: "g",
         },
+      },
+    ],
+  },
+  optimization: {
+    minimizer: [
+      (compiler) => {
+        const TerserPlugin = require("terser-webpack-plugin");
+        // Required for ESM generator support: keep_classnames and keep_fnames prevent mangling that breaks dynamic ESM imports
+        new TerserPlugin({
+          terserOptions: {
+            keep_classnames: true,
+            keep_fnames: true,
+            mangle: {
+              keep_classnames: true,
+              keep_fnames: true,
+            },
+          },
+        }).apply(compiler);
       },
     ],
   },

@@ -43,6 +43,17 @@ When an issue is reported, a committer will look at it and either confirm it as 
 
 An issue that is about a real bug is closed as soon as the fix is committed.
 
+## Compatibility matrix
+
+| Generator  | yo@4.3.1 | yo@5.1.0 | yo@6.0.0 |
+| ---------- | -------- | -------- | -------- |
+| cjs 5.10.0 | ✅       | ✅       | ✅       |
+| mjs 5.10.0 | ❌       | ✅       | ✅       |
+| cjs 6.0.1  | ❌       | ❌       | ❌       |
+| mjs 6.0.1  | ❌       | ✅       | ✅       |
+| cjs 7.5.1  | ❌       | ❌       | ❌       |
+| mjs 7.5.1  | ❌       | ❌       | ✅       |
+
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md).
