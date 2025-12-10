@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.20.5](https://github.com/SAP/yeoman-ui/compare/v1.20.3...v1.20.5) (2025-12-04)
+
+**Note:** Version bump only for package root
+
+## [1.20.4](https://github.com/SAP/yeoman-ui/compare/v1.20.3...v1.20.4) (2025-12-04)
+
+**Note:** Version bump only for package root
+
+## [1.20.3](https://github.com/SAP/yeoman-ui/compare/v1.20.2...v1.20.3) (2025-12-04)
+
+### Bug Fixes
+
+- dependencies update ([#922](https://github.com/SAP/yeoman-ui/issues/922)) ([b8b798d](https://github.com/SAP/yeoman-ui/commit/b8b798d4deb9c7ce829c53c178dd8decd08d9986))
+
 ## [1.20.2](https://github.com/SAP/yeoman-ui/compare/v1.20.1...v1.20.2) (2025-10-28)
 
 ### Bug Fixes

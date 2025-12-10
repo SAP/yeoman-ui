@@ -21,7 +21,9 @@
       "**/material-design-icons-iconfont",
       "**/material-design-icons-iconfont/**",
       "**/@sap-devx",
-      "**/@sap-devx/**"
+      "**/@sap-devx/**",
+      "**/lerna",
+      "**/lerna/**"
     ]
   },
   "scripts": {
@@ -72,7 +74,14 @@
     "@babel/runtime": "7.27.0",
     "follow-redirects": "1.15.6",
     "rollup": "3.29.5",
-    "tar-fs": "2.1.4"
+    "tar-fs": "2.1.4",
+    "@types/node": "14.18.63",
+    "@types/lodash": "4.14.202",
+    "@types/babel__traverse": "7.20.5",
+    "@types/diff": "5.0.9",
+    "@types/yeoman-generator": "5.2.14",
+    "@types/mem-fs-editor": "7.0.7",
+    "mem-fs-editor": "9.7.0"
   },
   "dependencies": {
     "@sap-devx/webview-rpc": "0.4.1",
@@ -94,7 +103,7 @@
     "eslint-plugin-vue": "^7.3.0",
     "glob": "^7.1.6",
     "husky": "9.0.10",
-    "lerna": "8.1.2",
+    "lerna": "9.0.3",
     "lint-staged": "15.2.2",
     "make-dir": "4.0.0",
     "mocha": "8.2.1",
