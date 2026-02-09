@@ -1,11 +1,13 @@
 <template>
   <!-- Banner container -->
   <v-banner
-    :class="
-      bannerProps.triggerActionFrom === 'banner'
-        ? 'banner-container banner-hover mb-6 mt-2'
-        : 'banner-container mb-6 mt-2'
-    "
+    :class="[
+      'banner-container',
+      'mb-6',
+      'mt-2',
+      { 'banner-hover': bannerProps.triggerActionFrom === 'banner' },
+      { 'banner-animated': bannerProps.animated },
+    ]"
     role="banner"
     elevation="0"
     :aria-label="bannerProps.ariaLabel"
@@ -16,8 +18,26 @@
     <div class="banner-content">
       <!-- Banner icon -->
       <div class="banner-icon">
-        <!-- Render image if icon type is "image" -->
-        <img v-if="bannerProps.icon?.type === 'image'" :src="bannerProps.icon?.source" :alt="bannerProps.ariaLabel" />
+        <!-- eslint-disable vue/no-v-html -->
+        <!-- 
+          v-html is required to render inline SVG for VS Code theme color support.
+          - Backend sends base64-encoded SVG with fill="currentColor"
+          - Inline SVG (via v-html) allows fill="currentColor" to inherit from parent CSS
+          - Parent CSS sets color: var(--vscode-settings-headerForeground) for theme adaptation
+        -->
+        <div
+          v-if="bannerProps.icon?.type === 'image' && isSvgIcon"
+          class="themed-image-container"
+          :aria-label="bannerProps.ariaLabel"
+          v-html="themedIcon"
+        ></div>
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <!-- Render regular img -->
+        <img
+          v-else-if="bannerProps.icon?.type === 'image'"
+          :src="bannerProps.icon?.source"
+          :alt="bannerProps.ariaLabel"
+        />
         <!-- Render v-icon if icon type is "mdi" -->
         <v-icon v-else-if="bannerProps.icon?.type === 'mdi'">
           {{ bannerProps.icon?.source }}
@@ -58,7 +78,7 @@
 </template>
 
 <script setup>
-import { toRefs, defineEmits } from "vue";
+import { toRefs, defineEmits, computed } from "vue";
 
 const props = defineProps({
   bannerProps: {
@@ -70,12 +90,36 @@ const props = defineProps({
       icon: {},
       action: {},
       triggerActionFrom: "banner",
+      animated: false,
     }),
   },
 });
 
 const emit = defineEmits(["parent-execute-command"]);
 const { bannerProps } = toRefs(props);
+
+/**
+ * Check if the icon is an SVG data URI
+ */
+const isSvgIcon = computed(() => {
+  return bannerProps.value.icon?.source?.startsWith("data:image/svg+xml");
+});
+
+/**
+ * Decode base64 SVG for theme color inheritance
+ * Only called when isSvgIcon is true
+ *
+ * @returns {string} Decoded SVG markup
+ */
+const themedIcon = computed(() => {
+  try {
+    const base64 = bannerProps.value.icon?.source?.split(",")[1];
+    return base64 ? atob(base64) : "";
+  } catch (error) {
+    console.error("Failed to decode SVG:", error);
+    return "";
+  }
+});
 
 /**
  * Trigger the command action and emit the event to the parent component
@@ -88,15 +132,15 @@ const triggerCommand = (event) => {
 
 <style lang="scss">
 // Define color variables
-$icon-background-color: #005fb8;
-$background-color: var(--vscode-editorWidget-background, #f8f8f8);
-$focus-border-color: var(--vscode-focusBorder, $icon-background-color);
-$text-link-color: var(--vscode-textLink-foreground, $icon-background-color);
+$background-color: #005fb8;
 
 // Banner container styles
 .v-banner.banner-container {
-  background-color: $background-color;
-  border-radius: 3px;
+  position: relative;
+  background-color: var(--vscode-peekViewResult-selectionBackground);
+  border: 1px solid var(--vscode-contrastBorder, var(--vscode-peekViewResult-selectionBackground));
+  color: var(--vscode-settings-headerForeground, var(--vscode-foreground, #3b3b3b));
+  border-radius: 100px;
   padding: 12px;
   box-shadow: 0px 4px 8px 0px var(--vscode-widget-shadow, rgba(0, 0, 0, 0.1)) !important;
   display: flex;
@@ -105,7 +149,6 @@ $text-link-color: var(--vscode-textLink-foreground, $icon-background-color);
   justify-content: flex-start;
   flex-wrap: wrap;
   height: auto;
-  border: 1px solid var(--vscode-editorWidget-border, #c8c8c8);
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
@@ -115,7 +158,7 @@ $text-link-color: var(--vscode-textLink-foreground, $icon-background-color);
   }
 
   &:hover {
-    border: 1px solid $focus-border-color;
+    border: 1px solid var(--vscode-focusBorder, $background-color) !important;
     box-shadow: 0px 6px 12px 0px var(--vscode-widget-shadow, rgba(0, 0, 0, 0.2)) !important;
 
     .banner-link-text {
@@ -136,11 +179,12 @@ $text-link-color: var(--vscode-textLink-foreground, $icon-background-color);
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: $icon-background-color;
+  background-color: var(--vscode-editor-background, $background-color);
+  outline: 1px solid var(--vscode-contrastBorder, var(--vscode-peekViewResult-selectionBackground));
   padding: 4px;
-  width: 24px;
-  height: 24px;
-  border-radius: 2px;
+  width: 30px;
+  height: 30px;
+  border-radius: 100px;
   flex: none;
 
   img,
@@ -151,17 +195,26 @@ $text-link-color: var(--vscode-textLink-foreground, $icon-background-color);
   }
 }
 
+.themed-image-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--vscode-settings-headerForeground, var(--vscode-foreground, #3b3b3b));
+}
+
 // Banner text styles
 .banner-text {
   white-space: normal;
-  color: var(--vscode-foreground, #3b3b3b);
+  color: var(--vscode-settings-headerForeground, var(--vscode-foreground, #3b3b3b));
   font-size: 13px;
   line-height: 1.5;
 }
 
 // Banner link text styles
 .banner-link-text {
-  color: $text-link-color;
+  color: var(--vscode-textLink-foreground, $background-color);
   text-decoration: underline;
   font-weight: bold;
   width: fit-content;
@@ -172,6 +225,51 @@ $text-link-color: var(--vscode-textLink-foreground, $icon-background-color);
 
   &:hover {
     text-decoration: none;
+  }
+}
+
+// Animated effect
+.banner-animated::before {
+  content: "";
+  position: absolute;
+  top: -150%;
+  left: -150%;
+  width: 300%;
+  height: 300%;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  // repeat the animated effect every 10s after the first 4s
+  animation:
+    animated-first 4s ease-in-out forwards,
+    animated-repeat 10s ease-in-out 4s infinite;
+  pointer-events: none;
+}
+@keyframes animated-first {
+  0% {
+    transform: translateX(-50%);
+  }
+  50% {
+    transform: translateX(50%);
+  }
+  100% {
+    transform: translateX(50%);
+  }
+}
+
+@keyframes animated-repeat {
+  0%,
+  60% {
+    transform: translateX(-50%);
+  }
+  80% {
+    transform: translateX(50%);
+  }
+  100% {
+    transform: translateX(50%);
   }
 }
 </style>

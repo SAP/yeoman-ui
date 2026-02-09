@@ -177,6 +177,7 @@ function initialState() {
       action: {},
       triggerActionFrom: "banner",
       displayBannerForStep: "",
+      animated: false,
     },
   };
 }
@@ -368,7 +369,7 @@ export default {
         this.reject(error);
       }
     },
-    setBanner({ icon, text, action, ariaLabel, triggerActionFrom, displayBannerForStep }) {
+    setBanner({ icon, text, action, ariaLabel, triggerActionFrom, displayBannerForStep, animated }) {
       this.bannerProps = {
         displayBannerForStep,
         text,
@@ -376,6 +377,7 @@ export default {
         icon: icon ? { source: icon.source, type: icon.type } : undefined,
         action: action ? { ...action } : undefined,
         triggerActionFrom: triggerActionFrom ?? "banner",
+        ...(animated === true && { animated: true }),
       };
     },
     setHeaderTitle(title, info) {

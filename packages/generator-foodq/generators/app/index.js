@@ -157,6 +157,7 @@ module.exports = class extends Generator {
         },
         ariaLabel: "Main Dishes Banner",
         triggerActionFrom: "link",
+        animated: true,
       });
     }
 

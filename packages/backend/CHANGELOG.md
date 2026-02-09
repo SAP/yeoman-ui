@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.21.0](https://github.com/SAP/yeoman-ui/compare/v1.20.5...v1.21.0) (2025-12-10)
+
+### Features
+
+- add esm generator support ([#921](https://github.com/SAP/yeoman-ui/issues/921)) ([56811e4](https://github.com/SAP/yeoman-ui/commit/56811e49380b86561d1c1b15db64f49e78f98df2))
+
 ## [1.20.5](https://github.com/SAP/yeoman-ui/compare/v1.20.3...v1.20.5) (2025-12-04)
 
 **Note:** Version bump only for package yeoman-ui
