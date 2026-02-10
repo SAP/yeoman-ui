@@ -152,7 +152,7 @@ export interface IBannerProps {
   /**
    * Optional flag to enable animated on the banner
    */
-  animated?: true;
+  animated?: boolean;
 }
 
 /**
