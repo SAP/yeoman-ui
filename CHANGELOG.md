@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.22.0](https://github.com/SAP/yeoman-ui/compare/v1.21.0...v1.22.0) (2026-02-10)
+
+### Features
+
+- upgrade Lodash to 4.17.23 ([#933](https://github.com/SAP/yeoman-ui/issues/933)) ([326cae4](https://github.com/SAP/yeoman-ui/commit/326cae41eeb0d13378fc8ad7a04151af3429b76b))
+
 # [1.21.0](https://github.com/SAP/yeoman-ui/compare/v1.20.5...v1.21.0) (2025-12-10)
 
 ### Features
