@@ -85,7 +85,7 @@
   },
   "dependencies": {
     "@sap-devx/webview-rpc": "0.4.1",
-    "lodash": "4.17.21"
+    "lodash": "4.17.23"
   },
   "devDependencies": {
     "@commitlint/cli": "18.6.0",
