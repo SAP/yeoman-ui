@@ -149,6 +149,10 @@ export interface IBannerProps {
    * - `link`: Action is triggered on link click
    */
   triggerActionFrom: "banner" | "link";
+  /**
+   * Optional flag to enable animated on the banner
+   */
+  animated?: boolean;
 }
 
 /**

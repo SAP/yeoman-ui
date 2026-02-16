@@ -219,3 +219,179 @@ describe("YOUIBanner.vue - trigger command", () => {
     expect(wrapper.emitted("parent-execute-command")).toBeFalsy();
   });
 });
+
+describe("banner-animated class", () => {
+  let wrapper;
+
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount();
+    }
+  });
+
+  it("applies banner-animated class when animated prop is true", () => {
+    wrapper = mount(Banner, {
+      props: {
+        bannerProps: {
+          text: "Animated banner",
+          ariaLabel: "Animated banner",
+          icon: {
+            type: "image",
+            source: "data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=",
+          },
+          action: {},
+          triggerActionFrom: "banner",
+          animated: true,
+        },
+      },
+    });
+
+    expect(wrapper.find(".banner-animated").exists()).toBe(true);
+  });
+
+  it("does not apply banner-animated class when animated prop is false", () => {
+    wrapper = mount(Banner, {
+      props: {
+        bannerProps: {
+          text: "Static banner",
+          ariaLabel: "Static banner",
+          icon: {
+            type: "image",
+            source: "data:image/png;base64,iVBORw0KGgoAAAANS=",
+          },
+          action: {},
+          triggerActionFrom: "banner",
+          animated: false,
+        },
+      },
+    });
+
+    expect(wrapper.find(".banner-animated").exists()).toBe(false);
+  });
+});
+
+describe("SVG icon detection and rendering", () => {
+  let wrapper;
+
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount();
+    }
+  });
+
+  it("detects SVG icon correctly with isSvgIcon computed", () => {
+    const svgBase64 = btoa('<svg xmlns="http://www.w3.org/2000/svg"><path fill="currentColor"/></svg>');
+
+    wrapper = mount(Banner, {
+      props: {
+        bannerProps: {
+          text: "Banner with SVG",
+          ariaLabel: "SVG banner",
+          icon: {
+            type: "image",
+            source: `data:image/svg+xml;base64,${svgBase64}`,
+          },
+          action: {},
+          triggerActionFrom: "banner",
+          animated: true,
+        },
+      },
+    });
+
+    // isSvgIcon should be true, so themed-image-container should exist
+    expect(wrapper.find(".themed-image-container").exists()).toBe(true);
+  });
+
+  it("does not render themed-image-container for icons which do not use SVG", () => {
+    wrapper = mount(Banner, {
+      props: {
+        bannerProps: {
+          text: "Banner with PNG",
+          ariaLabel: "PNG banner",
+          icon: {
+            type: "image",
+            source: "data:image/png;base64,iVBORw0KGgoAAAANS=",
+          },
+          action: {},
+          triggerActionFrom: "banner",
+          animated: true,
+        },
+      },
+    });
+
+    // PNG should not use themed-image-container
+    expect(wrapper.find(".themed-image-container").exists()).toBe(false);
+    // Should use img tag instead
+    expect(wrapper.find(".banner-icon img").exists()).toBe(true);
+  });
+
+  it("renders themed-image-container with v-html for SVG icons", () => {
+    const svgMarkup = '<svg xmlns="http://www.w3.org/2000/svg"><path fill="currentColor"/></svg>';
+    const base64Svg = btoa(svgMarkup);
+
+    wrapper = mount(Banner, {
+      props: {
+        bannerProps: {
+          text: "banner",
+          ariaLabel: "banner",
+          icon: {
+            type: "image",
+            source: `data:image/svg+xml;base64,${base64Svg}`,
+          },
+          action: {},
+          triggerActionFrom: "banner",
+          animated: true,
+        },
+      },
+    });
+
+    const container = wrapper.find(".themed-image-container");
+    expect(container.exists()).toBe(true);
+    expect(container.html()).toContain("<svg");
+    expect(container.html()).toContain('fill="currentColor"');
+  });
+
+  it("decodes base64 SVG correctly", () => {
+    const svgMarkup =
+      '<svg xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="5" fill="currentColor"/></svg>';
+    const base64Svg = btoa(svgMarkup);
+
+    wrapper = mount(Banner, {
+      props: {
+        bannerProps: {
+          text: "Banner",
+          ariaLabel: "Banner",
+          icon: {
+            type: "image",
+            source: `data:image/svg+xml;base64,${base64Svg}`,
+          },
+          action: {},
+          triggerActionFrom: "banner",
+          animated: true,
+        },
+      },
+    });
+
+    const container = wrapper.find(".themed-image-container");
+    expect(container.html()).toContain("<circle");
+    expect(container.html()).toContain('cx="10"');
+    expect(container.html()).toContain('fill="currentColor"');
+  });
+
+  it("handles empty icon object", () => {
+    wrapper = mount(Banner, {
+      props: {
+        bannerProps: {
+          text: "Banner with empty icon",
+          ariaLabel: "Banner",
+          icon: {},
+          action: {},
+          triggerActionFrom: "banner",
+          animated: true,
+        },
+      },
+    });
+
+    expect(wrapper.find(".banner-icon").exists()).toBe(true);
+  });
+});
