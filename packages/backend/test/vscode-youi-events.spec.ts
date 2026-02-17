@@ -529,5 +529,58 @@ describe("vscode-youi-events unit test", () => {
       const result = events["getUniqueProjectName"]("UniqueProject");
       expect(result).to.equal("UniqueProject");
     });
+
+    it("should ignore non-file scheme folders when checking uniqueness", () => {
+      const mockFolders = [
+        { uri: { scheme: "file" }, name: "LocalProject" },
+        { uri: { scheme: "vscode-remote" }, name: "RemoteProject" },
+        { uri: { scheme: "ssh" }, name: "SSHProject" },
+      ];
+      sandbox.stub(vscode.workspace, "workspaceFolders").value(mockFolders);
+      // RemoteProject exists but should be ignored since it's not file scheme
+      const result = events["getUniqueProjectName"]("RemoteProject");
+      expect(result).to.equal("RemoteProject");
+    });
+
+    it("should detect conflicts only in file-scheme folders", () => {
+      const mockFolders = [
+        { uri: { scheme: "file" }, name: "MyProject" },
+        { uri: { scheme: "vscode-remote" }, name: "MyProject" }, // Same name but different scheme
+      ];
+      sandbox.stub(vscode.workspace, "workspaceFolders").value(mockFolders);
+      // Should detect conflict with file-scheme MyProject
+      const result = events["getUniqueProjectName"]("MyProject");
+      expect(result).to.equal("MyProject(1)");
+    });
+  });
+
+  describe("addOrCreateProjectWorkspace", () => {
+    it("should count only file-scheme folders", () => {
+      const mockFolders = [
+        { uri: { scheme: "file" }, name: "Local1" },
+        { uri: { scheme: "vscode-remote" }, name: "Remote1" },
+        { uri: { scheme: "file" }, name: "Local2" },
+        { uri: { scheme: "ssh" }, name: "SSH1" },
+      ];
+      sandbox.stub(vscode.workspace, "workspaceFolders").value(mockFolders);
+
+      const wsFolderToAdd = { uri: vscode.Uri.file("/new/path"), name: "NewFolder" };
+      workspaceMock.expects("updateWorkspaceFolders").withArgs(2, null, wsFolderToAdd);
+
+      events["addOrCreateProjectWorkspace"](wsFolderToAdd);
+    });
+
+    it("should use zero count when only virtual workspaces exist", () => {
+      const mockFolders = [
+        { uri: { scheme: "vscode-remote" }, name: "Remote1" },
+        { uri: { scheme: "ssh" }, name: "SSH1" },
+      ];
+      sandbox.stub(vscode.workspace, "workspaceFolders").value(mockFolders);
+
+      const wsFolderToAdd = { uri: vscode.Uri.file("/new/path"), name: "NewFolder" };
+      workspaceMock.expects("updateWorkspaceFolders").withArgs(0, null, wsFolderToAdd);
+
+      events["addOrCreateProjectWorkspace"](wsFolderToAdd);
+    });
   });
 });

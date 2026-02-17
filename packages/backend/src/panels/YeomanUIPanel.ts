@@ -16,6 +16,7 @@ import { NpmCommand } from "../utils/npm";
 import { Constants } from "../utils/constants";
 import { notifyGeneratorsInstallationProgress } from "../utils/generators-installation-progress";
 import messages from "../messages";
+import { getWorkspaceFolders, getFileSchemeWorkspaceFolders } from "../utils/workspaceFolders";
 
 export class YeomanUIPanel extends AbstractWebviewPanel {
   public static YEOMAN_UI = "Application Wizard";
@@ -46,7 +47,32 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
     this.yeomanui = null;
   }
 
+  private async ensureValidTargetFolder(): Promise<{ originalTargetFolder: string; wasModified: boolean }> {
+    const originalTargetFolder = vscode.workspace.getConfiguration()?.get<string>('ApplicationWizard.TargetFolder');
+    const supportedFileWorkspaceFolders = getWorkspaceFolders();
+
+    // If there are in-memory folders, ensure targetFolder is a valid physical path that will load yeoman UI
+    const hasInMemoryFolders =
+      (vscode.workspace.workspaceFolders?.length ?? 0) !== (supportedFileWorkspaceFolders?.length ?? 0);
+
+    if (hasInMemoryFolders) {
+      // Using logical OR to ensure we don't set empty string, which is an invalid state
+      const workspaceFolder = originalTargetFolder?.trim() || supportedFileWorkspaceFolders?.[0]?.trim() || '';
+      const targetFolder = workspaceFolder || join(homedir(), 'projects');
+
+      await vscode.workspace
+        .getConfiguration()
+        .update('ApplicationWizard.TargetFolder', targetFolder, vscode.ConfigurationTarget.Global);
+
+      return { originalTargetFolder, wasModified: true };
+    }
+
+    return { originalTargetFolder, wasModified: false };
+  }
+
   public async loadWebviewPanel(uiOptions?: any): Promise<void> {
+    // Ensure valid target folder when virtual workspaces are present
+    await this.ensureValidTargetFolder();
     if (!Constants.IS_IN_BAS && (await NpmCommand.getNodeProcessVersions()).node === undefined) {
       void vscode.window.showErrorMessage(messages.nodejs_install_not_found);
     }
@@ -142,10 +168,8 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
       }
       uri = vscode.Uri.file(currentPath);
     } catch (e) {
-      uri = get(vscode, "workspace.workspaceFolders[0].uri");
-      if (isNil(uri)) {
-        uri = vscode.Uri.file(join(homedir()));
-      }
+      const workspaceFolders = getFileSchemeWorkspaceFolders();
+      uri = workspaceFolders.length > 0 ? workspaceFolders[0].uri : vscode.Uri.file(join(homedir()));
     }
 
     try {

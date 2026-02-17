@@ -272,6 +272,89 @@ describe("YeomanUIPanel unit test", () => {
         .throws(new Error("unexpected"));
       expect(await panel["showOpenDialog"](required, canSelectFiles)).to.equal(required);
     });
+
+    it("showOpenDialog - empty path, only remote workspaces, uses homedir fallback", async () => {
+      const canSelectFiles = false;
+      const mockFolders = [
+        { uri: { scheme: "vscode-remote", fsPath: "" }, name: "remote" },
+        { uri: { scheme: "ssh", fsPath: "" }, name: "ssh" },
+      ];
+      sandbox.stub(vscode.workspace, "workspaceFolders").value(mockFolders);
+      windowMock
+        .expects("showOpenDialog")
+        .withExactArgs({
+          canSelectFiles,
+          canSelectFolders: !canSelectFiles,
+          defaultUri: vscode.Uri.file(join(homedir())),
+        })
+        .resolves([selected]);
+      expect(await panel["showOpenDialog"]("", canSelectFiles)).to.equal(selected.fsPath);
+    });
+
+    it("showOpenDialog - empty path, mixed schemes, uses first file-scheme workspace", async () => {
+      const canSelectFiles = true;
+      const fileWorkspacePath = "/local/path";
+      const mockFolders = [
+        { uri: { scheme: "vscode-remote", fsPath: "" }, name: "remote" },
+        { uri: { scheme: "file", fsPath: fileWorkspacePath }, name: "local" },
+      ];
+      sandbox.stub(vscode.workspace, "workspaceFolders").value(mockFolders);
+      windowMock
+        .expects("showOpenDialog")
+        .withExactArgs({
+          canSelectFiles,
+          canSelectFolders: !canSelectFiles,
+          defaultUri: vscode.Uri.file(fileWorkspacePath),
+        })
+        .resolves([selected]);
+      expect(await panel["showOpenDialog"]("", canSelectFiles)).to.equal(selected.fsPath);
+    });
+  });
+
+  describe("ensureValidTargetFolder", () => {
+    it("detects in-memory folders and updates config", async () => {
+      const mockFolders = [
+        { uri: { scheme: "vscode-remote", fsPath: "" }, name: "remote" },
+        { uri: { scheme: "file", fsPath: "/local/path" }, name: "local" },
+      ];
+      sandbox.stub(vscode.workspace, "workspaceFolders").value(mockFolders);
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.TargetFolder").returns(undefined);
+      wsConfigMock
+        .expects("update")
+        .withArgs("ApplicationWizard.TargetFolder", "/local/path", vscode.ConfigurationTarget.Global)
+        .resolves();
+
+      const result = await panel["ensureValidTargetFolder"]();
+      expect(result.wasModified).to.be.true;
+    });
+
+    it("does not modify config when no in-memory folders exist", async () => {
+      const mockFolders = [
+        { uri: { scheme: "file", fsPath: "/local/path1" }, name: "local1" },
+        { uri: { scheme: "file", fsPath: "/local/path2" }, name: "local2" },
+      ];
+      sandbox.stub(vscode.workspace, "workspaceFolders").value(mockFolders);
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.TargetFolder").returns(undefined);
+      wsConfigMock.expects("update").never();
+
+      const result = await panel["ensureValidTargetFolder"]();
+      expect(result.wasModified).to.be.false;
+    });
+
+    it("uses homedir fallback when no file-scheme workspaces exist", async () => {
+      const mockFolders = [
+        { uri: { scheme: "vscode-remote", fsPath: "" }, name: "remote" },
+      ];
+      sandbox.stub(vscode.workspace, "workspaceFolders").value(mockFolders);
+      wsConfigMock.expects("get").withExactArgs("ApplicationWizard.TargetFolder").returns(undefined);
+      wsConfigMock
+        .expects("update")
+        .withArgs("ApplicationWizard.TargetFolder", join(homedir(), "projects"), vscode.ConfigurationTarget.Global)
+        .resolves();
+
+      const result = await panel["ensureValidTargetFolder"]();
+      expect(result.wasModified).to.be.true;
+    });
   });
 
   describe("dispose", () => {

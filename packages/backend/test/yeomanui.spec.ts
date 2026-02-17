@@ -984,6 +984,39 @@ describe("yeomanui unit test", () => {
       const res = yeomanUiInstance["getCwd"]();
       expect(res).equal(targetFolderConfig);
     });
+
+    it("in VSCODE, with mixed scheme workspaces returns first file-scheme path", () => {
+      Constants.IS_IN_BAS = false;
+      const fileWorkspacePath = "/local/file/path";
+      const mockFolders = [
+        { uri: { scheme: "vscode-remote", fsPath: "" }, name: "remote", index: 0 },
+        { uri: { scheme: "file", fsPath: fileWorkspacePath }, name: "local", index: 1 },
+      ];
+      sandbox.stub(vscode.workspace, "workspaceFolders").value(mockFolders);
+      wsConfigMock.expects("get").withExactArgs(yeomanUiInstance["TARGET_FOLDER_CONFIG_PROP"]);
+      const res = yeomanUiInstance["getCwd"]();
+      expect(res).equal(fileWorkspacePath);
+    });
+
+    it("in VSCODE, with only virtual workspaces returns fallback", () => {
+      Constants.IS_IN_BAS = false;
+      const mockFolders = [
+        { uri: { scheme: "vscode-remote", fsPath: "" }, name: "remote1", index: 0 },
+        { uri: { scheme: "ssh", fsPath: "" }, name: "remote2", index: 1 },
+      ];
+      sandbox.stub(vscode.workspace, "workspaceFolders").value(mockFolders);
+      wsConfigMock.expects("get").withExactArgs(yeomanUiInstance["TARGET_FOLDER_CONFIG_PROP"]);
+      const res = yeomanUiInstance["getCwd"]();
+      expect(res).equal(Constants.HOMEDIR_PROJECTS);
+    });
+
+    it("in VSCODE, with no workspaces returns fallback", () => {
+      Constants.IS_IN_BAS = false;
+      sandbox.stub(vscode.workspace, "workspaceFolders").value(undefined);
+      wsConfigMock.expects("get").withExactArgs(yeomanUiInstance["TARGET_FOLDER_CONFIG_PROP"]);
+      const res = yeomanUiInstance["getCwd"]();
+      expect(res).equal(Constants.HOMEDIR_PROJECTS);
+    });
   });
 
   it("getErrorInfo", () => {

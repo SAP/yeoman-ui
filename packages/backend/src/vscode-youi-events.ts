@@ -9,6 +9,7 @@ import { getImage } from "./images/messageImages";
 import { AppWizard, MessageType, Severity, IBannerProps } from "@sap-devx/yeoman-ui-types";
 import { FolderUriConfig, getFolderUri, getValidFolderUri, WorkspaceFile, WsFoldersToAdd } from "./utils/workspaceFile";
 import { Constants } from "./utils/constants";
+import { getFileSchemeWorkspaceFolders } from "./utils/workspaceFolders";
 
 class YoUiAppWizard extends AppWizard {
   constructor(private readonly events: VSCodeYouiEvents) {
@@ -240,7 +241,7 @@ export class VSCodeYouiEvents implements YouiEvents {
   }
 
   private getUniqueProjectName(baseName: string): string {
-    const existingNames = vscode.workspace.workspaceFolders?.map((folder) => folder.name) || [];
+    const existingNames = getFileSchemeWorkspaceFolders().map((folder) => folder.name);
     if (!existingNames.includes(baseName)) {
       return baseName;
     }
@@ -257,7 +258,7 @@ export class VSCodeYouiEvents implements YouiEvents {
   }
 
   private addOrCreateProjectWorkspace(wsFoldersToAdd: WsFoldersToAdd) {
-    const wsFoldersQuantity = size(vscode.workspace.workspaceFolders);
+    const wsFoldersQuantity = getFileSchemeWorkspaceFolders().length;
     vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, wsFoldersToAdd);
   }
 
