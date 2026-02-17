@@ -1,4 +1,4 @@
-import { isEmpty, get, isNil, assign } from "lodash";
+import { isEmpty, get, assign } from "lodash";
 import { join } from "path";
 import * as vscode from "vscode";
 import { YeomanUI } from "../yeomanui";
