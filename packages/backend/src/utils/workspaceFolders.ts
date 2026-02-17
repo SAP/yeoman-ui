@@ -7,9 +7,7 @@ import { workspace, WorkspaceFolder } from "vscode";
  */
 export function getWorkspaceFolders(): string[] {
   return workspace.workspaceFolders
-    ? workspace.workspaceFolders
-        .filter((ws) => ws.uri.scheme === "file")
-        .map((ws) => ws.uri.fsPath)
+    ? workspace.workspaceFolders.filter((ws) => ws.uri.scheme === "file").map((ws) => ws.uri.fsPath)
     : [];
 }
 
@@ -19,9 +17,7 @@ export function getWorkspaceFolders(): string[] {
  * @returns Array of WorkspaceFolder objects with file scheme, or empty array
  */
 export function getFileSchemeWorkspaceFolders(): WorkspaceFolder[] {
-  return workspace.workspaceFolders
-    ? workspace.workspaceFolders.filter((folder) => folder.uri.scheme === "file")
-    : [];
+  return workspace.workspaceFolders ? workspace.workspaceFolders.filter((folder) => folder.uri.scheme === "file") : [];
 }
 
 /**

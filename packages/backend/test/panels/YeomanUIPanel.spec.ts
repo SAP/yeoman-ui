@@ -342,9 +342,7 @@ describe("YeomanUIPanel unit test", () => {
     });
 
     it("uses homedir fallback when no file-scheme workspaces exist", async () => {
-      const mockFolders = [
-        { uri: { scheme: "vscode-remote", fsPath: "" }, name: "remote" },
-      ];
+      const mockFolders = [{ uri: { scheme: "vscode-remote", fsPath: "" }, name: "remote" }];
       sandbox.stub(vscode.workspace, "workspaceFolders").value(mockFolders);
       wsConfigMock.expects("get").withExactArgs("ApplicationWizard.TargetFolder").returns(undefined);
       wsConfigMock

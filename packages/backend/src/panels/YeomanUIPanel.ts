@@ -48,7 +48,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
   }
 
   private async ensureValidTargetFolder(): Promise<{ originalTargetFolder: string; wasModified: boolean }> {
-    const originalTargetFolder = vscode.workspace.getConfiguration()?.get<string>('ApplicationWizard.TargetFolder');
+    const originalTargetFolder = vscode.workspace.getConfiguration()?.get<string>("ApplicationWizard.TargetFolder");
     const supportedFileWorkspaceFolders = getWorkspaceFolders();
 
     // If there are in-memory folders, ensure targetFolder is a valid physical path that will load yeoman UI
@@ -57,12 +57,12 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
 
     if (hasInMemoryFolders) {
       // Using logical OR to ensure we don't set empty string, which is an invalid state
-      const workspaceFolder = originalTargetFolder?.trim() || supportedFileWorkspaceFolders?.[0]?.trim() || '';
-      const targetFolder = workspaceFolder || join(homedir(), 'projects');
+      const workspaceFolder = originalTargetFolder?.trim() || supportedFileWorkspaceFolders?.[0]?.trim() || "";
+      const targetFolder = workspaceFolder || join(homedir(), "projects");
 
       await vscode.workspace
         .getConfiguration()
-        .update('ApplicationWizard.TargetFolder', targetFolder, vscode.ConfigurationTarget.Global);
+        .update("ApplicationWizard.TargetFolder", targetFolder, vscode.ConfigurationTarget.Global);
 
       return { originalTargetFolder, wasModified: true };
     }

@@ -364,9 +364,7 @@ export class YeomanUI {
       return targetFolderConfig;
     }
 
-    return Constants.IS_IN_BAS
-      ? Constants.HOMEDIR_PROJECTS
-      : getFirstWorkspacePath(Constants.HOMEDIR_PROJECTS);
+    return Constants.IS_IN_BAS ? Constants.HOMEDIR_PROJECTS : getFirstWorkspacePath(Constants.HOMEDIR_PROJECTS);
   }
 
   public async showPrompt(questions: Questions<any>): Promise<inquirer.Answers> {
