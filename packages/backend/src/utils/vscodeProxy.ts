@@ -1,5 +1,6 @@
 import { set } from "lodash";
 import { join } from "path";
+import { URI } from "vscode-uri";
 
 export const getVscode = () => {
   try {
@@ -33,11 +34,10 @@ const context = { globalState: globalStateObj, extensionPath: "" };
 
 const Uri = {
   file: (path?: string) => {
-    return { fsPath: path, scheme: "file" };
+    return URI.file(path || "");
   },
   parse: (path?: string) => {
-    const scheme = path?.includes("://") ? path.split("://")[0] : "file";
-    return { fsPath: path, scheme };
+    return URI.parse(path || "");
   },
 };
 
