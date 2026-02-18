@@ -952,6 +952,7 @@ describe("yeomanui unit test", () => {
       Constants.IS_IN_BAS = false;
       const openedVscodeFolderPath = "/home/user/folder/folder2";
       _.set(vscode, "workspace.workspaceFolders[0].uri.fsPath", openedVscodeFolderPath);
+      _.set(vscode, "workspace.workspaceFolders[0].uri.scheme", "file");
       wsConfigMock.expects("get").withExactArgs(yeomanUiInstance["TARGET_FOLDER_CONFIG_PROP"]);
       const res = yeomanUiInstance["getCwd"]();
       expect(res).equal(openedVscodeFolderPath);

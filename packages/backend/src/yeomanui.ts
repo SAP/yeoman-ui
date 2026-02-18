@@ -24,6 +24,7 @@ import { Questions } from "yeoman-environment/lib/adapter";
 import { State } from "./utils/promise";
 import { Constants } from "./utils/constants";
 import { isUriFlow } from "./utils/workspaceFile";
+import { getFirstWorkspacePath } from "./utils/workspaceFolders";
 
 export interface IQuestionsPrompt extends IPrompt {
   questions: any[];
@@ -363,9 +364,7 @@ export class YeomanUI {
       return targetFolderConfig;
     }
 
-    return Constants.IS_IN_BAS
-      ? Constants.HOMEDIR_PROJECTS
-      : _.get(vscode, "workspace.workspaceFolders[0].uri.fsPath", Constants.HOMEDIR_PROJECTS);
+    return Constants.IS_IN_BAS ? Constants.HOMEDIR_PROJECTS : getFirstWorkspacePath(Constants.HOMEDIR_PROJECTS);
   }
 
   public async showPrompt(questions: Questions<any>): Promise<inquirer.Answers> {

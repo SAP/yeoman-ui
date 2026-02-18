@@ -33,10 +33,11 @@ const context = { globalState: globalStateObj, extensionPath: "" };
 
 const Uri = {
   file: (path?: string) => {
-    return { fsPath: path };
+    return { fsPath: path, scheme: "file" };
   },
   parse: (path?: string) => {
-    return { fsPath: path };
+    const scheme = path?.includes("://") ? path.split("://")[0] : "file";
+    return { fsPath: path, scheme };
   },
 };
 
