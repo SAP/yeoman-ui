@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { isEmpty, size, isNil, set } from "lodash";
+import { isEmpty, isNil, set } from "lodash";
 import { YouiEvents } from "./youi-events";
 import { IRpc } from "@sap-devx/webview-rpc/out.ext/rpc-common";
 import { GeneratorOutput } from "./vscode-output";
@@ -9,6 +9,7 @@ import { getImage } from "./images/messageImages";
 import { AppWizard, MessageType, Severity, IBannerProps } from "@sap-devx/yeoman-ui-types";
 import { FolderUriConfig, getFolderUri, getValidFolderUri, WorkspaceFile, WsFoldersToAdd } from "./utils/workspaceFile";
 import { Constants } from "./utils/constants";
+import { getFileSchemeWorkspaceFolders } from "./utils/workspaceFolders";
 
 class YoUiAppWizard extends AppWizard {
   constructor(private readonly events: VSCodeYouiEvents) {
@@ -240,7 +241,7 @@ export class VSCodeYouiEvents implements YouiEvents {
   }
 
   private getUniqueProjectName(baseName: string): string {
-    const existingNames = vscode.workspace.workspaceFolders?.map((folder) => folder.name) || [];
+    const existingNames = getFileSchemeWorkspaceFolders().map((folder) => folder.name);
     if (!existingNames.includes(baseName)) {
       return baseName;
     }
@@ -257,8 +258,9 @@ export class VSCodeYouiEvents implements YouiEvents {
   }
 
   private addOrCreateProjectWorkspace(wsFoldersToAdd: WsFoldersToAdd) {
-    const wsFoldersQuantity = size(vscode.workspace.workspaceFolders);
-    vscode.workspace.updateWorkspaceFolders(wsFoldersQuantity, null, wsFoldersToAdd);
+    const fileSchemeWorkspaces = getFileSchemeWorkspaceFolders();
+    const insertPosition = fileSchemeWorkspaces.length;
+    vscode.workspace.updateWorkspaceFolders(insertPosition, null, wsFoldersToAdd);
   }
 
   private getSuccessInfoMessage(selectedWorkspace: string, type: string): string {
