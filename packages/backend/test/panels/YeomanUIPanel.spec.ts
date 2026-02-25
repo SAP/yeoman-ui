@@ -231,7 +231,7 @@ describe("YeomanUIPanel unit test", () => {
 
     it("showOpenDialog - empty path provided, ws folder exists", async () => {
       const canSelectFiles = true;
-      const objWs = [{ uri: { fsPath: "rootFolderPath" } }];
+      const objWs = [{ uri: { fsPath: "rootFolderPath", scheme: "file" } }];
       sandbox.stub(vscode.workspace, "workspaceFolders").value(objWs);
       windowMock
         .expects("showOpenDialog")

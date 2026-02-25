@@ -16,6 +16,7 @@ import { NpmCommand } from "../utils/npm";
 import { Constants } from "../utils/constants";
 import { notifyGeneratorsInstallationProgress } from "../utils/generators-installation-progress";
 import messages from "../messages";
+import { getFileSchemeWorkspaceFolders } from "../utils/workspaceFolders";
 
 export class YeomanUIPanel extends AbstractWebviewPanel {
   public static YEOMAN_UI = "Application Wizard";
@@ -142,7 +143,8 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
       }
       uri = vscode.Uri.file(currentPath);
     } catch (e) {
-      uri = get(vscode, "workspace.workspaceFolders[0].uri");
+      const fileSchemeWorkspaces = getFileSchemeWorkspaceFolders();
+      uri = fileSchemeWorkspaces.length > 0 ? fileSchemeWorkspaces[0].uri : undefined;
       if (isNil(uri)) {
         uri = vscode.Uri.file(join(homedir()));
       }

@@ -307,7 +307,10 @@ describe("vscode-youi-events unit test", () => {
       eventsMock.expects("doClose");
       sandbox
         .stub(vscode.workspace, "workspaceFolders")
-        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testRoot" } }]);
+        .value([
+          { uri: { fsPath: "rootFolderPath", scheme: "file" } },
+          { uri: { fsPath: "testRoot", scheme: "file" } },
+        ]);
       sandbox.stub(vscode.workspace, "workspaceFile").value("/workspace/file/path");
       windowMock
         .expects("showInformationMessage")
@@ -321,7 +324,10 @@ describe("vscode-youi-events unit test", () => {
       eventsMock.expects("doClose");
       sandbox
         .stub(vscode.workspace, "workspaceFolders")
-        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
+        .value([
+          { uri: { fsPath: "rootFolderPath", scheme: "file" } },
+          { uri: { fsPath: "testDestinationRoot", scheme: "file" } },
+        ]);
       sandbox.stub(vscode.workspace, "workspaceFile").value("/workspace/file/path");
       windowMock
         .expects("showInformationMessage")
@@ -335,7 +341,10 @@ describe("vscode-youi-events unit test", () => {
       eventsMock.expects("doClose");
       sandbox
         .stub(vscode.workspace, "workspaceFolders")
-        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
+        .value([
+          { uri: { fsPath: "rootFolderPath", scheme: "file" } },
+          { uri: { fsPath: "testDestinationRoot", scheme: "file" } },
+        ]);
       windowMock
         .expects("showInformationMessage")
         .withExactArgs(messages.default.artifact_generated_project_saved_for_future)
@@ -353,7 +362,10 @@ describe("vscode-youi-events unit test", () => {
       eventsMock.expects("doClose");
       sandbox
         .stub(vscode.workspace, "workspaceFolders")
-        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
+        .value([
+          { uri: { fsPath: "rootFolderPath", scheme: "file" } },
+          { uri: { fsPath: "testDestinationRoot", scheme: "file" } },
+        ]);
       windowMock
         .expects("showInformationMessage")
         .withExactArgs(messages.default.artifact_generated_project_open_in_a_new_workspace)
@@ -460,7 +472,10 @@ describe("vscode-youi-events unit test", () => {
       eventsMock.expects("doClose");
       sandbox
         .stub(vscode.workspace, "workspaceFolders")
-        .value([{ uri: { fsPath: "rootFolderPath" } }, { uri: { fsPath: "testDestinationRoot" } }]);
+        .value([
+          { uri: { fsPath: "rootFolderPath", scheme: "file" } },
+          { uri: { fsPath: "testDestinationRoot", scheme: "file" } },
+        ]);
       windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated_module).resolves();
       return events.doGeneratorDone(
         true,
@@ -476,8 +491,8 @@ describe("vscode-youi-events unit test", () => {
       sandbox
         .stub(vscode.workspace, "workspaceFolders")
         .value([
-          { uri: { fsPath: "rootFolderPath" } },
-          { uri: { fsPath: "testDestinationRoot/../testDestinationRoot" } },
+          { uri: { fsPath: "rootFolderPath", scheme: "file" } },
+          { uri: { fsPath: "testDestinationRoot/../testDestinationRoot", scheme: "file" } },
         ]);
       windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated_files).resolves();
       return events.doGeneratorDone(
@@ -491,7 +506,7 @@ describe("vscode-youi-events unit test", () => {
 
     it("on success with null targetFolderPath", () => {
       eventsMock.expects("doClose");
-      sandbox.stub(vscode.workspace, "workspaceFolders").value([{ uri: { fsPath: "rootFolderPath" } }]);
+      sandbox.stub(vscode.workspace, "workspaceFolders").value([{ uri: { fsPath: "rootFolderPath", scheme: "file" } }]);
       windowMock.expects("showInformationMessage").withExactArgs(messages.default.artifact_generated_files).resolves();
       return events.doGeneratorDone(true, "success message", createAndClose, "files", null);
     });
@@ -505,21 +520,29 @@ describe("vscode-youi-events unit test", () => {
 
   describe("getUniqueProjectName", () => {
     it("should return baseName if it does not exist in workspace", () => {
-      sandbox.stub(vscode.workspace, "workspaceFolders").value([{ name: "Project1" }, { name: "Project2" }]);
+      sandbox.stub(vscode.workspace, "workspaceFolders").value([
+        { name: "Project1", uri: { scheme: "file" } },
+        { name: "Project2", uri: { scheme: "file" } },
+      ]);
       const result = events["getUniqueProjectName"]("NewProject");
       expect(result).to.equal("NewProject");
     });
 
     it("should return baseName(1) if baseName already exists", () => {
-      sandbox.stub(vscode.workspace, "workspaceFolders").value([{ name: "Project1" }, { name: "NewProject" }]);
+      sandbox.stub(vscode.workspace, "workspaceFolders").value([
+        { name: "Project1", uri: { scheme: "file" } },
+        { name: "NewProject", uri: { scheme: "file" } },
+      ]);
       const result = events["getUniqueProjectName"]("NewProject");
       expect(result).to.equal("NewProject(1)");
     });
 
     it("should return baseName with incremented counter if multiple exist", () => {
-      sandbox
-        .stub(vscode.workspace, "workspaceFolders")
-        .value([{ name: "NewProject" }, { name: "NewProject(1)" }, { name: "NewProject(2)" }]);
+      sandbox.stub(vscode.workspace, "workspaceFolders").value([
+        { name: "NewProject", uri: { scheme: "file" } },
+        { name: "NewProject(1)", uri: { scheme: "file" } },
+        { name: "NewProject(2)", uri: { scheme: "file" } },
+      ]);
       const result = events["getUniqueProjectName"]("NewProject");
       expect(result).to.equal("NewProject(3)");
     });
