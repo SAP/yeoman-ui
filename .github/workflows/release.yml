@@ -12,7 +12,7 @@ jobs:
     steps:
       # using `v1` because of: https://github.com/actions/checkout/issues/246
       - uses: actions/checkout@v1
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: '24.x'
           registry-url: 'https://registry.npmjs.org'
