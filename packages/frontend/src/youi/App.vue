@@ -49,6 +49,7 @@
                 @parent-execute-command="executeCommand"
                 @answered="onAnswered"
                 @set-busy-indicator="setBusyIndicator"
+                @show-output-tab-link="onShowOutputTabLink"
               />
             </v-slide-x-transition>
             <YOUIInfo
@@ -343,6 +344,9 @@ export default {
       }
       const params = command.params ? JSON.parse(JSON.stringify(command.params)) : null;
       this.rpc.invoke("executeCommand", [command.id, params]);
+    },
+    onShowOutputTabLink() {
+      this.rpc.invoke("executeCommand", ["sap.ux.appWizard.showOutputChannel", null]);
     },
     back() {
       return this.gotoStep(1); // go 1 step back
