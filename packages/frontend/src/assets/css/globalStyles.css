@@ -176,6 +176,23 @@ div[role="listbox"].v-theme--light.v-list {
   background-color: var(--vscode-input-background, #3c3c3c);
 }
 
+/* Fix white flash when opening a v-autocomplete dropdown.
+   Vuetify teleports the dropdown list to <body> and applies
+   background:rgb(--v-theme-surface) via .v-menu>.v-overlay__content>.v-list
+   before any other CSS re-evaluates. We match that exact selector and use
+   !important so we win regardless of load order or Vuetify's inline styles. */
+.v-menu > .v-overlay__content > .v-list {
+  background: var(--vscode-dropdown-background, var(--vscode-editor-background, #1f1f1f)) !important;
+  color: var(--vscode-dropdown-foreground, var(--vscode-editor-foreground, #cccccc)) !important;
+}
+
+/* Fix white flash from v-autocomplete__mask.
+   When clicking an autocomplete, Vuetify briefly shows a mask over the input
+   with background:rgb(--v-theme-surface-light) = white in the light theme. */
+.v-autocomplete__mask {
+  background: var(--vscode-input-background, var(--vscode-editor-background, #3c3c3c)) !important;
+}
+
 div.v-theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {
   color: var(--vscode-input-foreground, white) !important;
 }
