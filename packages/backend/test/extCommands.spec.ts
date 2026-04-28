@@ -43,6 +43,7 @@ describe("extension commands unit test", () => {
     expect(get(oRegisteredCommands, "exploreGenerators")).to.be.not.undefined;
     expect(get(oRegisteredCommands, "yeomanUI._notifyGeneratorsChange")).to.be.not.undefined;
     expect(get(oRegisteredCommands, "runGenerator")).to.be.not.undefined;
+    expect(get(oRegisteredCommands, "sap.ux.appWizard.showOutputChannel")).to.be.not.undefined;
   });
 
   it("call ExploreGensPanel commands", async () => {

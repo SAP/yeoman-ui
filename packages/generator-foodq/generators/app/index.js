@@ -167,6 +167,10 @@ module.exports = class extends Generator {
         type: "input",
         name: "name",
         message: "What is your name?",
+        // showOutputTabLink: "validationMessageOverflow" — the link appears automatically below the
+        // validation error when the error text is clamped to 2 lines (panel is narrow). Resize the
+        // wizard wider and the link disappears; narrow it again and it reappears.
+        showOutputTabLink: "validationMessageOverflow",
         validate: async (value) => {
           // Clear any previously scheduled validation
           clearTimeout(validationDelayTimer);
@@ -179,7 +183,19 @@ module.exports = class extends Generator {
               } else if (value.charAt(0) === value.charAt(0).toUpperCase()) {
                 resolve(true);
               } else {
-                resolve("Your name must start with a capital letter!");
+                this.log(
+                  "[FoodQ] Name validation failed: the provided name does not start with a capital letter.\n" +
+                    "Names in our system are used for personalized greetings, table reservations, and loyalty\n" +
+                    "program enrollment. The first character must be uppercase (e.g. 'Alice', not 'alice').\n" +
+                    "If your name begins with a special character or a non-Latin script, please contact\n" +
+                    "our support team at support@foodq.example.com for assistance.",
+                );
+                resolve(
+                  "Your name must start with a capital letter! " +
+                    "Names are used for personalized greetings, table reservations, and loyalty program enrollment. " +
+                    "Please ensure the first character is uppercase (e.g. 'Alice', not 'alice'). " +
+                    "For further details, check the output tab.",
+                );
               }
             }, 900);
           });
@@ -625,6 +641,16 @@ module.exports = class extends Generator {
         message: "GitHub password",
         mask: "*",
         validate: this._requireLetterAndNumber.bind(this),
+        // showOutputTabLink as a function — the generator decides when to show the link.
+        // Here the link appears as soon as the answer fails validation, regardless of whether
+        // the error text is truncated. The custom linkMessage overrides the default label.
+        showOutputTabLink: async (answer) => {
+          if (!answer) {
+            return false;
+          }
+          const isValid = /\w/.test(answer) && /\d/.test(answer);
+          return isValid ? false : { show: true, linkMessage: "See full password requirements in the output tab." };
+        },
         when: (response) => {
           if (_.isNil(this._getOption("password"))) {
             return this._getAnswer("email", response) !== "root";
@@ -646,6 +672,15 @@ module.exports = class extends Generator {
     if (/\w/.test(value) && /\d/.test(value)) {
       return true;
     }
+    this.log(
+      "[FoodQ] Password validation failed.\n" +
+        "Requirements:\n" +
+        "  - Must contain at least one letter (a-z or A-Z)\n" +
+        "  - Must contain at least one digit (0-9)\n" +
+        "  - Special characters are allowed but not required\n" +
+        "  - Example of a valid password: 'FoodQ2024!'\n" +
+        "Please update your password to meet all requirements before continuing.",
+    );
     this.appWizard.showWarning(
       "The password must contain at least a letter and a number",
       types.MessageType.notification,
