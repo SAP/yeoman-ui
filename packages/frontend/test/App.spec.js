@@ -665,9 +665,30 @@ describe("App.vue", () => {
     const invokeSpy = jest.spyOn(wrapper.vm.rpc, "invoke");
     wrapper.vm.onShowOutputTabLink();
 
-    expect(invokeSpy).toHaveBeenCalledWith("executeCommand", ["sap.ux.appWizard.showOutputChannel", null]);
+    expect(invokeSpy).toHaveBeenCalledWith("executeCommand", ["sap.ux.appWizard.showOutputChannel", []]);
 
     invokeSpy.mockRestore();
+  });
+
+  it("onShowOutputTabLink - triggered by Form @show-output-tab-link event", async () => {
+    let capturedFormVm;
+    wrapper = initComponent(App, {}, true, {
+      Form: {
+        template: "<div />",
+        emits: ["show-output-tab-link"],
+        created() {
+          capturedFormVm = this;
+        },
+      },
+    });
+    wrapper.vm.rpc = {
+      invoke: jest.fn(),
+    };
+    // Emit from the Form stub — verifies the template binding @show-output-tab-link wires to onShowOutputTabLink
+    capturedFormVm.$emit("show-output-tab-link");
+    await nextTick();
+
+    expect(wrapper.vm.rpc.invoke).toHaveBeenCalledWith("executeCommand", ["sap.ux.appWizard.showOutputChannel", []]);
   });
 
   describe("next - method", () => {

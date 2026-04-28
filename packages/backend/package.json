@@ -160,6 +160,10 @@
         {
           "command": "yeomanUI._notifyGeneratorsChange",
           "when": "false"
+        },
+        {
+          "command": "sap.ux.appWizard.showOutputChannel",
+          "when": "false"
         }
       ],
       "editor/title": [

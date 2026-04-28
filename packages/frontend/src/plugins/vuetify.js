@@ -12,7 +12,7 @@ import "@mdi/font/css/materialdesignicons.css";
 function getVSCodeColor(variable, fallback) {
   try {
     const val = getComputedStyle(document.body).getPropertyValue(variable).trim();
-    return /^#[0-9a-fA-F]{6}$/.test(val) ? val : fallback;
+    return /^#[0-9a-fA-F]{6,8}$/.test(val) ? val : fallback;
   } catch {
     return fallback;
   }
