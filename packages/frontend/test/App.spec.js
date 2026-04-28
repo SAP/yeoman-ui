@@ -657,6 +657,19 @@ describe("App.vue", () => {
     invokeSpy.mockRestore();
   });
 
+  it("onShowOutputTabLink - method", () => {
+    wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
+    wrapper.vm.rpc = {
+      invoke: jest.fn(),
+    };
+    const invokeSpy = jest.spyOn(wrapper.vm.rpc, "invoke");
+    wrapper.vm.onShowOutputTabLink();
+
+    expect(invokeSpy).toHaveBeenCalledWith("executeCommand", ["sap.ux.appWizard.showOutputChannel", null]);
+
+    invokeSpy.mockRestore();
+  });
+
   describe("next - method", () => {
     it("resolve is null", () => {
       wrapper = initComponent(App, {}, false, ["vscode-textfield"]);
