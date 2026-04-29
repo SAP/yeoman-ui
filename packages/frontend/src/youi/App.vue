@@ -346,7 +346,7 @@ export default {
       this.rpc.invoke("executeCommand", [command.id, params]);
     },
     onShowOutputTabLink() {
-      this.rpc.invoke("executeCommand", ["sap.ux.appWizard.showOutputChannel", []]);
+      this.rpc.invoke("executeCommand", ["sap.ux.appWizard.showOutputChannel", null]);
     },
     back() {
       return this.gotoStep(1); // go 1 step back

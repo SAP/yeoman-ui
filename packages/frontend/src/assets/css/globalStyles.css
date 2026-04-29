@@ -180,7 +180,9 @@ div[role="listbox"].v-theme--light.v-list {
    Vuetify teleports the dropdown list to <body> and applies
    background:rgb(--v-theme-surface) via .v-menu>.v-overlay__content>.v-list
    before any other CSS re-evaluates. We match that exact selector and use
-   !important so we win regardless of load order or Vuetify's inline styles. */
+   !important so we win regardless of load order or Vuetify's inline styles.
+   NOTE: keep in sync with the duplicate inline rule in index.html, which exists
+   to bypass Chromium's webview resource cache on every panel creation. */
 .v-menu > .v-overlay__content > .v-list {
   background: var(--vscode-dropdown-background, var(--vscode-editor-background, #1f1f1f)) !important;
   color: var(--vscode-dropdown-foreground, var(--vscode-editor-foreground, #cccccc)) !important;
@@ -188,7 +190,8 @@ div[role="listbox"].v-theme--light.v-list {
 
 /* Fix white flash from v-autocomplete__mask.
    When clicking an autocomplete, Vuetify briefly shows a mask over the input
-   with background:rgb(--v-theme-surface-light) = white in the light theme. */
+   with background:rgb(--v-theme-surface-light) = white in the light theme.
+   NOTE: keep in sync with the duplicate inline rule in index.html (see comment above). */
 .v-autocomplete__mask {
   background: var(--vscode-input-background, var(--vscode-editor-background, #3c3c3c)) !important;
 }

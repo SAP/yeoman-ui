@@ -8,11 +8,13 @@ import "@mdi/font/css/materialdesignicons.css";
 
 // Read VS Code theme CSS variables injected into the webview.
 // VS Code injects these on document.body (not document.documentElement).
-// We validate the value is a plain hex color before using it.
+// The value may be hex (#rrggbb), rgb(...), rgba(...), or a var(...) reference
+// depending on the theme. Accept any non-empty string; only fall back to the
+// dark-theme default when the property is missing or blank.
 function getVSCodeColor(variable, fallback) {
   try {
     const val = getComputedStyle(document.body).getPropertyValue(variable).trim();
-    return /^#[0-9a-fA-F]{6,8}$/.test(val) ? val : fallback;
+    return val.length > 0 ? val : fallback;
   } catch {
     return fallback;
   }
@@ -49,8 +51,10 @@ const vuetify = createVuetify({
 // (e.g. "vscode-dark" → "vscode-light"). When that happens, re-read the
 // VS Code CSS variables and update Vuetify's theme so the dropdown colours
 // stay correct without needing to close and reopen the panel.
-new MutationObserver(() => {
+// The observer reference is exported so callers (e.g. tests) can disconnect it.
+export const themeObserver = new MutationObserver(() => {
   Object.assign(vuetify.theme.themes.value.light.colors, getVSCodeSurfaceColors());
-}).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+});
+themeObserver.observe(document.body, { attributes: true, attributeFilter: ["class"] });
 
 export default vuetify;
