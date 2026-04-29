@@ -665,7 +665,7 @@ describe("App.vue", () => {
     const invokeSpy = jest.spyOn(wrapper.vm.rpc, "invoke");
     wrapper.vm.onShowOutputTabLink();
 
-    expect(invokeSpy).toHaveBeenCalledWith("executeCommand", ["sap.ux.appWizard.showOutputChannel", []]);
+    expect(invokeSpy).toHaveBeenCalledWith("executeCommand", ["sap.ux.appWizard.showOutputChannel", null]);
 
     invokeSpy.mockRestore();
   });
@@ -688,7 +688,7 @@ describe("App.vue", () => {
     capturedFormVm.$emit("show-output-tab-link");
     await nextTick();
 
-    expect(wrapper.vm.rpc.invoke).toHaveBeenCalledWith("executeCommand", ["sap.ux.appWizard.showOutputChannel", []]);
+    expect(wrapper.vm.rpc.invoke).toHaveBeenCalledWith("executeCommand", ["sap.ux.appWizard.showOutputChannel", null]);
   });
 
   describe("next - method", () => {
