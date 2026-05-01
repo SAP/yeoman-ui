@@ -69,6 +69,10 @@
       {
         "command": "runGenerator",
         "title": "Run Generator"
+      },
+      {
+        "command": "sap.ux.appWizard.showOutputChannel",
+        "title": "Show Output Channel"
       }
     ],
     "configuration": {
@@ -155,6 +159,10 @@
         },
         {
           "command": "yeomanUI._notifyGeneratorsChange",
+          "when": "false"
+        },
+        {
+          "command": "sap.ux.appWizard.showOutputChannel",
           "when": "false"
         }
       ],

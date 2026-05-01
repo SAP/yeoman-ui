@@ -23,6 +23,11 @@ export class ExtCommands {
     );
 
     this.registerAndSubscribeCommand("exploreGenerators", this.exploreGenerators_Command.bind(this));
+
+    this.registerAndSubscribeCommand(
+      "sap.ux.appWizard.showOutputChannel",
+      this.yeomanUIPanel_toggleOutput_Command.bind(this),
+    );
   }
 
   private registerAndSubscribeCommand(cId: string, cAction: any) {
