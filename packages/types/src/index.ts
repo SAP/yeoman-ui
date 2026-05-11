@@ -217,5 +217,5 @@ export type OutputTabLinkResult = { show: boolean; linkMessage?: string };
  * to the appropriate output-channel command.
  */
 export type ShowOutputTabLink =
-  | 'validationMessageOverflow'
+  | "validationMessageOverflow"
   | (() => OutputTabLinkResult | boolean | Promise<OutputTabLinkResult | boolean>);
