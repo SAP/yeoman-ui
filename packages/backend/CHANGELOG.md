@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.24.0](https://github.com/SAP/yeoman-ui/compare/v1.23.0...v1.24.0) (2026-05-12)
+
+### Features
+
+- **yeoman UI:** 37088 output tab link ([#940](https://github.com/SAP/yeoman-ui/issues/940)) ([f6e68ce](https://github.com/SAP/yeoman-ui/commit/f6e68ce84c1c8d79b81ea54a7fa6d6269d6aaa69)), closes [#37088](https://github.com/SAP/yeoman-ui/issues/37088) [#37088](https://github.com/SAP/yeoman-ui/issues/37088) [SAP/inquirer-gui#37088](https://github.com/SAP/inquirer-gui/issues/37088) [#37088](https://github.com/SAP/yeoman-ui/issues/37088)
+
 # [1.23.0](https://github.com/SAP/yeoman-ui/compare/v1.21.0...v1.23.0) (2026-03-24)
 
 ### Bug Fixes
