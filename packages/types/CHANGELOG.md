@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.25.0](https://github.com/SAP/yeoman-ui/compare/v1.23.0...v1.25.0) (2026-05-13)
+
+### Features
+
+- **37088:** add OutputTabLinkResult and ShowOutputTabLink to yeoman-… ([#941](https://github.com/SAP/yeoman-ui/issues/941)) ([00e2f52](https://github.com/SAP/yeoman-ui/commit/00e2f52e159b627900f079865092041bd6848fe5))
+
 # [1.24.0](https://github.com/SAP/yeoman-ui/compare/v1.23.0...v1.24.0) (2026-05-12)
 
 **Note:** Version bump only for package @sap-devx/yeoman-ui-types

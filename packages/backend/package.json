@@ -1,7 +1,7 @@
 {
   "name": "yeoman-ui",
   "displayName": "Application Wizard",
-  "version": "1.24.0",
+  "version": "1.25.0",
   "private": true,
   "description": "Provides rich user experience for Yeoman generators.",
   "categories": [
@@ -193,7 +193,7 @@
   },
   "dependencies": {
     "@sap-devx/webview-rpc": "0.4.1",
-    "@sap-devx/yeoman-ui-types": "^1.24.0",
+    "@sap-devx/yeoman-ui-types": "^1.25.0",
     "@sap/bas-sdk": "3.13.7",
     "@sap/swa-for-sapbas-vsx": "2.0.16",
     "@vscode-logging/logger": "2.0.9",
