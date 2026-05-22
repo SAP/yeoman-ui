@@ -70,8 +70,8 @@
               {{ gen.package.description }}
             </v-card-text>
             <v-spacer />
-            <v-card-text class="homepage">
-              <a class="text-blue" :href="gen.package.links.npm">{{ messages.more_info }}</a>
+            <v-card-text v-if="generatorInfoUrl(gen)" class="homepage">
+              <a class="text-blue" :href="generatorInfoUrl(gen)">{{ messages.more_info }}</a>
             </v-card-text>
             <v-card-actions class="pa-4">
               <v-btn
@@ -184,6 +184,9 @@ export default {
       }
 
       return gen.state === "installed" ? "#585858" : "";
+    },
+    generatorInfoUrl(gen) {
+      return _get(gen, "package.links.npm", "");
     },
     onAction(gen) {
       const action = gen.action.toLowerCase();
