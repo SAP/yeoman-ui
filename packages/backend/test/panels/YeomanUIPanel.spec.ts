@@ -165,6 +165,13 @@ describe("YeomanUIPanel unit test", () => {
       mockOutput.expects("show").returns(undefined);
       panel.toggleOutput();
     });
+
+    it("toggleOutput - output is undefined", () => {
+      const savedOutput = panel["output"];
+      Object.defineProperty(panel, "output", { value: undefined, writable: true, configurable: true });
+      panel.toggleOutput();
+      Object.defineProperty(panel, "output", { value: savedOutput, writable: false, configurable: true });
+    });
   });
 
   describe("notifyGeneratorsChange", () => {
@@ -201,7 +208,7 @@ describe("YeomanUIPanel unit test", () => {
       const args: any[] = [];
       mockYeomanui.expects("_notifyGeneratorsInstall").withExactArgs(args);
       mockYeomanui.expects("_notifyGeneratorsChange");
-      envUtilsMock.expects("loadNpmPath").withExactArgs(true);
+      envUtilsMock.expects("loadNpmPath");
       panel.notifyGeneratorsChange(args);
       expect(panel["installGens"]).to.be.undefined;
     });

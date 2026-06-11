@@ -3,6 +3,7 @@
 "use strict";
 
 const path = require("path");
+const webpack = require("webpack");
 
 /**
  * Investigate the usage of "import(/webpackIgnore: true / 'ignored-module.js');"
@@ -26,7 +27,16 @@ const config = {
   },
   externals: {
     vscode: "commonjs vscode",
+    // yeoman-environment and yeoman-generator are ESM-only packages (type: "module").
+    // They cannot be loaded via CommonJS require() on Node < 22.12 (ERR_REQUIRE_ESM).
+    // They must be bundled so webpack can handle their ESM internals via the
+    // string-replace-loader rules below.
     // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
+    "spdx-license-ids": "commonjs spdx-license-ids",
+    "spdx-license-ids/deprecated": "commonjs spdx-license-ids/deprecated",
+    "spdx-exceptions": "commonjs spdx-exceptions",
+    "@azure/functions-core": "commonjs @azure/functions-core",
+    "applicationinsights-native-metrics": "commonjs applicationinsights-native-metrics",
   },
   resolve: {
     modules: ["node_modules"],
@@ -53,19 +63,11 @@ const config = {
           flags: "g",
         },
       },
+      // yeoman-environment v6 (dist/) rules — replaces the old lib/ rules.
+      // environment-base.js uses createRequire(import.meta.url) for package.json and native lookups;
+      // those require() calls must bypass webpack and use Node's native require at runtime.
       {
-        test: /yeoman-environment[/|\\]lib[/|\\]environment.js/,
-        loader: "string-replace-loader",
-        options: {
-          search: "require[.]resolve[(]",
-          replace: "__non_webpack_require__.resolve(",
-          flags: "g",
-        },
-      },
-      // We replace require() with __non_webpack_require__() to bypass webpack's module resolution and use
-      // Node's native require at runtime, allowing dynamic loading of generators installed globally or locally.
-      {
-        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]esm.js/,
+        test: /yeoman-environment[/|\\]dist[/|\\]environment-base\.js/,
         loader: "string-replace-loader",
         options: {
           search: "require[(]",
@@ -73,14 +75,35 @@ const config = {
           flags: "g",
         },
       },
-      // ESM (ES Module) dynamic import workaround for bundled context:
-      // Webpack processes dynamic import() calls at build time, converting them to webpack's chunk loading system.
-      // However, yeoman-environment's esm.js needs to use native Node.js dynamic import() at runtime to load
-      // external .mjs generator files from the file system (not bundled).
-      // We wrap import() in a Function constructor to hide it from webpack's static analysis, forcing it to
-      // use the native import() at runtime. This is similar to __non_webpack_require__ but for ESM modules.
+      // store.js calls require.resolve(meta.resolved) to resolve generator package paths at runtime.
+      // Must use the native resolver, not webpack's.
       {
-        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]esm.js/,
+        test: /yeoman-environment[/|\\]dist[/|\\]store\.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[.]resolve[(]",
+          replace: "__non_webpack_require__.resolve(",
+          flags: "g",
+        },
+      },
+      // store.js loads generator modules at runtime via require(meta.resolved); must stay native.
+      // It also has a dynamic import() fallback for ESM generators — hide it from webpack's
+      // static analysis so it stays as a real native import() at runtime.
+      {
+        test: /yeoman-environment[/|\\]dist[/|\\]store\.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[(]meta[.]resolved[)]",
+          replace: "__non_webpack_require__(meta.resolved)",
+          flags: "g",
+        },
+      },
+      // ESM (ES Module) dynamic import workaround for bundled context:
+      // store.js falls back to import() for ESM generators. Webpack would convert this to
+      // its own chunk-loading system, breaking runtime loading of generators from disk.
+      // Wrap in Function constructor to hide it from webpack's static analysis.
+      {
+        test: /yeoman-environment[/|\\]dist[/|\\]store\.js/,
         loader: "string-replace-loader",
         options: {
           search: "return import[(]",
@@ -88,57 +111,76 @@ const config = {
           flags: "g",
         },
       },
+      // environment-full.js dynamically imports yeoman-generator at runtime. Must stay native.
       {
-        test: /yeoman-environment[/|\\]lib[/|\\]store.js/,
+        test: /yeoman-environment[/|\\]dist[/|\\]environment-full\.js/,
         loader: "string-replace-loader",
         options: {
-          search: "require[(]path",
-          replace: "__non_webpack_require__(path",
+          search: "await import[(]'yeoman-generator'[)]",
+          replace: "await new Function('s', 'return import(s)')('yeoman-generator')",
           flags: "g",
         },
       },
+      // generator-lookup.js resolves installed generator packages from disk at runtime.
       {
-        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]repository.js/,
+        test: /yeoman-environment[/|\\]dist[/|\\]generator-lookup\.js/,
         loader: "string-replace-loader",
         options: {
-          search: "require[(]packageJson",
-          replace: "__non_webpack_require__(packageJson",
+          search: "require[(]",
+          replace: "__non_webpack_require__(",
           flags: "g",
         },
       },
+      // module-lookup.js resolves npm paths and package locations from disk at runtime.
       {
-        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]repository.js/,
+        test: /yeoman-environment[/|\\]dist[/|\\]module-lookup\.js/,
         loader: "string-replace-loader",
         options: {
-          search: "require[(]absolutePath",
-          replace: "__non_webpack_require__(absolutePath",
+          search: "require[(]",
+          replace: "__non_webpack_require__(",
           flags: "g",
         },
       },
+      // yeoman-generator v8 (dist/) — lifecycle.js loads generator sub-generators from disk.
       {
-        test: /yeoman-environment[/|\\]lib[/|\\]resolver.js/,
+        test: /yeoman-generator[/|\\]dist[/|\\]actions[/|\\]lifecycle\.js/,
         loader: "string-replace-loader",
         options: {
-          search: "require[(]path",
-          replace: "__non_webpack_require__(path",
+          search: "await import[(]",
+          replace: "await new Function('s', 'return import(s)')(",
           flags: "g",
         },
       },
+      // fly-import is yeoman-environment's fallback for loading generators dynamically at runtime.
+      // Its dynamic import() must stay as native import() — wrap in Function to hide from webpack.
       {
-        test: /yeoman-environment[/|\\]lib[/|\\]resolver.js/,
+        test: /fly-import[/|\\]dist[/|\\]fly-import\.js/,
         loader: "string-replace-loader",
         options: {
-          search: "PACKAGE_NAME_PATTERN = [[]require.*",
-          replace: "PACKAGE_NAME_PATTERN = ['yeoman-environment'];",
+          search: "async [(][)] => import[(]",
+          replace: "async () => new Function('s', 'return import(s)')(",
           flags: "g",
         },
       },
+      // @pnpm/npm-conf uses require.resolve() at runtime to find npm installation paths.
+      // Only require.resolve() calls need to be native — the require('./lib/*') internal requires
+      // must stay as webpack require so those files get bundled.
       {
-        test: /yeoman-environment[/|\\]lib[/|\\]composability.js/,
+        test: /@pnpm[/|\\]npm-conf[/|\\]index\.js/,
         loader: "string-replace-loader",
         options: {
-          search: "require[(]'yeoman",
-          replace: "__non_webpack_require__('yeoman",
+          search: "require[.]resolve",
+          replace: "__non_webpack_require__.resolve",
+          flags: "g",
+        },
+      },
+      // lib/make.js uses require.resolve('npm/lib/config/defaults') at build-time to parse npm defaults.
+      {
+        test: /@pnpm[/|\\]npm-conf[/|\\]lib[/|\\]make\.js/,
+        loader: "string-replace-loader",
+        options: {
+          search: "require[.]resolve",
+          replace: "__non_webpack_require__.resolve",
           flags: "g",
         },
       },
@@ -175,24 +217,6 @@ const config = {
         options: {
           search: "require[(]",
           replace: "__non_webpack_require__(",
-          flags: "g",
-        },
-      },
-      {
-        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]binary-diff.js/,
-        loader: "string-replace-loader",
-        options: {
-          search: "const istextorbinary.*",
-          replace: "import {isBinary} from 'istextorbinary';",
-          flags: "g",
-        },
-      },
-      {
-        test: /yeoman-environment[/|\\]lib[/|\\]util[/|\\]binary-diff.js/,
-        loader: "string-replace-loader",
-        options: {
-          search: "istextorbinary[.]isBinary",
-          replace: "isBinary",
           flags: "g",
         },
       },
@@ -262,6 +286,12 @@ const config = {
     ],
   },
   optimization: {
+    // Disable ESM scope hoisting (ModuleConcatenationPlugin) for yeoman-environment.
+    // yeoman-environment v6 uses import.meta.url patterns that must be patched before bundling.
+    // With concatenation enabled, webpack merges all ESM modules into one block and our
+    // per-file loader patches may be overwritten by webpack's own ESM→CJS rewriting.
+    // Disabling concatenation forces each file through the full loader pipeline individually.
+    concatenateModules: false,
     minimizer: [
       (compiler) => {
         const TerserPlugin = require("terser-webpack-plugin");
@@ -279,5 +309,24 @@ const config = {
       },
     ],
   },
+  plugins: [
+    // yeoman-environment v6 is pure ESM. Several dist/ files use import.meta.url patterns
+    // that break when bundled as CJS:
+    //   - createRequire(import.meta.url)  → becomes createRequire(undefined) → throws
+    //   - fileURLToPath(import.meta.url)  → bakes build-machine absolute path into bundle → ENOENT on other machines
+    // Apply a single patch loader to all yeoman-environment dist files so the patches
+    // land regardless of webpack's ESM ModuleConcatenation processing order.
+    new webpack.NormalModuleReplacementPlugin(/yeoman-environment[/\\]dist[/\\].+\.js$/, (resolveData) => {
+      // NormalModuleReplacementPlugin passes the full resolveData object.
+      // Loaders are processed right-to-left (last in array runs first on raw source).
+      // We push (append) so our patch loader runs first on the raw ESM source,
+      // before string-replace-loader modifies require() calls.
+      const createData = resolveData.createData || resolveData;
+      createData.loaders = createData.loaders || [];
+      createData.loaders.push({
+        loader: require.resolve("./src/utils/yeoman-env-all-patch-loader.js"),
+      });
+    }),
+  ],
 };
 module.exports = config;

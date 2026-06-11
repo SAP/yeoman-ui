@@ -34,7 +34,7 @@ export class YeomanUIPanel extends AbstractWebviewPanel {
       } else {
         void yeomanUi._notifyGeneratorsInstall(this.installGens);
         if (isEmpty(this.installGens)) {
-          Env.loadNpmPath(true); // force to reload the env existing npm paths
+          Env.loadNpmPath();
           void yeomanUi._notifyGeneratorsChange();
           this.installGens = undefined;
         }

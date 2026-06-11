@@ -23,7 +23,9 @@
       "**/@sap-devx",
       "**/@sap-devx/**",
       "**/lerna",
-      "**/lerna/**"
+      "**/lerna/**",
+      "**/fly-import",
+      "**/fly-import/**"
     ]
   },
   "scripts": {
@@ -79,9 +81,9 @@
     "@types/lodash": "4.14.202",
     "@types/babel__traverse": "7.20.5",
     "@types/diff": "5.0.9",
-    "@types/yeoman-generator": "5.2.14",
-    "@types/mem-fs-editor": "7.0.7",
-    "mem-fs-editor": "9.7.0"
+    "@types/mem-fs-editor": "10.0.1",
+    "read-package-json-fast": "3.0.0",
+    "promise-inflight": "1.0.1"
   },
   "dependencies": {
     "@sap-devx/webview-rpc": "0.4.1",
@@ -92,15 +94,15 @@
     "@commitlint/config-conventional": "18.6.0",
     "@types/chai": "4.2.14",
     "@types/mocha": "8.2.0",
-    "@typescript-eslint/eslint-plugin": "5.28.0",
-    "@typescript-eslint/parser": "5.28.0",
+    "@typescript-eslint/eslint-plugin": "8.60.1",
+    "@typescript-eslint/parser": "8.60.1",
     "chai": "4.2.0",
     "conventional-changelog-cli": "^5.0.0",
     "cz-conventional-changelog": "3.3.0",
-    "eslint": "7.18.0",
-    "eslint-config-prettier": "7.2.0",
+    "eslint": "8.57.1",
+    "eslint-config-prettier": "9.1.0",
     "eslint-plugin-eslint-comments": "3.2.0",
-    "eslint-plugin-vue": "^7.3.0",
+    "eslint-plugin-vue": "^9.33.0",
     "glob": "^7.1.6",
     "husky": "9.0.10",
     "lerna": "9.0.3",
@@ -111,6 +113,6 @@
     "nyc": "15.1.0",
     "prettier": "3.2.5",
     "shx": "0.3.4",
-    "typescript": "~4.5.0"
+    "typescript": "~5.7.0"
   }
 }
