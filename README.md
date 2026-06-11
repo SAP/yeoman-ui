@@ -1,3 +1,6 @@
+> [!WARNING]
+> **This repository has moved to [SAP/app-studio-toolkit/projects/yeoman-ui](https://github.com/SAP/app-studio-toolkit/tree/main/projects/yeoman-ui).**
+
 [![Continuous Integration](https://github.com/SAP/yeoman-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/SAP/yeoman-ui/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/SAP/yeoman-ui/badge.svg?branch=master)](https://coveralls.io/github/SAP/yeoman-ui?branch=master)
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/SAP/yeoman-ui.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/SAP/yeoman-ui/context:javascript)
