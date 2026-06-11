@@ -29,18 +29,20 @@ module.exports = {
       parserOptions: {
         project: ["./tsconfig.base.json", "./tsconfig.json"],
       },
-      extends: [
-        "plugin:@typescript-eslint/eslint-recommended",
-        "plugin:@typescript-eslint/recommended-requiring-type-checking",
-      ],
+      extends: ["plugin:@typescript-eslint/eslint-recommended", "plugin:@typescript-eslint/recommended-type-checked"],
       rules: {
         semi: "error",
         "no-extra-semi": "error",
         "no-eval": "error",
         // TODO review each exclusion and fix issues if needed
-        "@typescript-eslint/interface-name-prefix": "off",
-        "@typescript-eslint/camelcase": "off",
         "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-require-imports": "off",
+        "@typescript-eslint/no-redundant-type-constituents": "off",
+        "@typescript-eslint/no-wrapper-object-types": "off",
+        "@typescript-eslint/no-unsafe-function-type": "off",
+        "@typescript-eslint/no-unused-expressions": "off",
+        "@typescript-eslint/no-misused-promises": "off",
+        "@typescript-eslint/no-unnecessary-type-assertion": "off",
         "@typescript-eslint/no-floating-promises": "error",
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-unsafe-assignment": "off",
@@ -49,7 +51,7 @@ module.exports = {
         "@typescript-eslint/no-unsafe-return": "off",
         "@typescript-eslint/restrict-template-expressions": "off",
         "@typescript-eslint/unbound-method": "off",
-        "@typescript-eslint/no-unused-vars": "error",
+        "@typescript-eslint/no-unused-vars": ["error", { caughtErrors: "none" }],
         "@typescript-eslint/no-unsafe-argument": "off",
         "no-async-promise-executor": "off",
         "no-irregular-whitespace": "off",
@@ -63,7 +65,7 @@ module.exports = {
       parser: "vue-eslint-parser",
       // Using the smaller vue rule subset (essential) to avoid including formatting rules
       // as formatting as handled by prettier **directly**.
-      extends: ["plugin:vue/essential"],
+      extends: ["plugin:vue/vue3-essential"],
     },
   ],
 };

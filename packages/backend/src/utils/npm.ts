@@ -9,7 +9,7 @@ import messages from "../messages";
 import { vscode } from "./vscodeProxy";
 import * as path from "path";
 import * as npmFetch from "npm-registry-fetch";
-import { LookupGeneratorMeta } from "yeoman-environment";
+import type { LookupGeneratorMeta } from "@yeoman/types";
 import { getConsoleWarnLogger } from "../logger/console-logger";
 import { Constants } from "./constants";
 import { spawn } from "child_process";

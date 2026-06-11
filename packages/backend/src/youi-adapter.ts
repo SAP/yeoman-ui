@@ -3,7 +3,7 @@ import { YouiEvents } from "./youi-events";
 const yoUiLog = require("./utils/log"); // eslint-disable-line @typescript-eslint/no-var-requires
 import { isFunction, get } from "lodash";
 const chalk = require("chalk");
-import { Questions } from "yeoman-environment/lib/adapter";
+import type { PromptQuestions, PromptAnswers } from "@yeoman/adapter/types";
 import { Output } from "./output";
 
 export class YouiAdapter {
@@ -39,7 +39,7 @@ export class YouiAdapter {
    * @param {Array} questions
    * @param {Function} callback
    */
-  public async prompt<T1, T2>(questions: Questions<T1>, cb?: (res: T1) => T2): Promise<T2> {
+  public async prompt<T1 extends PromptAnswers, T2>(questions: PromptQuestions<T1>, cb?: (res: T1) => T2): Promise<T2> {
     if (this.yeomanui && questions) {
       const result: any = await (this.yeomanui.showPrompt(questions) as Promise<T2>);
       if (isFunction(cb)) {
