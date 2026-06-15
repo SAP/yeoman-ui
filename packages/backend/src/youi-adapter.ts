@@ -66,4 +66,23 @@ export class YouiAdapter {
   public diff(): string {
     return "";
   }
+
+  // --- yeoman-environment v6 adapter interface ---
+  // These methods are required by Environment.start() and other lifecycle hooks.
+  // Without them, env.start() throws TypeError when error events are emitted
+  // or when the commit/transform phase runs.
+
+  public abort(): void {
+    // no-op: the UI handles generator failure via the error event propagation
+  }
+
+  public async onIdle(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  public async progress<T>(fn: (arg: { step: (...args: any[]) => void }) => Promise<T>): Promise<T> {
+    return fn({ step: () => undefined });
+  }
+
+  public signal?: AbortSignal = undefined;
 }

@@ -2,9 +2,71 @@ import * as _ from "lodash";
 import { NpmCommand } from "./npm";
 import * as customLocation from "./customLocation";
 import Environment, { createEnv, type EnvironmentOptions } from "yeoman-environment";
+import { create as createMemFsEditor } from "mem-fs-editor";
 import type { LookupGeneratorMeta } from "@yeoman/types";
 import { IChildLogger } from "@vscode-logging/logger";
 import { getClassLogger } from "../logger/logger-wrapper";
+
+// Inlined minimal implementations of requireNamespace / toNamespace from @yeoman/namespace.
+// @yeoman/namespace is ESM-only and cannot be imported in CJS test environments or reliably
+// dynamic-imported at runtime (the package is not present next to the bundled extension.js).
+// These two functions are all we need to shim onto the v6 env for yeoman-generator v5 compat.
+const _NS_REGEX = {
+  name: /^[a-z\d-~][a-z\d-._~]*$/,
+  semver: /^[a-z\d-. *+<=>^~]*$/,
+  method: /^[\dA-Za-z]\w*$/,
+};
+function _parseNamespace(complete: string): any {
+  if (typeof complete !== "string") throw new TypeError("Must be a string");
+  let cursor = 0;
+  const parsed: any = { complete, unscoped: "" };
+  if (complete.startsWith("@")) {
+    const sep = complete.indexOf("/");
+    if (sep === -1) return undefined;
+    parsed.scope = complete.slice(0, sep);
+    cursor = sep + 1;
+  }
+  const stopTokens = [":", "@", "#", "+", "?"];
+  let unscopedEnd = complete.length;
+  for (const t of stopTokens) {
+    const i = complete.indexOf(t, cursor);
+    if (i !== -1 && i < unscopedEnd) unscopedEnd = i;
+  }
+  const unscoped = complete.slice(cursor, unscopedEnd);
+  if (!_NS_REGEX.name.test(unscoped)) return undefined;
+  parsed.unscoped = unscoped;
+  cursor = unscopedEnd;
+  if (complete.charAt(cursor) === ":") {
+    cursor++;
+    const genStops = ["@", "#", "+", "?"];
+    let genEnd = complete.length;
+    for (const t of genStops) {
+      const i = complete.indexOf(t, cursor);
+      if (i !== -1 && i < genEnd) genEnd = i;
+    }
+    parsed.generator = complete.slice(cursor, genEnd);
+    cursor = genEnd;
+  }
+  // Build a YeomanNamespace-compatible object with a .with() method
+  return {
+    ...parsed,
+    with(newValues: any) {
+      return _parseNamespace(complete) ? { ..._parseNamespace(complete), ...newValues, with: this.with } : this;
+    },
+    toString() {
+      return complete;
+    },
+  };
+}
+function _requireNamespace(namespace: string): any {
+  const parsed = _parseNamespace(namespace);
+  if (!parsed) throw new Error(`Error parsing namespace ${namespace}`);
+  return parsed;
+}
+function _toNamespace(namespace: string | object): any {
+  if (namespace && (namespace as any).constructor?.name === "YeomanNamespace") return namespace;
+  return typeof namespace === "string" ? _parseNamespace(namespace) : undefined;
+}
 
 const GENERATOR = "generator-";
 const NAMESPACE = "namespace";
@@ -55,7 +117,29 @@ class EnvUtil {
   }
 
   private createEnvInstance(opts?: EnvironmentOptions, adapter?: any): Environment {
-    return createEnv({ ...opts, ...(adapter ? { adapter } : {}) });
+    const env = createEnv({ ...opts, ...(adapter ? { adapter } : {}) });
+    // Backward compat shims for old generators (yeoman-generator v5 and earlier)
+    // that call this.env.requireNamespace() / this.env.toNamespace() directly.
+    // These were env instance methods in yeoman-environment v3 but were removed in v6.
+    if (!(env as any).requireNamespace) {
+      (env as any).requireNamespace = _requireNamespace;
+    }
+    if (!(env as any).toNamespace) {
+      (env as any).toNamespace = _toNamespace;
+    }
+    // yeoman-generator v5 also checks for env.fs (a mem-fs-editor instance).
+    // yeoman-environment v6 only exposes env.sharedFs (raw mem-fs store).
+    if (!(env as any).fs) {
+      (env as any).fs = createMemFsEditor((env as any).sharedFs);
+    }
+    // env.error(err) was a v3 method that threw the error; removed in v6.
+    // Some generators (e.g. approuter, deployer) call this.env.error() in their abort handler.
+    if (!(env as any).error) {
+      (env as any).error = (err: any) => {
+        throw err instanceof Error ? err : new Error(String(err));
+      };
+    }
+    return env;
   }
 
   private unloadGeneratorModules(genNamespace: string): void {
